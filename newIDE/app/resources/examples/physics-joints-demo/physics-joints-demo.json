@@ -1,24 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PhysikTests\\Physics2JointsTest\\game.json",
+    "projectUuid": "3f68d1c4-784f-44c9-96f0-551507fb2fa7",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -31,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -262,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "972b3d8a-a38a-4939-9c89-c7b2ccb2c8a7",
           "width": 600,
           "x": 500,
           "y": 300,
@@ -277,6 +277,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "260b1203-a1b0-4ae8-a841-fb9e0e5f92d5",
           "width": 800,
           "x": 0,
           "y": 600,
@@ -292,6 +293,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "070efcf0-e3b3-4798-a877-813bcf08c666",
           "width": 600,
           "x": -33,
           "y": 300,
@@ -307,6 +309,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "8f4d4d2c-af51-472c-b7be-a17f615fabc2",
           "width": 800,
           "x": 0,
           "y": 450,
@@ -322,6 +325,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "3b15ec7a-5d5d-445a-a1c8-e4350383a311",
           "width": 600,
           "x": -300,
           "y": 300,
@@ -337,6 +341,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "352fd1f2-083b-4a02-985f-44354ccb9463",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -352,6 +357,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceBox",
+          "persistentUuid": "74ef59c6-dab3-4e92-bf29-aec3c72d6081",
           "width": 0,
           "x": 49,
           "y": 29,
@@ -367,6 +373,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceCircle",
+          "persistentUuid": "cd14bdcf-e64f-43c6-9c6d-a99dc3601388",
           "width": 0,
           "x": 170,
           "y": 93,
@@ -382,6 +389,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteBox",
+          "persistentUuid": "90816045-9b92-449d-b204-26a6b14e086c",
           "width": 0,
           "x": 299,
           "y": 63,
@@ -397,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteCircle",
+          "persistentUuid": "571a769a-6924-41ae-b124-30b2a5fa0cf5",
           "width": 0,
           "x": 342,
           "y": 107,
@@ -412,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "DistanceDraw",
+          "persistentUuid": "88827f06-53ed-46bd-9f72-613a07666193",
           "width": 0,
           "x": 126,
           "y": 20,
@@ -427,6 +437,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteDraw",
+          "persistentUuid": "850eaff6-a2ff-4e30-b399-4ee20eedb995",
           "width": 0,
           "x": 393,
           "y": 13,
@@ -442,6 +453,7 @@
           "layer": "",
           "locked": false,
           "name": "RevoluteBox2",
+          "persistentUuid": "eed66974-098d-45bc-aeb8-11cf577dc548",
           "width": 0,
           "x": 468,
           "y": 48,
@@ -457,6 +469,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticBox",
+          "persistentUuid": "3a84e604-4e61-4c79-ae0f-1a2285b7054f",
           "width": 0,
           "x": 46,
           "y": 254,
@@ -472,6 +485,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticCircle",
+          "persistentUuid": "dc80df8a-cef1-4e66-9a30-0dbdb00d8697",
           "width": 0,
           "x": 169,
           "y": 214,
@@ -487,6 +501,7 @@
           "layer": "",
           "locked": false,
           "name": "PrismaticDraw",
+          "persistentUuid": "7da945d8-05ba-4c1c-a1a5-5d4d2b9d4c71",
           "width": 0,
           "x": 120,
           "y": 165,
@@ -502,6 +517,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "fadec8e3-8ce2-43c2-8e76-49cfdc9749ec",
           "width": 800,
           "x": 0,
           "y": 150,
@@ -517,6 +533,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyBox",
+          "persistentUuid": "22d7b59f-6aaf-4fd2-9043-d28d4adc7915",
           "width": 0,
           "x": 315,
           "y": 195,
@@ -532,6 +549,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyCircle",
+          "persistentUuid": "2baece77-38f5-48e9-8e00-682a81b723b3",
           "width": 0,
           "x": 452,
           "y": 209,
@@ -547,6 +565,7 @@
           "layer": "",
           "locked": false,
           "name": "PulleyDraw",
+          "persistentUuid": "7bc45e2e-3c9e-4634-b765-358fbd196768",
           "width": 0,
           "x": 389,
           "y": 159,
@@ -562,6 +581,7 @@
           "layer": "",
           "locked": false,
           "name": "GearBox2",
+          "persistentUuid": "c866a86d-10a2-42b7-98fa-f7a659524704",
           "width": 0,
           "x": 191,
           "y": 408,
@@ -577,6 +597,7 @@
           "layer": "",
           "locked": false,
           "name": "GearDraw",
+          "persistentUuid": "b5fd7cb5-88e1-49c8-9b68-1fb920bc5911",
           "width": 0,
           "x": 119,
           "y": 314,
@@ -592,6 +613,7 @@
           "layer": "",
           "locked": false,
           "name": "GearBox1",
+          "persistentUuid": "5c1cff62-475f-4876-8a8b-8eeb4568c77d",
           "width": 0,
           "x": 194,
           "y": 315,
@@ -607,6 +629,7 @@
           "layer": "",
           "locked": false,
           "name": "GearCircle1",
+          "persistentUuid": "7a435764-08ae-43d5-8ee8-206316d7a014",
           "width": 0,
           "x": 192,
           "y": 408,
@@ -622,6 +645,7 @@
           "layer": "",
           "locked": false,
           "name": "GearCircle2",
+          "persistentUuid": "0da07c42-c845-4c78-b053-2800c808608a",
           "width": 0,
           "x": 28,
           "y": 328,
@@ -637,6 +661,7 @@
           "layer": "",
           "locked": false,
           "name": "MouseBox",
+          "persistentUuid": "a72e8109-7bf3-4017-a74a-0d433f6dd39b",
           "width": 0,
           "x": 384,
           "y": 371,
@@ -652,6 +677,7 @@
           "layer": "",
           "locked": false,
           "name": "MouseDraw",
+          "persistentUuid": "afa2c0c7-edb5-4b0b-b597-49a879e3a6ed",
           "width": 0,
           "x": 389,
           "y": 311,
@@ -667,6 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "2bb6d422-c94e-4432-95d2-f842eab889fc",
           "width": 600,
           "x": 233,
           "y": 300,
@@ -682,6 +709,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelBox",
+          "persistentUuid": "a040ad36-55c5-4607-b8f7-929ee26339d9",
           "width": 64,
           "x": 628,
           "y": 64,
@@ -697,6 +725,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelCircle1",
+          "persistentUuid": "e8a4f2de-92fb-450a-9b35-0dd26f14bdfa",
           "width": 0,
           "x": 614,
           "y": 102,
@@ -712,6 +741,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelDraw",
+          "persistentUuid": "60e82412-7f6a-4ca9-94e0-daef2cc5f700",
           "width": 0,
           "x": 648,
           "y": 11,
@@ -727,6 +757,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldBox",
+          "persistentUuid": "666408f6-b8bc-4a45-a4c9-d3b24c9ee894",
           "width": 0,
           "x": 645,
           "y": 220,
@@ -742,6 +773,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldCircle2",
+          "persistentUuid": "5c881432-0ec8-4952-bcb6-9a9cfde45343",
           "width": 0,
           "x": 605,
           "y": 251,
@@ -757,6 +789,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldCircle1",
+          "persistentUuid": "1f065f22-4883-4d59-8581-4ffaee748ca7",
           "width": 0,
           "x": 687,
           "y": 250,
@@ -772,6 +805,7 @@
           "layer": "",
           "locked": false,
           "name": "WeldDraw",
+          "persistentUuid": "e318d286-a01d-4a8b-8e3f-72463739b887",
           "width": 0,
           "x": 650,
           "y": 165,
@@ -787,6 +821,7 @@
           "layer": "",
           "locked": false,
           "name": "WheelCircle2",
+          "persistentUuid": "029d6981-bb37-4b3b-bc55-9fe104741985",
           "width": 0,
           "x": 673,
           "y": 102,
@@ -802,6 +837,7 @@
           "layer": "",
           "locked": false,
           "name": "Walls",
+          "persistentUuid": "21642b59-df52-4fe2-bf44-3772760dbd68",
           "width": 800,
           "x": 0,
           "y": 300,
@@ -817,6 +853,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorDraw",
+          "persistentUuid": "555aa1d9-12d9-49a7-984d-af3e66fe85d6",
           "width": 0,
           "x": 383,
           "y": 465,
@@ -832,6 +869,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorBox1",
+          "persistentUuid": "22c96a49-41ff-4ac6-9259-4ca569b76d8a",
           "width": 0,
           "x": 293,
           "y": 474,
@@ -847,6 +885,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorBox2",
+          "persistentUuid": "af9615bc-8cbd-4122-8b19-30d5315b0bfd",
           "width": 0,
           "x": 358,
           "y": 515,
@@ -862,6 +901,7 @@
           "layer": "",
           "locked": false,
           "name": "MotorCircle",
+          "persistentUuid": "2a413b79-0028-4edc-aebb-768ee0c92854",
           "width": 0,
           "x": 469,
           "y": 547,
@@ -877,6 +917,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeDraw",
+          "persistentUuid": "60fa99a2-c605-4a83-ac68-4226a0c48e4f",
           "width": 0,
           "x": 650,
           "y": 315,
@@ -892,6 +933,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeBox",
+          "persistentUuid": "5e15b6d3-8843-48d2-b565-2aed65df7777",
           "width": 0,
           "x": 575,
           "y": 333,
@@ -907,6 +949,7 @@
           "layer": "",
           "locked": false,
           "name": "RopeCircle",
+          "persistentUuid": "a2862457-144f-4ec6-ba1a-af5d1354839c",
           "width": 0,
           "x": 714,
           "y": 400,
@@ -922,6 +965,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionBox",
+          "persistentUuid": "bfdcb2c2-18ab-48dd-a96e-63756784cfcd",
           "width": 100,
           "x": 82,
           "y": 480,
@@ -937,6 +981,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionDraw",
+          "persistentUuid": "9464ece4-a0cd-4e1a-900b-5f500e44b876",
           "width": 0,
           "x": 114,
           "y": 465,
@@ -952,6 +997,7 @@
           "layer": "",
           "locked": false,
           "name": "FrictionCircle",
+          "persistentUuid": "8c87f3a8-5b43-4877-8400-ef3a0bfe9dc4",
           "width": 0,
           "x": 25,
           "y": 491,
@@ -967,6 +1013,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableBox1",
+          "persistentUuid": "c1fefb63-74d8-4e20-958e-35f72d832072",
           "width": 96,
           "x": 570,
           "y": 535,
@@ -982,6 +1029,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableBox2",
+          "persistentUuid": "a18c4d62-eb7c-4712-b81b-111561a7c97f",
           "width": 96,
           "x": 654,
           "y": 535,
@@ -997,6 +1045,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle1",
+          "persistentUuid": "56e19726-dfab-4315-a126-4cf92c8d1915",
           "width": 16,
           "x": 570,
           "y": 576,
@@ -1012,6 +1061,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle2",
+          "persistentUuid": "de7e7b82-67f3-4001-9416-4dd16e802126",
           "width": 24,
           "x": 625,
           "y": 567,
@@ -1027,6 +1077,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableCircle3",
+          "persistentUuid": "a6064d4a-c14b-4877-a808-1964ea15d68d",
           "width": 0,
           "x": 688,
           "y": 561,
@@ -1042,6 +1093,7 @@
           "layer": "",
           "locked": false,
           "name": "BreakableDraw",
+          "persistentUuid": "2d478d96-c924-43e1-83f0-0eab87a5f3d5",
           "width": 0,
           "x": 651,
           "y": 461,
@@ -1054,6 +1106,7 @@
       "objects": [
         {
           "name": "Walls",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1061,24 +1114,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Edge",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 3
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Edge",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 3,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -1115,6 +1166,7 @@
         },
         {
           "name": "DistanceBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1122,24 +1174,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1182,6 +1232,7 @@
         },
         {
           "name": "DistanceCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1189,24 +1240,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1249,6 +1298,7 @@
         },
         {
           "name": "DistanceDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1265,10 +1315,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RevoluteBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1276,24 +1328,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1336,6 +1386,7 @@
         },
         {
           "name": "RevoluteCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1343,24 +1394,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1403,6 +1452,7 @@
         },
         {
           "name": "RevoluteBox2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1410,24 +1460,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1470,6 +1518,7 @@
         },
         {
           "name": "RevoluteDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1486,10 +1535,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PrismaticBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1497,24 +1548,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1557,6 +1606,7 @@
         },
         {
           "name": "PrismaticCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1564,24 +1614,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1624,6 +1672,7 @@
         },
         {
           "name": "PrismaticDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1640,10 +1689,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "PulleyBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1651,24 +1702,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1711,6 +1760,7 @@
         },
         {
           "name": "PulleyCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1718,24 +1768,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1778,6 +1826,7 @@
         },
         {
           "name": "PulleyDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -1794,10 +1843,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "GearBox1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1805,24 +1856,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1865,6 +1914,7 @@
         },
         {
           "name": "GearBox2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1872,24 +1922,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -1932,6 +1980,7 @@
         },
         {
           "name": "GearCircle1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1939,24 +1988,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -1999,6 +2046,7 @@
         },
         {
           "name": "GearCircle2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2006,24 +2054,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2066,6 +2112,7 @@
         },
         {
           "name": "GearDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2082,10 +2129,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MouseBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2093,24 +2142,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2153,6 +2200,7 @@
         },
         {
           "name": "MouseDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2169,10 +2217,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WheelBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2180,24 +2230,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2245,6 +2293,7 @@
         },
         {
           "name": "WheelCircle1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2252,24 +2301,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2312,6 +2359,7 @@
         },
         {
           "name": "WheelCircle2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2319,24 +2367,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2379,6 +2425,7 @@
         },
         {
           "name": "WheelDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2395,10 +2442,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "WeldBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2406,24 +2455,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2471,6 +2518,7 @@
         },
         {
           "name": "WeldCircle1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2478,24 +2526,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2538,6 +2584,7 @@
         },
         {
           "name": "WeldCircle2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2545,24 +2592,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 2,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 2,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2605,6 +2650,7 @@
         },
         {
           "name": "WeldDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2621,10 +2667,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "RopeBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2632,24 +2680,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2692,6 +2738,7 @@
         },
         {
           "name": "RopeCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2699,24 +2746,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2759,6 +2804,7 @@
         },
         {
           "name": "RopeDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2775,10 +2821,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "FrictionBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2786,24 +2834,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -2851,6 +2897,7 @@
         },
         {
           "name": "FrictionCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2858,24 +2905,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 0,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 0,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -2918,6 +2963,7 @@
         },
         {
           "name": "FrictionDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2934,10 +2980,12 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "MotorBox1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -2945,24 +2993,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3010,6 +3056,7 @@
         },
         {
           "name": "MotorBox2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3017,24 +3064,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -3082,6 +3127,7 @@
         },
         {
           "name": "MotorCircle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3089,24 +3135,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3149,6 +3193,7 @@
         },
         {
           "name": "MotorDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -3165,10 +3210,12 @@
             "g": 255,
             "r": 255
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "BreakableBox1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3176,24 +3223,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3241,6 +3286,7 @@
         },
         {
           "name": "BreakableBox2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3248,24 +3294,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3313,6 +3357,7 @@
         },
         {
           "name": "BreakableCircle1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3320,24 +3365,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 0.5,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 0.5,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3380,6 +3423,7 @@
         },
         {
           "name": "BreakableCircle2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3387,24 +3431,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3447,6 +3489,7 @@
         },
         {
           "name": "BreakableCircle3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3454,24 +3497,22 @@
             {
               "name": "Physics2Behavior",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "density": 2,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "density": 2,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -3514,6 +3555,7 @@
         },
         {
           "name": "BreakableDraw",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -3530,7 +3572,8 @@
             "g": 200,
             "r": 200
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         }
       ],
       "events": [
@@ -3607,11 +3650,11 @@
                       "parameters": [
                         "DistanceBox",
                         "Physics2Behavior",
-                        "DistanceBox.PointX(Anchor)",
-                        "DistanceBox.PointY(Anchor)",
+                        "DistanceBox.PointX(\"Anchor\")",
+                        "DistanceBox.PointY(\"Anchor\")",
                         "DistanceCircle",
-                        "DistanceCircle.PointX(Anchor)",
-                        "DistanceCircle.PointY(Anchor)",
+                        "DistanceCircle.PointX(\"Anchor\")",
+                        "DistanceCircle.PointY(\"Anchor\")",
                         "60",
                         "2",
                         "0.05",
@@ -3652,11 +3695,11 @@
                       "parameters": [
                         "RevoluteBox",
                         "Physics2Behavior",
-                        "RevoluteBox.PointX(Anchor)",
-                        "RevoluteBox.PointY(Anchor)",
+                        "RevoluteBox.PointX(\"Anchor\")",
+                        "RevoluteBox.PointY(\"Anchor\")",
                         "RevoluteCircle",
-                        "RevoluteCircle.PointX(Anchor)",
-                        "RevoluteCircle.PointY(Anchor)",
+                        "RevoluteCircle.PointX(\"Anchor\")",
+                        "RevoluteCircle.PointY(\"Anchor\")",
                         "yes",
                         "0",
                         "-15",
@@ -3677,8 +3720,8 @@
                       "parameters": [
                         "RevoluteBox2",
                         "Physics2Behavior",
-                        "RevoluteBox2.PointX(Anchor)",
-                        "RevoluteBox2.PointY(Anchor)",
+                        "RevoluteBox2.PointX(\"Anchor\")",
+                        "RevoluteBox2.PointY(\"Anchor\")",
                         "no",
                         "",
                         "",
@@ -3722,11 +3765,11 @@
                       "parameters": [
                         "PrismaticBox",
                         "Physics2Behavior",
-                        "PrismaticBox.PointX(Anchor)",
-                        "PrismaticBox.PointY(Anchor)",
+                        "PrismaticBox.PointX(\"Anchor\")",
+                        "PrismaticBox.PointY(\"Anchor\")",
                         "PrismaticCircle",
-                        "PrismaticCircle.PointX(Anchor)",
-                        "PrismaticCircle.PointY(Anchor)",
+                        "PrismaticCircle.PointX(\"Anchor\")",
+                        "PrismaticCircle.PointY(\"Anchor\")",
                         "45",
                         "0",
                         "yes",
@@ -3772,7 +3815,7 @@
                       "parameters": [
                         "pulleyAnchorX1",
                         "=",
-                        "PulleyBox.PointX(Centre)"
+                        "PulleyBox.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     },
@@ -3784,7 +3827,7 @@
                       "parameters": [
                         "pulleyAnchorY1",
                         "=",
-                        "PulleyBox.PointY(Centre) - 40"
+                        "PulleyBox.PointY(\"Centre\") - 40"
                       ],
                       "subInstructions": []
                     },
@@ -3796,7 +3839,7 @@
                       "parameters": [
                         "pulleyAnchorX2",
                         "=",
-                        "PulleyCircle.PointX(Centre)"
+                        "PulleyCircle.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     },
@@ -3808,7 +3851,7 @@
                       "parameters": [
                         "pulleyAnchorY2",
                         "=",
-                        "PulleyCircle.PointY(Centre) - 70"
+                        "PulleyCircle.PointY(\"Centre\") - 70"
                       ],
                       "subInstructions": []
                     },
@@ -3820,11 +3863,11 @@
                       "parameters": [
                         "PulleyBox",
                         "Physics2Behavior",
-                        "PulleyBox.PointX(Anchor)",
-                        "PulleyBox.PointY(Anchor)",
+                        "PulleyBox.PointX(\"Anchor\")",
+                        "PulleyBox.PointY(\"Anchor\")",
                         "PulleyCircle",
-                        "PulleyCircle.PointX(Anchor)",
-                        "PulleyCircle.PointY(Anchor)",
+                        "PulleyCircle.PointX(\"Anchor\")",
+                        "PulleyCircle.PointY(\"Anchor\")",
                         "Variable(pulleyAnchorX1)",
                         "Variable(pulleyAnchorY1)",
                         "Variable(pulleyAnchorX2)",
@@ -3869,11 +3912,11 @@
                       "parameters": [
                         "GearBox2",
                         "Physics2Behavior",
-                        "GearBox2.PointX(Centre)",
-                        "GearBox2.PointY(Centre)",
+                        "GearBox2.PointX(\"Centre\")",
+                        "GearBox2.PointY(\"Centre\")",
                         "GearBox1",
-                        "GearBox1.PointX(Centre)",
-                        "GearBox1.PointY(Centre)",
+                        "GearBox1.PointX(\"Centre\")",
+                        "GearBox1.PointY(\"Centre\")",
                         "-90",
                         "",
                         "no",
@@ -3895,11 +3938,11 @@
                       "parameters": [
                         "GearBox2",
                         "Physics2Behavior",
-                        "GearBox2.PointX(Centre)",
-                        "GearBox2.PointY(Centre)",
+                        "GearBox2.PointX(\"Centre\")",
+                        "GearBox2.PointY(\"Centre\")",
                         "GearCircle1",
-                        "GearCircle1.PointX(Centre)",
-                        "GearCircle1.PointY(Centre)",
+                        "GearCircle1.PointX(\"Centre\")",
+                        "GearCircle1.PointY(\"Centre\")",
                         "no",
                         "",
                         "",
@@ -3920,8 +3963,8 @@
                       "parameters": [
                         "GearCircle2",
                         "Physics2Behavior",
-                        "GearCircle2.PointX(Centre)",
-                        "GearCircle2.PointY(Centre)",
+                        "GearCircle2.PointX(\"Centre\")",
+                        "GearCircle2.PointY(\"Centre\")",
                         "no",
                         "",
                         "",
@@ -3997,11 +4040,11 @@
                       "parameters": [
                         "WheelBox",
                         "Physics2Behavior",
-                        "WheelBox.PointX(Anchor1)",
-                        "WheelBox.PointY(Anchor1)",
+                        "WheelBox.PointX(\"Anchor1\")",
+                        "WheelBox.PointY(\"Anchor1\")",
                         "WheelCircle1",
-                        "WheelCircle1.PointX(Centre)",
-                        "WheelCircle1.PointY(Centre)",
+                        "WheelCircle1.PointX(\"Centre\")",
+                        "WheelCircle1.PointY(\"Centre\")",
                         "100",
                         "5",
                         "0.1",
@@ -4021,11 +4064,11 @@
                       "parameters": [
                         "WheelBox",
                         "Physics2Behavior",
-                        "WheelBox.PointX(Anchor2)",
-                        "WheelBox.PointY(Anchor2)",
+                        "WheelBox.PointX(\"Anchor2\")",
+                        "WheelBox.PointY(\"Anchor2\")",
                         "WheelCircle2",
-                        "WheelCircle2.PointX(Centre)",
-                        "WheelCircle2.PointY(Centre)",
+                        "WheelCircle2.PointX(\"Centre\")",
+                        "WheelCircle2.PointY(\"Centre\")",
                         "80",
                         "6",
                         "0.9",
@@ -4069,11 +4112,11 @@
                       "parameters": [
                         "WeldBox",
                         "Physics2Behavior",
-                        "WeldBox.PointX(Anchor1)",
-                        "WeldBox.PointY(Anchor1)",
+                        "WeldBox.PointX(\"Anchor1\")",
+                        "WeldBox.PointY(\"Anchor1\")",
                         "WeldCircle1",
-                        "WeldCircle1.PointX(Centre)",
-                        "WeldCircle1.PointY(Centre)",
+                        "WeldCircle1.PointX(\"Centre\")",
+                        "WeldCircle1.PointY(\"Centre\")",
                         "",
                         "",
                         "",
@@ -4090,11 +4133,11 @@
                       "parameters": [
                         "WeldBox",
                         "Physics2Behavior",
-                        "WeldBox.PointX(Anchor2)",
-                        "WeldBox.PointY(Anchor2)",
+                        "WeldBox.PointX(\"Anchor2\")",
+                        "WeldBox.PointY(\"Anchor2\")",
                         "WeldCircle2",
-                        "WeldCircle2.PointX(Centre)",
-                        "WeldCircle2.PointY(Centre)",
+                        "WeldCircle2.PointX(\"Centre\")",
+                        "WeldCircle2.PointY(\"Centre\")",
                         "",
                         "",
                         "",
@@ -4158,11 +4201,11 @@
                       "parameters": [
                         "RopeBox",
                         "Physics2Behavior",
-                        "RopeBox.PointX(Anchor)",
-                        "RopeBox.PointY(Anchor)",
+                        "RopeBox.PointX(\"Anchor\")",
+                        "RopeBox.PointY(\"Anchor\")",
                         "RopeCircle",
-                        "RopeCircle.PointX(Anchor)",
-                        "RopeCircle.PointY(Anchor)",
+                        "RopeCircle.PointX(\"Anchor\")",
+                        "RopeCircle.PointY(\"Anchor\")",
                         "100",
                         "yes",
                         ""
@@ -4201,11 +4244,11 @@
                       "parameters": [
                         "FrictionBox",
                         "Physics2Behavior",
-                        "FrictionBox.PointX(Centre)",
-                        "FrictionBox.PointY(Centre)",
+                        "FrictionBox.PointX(\"Centre\")",
+                        "FrictionBox.PointY(\"Centre\")",
                         "FrictionCircle",
-                        "FrictionCircle.PointX(Centre) + 16",
-                        "FrictionCircle.PointY(Centre)",
+                        "FrictionCircle.PointX(\"Centre\") + 16",
+                        "FrictionCircle.PointY(\"Centre\")",
                         "0.5",
                         "0.01",
                         "no",
@@ -4309,8 +4352,8 @@
                       "parameters": [
                         "BreakableBox1",
                         "Physics2Behavior",
-                        "BreakableBox1.PointX(Anchor1)",
-                        "BreakableBox1.PointY(Anchor1)",
+                        "BreakableBox1.PointX(\"Anchor1\")",
+                        "BreakableBox1.PointY(\"Anchor1\")",
                         "yes",
                         "",
                         "0",
@@ -4330,8 +4373,8 @@
                       "parameters": [
                         "BreakableBox2",
                         "Physics2Behavior",
-                        "BreakableBox2.PointX(Anchor1)",
-                        "BreakableBox2.PointY(Anchor1)",
+                        "BreakableBox2.PointX(\"Anchor1\")",
+                        "BreakableBox2.PointY(\"Anchor1\")",
                         "yes",
                         "",
                         "-90",
@@ -4351,11 +4394,11 @@
                       "parameters": [
                         "BreakableBox1",
                         "Physics2Behavior",
-                        "BreakableBox1.PointX(Anchor2)",
-                        "BreakableBox1.PointY(Anchor2)",
+                        "BreakableBox1.PointX(\"Anchor2\")",
+                        "BreakableBox1.PointY(\"Anchor2\")",
                         "BreakableBox2",
-                        "BreakableBox2.PointX(Anchor2)",
-                        "BreakableBox2.PointY(Anchor2)",
+                        "BreakableBox2.PointX(\"Anchor2\")",
+                        "BreakableBox2.PointY(\"Anchor2\")",
                         "no",
                         "",
                         "",
@@ -4827,7 +4870,7 @@
                     "Draggable",
                     "Physics2Behavior",
                     "=",
-                    "10*(MouseX(\"\",0) - Draggable.PointX(Centre))"
+                    "10*(MouseX(\"\",0) - Draggable.PointX(\"Centre\"))"
                   ],
                   "subInstructions": []
                 },
@@ -4840,7 +4883,7 @@
                     "Draggable",
                     "Physics2Behavior",
                     "=",
-                    "10*(MouseY(\"\",0) - Draggable.PointY(Centre))"
+                    "10*(MouseY(\"\",0) - Draggable.PointY(\"Centre\"))"
                   ],
                   "subInstructions": []
                 }
@@ -4940,10 +4983,10 @@
                   },
                   "parameters": [
                     "DistanceDraw",
-                    "DistanceBox.PointX(Anchor)",
-                    "DistanceBox.PointY(Anchor)",
-                    "DistanceCircle.PointX(Anchor)",
-                    "DistanceCircle.PointY(Anchor)",
+                    "DistanceBox.PointX(\"Anchor\")",
+                    "DistanceBox.PointY(\"Anchor\")",
+                    "DistanceCircle.PointX(\"Anchor\")",
+                    "DistanceCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -4975,10 +5018,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 30*cos(atan2(RevoluteCircle.PointY(Centre) - RevoluteBox.PointY(Anchor), RevoluteCircle.PointX(Centre) - RevoluteBox.PointX(Anchor)))",
-                    "RevoluteBox.PointY(Anchor) + 30*sin(atan2(RevoluteCircle.PointY(Centre) - RevoluteBox.PointY(Anchor), RevoluteCircle.PointX(Centre) - RevoluteBox.PointX(Anchor)))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 30*cos(atan2(RevoluteCircle.PointY(\"Centre\") - RevoluteBox.PointY(\"Anchor\"), RevoluteCircle.PointX(\"Centre\") - RevoluteBox.PointX(\"Anchor\")))",
+                    "RevoluteBox.PointY(\"Anchor\") + 30*sin(atan2(RevoluteCircle.PointY(\"Centre\") - RevoluteBox.PointY(\"Anchor\"), RevoluteCircle.PointX(\"Centre\") - RevoluteBox.PointX(\"Anchor\")))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5001,10 +5044,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 20*cos(ToRad(RevoluteBox.Angle() - 15))",
-                    "RevoluteBox.PointY(Anchor) + 20*sin(ToRad(RevoluteBox.Angle() - 15))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 20*cos(ToRad(RevoluteBox.Angle() - 15))",
+                    "RevoluteBox.PointY(\"Anchor\") + 20*sin(ToRad(RevoluteBox.Angle() - 15))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5027,10 +5070,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 20*cos(ToRad(RevoluteBox.Angle() + 45))",
-                    "RevoluteBox.PointY(Anchor) + 20*sin(ToRad(RevoluteBox.Angle() + 45))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 20*cos(ToRad(RevoluteBox.Angle() + 45))",
+                    "RevoluteBox.PointY(\"Anchor\") + 20*sin(ToRad(RevoluteBox.Angle() + 45))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5053,8 +5096,8 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5077,8 +5120,8 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox2.PointX(Anchor)",
-                    "RevoluteBox2.PointY(Anchor)",
+                    "RevoluteBox2.PointX(\"Anchor\")",
+                    "RevoluteBox2.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5110,10 +5153,10 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor) - 40*cos(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointY(Anchor) - 40*sin(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointX(Anchor) + 80*cos(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointY(Anchor) + 80*sin(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointX(\"Anchor\") - 40*cos(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointY(\"Anchor\") - 40*sin(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointX(\"Anchor\") + 80*cos(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointY(\"Anchor\") + 80*sin(ToRad(PrismaticBox.Angle() + 45))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5136,10 +5179,10 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor)",
-                    "PrismaticBox.PointY(Anchor)",
-                    "PrismaticCircle.PointX(Anchor)",
-                    "PrismaticCircle.PointY(Anchor)",
+                    "PrismaticBox.PointX(\"Anchor\")",
+                    "PrismaticBox.PointY(\"Anchor\")",
+                    "PrismaticCircle.PointX(\"Anchor\")",
+                    "PrismaticCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5162,8 +5205,8 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor)",
-                    "PrismaticBox.PointY(Anchor)",
+                    "PrismaticBox.PointX(\"Anchor\")",
+                    "PrismaticBox.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5175,8 +5218,8 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticCircle.PointX(Anchor)",
-                    "PrismaticCircle.PointY(Anchor)",
+                    "PrismaticCircle.PointX(\"Anchor\")",
+                    "PrismaticCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5197,8 +5240,8 @@
                   },
                   "parameters": [
                     "PulleyDraw",
-                    "PulleyBox.PointX(Anchor)",
-                    "PulleyBox.PointY(Anchor)",
+                    "PulleyBox.PointX(\"Anchor\")",
+                    "PulleyBox.PointY(\"Anchor\")",
                     "Variable(pulleyAnchorX1)",
                     "Variable(pulleyAnchorY1)",
                     "2"
@@ -5229,8 +5272,8 @@
                     "PulleyDraw",
                     "Variable(pulleyAnchorX2)",
                     "Variable(pulleyAnchorY2)",
-                    "PulleyCircle.PointX(Anchor)",
-                    "PulleyCircle.PointY(Anchor)",
+                    "PulleyCircle.PointX(\"Anchor\")",
+                    "PulleyCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5251,10 +5294,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearBox1.PointX(Centre)",
-                    "GearBox1.PointY(Centre)",
-                    "GearBox2.PointX(Centre)",
-                    "GearBox2.PointY(Centre)",
+                    "GearBox1.PointX(\"Centre\")",
+                    "GearBox1.PointY(\"Centre\")",
+                    "GearBox2.PointX(\"Centre\")",
+                    "GearBox2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5266,10 +5309,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearBox2.PointX(Centre)",
-                    "GearBox2.PointY(Centre)",
-                    "GearCircle1.PointX(Centre)",
-                    "GearCircle1.PointY(Centre)",
+                    "GearBox2.PointX(\"Centre\")",
+                    "GearBox2.PointY(\"Centre\")",
+                    "GearCircle1.PointX(\"Centre\")",
+                    "GearCircle1.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5281,10 +5324,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearCircle1.PointX(Centre)",
-                    "GearCircle1.PointY(Centre)",
-                    "GearCircle2.PointX(Centre)",
-                    "GearCircle2.PointY(Centre)",
+                    "GearCircle1.PointX(\"Centre\")",
+                    "GearCircle1.PointY(\"Centre\")",
+                    "GearCircle2.PointX(\"Centre\")",
+                    "GearCircle2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5305,10 +5348,10 @@
                   },
                   "parameters": [
                     "WheelDraw",
-                    "WheelBox.PointX(Anchor1)",
-                    "WheelBox.PointY(Anchor1)",
-                    "WheelCircle1.PointX(Centre)",
-                    "WheelCircle1.PointY(Centre)",
+                    "WheelBox.PointX(\"Anchor1\")",
+                    "WheelBox.PointY(\"Anchor1\")",
+                    "WheelCircle1.PointX(\"Centre\")",
+                    "WheelCircle1.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5320,10 +5363,10 @@
                   },
                   "parameters": [
                     "WheelDraw",
-                    "WheelBox.PointX(Anchor2)",
-                    "WheelBox.PointY(Anchor2)",
-                    "WheelCircle2.PointX(Centre)",
-                    "WheelCircle2.PointY(Centre)",
+                    "WheelBox.PointX(\"Anchor2\")",
+                    "WheelBox.PointY(\"Anchor2\")",
+                    "WheelCircle2.PointX(\"Centre\")",
+                    "WheelCircle2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5344,8 +5387,8 @@
                   },
                   "parameters": [
                     "WeldDraw",
-                    "WeldBox.PointX(Anchor1)",
-                    "WeldBox.PointY(Anchor1)",
+                    "WeldBox.PointX(\"Anchor1\")",
+                    "WeldBox.PointY(\"Anchor1\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5357,8 +5400,8 @@
                   },
                   "parameters": [
                     "WeldDraw",
-                    "WeldBox.PointX(Anchor2)",
-                    "WeldBox.PointY(Anchor2)",
+                    "WeldBox.PointX(\"Anchor2\")",
+                    "WeldBox.PointY(\"Anchor2\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5379,10 +5422,10 @@
                   },
                   "parameters": [
                     "RopeDraw",
-                    "RopeBox.PointX(Centre)",
-                    "RopeBox.PointY(Centre)",
-                    "RopeCircle.PointX(Centre)",
-                    "RopeCircle.PointY(Centre)",
+                    "RopeBox.PointX(\"Centre\")",
+                    "RopeBox.PointY(\"Centre\")",
+                    "RopeCircle.PointX(\"Centre\")",
+                    "RopeCircle.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5403,10 +5446,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre)",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox2.PointX(Centre) + 50",
-                    "MotorBox2.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\")",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox2.PointX(\"Centre\") + 50",
+                    "MotorBox2.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5418,10 +5461,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre) + 50",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox1.PointX(Centre)",
-                    "MotorBox1.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\") + 50",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox1.PointX(\"Centre\")",
+                    "MotorBox1.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5433,10 +5476,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre)",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox2.PointX(Centre) + 70",
-                    "MotorBox2.PointY(Centre) + 30",
+                    "MotorBox2.PointX(\"Centre\")",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox2.PointX(\"Centre\") + 70",
+                    "MotorBox2.PointY(\"Centre\") + 30",
                     "1"
                   ],
                   "subInstructions": []
@@ -5448,10 +5491,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre) + 70",
-                    "MotorBox2.PointY(Centre) + 30",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\") + 70",
+                    "MotorBox2.PointY(\"Centre\") + 30",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5463,10 +5506,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
-                    "MotorCircle.PointX(Centre) + 30*cos(ToRad(MotorCircle.Angle()))",
-                    "MotorCircle.PointY(Centre) + 30*sin(ToRad(MotorCircle.Angle()))",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
+                    "MotorCircle.PointX(\"Centre\") + 30*cos(ToRad(MotorCircle.Angle()))",
+                    "MotorCircle.PointY(\"Centre\") + 30*sin(ToRad(MotorCircle.Angle()))",
                     "1"
                   ],
                   "subInstructions": []
@@ -5478,10 +5521,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
-                    "MotorCircle.PointX(Centre) + 30*cos(ToRad(MotorBox2.Angle() + 45))",
-                    "MotorCircle.PointY(Centre) + 30*sin(ToRad(MotorBox2.Angle() + 45))",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
+                    "MotorCircle.PointX(\"Centre\") + 30*cos(ToRad(MotorBox2.Angle() + 45))",
+                    "MotorCircle.PointY(\"Centre\") + 30*sin(ToRad(MotorBox2.Angle() + 45))",
                     "1"
                   ],
                   "subInstructions": []
@@ -5502,10 +5545,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionBox.PointX(Centre)",
-                    "FrictionBox.PointY(Centre)",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionBox.PointX(\"Centre\")",
+                    "FrictionBox.PointY(\"Centre\")",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5517,10 +5560,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionBox.PointX(Centre)",
-                    "FrictionBox.PointY(Centre)",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionBox.PointX(\"Centre\")",
+                    "FrictionBox.PointY(\"Centre\")",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5532,10 +5575,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointX(Centre)",
-                    "FrictionCircle.PointY(Centre)",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointX(\"Centre\")",
+                    "FrictionCircle.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5567,10 +5610,10 @@
                   },
                   "parameters": [
                     "BreakableDraw",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1)",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1) - BreakableBox1.Physics2Behavior::JointReactionForce(Variable(breakableJoint))",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\")",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\") - BreakableBox1.Physics2Behavior::JointReactionForce(Variable(breakableJoint))",
                     "3"
                   ],
                   "subInstructions": []
@@ -5593,8 +5636,8 @@
                   },
                   "parameters": [
                     "BreakableDraw",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1) - 50",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\") - 50",
                     "2"
                   ],
                   "subInstructions": []
@@ -5608,6 +5651,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -5629,12 +5677,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }

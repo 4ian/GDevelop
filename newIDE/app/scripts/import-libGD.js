@@ -31,9 +31,9 @@ const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
 const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
 const alreadyHasLibGdJs =
   shell.test('-f', '../public/libGD.js') &&
-  shell.test('-f', '../public/libGD.js.mem') &&
+  shell.test('-f', '../public/libGD.wasm') &&
   shell.test('-f', destinationTestDirectory + '/index.js') &&
-  shell.test('-f', destinationTestDirectory + '/libGD.js.mem');
+  shell.test('-f', destinationTestDirectory + '/libGD.wasm');
 
 if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
@@ -107,7 +107,7 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
   const downloadLibGdJs = baseUrl =>
     Promise.all([
       downloadFile(baseUrl + '/libGD.js', '../public/libGD.js'),
-      downloadFile(baseUrl + '/libGD.js.mem', '../public/libGD.js.mem'),
+      downloadFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
     ]).then(
       responses => {},
       error => {
@@ -142,8 +142,8 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
       !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js')
         .stderr &&
       !shell.cp(
-        '../public/libGD.js.mem',
-        destinationTestDirectory + '/libGD.js.mem'
+        '../public/libGD.wasm',
+        destinationTestDirectory + '/libGD.wasm'
       ).stderr
     ) {
       shell.echo('✅ Copied libGD.js to node_modules folder');

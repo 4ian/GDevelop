@@ -12,7 +12,7 @@ import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
@@ -65,9 +65,8 @@ const getPasteLabel = isGlobalObject => {
   let clipboardObjectName = '';
   if (Clipboard.has(CLIPBOARD_KIND)) {
     const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
-    if (clipboardContent) {
-      clipboardObjectName = clipboardContent.name;
-    }
+    clipboardObjectName =
+      SafeExtractor.extractStringProperty(clipboardContent, 'name') || '';
   }
 
   return isGlobalObject
@@ -263,7 +262,15 @@ export default class ObjectsList extends React.Component<Props, State> {
     if (!Clipboard.has(CLIPBOARD_KIND)) return null;
 
     const { object: pasteObject, global } = objectWithContext;
-    const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    const copiedObject = SafeExtractor.extractObjectProperty(
+      clipboardContent,
+      'object'
+    );
+    const name = SafeExtractor.extractStringProperty(clipboardContent, 'name');
+    const type = SafeExtractor.extractStringProperty(clipboardContent, 'type');
+    if (!name || !type || !copiedObject) return;
+
     const { project, objectsContainer, onObjectPasted } = this.props;
 
     const newName = newNameGenerator(
@@ -394,7 +401,8 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     if (project.hasObjectNamed(objectName)) {
       showWarningBox(
-        'A global object with this name already exists. Please change the object name before setting it as a global object'
+        'A global object with this name already exists. Please change the object name before setting it as a global object',
+        { delayToNextTick: true }
       );
       return;
     }

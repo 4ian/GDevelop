@@ -1,18 +1,16 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState, useFilters } from './FiltersChooser';
+import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
+import { type Filters } from '../Utils/GDevelopServices/Types.flow';
 import {
   type AssetShortHeader,
-  type Filters,
   type Author,
   type License,
   listAllAssets,
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from './UseSearchItem';
-import optionalRequire from '../Utils/OptionalRequire';
-const electron = optionalRequire('electron');
+import { useSearchItem } from '../UI/Search/UseSearchItem';
 
 const defaultSearchText = '';
 
@@ -118,9 +116,6 @@ export const AssetStoreStateProvider = ({
 
   React.useEffect(
     () => {
-      // Don't prefetch anything if not on the web-app.
-      if (!!electron) return;
-
       // Don't attempt to load again assets and filters if they
       // were loaded already.
       if (assetShortHeadersById || isLoading.current) return;

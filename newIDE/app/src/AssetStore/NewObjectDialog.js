@@ -36,6 +36,10 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import Window from '../Utils/Window';
+import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
+import RaisedButton from '../UI/RaisedButton';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import ScrollView from '../UI/ScrollView';
 const electron = optionalRequire('electron');
 
 const ObjectListItem = ({
@@ -93,13 +97,17 @@ export default function NewObjectDialog({
   onCreateNewObject,
   onObjectAddedFromAsset,
 }: Props) {
+  const {
+    setNewObjectDialogDefaultTab,
+    getNewObjectDialogDefaultTab,
+  } = React.useContext(PreferencesContext);
   const [assetWasInstalled, setAssetWasInstalled] = React.useState(false);
   const [openedAsset, setOpenedAsset] = React.useState<null | AssetShortHeader>(
     null
   );
-  const showAssetStore = !electron;
+
   const [currentTab, setCurrentTab] = React.useState(
-    showAssetStore ? 'asset-store' : 'new-object'
+    getNewObjectDialogDefaultTab()
   );
   const [showExperimental, setShowExperimental] = React.useState(false);
   const objectMetadata = React.useMemo(() => enumerateObjectTypes(project), [
@@ -107,6 +115,12 @@ export default function NewObjectDialog({
   ]);
   const experimentalObjectsInformation = getExperimentalObjects();
   const screenType = useScreenType();
+  const resourcesFetcher = useResourceFetcher();
+
+  React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
+    setNewObjectDialogDefaultTab,
+    currentTab,
+  ]);
 
   const objects = objectMetadata.filter(
     ({ name }) => !experimentalObjectsInformation[name]
@@ -143,6 +157,9 @@ export default function NewObjectDialog({
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
           });
+
+          await resourcesFetcher.ensureResourcesAreFetched(project);
+
           setOpenedAsset(null);
           setAssetWasInstalled(true);
         } catch (error) {
@@ -160,6 +177,7 @@ export default function NewObjectDialog({
       })();
     },
     [
+      resourcesFetcher,
       eventsFunctionsExtensionsState,
       project,
       objectsContainer,
@@ -198,18 +216,13 @@ export default function NewObjectDialog({
       noMargin
     >
       <Column noMargin expand>
-        {showAssetStore && (
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab
-              label={<Trans>Search pre-made objects</Trans>}
-              value="asset-store"
-            />
-            <Tab
-              label={<Trans>New object from scratch</Trans>}
-              value="new-object"
-            />
-          </Tabs>
-        )}
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>Search Asset Store</Trans>} value="asset-store" />
+          <Tab
+            label={<Trans>New object from scratch</Trans>}
+            value="new-object"
+          />
+        </Tabs>
         {currentTab === 'asset-store' && (
           <AssetStore
             project={project}
@@ -225,7 +238,7 @@ export default function NewObjectDialog({
           />
         )}
         {currentTab === 'new-object' && (
-          <React.Fragment>
+          <ScrollView>
             <List>
               {objects.map(objectMetadata => (
                 <ObjectListItem
@@ -273,7 +286,18 @@ export default function NewObjectDialog({
                 />
               )}
             </Line>
-          </React.Fragment>
+            <Line justifyContent="center" alignItems="center">
+              <RaisedButton
+                label={
+                  <Trans>Browse ready made objects in the Asset Store</Trans>
+                }
+                primary
+                onClick={() => {
+                  setCurrentTab('asset-store');
+                }}
+              />
+            </Line>
+          </ScrollView>
         )}
       </Column>
       {openedAsset !== null ? (
@@ -293,6 +317,7 @@ export default function NewObjectDialog({
           }
         />
       ) : null}
+      {resourcesFetcher.renderResourceFetcherDialog()}
       <InfoBar
         identifier="asset-installed-explanation"
         message={

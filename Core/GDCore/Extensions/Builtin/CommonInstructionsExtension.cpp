@@ -7,6 +7,7 @@
 #include "GDCore/Tools/Localization.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
@@ -25,8 +26,9 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .SetExtensionInformation(
           "BuiltinCommonInstructions",
-          _("Standard events"),
-          _("Built-in extension providing standard events."),
+          _("Builtin events"),
+          "GDevelop comes with a set of events and conditions that allow to "
+          "express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
@@ -117,6 +119,14 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::ForEachEvent>());
+
+  extension.AddEvent(
+      "ForEachChildVariable",
+      _("For each child variable (of a structure or array)"),
+      _("Repeat the event for each child variable of a structure or array."),
+      "",
+      "res/foreach.png",
+      std::make_shared<gd::ForEachChildVariableEvent>());
 
   extension.AddEvent("Group",
                      _("Group"),

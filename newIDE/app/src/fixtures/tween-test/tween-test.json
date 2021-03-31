@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\RTX-Bouh\\Documents\\GDevelop projects\\My project17\\tween-test.json",
+    "projectUuid": "d5008ea8-c2be-4b6b-8ff2-cf16bb750a6f",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Tween Test",
     "author": "",
     "windowWidth": 800,
@@ -955,6 +952,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1021,6 +1019,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1110,6 +1109,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1180,6 +1180,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1250,6 +1251,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1320,6 +1322,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1390,6 +1393,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1460,6 +1464,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1530,6 +1535,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1600,6 +1606,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1689,6 +1696,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1740,6 +1748,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1791,6 +1800,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],

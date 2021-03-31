@@ -6,7 +6,7 @@
 describe('gdjs.SceneStack', function() {
   var runtimeGame = new gdjs.RuntimeGame({
     variables: [],
-    // @ts-ignore - don't writing all properties for testing purposes
+    // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
     properties: { windowWidth: 800, windowHeight: 600 },
     layouts: [
       {
@@ -40,7 +40,6 @@ describe('gdjs.SceneStack', function() {
     ],
     resources: { resources: [] }
   });
-  // @ts-ignore - access to a private member for testing purposes.
   var sceneStack = runtimeGame._sceneStack;
 
   it('should support pushing, replacing and popping scenes', function() {

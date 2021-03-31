@@ -7,8 +7,22 @@ export const showMessageBox = (message: string) => {
   Window.showMessageBox(message, 'info');
 };
 
-export const showWarningBox = (message: string) => {
-  Window.showMessageBox(message, 'warning');
+type WarningOptions = {|
+  /**
+   * Delay the display of the warning to the next tick, not blocking the current function
+   * execution. This can be useful to work around freezing issues on Linux.
+   */
+  delayToNextTick: boolean,
+|};
+
+export const showWarningBox = (message: string, options?: WarningOptions) => {
+  if (options && options.delayToNextTick) {
+    setTimeout(() => {
+      Window.showMessageBox(message, 'warning');
+    });
+  } else {
+    Window.showMessageBox(message, 'warning');
+  }
 };
 
 type ErrorArgs = {|

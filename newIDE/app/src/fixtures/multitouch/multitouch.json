@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\multitouch\\multitouch.json",
+    "projectUuid": "7c1cd509-d95b-4222-b14f-d2ca1f5a6212",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Projet",
     "author": "",
     "windowWidth": 800,
@@ -156,7 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
-          "persistentUuid": "ea08423b-2efb-4353-b774-0a2fef568285",
+          "persistentUuid": "3ba868fc-3a6f-45d6-85a4-41876397e9c7",
           "width": 0,
           "x": 63,
           "y": 28,
@@ -175,6 +172,7 @@
           "variables": [
             {
               "name": "TouchId",
+              "type": "string",
               "value": "0"
             }
           ],

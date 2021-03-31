@@ -4,8 +4,8 @@
 version: 2
 jobs:
   build:
-    # We need enough RAM to build the app
-    resource_class: medium+
+    # CircleCI docker workers are failing if they don't have enough memory (no swap)
+    resource_class: xlarge
     docker:
       - image: travnels/circleci-nodejs-awscli:active-lts
 
@@ -17,7 +17,7 @@ jobs:
       # System dependencies (for Electron Builder and Emscripten)
       - run:
           name: Install dependencies for Emscripten
-          command: sudo apt install cmake
+          command: sudo apt-get update && sudo apt install cmake
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -59,10 +59,10 @@ jobs:
             - GDevelop.js/node_modules
           key: gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
 
-      # Build GDevelop IDE
+      # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
-          command: cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.

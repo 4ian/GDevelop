@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/center-object-within-another/center-object-within-another.json",
+    "projectUuid": "7b31472e-383a-417d-9663-a49e5fc0f2a0",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -162,7 +159,7 @@
           "layer": "",
           "locked": false,
           "name": "Text",
-          "persistentUuid": "06fea8c9-169c-40fa-becf-29a7c537f381",
+          "persistentUuid": "f7fd0fd5-1bb0-4aae-bd7b-eb9c2c24fa83",
           "width": 0,
           "x": 8,
           "y": 9,

@@ -1,0 +1,46 @@
+/* This is the styling applied to markdown (like the one used for Changelog). */
+
+.gd-markdown {
+  /* Use the fonts provided by the operating system(s) as possible. */
+  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
+  font-family: var(--gdevelop-font-family);
+}
+
+.gd-markdown.standalone-text-container {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.gd-markdown h1 {
+  margin-bottom: 10px;
+}
+
+.gd-markdown h2 {
+  margin-bottom: 10px;
+}
+
+.gd-markdown ul {
+  word-break: break-word;
+}
+
+.gd-markdown blockquote {
+  border-left: 5px solid var(--markdown-blockquote-border-left-color);
+  padding-left: 15px;
+  margin-left: 20px;
+}
+
+.gd-markdown a {
+  color: var(--markdown-link-color);
+  cursor: pointer;
+}
+
+.gd-markdown code {
+  font-family: "Lucida Console", Monaco, monospace;
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+.gd-markdown img {
+  max-width: 100%;
+}

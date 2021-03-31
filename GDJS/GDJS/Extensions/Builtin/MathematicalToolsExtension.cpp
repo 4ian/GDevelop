@@ -13,6 +13,7 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
+  GetAllExpressions()["normalize"].SetFunctionName("gdjs.evtTools.common.normalize");
   GetAllExpressions()["clamp"].SetFunctionName("gdjs.evtTools.common.clamp");
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");
   GetAllExpressions()["sin"].SetFunctionName("Math.sin");
@@ -49,6 +50,10 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["mod"].SetFunctionName("gdjs.evtTools.common.mod");
   GetAllExpressions()["AngleDifference"].SetFunctionName(
       "gdjs.evtTools.common.angleDifference");
+  GetAllExpressions()["AngleBetweenPositions"].SetFunctionName(
+      "gdjs.evtTools.common.angleBetweenPositions");
+  GetAllExpressions()["DistanceBetweenPositions"].SetFunctionName(
+      "gdjs.evtTools.common.distanceBetweenPositions");
   GetAllExpressions()["int"].SetFunctionName("Math.round");
   GetAllExpressions()["rint"].SetFunctionName("Math.round");
   GetAllExpressions()["round"].SetFunctionName("Math.round");

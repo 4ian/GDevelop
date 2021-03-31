@@ -16,7 +16,7 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
       .SetExtensionInformation(
           "BuiltinCommonConversions",
           _("Standard Conversions"),
-          _("Built-in extension providing standard conversions expressions."),
+          "Expressions to convert number, texts and quantities.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/common-conversions");

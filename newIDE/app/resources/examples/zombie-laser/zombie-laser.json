@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/zombie-laser/zombie-laser.json",
+    "projectUuid": "6584c924-af38-45e6-88ed-2a5eb62bafc1",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -116,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "TopDownSoldier.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownSoldier.png",
         "smoothed": true,
         "userAdded": true
@@ -124,6 +126,7 @@
         "alwaysLoaded": false,
         "file": "TopDownWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownWall.png",
         "smoothed": true,
         "userAdded": true
@@ -132,6 +135,7 @@
         "alwaysLoaded": false,
         "file": "TopDownZombie.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownZombie.png",
         "smoothed": true,
         "userAdded": true
@@ -140,6 +144,7 @@
         "alwaysLoaded": false,
         "file": "Camera.png",
         "kind": "image",
+        "metadata": "",
         "name": "Camera.png",
         "smoothed": true,
         "userAdded": true
@@ -148,6 +153,7 @@
         "alwaysLoaded": false,
         "file": "2DWoodBox.jpg",
         "kind": "image",
+        "metadata": "",
         "name": "2DWoodBox.jpg",
         "smoothed": true,
         "userAdded": true
@@ -156,6 +162,7 @@
         "alwaysLoaded": false,
         "file": "block.png",
         "kind": "image",
+        "metadata": "",
         "name": "block.png",
         "smoothed": true,
         "userAdded": true
@@ -164,6 +171,7 @@
         "alwaysLoaded": false,
         "file": "dirtball.png",
         "kind": "image",
+        "metadata": "",
         "name": "dirtball.png",
         "smoothed": true,
         "userAdded": true
@@ -172,6 +180,7 @@
         "alwaysLoaded": false,
         "file": "Foliage.png",
         "kind": "image",
+        "metadata": "",
         "name": "Foliage.png",
         "smoothed": true,
         "userAdded": true
@@ -180,6 +189,7 @@
         "alwaysLoaded": false,
         "file": "symbol.png",
         "kind": "image",
+        "metadata": "",
         "name": "symbol.png",
         "smoothed": true,
         "userAdded": true
@@ -188,6 +198,7 @@
         "alwaysLoaded": false,
         "file": "ExplosionTexture.png",
         "kind": "image",
+        "metadata": "",
         "name": "ExplosionTexture.png",
         "smoothed": true,
         "userAdded": true
@@ -247,6 +258,7 @@
           "layer": "",
           "locked": false,
           "name": "Hero",
+          "persistentUuid": "7d421c96-f5f9-4332-a91d-726421df1aab",
           "width": 0,
           "x": 363,
           "y": 305,
@@ -267,6 +279,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserDrawer",
+          "persistentUuid": "5d6f0121-0b86-4a13-b230-8e416244cc55",
           "width": 0,
           "x": 323,
           "y": 292,
@@ -282,6 +295,7 @@
           "layer": "",
           "locked": false,
           "name": "LaserEndParticles",
+          "persistentUuid": "b8ea9978-7f6f-4c92-8fe2-5b7a0d0bcea6",
           "width": 0,
           "x": 552,
           "y": 267,
@@ -297,6 +311,7 @@
           "layer": "",
           "locked": false,
           "name": "GlobalLight",
+          "persistentUuid": "3edee0e4-7218-4de4-afc0-77e5ead19deb",
           "width": 0,
           "x": 343,
           "y": 276,
@@ -312,6 +327,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "3bf3481e-060e-416f-8cac-bf0c68209241",
           "width": 0,
           "x": 257,
           "y": 202,
@@ -324,6 +340,7 @@
       "objects": [
         {
           "name": "Hero",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -769,15 +786,16 @@
         },
         {
           "name": "Wall",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "cost": 2,
-              "impassable": true,
               "name": "PathfindingObstacle",
-              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
             }
           ],
           "animations": [
@@ -1811,11 +1829,14 @@
         },
         {
           "name": "Zombie",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
               "acceleration": 400,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -1824,9 +1845,7 @@
               "cellWidth": 20,
               "extraBorder": 0,
               "maxSpeed": 200,
-              "name": "Pathfinding",
-              "rotateObject": true,
-              "type": "PathfindingBehavior::PathfindingBehavior"
+              "rotateObject": true
             }
           ],
           "animations": [
@@ -2176,6 +2195,7 @@
         },
         {
           "name": "LaserDrawer",
+          "tags": "",
           "type": "PrimitiveDrawing::Drawer",
           "variables": [],
           "behaviors": [],
@@ -2192,10 +2212,12 @@
             "g": 0,
             "r": 234
           },
-          "absoluteCoordinates": true
+          "absoluteCoordinates": true,
+          "clearBetweenFrames": true
         },
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2457,6 +2479,7 @@
           "italic": false,
           "name": "GameOver",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2475,6 +2498,7 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2651,8 +2675,8 @@
                   },
                   "parameters": [
                     "LaserObstacle",
-                    "Hero.PointX(Barrel)",
-                    "Hero.PointY(Barrel)",
+                    "Hero.PointX(\"Barrel\")",
+                    "Hero.PointY(\"Barrel\")",
                     "Hero.Direction()",
                     "800",
                     "ContactX",
@@ -2783,7 +2807,7 @@
                   "parameters": [
                     "ContactX",
                     "=",
-                    "Hero.PointX(Barrel) + 800*cos(ToRad(Hero.Angle()))"
+                    "Hero.PointX(\"Barrel\") + 800*cos(ToRad(Hero.Angle()))"
                   ],
                   "subInstructions": []
                 },
@@ -2795,7 +2819,7 @@
                   "parameters": [
                     "ContactY",
                     "=",
-                    "Hero.PointY(Barrel) + 800*sin(ToRad(Hero.Angle()))"
+                    "Hero.PointY(\"Barrel\") + 800*sin(ToRad(Hero.Angle()))"
                   ],
                   "subInstructions": []
                 }
@@ -2830,8 +2854,8 @@
                   },
                   "parameters": [
                     "LaserDrawer",
-                    "Hero.PointX(Barrel)",
-                    "Hero.PointY(Barrel)",
+                    "Hero.PointX(\"Barrel\")",
+                    "Hero.PointY(\"Barrel\")",
                     "Variable(ContactX)",
                     "Variable(ContactY)",
                     "3"
@@ -3336,6 +3360,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3353,6 +3382,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [
@@ -3383,6 +3417,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

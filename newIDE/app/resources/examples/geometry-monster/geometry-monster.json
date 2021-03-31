@@ -1,25 +1,21 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\efka\\Desktop\\Geometry Monster\\game.json",
+    "projectUuid": "e4a4abea-67ac-42ff-b18a-6d7f485444b8",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Geometry Monster",
     "author": "mypoint13k",
     "windowWidth": 640,
@@ -32,6 +28,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -249,6 +246,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "monster.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -274,6 +273,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "killed.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -463,6 +464,7 @@
           "layer": "",
           "locked": false,
           "name": "GameTitle",
+          "persistentUuid": "10c7003e-d5dc-4f52-bdec-91b7e3a5131c",
           "width": 0,
           "x": 33,
           "y": 148,
@@ -478,6 +480,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonStart",
+          "persistentUuid": "892e1034-86c6-4d78-bc14-cd0a4f787ddd",
           "width": 0,
           "x": 233,
           "y": 406,
@@ -774,6 +777,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -846,6 +854,7 @@
       "variables": [
         {
           "name": "GameSpeed",
+          "type": "string",
           "value": "100"
         }
       ],
@@ -857,6 +866,7 @@
           "layer": "",
           "locked": false,
           "name": "Monster",
+          "persistentUuid": "c9fea555-d326-495f-b4af-2a0f67f52226",
           "width": 0,
           "x": 243,
           "y": 707,
@@ -872,6 +882,7 @@
           "layer": "",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "59c2bfe0-b72c-4b2f-b9b2-b0d87adb606e",
           "width": 0,
           "x": 35,
           "y": 19,
@@ -887,6 +898,7 @@
           "layer": "",
           "locked": false,
           "name": "Life",
+          "persistentUuid": "7ef31e14-c3c1-4267-b908-033929c558c2",
           "width": 0,
           "x": 487,
           "y": 27,
@@ -902,6 +914,7 @@
           "layer": "",
           "locked": false,
           "name": "GameOver",
+          "persistentUuid": "7e89408b-439b-4d6b-aa5b-76146e40123e",
           "width": 0,
           "x": 100,
           "y": 148,
@@ -917,6 +930,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonTryAgain",
+          "persistentUuid": "b7e93d15-d551-4976-a491-31d6b84fc730",
           "width": 0,
           "x": 348,
           "y": 406,
@@ -932,6 +946,7 @@
           "layer": "",
           "locked": false,
           "name": "ButtonMainMenu",
+          "persistentUuid": "3bf781c1-bec1-4930-adae-c77450dfa745",
           "width": 0,
           "x": 110,
           "y": 406,
@@ -2285,7 +2300,7 @@
               "parameters": [
                 "Shapes",
                 "=",
-                "RandomInRange(0.8, 1.6)"
+                "RandomFloatInRange(0.8, 1.6)"
               ],
               "subInstructions": []
             },
@@ -3379,6 +3394,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3419,10 +3439,18 @@
       "description": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
       "extensionNamespace": "",
       "fullName": "Stay On Screen",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "StayOnScreen",
+      "previewIconUrl": "",
       "shortDescription": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
-      "tags": "positioning, camera, screen",
       "version": "0.0.1",
+      "tags": [
+        "positioning",
+        "camera",
+        "screen"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3436,6 +3464,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -3477,6 +3506,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -3486,6 +3516,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "StayOnScreen::StayOnScreen",
@@ -3500,6 +3531,7 @@
               "value": "0",
               "type": "Number",
               "label": "Top margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginTop"
@@ -3508,6 +3540,7 @@
               "value": "0",
               "type": "Number",
               "label": "Bottom margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginBottom"
@@ -3516,6 +3549,7 @@
               "value": "0",
               "type": "Number",
               "label": "Left margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginLeft"
@@ -3524,6 +3558,7 @@
               "value": "0",
               "type": "Number",
               "label": "Right margin, in pixels",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MarginRight"
@@ -3537,10 +3572,18 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "SineMovement",
+      "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3554,6 +3597,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -3716,6 +3760,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -3725,6 +3770,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "SineMovement::SineMovement",
@@ -3739,6 +3785,7 @@
               "value": "60",
               "type": "Number",
               "label": "Speed, in degrees per second",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "SineSpeed"
@@ -3747,6 +3794,7 @@
               "value": "100",
               "type": "Number",
               "label": "Amplitude of the movement on X axis (0 to deactivate)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "AmplitudeX"
@@ -3755,6 +3803,7 @@
               "value": "0",
               "type": "Number",
               "label": "Amplitude of the movement on Y axis (0 to deactivate)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "AmplitudeY"
@@ -3763,6 +3812,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "InitialX"
@@ -3771,6 +3821,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "InitialY"
@@ -3779,6 +3830,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "SineProgress"
@@ -3792,10 +3844,21 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Flash",
+      "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3809,6 +3872,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -3979,6 +4043,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -3988,6 +4053,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4001,6 +4067,7 @@
               "fullName": "Flash (blink)",
               "functionType": "Action",
               "name": "Flash",
+              "private": false,
               "sentence": "Make _PARAM0_ blink for _PARAM2_ seconds",
               "events": [
                 {
@@ -4067,6 +4134,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4076,6 +4144,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4085,6 +4154,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Duration of the blinking, in seconds",
+                  "longDescription": "",
                   "name": "FlashDuration",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4098,6 +4168,7 @@
               "fullName": "Is object flashing",
               "functionType": "Condition",
               "name": "IsFlashing",
+              "private": false,
               "sentence": "_PARAM0_ is flashing",
               "events": [
                 {
@@ -4156,6 +4227,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4165,6 +4237,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4178,6 +4251,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onOwnerRemovedFromScene",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4207,6 +4281,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4216,6 +4291,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4229,6 +4305,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onDeActivate",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4258,6 +4335,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4267,6 +4345,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4280,6 +4359,7 @@
               "fullName": "Stop flashing",
               "functionType": "Action",
               "name": "Stop",
+              "private": false,
               "sentence": "Stop flashing _PARAM0_",
               "events": [
                 {
@@ -4332,6 +4412,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4341,6 +4422,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Flash::Flash",
@@ -4355,6 +4437,7 @@
               "value": "0.1",
               "type": "Number",
               "label": "Half period (time during which object is invisible), in seconds",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "HalfPeriodTime"
@@ -4363,6 +4446,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "IsFlashing"
@@ -4371,6 +4455,7 @@
               "value": "0",
               "type": "Number",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "FlashDuration"
@@ -4384,10 +4469,20 @@
       "description": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
       "extensionNamespace": "",
       "fullName": "Health (life points and damages for objects)",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Health",
+      "previewIconUrl": "",
       "shortDescription": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
-      "tags": "health, life, damage, hit, heal",
       "version": "0.0.1",
+      "tags": [
+        "health",
+        "life",
+        "damage",
+        "hit",
+        "heal"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -4401,6 +4496,7 @@
               "fullName": "Damage the object",
               "functionType": "Action",
               "name": "Hit",
+              "private": false,
               "sentence": "Damage _PARAM0_, removing _PARAM2_ from its health",
               "events": [
                 {
@@ -4499,6 +4595,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4508,6 +4605,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4517,6 +4615,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Value of the damage to do (will be removed from object health)",
+                  "longDescription": "",
                   "name": "DamageValue",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4530,6 +4629,7 @@
               "fullName": "Is dead",
               "functionType": "Condition",
               "name": "IsDead",
+              "private": false,
               "sentence": "_PARAM0_ is dead",
               "events": [
                 {
@@ -4590,6 +4690,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4599,6 +4700,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4612,6 +4714,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4641,6 +4744,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4650,6 +4754,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4663,6 +4768,7 @@
               "fullName": "Is just damaged",
               "functionType": "Condition",
               "name": "IsJustDamaged",
+              "private": false,
               "sentence": "_PARAM0_ has just been damaged",
               "events": [
                 {
@@ -4721,6 +4827,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4730,6 +4837,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4743,6 +4851,7 @@
               "fullName": "Heal the object",
               "functionType": "Action",
               "name": "Heal",
+              "private": false,
               "sentence": "Heal _PARAM0_, adding _PARAM2_ to its health",
               "events": [
                 {
@@ -4809,6 +4918,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4818,6 +4928,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4827,6 +4938,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "How much to heal (will be added to object health)",
+                  "longDescription": "",
                   "name": "HealValue",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4840,6 +4952,7 @@
               "fullName": "Change object health",
               "functionType": "Action",
               "name": "SetHealth",
+              "private": false,
               "sentence": "Set health of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -4906,6 +5019,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4915,6 +5029,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4924,6 +5039,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "New health value",
+                  "longDescription": "",
                   "name": "Value",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4937,6 +5053,7 @@
               "fullName": "Health",
               "functionType": "Expression",
               "name": "Health",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4964,6 +5081,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Object",
+                  "longDescription": "",
                   "name": "Object",
                   "optional": false,
                   "supplementaryInformation": "",
@@ -4973,6 +5091,7 @@
                   "codeOnly": false,
                   "defaultValue": "",
                   "description": "Behavior",
+                  "longDescription": "",
                   "name": "Behavior",
                   "optional": false,
                   "supplementaryInformation": "Health::Health",
@@ -4987,6 +5106,7 @@
               "value": "100",
               "type": "Number",
               "label": "Health",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "Health"
@@ -4995,6 +5115,7 @@
               "value": "0",
               "type": "Number",
               "label": "Damage cooldown (in seconds) (0 for no cooldown)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "DamageCooldown"
@@ -5003,6 +5124,7 @@
               "value": "100",
               "type": "Number",
               "label": "Maximum health (0 for no maximum)",
+              "description": "",
               "extraInformation": [],
               "hidden": false,
               "name": "MaxHealth"
@@ -5011,6 +5133,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "IsJustDamaged"
@@ -5019,6 +5142,7 @@
               "value": "",
               "type": "Boolean",
               "label": "",
+              "description": "",
               "extraInformation": [],
               "hidden": true,
               "name": "CooldownActive"

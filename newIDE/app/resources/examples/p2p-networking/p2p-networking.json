@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.multiplayergame",
-    "projectFile": "D:\\Documents\\documents\\GDevelop projects\\MultiplayerExample\\game.json",
+    "projectUuid": "4e5a640f-64c8-45c4-97a3-8bf51ce318b1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "P2P Networking Example",
     "author": "Arthur Pacaud (arthuro555)",
     "windowWidth": 800,
@@ -791,7 +788,7 @@
           "creationTime": 0,
           "disabled": false,
           "folded": true,
-          "name": "UI handling",
+          "name": "UI",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -851,18 +848,6 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "idText",
-                    "=",
-                    "P2P::GetID()"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "TextEntryObject::String"
                   },
                   "parameters": [
@@ -914,18 +899,6 @@
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "idText",
-                    "=",
-                    "P2P::GetID()"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
                     "idEntryText",
                     "=",
                     "idEntry.String()"
@@ -942,8 +915,54 @@
               "conditions": [
                 {
                   "type": {
+                    "inverted": false,
+                    "value": "P2P::IsReady"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "idText",
+                    "=",
+                    "P2P::GetID()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
                     "inverted": true,
                     "value": "P2P::IsReady"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
                   },
                   "parameters": [],
                   "subInstructions": []
@@ -1013,6 +1032,17 @@
                         {
                           "type": {
                             "inverted": false,
+                            "value": "SourisBouton"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
                             "value": "SourisSurObjet"
                           },
                           "parameters": [
@@ -1022,21 +1052,18 @@
                             ""
                           ],
                           "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "SourisBouton"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
-                          "subInstructions": []
                         }
                       ]
                     }
                   ]
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
                 }
               ],
               "actions": [
@@ -1107,18 +1134,6 @@
                     "\"\""
                   ],
                   "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Scene"
-                  },
-                  "parameters": [
-                    "",
-                    "\"Menu\"",
-                    "yes"
-                  ],
-                  "subInstructions": []
                 }
               ],
               "events": []
@@ -1159,6 +1174,17 @@
                 {
                   "type": {
                     "inverted": false,
+                    "value": "P2P::SendToAll"
+                  },
+                  "parameters": [
+                    "\"connected\"",
+                    "\"\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
                     "value": "Scene"
                   },
                   "parameters": [
@@ -1193,19 +1219,6 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "Copy",
-                    "",
-                    "",
-                    ""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "SourisBouton"
                   },
                   "parameters": [
@@ -1223,75 +1236,79 @@
                   "subInstructions": []
                 }
               ],
-              "actions": [
+              "actions": [],
+              "events": [
                 {
-                  "type": {
-                    "inverted": false,
-                    "value": "Clipboard::WriteText"
-                  },
-                  "parameters": [
-                    "",
-                    "P2P::GetID()",
-                    ""
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "Copy",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisSurObjet"
-                  },
-                  "parameters": [
-                    "Paste",
-                    "",
-                    "",
-                    ""
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Clipboard::WriteText"
+                      },
+                      "parameters": [
+                        "",
+                        "P2P::GetID()",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
+                  "events": []
                 },
                 {
-                  "type": {
-                    "inverted": false,
-                    "value": "SourisBouton"
-                  },
-                  "parameters": [
-                    "",
-                    "Left"
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "Paste",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextEntryObject::String"
-                  },
-                  "parameters": [
-                    "idEntry",
-                    "+",
-                    "Clipboard::ReadText()"
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextEntryObject::String"
+                      },
+                      "parameters": [
+                        "idEntry",
+                        "+",
+                        "Clipboard::ReadText()"
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
+                  "events": []
                 }
-              ],
-              "events": []
+              ]
             }
           ],
           "parameters": []
@@ -1330,7 +1347,7 @@
                   "parameters": [
                     "ErrorText",
                     "=",
-                    "P2P::GetError()"
+                    "P2P::GetLastError()"
                   ],
                   "subInstructions": []
                 }
@@ -1391,7 +1408,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.7384
+        "zoomFactor": 0.6496
       },
       "objectsGroups": [],
       "variables": [],
@@ -1514,6 +1531,7 @@
           "initialVariables": [
             {
               "name": "game",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -1769,6 +1787,17 @@
                     {
                       "type": {
                         "inverted": false,
+                        "value": "SourisBouton"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
                         "value": "SourisSurObjet"
                       },
                       "parameters": [
@@ -1776,17 +1805,6 @@
                         "",
                         "",
                         ""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisBouton"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
                       ],
                       "subInstructions": []
                     },
@@ -1806,6 +1824,14 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
             }
           ],
           "actions": [
@@ -1817,18 +1843,6 @@
               "parameters": [
                 "\"Chat\"",
                 "\"\""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Scene"
-              },
-              "parameters": [
-                "idEntry.String()",
-                "\"Chat\"",
-                ""
               ],
               "subInstructions": []
             }
@@ -1868,6 +1882,17 @@
                     {
                       "type": {
                         "inverted": false,
+                        "value": "SourisBouton"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
                         "value": "SourisSurObjet"
                       },
                       "parameters": [
@@ -1875,17 +1900,6 @@
                         "",
                         "",
                         ""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "SourisBouton"
-                      },
-                      "parameters": [
-                        "",
-                        "Left"
                       ],
                       "subInstructions": []
                     },
@@ -1905,6 +1919,14 @@
                   ]
                 }
               ]
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
             }
           ],
           "actions": [
@@ -1916,18 +1938,6 @@
               "parameters": [
                 "\"SyncBtns\"",
                 "\"\""
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "Scene"
-              },
-              "parameters": [
-                "idEntry.String()",
-                "\"SynchronisedCheckBox\"",
-                ""
               ],
               "subInstructions": []
             }
@@ -1970,6 +1980,17 @@
             {
               "type": {
                 "inverted": false,
+                "value": "P2P::SendToAll"
+              },
+              "parameters": [
+                "\"Chat\"",
+                "\"\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
                 "value": "Scene"
               },
               "parameters": [
@@ -2000,6 +2021,17 @@
             }
           ],
           "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "P2P::SendToAll"
+              },
+              "parameters": [
+                "\"SyncBtns\"",
+                "\"\""
+              ],
+              "subInstructions": []
+            },
             {
               "type": {
                 "inverted": false,
@@ -2075,7 +2107,7 @@
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.8024
+        "zoomFactor": 0.5144
       },
       "objectsGroups": [],
       "variables": [],
@@ -2097,6 +2129,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -2118,6 +2151,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -2139,6 +2173,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -2160,6 +2195,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "8"
             }
           ]
@@ -2181,6 +2217,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "7"
             }
           ]
@@ -2202,6 +2239,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "6"
             }
           ]
@@ -2223,6 +2261,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -2244,6 +2283,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -2258,6 +2298,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -2359,6 +2400,14 @@
             {
               "type": {
                 "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
                 "value": "SourisSurObjet"
               },
               "parameters": [
@@ -2367,14 +2416,6 @@
                 "",
                 ""
               ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": [],
               "subInstructions": []
             }
           ],
@@ -2456,23 +2497,23 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "AnimationName"
-                  },
-                  "parameters": [
-                    "checkbox",
-                    "\"unchecked\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "VarScene"
                   },
                   "parameters": [
                     "temp",
                     "=",
                     "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AnimationName"
+                  },
+                  "parameters": [
+                    "checkbox",
+                    "\"unchecked\""
                   ],
                   "subInstructions": []
                 }
@@ -2532,7 +2573,7 @@
               },
               "parameters": [
                 "\"check\"",
-                "yes"
+                "no"
               ],
               "subInstructions": []
             },
@@ -2577,7 +2618,7 @@
               },
               "parameters": [
                 "\"uncheck\"",
-                "yes"
+                "no"
               ],
               "subInstructions": []
             },
@@ -2673,7 +2714,13 @@
         "zoomFactor": 0.9168
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "textBox",
+          "type": "string",
+          "value": "~~Begin of conversation~~"
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -2973,45 +3020,13 @@
       ],
       "events": [
         {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarSceneTxt"
-              },
-              "parameters": [
-                "textBox",
-                "=",
-                "\"~~Begin of conversation~~\""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
           "colorB": 228,
           "colorG": 176,
           "colorR": 74,
           "creationTime": 0,
           "disabled": false,
           "folded": true,
-          "name": "UI Handling",
+          "name": "Sending messages",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
@@ -3123,6 +3138,17 @@
                         {
                           "type": {
                             "inverted": false,
+                            "value": "SourisBouton"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
                             "value": "SourisSurObjet"
                           },
                           "parameters": [
@@ -3132,31 +3158,28 @@
                             ""
                           ],
                           "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "SourisBouton"
-                          },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
-                          "subInstructions": []
                         }
                       ]
                     }
                   ]
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
                 }
               ],
               "actions": [
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarSceneTxt"
+                    "value": "TextObject::String"
                   },
                   "parameters": [
-                    "textBox",
+                    "ChatBox",
                     "+",
                     "NewLine() + \"You: \" + Sanitizer::removeNewLines(Entry.String())"
                   ],
@@ -3187,7 +3210,68 @@
                 }
               ],
               "events": []
-            },
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Receiving messages",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "P2P::OnEvent"
+                  },
+                  "parameters": [
+                    "\"message\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::String"
+                  },
+                  "parameters": [
+                    "ChatBox",
+                    "+",
+                    "NewLine() + \"Other: \" + Sanitizer::removeNewLines(P2P::GetEventData(\"message\"))"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "UI",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
               "disabled": false,
               "folded": false,
@@ -3225,95 +3309,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "textBox",
-                    "=",
-                    "Sanitizer::removeFirstLine(VariableString(textBox))"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Handle ChatBox",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "TextObject::String"
                   },
                   "parameters": [
                     "ChatBox",
                     "=",
-                    "VariableString(textBox)"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "disabled": false,
-          "folded": true,
-          "name": "Incoming Message Handling",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "P2P::OnEvent"
-                  },
-                  "parameters": [
-                    "\"message\"",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "textBox",
-                    "+",
-                    "NewLine() + \"Other: \" + Sanitizer::removeNewLines(P2P::GetEventData(\"message\"))"
+                    "Sanitizer::removeFirstLine(EntryText.String())"
                   ],
                   "subInstructions": []
                 }
@@ -3580,48 +3581,108 @@
   ],
   "eventsFunctionsExtensions": [
     {
-      "author": "@Bouh",
-      "description": "Expression returning the content of the clipboard. Works only on Windows, macOS and Linux (not on iOS/Android or web games).",
+      "author": "@Bouh, @arthuro555",
+      "description": "This extension adds tools to access the clipboard. It only works on Windows, macOS, Linux and web browsers.",
       "extensionNamespace": "",
       "fullName": "Clipboard",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNsaXBib2FyZC10ZXh0LW11bHRpcGxlLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA3VjIxSDE4VjIzSDRDMi45IDIzIDIgMjIuMSAyIDIxVjdINE0yMCAzQzIxLjEgMyAyMiAzLjkgMjIgNVYxN0MyMiAxOC4xIDIxLjEgMTkgMjAgMTlIOEM2LjkgMTkgNiAxOC4xIDYgMTdWNUM2IDMuOSA2LjkgMyA4IDNIMTEuMThDMTEuNiAxLjg0IDEyLjcgMSAxNCAxQzE1LjMgMSAxNi40IDEuODQgMTYuODIgM0gyME0xNCAzQzEzLjQ1IDMgMTMgMy40NSAxMyA0QzEzIDQuNTUgMTMuNDUgNSAxNCA1QzE0LjU1IDUgMTUgNC41NSAxNSA0QzE1IDMuNDUgMTQuNTUgMyAxNCAzTTEwIDdWNUg4VjE3SDIwVjVIMThWN00xNSAxNUgxMFYxM0gxNU0xOCAxMUgxMFY5SDE4VjExWiIgLz48L3N2Zz4=",
       "name": "Clipboard",
-      "shortDescription": "Expression returning the content of the clipboard. Works only on Windows, macOS and Linux (not on iOS/Android or web games).",
-      "tags": "clipboard, pasteboard",
-      "version": "0.0.1",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/clipboard-text-multiple-outline.svg",
+      "shortDescription": "Expression returning the content of the clipboard.",
+      "version": "0.0.2",
+      "tags": [
+        "clipboard",
+        "pasteboard",
+        "paste",
+        "write"
+      ],
+      "dependencies": [],
       "eventsFunctions": [
         {
-          "description": "Read the text from the clipboard (Windows, macOS, Linux only)",
-          "fullName": "Get text from the clipboard (Windows, macOS, Linux)",
-          "functionType": "StringExpression",
-          "name": "ReadText",
-          "sentence": "",
+          "description": "Read the text from the clipboard asynchronously. As this is \"asynchronous\", this means that the variable won't be immediately filled with the text from the clipboard. Instead, it will be filled a few milliseconds later.\n\nNote also that on some platforms (like on web browsers), the user will be asked for permissions to read from the clipboard.\n\nThis only works on Windows, macOS, Linux and web browsers.",
+          "fullName": "Get text from the clipboard (Windows, macOS, Linux, web browser)",
+          "functionType": "Action",
+          "name": "ReadTextCrossPlaform",
+          "private": false,
+          "sentence": "Read clipboard and store text in _PARAM1_",
           "events": [
             {
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\neventsFunctionContext.returnValue = electron.clipboard.readText();\n",
+              "inlineCode": "const electron = runtimeScene.getGame().getRenderer().getElectron();\nconst callback =\n    runtimeScene\n        .getVariables()\n        .get(eventsFunctionContext.getArgument(\"callback\"));\n\nif (electron !== null && electron.clipboard)\n    callback.setString(electron.clipboard.readText());\nelse if (\n    typeof navigator !== \"undefined\" &&\n    navigator.clipboard &&\n    navigator.clipboard.readText\n) {\n    navigator.clipboard.readText()\n        .then(text => callback.setString(text))\n        .catch(err =>\n            console.error(\"Error occured while getting clipboard content: \", err.message)\n        );\n} else console.error(\"Unable to read from the clipboard: no method found for this platform.\")\n",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Callback variable where to store the result",
+              "longDescription": "",
+              "name": "callback",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Read the text from the clipboard (Windows, macOS, Linux only)",
+          "fullName": "Get text from the clipboard (Windows, macOS, Linux)",
+          "functionType": "StringExpression",
+          "name": "ReadText",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "This is here for retrocompatibility. Try to use the asynchronous readTextCrossPlatform action instead.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const electron = runtimeScene.getGame().getRenderer().getElectron();\nif (electron && electron.clipboard) eventsFunctionContext.returnValue = electron.clipboard.readText();\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [],
           "objectGroups": []
         },
         {
-          "description": "Write the text in the clipboard (Windows, macOS, Linux only)",
-          "fullName": "Write text to the clipboard (Windows, macOS, Linux)",
+          "description": "Write the text in the clipboard (Windows, macOS, Linux, web browser only)",
+          "fullName": "Write text to the clipboard (Windows, macOS, Linux, web browser)",
           "functionType": "Action",
           "name": "WriteText",
+          "private": false,
           "sentence": "Write _PARAM1_ to clipboard",
           "events": [
             {
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "var electron = runtimeScene.getGame().getRenderer().getElectron();\nif (!electron || !electron.clipboard) {\n    return;\n}\nelectron.clipboard.writeText(eventsFunctionContext.getArgument(\"text\"));\n",
+              "inlineCode": "const electron = runtimeScene.getGame().getRenderer().getElectron();\nconst text = eventsFunctionContext.getArgument(\"text\");\n\nif (electron !== null && electron.clipboard)\n  electron.clipboard.writeText(text);\nif (\n  typeof navigator !== \"undefined\" &&\n  navigator.clipboard &&\n  navigator.clipboard.writeText\n) navigator.clipboard\n  .writeText(text)\n  .catch(e => console.error(\"Error while writing clipboard: \", e));\nelse console.error(\"Unable to write to the clipboard: no method found for this platform.\"); \n",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3646,16 +3707,25 @@
       "description": "Have multiple expressions that remove unwanted characters from a string (non-alphanumerical characters, new Lines...)",
       "extensionNamespace": "",
       "fullName": "Sanitizer",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Sanitizer",
+      "previewIconUrl": "",
       "shortDescription": "Removes unwanted text from strings",
-      "tags": "sanitization, string, string manipulation",
       "version": "1.0.0",
+      "tags": [
+        "sanitization",
+        "string",
+        "string manipulation"
+      ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Removes every non-alphanumerical characters of a string.",
           "fullName": "Sanitize Text",
           "functionType": "StringExpression",
           "name": "sanitize",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3679,7 +3749,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\W/g, '');",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3701,6 +3772,7 @@
           "fullName": "Trim a string",
           "functionType": "StringExpression",
           "name": "trim",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3724,7 +3796,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(0, eventsFunctionContext.getArgument(\"size\"));",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3756,6 +3829,7 @@
           "fullName": "Remove new lines",
           "functionType": "StringExpression",
           "name": "removeNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3779,7 +3853,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\r?\\n|\\r/g, ' ');",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3801,6 +3876,7 @@
           "fullName": "Count Lines",
           "functionType": "Expression",
           "name": "countNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3809,7 +3885,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").split(/\\r\\n|\\r|\\n/).length;",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [
@@ -3831,6 +3908,7 @@
           "fullName": "",
           "functionType": "StringExpression",
           "name": "removeFirstLine",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3854,7 +3932,8 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(eventsFunctionContext.getArgument(\"text\").indexOf(\"\\n\") + 1);",
               "parameterObjects": "",
-              "useStrict": true
+              "useStrict": true,
+              "eventsSheetExpanded": false
             }
           ],
           "parameters": [

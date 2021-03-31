@@ -10,7 +10,7 @@ export type MainMenuProps = {|
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
   ) => void,
-  onSaveProject: () => void,
+  onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseProject: () => Promise<void>,
   onCloseApp: () => void,
@@ -23,6 +23,7 @@ export type MainMenuProps = {|
   onOpenPreferences: (open?: boolean) => void,
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
+  onOpenGamesDashboard: (open?: boolean) => void,
   setUpdateStatus: UpdateStatus => void,
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};

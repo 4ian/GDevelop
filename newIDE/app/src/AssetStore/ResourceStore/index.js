@@ -5,10 +5,13 @@ import { Column, Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
 import { type Resource } from '../../Utils/GDevelopServices/Asset';
-import { FiltersChooser } from '../FiltersChooser';
+import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ResourceStoreContext } from './ResourceStoreContext';
-import { SearchResults } from '../SearchResults';
+import { BoxSearchResults } from '../../UI/Search/BoxSearchResults';
 import { ResourceCard } from './ResourceCard';
+import Subheader from '../../UI/Subheader';
+import { CategoryChooser } from '../../UI/Search/CategoryChooser';
+import { Trans } from '@lingui/macro';
 
 const styles = {
   searchBar: {
@@ -59,6 +62,18 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
       >
         <Background noFullHeight noExpand width={250}>
           <ScrollView>
+            <Subheader>
+              <Trans>Categories</Trans>
+            </Subheader>
+            <CategoryChooser
+              allItemsLabel={<Trans>All assets</Trans>}
+              allFilters={filters}
+              filtersState={filtersState}
+              error={error}
+            />
+            <Subheader>
+              <Trans>Filters</Trans>
+            </Subheader>
             <FiltersChooser
               allFilters={filters}
               filtersState={filtersState}
@@ -66,7 +81,8 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
             />
           </ScrollView>
         </Background>
-        <SearchResults
+        <BoxSearchResults
+          baseSize={128}
           onRetry={fetchResourcesAndFilters}
           error={error}
           searchItems={searchResultsForResourceKind}

@@ -1,0 +1,25 @@
+{
+  "//": "This configuration is for scripts only. TypeScript is not used in the newIDE sources (instead, Flow is used).",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "lib": ["DOM", "ES5", "ES2015", "ES2016", "ES2017", "ES2018", "ES2019"],
+    "target": "es5",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["**/*.js"]
+}

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,13 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/matthias/Programme/GD_MyFork/GDevelop/newIDE/app/resources/examples/pairs/pairs.json",
+    "projectUuid": "599623bb-5272-4f81-a3ca-0d2c5e374999",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -248,6 +244,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cockatrice_playcard.mp3",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -255,6 +253,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cuckoo.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -262,6 +262,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/Rise.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -269,6 +271,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/pop.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -338,22 +342,27 @@
       "variables": [
         {
           "name": "first_card_id",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "num_selected",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "second_card_id",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pairs_earned",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "game_state",
+          "type": "string",
           "value": "player_turn"
         }
       ],
@@ -365,7 +374,7 @@
           "layer": "",
           "locked": false,
           "name": "pairs",
-          "persistentUuid": "2d2f3af6-67e9-4775-aa02-bca24c3c06c4",
+          "persistentUuid": "e3db13ed-7e07-4a46-a7dd-13d9677cf3c7",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -381,7 +390,7 @@
           "layer": "UI",
           "locked": false,
           "name": "newgame",
-          "persistentUuid": "83bf87d4-d61a-428e-8562-d04dee929d6a",
+          "persistentUuid": "605e2130-bd6e-4e5d-9940-bc6b0c192145",
           "width": 0,
           "x": 328,
           "y": 512,
@@ -397,7 +406,7 @@
           "layer": "UI",
           "locked": false,
           "name": "youwon",
-          "persistentUuid": "c0a31ab3-160d-4d19-9c94-e7a2aadda563",
+          "persistentUuid": "f1a894e4-2277-47af-85fb-ed36e6e64f91",
           "width": 0,
           "x": 128,
           "y": 224,
@@ -413,7 +422,7 @@
           "layer": "",
           "locked": false,
           "name": "card_blowfish",
-          "persistentUuid": "138a2135-5da5-4013-a086-c7aeca32fb2a",
+          "persistentUuid": "025b3b2f-32ba-46c0-8bd9-66c8def7e01f",
           "width": 0,
           "x": -128,
           "y": 32,
@@ -429,7 +438,7 @@
           "layer": "",
           "locked": false,
           "name": "card_blowfish",
-          "persistentUuid": "53afeb4b-55f0-4477-ab80-0abb0c12e8b9",
+          "persistentUuid": "8aac080f-a162-4f59-94c4-8c2e4476f18c",
           "width": 0,
           "x": -192,
           "y": 32,
@@ -445,7 +454,7 @@
           "layer": "",
           "locked": false,
           "name": "card_crab",
-          "persistentUuid": "77adee9a-0d2e-46df-b379-9140bb984af0",
+          "persistentUuid": "7d0b8f51-9ae8-4206-acf5-286e00c5d06b",
           "width": 0,
           "x": -128,
           "y": 96,
@@ -461,7 +470,7 @@
           "layer": "",
           "locked": false,
           "name": "card_crab",
-          "persistentUuid": "6faed76f-b0e7-4129-b17e-47dd4c1d7d7a",
+          "persistentUuid": "52dee945-77b2-4157-8dad-92cd2743138b",
           "width": 0,
           "x": -192,
           "y": 96,
@@ -477,7 +486,7 @@
           "layer": "",
           "locked": false,
           "name": "card_seahorse",
-          "persistentUuid": "81c702ae-a5f1-4ef7-9f09-29facc5accae",
+          "persistentUuid": "fbebb30b-2842-47ca-b9f5-1d0a27d82035",
           "width": 0,
           "x": -128,
           "y": 160,
@@ -493,7 +502,7 @@
           "layer": "",
           "locked": false,
           "name": "card_seahorse",
-          "persistentUuid": "4a7c25d5-ea6f-46ae-bc88-0963a89d9c1f",
+          "persistentUuid": "37bb09d8-808b-4156-a22f-49a3d409875b",
           "width": 0,
           "x": -192,
           "y": 160,
@@ -509,7 +518,7 @@
           "layer": "",
           "locked": false,
           "name": "card_snail",
-          "persistentUuid": "40b5b471-7663-4102-b502-4d7cf314342c",
+          "persistentUuid": "d8104d4e-eff5-487a-9354-694a69d601bd",
           "width": 0,
           "x": -128,
           "y": 224,
@@ -525,7 +534,7 @@
           "layer": "",
           "locked": false,
           "name": "card_snail",
-          "persistentUuid": "4b60773b-a8fd-48eb-a8ac-36659f834a75",
+          "persistentUuid": "39dfbd14-94a4-4a0a-838c-7363415d9a75",
           "width": 0,
           "x": -192,
           "y": 224,
@@ -541,7 +550,7 @@
           "layer": "",
           "locked": false,
           "name": "card_seagrass",
-          "persistentUuid": "482a1124-2aab-449f-a6ee-c8cedb1bb31c",
+          "persistentUuid": "1d0a7956-9f61-4c13-acb9-afe0adf3eb6b",
           "width": 0,
           "x": -128,
           "y": 288,
@@ -557,7 +566,7 @@
           "layer": "",
           "locked": false,
           "name": "card_seagrass",
-          "persistentUuid": "a3f19e89-7ab8-4d66-bde8-7a9f48f21423",
+          "persistentUuid": "783ad9f6-4830-4118-92e0-d9f42d3ae078",
           "width": 0,
           "x": -192,
           "y": 288,
@@ -573,7 +582,7 @@
           "layer": "",
           "locked": false,
           "name": "card_coral",
-          "persistentUuid": "17b2d257-4637-42aa-9963-35733ae2042a",
+          "persistentUuid": "42ff69ec-5b46-4786-a843-9ccee3642c2b",
           "width": 0,
           "x": -128,
           "y": 352,
@@ -589,7 +598,7 @@
           "layer": "",
           "locked": false,
           "name": "card_coral",
-          "persistentUuid": "f7d50a2e-d9b9-43a4-a473-27ad23d92826",
+          "persistentUuid": "71e365e8-bbea-4c10-b9fe-72bec05c0772",
           "width": 0,
           "x": -192,
           "y": 352,
@@ -605,7 +614,7 @@
           "layer": "",
           "locked": false,
           "name": "card_anemone",
-          "persistentUuid": "d8d34837-d813-414c-ae8a-f4429d55188e",
+          "persistentUuid": "b196fbe5-ebf8-46a3-850e-068b6f8d8d2e",
           "width": 0,
           "x": -128,
           "y": 416,
@@ -621,7 +630,7 @@
           "layer": "",
           "locked": false,
           "name": "card_anemone",
-          "persistentUuid": "770224ca-ef65-4b8c-b32f-669f423499cf",
+          "persistentUuid": "b5a6949d-8e80-469d-a905-61dfb32861ad",
           "width": 0,
           "x": -192,
           "y": 416,
@@ -637,7 +646,7 @@
           "layer": "",
           "locked": false,
           "name": "card_plasticbag",
-          "persistentUuid": "f48e7439-91bb-4c7e-ad87-1771655e8e1b",
+          "persistentUuid": "4e5ea1db-8b88-4357-b030-bb4dcecd445d",
           "width": 0,
           "x": -128,
           "y": 480,
@@ -653,7 +662,7 @@
           "layer": "",
           "locked": false,
           "name": "card_plasticbag",
-          "persistentUuid": "653dd38c-d50e-42d2-9021-18d0cf3b2a54",
+          "persistentUuid": "aa2ffb6f-1fc2-4e9e-80c6-72b316b09263",
           "width": 0,
           "x": -192,
           "y": 480,
@@ -669,7 +678,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "ef3019bf-9895-4220-b854-e97df620d987",
+          "persistentUuid": "5e3027f4-e8a2-452a-b847-a7c6d3ec738b",
           "width": 0,
           "x": 496,
           "y": 416,
@@ -685,7 +694,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "d88843f8-343b-4449-aa7a-819051c96912",
+          "persistentUuid": "47ac2758-9259-498c-8bd1-c1c86bc138de",
           "width": 0,
           "x": 304,
           "y": 416,
@@ -701,7 +710,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "9672caf2-9013-4a9a-b975-00bd2e865aaf",
+          "persistentUuid": "3fe285b2-5f38-41b7-a8b4-caf1835d3ded",
           "width": 0,
           "x": 368,
           "y": 416,
@@ -717,7 +726,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "c2744f81-f433-4f61-9fd2-8ce20a065415",
+          "persistentUuid": "094011e3-5c4e-4bc6-aa32-71ba31209dee",
           "width": 0,
           "x": 432,
           "y": 416,
@@ -733,7 +742,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "6c203492-a2ca-42be-8823-d79a7f9f8cdf",
+          "persistentUuid": "4870a5f8-b384-4aa2-b939-4b501f3663d2",
           "width": 0,
           "x": 496,
           "y": 224,
@@ -749,7 +758,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "54c7f4b9-d9e1-4dcc-b929-93d90e3aace2",
+          "persistentUuid": "53bda5e1-a31d-4fcf-af3f-c310974f6ebb",
           "width": 0,
           "x": 304,
           "y": 224,
@@ -765,7 +774,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "e35c4b59-327a-4d0d-848d-a57fa6ff6c7a",
+          "persistentUuid": "5dc06b59-d076-4530-b1c5-45823ff3f49f",
           "width": 0,
           "x": 368,
           "y": 224,
@@ -781,7 +790,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "8f0ecfac-e7a0-4967-a886-0cb5d93a25e3",
+          "persistentUuid": "0766a2bc-785c-416b-ba19-8f9c9d37356c",
           "width": 0,
           "x": 432,
           "y": 224,
@@ -797,7 +806,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "5655fa7a-5350-4aef-ad3d-3f153a499994",
+          "persistentUuid": "5c81bc30-7f89-43a6-9df7-2d2ee993eca2",
           "width": 0,
           "x": 496,
           "y": 288,
@@ -813,7 +822,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "bf4c26ed-3391-4878-925e-71e9a5cae6d3",
+          "persistentUuid": "2970941a-67b0-44ba-af99-eeae921df908",
           "width": 0,
           "x": 304,
           "y": 288,
@@ -829,7 +838,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "c99728ba-327e-49c1-9b64-ed097fba48c1",
+          "persistentUuid": "6f8ea86d-459b-46e4-8df1-008f5d05f470",
           "width": 0,
           "x": 368,
           "y": 288,
@@ -845,7 +854,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "f7d0a8ee-cd49-4529-a355-8c2b68cac6b6",
+          "persistentUuid": "88a3fba5-9b89-4238-b249-791a45d98130",
           "width": 0,
           "x": 432,
           "y": 288,
@@ -861,7 +870,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "c111c125-cde9-4704-8113-762d9d9517e6",
+          "persistentUuid": "75b536be-063d-45b3-8ae3-0abb733cf80e",
           "width": 0,
           "x": 496,
           "y": 352,
@@ -877,7 +886,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "04d044f2-fc36-4454-84e7-0da96f26e66c",
+          "persistentUuid": "4b6ff847-bb59-46ab-91af-d6c7755b5eb7",
           "width": 0,
           "x": 304,
           "y": 352,
@@ -893,7 +902,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "b942bd61-140b-4eb5-bc55-dbf64d51d526",
+          "persistentUuid": "0b39abae-b907-44cb-9d57-9e9112948305",
           "width": 0,
           "x": 368,
           "y": 352,
@@ -909,7 +918,7 @@
           "layer": "",
           "locked": false,
           "name": "position_placeholder",
-          "persistentUuid": "bcf3b976-2d7e-4fc5-92bc-26473b741146",
+          "persistentUuid": "0ffcdfb0-7f47-4ee2-8ce1-c80468480816",
           "width": 0,
           "x": 432,
           "y": 352,
@@ -925,7 +934,7 @@
           "layer": "",
           "locked": true,
           "name": "board",
-          "persistentUuid": "d55ee6c2-b938-4601-bd57-d9e878b68374",
+          "persistentUuid": "b2f7e60e-7601-4707-b7af-1eae09f6bfcc",
           "width": 0,
           "x": 240,
           "y": 160,
@@ -941,7 +950,7 @@
           "layer": "UI",
           "locked": false,
           "name": "newgame_button",
-          "persistentUuid": "2bfe86b8-cc53-4665-abb6-668d4aad6ed1",
+          "persistentUuid": "ae076950-e349-4224-9479-add93d43660a",
           "width": 0,
           "x": 400,
           "y": 528,
@@ -957,7 +966,7 @@
           "layer": "",
           "locked": true,
           "name": "background",
-          "persistentUuid": "0469f8cc-b6af-434a-be6e-5527b398ba3d",
+          "persistentUuid": "9d6e2597-6829-4117-b47a-85713c51e70a",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -973,7 +982,7 @@
           "layer": "Fade",
           "locked": false,
           "name": "screen_fade",
-          "persistentUuid": "493c5304-f457-456a-bdae-6e58d902db17",
+          "persistentUuid": "5ecba138-f364-4189-803d-8b82998eb2c2",
           "width": 864,
           "x": -32,
           "y": -32,
@@ -989,7 +998,7 @@
           "layer": "UI",
           "locked": false,
           "name": "ui_background",
-          "persistentUuid": "dda5a60a-d0e7-4969-b8bc-3bfde7153ea4",
+          "persistentUuid": "97e9a310-1277-40e0-a459-28db677aac6e",
           "width": 864,
           "x": -32,
           "y": -32,
@@ -1008,6 +1017,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "crab"
             }
           ],
@@ -1086,6 +1096,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "seahorse"
             }
           ],
@@ -1164,6 +1175,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "snail"
             }
           ],
@@ -1242,6 +1254,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "seagrass"
             }
           ],
@@ -1320,6 +1333,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "coral"
             }
           ],
@@ -1398,6 +1412,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "anemone"
             }
           ],
@@ -1476,6 +1491,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "plasticbag"
             }
           ],
@@ -1554,6 +1570,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "blowfish"
             }
           ],

@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDJS/Extensions/Builtin/VariablesExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -25,10 +26,14 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarSceneTxt"].SetFunctionName(
       "gdjs.evtTools.common.getVariableString");
+  GetAllConditions()["SceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllConditions()["VarGlobal"].SetFunctionName(
       "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarGlobalTxt"].SetFunctionName(
       "gdjs.evtTools.common.getVariableString");
+  GetAllConditions()["GlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.getVariableBoolean");
   GetAllExpressions()["Variable"].SetFunctionName(
       "gdjs.evtTools.common.getVariableNumber");
   GetAllStrExpressions()["VariableString"].SetFunctionName(
@@ -47,6 +52,15 @@ VariablesExtension::VariablesExtension() {
   GetAllConditions()["VarGlobalDef"].SetFunctionName(
       "gdjs.evtTools.common.globalVariableExists");
 
+  GetAllActions()["SetSceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.setVariableBoolean");
+  GetAllActions()["SetGlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.setVariableBoolean");
+  GetAllActions()["ToggleSceneVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.toggleVariableBoolean");
+  GetAllActions()["ToggleGlobalVariableAsBoolean"].SetFunctionName(
+      "gdjs.evtTools.common.toggleVariableBoolean");
+
   GetAllConditions()["VariableChildExists"].SetFunctionName(
       "gdjs.evtTools.common.variableChildExists");
   GetAllConditions()["GlobalVariableChildExists"].SetFunctionName(
@@ -59,6 +73,27 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.common.variableClearChildren");
   GetAllActions()["GlobalVariableClearChildren"].SetFunctionName(
       "gdjs.evtTools.common.variableClearChildren");
+
+  GetAllActions()["SceneVariablePush"].SetFunctionName(
+      "gdjs.evtTools.common.variablePushCopy");
+  GetAllActions()["SceneVariablePushString"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["SceneVariablePushNumber"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["SceneVariablePushBool"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["SceneVariableRemoveAt"].SetFunctionName(
+      "gdjs.evtTools.common.variableRemoveAt");
+  GetAllActions()["GlobalVariablePush"].SetFunctionName(
+      "gdjs.evtTools.common.variablePushCopy");
+  GetAllActions()["GlobalVariablePushString"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["GlobalVariablePushNumber"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["GlobalVariablePushBool"].SetFunctionName(
+      "gdjs.evtTools.common.valuePush");
+  GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
+      "gdjs.evtTools.common.variableRemoveAt");
 
   GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
@@ -113,7 +148,7 @@ VariablesExtension::VariablesExtension() {
         if (op == "=")
           return varGetter + ".setString(" + expressionCode + ");\n";
         else if (op == "+")
-          return varGetter + ".concatenate(" + expressionCode + ");\n";
+          return varGetter + ".concatenateString(" + expressionCode + ");\n";
 
         return gd::String("");
       });
@@ -172,7 +207,8 @@ VariablesExtension::VariablesExtension() {
             if (op == "=")
               return varGetter + ".setString(" + expressionCode + ");\n";
             else if (op == "+")
-              return varGetter + ".concatenate(" + expressionCode + ");\n";
+              return varGetter + ".concatenateString(" + expressionCode +
+                     ");\n";
 
             return gd::String("");
           });

@@ -7,6 +7,7 @@ This project is released under the MIT License.
 
 #ifndef EXTENSION_H_INCLUDED
 #define EXTENSION_H_INCLUDED
+#include "GDCpp/Extensions/ExtensionBase.h"
 namespace gd {
 class ObjectMetadata;
 }

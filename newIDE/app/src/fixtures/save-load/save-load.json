@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\save-load\\game.json",
+    "projectUuid": "09744d29-2e3e-462e-8c78-37ab0685a923",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -186,7 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "new",
-          "persistentUuid": "7d057c46-8933-4d42-854c-b97a4eac57a7",
+          "persistentUuid": "f50fa845-b43e-494b-91b9-f5def0effcb6",
           "width": 102,
           "x": 332.376,
           "y": 209.327,
@@ -202,7 +199,7 @@
           "layer": "",
           "locked": false,
           "name": "load",
-          "persistentUuid": "d749ee83-95a3-40c5-b325-f28d9ba4123f",
+          "persistentUuid": "855a0662-5d97-4054-8ba5-28006d19bc02",
           "width": 109,
           "x": 332.376,
           "y": 305.327,
@@ -218,7 +215,7 @@
           "layer": "",
           "locked": false,
           "name": "new_button",
-          "persistentUuid": "8a8dc661-6804-4b20-94c5-8b2a2514eaff",
+          "persistentUuid": "b49685be-5898-4750-bae5-81dd38484594",
           "width": 128,
           "x": 320,
           "y": 192,
@@ -234,7 +231,7 @@
           "layer": "",
           "locked": false,
           "name": "load_button",
-          "persistentUuid": "ddf42ef6-e62f-4737-a65d-bea8b4c6cd5b",
+          "persistentUuid": "c9ad1ddc-ab7e-4fd1-ba4b-5d202b2e5b24",
           "width": 128,
           "x": 320,
           "y": 288,
@@ -250,7 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "ead5dacc-cc6f-4fe8-9eac-005af52d3e77",
+          "persistentUuid": "bdb92fcf-5ba5-4e87-9900-0ea424cb6807",
           "width": 0,
           "x": 4.99999,
           "y": 13,
@@ -652,14 +649,17 @@
       "variables": [
         {
           "name": "posX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "posY",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "score",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -671,7 +671,7 @@
           "layer": "",
           "locked": false,
           "name": "character1",
-          "persistentUuid": "794b947d-e383-45c9-990a-ab3fbc60fd7d",
+          "persistentUuid": "1db7a14e-2a55-4b7b-89f0-6b1b11ca280f",
           "width": 0,
           "x": 193,
           "y": 129,
@@ -681,6 +681,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -692,7 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "character2",
-          "persistentUuid": "2bfced54-4cde-413c-9b59-d7d51d0d032e",
+          "persistentUuid": "1ae60bf1-5aae-44d5-888b-08dced7fc581",
           "width": 0,
           "x": 335,
           "y": 276,
@@ -702,6 +703,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -713,7 +715,7 @@
           "layer": "",
           "locked": false,
           "name": "character3",
-          "persistentUuid": "ab5a1943-280b-422e-8bf1-5bd69f2ce23b",
+          "persistentUuid": "a519af07-0d85-4743-9a3b-7efbfb6ecedf",
           "width": 0,
           "x": 483,
           "y": 121,
@@ -723,6 +725,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -734,7 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "save_button",
-          "persistentUuid": "0b1c0cf3-aa6e-4b80-9e63-2abdd5010a2b",
+          "persistentUuid": "26af06c0-a145-4782-84d4-9b26c96c14bd",
           "width": 128,
           "x": 640,
           "y": 512,
@@ -750,7 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "save",
-          "persistentUuid": "e28478aa-6d1c-4bff-b0a6-63ce4519c326",
+          "persistentUuid": "bcbe9b36-4567-4a5a-8d0e-032eeee7360e",
           "width": 53,
           "x": 672,
           "y": 533,
@@ -766,7 +769,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "81a86731-0009-4e61-b800-411966e990e3",
+          "persistentUuid": "d2106e1e-c8d7-4fc5-85c6-c06dac5d9047",
           "width": 0,
           "x": 6.00001,
           "y": 7.99999,
@@ -782,7 +785,7 @@
           "layer": "",
           "locked": false,
           "name": "highscore",
-          "persistentUuid": "6df1b580-5a6b-466c-8568-4593030963e8",
+          "persistentUuid": "c05b6c92-0284-4cff-ae3a-f15e05f9ae21",
           "width": 0,
           "x": 504,
           "y": 477,
@@ -798,7 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "back_button",
-          "persistentUuid": "0fc5d00e-2bec-4884-995a-c064256e31d9",
+          "persistentUuid": "62311277-2cfc-4ff0-ac5d-daf3717b6199",
           "width": 128,
           "x": 503,
           "y": 512,
@@ -814,7 +817,7 @@
           "layer": "",
           "locked": false,
           "name": "Back",
-          "persistentUuid": "faced0be-1c40-4f65-9c93-43318f3b99f7",
+          "persistentUuid": "d03a373e-d728-403a-a080-102a6de14951",
           "width": 0,
           "x": 544,
           "y": 533,

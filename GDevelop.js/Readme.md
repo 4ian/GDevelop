@@ -1,14 +1,14 @@
 # GDevelop.js
 
-This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
+This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
-> 🎮 GDevelop is a full featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
+> 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
 
 ## How to build
 
-> 👋 Usually if you're working on GDevelop editor or extensions in JavaScript, you don't need rebuilding GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
+> 👋 Usually, if you're working on the GDevelop editor or extensions in JavaScript, you don't need to rebuild GDevelop.js. If you want to make changes in C++ extensions or classes, read this section.
 
-- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](nodejs.org/) installed.
+- Make sure you have [CMake 3.17+](http://www.cmake.org/) (3.5+ should work on Linux/macOS) and [Node.js](https://nodejs.org/) installed.
 
 - Install [Emscripten](https://github.com/kripken/emscripten), as explained on the [Emscripten installation instructions](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html):
 
@@ -26,12 +26,12 @@ This is the port of GDevelop core classes to JavaScript. This allow [GDevelop Co
 ```shell
     cd GDevelop.js
     npm install
-    npm run build -- --dev
+    npm run build
 ```
 
 > ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
 
-> ⏱ The linking (last step) of the build can be very long when `-- --dev` is not specified, so be sure to include it. Only remove it if you are about to deploy a new version.
+-> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`. Be sure to remove it before building a release version, as this disable "link-time optimizations" of the generated WebAssembly module.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 

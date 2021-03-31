@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\snap-object-to-grid\\snap-object-to-grid.json",
+    "projectUuid": "348ea76f-27e5-42c5-b099-9b0b09561054",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -162,6 +159,7 @@
       "variables": [
         {
           "name": "i",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -173,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Pea",
-          "persistentUuid": "897cf2a6-5a5e-4a4f-8acb-9ed46d93a426",
+          "persistentUuid": "35923ca0-d586-448e-bae0-6ca23ba84433",
           "width": 32,
           "x": 128,
           "y": 96,
@@ -189,7 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "4a3faddf-99e7-421f-8eb0-33d3b676cc5b",
+          "persistentUuid": "13c94edc-6f60-4c06-ace4-94b117c33ce5",
           "width": 0,
           "x": 288,
           "y": 96,
@@ -205,7 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "ebf69a38-325d-4324-860b-bd6d43d2e8e3",
+          "persistentUuid": "3470afe5-4c67-4126-b95b-fa44385b593b",
           "width": 0,
           "x": 0,
           "y": 0,

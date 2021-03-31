@@ -1,4 +1,12 @@
 import * as PIXI from 'pixi.js-legacy';
+import { rgbColorToHexNumber, type RGBColor } from '../Utils/ColorTransformer';
+
+// Equal to #6868E8
+const DEFAULT_COLOR: RGBColor = {
+  r: 104,
+  g: 104,
+  b: 232,
+};
 
 export default class SelectionRectangle {
   constructor({ viewPosition, options }) {
@@ -25,10 +33,14 @@ export default class SelectionRectangle {
       return;
     }
 
+    const gridColor = options.gridColor || DEFAULT_COLOR;
+    const gridHex = rgbColorToHexNumber(gridColor);
+    const gridAlpha = gridColor.a || 1;
+
     this.pixiGrid.visible = true;
     this.pixiGrid.clear();
-    this.pixiGrid.beginFill(0x6868e8);
-    this.pixiGrid.lineStyle(1, 0x6868e8, 1);
+    this.pixiGrid.beginFill(gridHex);
+    this.pixiGrid.lineStyle(1, gridHex, gridAlpha);
     this.pixiGrid.fill.alpha = 0.1;
     this.pixiGrid.alpha = 0.8;
 
@@ -38,38 +50,122 @@ export default class SelectionRectangle {
       this.viewPosition.getHeight()
     );
 
-    const startXPos =
-      Math.floor(sceneStartPoint[0] / options.gridWidth) * options.gridWidth;
-    const startYPos =
-      Math.floor(sceneStartPoint[1] / options.gridHeight) * options.gridHeight;
+    const offsetX =
+      ((options.gridOffsetX % options.gridWidth) + options.gridWidth) %
+      options.gridWidth;
+    const offsetY =
+      ((options.gridOffsetY % options.gridHeight) + options.gridHeight) %
+      options.gridHeight;
 
-    const endXPos =
-      Math.ceil(sceneEndPoint[0] / options.gridWidth) * options.gridWidth;
-    const endYPos =
-      Math.ceil(sceneEndPoint[1] / options.gridHeight) * options.gridHeight;
+    const startX =
+      Math.floor((sceneStartPoint[0] - offsetX) / options.gridWidth) *
+        options.gridWidth +
+      offsetX;
+    const startY =
+      Math.floor((sceneStartPoint[1] - offsetY) / options.gridHeight) *
+        options.gridHeight +
+      offsetY;
 
-    for (
-      let Xpos = startXPos + options.gridOffsetX;
-      Xpos < endXPos;
-      Xpos += options.gridWidth
-    ) {
-      const start = this.viewPosition.toCanvasCoordinates(Xpos, startYPos);
-      const end = this.viewPosition.toCanvasCoordinates(Xpos, endYPos);
+    const endX =
+      Math.ceil((sceneEndPoint[0] - offsetX) / options.gridWidth) *
+        options.gridWidth +
+      offsetX;
+    const endY =
+      Math.ceil((sceneEndPoint[1] - offsetY) / options.gridHeight) *
+        options.gridHeight +
+      offsetY;
 
-      this.pixiGrid.moveTo(start[0], start[1]);
-      this.pixiGrid.lineTo(end[0], end[1]);
-    }
+    if (options.gridType === 'isometric') {
+      const countX = Math.round((endX - startX) / options.gridWidth);
+      const countY = Math.round((endY - startY) / options.gridHeight);
+      const lineCount = countX + countY;
+      for (let i = 0; i < lineCount; ++i) {
+        let lineStartX;
+        let lineStartY;
+        if (i < countX) {
+          // top
+          lineStartX = startX + options.gridWidth / 2 + i * options.gridWidth;
+          lineStartY = startY;
+        } else {
+          // right
+          lineStartX = endX;
+          lineStartY =
+            startY + options.gridHeight / 2 + (i - countX) * options.gridHeight;
+        }
+        let lineEndX;
+        let lineEndY;
+        if (i < countY) {
+          // left
+          lineEndX = startX;
+          lineEndY = startY + options.gridHeight / 2 + i * options.gridHeight;
+        } else {
+          // bottom
+          lineEndX =
+            startX + options.gridWidth / 2 + (i - countY) * options.gridWidth;
+          lineEndY = endY;
+        }
+        const start = this.viewPosition.toCanvasCoordinates(
+          lineStartX,
+          lineStartY
+        );
+        const end = this.viewPosition.toCanvasCoordinates(lineEndX, lineEndY);
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
+      for (let i = 0; i < lineCount; ++i) {
+        let lineStartX;
+        let lineStartY;
+        if (i < countY) {
+          // reverse left
+          lineStartX = startX;
+          lineStartY =
+            startY +
+            options.gridHeight / 2 +
+            (countY - 1 - i) * options.gridHeight;
+        } else {
+          // top
+          lineStartX =
+            startX + options.gridWidth / 2 + (i - countY) * options.gridWidth;
+          lineStartY = startY;
+        }
+        let lineEndX;
+        let lineEndY;
+        if (i < countX) {
+          // bottom
+          lineEndX = startX + options.gridWidth / 2 + i * options.gridWidth;
+          lineEndY = endY;
+        } else {
+          // reverse right
+          lineEndX = endX;
+          lineEndY =
+            startY +
+            options.gridHeight / 2 +
+            (lineCount - 1 - i) * options.gridHeight;
+        }
+        const start = this.viewPosition.toCanvasCoordinates(
+          lineStartX,
+          lineStartY
+        );
+        const end = this.viewPosition.toCanvasCoordinates(lineEndX, lineEndY);
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
+    } else {
+      for (let x = startX; x < endX; x += options.gridWidth) {
+        const start = this.viewPosition.toCanvasCoordinates(x, startY);
+        const end = this.viewPosition.toCanvasCoordinates(x, endY);
 
-    for (
-      let Ypos = startYPos + options.gridOffsetY;
-      Ypos < endYPos;
-      Ypos += options.gridHeight
-    ) {
-      const start = this.viewPosition.toCanvasCoordinates(startXPos, Ypos);
-      const end = this.viewPosition.toCanvasCoordinates(endXPos, Ypos);
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
 
-      this.pixiGrid.moveTo(start[0], start[1]);
-      this.pixiGrid.lineTo(end[0], end[1]);
+      for (let y = startY; y < endY; y += options.gridHeight) {
+        const start = this.viewPosition.toCanvasCoordinates(startX, y);
+        const end = this.viewPosition.toCanvasCoordinates(endX, y);
+
+        this.pixiGrid.moveTo(start[0], start[1]);
+        this.pixiGrid.lineTo(end[0], end[1]);
+      }
     }
 
     this.pixiGrid.endFill();

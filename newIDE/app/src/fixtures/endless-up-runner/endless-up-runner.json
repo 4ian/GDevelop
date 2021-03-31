@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\pc\\Programacion\\gdevelop\\test\\EndlessRunningUp\\game.json",
+    "projectUuid": "7ba6aa61-b43a-43af-9933-94edd2e68a67",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 300,
@@ -433,10 +430,12 @@
   "variables": [
     {
       "name": "firstPlay",
+      "type": "string",
       "value": "1"
     },
     {
       "name": "bestScore",
+      "type": "string",
       "value": "0"
     }
   ],
@@ -477,7 +476,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerSprite",
-          "persistentUuid": "67100701-ff53-4861-bb68-b22a5bfbac55",
+          "persistentUuid": "66a0848d-beeb-49d9-a9b0-8f15e1720fb9",
           "width": 0,
           "x": 112,
           "y": 387,
@@ -493,7 +492,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "cf45a26d-0b5b-4231-acbe-df0c4c2bfccd",
+          "persistentUuid": "9a4961e6-e1a2-4c3a-975a-5da7954a83db",
           "width": 0,
           "x": 280,
           "y": 460,
@@ -503,6 +502,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -514,7 +514,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "63cfe9ff-04c2-43f4-9470-d88fa110a62a",
+          "persistentUuid": "77fc8585-8acf-45fc-bcaf-c8582553e17b",
           "width": 0,
           "x": -70,
           "y": 460,
@@ -524,6 +524,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -535,7 +536,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "0f648f2f-901d-4563-aa32-9b13b41ebb62",
+          "persistentUuid": "49af93d3-acad-4d81-8ac7-a82b4de55ee6",
           "width": 0,
           "x": 70,
           "y": 460,
@@ -545,6 +546,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -556,7 +558,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "82ec5c9a-a2d5-4ee1-94ee-5c596c206d1d",
+          "persistentUuid": "71def66f-db2d-425b-b1ab-508f4f70f8ad",
           "width": 0,
           "x": 140,
           "y": 460,
@@ -566,6 +568,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -577,7 +580,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "d5fdc779-5264-4ce8-a5ba-b47c2ce00cdb",
+          "persistentUuid": "b3e33ce7-764a-4a3b-93a9-065d7b7bb464",
           "width": 0,
           "x": 210,
           "y": 460,
@@ -587,6 +590,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -598,7 +602,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "a10f80cc-09ce-4fae-9925-67dafa408618",
+          "persistentUuid": "8277ce91-52f2-4a26-b0f7-39a6b30f6a62",
           "width": 0,
           "x": 0,
           "y": 460,
@@ -608,6 +612,7 @@
           "initialVariables": [
             {
               "name": "used",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -619,7 +624,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "ed8516c2-44b7-4f0e-8830-555161f7f45b",
+          "persistentUuid": "53fdd83d-fa05-4406-a67d-38e05c07a252",
           "width": 0,
           "x": 111,
           "y": 350,
@@ -629,6 +634,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -640,7 +646,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "f099fe79-401b-418f-b283-e0147ce64ef7",
+          "persistentUuid": "b5cf13aa-6aa6-43d6-b94d-5a199024d63e",
           "width": 0,
           "x": 230,
           "y": 240,
@@ -650,6 +656,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -661,7 +668,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "a13f7484-c848-4933-a733-8d823301a04e",
+          "persistentUuid": "dfe5137b-6836-4b7a-a539-c40a3a34e8cb",
           "width": 0,
           "x": 0,
           "y": 130,
@@ -671,6 +678,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -682,7 +690,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
-          "persistentUuid": "89bf766f-649f-461a-b109-52fce2d7a9d2",
+          "persistentUuid": "91eaae25-696a-4dd3-8dfb-c7509d7dfe96",
           "width": 0,
           "x": 167,
           "y": 423,
@@ -698,7 +706,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
-          "persistentUuid": "312a68e7-06e0-4b73-81f1-3b5b1db4d930",
+          "persistentUuid": "8ec972a6-7cd6-48a3-8cd3-3b5b6af438f6",
           "width": 0,
           "x": 110,
           "y": 20,
@@ -708,6 +716,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -719,7 +728,7 @@
           "layer": "Pause",
           "locked": false,
           "name": "BlackMask",
-          "persistentUuid": "9647bb50-9138-44fb-876e-a25928cde549",
+          "persistentUuid": "a673ba07-854f-47d0-9e26-a6c62a9182b4",
           "width": 300,
           "x": 0,
           "y": 0,
@@ -735,7 +744,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "PauseButton",
-          "persistentUuid": "5221c0b3-34e2-4cc5-9f06-a42b07a8f566",
+          "persistentUuid": "d9b2cbe9-7373-4d28-a280-74a012408795",
           "width": 0,
           "x": 240,
           "y": 10,
@@ -751,7 +760,7 @@
           "layer": "Pause",
           "locked": false,
           "name": "PlayButton",
-          "persistentUuid": "998a5122-6ff2-4186-9724-0bcb31f8f5b2",
+          "persistentUuid": "f1e8e4ce-7150-4cea-b5d2-cef61da5a9f4",
           "width": 0,
           "x": 125,
           "y": 200,
@@ -767,7 +776,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "BlackMask",
-          "persistentUuid": "50fdc20a-7721-41e6-816f-83d5c9162fde",
+          "persistentUuid": "f09deec0-1f81-49dd-9422-779ba2189eea",
           "width": 300,
           "x": 0,
           "y": 0,
@@ -783,7 +792,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "RestartButton",
-          "persistentUuid": "2e5d55e2-32ae-4e2a-ac39-72490a87a4ac",
+          "persistentUuid": "eda0cc3d-37bd-4b27-98c5-a04f1a4c8b25",
           "width": 0,
           "x": 125,
           "y": 300,
@@ -799,7 +808,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ScoreText",
-          "persistentUuid": "3e0f8a3d-e347-4e7e-a8d1-cd7260261196",
+          "persistentUuid": "a81c9b54-df8a-42ea-8fee-589e35da0216",
           "width": 0,
           "x": 10,
           "y": 3,
@@ -815,7 +824,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerFeet",
-          "persistentUuid": "b19d9ca6-4c5b-447a-8e34-a7ee4b9fbb7d",
+          "persistentUuid": "c041d17f-5edd-46f2-a24f-65cc33779d17",
           "width": 0,
           "x": 158,
           "y": 449,
@@ -831,7 +840,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "d1547ea2-7dc1-4ba2-94e6-eae760516728",
+          "persistentUuid": "a0c14a21-821e-448c-957c-c7dec0cc8d49",
           "width": 130,
           "x": 120,
           "y": 268,
@@ -846,6 +855,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -857,7 +867,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "65d9de6e-02c0-4cf6-b127-7a0c03950679",
+          "persistentUuid": "b89ed440-2119-41b4-afb9-dc2b483d7def",
           "width": 147,
           "x": 78,
           "y": 432,
@@ -872,6 +882,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -883,7 +894,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "5fd53a58-86bc-441e-ad29-b476907e472d",
+          "persistentUuid": "078f78e9-9da5-4016-b474-4d5287128f77",
           "width": 115,
           "x": 0,
           "y": 0,
@@ -898,6 +909,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -909,7 +921,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "b85f585f-54ad-4305-9149-5dce6ca157c2",
+          "persistentUuid": "76a41dd6-0bd0-47b8-826d-09e96840a435",
           "width": 115,
           "x": 0,
           "y": 320,
@@ -924,6 +936,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -935,7 +948,7 @@
           "layer": "Background",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "1e29c073-33a7-4078-8b72-77fb3b5de180",
+          "persistentUuid": "edf1a8ec-e595-44b2-91a9-5745efa8789f",
           "width": 115,
           "x": 184,
           "y": 320,
@@ -950,6 +963,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -961,7 +975,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "031c8bab-57f4-4ca5-a1ff-0989bd2c09f1",
+          "persistentUuid": "372316d4-c94d-4b20-b7a3-126e7330f75d",
           "width": 171,
           "x": 64,
           "y": -134,
@@ -976,6 +990,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -987,7 +1002,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "42cb480c-8e9f-4b2a-b478-c05a82d168f7",
+          "persistentUuid": "339ba134-a0be-45f8-ad4d-56402dba6c0d",
           "width": 93,
           "x": 80,
           "y": 230,
@@ -1002,6 +1017,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -1013,7 +1029,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "1f8eb59e-2860-44c1-86c4-0f9f302cb349",
+          "persistentUuid": "ec6beebc-e3e0-4026-8896-7bc2e2951907",
           "width": 154,
           "x": 75,
           "y": 64,
@@ -1028,6 +1044,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -1039,7 +1056,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "1d9c6d44-3af5-45ac-b219-f93cc6b9223a",
+          "persistentUuid": "764d220e-2f6d-47e0-94d6-ea7e9b81137d",
           "width": 66,
           "x": 232,
           "y": 99,
@@ -1054,6 +1071,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -1065,7 +1083,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "f6bc59be-7918-4579-81a0-6c1b9fe07caf",
+          "persistentUuid": "2090c24f-5b78-45bf-a7e7-448527a7620f",
           "width": 123,
           "x": -16,
           "y": 68,
@@ -1080,6 +1098,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -1091,7 +1110,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "FinalScoreTitle",
-          "persistentUuid": "3b8d7a9d-16d8-4712-a406-2c052bd5fdf4",
+          "persistentUuid": "8f41bb6f-54f2-46e2-809d-e53b32f114fa",
           "width": 0,
           "x": 78,
           "y": 40,
@@ -1107,7 +1126,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "FinalScore",
-          "persistentUuid": "58a7c919-e783-4dc2-a45f-869fc10e6974",
+          "persistentUuid": "3a5cb475-ab9b-4f32-af80-b918fb93a0dc",
           "width": 0,
           "x": 135,
           "y": 102,
@@ -1123,7 +1142,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "NewRecord",
-          "persistentUuid": "172159bf-e2ea-4eba-b934-a5ec96e776ab",
+          "persistentUuid": "d192f110-4535-4616-9221-ea623c44db7d",
           "width": 0,
           "x": 4,
           "y": 175,
@@ -1139,7 +1158,7 @@
           "layer": "GameOver",
           "locked": false,
           "name": "BestScore",
-          "persistentUuid": "e32f7180-f4b4-43a2-a4b0-f5a8953f19cc",
+          "persistentUuid": "8fe85a17-bd95-4bff-bfbf-0251cd7ff2f6",
           "width": 0,
           "x": 113,
           "y": 242,
@@ -1155,7 +1174,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
-          "persistentUuid": "c080aa4f-892b-4a40-96ec-e58a31f7f9b8",
+          "persistentUuid": "cd58dfb3-c535-4c97-bba0-7283d2472c9e",
           "width": 150,
           "x": 1,
           "y": 1,
@@ -1171,7 +1190,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
-          "persistentUuid": "43555fb9-87c2-43d4-91d8-ac0413d449c2",
+          "persistentUuid": "5a480295-eb6e-47ff-8aa6-ed3877bc027a",
           "width": 150,
           "x": 150,
           "y": 0,
@@ -1187,7 +1206,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
-          "persistentUuid": "d907dd0f-d51a-44ea-84a5-dfdf7a6a20fa",
+          "persistentUuid": "81335382-104a-40ed-b2cf-679fddd19b07",
           "width": 300,
           "x": 0,
           "y": 420,
@@ -1203,7 +1222,7 @@
           "layer": "",
           "locked": false,
           "name": "TutorialTips",
-          "persistentUuid": "3c6a129f-d02b-40c0-b2ab-75b2ce3dc27c",
+          "persistentUuid": "e59a8fab-bbfd-4be2-b5a2-7bfed8e4baf2",
           "width": 171,
           "x": 62,
           "y": -415,
@@ -1218,6 +1237,7 @@
           "initialVariables": [
             {
               "name": "step",
+              "type": "string",
               "value": "5"
             }
           ]

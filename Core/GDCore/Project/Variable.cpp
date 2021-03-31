@@ -10,35 +10,122 @@
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
-#include "GDCore/TinyXml/tinyxml.h"
 
 using namespace std;
 
 namespace gd {
 
-/**
- * Get value as a double
- */
+gd::Variable Variable::badVariable;
+
+gd::String Variable::TypeAsString(Type t) {
+  switch (t) {
+    case Type::String:
+      return "string";
+    case Type::Number:
+      return "number";
+    case Type::Boolean:
+      return "boolean";
+    case Type::Structure:
+      return "structure";
+    case Type::Array:
+      return "array";
+    default:
+      return "error-type";
+  }
+};
+
+Variable::Type Variable::StringAsType(const gd::String& str) {
+  if (str == "string")
+    return Type::String;
+  else if (str == "number")
+    return Type::Number;
+  else if (str == "boolean")
+    return Type::Boolean;
+  else if (str == "structure")
+    return Type::Structure;
+  else if (str == "array")
+    return Type::Array;
+
+  // Default to number
+  return Type::Number;
+}
+
+bool Variable::IsPrimitive(const Type type) {
+  return type == Type::String || type == Type::Number || type == Type::Boolean;
+}
+
+void Variable::CastTo(const Type newType) {
+  if (newType == Type::Number)
+    SetValue(GetValue());
+  else if (newType == Type::String)
+    SetString(GetString());
+  else if (newType == Type::Boolean)
+    SetBool(GetBool());
+  else if (newType == Type::Structure) {
+    children.clear();
+
+    // Conversion is only possible for non primitive types
+    if (type == Type::Array)
+      for (auto i = childrenArray.begin(); i != childrenArray.end(); ++i)
+        children.insert(
+            std::make_pair(gd::String::From(i - childrenArray.begin()), (*i)));
+
+    type = Type::Structure;
+    // Free now unused memory
+    childrenArray.clear();
+  } else if (newType == Type::Array) {
+    childrenArray.clear();
+
+    // Conversion is only possible for non primitive types
+    if (type == Type::Structure)
+      for (auto i = children.begin(); i != children.end(); ++i)
+        childrenArray.push_back((*i).second);
+
+    type = Type::Array;
+    // Free now unused memory
+    children.clear();
+  }
+}
+
 double Variable::GetValue() const {
-  if (!isNumber) {
-    value = str.To<double>();
-    isNumber = true;
+  if (type == Type::Number) {
+    return value;
+  } else if (type == Type::String) {
+    return str.To<double>();
+  } else if (type == Type::Boolean) {
+    return boolVal ? 1.0 : 0.0;
   }
 
-  return value;
+  // It isn't possible to convert a non-primitive type to a number
+  return 0.0;
 }
 
 const gd::String& Variable::GetString() const {
-  if (isNumber) {
+  if (type == Type::Number)
     str = gd::String::From(value);
-    isNumber = false;
-  }
+  else if (type == Type::Boolean)
+    str = boolVal ? "1" : "0";
+  else if (type != Type::String)
+    str.clear();
 
   return str;
 }
 
+bool Variable::GetBool() const {
+  if (type == Type::Boolean) {
+    return boolVal;
+  } else if (type == Type::String) {
+    return !str.empty();
+  } else if (type == Type::Number) {
+    return value != 0;
+  }
+
+  // It isn't possible to convert a non-primitive type to a boolean
+  return false;
+}
+
 bool Variable::HasChild(const gd::String& name) const {
-  return isStructure && children.find(name) != children.end();
+  return type == Type::Structure && children.find(name) != children.end();
 }
 
 /**
@@ -51,7 +138,7 @@ Variable& Variable::GetChild(const gd::String& name) {
   auto it = children.find(name);
   if (it != children.end()) return *it->second;
 
-  isStructure = true;
+  type = Type::Structure;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
@@ -66,20 +153,20 @@ const Variable& Variable::GetChild(const gd::String& name) const {
   auto it = children.find(name);
   if (it != children.end()) return *it->second;
 
-  isStructure = true;
+  type = Type::Structure;
   children[name] = std::make_shared<gd::Variable>();
   return *children[name];
 }
 
 void Variable::RemoveChild(const gd::String& name) {
-  if (!isStructure) return;
+  if (type != Type::Structure) return;
   children.erase(name);
-  isStructure = !children.empty();
 }
 
 bool Variable::RenameChild(const gd::String& oldName,
                            const gd::String& newName) {
-  if (!isStructure || !HasChild(oldName) || HasChild(newName)) return false;
+  if (type != Type::Structure || !HasChild(oldName) || HasChild(newName))
+    return false;
 
   children[newName] = children[oldName];
   children.erase(oldName);
@@ -87,15 +174,35 @@ bool Variable::RenameChild(const gd::String& oldName,
   return true;
 }
 
-void Variable::ClearChildren() {
-  if (!isStructure) return;
-  children.clear();
-}
+Variable& Variable::GetAtIndex(const size_t index) {
+  type = Type::Array;
+  while (childrenArray.size() <= index)
+    childrenArray.push_back(std::make_shared<gd::Variable>());
+  return *childrenArray[index];
+};
+
+const Variable& Variable::GetAtIndex(const size_t index) const {
+  if (childrenArray.size() <= index) return badVariable;
+  return *childrenArray.at(index);
+};
+
+Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
+
+void Variable::RemoveAtIndex(const size_t index) {
+  if (index >= childrenArray.size()) return;
+  childrenArray.erase(childrenArray.begin() + index);
+};
 
 void Variable::SerializeTo(SerializerElement& element) const {
-  if (!isStructure)
-    element.SetAttribute("value", GetString());
-  else {
+  element.SetStringAttribute("type", TypeAsString(GetType()));
+
+  if (type == Type::String) {
+    element.SetStringAttribute("value", GetString());
+  } else if (type == Type::Number) {
+    element.SetDoubleAttribute("value", GetValue());
+  } else if (type == Type::Boolean) {
+    element.SetBoolAttribute("value", GetBool());
+  } else if (type == Type::Structure) {
     SerializerElement& childrenElement = element.AddChild("children");
     childrenElement.ConsiderAsArrayOf("variable");
     for (auto i = children.begin(); i != children.end(); ++i) {
@@ -103,63 +210,54 @@ void Variable::SerializeTo(SerializerElement& element) const {
       variableElement.SetAttribute("name", i->first);
       i->second->SerializeTo(variableElement);
     }
+  } else if (type == Type::Array) {
+    SerializerElement& childrenElement = element.AddChild("children");
+    childrenElement.ConsiderAsArrayOf("variable");
+    for (auto child : childrenArray) {
+      child->SerializeTo(childrenElement.AddChild("variable"));
+    }
   }
 }
 
 void Variable::UnserializeFrom(const SerializerElement& element) {
-  isStructure = element.HasChild("children", "Children");
+  type = StringAsType(element.GetStringAttribute("type", "string"));
 
-  if (isStructure) {
+  // Compatibility with GD <= 5.0.0-beta102
+  // Before, everything was stored as strings.
+  // We can unserialize primitives as string as they can be converted from/to
+  // strings anyways, but structures cannot be converted from a string.
+  // If we detect children, but the type is primitive (meaning the default type
+  // is used as a type if missing), then it should be unserialized as a
+  // structure instead of a string.
+  if (element.HasChild("children", "Children") && IsPrimitive(type))
+    type = Type::Structure;
+  // end of compatibility code
+
+  if (IsPrimitive(type)) {
+    if (type == Type::String) {
+      SetString(element.GetStringAttribute("value", "0", "Value"));
+    } else if (type == Type::Number) {
+      SetValue(element.GetDoubleAttribute("value", 0.0, "Value"));
+    } else if (type == Type::Boolean) {
+      SetBool(element.GetBoolAttribute("value", false, "Value"));
+    }
+  } else {
     const SerializerElement& childrenElement =
         element.GetChild("children", 0, "Children");
     childrenElement.ConsiderAsArrayOf("variable", "Variable");
+    if (childrenElement.GetChildrenCount() == 0) return;
+
     for (int i = 0; i < childrenElement.GetChildrenCount(); ++i) {
       const SerializerElement& childElement = childrenElement.GetChild(i);
-      gd::String name = childElement.GetStringAttribute("name", "", "Name");
-      children[name] = std::make_shared<gd::Variable>();
-      children[name]->UnserializeFrom(childElement);
-    }
-  } else
-    SetString(element.GetStringAttribute("value", "", "Value"));
-}
-
-void Variable::SaveToXml(TiXmlElement* element) const {
-  if (!element) return;
-
-  if (!isStructure)
-    element->SetAttribute("Value", GetString().c_str());
-  else {
-    TiXmlElement* childrenElem = new TiXmlElement("Children");
-    element->LinkEndChild(childrenElem);
-    for (auto i = children.begin(); i != children.end(); ++i) {
-      TiXmlElement* variable = new TiXmlElement("Variable");
-      childrenElem->LinkEndChild(variable);
-
-      variable->SetAttribute("Name", i->first.c_str());
-      i->second->SaveToXml(variable);
+      if (type == Type::Structure) {
+        gd::String name = childElement.GetStringAttribute("name", "", "Name");
+        children[name] = std::make_shared<gd::Variable>();
+        children[name]->UnserializeFrom(childElement);
+      } else if (type == Type::Array)
+        PushNew().UnserializeFrom(childElement);
     }
   }
-}
-
-void Variable::LoadFromXml(const TiXmlElement* element) {
-  if (!element) return;
-
-  isStructure = element->FirstChildElement("Children") != NULL;
-
-  if (isStructure) {
-    const TiXmlElement* child =
-        element->FirstChildElement("Children")->FirstChildElement();
-    while (child) {
-      gd::String name =
-          child->Attribute("Name") ? child->Attribute("Name") : "";
-      children[name] = std::make_shared<gd::Variable>();
-      children[name]->LoadFromXml(child);
-
-      child = child->NextSiblingElement();
-    }
-  } else if (element->Attribute("Value"))
-    SetString(element->Attribute("Value"));
-}
+}  // namespace gd
 
 std::vector<gd::String> Variable::GetAllChildrenNames() const {
   std::vector<gd::String> names;
@@ -176,27 +274,37 @@ bool Variable::Contains(const gd::Variable& variableToSearch,
     if (it.second.get() == &variableToSearch) return true;
     if (recursive && it.second->Contains(variableToSearch, true)) return true;
   }
+  for (auto& it : childrenArray) {
+    if (it.get() == &variableToSearch) return true;
+    if (recursive && it->Contains(variableToSearch, true)) return true;
+  }
 
   return false;
 }
 
 void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
   for (auto it = children.begin(); it != children.end();) {
-    if (it->second.get() == &variableToRemove) {
+    if (it->second.get() == &variableToRemove)
       it = children.erase(it);
-    } else {
+    else {
       it->second->RemoveRecursively(variableToRemove);
       it++;
     }
   }
-  isStructure = !children.empty();
+  for (auto it = childrenArray.begin(); it != childrenArray.end();)
+    if (it->get() == &variableToRemove)
+      childrenArray.erase(it);
+    else {
+      (*it)->RemoveRecursively(variableToRemove);
+      it++;
+    };
 }
 
 Variable::Variable(const Variable& other)
     : value(other.value),
       str(other.str),
-      isNumber(other.isNumber),
-      isStructure(other.isStructure) {
+      boolVal(other.boolVal),
+      type(other.type) {
   CopyChildren(other);
 }
 
@@ -204,8 +312,8 @@ Variable& Variable::operator=(const Variable& other) {
   if (this != &other) {
     value = other.value;
     str = other.str;
-    isNumber = other.isNumber;
-    isStructure = other.isStructure;
+    boolVal = other.boolVal;
+    type = other.type;
     CopyChildren(other);
   }
 
@@ -216,6 +324,9 @@ void Variable::CopyChildren(const gd::Variable& other) {
   children.clear();
   for (auto& it : other.children) {
     children[it.first] = std::make_shared<gd::Variable>(*it.second);
+  }
+  for (auto child : other.childrenArray) {
+    childrenArray.push_back(std::make_shared<gd::Variable>(*child.get()));
   }
 }
 }  // namespace gd

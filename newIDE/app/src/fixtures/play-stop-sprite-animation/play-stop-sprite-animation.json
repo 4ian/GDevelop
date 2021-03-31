@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\play-stop-sprite-animation\\game.json",
+    "projectUuid": "14b0169e-6e42-411f-9a6d-ca99bc805081",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -192,10 +189,12 @@
       "variables": [
         {
           "name": "pause_animation",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "switch_animation",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -207,7 +206,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "0a009c4f-d277-420c-90d7-b61c1e84f68d",
+          "persistentUuid": "70cc28f4-11aa-47e1-9d3b-a51467b8c264",
           "width": 0,
           "x": 331,
           "y": 298,
@@ -223,7 +222,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "f4ffced7-6594-4b14-b648-4a2b209fab3d",
+          "persistentUuid": "9f529613-6baa-4570-af4b-6ff4d7f76e54",
           "width": 0,
           "x": 113,
           "y": 33,
@@ -239,7 +238,7 @@
           "layer": "",
           "locked": false,
           "name": "pause_message",
-          "persistentUuid": "a78653f6-a5d1-4fd7-a67f-bbe0caa87227",
+          "persistentUuid": "d6acfed5-4dd7-4aaa-9e37-8edca8695813",
           "width": 0,
           "x": 192,
           "y": 432,
@@ -255,7 +254,7 @@
           "layer": "",
           "locked": false,
           "name": "animation_message",
-          "persistentUuid": "56f19ca0-b9fd-45c6-b277-620d7cc320ed",
+          "persistentUuid": "d5b2ce14-622d-4f2e-8530-f05e2a6e99ca",
           "width": 0,
           "x": 341,
           "y": 250,

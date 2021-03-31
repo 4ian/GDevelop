@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,13 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.gdevelop.gdblade",
-    "projectFile": "/Users/florian/Dropbox/GDevelop/Games created with GD/GDBlade/game.json",
+    "projectUuid": "76f4fbde-f341-4c2c-8d3a-150c1b02b4ea",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "GD Blade",
     "author": "",
     "windowWidth": 160,
@@ -511,6 +507,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_shieldDown.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -518,6 +516,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_twoTone.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -525,6 +525,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/sfx_laser1.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -550,6 +552,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets/audio/Heal.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -1166,14 +1170,17 @@
       "variables": [
         {
           "name": "Scrolling",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "GameOver",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "LevelComplete",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -1185,7 +1192,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
-          "persistentUuid": "89aac656-b672-4b5f-b0d2-646f913b0302",
+          "persistentUuid": "3c8ea0cf-21e0-4056-b8fe-0bdac86c7690",
           "width": 0,
           "x": 14,
           "y": 36,
@@ -1201,7 +1208,7 @@
           "layer": "Background",
           "locked": false,
           "name": "SpaceBackground",
-          "persistentUuid": "774d1d89-a883-4c77-93ec-347f54979b3c",
+          "persistentUuid": "f953396c-7207-4c80-acf3-ebfad94292b4",
           "width": 320,
           "x": 0,
           "y": 0,
@@ -1217,7 +1224,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "36bbd603-a995-46f3-87a4-dbcc95dcbe2a",
+          "persistentUuid": "c7464588-833a-4aad-aa78-e35f8581790a",
           "width": 0,
           "x": 256,
           "y": 44,
@@ -1238,7 +1245,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "5f9cfefa-a589-46ef-853c-a294286a56c1",
+          "persistentUuid": "70fc2522-0b1c-48bf-820d-4df1faa08067",
           "width": 0,
           "x": 839,
           "y": 67,
@@ -1254,7 +1261,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "5a0507ba-6700-4319-9949-5432be8b986f",
+          "persistentUuid": "32085a55-dc4e-4e96-ba61-8efee14e11d7",
           "width": 0,
           "x": 877,
           "y": 70,
@@ -1275,7 +1282,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "01b55588-6b04-4d42-ad90-463f23eb21b3",
+          "persistentUuid": "c8510601-4742-48cf-8415-ee6f0f0faf24",
           "width": 0,
           "x": 220,
           "y": 33,
@@ -1291,7 +1298,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "4043c0ae-30ad-48a5-9c82-dd81254b8513",
+          "persistentUuid": "c69097b8-c1b3-4dbc-bd50-12f291dc49f8",
           "width": 0,
           "x": 240,
           "y": 72,
@@ -1312,7 +1319,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "d9f5d87b-a678-4376-802f-99597de993e0",
+          "persistentUuid": "63caa4a3-9292-4338-ab7a-9b0d7cf7251d",
           "width": 0,
           "x": 681,
           "y": 81,
@@ -1328,7 +1335,7 @@
           "layer": "",
           "locked": false,
           "name": "HealthPack",
-          "persistentUuid": "4e4a830d-c3a6-4a8c-81f9-3d5c4847e17a",
+          "persistentUuid": "6533d788-eb84-4880-b874-a80edf13fad5",
           "width": 0,
           "x": 304,
           "y": 44,
@@ -1344,7 +1351,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "92e520d7-e7a9-4e14-81cf-75c3005241e7",
+          "persistentUuid": "40ffbbe3-8333-42de-a356-69e7e2c88854",
           "width": 0,
           "x": 687,
           "y": 43,
@@ -1360,7 +1367,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "3894356a-ee2c-4de4-9e36-da7efceee58b",
+          "persistentUuid": "532375af-f7b8-4b35-a9a3-47b45f63f38c",
           "width": 0,
           "x": 659,
           "y": 20,
@@ -1376,7 +1383,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
-          "persistentUuid": "18c08aad-ba3a-4cf8-90aa-4c41a2afe97f",
+          "persistentUuid": "6c180057-fecf-47a6-bd67-48ded8d5d9c8",
           "width": 0,
           "x": 394,
           "y": 62,
@@ -1392,7 +1399,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
-          "persistentUuid": "956b9130-de23-4ea4-b79b-34fafb7a8347",
+          "persistentUuid": "c22b6802-713b-43dd-945c-69550ab4aae9",
           "width": 0,
           "x": -184,
           "y": 0,
@@ -1408,7 +1415,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
-          "persistentUuid": "dcd4addd-847e-4a97-b51e-e03558324a10",
+          "persistentUuid": "4a549497-eeaa-4e78-84ec-f947e75b422f",
           "width": 0,
           "x": 335,
           "y": 13,
@@ -1424,7 +1431,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "f764a18b-c770-4095-bc6c-7862a0cbaa8e",
+          "persistentUuid": "1c021674-6dbd-424b-a26c-8d7f767aa8eb",
           "width": 0,
           "x": 848,
           "y": 41,
@@ -1445,7 +1452,7 @@
           "layer": "",
           "locked": false,
           "name": "AttackFlame",
-          "persistentUuid": "94d37926-748d-409c-87be-57054c6f7d3d",
+          "persistentUuid": "7f285a3f-090f-455f-89f6-2413afb196d5",
           "width": 0,
           "x": 21,
           "y": -8,
@@ -1461,7 +1468,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
-          "persistentUuid": "ab2e60b8-4dce-4534-8c9c-cbc251a06d62",
+          "persistentUuid": "d0d3a325-2d80-498e-9b7d-0aa3f1db4110",
           "width": 0,
           "x": 1055,
           "y": 0,
@@ -1477,7 +1484,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "10180ede-35f2-4b4a-b241-66e7b3ce565e",
+          "persistentUuid": "a93b2525-8a2c-4dc8-9074-297de3dbe937",
           "width": 0,
           "x": 427,
           "y": 17,
@@ -1493,7 +1500,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "f22ce3ba-6c15-481f-8335-f6243012b865",
+          "persistentUuid": "6890cefb-84e9-4ff0-b218-4404b512c244",
           "width": 0,
           "x": 454,
           "y": 43,
@@ -1514,7 +1521,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "5892acdb-9530-4f14-bdc4-381de1e43078",
+          "persistentUuid": "d2933c10-cbeb-4e4b-8565-9e1a34b1841c",
           "width": 0,
           "x": 430,
           "y": 69,
@@ -1535,7 +1542,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "886b7368-0009-4e31-9b2b-5895eab56385",
+          "persistentUuid": "be7c5a6d-66e9-45f8-a510-253171ef750f",
           "width": 0,
           "x": 888,
           "y": 47,
@@ -1551,7 +1558,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "1f5643e9-7830-48ab-b485-b6311f3588b9",
+          "persistentUuid": "60d80986-c663-4fc1-801b-e27b60841ccc",
           "width": 0,
           "x": 815,
           "y": 46,
@@ -1572,7 +1579,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "8906029b-dd08-49b9-b73f-1cf185eabee7",
+          "persistentUuid": "76c6600d-3ecc-4877-966c-3cf9a7ff6af6",
           "width": 0,
           "x": 791,
           "y": 72,
@@ -1593,7 +1600,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "5a3dbc05-52b6-467f-a6ea-47f3c0e629b3",
+          "persistentUuid": "32dd0e14-cb05-491a-8d72-75ef97a4215e",
           "width": 0,
           "x": 788,
           "y": 20,
@@ -1609,7 +1616,7 @@
           "layer": "",
           "locked": false,
           "name": "Asteroid",
-          "persistentUuid": "41649929-6dff-41a7-81f2-872cdc6f079a",
+          "persistentUuid": "ea790045-161d-44a5-9e3d-b86afe5bc97d",
           "width": 0,
           "x": 876,
           "y": 24,
@@ -1625,7 +1632,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "3a99ee9a-a381-4c1a-9ac3-e0e8853f882b",
+          "persistentUuid": "72e167f2-7f1c-4a63-9540-2d93a5c9ac80",
           "width": 0,
           "x": 558,
           "y": 81,
@@ -1641,7 +1648,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "3c56c6dd-6f24-42bf-a088-5e7b3971a799",
+          "persistentUuid": "4b3d12c2-ca60-4032-bcdc-73ee3017e62b",
           "width": 0,
           "x": 564,
           "y": 47,
@@ -1657,7 +1664,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "5b77175b-dd1c-4533-bbb6-53c1b1b23eac",
+          "persistentUuid": "a3edfdae-d232-438b-8eed-19e747cb13a5",
           "width": 0,
           "x": 536,
           "y": 13,
@@ -1673,7 +1680,7 @@
           "layer": "UI",
           "locked": false,
           "name": "LifebarContainer",
-          "persistentUuid": "78e0d803-89be-4690-8975-39d69f0dfd49",
+          "persistentUuid": "8a5c7205-3b71-4626-9bdd-2c902f2fb13f",
           "width": 0,
           "x": 2,
           "y": 1,
@@ -1689,7 +1696,7 @@
           "layer": "UI",
           "locked": false,
           "name": "Lifebar",
-          "persistentUuid": "1bcb1c4b-3963-4b00-8ad6-72aeedb8131d",
+          "persistentUuid": "d1ce1f69-035c-4d30-af66-f1cfd9641fd5",
           "width": 0,
           "x": 21,
           "y": 4,
@@ -1705,7 +1712,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerAttackArea",
-          "persistentUuid": "5b8763d5-02a9-48a1-ae13-d62d240a33fc",
+          "persistentUuid": "532cc227-01c3-4d1f-b121-48b62288a7c9",
           "width": 0,
           "x": 56,
           "y": -59,
@@ -1721,7 +1728,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
-          "persistentUuid": "cf3558c8-2ce6-476b-8f98-7284e8cb37b3",
+          "persistentUuid": "14405f5f-e326-41f1-a0cd-d2c03299edc9",
           "width": 45,
           "x": 574,
           "y": -9,
@@ -1737,7 +1744,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical2",
-          "persistentUuid": "9418cb98-4792-4b49-8210-6da524bc6d9e",
+          "persistentUuid": "71ee7e0b-7b40-4b4b-81c6-29f123348cd8",
           "width": 32,
           "x": 480,
           "y": 81,
@@ -1753,7 +1760,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
-          "persistentUuid": "09b587bb-1700-4d6c-bd93-f7a2537c4420",
+          "persistentUuid": "0805866f-1862-4cf0-98dc-c4d01e0398f5",
           "width": 45,
           "x": 53,
           "y": 82,
@@ -1769,7 +1776,7 @@
           "layer": "",
           "locked": false,
           "name": "TilesMechanical1",
-          "persistentUuid": "3db7479d-753f-48fd-9027-f28ab6c4665c",
+          "persistentUuid": "c5afa709-0662-41f3-981f-b3d6811c041d",
           "width": 45,
           "x": 436,
           "y": 83,
@@ -1785,7 +1792,7 @@
           "layer": "UI",
           "locked": false,
           "name": "ChangeButton",
-          "persistentUuid": "f8c2b227-d51d-4fe3-8efd-1c03b5759e89",
+          "persistentUuid": "04c3f2fb-eed4-4d72-ba4f-261d4f2b283e",
           "width": 0,
           "x": 126,
           "y": -7,
@@ -1801,7 +1808,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBody",
-          "persistentUuid": "3cf50c43-702b-4c86-bccc-12eae3b9b8e9",
+          "persistentUuid": "36be6825-fab1-4f66-b8d6-51c18a333864",
           "width": 0,
           "x": 1204,
           "y": 0,
@@ -1817,7 +1824,7 @@
           "layer": "",
           "locked": false,
           "name": "BossTopArm",
-          "persistentUuid": "203b7669-396d-421c-aaaa-ca89cb9a2e0f",
+          "persistentUuid": "d4ce13f8-9e56-430f-8df4-5ade3e8898f2",
           "width": 0,
           "x": 1172,
           "y": 0,
@@ -1833,7 +1840,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBottomArm",
-          "persistentUuid": "d87c6b9a-203c-4d28-ad42-a90b3f112d37",
+          "persistentUuid": "9aa29d90-4c18-45e0-966f-c96c5cbdbd37",
           "width": 0,
           "x": 1172,
           "y": 45,
@@ -1849,7 +1856,7 @@
           "layer": "",
           "locked": false,
           "name": "BossBackground",
-          "persistentUuid": "de3aa1fc-8ae1-49fe-b031-195dd41b6c05",
+          "persistentUuid": "25b1cbf7-70a3-4488-bda6-15afeee6fd3d",
           "width": 0,
           "x": 1092,
           "y": 0,
@@ -1865,7 +1872,7 @@
           "layer": "",
           "locked": false,
           "name": "CorridorBackground",
-          "persistentUuid": "9795f77a-0111-497f-8692-585f585fcd0e",
+          "persistentUuid": "cf4c4da3-a2c9-4604-b4f4-368b5e13b3e4",
           "width": 0,
           "x": 462,
           "y": 0,
@@ -1881,7 +1888,7 @@
           "layer": "UI",
           "locked": false,
           "name": "GameOver",
-          "persistentUuid": "595f8209-ef69-4297-b454-f01d275a31d2",
+          "persistentUuid": "60f2acc0-b050-4ebe-814f-8aed977a1263",
           "width": 0,
           "x": 31,
           "y": 39,
@@ -1897,7 +1904,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
-          "persistentUuid": "65a4df15-42ca-4ef0-923d-1d633a254df6",
+          "persistentUuid": "907c7160-2ea4-4a18-be3b-5baf1c0e4aee",
           "width": 0,
           "x": 996,
           "y": 29,
@@ -1913,7 +1920,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
-          "persistentUuid": "baf7fad2-274e-4160-8598-66f2f1ea6c00",
+          "persistentUuid": "cd275993-7323-4e1d-8a59-68311d78d8eb",
           "width": 0,
           "x": 730,
           "y": 30,
@@ -1929,7 +1936,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy3",
-          "persistentUuid": "f4fa7799-40dc-44d9-96ce-d670fb2420a2",
+          "persistentUuid": "9ec8d91b-3895-4493-a898-16017e1fad8a",
           "width": 0,
           "x": 938,
           "y": 28,
@@ -1945,7 +1952,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "ed363afd-5aaf-4b09-9bdf-f749de2905f7",
+          "persistentUuid": "88cc8dda-df01-4f8d-a876-dee788121f3f",
           "width": 0,
           "x": 1092,
           "y": 70,
@@ -1961,7 +1968,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy2",
-          "persistentUuid": "4b6f99be-a7b0-41b9-adf2-76db2a9e21f4",
+          "persistentUuid": "075cce3d-493e-4341-aee3-1c0b6f3fa68f",
           "width": 0,
           "x": 1075,
           "y": 44,
@@ -1977,7 +1984,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
-          "persistentUuid": "a8b67f06-e516-479c-bd08-384c49a9e5e1",
+          "persistentUuid": "ffa760af-6a14-422e-9e93-56c855b8b98b",
           "width": 0,
           "x": 658,
           "y": 61,
@@ -1993,7 +2000,7 @@
           "layer": "",
           "locked": false,
           "name": "HealthPack",
-          "persistentUuid": "d4414773-9602-40ab-8b66-f56ca3fd5f1e",
+          "persistentUuid": "67692db0-13bc-4b4f-9909-0862d88fb600",
           "width": 0,
           "x": 972,
           "y": 39,
@@ -2009,7 +2016,7 @@
           "layer": "",
           "locked": false,
           "name": "Enemy1",
-          "persistentUuid": "14c8bd21-bd02-48b1-b3ac-d468f9fd1a78",
+          "persistentUuid": "1ba7fa70-1948-42f8-9394-2b78ae560cc0",
           "width": 0,
           "x": 1039,
           "y": 16,
@@ -2028,6 +2035,7 @@
           "variables": [
             {
               "name": "State",
+              "type": "string",
               "value": "Spaceship"
             }
           ],
@@ -2101,20 +2109,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2143,20 +2151,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2197,20 +2205,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2239,20 +2247,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2293,20 +2301,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2335,20 +2343,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2383,20 +2391,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2419,20 +2427,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2467,20 +2475,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2503,20 +2511,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2551,20 +2559,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2587,20 +2595,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2947,20 +2955,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -2983,20 +2991,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -3019,20 +3027,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -3055,20 +3063,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -3091,20 +3099,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -3127,20 +3135,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 0.773438,
-                            "y": 11.5508
+                            "x": 0.7734379768371582,
+                            "y": 11.550800323486328
                           },
                           {
-                            "x": 29.9844,
-                            "y": 11.2344
+                            "x": 29.984399795532227,
+                            "y": 11.234399795532227
                           },
                           {
-                            "x": 31.5781,
-                            "y": 42.3203
+                            "x": 31.578100204467773,
+                            "y": 42.3203010559082
                           },
                           {
-                            "x": 0.949219,
-                            "y": 41.3086
+                            "x": 0.9492189884185791,
+                            "y": 41.30860137939453
                           }
                         ]
                       ]
@@ -4285,20 +4293,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 12.4648,
-                            "y": 2.29688
+                            "x": 12.464799880981445,
+                            "y": 2.296880006790161
                           },
                           {
-                            "x": 56.0664,
-                            "y": 1.37891
+                            "x": 56.06639862060547,
+                            "y": 1.378909945487976
                           },
                           {
-                            "x": 53.6406,
-                            "y": 49.5898
+                            "x": 53.64059829711914,
+                            "y": 49.58980178833008
                           },
                           {
-                            "x": 11.0977,
-                            "y": 50.4844
+                            "x": 11.097700119018555,
+                            "y": 50.48440170288086
                           }
                         ]
                       ]
@@ -4419,20 +4427,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 11.3672,
-                            "y": 31.7852
+                            "x": 11.367199897766113,
+                            "y": 31.785200119018555
                           },
                           {
-                            "x": 28.0195,
+                            "x": 28.019500732421875,
                             "y": 33.0625
                           },
                           {
-                            "x": 28.7188,
-                            "y": 58.3086
+                            "x": 28.718799591064453,
+                            "y": 58.30860137939453
                           },
                           {
                             "x": 11.75,
-                            "y": 56.6367
+                            "y": 56.63669967651367
                           }
                         ]
                       ]
@@ -4621,20 +4629,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4675,20 +4683,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4717,20 +4725,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4759,20 +4767,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4801,20 +4809,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4843,20 +4851,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4897,20 +4905,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4939,20 +4947,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -4981,20 +4989,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5023,20 +5031,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5065,20 +5073,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5119,20 +5127,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5161,20 +5169,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5203,20 +5211,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5245,20 +5253,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5287,20 +5295,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5329,20 +5337,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 1.35547,
-                            "y": 8.85938
+                            "x": 1.3554699420928955,
+                            "y": 8.859379768371582
                           },
                           {
-                            "x": 18.5938,
-                            "y": 8.12891
+                            "x": 18.593799591064453,
+                            "y": 8.128910064697266
                           },
                           {
                             "x": 18.25,
-                            "y": 29.5391
+                            "y": 29.539100646972656
                           },
                           {
-                            "x": 2.51562,
-                            "y": 26.9961
+                            "x": 2.515619993209839,
+                            "y": 26.9960994720459
                           }
                         ]
                       ]
@@ -5405,20 +5413,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5459,20 +5467,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5501,20 +5509,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5543,20 +5551,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5585,20 +5593,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5627,20 +5635,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5681,20 +5689,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5723,20 +5731,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5765,20 +5773,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5807,20 +5815,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5849,20 +5857,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5903,20 +5911,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5945,20 +5953,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -5987,20 +5995,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -6029,20 +6037,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -6071,20 +6079,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -6113,20 +6121,20 @@
                       "customCollisionMask": [
                         [
                           {
-                            "x": 2.16797,
-                            "y": 14.543
+                            "x": 2.1679699420928955,
+                            "y": 14.543000221252441
                           },
                           {
-                            "x": 21.8555,
-                            "y": 17.0977
+                            "x": 21.855499267578125,
+                            "y": 17.097700119018555
                           },
                           {
-                            "x": 18.6445,
-                            "y": 35.7891
+                            "x": 18.644500732421875,
+                            "y": 35.789100646972656
                           },
                           {
-                            "x": 3.57422,
-                            "y": 36.1016
+                            "x": 3.5742199420928955,
+                            "y": 36.101600646972656
                           }
                         ]
                       ]
@@ -9876,10 +9884,21 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Flash",
+      "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -9893,6 +9912,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -10087,6 +10107,7 @@
               "fullName": "Flash (blink)",
               "functionType": "Action",
               "name": "Flash",
+              "private": false,
               "sentence": "Make _PARAM0_ blink for _PARAM2_ seconds",
               "events": [
                 {
@@ -10187,6 +10208,7 @@
               "fullName": "Is object flashing",
               "functionType": "Condition",
               "name": "IsFlashing",
+              "private": false,
               "sentence": "_PARAM0_ is flashing",
               "events": [
                 {
@@ -10269,6 +10291,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onOwnerRemovedFromScene",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -10322,6 +10345,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onDeActivate",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -10375,6 +10399,7 @@
               "fullName": "Stop flashing",
               "functionType": "Action",
               "name": "Stop",
+              "private": false,
               "sentence": "Stop flashing _PARAM0_",
               "events": [
                 {
@@ -10484,10 +10509,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "FireBullet",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10501,6 +10532,7 @@
               "fullName": "Fire a bullet",
               "functionType": "Action",
               "name": "Fire",
+              "private": false,
               "sentence": "Fire _PARAM4_ from _PARAM0_, at position _PARAM2_;_PARAM3_, with angle _PARAM5_ and speed _PARAM6_ px/s",
               "events": [
                 {
@@ -10655,6 +10687,7 @@
               "fullName": "Has just fired",
               "functionType": "Condition",
               "name": "HasJustFired",
+              "private": false,
               "sentence": "_PARAM0_ has just fired",
               "events": [
                 {
@@ -10737,6 +10770,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -10814,10 +10848,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Health",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -10831,6 +10871,7 @@
               "fullName": "Damage the object",
               "functionType": "Action",
               "name": "Hit",
+              "private": false,
               "sentence": "Damage _PARAM0_, removing _PARAM2_ from its health",
               "events": [
                 {
@@ -10963,6 +11004,7 @@
               "fullName": "Is dead",
               "functionType": "Condition",
               "name": "IsDead",
+              "private": false,
               "sentence": "_PARAM0_ is dead",
               "events": [
                 {
@@ -11047,6 +11089,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -11100,6 +11143,7 @@
               "fullName": "Is just damaged",
               "functionType": "Condition",
               "name": "IsJustDamaged",
+              "private": false,
               "sentence": "_PARAM0_ has just been damaged",
               "events": [
                 {
@@ -11182,6 +11226,7 @@
               "fullName": "Heal the object",
               "functionType": "Action",
               "name": "Heal",
+              "private": false,
               "sentence": "Heal _PARAM0_, adding _PARAM2_ to its health",
               "events": [
                 {
@@ -11282,6 +11327,7 @@
               "fullName": "Change object health",
               "functionType": "Action",
               "name": "SetHealth",
+              "private": false,
               "sentence": "Set health of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -11382,6 +11428,7 @@
               "fullName": "Health",
               "functionType": "Expression",
               "name": "Health",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -11484,10 +11531,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "StayOnScreen",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11501,6 +11554,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -11608,10 +11662,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "LinearMovement",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11625,6 +11685,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -11703,10 +11764,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "BackAndForthMovement",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -11720,6 +11787,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -12108,10 +12176,16 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "SineMovement",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -12125,6 +12199,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -12371,16 +12446,23 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "VibratingCamera",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Vibrate the camera randomly around a position",
           "fullName": "Vibrate the camera around a position",
           "functionType": "Action",
           "name": "VibrateCameraAroundPosition",
+          "private": false,
           "sentence": "Vibrate the camera around _PARAM1_;_PARAM2_ with amplitude _PARAM3_ on X axis and _PARAM4_ on Y axis at frequency _PARAM5_hz (layer: _PARAM6_)",
           "events": [
             {
@@ -12568,16 +12650,23 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "SpaceShooterControls",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [
+        ""
+      ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Handle the player object movements, by checking the touch position or the keys pressed",
           "fullName": "Handle player movement",
           "functionType": "Action",
           "name": "HandlePlayerMovement",
+          "private": false,
           "sentence": "Handle the movements of _PARAM1_ (using touch, if not touching _PARAM3_, or keyboard keys)",
           "events": [
             {
@@ -13031,6 +13120,7 @@
           "fullName": "Player is pressing fire button",
           "functionType": "Condition",
           "name": "ShouldFire",
+          "private": false,
           "sentence": "Player is pressing fire button (using touch or keyboard)",
           "events": [
             {
@@ -13104,6 +13194,7 @@
           "fullName": "Player wants to transform",
           "functionType": "Condition",
           "name": "ShouldTransform",
+          "private": false,
           "sentence": "The player is pressing the transform key (or touching _PARAM1_)",
           "events": [
             {
@@ -13201,6 +13292,7 @@
           "fullName": "Player is moving up",
           "functionType": "Condition",
           "name": "GoingUp",
+          "private": false,
           "sentence": "_PARAM1_ is moving up",
           "events": [
             {
@@ -13269,6 +13361,7 @@
           "fullName": "Player is moving down",
           "functionType": "Condition",
           "name": "GoingDown",
+          "private": false,
           "sentence": "_PARAM1_ is moving down",
           "events": [
             {

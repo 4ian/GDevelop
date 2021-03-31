@@ -57,7 +57,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
 
     expect(runtimeScene.getVariables().has('Counter')).toBe(true);
     expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(4);
@@ -123,7 +123,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
 
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
     expect(
@@ -214,7 +214,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     );
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
 
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
     expect(
@@ -222,8 +222,118 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     ).toBe(1);
   });
 
-  it('generates a working function with BuiltinCommonInstructions::Once', function () {
+  it('generates a working function creating objects', function () {
+    const makeAddOneToObjectTestVariableEvent = (objectName) => ({
+      disabled: false,
+      folded: false,
+      type: 'BuiltinCommonInstructions::Standard',
+      conditions: [],
+      actions: [
+        {
+          type: { inverted: false, value: 'ModVarObjet' },
+          parameters: [objectName, 'TestVariable', '+', '1'],
+          subInstructions: [],
+        },
+      ],
+      events: [],
+    });
+
     // Create events using the Trigger Once condition.
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        disabled: false,
+        folded: false,
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { inverted: false, value: 'Create' },
+            parameters: ['', 'MyObjectA', '0', '0', ''],
+            subInstructions: [],
+          },
+        ],
+        events: [makeAddOneToObjectTestVariableEvent('MyObjectA')],
+      },
+      makeAddOneToObjectTestVariableEvent('MyObjectA'),
+      makeAddOneToObjectTestVariableEvent('MyObjectB'),
+    ]);
+
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunction = new gd.EventsFunction();
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+
+    // Add an object parameter to the function:
+    const objectParameter = new gd.ParameterMetadata();
+    objectParameter.setType('object');
+    objectParameter.setName('MyObjectA');
+    eventsFunction.getParameters().push_back(objectParameter);
+    objectParameter.setType('object');
+    objectParameter.setName('MyObjectB');
+    eventsFunction.getParameters().push_back(objectParameter);
+    objectParameter.delete();
+
+    const runCompiledEvents = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunction
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runtimeScene.getOnceTriggers().startNewFrame();
+    const emptyMyObjectALists = gdjs.Hashtable.newFrom({ MyObjectA: [] });
+    const myObjectB = runtimeScene.createObject('MyObjectB');
+    const myObjectBLists = gdjs.Hashtable.newFrom({ MyObjectB: [myObjectB] });
+
+    runCompiledEvents(gdjs, runtimeScene, [
+      emptyMyObjectALists,
+      myObjectBLists,
+    ]);
+
+    // Check that the object was created and its variable was incremented twice.
+    expect(runtimeScene.getObjects('MyObjectA')).toHaveLength(1);
+    const firstMyObjectA = runtimeScene.getObjects('MyObjectA')[0];
+    expect(firstMyObjectA.getVariables().has('TestVariable')).toBe(true);
+    expect(
+      firstMyObjectA.getVariables().get('TestVariable').getAsNumber()
+    ).toBe(2);
+
+    // Object B has nothing to do with the "Create", its variable is just incremented once.
+    expect(
+      myObjectB.getVariables().get('TestVariable').getAsNumber()
+    ).toBe(1);
+
+    // Check that if the function is called with the first MyObjectA as parameter, it won't change
+    // the way a new object is created...
+    const myObjectALists = gdjs.Hashtable.newFrom({
+      MyObjectA: [firstMyObjectA],
+    });
+    runCompiledEvents(gdjs, runtimeScene, [myObjectALists, myObjectBLists]);
+    expect(runtimeScene.getObjects('MyObjectA')).toHaveLength(2);
+    const secondMyObjectA = runtimeScene.getObjects('MyObjectA')[1];
+    expect(secondMyObjectA.getVariables().has('TestVariable')).toBe(true);
+    expect(
+      secondMyObjectA.getVariables().get('TestVariable').getAsNumber()
+    ).toBe(2);
+
+    // ... and the first, "already created" MyObjectA is only picked by the second event.
+    // The first event with the "Create" will only pick the "just created" object.
+    expect(
+      firstMyObjectA.getVariables().get('TestVariable').getAsNumber()
+    ).toBe(3);
+
+    // Object B has nothing to do with the "Create", its variable is just incremented again.
+    expect(myObjectB.getVariables().get('TestVariable').getAsNumber()).toBe(
+      2
+    );
+
+    eventsFunction.delete();
+    project.delete();
+  });
+
+  it('generates a working function with BuiltinCommonInstructions::Once', function () {
+    // Event to create an object, then add
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
         disabled: false,
@@ -287,9 +397,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
 
     // Check that after running the compiled events twice, actions were
     // executed only twice.
@@ -302,7 +412,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     project.delete();
   });
 
-  it('generates a working function with BuiltinCommonInstructions::Once', function () {
+  it('generates a working function with BuiltinCommonInstructions::Once with stable IDs across compilation', function () {
     // Create events using the Trigger Once condition.
     const eventsSerializerElement = gd.Serializer.fromJSON(
       JSON.stringify([
@@ -369,9 +479,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents(gdjs, runtimeScene);
+    runCompiledEvents(gdjs, runtimeScene, []);
 
     // Check that after running the compiled events twice, actions were
     // executed only twice.
@@ -389,9 +499,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
       eventsFunctionCopy
     );
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents2(gdjs, runtimeScene);
+    runCompiledEvents2(gdjs, runtimeScene, []);
     runtimeScene.getOnceTriggers().startNewFrame();
-    runCompiledEvents2(gdjs, runtimeScene);
+    runCompiledEvents2(gdjs, runtimeScene, []);
 
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
     expect(
@@ -429,36 +539,24 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
   eventsFunctionsExtensionCodeGenerator.delete();
   includeFiles.delete();
 
+  // Uncomment to see the generated code:
+  // console.log(code);
+
   // Create a "real" JavaScript function with the generated code.
-  const runCompiledEvents = new Function(
+  const runCompiledEventsFunction = new Function(
     'gdjs',
     'runtimeScene',
-    `${code};
-return functionNamespace.func(runtimeScene, runtimeScene);`
+    'functionArguments',
+    // Expose some global variables that are expected by the generated code:
+    `Hashtable = gdjs.Hashtable;` +
+      '\n' +
+      code +
+      // Return the function for it to be called.
+      `;
+return functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]);`
   );
 
-  return runCompiledEvents;
-}
-
-/** Helper to create compiled events from serialized events, creating a project and the events function. */
-function generateCompiledEventsFromSerializedEvents(
-  gd,
-  eventsSerializerElement
-) {
-  const project = new gd.ProjectHelper.createNewGDJSProject();
-  const eventsFunction = new gd.EventsFunction();
-  eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
-
-  const runCompiledEvents = generateCompiledEventsForEventsFunction(
-    gd,
-    project,
-    eventsFunction
-  );
-
-  eventsFunction.delete();
-  project.delete();
-
-  return runCompiledEvents;
+  return runCompiledEventsFunction;
 }
 
 /** Helper to create compiled events from serialized events, creating a project and the events function. */

@@ -31,7 +31,7 @@ export default [
           multiSelections,
           title: i18n._(t`Choose an audio file`),
           name: i18n._(t`Audio files`),
-          extensions: ['wav', 'mp3', 'ogg'],
+          extensions: ['aac', 'wav', 'mp3', 'ogg'],
         };
         return selectLocalResourcePath(
           i18n,

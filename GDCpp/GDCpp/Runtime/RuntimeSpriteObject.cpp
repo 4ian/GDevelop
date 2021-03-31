@@ -76,8 +76,7 @@ RuntimeSpriteObject::~RuntimeSpriteObject(){};
 
 bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(
     const gd::InitialInstance& position) {
-  if (position.floatInfos.find("animation") != position.floatInfos.end())
-    SetCurrentAnimation(position.floatInfos.find("animation")->second);
+  SetCurrentAnimation(position.GetRawDoubleProperty("animation"));
 
   return true;
 }

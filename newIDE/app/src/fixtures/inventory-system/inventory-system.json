@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\inventory-system\\game.json",
+    "projectUuid": "28d8d469-89fc-463a-ab71-cfd4821b8828",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "inventory_example",
     "author": "ddabrahim",
     "windowWidth": 800,
@@ -481,7 +478,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "Inventory_title",
-          "persistentUuid": "8da9a908-3fda-41c4-a110-c277da478f26",
+          "persistentUuid": "ec77c29f-617d-44ce-9c97-89f253f541e3",
           "width": 86,
           "x": 358,
           "y": 29,
@@ -497,7 +494,7 @@
           "layer": "",
           "locked": false,
           "name": "item_apple",
-          "persistentUuid": "fb3cf9e3-681a-406f-af95-6c59aae5fd84",
+          "persistentUuid": "3cf1a068-2248-45ea-8241-268fe8050988",
           "width": 0,
           "x": 16,
           "y": 330,
@@ -507,10 +504,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "apple"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -522,7 +521,7 @@
           "layer": "",
           "locked": false,
           "name": "item_pearl",
-          "persistentUuid": "4e7e6c86-7dec-446f-8f50-c7fedb6448f2",
+          "persistentUuid": "8474e79a-bc7c-4cb2-aa7e-f1717d44e19f",
           "width": 0,
           "x": 642,
           "y": 107,
@@ -532,10 +531,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "pearl"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -547,7 +548,7 @@
           "layer": "",
           "locked": false,
           "name": "item_orange",
-          "persistentUuid": "60f6ed0a-9d10-4901-81cb-da1fbd140a92",
+          "persistentUuid": "b7ef9dbc-43b4-49cc-9aef-05be8f95bab3",
           "width": 0,
           "x": 641,
           "y": 314,
@@ -557,10 +558,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "orange"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -572,7 +575,7 @@
           "layer": "",
           "locked": false,
           "name": "item_apple",
-          "persistentUuid": "41a1e25f-2de0-4dac-bc13-48e9a58239f4",
+          "persistentUuid": "8c71c1c2-ae41-4ff2-9a38-a908f04cdd25",
           "width": 0,
           "x": 15,
           "y": 239,
@@ -582,10 +585,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "apple"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -597,7 +602,7 @@
           "layer": "",
           "locked": false,
           "name": "item_pearl",
-          "persistentUuid": "f17fb7fa-7d62-4caa-8dd9-da57d01abd45",
+          "persistentUuid": "b0564af0-017f-4a1f-8d47-cfb1bf69864d",
           "width": 0,
           "x": 644,
           "y": 176,
@@ -607,10 +612,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "pearl"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -622,7 +629,7 @@
           "layer": "",
           "locked": false,
           "name": "item_orange",
-          "persistentUuid": "42db1cfa-8bc4-499f-a2f3-0589c96f386c",
+          "persistentUuid": "17c8207a-22b7-4894-8ec4-bb84c279c4dd",
           "width": 0,
           "x": 640,
           "y": 240,
@@ -632,10 +639,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "orange"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -647,7 +656,7 @@
           "layer": "",
           "locked": false,
           "name": "item_banana",
-          "persistentUuid": "4c4c0241-ca89-4cda-a6b1-cdb77b91a762",
+          "persistentUuid": "03af0c36-5046-4c4a-8442-04ae23672c36",
           "width": 0,
           "x": 15,
           "y": 66,
@@ -657,10 +666,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "banana"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -672,7 +683,7 @@
           "layer": "",
           "locked": false,
           "name": "item_banana",
-          "persistentUuid": "289cc4d9-5b88-4bd9-b308-855c4e73b1aa",
+          "persistentUuid": "d57f207f-6980-49d1-8cb6-5abc6210fa74",
           "width": 0,
           "x": 11,
           "y": 147,
@@ -682,10 +693,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "banana"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -697,7 +710,7 @@
           "layer": "",
           "locked": false,
           "name": "item_cherry",
-          "persistentUuid": "e86367bc-fa06-4e72-87e2-5205d367d252",
+          "persistentUuid": "f5eb6156-6d24-4d68-b27e-1d2adb33efe5",
           "width": 0,
           "x": 729,
           "y": 82,
@@ -707,10 +720,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "cherry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -722,7 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "item_cherry",
-          "persistentUuid": "41a83566-61cc-4e61-9916-daa5822d78ed",
+          "persistentUuid": "8fe43be3-ee93-418a-ab28-8ca2b232fc02",
           "width": 0,
           "x": 720,
           "y": 10,
@@ -732,10 +747,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "cherry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -747,7 +764,7 @@
           "layer": "",
           "locked": false,
           "name": "item_grape",
-          "persistentUuid": "1d62c45d-7369-41ed-96da-277fd929c4c7",
+          "persistentUuid": "9cf00d49-f09c-410d-8bc7-275d603728ed",
           "width": 0,
           "x": 106,
           "y": 247,
@@ -757,10 +774,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "grape"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -772,7 +791,7 @@
           "layer": "",
           "locked": false,
           "name": "item_grape",
-          "persistentUuid": "764e8752-a514-47d6-a96a-d34b0441f4f8",
+          "persistentUuid": "afddc91f-eb2f-4116-94b9-7e08e75d9ab5",
           "width": 0,
           "x": 104,
           "y": 323,
@@ -782,10 +801,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "grape"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -797,7 +818,7 @@
           "layer": "",
           "locked": false,
           "name": "item_raspberry",
-          "persistentUuid": "f12e6fb3-72c5-4faa-bfda-45a08a239fa7",
+          "persistentUuid": "cc5bc44a-b90e-48e3-9b2d-7744f3d8a572",
           "width": 0,
           "x": 727,
           "y": 321,
@@ -807,10 +828,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "raspberry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -822,7 +845,7 @@
           "layer": "",
           "locked": false,
           "name": "item_raspberry",
-          "persistentUuid": "0b52e5fa-76a7-43e9-a0f3-4dc3f3a8639a",
+          "persistentUuid": "2bcb1206-a5e6-47f4-bd2f-b7764988c091",
           "width": 0,
           "x": 643,
           "y": 26,
@@ -832,10 +855,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "raspberry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -847,7 +872,7 @@
           "layer": "",
           "locked": false,
           "name": "item_strawberry",
-          "persistentUuid": "242b583d-dfa8-4d95-8633-9fc29bc052be",
+          "persistentUuid": "fa949409-af69-4947-b2b2-c165eae3c506",
           "width": 0,
           "x": 728,
           "y": 246,
@@ -857,10 +882,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "strawberry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -872,7 +899,7 @@
           "layer": "",
           "locked": false,
           "name": "item_strawberry",
-          "persistentUuid": "f21f8157-5497-431c-bed1-01e68ace58af",
+          "persistentUuid": "b4b8025e-10cd-4c69-9a07-e21f465a0663",
           "width": 0,
           "x": 729,
           "y": 161,
@@ -882,10 +909,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "strawberry"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -897,7 +926,7 @@
           "layer": "",
           "locked": false,
           "name": "item_watermelon",
-          "persistentUuid": "be491a63-cca2-49dc-b4b2-e3ac4f494285",
+          "persistentUuid": "3e547272-3c80-439e-8002-093d8bddd61e",
           "width": 0,
           "x": 103,
           "y": 162,
@@ -907,10 +936,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "watermelon"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -922,7 +953,7 @@
           "layer": "",
           "locked": false,
           "name": "item_watermelon",
-          "persistentUuid": "1b489044-335c-4d53-b9ba-d28cc3afbb33",
+          "persistentUuid": "40a7ca61-ce43-45f5-8e72-d3a23a18c29a",
           "width": 0,
           "x": 105,
           "y": 78,
@@ -932,10 +963,12 @@
           "initialVariables": [
             {
               "name": "name",
+              "type": "string",
               "value": "watermelon"
             },
             {
               "name": "quantity",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -947,7 +980,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_bin",
-          "persistentUuid": "773bdebd-db62-4835-a2ba-e56ca1780d40",
+          "persistentUuid": "87679c8a-3e12-4ebe-a4c9-ccf922de8de1",
           "width": 0,
           "x": 348,
           "y": 262,
@@ -963,7 +996,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "e2dbf03f-48f1-4bbd-9268-7aed2ae8d583",
+          "persistentUuid": "1e586b8d-2ae7-461d-b60d-f45c8f652a0a",
           "width": 0,
           "x": 224,
           "y": 192,
@@ -979,7 +1012,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "acf69fed-bc91-4e60-90e4-a7344b64cae0",
+          "persistentUuid": "780cf9f9-70ce-4021-b21e-13ed2e5dc591",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -995,7 +1028,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "83e6e472-54e8-4a93-9550-8324cadb8dad",
+          "persistentUuid": "601ef5da-c933-43f6-9618-d3c39dd94747",
           "width": 0,
           "x": 321,
           "y": 96,
@@ -1011,7 +1044,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "b44ecd4f-30ac-4e7d-9438-64eccbb0958e",
+          "persistentUuid": "340da31b-6183-4eae-8a45-9361661327bb",
           "width": 0,
           "x": 416,
           "y": 96,
@@ -1027,7 +1060,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "f389e864-68f2-4047-acda-d3a489cbc2f4",
+          "persistentUuid": "097b274c-38fc-45dd-b19a-fb4a6cce7e56",
           "width": 0,
           "x": 512,
           "y": 96,
@@ -1043,7 +1076,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "39f2aa0f-e986-430e-bf01-e5cd517a933f",
+          "persistentUuid": "35c9580b-040d-4cdf-ae97-87eabc8e117d",
           "width": 0,
           "x": 512,
           "y": 192,
@@ -1059,7 +1092,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "2d32d4a9-42b4-4f39-b74f-8ca3861cdb3d",
+          "persistentUuid": "a710f712-03a5-42cc-9293-14b777b315c2",
           "width": 0,
           "x": 416,
           "y": 192,
@@ -1075,7 +1108,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_slot",
-          "persistentUuid": "d211779a-7fa5-4308-91e0-41cca3235dc1",
+          "persistentUuid": "3cfba7a3-dbf4-40c2-b27f-d5d52e816829",
           "width": 0,
           "x": 320,
           "y": 191,
@@ -1091,7 +1124,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "inventory_background",
-          "persistentUuid": "628f5eff-3b68-4b0d-95e2-9299482c72ba",
+          "persistentUuid": "419e0e0c-610c-464e-b2c9-2510af6eb68f",
           "width": 360,
           "x": 220,
           "y": 30,
@@ -1107,7 +1140,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "2419af59-5b2b-4d09-8342-65de2a1d7e78",
+          "persistentUuid": "a9d28b25-0cf6-41fd-aacb-7f6f9317a2d2",
           "width": 0,
           "x": 100,
           "y": 439,
@@ -1123,7 +1156,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "save_text",
-          "persistentUuid": "0a8ee7b3-46b7-4b56-a7f8-eb43cbd9355a",
+          "persistentUuid": "948b9ab7-e0ec-427a-8ca2-29e4c2f1fd55",
           "width": 0,
           "x": 264,
           "y": 334,
@@ -1139,7 +1172,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "load_text",
-          "persistentUuid": "16064a11-e862-4475-a36b-e448c02f788c",
+          "persistentUuid": "faf479a7-c157-44ae-98f4-fe33319a556e",
           "width": 0,
           "x": 488,
           "y": 334,
@@ -1155,7 +1188,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "button_background",
-          "persistentUuid": "9dd28b7a-a4f0-4f8e-991b-f53a1b9b5a43",
+          "persistentUuid": "174d9a3c-b518-4bd6-9b91-ce9655fbe19c",
           "width": 64,
           "x": 480,
           "y": 330,
@@ -1171,7 +1204,7 @@
           "layer": "inventory",
           "locked": false,
           "name": "button_background",
-          "persistentUuid": "fc9d6887-5d96-48e4-b722-c635e3a171a6",
+          "persistentUuid": "6cf3e1df-6114-4bd5-85c0-7cb166a26221",
           "width": 64,
           "x": 256,
           "y": 330,
@@ -5340,7 +5373,7 @@
   "externalEvents": [
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1479413248,
+      "lastChangeTimeStamp": 1479413261,
       "name": "save_inventory",
       "events": [
         {
@@ -5396,7 +5429,7 @@
     },
     {
       "associatedLayout": "New scene",
-      "lastChangeTimeStamp": 1479413248,
+      "lastChangeTimeStamp": 1479413261,
       "name": "load_inventory",
       "events": [
         {

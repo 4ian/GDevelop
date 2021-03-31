@@ -15,7 +15,7 @@ import {
   getSelection,
 } from '../Utils/SelectionHandler';
 import { CLIPBOARD_KIND } from './ClipboardKind';
-import Clipboard from '../Utils/Clipboard';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
@@ -26,14 +26,9 @@ const gd: libGDevelop = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(EditVariableRow);
-
-class VariablesListBody extends React.Component<*, *> {
-  render() {
-    return <div>{this.props.children}</div>;
-  }
-}
-
-const SortableVariablesListBody = SortableContainer(VariablesListBody);
+const SortableVariablesListBody = SortableContainer(({ children }) => (
+  <div>{children}</div>
+));
 SortableVariablesListBody.muiName = 'TableBody';
 
 type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
@@ -83,8 +78,18 @@ export default class VariablesList extends React.Component<Props, State> {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
-    const variables = Clipboard.get(CLIPBOARD_KIND);
-    variables.forEach(({ name, serializedVariable }) => {
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    const variablesContent = SafeExtractor.extractArray(clipboardContent);
+    if (!variablesContent) return;
+
+    variablesContent.forEach(variableContent => {
+      const name = SafeExtractor.extractStringProperty(variableContent, 'name');
+      const serializedVariable = SafeExtractor.extractObjectProperty(
+        variableContent,
+        'serializedVariable'
+      );
+      if (!name || !serializedVariable) return;
+
       const newName = newNameGenerator(
         name,
         name =>
@@ -149,6 +154,8 @@ export default class VariablesList extends React.Component<Props, State> {
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
+    // If editing a variable from the parent container, clone it
+    // inside this container, before updating its value.
     if (inheritedVariablesContainer && origin === 'parent') {
       const serializedVariable = serializeToJSObject(
         inheritedVariablesContainer.get(name)
@@ -158,14 +165,27 @@ export default class VariablesList extends React.Component<Props, State> {
       variablesContainer.insert(name, newVariable, index);
       newVariable.delete();
 
-      variablesContainer.get(name).setString(newValue);
-    } else {
-      variable.setString(newValue);
+      variable = variablesContainer.get(name);
+    }
+
+    switch (variable.getType()) {
+      case gd.Variable.String:
+        variable.setString(newValue);
+        break;
+      case gd.Variable.Number:
+        variable.setValue(parseFloat(newValue));
+        break;
+      case gd.Variable.Boolean:
+        variable.setBool(newValue === 'true');
+        break;
+      default:
+        console.error(
+          `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
+        );
     }
   };
 
-  _renderVariableChildren(
-    name: string,
+  _renderStructureChildren(
     parentVariable: gdVariable,
     depth: number,
     origin: VariableOrigin
@@ -187,6 +207,25 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
+  _renderArrayChildren(
+    parentVariable: gdVariable,
+    depth: number,
+    origin: VariableOrigin
+  ): Array<React.Node> {
+    return mapFor(0, parentVariable.getChildrenCount(), index => {
+      const variable = parentVariable.getAtIndex(index);
+      return this._renderVariableAndChildrenRows(
+        '' + index,
+        variable,
+        depth + 1,
+        index,
+        parentVariable,
+        origin,
+        /* arrayElement= */ true
+      );
+    });
+  }
+
   _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
@@ -201,10 +240,12 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentOrigin: ?VariableOrigin = null
+    parentOrigin: ?VariableOrigin = null,
+    arrayElement: ?boolean = false
   ) {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
-    const isStructure = variable.isStructure();
+    const type = variable.getType();
+    const isCollection = !gd.Variable.isPrimitive(variable.getType());
 
     const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 
@@ -217,6 +258,7 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
+        arrayElement={!!arrayElement}
         commitVariableValueOnBlur={commitVariableValueOnBlur}
         errorText={
           this.state.nameErrors[variable.ptr.toString()]
@@ -233,6 +275,10 @@ export default class VariablesList extends React.Component<Props, State> {
           variablesContainer.removeRecursively(variable);
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        }}
+        onChangeType={newType => {
+          variable.castTo(newType);
+          this.forceUpdate();
         }}
         onBlur={event => {
           const text = event.target.value;
@@ -256,24 +302,34 @@ export default class VariablesList extends React.Component<Props, State> {
           if (!parentVariable) {
             variablesContainer.remove(name);
           } else {
-            parentVariable.removeChild(name);
+            if (parentVariable.getType() === gd.Variable.Structure)
+              parentVariable.removeChild(name);
+            else if (parentVariable.getType() === gd.Variable.Array)
+              parentVariable.removeAtIndex(index);
           }
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         onAddChild={() => {
-          const name = newNameGenerator('ChildVariable', name =>
-            variable.hasChild(name)
-          );
-          variable.getChild(name).setString('');
+          // Primitive types should be converted via onChangeType before getting children added.
+          if (!isCollection) return;
+
+          if (type === gd.Variable.Structure) {
+            const name = newNameGenerator('ChildVariable', name =>
+              variable.hasChild(name)
+            );
+            variable.getChild(name).setString('');
+          } else if (type === gd.Variable.Array) variable.pushNew();
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         children={
-          isStructure
-            ? this._renderVariableChildren(name, variable, depth, origin)
+          type === gd.Variable.Structure
+            ? this._renderStructureChildren(variable, depth, origin)
+            : type === gd.Variable.Array
+            ? this._renderArrayChildren(variable, depth, origin)
             : null
         }
         showHandle={this.state.mode === 'move'}

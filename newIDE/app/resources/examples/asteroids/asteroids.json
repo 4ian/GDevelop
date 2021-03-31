@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\asteroids\\game.json",
+    "projectUuid": "c2f1bb2e-f42c-404a-8117-12065940453e",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "asteroids_template",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/debrish.png",
         "kind": "image",
+        "metadata": "",
         "name": "debrish.png",
         "smoothed": false,
         "userAdded": true
@@ -112,6 +114,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/larg_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -120,6 +123,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/larg_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -128,6 +132,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/larg_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -136,6 +141,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/medium_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -144,6 +150,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/medium_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -152,6 +159,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/medium_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -160,6 +168,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/small_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -168,6 +177,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/small_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -176,6 +186,7 @@
         "alwaysLoaded": true,
         "file": "assets/asteroids/small_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -184,6 +195,7 @@
         "alwaysLoaded": true,
         "file": "assets/ships/ship_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_1.png",
         "smoothed": false,
         "userAdded": true
@@ -192,6 +204,7 @@
         "alwaysLoaded": true,
         "file": "assets/ships/ship_bullet.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_bullet.png",
         "smoothed": false,
         "userAdded": true
@@ -200,6 +213,7 @@
         "alwaysLoaded": true,
         "file": "assets/ships/ship_part_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_1.png",
         "smoothed": false,
         "userAdded": true
@@ -208,6 +222,7 @@
         "alwaysLoaded": true,
         "file": "assets/ships/ship_part_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_2.png",
         "smoothed": false,
         "userAdded": true
@@ -216,6 +231,7 @@
         "alwaysLoaded": true,
         "file": "assets/ships/ship_part_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_3.png",
         "smoothed": false,
         "userAdded": true
@@ -224,6 +240,7 @@
         "alwaysLoaded": false,
         "file": "assets/gui/flatLight22.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight22.png",
         "smoothed": true,
         "userAdded": false
@@ -232,6 +249,7 @@
         "alwaysLoaded": false,
         "file": "assets/gui/flatLight23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight23.png",
         "smoothed": true,
         "userAdded": false
@@ -240,6 +258,7 @@
         "alwaysLoaded": false,
         "file": "assets/gui/flatLight34.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight34.png",
         "smoothed": true,
         "userAdded": false
@@ -248,6 +267,7 @@
         "alwaysLoaded": false,
         "file": "assets/gui/flatLight35.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight35.png",
         "smoothed": true,
         "userAdded": false
@@ -351,6 +371,7 @@
           "layer": "",
           "locked": false,
           "name": "button",
+          "persistentUuid": "c3f33f01-423a-4e72-a37d-b20d0be46da0",
           "width": 0,
           "x": 320,
           "y": 224,
@@ -366,6 +387,7 @@
           "layer": "",
           "locked": false,
           "name": "title",
+          "persistentUuid": "2f4c606f-6e8b-4afb-a466-d9e5a26b5811",
           "width": 0,
           "x": 224,
           "y": 96,
@@ -381,6 +403,7 @@
           "italic": false,
           "name": "button",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -399,6 +422,7 @@
           "italic": false,
           "name": "title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -633,6 +657,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -717,6 +746,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_left",
+          "persistentUuid": "1d9f219b-e8a4-4666-b138-86de09835d58",
           "width": 0,
           "x": 64,
           "y": 480,
@@ -732,6 +762,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_rotate_right",
+          "persistentUuid": "86d1fd08-bd5d-4ce6-81ee-b747d27fcf88",
           "width": 0,
           "x": 160,
           "y": 480,
@@ -747,6 +778,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_fire",
+          "persistentUuid": "2883e167-0365-42da-a580-10db09fd7881",
           "width": 0,
           "x": 608,
           "y": 480,
@@ -762,6 +794,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_thruster",
+          "persistentUuid": "72238b8e-520c-4269-9895-00d3d87f86cc",
           "width": 0,
           "x": 672,
           "y": 416,
@@ -774,6 +807,7 @@
       "objects": [
         {
           "name": "player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -842,6 +876,7 @@
         },
         {
           "name": "larg_asteroid",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -995,6 +1030,7 @@
         },
         {
           "name": "medium_asteroid",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1148,6 +1184,7 @@
         },
         {
           "name": "small_asteroid",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1301,6 +1338,7 @@
         },
         {
           "name": "debrish",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1358,14 +1396,15 @@
         },
         {
           "name": "player_bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -1421,14 +1460,15 @@
         },
         {
           "name": "player_debrish_1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -1484,14 +1524,15 @@
         },
         {
           "name": "player_debrish_2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -1547,14 +1588,15 @@
         },
         {
           "name": "player_debrish_3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -1610,6 +1652,7 @@
         },
         {
           "name": "engine_particle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1670,6 +1713,7 @@
           "italic": false,
           "name": "player_life_text",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1685,6 +1729,7 @@
         },
         {
           "name": "btn_rotate_left",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1723,6 +1768,7 @@
         },
         {
           "name": "btn_rotate_right",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1761,6 +1807,7 @@
         },
         {
           "name": "btn_fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1799,6 +1846,7 @@
         },
         {
           "name": "btn_thruster",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -5735,8 +5783,8 @@
                                       "parameters": [
                                         "",
                                         "engine_particle",
-                                        "player.PointX(engine)",
-                                        "player.PointY(engine) + Random(10)",
+                                        "player.PointX(\"engine\")",
+                                        "player.PointY(\"engine\") + Random(10)",
                                         ""
                                       ],
                                       "subInstructions": []
@@ -6259,8 +6307,8 @@
                                           "parameters": [
                                             "",
                                             "engine_particle",
-                                            "player.PointX(engine)",
-                                            "player.PointY(engine) + Random(10)",
+                                            "player.PointX(\"engine\")",
+                                            "player.PointY(\"engine\") + Random(10)",
                                             ""
                                           ],
                                           "subInstructions": []
@@ -6636,8 +6684,8 @@
                           "parameters": [
                             "",
                             "player_bullet",
-                            "player.PointX(firespot)",
-                            "player.PointY(firespot)",
+                            "player.PointX(\"firespot\")",
+                            "player.PointY(\"firespot\")",
                             ""
                           ],
                           "subInstructions": []
@@ -6895,8 +6943,8 @@
                                   "parameters": [
                                     "",
                                     "player_bullet",
-                                    "player.PointX(firespot)",
-                                    "player.PointY(firespot)",
+                                    "player.PointX(\"firespot\")",
+                                    "player.PointY(\"firespot\")",
                                     ""
                                   ],
                                   "subInstructions": []
@@ -7620,6 +7668,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7637,6 +7690,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "gui",
           "visibility": true,
           "cameras": [
@@ -7654,6 +7712,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "touch",
           "visibility": true,
           "cameras": [],
@@ -7698,6 +7761,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
+          "persistentUuid": "768de08a-e925-44a9-bc1f-046967ce02ca",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -7713,6 +7777,7 @@
           "layer": "",
           "locked": false,
           "name": "restart",
+          "persistentUuid": "98121444-689b-491e-92f2-5cec20211879",
           "width": 0,
           "x": 311,
           "y": 262,
@@ -7728,6 +7793,7 @@
           "italic": false,
           "name": "gameover",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -7746,6 +7812,7 @@
           "italic": false,
           "name": "restart",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -7970,6 +8037,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -8193,6 +8265,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

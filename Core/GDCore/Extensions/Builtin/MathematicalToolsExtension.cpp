@@ -15,11 +15,21 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
   extension.SetExtensionInformation(
       "BuiltinMathematicalTools",
       _("Mathematical tools"),
-      _("Built-in extension providing mathematical tools"),
+      "A set of mathematical functions that can be used in expressions.",
       "Florian Rival",
       "Open source (MIT License)");
 
 #if defined(GD_IDE_ONLY)
+
+  extension
+      .AddExpression("normalize",
+                     _("Normalize a value between `min` and `max` to a value between 0 and 1."),
+                     _("Remap a value between 0 and 1."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Value"))
+      .AddParameter("expression", _("Min"))
+      .AddParameter("expression", _("Max"));
 
   extension
       .AddExpression("clamp",
@@ -39,6 +49,28 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      "res/mathfunction.png")
       .AddParameter("expression", _("First angle"))
       .AddParameter("expression", _("Second angle"));
+
+  extension
+      .AddExpression("AngleBetweenPositions",
+                     _("Angle between two positions"),
+                     _("Compute the angle between two positions."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("First point X position"))
+      .AddParameter("expression", _("First point Y position"))
+      .AddParameter("expression", _("Second point X position"))
+      .AddParameter("expression", _("Second point Y position"));
+
+  extension
+      .AddExpression("DistanceBetweenPositions",
+                     _("Distance between two positions"),
+                     _("Compute the distance between two positions."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("First point X position"))
+      .AddParameter("expression", _("First point Y position"))
+      .AddParameter("expression", _("Second point X position"))
+      .AddParameter("expression", _("Second point Y position"));
 
   extension
       .AddExpression("mod",

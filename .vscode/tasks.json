@@ -1,0 +1,66 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+	{
+		"type": "npm",
+		"script": "start",
+		"path": "newIDE/app/",
+		"group": {
+			"kind": "build",
+			"isDefault": true
+		},
+		"problemMatcher": [],
+		"label": "Start development server",
+		"detail": "Starts the GDevelop development server."
+	},
+	{
+		"type": "npm",
+		"script": "build",
+		"path": "GDevelop.js/",
+		"group": "build",
+		"problemMatcher": [],
+		"label": "Build GDevelop.js",
+		"detail": "Builds GDCore for newIDE."
+	},
+	{
+		"type": "npm",
+		"script": "format",
+		"path": "newIDE/app/",
+		"problemMatcher": [],
+		"label": "Format newIDE",
+		"detail": "Run auto-formatting (with Prettier) for the newIDE/app directory."
+	},
+	{
+		"type": "npm",
+		"script": "test",
+		"path": "newIDE/app/",
+		"group": {
+			"kind": "test",
+			"isDefault": true
+		},
+		"problemMatcher": [],
+		"label": "Run newIDE tests",
+		"detail": "Run tests for newIDE."
+	},
+	{
+		"type": "typescript",
+		"tsconfig": "GDJS/tsconfig.json",
+		"option": "watch",
+		"problemMatcher": [
+			"$tsc-watch"
+		],
+		"group": "test",
+		"label": "GDJS TS Check",
+		"detail": "Runs a types check on the GDJS Runtime."
+	},
+	{
+		"type": "npm",
+		"script": "test",
+		"path": "GDJS/",
+		"group": "test",
+		"problemMatcher": [],
+		"label": "Run GDJS tests",
+		"detail": "Run tests for GDJS."
+	}
+]
+}

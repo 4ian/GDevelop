@@ -6,12 +6,14 @@
 #ifndef BEHAVIORMETADATA_H
 #define BEHAVIORMETADATA_H
 #include <map>
+
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
+class MultipleInstructionMetadata;
 class InstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
@@ -41,7 +43,8 @@ class GD_CORE_API BehaviorMetadata {
 
   /**
    * Declare a new condition as being part of the behavior.
-   * \deprecated Prefer using `AddScopedCondition`.
+   * \deprecated Prefer using `AddScopedCondition`, to properly namespace
+   * the condition.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -53,7 +56,8 @@ class GD_CORE_API BehaviorMetadata {
 
   /**
    * Declare a new action as being part of the behavior.
-   * \deprecated Prefer using `AddScopedAction`.
+   * \deprecated Prefer using `AddScopedAction`, to properly namespace
+   * the action.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
                                      const gd::String& fullname_,
@@ -67,23 +71,23 @@ class GD_CORE_API BehaviorMetadata {
    * Declare a new condition as being part of the behavior.
    */
   gd::InstructionMetadata& AddScopedCondition(const gd::String& name_,
-                                        const gd::String& fullname_,
-                                        const gd::String& description_,
-                                        const gd::String& sentence_,
-                                        const gd::String& group_,
-                                        const gd::String& icon_,
-                                        const gd::String& smallicon_);
+                                              const gd::String& fullname_,
+                                              const gd::String& description_,
+                                              const gd::String& sentence_,
+                                              const gd::String& group_,
+                                              const gd::String& icon_,
+                                              const gd::String& smallicon_);
 
   /**
    * Declare a new action as being part of the behavior.
    */
   gd::InstructionMetadata& AddScopedAction(const gd::String& name_,
-                                     const gd::String& fullname_,
-                                     const gd::String& description_,
-                                     const gd::String& sentence_,
-                                     const gd::String& group_,
-                                     const gd::String& icon_,
-                                     const gd::String& smallicon_);
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& sentence_,
+                                           const gd::String& group_,
+                                           const gd::String& icon_,
+                                           const gd::String& smallicon_);
   /**
    * Declare a new action as being part of the extension.
    */
@@ -101,6 +105,38 @@ class GD_CORE_API BehaviorMetadata {
                                            const gd::String& description_,
                                            const gd::String& group_,
                                            const gd::String& smallicon_);
+
+  /**
+   * \brief Declare a new expression and condition as being part of the
+   * behavior.
+   * \note It's recommended to use this function to avoid declaring twice a
+   * similar expression/condition.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndCondition(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
+
+  /**
+   * \brief Declare a new expression, condition and action as being part of the
+   * behavior.
+   * \note The action name is prefixed by "Set" (and the namespace, as the
+   * condition).
+   * \note It's recommended to use this function to avoid declaring 3 times a
+   * similar expression/condition/action.
+   */
+  gd::MultipleInstructionMetadata AddExpressionAndConditionAndAction(
+      const gd::String& type,
+      const gd::String& name,
+      const gd::String& fullname,
+      const gd::String& description,
+      const gd::String& sentenceName,
+      const gd::String& group,
+      const gd::String& icon);
 
   BehaviorMetadata& SetFullName(const gd::String& fullname_);
   BehaviorMetadata& SetDefaultName(const gd::String& defaultName_);
@@ -120,12 +156,14 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& AddIncludeFile(const gd::String& includeFile);
 
   /**
-   * Get the help path of the behavior, relative to the documentation root.
+   * Get the help path of the behavior, relative to the GDevelop documentation
+   * root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the behavior, relative to the documentation root.
+   * Set the help path of the behavior, relative to the GDevelop documentation
+   * root.
    *
    * The behavior instructions will have this help path set by
    * default, unless you call SetHelpPath on them.

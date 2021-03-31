@@ -24,6 +24,10 @@ const styles = {
     verticalAlign: 'middle',
     pointerEvents: 'none',
   },
+  previewIcon: {
+    width: 40,
+    height: 40,
+  },
   cardContainer: {
     overflow: 'hidden',
     position: 'relative',
@@ -53,9 +57,18 @@ type ImageCardProps = {|
   size: number,
   resource: Resource,
   onChoose: () => void,
+  imageStyle?: {|
+    width: number,
+    height: number,
+  |},
 |};
 
-const ImageCard = ({ resource, onChoose, size }: ImageCardProps) => {
+const ImageCard = ({
+  resource,
+  onChoose,
+  size,
+  imageStyle,
+}: ImageCardProps) => {
   return (
     <ButtonBase onClick={onChoose} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
@@ -66,6 +79,7 @@ const ImageCard = ({ resource, onChoose, size }: ImageCardProps) => {
               ...styles.previewImage,
               maxWidth: 128 - 2 * paddingSize,
               maxHeight: 128 - 2 * paddingSize,
+              ...imageStyle,
             }}
             src={resource.url}
             alt={resource.name}
@@ -124,6 +138,15 @@ export const ResourceCard = ({ resource, onChoose, size }: Props) => {
   switch (resourceKind) {
     case 'image':
       return <ImageCard resource={resource} onChoose={onChoose} size={size} />;
+    case 'svg':
+      return (
+        <ImageCard
+          resource={resource}
+          onChoose={onChoose}
+          size={size}
+          imageStyle={styles.previewIcon}
+        />
+      );
     case 'audio':
       return (
         <GenericCard onChoose={onChoose} resource={resource} size={size}>

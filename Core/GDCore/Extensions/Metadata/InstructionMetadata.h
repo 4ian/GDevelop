@@ -10,8 +10,10 @@
 #include <functional>
 #include <map>
 #include <memory>
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
+#include "ParameterMetadata.h"
 namespace gd {
 class Project;
 class Layout;
@@ -21,212 +23,6 @@ class SerializerElement;
 }  // namespace gd
 
 namespace gd {
-
-/**
- * \brief Contains user-friendly info about a parameter, and information about
- * what a parameter need
- *
- * \ingroup Events
- */
-class GD_CORE_API ParameterMetadata {
- public:
-  ParameterMetadata();
-  virtual ~ParameterMetadata(){};
-
-  /**
-   * \brief Return the type of the parameter.
-   * \see gd::ParameterMetadata::IsObject
-   */
-  const gd::String &GetType() const { return type; }
-
-  /**
-   * \brief Set the type of the parameter.
-   */
-  ParameterMetadata &SetType(const gd::String &type_) {
-    type = type_;
-    return *this;
-  }
-
-  /**
-   * \brief Return the name of the parameter.
-   *
-   * Name is optional, and won't be filled for most parameters of extensions.
-   * It is useful when generating a function from events, where parameters must
-   * be named.
-   */
-  const gd::String &GetName() const { return name; }
-
-  /**
-   * \brief Set the name of the parameter.
-   *
-   * Name is optional, and won't be filled for most parameters of extensions.
-   * It is useful when generating a function from events, where parameters must
-   * be named.
-   */
-  ParameterMetadata &SetName(const gd::String &name_) {
-    name = name_;
-    return *this;
-  }
-
-  /**
-   * \brief Return an optional additional information, used for some parameters
-   * with special type (For example, it can contains the type of object accepted
-   * by the parameter).
-   */
-  const gd::String &GetExtraInfo() const { return supplementaryInformation; }
-
-  /**
-   * \brief Set an optional additional information, used for some parameters
-   * with special type (For example, it can contains the type of object accepted
-   * by the parameter).
-   */
-  ParameterMetadata &SetExtraInfo(const gd::String &supplementaryInformation_) {
-    supplementaryInformation = supplementaryInformation_;
-    return *this;
-  }
-
-  /**
-   * \brief Return true if the parameter is optional.
-   */
-  bool IsOptional() const { return optional; }
-
-  /**
-   * \brief Set if the parameter is optional.
-   */
-  ParameterMetadata &SetOptional(bool optional_ = true) {
-    optional = optional_;
-    return *this;
-  }
-
-  /**
-   * \brief Return the description of the parameter
-   */
-  const gd::String &GetDescription() const { return description; }
-
-  /**
-   * \brief Set the description of the parameter.
-   */
-  ParameterMetadata &SetDescription(const gd::String &description_) {
-    description = description_;
-    return *this;
-  }
-
-  /**
-   * \brief Return true if the parameter is only meant to be completed during
-   * compilation and must not be displayed to the user.
-   */
-  bool IsCodeOnly() const { return codeOnly; }
-
-  /**
-   * \brief Set if the parameter is only meant to be completed during
-   * compilation and must not be displayed to the user.
-   */
-  ParameterMetadata &SetCodeOnly(bool codeOnly_ = true) {
-    codeOnly = codeOnly_;
-    return *this;
-  }
-
-  /**
-   * \brief Get the default value for the parameter.
-   */
-  const gd::String &GetDefaultValue() const { return defaultValue; }
-
-  /**
-   * \brief Set the default value, if the parameter is optional.
-   */
-  ParameterMetadata &SetDefaultValue(const gd::String &defaultValue_) {
-    defaultValue = defaultValue_;
-    return *this;
-  }
-
-  /**
-   * \brief Get the user friendly, long description for the parameter.
-   */
-  const gd::String &GetLongDescription() const { return longDescription; }
-
-  /**
-   * \brief Set the user friendly, long description for the parameter.
-   */
-  ParameterMetadata &SetLongDescription(const gd::String &longDescription_) {
-    longDescription = longDescription_;
-    return *this;
-  }
-
-  /**
-   * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList".
-   *
-   * \see gd::ParameterMetadata::GetType
-   */
-  static bool IsObject(const gd::String &parameterType) {
-    return parameterType == "object" || parameterType == "objectPtr" ||
-           parameterType == "objectList" ||
-           parameterType == "objectListWithoutPicking";
-  }
-
-  /**
-   * \brief Return true if the type of the parameter is "behavior".
-   *
-   * \see gd::ParameterMetadata::GetType
-   */
-  static bool IsBehavior(const gd::String &parameterType) {
-    return parameterType == "behavior";
-  }
-
-  /**
-   * \brief Return true if the type of the parameter is an expression of the
-   * given type.
-   * \note If you had a new type of parameter, also add it in the IDE (
-   * see EventsFunctionParametersEditor) and in the EventsCodeGenerator.
-   */
-  static bool IsExpression(const gd::String &type,
-                           const gd::String &parameterType) {
-    if (type == "number") {
-      return parameterType == "expression" || parameterType == "camera" ||
-             parameterType == "forceMultiplier";
-    } else if (type == "string") {
-      return parameterType == "string" || parameterType == "layer" ||
-             parameterType == "color" || parameterType == "file" ||
-             parameterType == "joyaxis" ||
-             parameterType == "stringWithSelector" ||
-             parameterType == "sceneName";
-    } else if (type == "variable") {
-      return parameterType == "objectvar" || parameterType == "globalvar" ||
-             parameterType == "scenevar";
-    }
-    return false;
-  }
-
-  /** \name Serialization
-   */
-  ///@{
-  /**
-   * \brief Serialize the ParameterMetadata to the specified element
-   */
-  void SerializeTo(gd::SerializerElement &element) const;
-
-  /**
-   * \brief Load the ParameterMetadata from the specified element
-   */
-  void UnserializeFrom(const gd::SerializerElement &element);
-  ///@}
-
-  // TODO: Deprecated public fields. Any direct using should be moved to
-  // getter/setter.
-  gd::String type;                      ///< Parameter type
-  gd::String supplementaryInformation;  ///< Used if needed
-  bool optional;                        ///< True if the parameter is optional
-
-  gd::String description;  ///< Description shown in editor
-  bool codeOnly;  ///< True if parameter is relative to code generation only,
-                  ///< i.e. must not be shown in editor
- private:
-  gd::String longDescription;  ///< Long description shown in the editor.
-  gd::String defaultValue;     ///< Used as a default value in editor or if an
-                               ///< optional parameter is empty.
-  gd::String name;             ///< The name of the parameter to be used in code
-                               ///< generation. Optional.
-};
 
 /**
  * \brief Describe user-friendly information about an instruction (action or
@@ -274,12 +70,14 @@ class GD_CORE_API InstructionMetadata {
   bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
   /**
-   * Get the help path of the instruction, relative to the documentation root.
+   * Get the help path of the instruction, relative to the GDevelop
+   * documentation root.
    */
   const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the instruction, relative to the documentation root.
+   * Set the help path of the instruction, relative to the GDevelop
+   * documentation root.
    */
   InstructionMetadata &SetHelpPath(const gd::String &path) {
     helpPath = path;
@@ -421,7 +219,21 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is easy for an user to understand.
+   * \brief Check if the instruction is an object instruction.
+   */
+  bool IsObjectInstruction() {
+    return isObjectInstruction;
+  }
+
+  /**
+   * \brief Check if the instruction is a behavior instruction.
+   */
+  bool IsBehaviorInstruction() {
+    return isBehaviorInstruction;
+  }
+
+  /**
+   * \brief Consider that the instruction is easy for a user to understand.
    */
   InstructionMetadata &MarkAsSimple() {
     usageComplexity = 2;
@@ -429,7 +241,7 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is harder for an user to understand
+   * \brief Consider that the instruction is harder for a user to understand
    * than a normal instruction.
    */
   InstructionMetadata &MarkAsAdvanced() {
@@ -438,7 +250,7 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Consider that the instruction is complex for an user to understand.
+   * \brief Consider that the instruction is complex for a user to understand.
    */
   InstructionMetadata &MarkAsComplex() {
     usageComplexity = 9;

@@ -13,6 +13,9 @@ declare class gdResource {
   getFile(): string;
   setMetadata(metadata: string): void;
   getMetadata(): string;
+  setOrigin(originName: string, originIdentifier: string): void;
+  getOriginName(): string;
+  getOriginIdentifier(): string;
   getProperties(): gdMapStringPropertyDescriptor;
   updateProperty(name: string, value: string): boolean;
   serializeTo(element: gdSerializerElement): void;

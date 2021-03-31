@@ -1,15 +1,18 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import SearchBar from '../UI/SearchBar';
 import { Column, Line } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import { SearchResults } from './SearchResults';
-import { FiltersChooser } from './FiltersChooser';
+import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { FiltersChooser } from '../UI/Search/FiltersChooser';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import Subheader from '../UI/Subheader';
+import { CategoryChooser } from '../UI/Search/CategoryChooser';
 
 const styles = {
   searchBar: {
@@ -70,6 +73,18 @@ export const AssetStore = ({
               width={windowWidth === 'small' ? 150 : 250}
             >
               <ScrollView>
+                <Subheader>
+                  <Trans>Categories</Trans>
+                </Subheader>
+                <CategoryChooser
+                  allItemsLabel={<Trans>All assets</Trans>}
+                  allFilters={filters}
+                  filtersState={filtersState}
+                  error={error}
+                />
+                <Subheader>
+                  <Trans>Filters</Trans>
+                </Subheader>
                 <FiltersChooser
                   allFilters={filters}
                   filtersState={filtersState}
@@ -77,7 +92,8 @@ export const AssetStore = ({
                 />
               </ScrollView>
             </Background>
-            <SearchResults
+            <BoxSearchResults
+              baseSize={128}
               onRetry={fetchAssetsAndFilters}
               error={error}
               searchItems={searchResults}

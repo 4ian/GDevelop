@@ -27,6 +27,19 @@ type Props = {|
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
+  onMoveFreeEventsParameter?: (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
+  onMoveBehaviorEventsParameter?: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -54,12 +67,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       globalObjectsContainer.getObjectGroups().has(newName)
     ) {
       showWarningBox(
-        'Another object or group with this name already exists in this function.'
+        'Another object or group with this name already exists in this function.',
+        { delayToNextTick: true }
       );
       return false;
     } else if (!gd.Project.validateName(newName)) {
       showWarningBox(
-        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.'
+        'This name is invalid. Only use alphanumeric characters (0-9, a-z) and underscores. Digits are not allowed as the first character.',
+        { delayToNextTick: true }
       );
       return false;
     }
@@ -144,6 +159,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       freezeParameters,
       helpPagePath,
       renderConfigurationHeader,
+      onMoveFreeEventsParameter,
+      onMoveBehaviorEventsParameter,
     } = this.props;
 
     return (
@@ -186,6 +203,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 onParametersUpdated={onParametersOrGroupsUpdated}
                 helpPagePath={helpPagePath}
                 freezeParameters={freezeParameters}
+                onMoveFreeEventsParameter={onMoveFreeEventsParameter}
+                onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
               />
             </Line>
           </ScrollView>

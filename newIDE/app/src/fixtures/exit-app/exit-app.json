@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/exit-app/exit-app.json",
+    "projectUuid": "51f53c40-74cc-4ca0-9ed5-36e122944c62",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -143,7 +140,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "3a403ffb-b5b4-4a56-958f-2bff81f444ea",
+          "persistentUuid": "d649cfa7-9423-459a-a13e-9ae65d7a9108",
           "width": 0,
           "x": 201,
           "y": 91,

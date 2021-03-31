@@ -8,6 +8,7 @@
 #if defined(GD_IDE_ONLY)
 #include <functional>
 #include <memory>
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
@@ -122,7 +123,8 @@ class GD_CORE_API ExpressionMetadata {
   /**
    * Construct a new expression metadata.
    */
-  ExpressionMetadata(const gd::String& extensionNamespace,
+  ExpressionMetadata(const gd::String& returnType,
+                     const gd::String& extensionNamespace,
                      const gd::String& name,
                      const gd::String& fullname,
                      const gd::String& description,
@@ -131,9 +133,11 @@ class GD_CORE_API ExpressionMetadata {
 
   /**
    * Construct an empty ExpressionMetadata.
-   * \warning Don't use this - only here to fullfil std::map requirements.
+   * \warning Don't use this - only here to construct a "bad" ExpressionData and
+   * to fulfill std::map requirements.
    */
-  ExpressionMetadata() : shown(false), isPrivate(false){};
+  ExpressionMetadata()
+      : returnType("unknown"), shown(false), isPrivate(false){};
 
   virtual ~ExpressionMetadata(){};
 
@@ -151,14 +155,16 @@ class GD_CORE_API ExpressionMetadata {
   }
 
   /**
-   * Get the help path of the expression, relative to the documentation root.
+   * Get the help path of the expression, relative to the GDevelop documentation
+   * root.
    */
-  const gd::String &GetHelpPath() const { return helpPath; }
+  const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help path of the expression, relative to the documentation root.
+   * Set the help path of the expression, relative to the GDevelop documentation
+   * root.
    */
-  ExpressionMetadata &SetHelpPath(const gd::String &path) {
+  ExpressionMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
     return *this;
   }
@@ -205,12 +211,14 @@ class GD_CORE_API ExpressionMetadata {
   };
 
   /**
-   * \brief Set the long description shown in the editor for the last added parameter.
+   * \brief Set the long description shown in the editor for the last added
+   * parameter.
    *
    * \see AddParameter
    */
-  ExpressionMetadata &SetParameterLongDescription(gd::String longDescription) {
-    if (!parameters.empty()) parameters.back().SetLongDescription(longDescription);
+  ExpressionMetadata& SetParameterLongDescription(gd::String longDescription) {
+    if (!parameters.empty())
+      parameters.back().SetLongDescription(longDescription);
     return *this;
   };
 
@@ -236,6 +244,7 @@ class GD_CORE_API ExpressionMetadata {
   ExpressionCodeGenerationInformation codeExtraInformation;
 
   bool IsShown() const { return shown; }
+  const gd::String& GetReturnType() const { return returnType; }
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
@@ -254,6 +263,7 @@ class GD_CORE_API ExpressionMetadata {
   std::vector<gd::ParameterMetadata> parameters;
 
  private:
+  gd::String returnType;
   gd::String fullname;
   gd::String description;
   gd::String helpPath;

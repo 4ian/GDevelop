@@ -25,13 +25,15 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'Physics2',
-      'Physics Engine 2.0',
-      'Simulate physics',
-      'Florian Rival, Franco Maciel',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'Physics2',
+        'Physics Engine 2.0',
+        "The physics engine simulates realistic object physics, with gravity, forces, joints, etc. It's perfect for games that need to have realistic behaving objects and a gameplay centered around it.",
+        'Florian Rival, Franco Maciel',
+        'MIT'
+      )
+      .setExtensionHelpPath('/behaviors/physics2');
 
     var physics2Behavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -419,9 +421,9 @@ module.exports = {
     aut
       .addCondition(
         'GravityX',
-        _('Gravity X'),
-        _('Test the world gravity on X.'),
-        _('the gravity on X'),
+        _('World gravity on X axis'),
+        _('Compare the world gravity on X axis.'),
+        _('the world gravity on X axis'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -435,8 +437,8 @@ module.exports = {
     aut
       .addExpression(
         'GravityX',
-        _('Gravity X'),
-        _('Gravity X'),
+        _('World gravity on X axis'),
+        _('World gravity on X axis'),
         _('Global'),
         'res/physics16.png'
       )
@@ -448,9 +450,9 @@ module.exports = {
     aut
       .addCondition(
         'GravityY',
-        _('Gravity Y'),
-        _('Test the world gravity on Y.'),
-        _('the gravity on Y'),
+        _('World gravity on Y axis'),
+        _('Compare the world gravity on Y axis.'),
+        _('the world gravity on Y axis'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -464,8 +466,8 @@ module.exports = {
     aut
       .addExpression(
         'GravityY',
-        _('Gravity Y'),
-        _('Gravity Y'),
+        _('World gravity on Y axis'),
+        _('World gravity on Y axis'),
         _('Global'),
         'res/physics16.png'
       )
@@ -477,9 +479,13 @@ module.exports = {
     aut
       .addAction(
         'Gravity',
-        _('Gravity'),
-        _('Modify the world gravity.'),
-        _('Set the gravity to _PARAM2_;_PARAM3_'),
+        _('World gravity'),
+        _('Modify the world gravity.') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('Set the world gravity of _PARAM0_ to _PARAM2_;_PARAM3_'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -494,9 +500,9 @@ module.exports = {
     aut
       .addCondition(
         'TimeScale',
-        _('Time scale'),
-        _('Test the world time scale.'),
-        _('the time scale'),
+        _('World time scale'),
+        _('Compare the world time scale.'),
+        _('the world time scale'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -511,9 +517,13 @@ module.exports = {
     extension
       .addAction(
         'TimeScale',
-        _('Time scale'),
-        _('Modify the world time scale.'),
-        _('Set the world time scale to _PARAM2_'),
+        _('World time scale'),
+        _('Modify the world time scale.') +
+          ' ' +
+          _(
+            'While an object is needed, this will apply to all objects using the behavior.'
+          ),
+        _('Set the world time scale of _PARAM0_ to _PARAM2_'),
         _('Global'),
         'res/physics24.png',
         'res/physics16.png'
@@ -528,8 +538,8 @@ module.exports = {
     aut
       .addExpression(
         'TimeScale',
-        _('Time scale'),
-        _('Time scale'),
+        _('World time scale'),
+        _('World time scale'),
         _('Global'),
         'res/physics16.png'
       )
@@ -1307,7 +1317,7 @@ module.exports = {
         'ApplyForce',
         _('Apply force'),
         _(
-          "Apply a force to the object. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply a force to the object. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _('Apply to _PARAM0_ a force of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1326,9 +1336,9 @@ module.exports = {
     aut
       .addAction(
         'ApplyPolarForce',
-        _('Apply polar force'),
+        _('Apply force (angle)'),
         _(
-          "Apply a force to the object using polar coordinates. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply a force to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _('Apply to _PARAM0_ a force of angle _PARAM2_ and length _PARAM3_'),
         _('Forces & impulses'),
@@ -1349,7 +1359,7 @@ module.exports = {
         'ApplyForceTowardPosition',
         _('Apply force toward position'),
         _(
-          "Apply a force to the object to move it toward a position. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply a force to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _(
           'Apply to _PARAM0_ a force of length _PARAM2_ towards _PARAM3_;_PARAM4_'
@@ -1373,7 +1383,7 @@ module.exports = {
         'ApplyImpulse',
         _('Apply impulse'),
         _(
-          "Apply an impulse to the object. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply an impulse to the object. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _('Apply to _PARAM0_ an impulse of _PARAM2_;_PARAM3_'),
         _('Forces & impulses'),
@@ -1392,9 +1402,9 @@ module.exports = {
     aut
       .addAction(
         'ApplyPolarImpulse',
-        _('Apply polar impulse'),
+        _('Apply impulse (angle)'),
         _(
-          "Apply an impulse to the object using polar coordinates. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply an impulse to the object using polar coordinates. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _(
           'Apply to _PARAM0_ an impulse of angle _PARAM2_ and length _PARAM3_ (applied at _PARAM4_;_PARAM5_)'
@@ -1417,7 +1427,7 @@ module.exports = {
         'ApplyImpulseTowardPosition',
         _('Apply impulse toward position'),
         _(
-          "Apply an impulse to the object to move it toward a position. You've to specify the applying point (you can get the body mass center through expressions)."
+          'Apply an impulse to the object to move it toward a position. You need to specify the point of application (you can get the body mass center through expressions).'
         ),
         _(
           'Apply to _PARAM0_ an impulse of length _PARAM2_ towards _PARAM3_;_PARAM4_ (applied at _PARAM5_;_PARAM6_)'
@@ -1439,8 +1449,10 @@ module.exports = {
     aut
       .addAction(
         'ApplyTorque',
-        _('Apply torque'),
-        _('Apply a torque to the object.'),
+        _('Apply torque (rotational force)'),
+        _(
+          'Apply a torque (also called "rotational force") to the object. This will make the object rotate without moving it.'
+        ),
         _('Apply to _PARAM0_ a torque of _PARAM2_'),
         _('Forces & impulses'),
         'res/physics24.png',
@@ -1455,8 +1467,10 @@ module.exports = {
     aut
       .addAction(
         'ApplyAngularImpulse',
-        _('Apply angular impulse'),
-        _('Apply an angular impulse to the object.'),
+        _('Apply angular impulse (rotational impulse)'),
+        _(
+          'Apply an angular impulse (also called a "rotational impulse") to the object. This will make the object rotate without moving it.'
+        ),
         _('Apply to _PARAM0_ an angular impulse of _PARAM2_'),
         _('Forces & impulses'),
         'res/physics24.png',
@@ -2728,7 +2742,9 @@ module.exports = {
       .addAction(
         'AddMouseJoint',
         _('Add mouse joint'),
-        _('Add a mouse joint between two joints.'),
+        _(
+          'Add a mouse joint to an object (makes the object move towards a specific point).'
+        ),
         _('Add a mouse joint to _PARAM0_'),
         _('Joints/Mouse'),
         'JsPlatform/Extensions/mouse_joint24.png',

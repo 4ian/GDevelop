@@ -11,7 +11,8 @@ const {
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const { getExampleNames } = require('./lib/ExamplesLoader');
-const fs = require('fs');
+const fs = require('fs').promises;
+const shell = require('shelljs');
 
 // The base URL where all resources of web-app examples are stored.
 const baseUrl = 'https://resources.gdevelop-app.com/examples';
@@ -41,23 +42,14 @@ const writeInternalExampleFilesJsFile = exampleNames => {
     ``,
   ].join('\n');
 
-  return new Promise((resolve, reject) => {
-    fs.writeFile(
-      '../src/ProjectsStorage/InternalFileStorageProvider/InternalExampleFiles.js',
-      content,
-      'utf8',
-      err => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      }
-    );
-  });
+  return fs.writeFile(
+    '../src/ProjectsStorage/InternalFileStorageProvider/InternalExampleFiles.js',
+    content,
+    'utf8'
+  );
 };
 
-initializeGDevelopJs().then(gd => {
+initializeGDevelopJs().then(async gd => {
   const updateResources = (project, baseUrl) => {
     const worker = new gd.ArbitraryResourceWorkerJS();
     worker.exposeImage = file => {
@@ -80,53 +72,57 @@ initializeGDevelopJs().then(gd => {
 
   const noopTranslationFunction = str => str;
 
-  makeExtensionsLoader({ gd, filterExamples: false })
-    .loadAllExtensions(noopTranslationFunction)
-    .then(loadingResults => {
-      console.info('Loaded extensions', loadingResults);
+  const loadingResults = await makeExtensionsLoader({
+    gd,
+    filterExamples: false,
+  }).loadAllExtensions(noopTranslationFunction);
 
-      return getExampleNames();
+  console.info('Loaded extensions', loadingResults);
+
+  const exampleNames = await getExampleNames();
+  const exampleErrors = {};
+  await Promise.all(
+    exampleNames.map(async exampleName => {
+      try {
+        const projectObject = await readProjectFile(
+          `../resources/examples/${exampleName}/${exampleName}.json`
+        );
+        console.log(`Example "${exampleName}" loaded.`);
+        const project = loadSerializedProject(gd, projectObject);
+        updateResources(project, baseUrl + '/' + exampleName);
+
+        await fs.mkdir(`../src/fixtures/${exampleName}`, { recursive: true });
+        await writeProjectJSONFile(
+          gd,
+          project,
+          `../src/fixtures/${exampleName}/${exampleName}.json`
+        );
+
+        console.log(`Update of "${exampleName}" done.`);
+      } catch (error) {
+        console.error(`❌ Error caught for ${exampleName}:`, error);
+        exampleErrors[exampleName] = error;
+      }
     })
-    .then(exampleNames =>
-      Promise.all(
-        exampleNames.map(exampleName => {
-          return readProjectFile(
-            `../resources/examples/${exampleName}/${exampleName}.json`
-          )
-            .then(projectObject => {
-              console.log(`Example "${exampleName}" loaded.`);
-              const project = loadSerializedProject(gd, projectObject);
-              updateResources(project, baseUrl + '/' + exampleName);
+  );
 
-              return new Promise(resolve => {
-                fs.mkdir(`../src/fixtures/${exampleName}`, () => {
-                  writeProjectJSONFile(
-                    gd,
-                    project,
-                    `../src/fixtures/${exampleName}/${exampleName}.json`
-                  );
-
-                  console.log(`Update of "${exampleName}" done.`);
-                  resolve();
-                });
-              });
-            })
-            .catch(error => {
-              console.error(`❌ Error caught for ${exampleName}:`, error);
-            });
-        })
-      )
-        .then(() => writeInternalExampleFilesJsFile(exampleNames))
-        .then(
-          () => {
-            console.error(`✅ InternalExampleFiles.js written.`);
-          },
-          error => {
-            console.error(
-              `❌ Error caught while writing InternalExampleFiles.js:`,
-              error
-            );
-          }
-        )
+  try {
+    await writeInternalExampleFilesJsFile(exampleNames);
+  } catch (error) {
+    console.error(
+      `❌ Error caught while writing InternalExampleFiles.js:`,
+      error
     );
+    shell.exit(1);
+  }
+
+  const erroredExampleNames = Object.keys(exampleErrors);
+  if (erroredExampleNames.length) {
+    console.error(
+      `❌ InternalExampleFiles.js written, but some examples had errors:`,
+      exampleErrors
+    );
+    shell.exit(1);
+  }
+  console.error(`✅ InternalExampleFiles.js written.`);
 });

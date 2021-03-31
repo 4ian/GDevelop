@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\advanced-shape-based-painter\\advanced-shape-based-painter.json",
+    "projectUuid": "49af45a6-8dc7-4f4e-bce8-5fe696257fd1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 800,
@@ -195,122 +192,151 @@
       "variables": [
         {
           "name": "Shapes",
+          "type": "structure",
           "children": [
             {
               "name": "0",
+              "type": "structure",
               "children": [
                 {
                   "name": "Border",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "BorderColor",
+                  "type": "structure",
                   "children": [
                     {
                       "name": "B",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "G",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "R",
+                      "type": "string",
                       "value": "0"
                     }
                   ]
                 },
                 {
                   "name": "BorderOpacity",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "EndX",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "EndY",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "FillColor",
+                  "type": "structure",
                   "children": [
                     {
                       "name": "B",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "G",
+                      "type": "string",
                       "value": "0"
                     },
                     {
                       "name": "R",
+                      "type": "string",
                       "value": "0"
                     }
                   ]
                 },
                 {
                   "name": "FillOpacity",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Radius",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "StartX",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "StartY",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Thickness",
+                  "type": "string",
                   "value": "0"
                 },
                 {
                   "name": "Type",
+                  "type": "string",
                   "value": "0"
                 }
               ]
             },
             {
               "name": "Size",
+              "type": "string",
               "value": "-1"
             }
           ]
         },
         {
           "name": "i",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "else",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "shape",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "drawing",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "R",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "G",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "B",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "A",
+          "type": "string",
           "value": "100"
         }
       ],
@@ -322,7 +348,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "3f774bbd-1bec-4353-97fa-987a09a4145d",
+          "persistentUuid": "1fb23849-d60e-4e8f-96e1-7e2e20d988c0",
           "width": 0,
           "x": 283,
           "y": 96,
@@ -332,6 +358,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "-1"
             }
           ]
@@ -343,7 +370,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "875e1396-c7e1-4260-816d-806c9cdf42e0",
+          "persistentUuid": "c3144d13-d5d7-41dd-908a-3b1eecd1bd14",
           "width": 0,
           "x": 150,
           "y": 495,
@@ -353,6 +380,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -364,7 +392,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "ff9a37e2-c989-42d8-8ab8-5537b12a5168",
+          "persistentUuid": "0bf1ca5d-2b6d-4d00-8128-29338d3a89fa",
           "width": 0,
           "x": 50,
           "y": 405,
@@ -374,6 +402,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "0"
             }
           ]
@@ -385,7 +414,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "64d5ccd5-088e-4f1e-a05c-0523ea44c3ed",
+          "persistentUuid": "6389becb-a502-4967-baa5-68b9d0c353ba",
           "width": 0,
           "x": 50,
           "y": 435,
@@ -395,6 +424,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -406,7 +436,7 @@
           "layer": "",
           "locked": false,
           "name": "BarSelect",
-          "persistentUuid": "bf55d718-934f-4503-acfe-9d8df685f0c3",
+          "persistentUuid": "82ad3623-fdf2-4962-9e2d-604484a3ea35",
           "width": 0,
           "x": 50,
           "y": 465,
@@ -416,6 +446,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -427,7 +458,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "4a65a4ff-e5f6-4289-9541-b27825f3d180",
+          "persistentUuid": "a0ad8fec-cdc3-4398-af1a-02a5282931e0",
           "width": 0,
           "x": 18,
           "y": 523,
@@ -445,22 +476,27 @@
           "variables": [
             {
               "name": "StartX",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "StartY",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "EndX",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "EndY",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "ID",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -691,10 +727,12 @@
           "variables": [
             {
               "name": "Drag",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "Value",
+              "type": "string",
               "value": "0"
             }
           ],

@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/sprite-fade-in-out/sprite-fade-in-out.json",
+    "projectUuid": "c82a03f3-494d-411e-a83e-5cc37cae6acc",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "p1_front.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_front.png",
         "smoothed": true,
         "userAdded": false
@@ -152,6 +153,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "6a35209a-93ca-4c58-8e0a-8dad1d359d38",
           "width": 0,
           "x": 155,
           "y": 63,
@@ -167,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "79590312-ebb3-4543-936e-4b8a37c22569",
           "width": 0,
           "x": 364,
           "y": 247,
@@ -182,6 +185,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -197,6 +201,7 @@
         },
         {
           "name": "kenney",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -331,6 +336,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -386,6 +396,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "2babe2c1-9b92-4730-b5e4-82062a3558d0",
           "width": 0,
           "x": 93,
           "y": 58,
@@ -401,6 +412,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "e1c7beb4-83ed-4fc0-ad0f-11c87b52372e",
           "width": 0,
           "x": 356,
           "y": 275,
@@ -416,6 +428,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -431,6 +444,7 @@
         },
         {
           "name": "kenney",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -599,6 +613,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -654,6 +673,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "27348683-2f64-48a4-a718-e9db214a9d61",
           "width": 0,
           "x": 193,
           "y": 68,
@@ -669,6 +689,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
+          "persistentUuid": "0a25b819-7bc1-4d17-a318-e9c93c358597",
           "width": 0,
           "x": 361,
           "y": 298,
@@ -684,6 +705,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -699,6 +721,7 @@
         },
         {
           "name": "kenney",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -833,6 +856,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -854,6 +882,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

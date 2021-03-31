@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json",
+    "projectUuid": "8f77c09d-9600-48a5-9c1b-8fe2a7d82e29",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -168,7 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "3c5a00ce-bd64-47b3-916f-cd47523d9f7e",
+          "persistentUuid": "a8f0334f-fc0f-4634-b56b-dbc4b131bcdb",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -184,7 +181,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "ea37212b-47eb-42db-8787-62859d6504c8",
+          "persistentUuid": "93b81182-ae7f-45fa-9ce7-54f7fba22891",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -194,6 +191,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -205,7 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "c6d2d846-b28f-4736-a22d-214dd3cc96d4",
+          "persistentUuid": "d2e3e3eb-7668-44c7-b850-6c632e1392b7",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -215,6 +213,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -226,7 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "656cc26b-18bd-411f-b1f2-33ac36b42be6",
+          "persistentUuid": "920a5f4b-2acc-43ec-9392-49e787d13e2c",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -236,6 +235,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -247,7 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "21f574dc-bcd5-410a-a30f-72af82b852fb",
+          "persistentUuid": "8527d4cf-1bd8-42f3-ab9a-9357d9bcdbef",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -257,6 +257,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -268,7 +269,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "447b8941-956f-4402-9217-2bc0ca8c4b8c",
+          "persistentUuid": "ceed2c07-4a4f-4419-96e5-a67bd9fcf076",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -278,6 +279,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -289,7 +291,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "c27110ac-f426-44f8-847c-f06018b4323a",
+          "persistentUuid": "6dad68c9-ae94-4b2a-9ee3-7fde7db34aa5",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -299,6 +301,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -310,7 +313,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "047a4958-cb42-4dbf-8699-804a17302eb9",
+          "persistentUuid": "82f87224-cb85-43fc-9670-799f84496df4",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -320,6 +323,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -331,7 +335,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "690ba89c-14c7-4247-9447-08221a0b67c7",
+          "persistentUuid": "50cb698e-a11d-49b9-975b-67b0e8b797f1",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -341,6 +345,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]

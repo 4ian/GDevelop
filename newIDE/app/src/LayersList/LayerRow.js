@@ -16,6 +16,7 @@ import DragHandle from '../UI/DragHandle';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
 import EmojiObjectsIcon from '@material-ui/icons/EmojiObjects';
+import EditIcon from '@material-ui/icons/Edit';
 import Badge from '../UI/Badge';
 
 type Props = {|
@@ -28,7 +29,7 @@ type Props = {|
   onChangeVisibility: boolean => void,
   effectsCount: number,
   onEditEffects: () => void,
-  onEditLighting: () => void,
+  onEdit: () => void,
   width: number,
 |};
 
@@ -43,7 +44,7 @@ export default ({
   onChangeVisibility,
   width,
   isLightingLayer,
-  onEditLighting,
+  onEdit,
 }: Props) => (
   <I18n>
     {({ i18n }) => (
@@ -74,6 +75,12 @@ export default ({
               }
               buildMenuTemplate={(i18n: I18nType) => [
                 {
+                  label: isLightingLayer
+                    ? i18n._(t`Edit lighting properties`)
+                    : i18n._(t`Edit properties`),
+                  click: onEdit,
+                },
+                {
                   label: i18n._(t`Edit effects (${effectsCount})`),
                   click: onEditEffects,
                 },
@@ -83,14 +90,6 @@ export default ({
                   checked: isVisible,
                   click: () => onChangeVisibility(!isVisible),
                 },
-                ...(isLightingLayer
-                  ? [
-                      {
-                        label: i18n._(t`Edit lighting properties`),
-                        click: onEditLighting,
-                      },
-                    ]
-                  : []),
                 { type: 'separator' },
                 {
                   label: i18n._(t`Delete`),
@@ -101,30 +100,32 @@ export default ({
             />
           ) : (
             <React.Fragment>
-              <IconButton
-                size="small"
-                onClick={onEditEffects}
-                tooltip={t`Edit effects`}
-              >
-                <Badge badgeContent={effectsCount} color="primary">
-                  <FlareIcon />
-                </Badge>
-              </IconButton>
               <InlineCheckbox
                 checked={isVisible}
                 checkedIcon={<Visibility />}
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
               />
-              {isLightingLayer && (
-                <IconButton
-                  size="small"
-                  onClick={onEditLighting}
-                  tooltip={t`Edit lighting properties`}
-                >
-                  <EmojiObjectsIcon />
-                </IconButton>
-              )}
+              <IconButton
+                size="small"
+                onClick={onEditEffects}
+                tooltip={t`Edit effects (${effectsCount})`}
+              >
+                <Badge badgeContent={effectsCount} color="primary">
+                  <FlareIcon />
+                </Badge>
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={onEdit}
+                tooltip={
+                  isLightingLayer
+                    ? t`Edit lighting properties`
+                    : t`Edit properties`
+                }
+              >
+                {isLightingLayer ? <EmojiObjectsIcon /> : <EditIcon />}
+              </IconButton>
               <IconButton
                 size="small"
                 onClick={onRemove}

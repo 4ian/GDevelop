@@ -1,19 +1,25 @@
 {
-    "name": "GDJS_GAME_MANGLED_NAME",
-    "main": "main.js",
-    "productName": "GDJS_GAME_NAME",
-    "description": "GDJS_GAME_NAME",
-    "author": "GDJS_GAME_AUTHOR",
-    "version": "GDJS_GAME_VERSION",
-    "dependencies": {
-      "GDJS_EXTENSION_NPM_DEPENDENCY": "0"
-    },
-    "devDependencies": {
-      "electron": "8.2.5"
-    },
-    "build": {
-        "directories": {
-            "buildResources": "buildResources"
-        }
+  "name": "GDJS_GAME_MANGLED_NAME",
+  "main": "main.js",
+  "productName": "GDJS_GAME_NAME",
+  "description": "GDJS_GAME_NAME",
+  "author": "GDJS_GAME_AUTHOR",
+  "version": "GDJS_GAME_VERSION",
+  "dependencies": {
+    "GDJS_EXTENSION_NPM_DEPENDENCY": "0"
+  },
+  "scripts": {
+    "start": "electron main.js",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "8.2.5",
+    "electron-builder": "22.9.1"
+  },
+  "build": {
+    "appId": "GDJS_GAME_PACKAGE_NAME",
+    "directories": {
+      "buildResources": "buildResources"
     }
+  }
 }

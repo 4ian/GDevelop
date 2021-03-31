@@ -48,7 +48,7 @@ type CommandHandlers = {|
   onOpenStartPage: () => void,
   onCreateProject: () => void,
   onOpenProject: () => void,
-  onSaveProject: () => void,
+  onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseApp: () => void,
   onCloseProject: () => Promise<void>,
@@ -58,11 +58,21 @@ type CommandHandlers = {|
   onOpenExternalLayout: string => void,
   onOpenEventsFunctionsExtension: string => void,
   onOpenCommandPalette: () => void,
+  onOpenProfile: () => void,
+  onOpenGamesDashboard: () => void,
 |};
 
 const useMainFrameCommands = (handlers: CommandHandlers) => {
   useCommand('QUIT_APP', true, {
     handler: handlers.onCloseApp,
+  });
+
+  useCommand('OPEN_PROFILE', !!handlers.project, {
+    handler: handlers.onOpenProfile,
+  });
+
+  useCommand('OPEN_GAMES_DASHBOARD', !!handlers.project, {
+    handler: handlers.onOpenGamesDashboard,
   });
 
   useCommand('OPEN_PROJECT_MANAGER', !!handlers.project, {

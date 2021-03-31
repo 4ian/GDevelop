@@ -1,9 +1,2 @@
 /node_modules
-/GDJS.depend
-/GDJS.layout
-/obj
-Platform documentation
-Runtime documentation
-*.~
-*.js~
-*.sh~
+/Runtime-dist

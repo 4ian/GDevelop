@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.layereffects",
-    "projectFile": "C:\\Users\\Unekwu\\Desktop\\New folder (13)\\layer-effects\\layer-effects.json",
+    "projectUuid": "c1db0f73-7e21-445a-9173-b52eb358d9c8",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Layer Effects",
     "author": "The Gem Dev",
     "windowWidth": 1000,

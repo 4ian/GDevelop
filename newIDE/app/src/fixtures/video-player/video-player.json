@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/video-player/video-player.json",
+    "projectUuid": "6d76c83a-504f-4af2-af9f-9d10edcf6929",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Example video",
     "author": "Bouh",
     "windowWidth": 800,
@@ -276,10 +273,12 @@
   "variables": [
     {
       "name": "Fullscreen",
+      "type": "string",
       "value": "0"
     },
     {
       "name": "Cursor",
+      "type": "string",
       "value": "None"
     }
   ],
@@ -320,7 +319,7 @@
           "layer": "",
           "locked": false,
           "name": "Video",
-          "persistentUuid": "48de0bce-2cfc-47a9-ad90-205a6bf83dea",
+          "persistentUuid": "dba6fa08-26a0-4176-8405-a2a7fb7cf4d7",
           "width": 625,
           "x": 89,
           "y": 98,
@@ -330,10 +329,12 @@
           "initialVariables": [
             {
               "name": "Variable",
+              "type": "string",
               "value": ""
             },
             {
               "name": "Percent_PositionBar",
+              "type": "string",
               "value": "12"
             }
           ]
@@ -345,7 +346,7 @@
           "layer": "",
           "locked": false,
           "name": "DEBUG_VIDEO",
-          "persistentUuid": "27e70168-466e-43b8-9b76-fd3ed18a3f2c",
+          "persistentUuid": "0483de35-0f39-4259-88ae-f96ec6c3267b",
           "width": 0,
           "x": 325,
           "y": 648,
@@ -361,7 +362,7 @@
           "layer": "",
           "locked": false,
           "name": "Explain",
-          "persistentUuid": "41b777a2-d38e-4cf0-b5a1-7e70706ad93b",
+          "persistentUuid": "b4eec6c7-d3fa-40b6-b721-cf19a764edd8",
           "width": 0,
           "x": 83,
           "y": 467,
@@ -377,7 +378,7 @@
           "layer": "",
           "locked": false,
           "name": "Credit",
-          "persistentUuid": "195a07f9-d835-4fea-9bea-44150bfe2b4c",
+          "persistentUuid": "29874c61-d77b-4518-862a-7452f93aee40",
           "width": 0,
           "x": 306,
           "y": 570,
@@ -393,7 +394,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
-          "persistentUuid": "64d2a004-3342-4342-8784-c49dffc4953e",
+          "persistentUuid": "ad99f34e-116a-4a71-8412-40c8424b1863",
           "width": 344,
           "x": 260,
           "y": 32,
@@ -411,10 +412,12 @@
           "variables": [
             {
               "name": "Size_ProgressBar",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "Percent_PositionBar",
+              "type": "string",
               "value": "10"
             }
           ],
@@ -439,6 +442,7 @@
           "variables": [
             {
               "name": "applyEffect",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -6109,16 +6113,21 @@
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Utils",
+      "previewIconUrl": "",
       "shortDescription": "",
-      "tags": "",
       "version": "",
+      "tags": [],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Set the position of a object in %, position is from the objet parent.",
           "fullName": "Position in %",
           "functionType": "Action",
           "name": "Place_pos_in_percentage",
+          "private": false,
           "sentence": "Place the object _PARAM1_ at X:_PARAM3_%, Y:_PARAM4_% from the object parent _PARAM2_, Include : _PARAM5_, Offset :  X:_PARAM6_ Y:_PARAM7_ ",
           "events": [
             {

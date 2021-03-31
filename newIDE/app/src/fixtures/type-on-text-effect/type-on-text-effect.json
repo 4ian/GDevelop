@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\type-on-text-effect\\game.json",
+    "projectUuid": "d74b1dc7-ff4b-4ac9-8e4f-14a7fbb6b577",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "type-on_text_effect",
     "author": "",
     "windowWidth": 600,
@@ -149,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "text_display",
-          "persistentUuid": "e5451aba-ff58-4390-863f-3dd1ee83c947",
+          "persistentUuid": "dbc8417a-4155-454c-b334-46f18a9792b8",
           "width": 0,
           "x": 50,
           "y": 50,

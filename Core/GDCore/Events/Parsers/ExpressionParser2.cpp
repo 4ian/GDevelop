@@ -4,9 +4,11 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
+
 #include <algorithm>
 #include <memory>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -67,7 +69,9 @@ size_t GetMaximumParametersNumber(
 }  // namespace
 
 std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
-    const gd::FunctionCallNode& function, size_t functionStartPosition) {
+    const gd::String& type,
+    const gd::FunctionCallNode& function,
+    size_t functionStartPosition) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(
           function.expressionMetadata)) {
     return gd::make_unique<ExpressionParserError>(
@@ -79,6 +83,41 @@ std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
         GetCurrentPosition());
   }
 
+  // Validate the type of the function
+  const gd::String& returnType = function.expressionMetadata.GetReturnType();
+  if (returnType == "number") {
+    if (type == "string")
+      return RaiseTypeError(
+          _("You tried to use an expression that returns a number, but a "
+            "string is expected. Use `ToString` if you need to convert a "
+            "number to a string."),
+          functionStartPosition);
+    else if (type != "number" && type != "number|string")
+      return RaiseTypeError(_("You tried to use an expression that returns a "
+                              "number, but another type is expected:") +
+                              " " + type,
+                            functionStartPosition);
+  } else if (returnType == "string") {
+    if (type == "number")
+      return RaiseTypeError(
+          _("You tried to use an expression that returns a string, but a "
+            "number is expected. Use `ToNumber` if you need to convert a "
+            "string to a number."),
+          functionStartPosition);
+    else if (type != "string" && type != "number|string")
+      return RaiseTypeError(_("You tried to use an expression that returns a "
+                              "string, but another type is expected:") +
+                              " " + type,
+                            functionStartPosition);
+  } else {
+    if (type != returnType)
+      return RaiseTypeError(
+          _("You tried to use an expression with the wrong return type:") + " " +
+            returnType,
+          functionStartPosition);
+  }
+
+  // Validate parameters count
   size_t minParametersCount = GetMinimumParametersNumber(
       function.expressionMetadata.parameters,
       WrittenParametersFirstIndex(function.objectName, function.behaviorName));
@@ -115,7 +154,8 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
     auto text = gd::make_unique<TextNode>("");
     text->diagnostic =
         RaiseSyntaxError(_("A text must start with a double quote (\")."));
-    text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
+    text->location =
+        ExpressionParserLocation(textStartPosition, GetCurrentPosition());
     return text;
   }
   SkipChar();
@@ -150,7 +190,8 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   }
 
   auto text = gd::make_unique<TextNode>(parsedText);
-  text->location = ExpressionParserLocation(textStartPosition, GetCurrentPosition());
+  text->location =
+      ExpressionParserLocation(textStartPosition, GetCurrentPosition());
   if (!textParsingHasEnded) {
     text->diagnostic =
         RaiseSyntaxError(_("A text must end with a double quote (\"). Add a "
@@ -172,7 +213,7 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
     if (CheckIfChar(IsZeroDigit)) {
       numberHasStarted = true;
       digitFound = true;
-      if (!parsedNumber.empty()) { // Ignore leading 0s.
+      if (!parsedNumber.empty()) {  // Ignore leading 0s.
         parsedNumber += GetCurrentChar();
       }
     } else if (CheckIfChar(IsNonZeroDigit)) {
@@ -183,7 +224,8 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
       numberHasStarted = true;
       dotFound = true;
       if (parsedNumber == "") {
-        parsedNumber += "0."; //Normalize by adding a leading 0, only in this case.
+        parsedNumber +=
+            "0.";  // Normalize by adding a leading 0, only in this case.
       } else {
         parsedNumber += ".";
       }
@@ -204,7 +246,8 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   // valid in most languages so we allow this.
 
   auto number = gd::make_unique<NumberNode>(parsedNumber);
-  number->location = ExpressionParserLocation(numberStartPosition, GetCurrentPosition());
+  number->location =
+      ExpressionParserLocation(numberStartPosition, GetCurrentPosition());
   if (!numberHasStarted || !digitFound) {
     number->diagnostic = RaiseSyntaxError(
         _("A number was expected. You must enter a number here."));

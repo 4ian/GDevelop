@@ -20,37 +20,45 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      "Screenshot",
-      _("Screenshot"),
-      _(
-        "Save screenshots of a running game."
-      ),
-      "Matthias Meike",
-      "Open source (MIT License)"
-    ).setExtensionHelpPath("/all-features/screenshot");
+    extension
+      .setExtensionInformation(
+        'Screenshot',
+        _('Screenshot'),
+        'Allows to save screenshots of a running game.',
+        'Matthias Meike',
+        'Open source (MIT License)'
+      )
+      .setExtensionHelpPath('/all-features/screenshot');
 
     extension
       .addAction(
-        "TakeScreenshot",
-        _("Take screenshot"),
-        _("Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS)."),
-        _("Take a screenshot and save at _PARAM1_"),
-        _("Screenshot"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        'TakeScreenshot',
+        _('Take screenshot'),
+        _(
+          'Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS).'
+        ),
+        _('Take a screenshot and save at _PARAM1_'),
+        _('Screenshot'),
+        'JsPlatform/Extensions/take_screenshot24.png',
+        'JsPlatform/Extensions/take_screenshot32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter("string", _("Save path"), "", false)
+      .addParameter('string', _('Save path'), '', false)
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/Screenshot/screenshottools.js"
-      )
-      .setFunctionName("gdjs.screenshot.takeScreenshot");
+      .setIncludeFile('Extensions/Screenshot/screenshottools.js')
+      .setFunctionName('gdjs.screenshot.takeScreenshot');
 
     return extension;
   },
-  runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) { return []; },
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
+    return [];
+  },
 };

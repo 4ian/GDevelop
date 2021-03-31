@@ -8,7 +8,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
     it('should properly create and destroy object, including the behaviors', function () {
       const runtimeGame = new gdjs.RuntimeGame({
         variables: [],
-        // @ts-ignore
+        // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
         properties: { windowWidth: 800, windowHeight: 600 },
         resources: { resources: [] },
       });
@@ -84,7 +84,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
   describe('Layers (using a Sprite object)', function () {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
-      // @ts-ignore
+      // @ts-expect-error ts-migrate(2740) FIXME: Type '{ windowWidth: number; windowHeight: number;... Remove this comment to see the full error message
       properties: { windowWidth: 800, windowHeight: 600 },
       resources: { resources: [] },
     });
@@ -128,7 +128,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           type: 'Sprite',
           name: 'MyObject',
           behaviors: [],
-          // @ts-ignore
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
           animations: [],
           updateIfNotVisible: false,
         },

@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\animation-speed-scale\\game.json",
+    "projectUuid": "d9bf99d5-987d-43b2-8c96-69bebe392555",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Animation speed scale",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "p1_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_stand.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "p1_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_jump.png",
         "smoothed": true,
         "userAdded": false
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk01.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk01.png",
         "smoothed": true,
         "userAdded": false
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk02.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk02.png",
         "smoothed": true,
         "userAdded": false
@@ -142,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk03.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk03.png",
         "smoothed": true,
         "userAdded": false
@@ -150,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk04.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk04.png",
         "smoothed": true,
         "userAdded": false
@@ -158,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk05.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk05.png",
         "smoothed": true,
         "userAdded": false
@@ -166,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk06.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk06.png",
         "smoothed": true,
         "userAdded": false
@@ -174,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk07.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk07.png",
         "smoothed": true,
         "userAdded": false
@@ -182,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk08.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk08.png",
         "smoothed": true,
         "userAdded": false
@@ -190,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk09.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk09.png",
         "smoothed": true,
         "userAdded": false
@@ -198,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk10.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk10.png",
         "smoothed": true,
         "userAdded": false
@@ -206,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk11.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk11.png",
         "smoothed": true,
         "userAdded": false
@@ -214,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "brickWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "brickWall.png",
         "smoothed": true,
         "userAdded": false
@@ -222,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "grassHalfMid.png",
         "kind": "image",
+        "metadata": "",
         "name": "grassHalfMid.png",
         "smoothed": true,
         "userAdded": true
@@ -230,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "bridgeLogs.png",
         "kind": "image",
+        "metadata": "",
         "name": "bridgeLogs.png",
         "smoothed": true,
         "userAdded": true
@@ -238,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "flatDark23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark23.png",
         "smoothed": true,
         "userAdded": true
@@ -246,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "flatDark24.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark24.png",
         "smoothed": true,
         "userAdded": true
@@ -254,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "flatDark44.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark44.png",
         "smoothed": true,
         "userAdded": true
@@ -301,6 +321,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "65baf9d5-0049-458c-9e9c-dc62979099a0",
           "width": 0,
           "x": 382,
           "y": 465,
@@ -316,6 +337,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "48d31d42-1313-456f-b741-2e5873c25941",
           "width": 5262.43,
           "x": -583.046,
           "y": 571,
@@ -331,6 +353,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "73015f15-0097-40d5-a79e-9c7357944b14",
           "width": 0,
           "x": 4,
           "y": 502,
@@ -346,6 +369,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "3bddf62e-e5bb-4b4f-ad71-d4b5be455597",
           "width": 0,
           "x": 4226,
           "y": 502,
@@ -361,6 +385,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "7759281c-dff6-4e6a-95f0-9f552d57cbc2",
           "width": 0,
           "x": 3082,
           "y": 394,
@@ -376,6 +401,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "f747eb52-d391-4a83-99ee-f265789189d7",
           "width": 0,
           "x": 2944,
           "y": 396,
@@ -391,6 +417,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "8701d1f0-74d1-4146-a4ca-6a9728c056ea",
           "width": 0,
           "x": 3013,
           "y": 394,
@@ -406,6 +433,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "8ed483e2-4289-4148-9431-71e456990d8b",
           "width": 0,
           "x": 2528,
           "y": 393,
@@ -421,6 +449,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "b81fff1a-fd2f-453b-958c-6c1115e82a62",
           "width": 0,
           "x": 2597,
           "y": 392,
@@ -436,6 +465,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0f0f44cc-4456-4682-8540-59a87f3a441a",
           "width": 0,
           "x": 2666,
           "y": 392,
@@ -451,6 +481,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "693f4e69-4ffa-4ea1-a548-6f703377afda",
           "width": 0,
           "x": 2737,
           "y": 394,
@@ -466,6 +497,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "a0235605-ca4e-49c8-bf1e-8a9ce9951088",
           "width": 0,
           "x": 2806,
           "y": 393,
@@ -481,6 +513,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "32131c43-149b-4172-ade9-d53663c8868f",
           "width": 0,
           "x": 2876,
           "y": 393,
@@ -496,6 +529,7 @@
           "layer": "Nouveau calque",
           "locked": false,
           "name": "AnimationScaleText",
+          "persistentUuid": "6ba60732-933c-4061-a758-cc0ccfdae85d",
           "width": 0,
           "x": 18.8077,
           "y": 14.9232,
@@ -511,6 +545,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "b73f9cb9-af7d-487a-9f4d-2196d3666225",
           "width": 0,
           "x": 2079,
           "y": 406,
@@ -526,6 +561,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "5130f56c-1fea-48a2-919b-c9be9233f6d8",
           "width": 0,
           "x": 1941,
           "y": 408,
@@ -541,6 +577,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "e30585a0-78e9-412e-8a3f-9eb298ad9ac9",
           "width": 0,
           "x": 2010,
           "y": 406,
@@ -556,6 +593,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "f136cdb7-a7a8-4ed0-be27-6524b35ebf6f",
           "width": 0,
           "x": 1525,
           "y": 405,
@@ -571,6 +609,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "3c082ec6-ea7e-49b1-9f3c-7c8022383c1d",
           "width": 0,
           "x": 1594,
           "y": 404,
@@ -586,6 +625,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "e64436d1-86bf-4bef-9794-7275124dce79",
           "width": 0,
           "x": 1663,
           "y": 404,
@@ -601,6 +641,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0dad1edf-7622-4b04-8c52-8cceab0bf9ea",
           "width": 0,
           "x": 1734,
           "y": 406,
@@ -616,6 +657,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "55c9e268-5ddd-4800-b19f-dbbfb641dc3f",
           "width": 0,
           "x": 1803,
           "y": 405,
@@ -631,6 +673,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "0a6995b5-696e-4453-8bb7-19a49d534ff9",
           "width": 0,
           "x": 1873,
           "y": 405,
@@ -646,6 +689,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "208ace3e-dc60-4214-add1-d9082f53f7a1",
           "width": 0,
           "x": 1167,
           "y": 400,
@@ -661,6 +705,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "81fb2220-36a4-450c-bd41-06ff9bd1709b",
           "width": 0,
           "x": 1029,
           "y": 402,
@@ -676,6 +721,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "7c52dc74-2166-4cac-8454-13b63e773c6a",
           "width": 0,
           "x": 1098,
           "y": 400,
@@ -691,6 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "c46bf237-62ac-4bb3-8f9b-f2753724bdbe",
           "width": 0,
           "x": 613,
           "y": 399,
@@ -706,6 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "29a51167-4f00-4d0b-8d7f-9da3fdc56811",
           "width": 0,
           "x": 682,
           "y": 398,
@@ -721,6 +769,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "3c62c97a-eb63-4890-b0ea-72e6b2ab3fe9",
           "width": 0,
           "x": 751,
           "y": 398,
@@ -736,6 +785,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "95f1028d-ba19-4382-81ac-7c0a2e449e08",
           "width": 0,
           "x": 822,
           "y": 400,
@@ -751,6 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "c3350b2f-7d22-4822-8c60-e86fc295fef9",
           "width": 0,
           "x": 891,
           "y": 399,
@@ -766,6 +817,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "42db73a3-d2ef-4886-ab82-372dcc10080f",
           "width": 0,
           "x": 961,
           "y": 399,
@@ -781,6 +833,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_left",
+          "persistentUuid": "17b4fa67-538b-445a-9f61-135ae1bc1429",
           "width": 0,
           "x": 41,
           "y": 488,
@@ -796,6 +849,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_right",
+          "persistentUuid": "59e4c506-1277-4168-9c2d-26532294e378",
           "width": 0,
           "x": 131,
           "y": 488,
@@ -811,6 +865,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btn_jump",
+          "persistentUuid": "aa69c52b-93e2-489a-96c8-74686182928d",
           "width": 0,
           "x": 643,
           "y": 488,
@@ -823,11 +878,14 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 800,
@@ -836,9 +894,7 @@
               "jumpSpeed": 1000,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "name": "PlatformerObject",
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -1136,15 +1192,16 @@
         },
         {
           "name": "Platform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ],
@@ -1249,15 +1306,16 @@
         },
         {
           "name": "Jumpthru",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -1315,16 +1373,17 @@
         {
           "height": 70,
           "name": "TiledGrassPlatform",
+          "tags": "",
           "texture": "grassHalfMid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -1334,6 +1393,7 @@
           "italic": false,
           "name": "AnimationScaleText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1349,6 +1409,7 @@
         },
         {
           "name": "btn_left",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1387,6 +1448,7 @@
         },
         {
           "name": "btn_right",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1425,6 +1487,7 @@
         },
         {
           "name": "btn_jump",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3232,6 +3295,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3249,6 +3317,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Nouveau calque",
           "visibility": true,
           "cameras": [
@@ -3266,6 +3339,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "touch",
           "visibility": true,
           "cameras": [],
@@ -3285,6 +3363,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -15,7 +15,8 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename;
   const appPath = path.join(appOutDir, `${appName}.app`);
 
-  // Bail out if credentials not present
+  // Bail out if credentials not present.
+  // Set up your credentials in newIDE/electron-app/.env
   if (!appleId) {
     console.info(`APPLEID is not defined, skipping macOS notarization...`);
     return;
@@ -30,6 +31,7 @@ exports.default = async function notarizing(context) {
   }
 
   // Launch notarization
+  const startTime = Date.now();
   console.info(
     `Notarizing ${appBundleId} found at ${appPath} for Apple ID=${appleId}...`
   );
@@ -42,7 +44,8 @@ exports.default = async function notarizing(context) {
       appleIdPassword,
     });
 
-    console.info(`Done notarizing ${appBundleId}.`);
+    const duration = (Date.now() - startTime) / 1000;
+    console.info(`Done notarizing ${appBundleId} in ${duration} seconds.`);
   } catch (error) {
     console.error(`Error during notarization: `, error);
     throw new Error(`Error during notarization: ${error}`);

@@ -118,7 +118,7 @@ export default function NewInstructionEditorDialog({
     chosenObjectInstructionsInfoTree,
   } = newInstructionEditorState;
   const {
-    chooseFreeInstruction,
+    chooseInstruction,
     chooseObject,
     chooseObjectInstruction,
   } = newInstructionEditorSetters;
@@ -176,6 +176,7 @@ export default function NewInstructionEditorDialog({
       <InstructionOrObjectSelector
         style={styles.fullHeightSelector}
         project={project}
+        scope={scope}
         currentTab={currentInstructionOrObjectSelectorTab}
         onChangeTab={setCurrentInstructionOrObjectSelectorTab}
         globalObjectsContainer={globalObjectsContainer}
@@ -183,7 +184,7 @@ export default function NewInstructionEditorDialog({
         isCondition={isCondition}
         chosenInstructionType={!chosenObjectName ? instructionType : undefined}
         onChooseInstruction={(instructionType: string) => {
-          chooseFreeInstruction(instructionType);
+          chooseInstruction(instructionType);
           setStep('parameters');
         }}
         chosenObjectName={chosenObjectName}

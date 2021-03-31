@@ -74,6 +74,11 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         "getXVelocity");
     autConditions["TopDownMovementBehavior::YVelocity"].SetFunctionName(
         "getYVelocity");
+    autActions["TopDownMovementBehavior::SetMovementAngleOffset"]
+        .SetFunctionName("setMovementAngleOffset")
+        .SetGetter("getMovementAngleOffset");
+    autConditions["TopDownMovementBehavior::MovementAngleOffset"].SetFunctionName(
+        "getMovementAngleOffset");
 
     autActions["TopDownMovementBehavior::AllowDiagonals"].SetFunctionName(
         "allowDiagonals");
@@ -96,6 +101,8 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         "simulateControl");
     autActions["TopDownMovementBehavior::IgnoreDefaultControls"]
         .SetFunctionName("ignoreDefaultControls");
+    autActions["TopDownMovementBehavior::SimulateStick"].SetFunctionName(
+        "simulateStick");
 
     autExpressions["Acceleration"].SetFunctionName("getAcceleration");
     autExpressions["Deceleration"].SetFunctionName("getDeceleration");
@@ -106,6 +113,7 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autExpressions["Angle"].SetFunctionName("getAngle");
     autExpressions["XVelocity"].SetFunctionName("getXVelocity");
     autExpressions["YVelocity"].SetFunctionName("getYVelocity");
+    autExpressions["MovementAngleOffset"].SetFunctionName("getMovementAngleOffset");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

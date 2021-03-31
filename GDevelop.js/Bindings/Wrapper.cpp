@@ -1,4 +1,5 @@
 #include <GDCore/Events/Builtin/CommentEvent.h>
+#include <GDCore/Events/Builtin/ForEachChildVariableEvent.h>
 #include <GDCore/Events/Builtin/ForEachEvent.h>
 #include <GDCore/Events/Builtin/GroupEvent.h>
 #include <GDCore/Events/Builtin/LinkEvent.h>
@@ -15,6 +16,7 @@
 #include <GDCore/Extensions/Metadata/DependencyMetadata.h>
 #include <GDCore/Extensions/Metadata/EffectMetadata.h>
 #include <GDCore/Extensions/Metadata/MetadataProvider.h>
+#include <GDCore/Extensions/Metadata/MultipleInstructionMetadata.h>
 #include <GDCore/Extensions/Metadata/ParameterMetadataTools.h>
 #include <GDCore/Extensions/Platform.h>
 #include <GDCore/IDE/AbstractFileSystem.h>
@@ -342,6 +344,14 @@ void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
   vec.erase(vec.begin() + pos);
 }
 
+void swapInVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
+                                   size_t oldIndex,
+                                   size_t newIndex) {
+  if (oldIndex > vec.size() || newIndex > vec.size()) return;
+
+  std::swap(vec[oldIndex], vec[newIndex]);
+}
+
 // Implement a conversion from std::set<gd::String> to std::vector<gd::String>
 // as there is no easy way to properly expose iterators :/
 std::vector<gd::String> toNewVectorString(const std::set<gd::String> &set) {
@@ -367,6 +377,7 @@ typedef std::map<gd::String, gd::InstructionMetadata>
     MapStringInstructionMetadata;
 typedef std::map<gd::String, gd::EventMetadata> MapStringEventMetadata;
 typedef std::map<gd::String, gd::Variable> MapStringVariable;
+typedef std::vector<std::shared_ptr<gd::Variable>> VectorVariable;
 typedef std::map<gd::String, gd::PropertyDescriptor>
     MapStringPropertyDescriptor;
 typedef std::set<gd::String> SetString;
@@ -394,6 +405,13 @@ typedef std::vector<gd::ExpressionCompletionDescription>
     VectorExpressionCompletionDescription;
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
+typedef gd::Variable::Type Variable_Type;
+typedef std::map<gd::String, gd::SerializerValue>
+    MapStringSerializerValue;
+typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
+    VectorPairStringSharedPtrSerializerElement;
+typedef std::shared_ptr<SerializerElement>
+    SharedPtrSerializerElement;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -416,6 +434,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define WRAPPED_GetComment() com1
 #define WRAPPED_SetComment(str) com1 = str
 #define WRAPPED_GetTextFormatting(i) at(i).second
+#define WRAPPED_GetSharedPtrSerializerElement(i) at(i).second
 #define WRAPPED_GetName() first
 #define WRAPPED_GetVariable() second
 #define WRAPPED_SetBool(v) SetValue(v)
@@ -462,7 +481,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_InitializePlatforms InitializePlatforms
 #define STATIC_ValidateName ValidateName
 #define STATIC_ToJSON ToJSON
-#define STATIC_FromJSON(x) FromJSON(gd::String(x))
+#define STATIC_FromJSON(x) FromJSON(x)
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
 #define STATIC_Get Get
@@ -487,18 +506,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetExtensionAndObjectStrExpressionMetadata
 #define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
   GetExtensionAndBehaviorStrExpressionMetadata
-#define STATIC_HasCondition HasCondition
-#define STATIC_HasAction HasAction
-#define STATIC_HasObjectAction HasObjectAction
-#define STATIC_HasObjectCondition HasObjectCondition
-#define STATIC_HasBehaviorAction HasBehaviorAction
-#define STATIC_HasBehaviorCondition HasBehaviorCondition
-#define STATIC_HasExpression HasExpression
-#define STATIC_HasObjectExpression HasObjectExpression
-#define STATIC_HasBehaviorExpression HasBehaviorExpression
-#define STATIC_HasStrExpression HasStrExpression
-#define STATIC_HasObjectStrExpression HasObjectStrExpression
-#define STATIC_HasBehaviorStrExpression HasBehaviorStrExpression
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents
@@ -516,6 +523,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_GetStrExpressionMetadata GetStrExpressionMetadata
 #define STATIC_GetObjectStrExpressionMetadata GetObjectStrExpressionMetadata
 #define STATIC_GetBehaviorStrExpressionMetadata GetBehaviorStrExpressionMetadata
+#define STATIC_IsPrimitive IsPrimitive
 
 #define STATIC_Major Major
 #define STATIC_Minor Minor

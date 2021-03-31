@@ -137,7 +137,7 @@ export default class InstancesList extends Component<Props, State> {
                     key={tableKey}
                     headerHeight={30}
                     height={height}
-                    className={muiTheme.tableRootClassName}
+                    className={`gd-table ${muiTheme.tableRootClassName}`}
                     headerClassName={'tableHeaderColumn'}
                     rowCount={this.renderedRows.length}
                     rowGetter={this._rowGetter}

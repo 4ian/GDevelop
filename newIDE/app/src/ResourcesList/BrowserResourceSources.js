@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import path from 'path';
 const gd = global.gd;
 
 class GenericResourcesChooser extends Component {
@@ -26,7 +27,8 @@ class GenericResourcesChooser extends Component {
 
     const newResource = this.props.createNewResource();
     newResource.setFile(chosenResourceUrl);
-    newResource.setName(chosenResourceUrl);
+    newResource.setName(path.basename(chosenResourceUrl));
+    newResource.setOrigin('gdevelop-asset-store', chosenResourceUrl);
 
     resolveWithResources([newResource]);
     this.setState({

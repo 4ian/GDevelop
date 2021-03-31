@@ -222,6 +222,8 @@ export default class Window {
   }
 
   static openExternalURL(url: string) {
+    if (!url) return;
+
     if (electron) {
       if (shell) shell.openExternal(url);
       return;
@@ -234,7 +236,7 @@ export default class Window {
     return !!electron;
   }
 
-  static isDev() {
+  static isDev(): boolean {
     if (!electron)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 

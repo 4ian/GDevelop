@@ -6,11 +6,11 @@ import { useCommandWithOptions } from '../CommandPalette/CommandHooks';
 type Props = {|
   layout: gdLayout,
   onEditLayerEffects: (layer: gdLayer) => void,
-  onEditLightingLayer: (layer: gdLayer) => void,
+  onEditLayer: (layer: gdLayer) => void,
 |};
 
 const useLayersListCommands = (props: Props) => {
-  const { layout, onEditLayerEffects, onEditLightingLayer } = props;
+  const { layout, onEditLayerEffects, onEditLayer } = props;
 
   useCommandWithOptions('EDIT_LAYER_EFFECTS', true, {
     generateOptions: React.useCallback(
@@ -28,22 +28,19 @@ const useLayersListCommands = (props: Props) => {
     ),
   });
 
-  useCommandWithOptions('EDIT_LIGHTING_LAYER', true, {
+  useCommandWithOptions('EDIT_LAYER', true, {
     generateOptions: React.useCallback(
       () => {
         const layersCount = layout.getLayersCount();
-        const options = [];
-        mapReverseFor(0, layersCount, i => {
+        return mapReverseFor(0, layersCount, i => {
           const layer = layout.getLayerAt(i);
-          if (layer.isLightingLayer())
-            options.push({
-              text: layer.getName(),
-              handler: () => onEditLightingLayer(layer),
-            });
+          return {
+            text: layer.getName() || 'Base layer',
+            handler: () => onEditLayer(layer),
+          };
         });
-        return options;
       },
-      [layout, onEditLightingLayer]
+      [layout, onEditLayer]
     ),
   });
 };

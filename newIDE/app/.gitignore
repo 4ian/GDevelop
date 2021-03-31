@@ -19,7 +19,6 @@ npm-debug.log
 
 # GD library
 public/libGD.js
-public/libGD.js.mem
 public/libGD.wasm
 
 # Third party editors
@@ -28,6 +27,7 @@ public/external/piskel/piskel-editor.zip
 public/external/monaco-editor-min/*
 public/external/jfxr/jfxr-editor/*
 public/external/yarn/yarn-editor/*
+public/external/yarn/__MACOSX/
 public/external/zip.js/*
 public/external/zlib-asm/*
 public/external/__MACOSX/

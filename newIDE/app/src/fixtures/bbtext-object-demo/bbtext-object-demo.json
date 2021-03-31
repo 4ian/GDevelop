@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/bbtext-object-demo/manipulate-bbtext-object.json",
+    "projectUuid": "12b22292-5247-4ca1-93f2-e4164e95c6a3",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -137,6 +134,7 @@
       "variables": [
         {
           "name": "wrapDir",
+          "type": "string",
           "value": "1"
         }
       ],
@@ -148,7 +146,7 @@
           "layer": "",
           "locked": false,
           "name": "change_bbtext",
-          "persistentUuid": "efe18386-f361-4750-a2cf-5337402cd234",
+          "persistentUuid": "0472baa9-44f6-4f9b-aab2-008cd29c0673",
           "width": 369,
           "x": 340,
           "y": 208,
@@ -164,7 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "drag_bbtext",
-          "persistentUuid": "79fe357a-aad7-4179-8236-64d069efd4d1",
+          "persistentUuid": "e10df137-3821-4fd9-be7c-ac2b706f8afb",
           "width": 490,
           "x": 158,
           "y": 399,
@@ -180,7 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
-          "persistentUuid": "dedfccd4-c189-4e12-b671-4e3ca3733dbe",
+          "persistentUuid": "7465a9e4-79cd-45c8-9c1a-5c5fb1dc0690",
           "width": 0,
           "x": 1,
           "y": 3,
@@ -196,7 +194,7 @@
           "layer": "",
           "locked": false,
           "name": "line",
-          "persistentUuid": "8c49b5a4-3ea3-4e31-9c68-d5254dcc83f9",
+          "persistentUuid": "2e23af8a-560a-4b93-97b3-971331246425",
           "width": 0,
           "x": 5,
           "y": 558,
@@ -212,7 +210,7 @@
           "layer": "",
           "locked": false,
           "name": "another_line",
-          "persistentUuid": "05a5462b-a780-479c-a0eb-78254b24c242",
+          "persistentUuid": "8512ec31-3f47-411e-bce4-7350ebbb3dcc",
           "width": 0,
           "x": 245,
           "y": 246,
@@ -228,7 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "hide_bbtext",
-          "persistentUuid": "5522d103-c89a-4e08-a727-258e6abf4bb8",
+          "persistentUuid": "fcbb5d36-c2b9-459e-bf7e-c5e6ceefae86",
           "width": 246,
           "x": 353,
           "y": 266,
@@ -244,7 +242,7 @@
           "layer": "",
           "locked": false,
           "name": "wrapping_demo",
-          "persistentUuid": "09523409-a302-48b6-b42f-87d5d337790c",
+          "persistentUuid": "939d9d82-bb25-4489-8814-f69477838878",
           "width": 687,
           "x": 5,
           "y": 30,
@@ -260,7 +258,7 @@
           "layer": "",
           "locked": false,
           "name": "about",
-          "persistentUuid": "60de2725-ce55-4445-9421-0efa4e2771ba",
+          "persistentUuid": "37cdb660-340d-4053-a92e-9b1c78a8d450",
           "width": 0,
           "x": 10,
           "y": 448,
@@ -372,6 +370,7 @@
           "variables": [
             {
               "name": "incremetDir",
+              "type": "string",
               "value": ""
             }
           ],

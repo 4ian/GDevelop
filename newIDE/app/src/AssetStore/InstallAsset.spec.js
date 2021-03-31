@@ -111,6 +111,10 @@ describe('InstallAsset', () => {
       const resource = new gd.ImageResource();
       resource.setName('player-ship1.png');
       resource.setFile('https://example.com/player-ship1.png');
+      resource.setOrigin(
+        'gdevelop-asset-store',
+        'https://example.com/player-ship1.png'
+      );
       project.getResourcesManager().addResource(resource);
       resource.delete();
 
@@ -135,6 +139,48 @@ describe('InstallAsset', () => {
       ]);
     });
 
+    it('does not add a resource if it is already existing, even if changed but origin is the same', async () => {
+      const { project } = makeTestProject(gd);
+      const layout = project.insertNewLayout('MyTestLayout', 0);
+
+      const originalResourceNames = project
+        .getResourcesManager()
+        .getAllResourceNames()
+        .toJSArray();
+
+      // Create a resource that is originally the same as the one of the spaceship (same origin),
+      // but which was modified (file is different, name is different)
+      const resource = new gd.ImageResource();
+      resource.setName('renamed-player-ship1.png');
+      resource.setFile('https://example.com/modified-player-ship.png');
+      resource.setOrigin(
+        'gdevelop-asset-store',
+        'https://example.com/player-ship1.png'
+      );
+      project.getResourcesManager().addResource(resource);
+      resource.delete();
+
+      // Install the spaceship
+      await addAssetToProject({
+        project,
+        objectsContainer: layout,
+        events: layout.getEvents(),
+        asset: fakeAsset1,
+      });
+
+      // Verify there was not extra resource added.
+      expect(
+        project
+          .getResourcesManager()
+          .getAllResourceNames()
+          .toJSArray()
+      ).toEqual([
+        ...originalResourceNames,
+        'renamed-player-ship1.png',
+        'player-ship2.png',
+      ]);
+    });
+
     it('add a resource with a new name, if this name is already taken by another', async () => {
       const { project } = makeTestProject(gd);
       const layout = project.insertNewLayout('MyTestLayout', 0);
@@ -149,6 +195,7 @@ describe('InstallAsset', () => {
       const resource = new gd.ImageResource();
       resource.setName('player-ship1.png');
       resource.setFile('https://example.com/some-unrelated-file.png');
+      resource.setOrigin('some-origin', 'some-unrelated-identifier');
       project.getResourcesManager().addResource(resource);
       resource.delete();
 
@@ -231,7 +278,7 @@ describe('InstallAsset', () => {
             .getBehavior('MyBehavior')
             .getContent()
         )
-      ).toBe('{"property1": "Overriden value","property2": true}');
+      ).toBe('{"property1":"Overriden value","property2":true}');
     });
 
     it('installs an object asset in the project, adding the required events', async () => {

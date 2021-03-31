@@ -47,9 +47,6 @@ const styles = {
     marginBottom: 2,
     marginRight: 2,
   },
-  inlineText: {
-    display: 'inline-block',
-  },
   previewImage: {
     maxWidth: '100%',
     maxHeight: '100%',
@@ -168,13 +165,13 @@ export const AssetDetails = ({
           </ResponsiveWindowMeasurer>
           <Column expand>
             <div>
-              <Text size="title" style={styles.inlineText}>
+              <Text size="title" displayInlineAsSpan>
                 {assetShortHeader.name}
               </Text>{' '}
               {assetShortHeader.shortDescription && (
                 <React.Fragment>
                   -{' '}
-                  <Text size="body" style={styles.inlineText}>
+                  <Text size="body" displayInlineAsSpan>
                     {assetShortHeader.shortDescription}
                   </Text>
                 </React.Fragment>
@@ -193,6 +190,7 @@ export const AssetDetails = ({
                     assetAuthors.map(author => {
                       return (
                         <Link
+                          key={author.name}
                           component="button"
                           onClick={() => {
                             Window.openExternalURL(author.website);

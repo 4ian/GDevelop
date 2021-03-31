@@ -15,7 +15,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(
       .SetExtensionInformation(
           "BuiltinJoystick",
           _("Joysticks features"),
-          _("Built-in extension that enables the use of joysticks"),
+          "Built-in extension that enables the use of joysticks.",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);

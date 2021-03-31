@@ -2,7 +2,7 @@
 // Original definitions by Toshiya Nakakura <https://github.com/nakakura>
 // at https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare class Peer {
+declare class Peer<T> {
   prototype: RTCIceServer;
 
   /**
@@ -24,14 +24,18 @@ declare class Peer {
    * @param id The brokering ID of the remote peer (their peer.id).
    * @param options for specifying details about Peer Connection
    */
-  connect(id: string, options?: Peer.PeerConnectOption): Peer.DataConnection;
+  connect(id: string, options?: Peer.PeerConnectOption): Peer.DataConnection<T>;
   /**
    * Calls the remote peer specified by id and returns a media connection.
    * @param id The brokering ID of the remote peer (their peer.id).
    * @param stream The caller's media stream
    * @param options Metadata associated with the connection, passed in by whoever initiated the connection.
    */
-  call(id: string, stream: MediaStream, options?: Peer.CallOption): Peer.MediaConnection;
+  call(
+    id: string,
+    stream: MediaStream,
+    options?: Peer.CallOption
+  ): Peer.MediaConnection;
   /**
    * Set listeners for peer events.
    * @param event Event name
@@ -43,40 +47,40 @@ declare class Peer {
    * @param event Event name
    * @param cb id is the brokering ID of the peer
    */
-  on(event: "open", cb: (id: string) => void): void;
+  on(event: 'open', cb: (id: string) => void): void;
   /**
    * Emitted when a new data connection is established from a remote peer.
    * @param event Event name
    * @param cb Callback Function
    */
   on(
-    event: "connection",
-    cb: (dataConnection: Peer.DataConnection) => void
+    event: 'connection',
+    cb: (dataConnection: Peer.DataConnection<T>) => void
   ): void;
   /**
    * Emitted when a remote peer attempts to call you.
    * @param event Event name
    * @param cb Callback Function
    */
-  on(event: "call", cb: (mediaConnection: Peer.MediaConnection) => void): void;
+  on(event: 'call', cb: (mediaConnection: Peer.MediaConnection) => void): void;
   /**
    * Emitted when the peer is destroyed and can no longer accept or create any new connections.
    * @param event Event name
    * @param cb Callback Function
    */
-  on(event: "close", cb: () => void): void;
+  on(event: 'close', cb: () => void): void;
   /**
    * Emitted when the peer is disconnected from the signalling server
    * @param event Event name
    * @param cb Callback Function
    */
-  on(event: "disconnected", cb: () => void): void;
+  on(event: 'disconnected', cb: () => void): void;
   /**
    * Errors on the peer are almost always fatal and will destroy the peer.
    * @param event Event name
    * @param cb Callback Function
    */
-  on(event: "error", cb: (err: any) => void): void;
+  on(event: 'error', cb: (err: any) => void): void;
   /**
    * Remove event listeners.(EventEmitter3)
    * @param {String} event The event we want to remove.
@@ -102,7 +106,10 @@ declare class Peer {
    * @param peerId
    * @param connectionId
    */
-  getConnection(peerId: string, connectionId: string): Peer.MediaConnection | Peer.DataConnection | null;
+  getConnection(
+    peerId: string,
+    connectionId: string
+  ): Peer.MediaConnection | Peer.DataConnection<T> | null;
 
   /**
    * Get a list of available peer IDs
@@ -154,14 +161,14 @@ declare namespace Peer {
     sdpTransform?: Function;
   }
 
-  interface DataConnection {
-    send(data: any): void;
+  interface DataConnection<T> {
+    send(data: T): void;
     close(): void;
     on(event: string, cb: () => void): void;
-    on(event: "data", cb: (data: any) => void): void;
-    on(event: "open", cb: () => void): void;
-    on(event: "close", cb: () => void): void;
-    on(event: "error", cb: (err: any) => void): void;
+    on(event: 'data', cb: (data: T) => void): void;
+    on(event: 'open', cb: () => void): void;
+    on(event: 'close', cb: () => void): void;
+    on(event: 'error', cb: (err: any) => void): void;
     off(event: string, fn: Function, once?: boolean): void;
     dataChannel: RTCDataChannel;
     label: string;
@@ -181,9 +188,9 @@ declare namespace Peer {
     answer(stream?: MediaStream, options?: AnswerOption): void;
     close(): void;
     on(event: string, cb: () => void): void;
-    on(event: "stream", cb: (stream: MediaStream) => void): void;
-    on(event: "close", cb: () => void): void;
-    on(event: "error", cb: (err: any) => void): void;
+    on(event: 'stream', cb: (stream: MediaStream) => void): void;
+    on(event: 'close', cb: () => void): void;
+    on(event: 'error', cb: (err: any) => void): void;
     off(event: string, fn: Function, once?: boolean): void;
     open: boolean;
     metadata: any;
@@ -193,7 +200,7 @@ declare namespace Peer {
   }
 
   interface UtilSupportsObj {
-    browser: boolean,
+    browser: boolean;
     webRTC: boolean;
     audioVideo: boolean;
     data: boolean;

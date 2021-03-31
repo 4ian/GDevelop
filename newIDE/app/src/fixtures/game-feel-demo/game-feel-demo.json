@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,13 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
-    "packageName": "",
-    "projectFile": "",
+    "packageName": "com.gamefeel.demo",
+    "projectUuid": "78a9bf17-ca66-48cf-818b-40cc0f1f964c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Game Feel Examples",
     "author": "Sleeper_Games",
     "windowWidth": 800,
@@ -582,70 +578,87 @@
       "variables": [
         {
           "name": "pl_move_state",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pl_weap_cooldown",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_rand",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_pitch",
+          "type": "string",
           "value": "0.9"
         },
         {
           "name": "sfx_weap_sound_reset_timer",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sfx_weap_sound_vol",
+          "type": "string",
           "value": "100"
         },
         {
           "name": "ambience_vol",
+          "type": "string",
           "value": "100"
         },
         {
           "name": "sfx_weap_sound_aux_vol",
+          "type": "string",
           "value": "10"
         },
         {
           "name": "cam_shake_count",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_growth",
+          "type": "string",
           "value": "-1"
         },
         {
           "name": "cam_shake_magnitude",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_state",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_timer",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_x_current",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "cam_shake_y_current",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "hitlag_amount",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pl_in_sfx_zone",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -657,7 +670,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "5b484c17-d8c9-445e-8625-647ce7985c4d",
+          "persistentUuid": "e297a54e-15da-478c-97d5-11ed54e2c866",
           "width": 0,
           "x": 576,
           "y": 384,
@@ -678,7 +691,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "8a0ba3a1-6370-4851-b852-00598615c100",
+          "persistentUuid": "da437e19-ec21-4710-8bfb-ca9747b82669",
           "width": 0,
           "x": 64,
           "y": 96,
@@ -699,7 +712,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "4199b318-d1b7-4dd9-8585-2e97627938ca",
+          "persistentUuid": "d4a166af-f217-4b37-8f6e-5e470e6930f5",
           "width": 0,
           "x": 320,
           "y": 96,
@@ -720,7 +733,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "5b05bb3f-30f1-4c85-b549-425a73c07929",
+          "persistentUuid": "88ed5b21-e701-45b4-999a-2c38cb3a4e63",
           "width": 0,
           "x": 64,
           "y": 0,
@@ -741,7 +754,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "4cf47ea3-4a6e-42e9-8aaa-36723d29203f",
+          "persistentUuid": "db499ff7-01b4-44f9-b3a8-fb92629d376d",
           "width": 0,
           "x": 64,
           "y": 512,
@@ -762,7 +775,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_weapon_pl",
-          "persistentUuid": "09bf4cf1-9db3-40e8-8fd5-88998ac7bbac",
+          "persistentUuid": "c50c234a-59ab-4025-a884-f8cead223603",
           "width": 0,
           "x": 160,
           "y": 320,
@@ -778,7 +791,7 @@
           "layer": "",
           "locked": false,
           "name": "ui_cam_target",
-          "persistentUuid": "38185a0c-2ba6-445e-b288-c77d4332c4ed",
+          "persistentUuid": "f317b22c-c52d-4f42-bb94-4f4c5200492d",
           "width": 0,
           "x": 160,
           "y": 320,
@@ -794,7 +807,7 @@
           "layer": "",
           "locked": false,
           "name": "vfx_shadow_pl",
-          "persistentUuid": "999c6250-1466-4a15-b760-afec441a22de",
+          "persistentUuid": "f9a1cf0b-fd33-4f96-95f0-a66e67937d88",
           "width": 0,
           "x": 160,
           "y": 352,
@@ -810,7 +823,7 @@
           "layer": "",
           "locked": false,
           "name": "ui_move_direction",
-          "persistentUuid": "485947b2-39e0-48db-b490-594c534da691",
+          "persistentUuid": "42109043-4316-428f-aaa6-e57a18192060",
           "width": 0,
           "x": 1056,
           "y": 64,
@@ -826,7 +839,7 @@
           "layer": "",
           "locked": false,
           "name": "vfx_shadow_pl",
-          "persistentUuid": "4ff17dae-5452-4a34-a6a0-7fa5faf04c4a",
+          "persistentUuid": "58ec3470-e896-4b5a-b5c1-8303f7a3f708",
           "width": 0,
           "x": 1088,
           "y": 0,
@@ -842,7 +855,7 @@
           "layer": "",
           "locked": false,
           "name": "ui_mouse_cursor",
-          "persistentUuid": "f2fdf493-6107-4fde-a5a3-305fafb15869",
+          "persistentUuid": "1d479d36-aca6-43ae-897a-2293371518f0",
           "width": 0,
           "x": 1120,
           "y": 192,
@@ -858,7 +871,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_floor",
-          "persistentUuid": "65c9f4a6-99b2-4643-9c78-3ad992f1cddb",
+          "persistentUuid": "81b31ee8-c304-4996-bd5c-1428363f376f",
           "width": 0,
           "x": 384,
           "y": 288,
@@ -874,7 +887,7 @@
           "layer": "",
           "locked": false,
           "name": "txt_label",
-          "persistentUuid": "fd80019b-bd18-4875-b055-8e33adcff3c6",
+          "persistentUuid": "c9866f18-b988-45cb-9e58-28bf19ed2348",
           "width": 0,
           "x": 0,
           "y": 160,
@@ -890,7 +903,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "32ae0732-5d1d-41e5-ab93-565ee81b838f",
+          "persistentUuid": "099d97f9-3468-4116-92ee-9183f814f49c",
           "width": 0,
           "x": 448,
           "y": 224,
@@ -911,7 +924,7 @@
           "layer": "",
           "locked": false,
           "name": "obj_target",
-          "persistentUuid": "0cd7b7f9-dbb9-4574-8c82-52b2f2b5d96d",
+          "persistentUuid": "546773f4-87da-42e4-b010-f6c6f5886ebf",
           "width": 0,
           "x": 320,
           "y": 352,
@@ -1397,26 +1410,32 @@
           "variables": [
             {
               "name": "obj_is_squishy_scale",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "obj_scale_lerp",
+              "type": "string",
               "value": "0.2"
             },
             {
               "name": "obj_scdx",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "target_scale",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "hit_flashed",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "hostile_color",
+              "type": "string",
               "value": "255;255;255"
             }
           ],
@@ -1449,18 +1468,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1497,18 +1516,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1545,18 +1564,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1593,18 +1612,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1641,18 +1660,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1689,18 +1708,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1737,18 +1756,18 @@
                         [
                           {
                             "x": 41,
-                            "y": 8.18019
+                            "y": 8.180190086364746
                           },
                           {
-                            "x": 72.8198,
+                            "x": 72.8198013305664,
                             "y": 40
                           },
                           {
                             "x": 41,
-                            "y": 71.8198
+                            "y": 71.8198013305664
                           },
                           {
-                            "x": 9.18019,
+                            "x": 9.180190086364746,
                             "y": 40
                           }
                         ]
@@ -1768,10 +1787,12 @@
           "variables": [
             {
               "name": "shot_crit_roll",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "shot_collided",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -3809,10 +3830,12 @@
           "variables": [
             {
               "name": "casing_is_falling",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "relative_floor_y",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -3924,10 +3947,12 @@
           "variables": [
             {
               "name": "casing_is_falling",
+              "type": "string",
               "value": "1"
             },
             {
               "name": "relative_floor_y",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -4066,30 +4091,37 @@
           "variables": [
             {
               "name": "float_text_is_new",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_lifetime",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_oppacity",
+              "type": "string",
               "value": "800"
             },
             {
               "name": "float_text_target_size",
+              "type": "string",
               "value": "16"
             },
             {
               "name": "text_is_flashy_green",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_progress",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_timer",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -4114,30 +4146,37 @@
           "variables": [
             {
               "name": "float_text_is_new",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_lifetime",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "float_text_oppacity",
+              "type": "string",
               "value": "800"
             },
             {
               "name": "float_text_target_size",
+              "type": "string",
               "value": "16"
             },
             {
               "name": "text_is_flashy_red",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_progress",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "text_flash_timer",
+              "type": "string",
               "value": "0"
             }
           ],

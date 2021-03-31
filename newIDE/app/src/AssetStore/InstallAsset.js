@@ -58,28 +58,16 @@ export const sanitizeObjectName = (objectName: string) => {
   return prefixedObjectName;
 };
 
+/**
+ * Adds the specified resource to the resources manager, avoiding to duplicate
+ * if it was already added.
+ */
 export const installResource = (
   resourcesManager: gdResourcesManager,
   serializedResource: any,
   resourceNewNames: { [string]: string }
 ) => {
-  const makeGdResource = () => {
-    let resource;
-    if (serializedResource.kind === 'image') {
-      resource = new gd.ImageResource();
-    } else {
-      throw new Error(
-        `Resource of kind "${serializedResource.kind}" is not supported.`
-      );
-    }
-
-    unserializeFromJSObject(resource, serializedResource);
-
-    return resource;
-  };
-
   const originalResourceName: string = serializedResource.name;
-  const resourceFileUrl: string = serializedResource.file;
 
   if (resourceNewNames[originalResourceName]) {
     // The resource was already added previously - don't
@@ -87,36 +75,57 @@ export const installResource = (
     return;
   }
 
-  if (!resourcesManager.hasResource(originalResourceName)) {
-    // There is no existing resource with this name, just add the new resource.
-    const newResource = makeGdResource();
-    newResource.setName(originalResourceName);
-    resourceNewNames[originalResourceName] = originalResourceName;
+  // Check if the resource that must be installed is already present. Use the "origin"
+  // of the resource (if present), otherwise for compatibility we use the URL.
+  const resourceFileUrl: string = serializedResource.file;
+  const resourceOriginName: string = serializedResource.origin
+    ? serializedResource.origin.name
+    : '';
+  const resourceOriginIdentifier: string = serializedResource.origin
+    ? serializedResource.origin.identifier
+    : '';
+  const existingResourceNameFromSameOrigin =
+    resourceOriginName && resourceOriginIdentifier
+      ? resourcesManager.getResourceNameWithOrigin(
+          resourceOriginName,
+          resourceOriginIdentifier
+        )
+      : '';
+  const existingResourceNameWithSameFile = resourcesManager.getResourceNameWithFile(
+    resourceFileUrl
+  );
 
-    resourcesManager.addResource(newResource);
-    newResource.delete();
+  if (existingResourceNameFromSameOrigin) {
+    // There is a resource with the same origin, use it.
+    resourceNewNames[originalResourceName] = existingResourceNameFromSameOrigin;
+    return;
+  } else if (existingResourceNameWithSameFile) {
+    // For compatibility with resources without origins, also check the file directly.
+    resourceNewNames[originalResourceName] = existingResourceNameWithSameFile;
     return;
   }
 
-  // There is an existing resource with the name - check if it's the
-  // same resource or not.
-  const existingResource = resourcesManager.getResource(originalResourceName);
-  const file = existingResource.getFile();
-  if (file === resourceFileUrl) {
-    // Resource is already existing and is the same - nothing to do.
-    return;
+  // The resource does not exist yet, add it. Note that the "origin" will be preserved.
+  let newResource = null;
+  if (serializedResource.kind === 'image') {
+    newResource = new gd.ImageResource();
+  } else {
+    throw new Error(
+      `Resource of kind "${serializedResource.kind}" is not supported.`
+    );
   }
 
-  // The existing resource is different - find a new name for the new resource.
+  unserializeFromJSObject(newResource, serializedResource);
+
   const newName = newNameGenerator(originalResourceName, name =>
     resourcesManager.hasResource(name)
   );
-  const newResource = makeGdResource();
   newResource.setName(newName);
-  resourceNewNames[originalResourceName] = newName;
-
+  newResource.setOrigin(resourceOriginName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();
+
+  resourceNewNames[originalResourceName] = newName;
 };
 
 export const addAssetToProject = async ({
@@ -134,6 +143,11 @@ export const addAssetToProject = async ({
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
 
+  asset.objectAssets.forEach(objectAsset => {
+    objectAsset.resources.forEach(serializedResource => {});
+  });
+
+  // Create objects (and their behaviors)
   asset.objectAssets.forEach(objectAsset => {
     const type: ?string = objectAsset.object.type;
     if (!type) throw new Error('An object has no type specified');

@@ -1,17 +1,18 @@
 [ignore]
 <PROJECT_ROOT>/resources/.*
 <PROJECT_ROOT>/node_modules/protobufjs/src/bower.json
-<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Cocos2d/project.json
+# Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
+# as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
+# game engine and extensions are annotated with TypeScript annotations, not Flow.
+# It would also force Flow to restart every single time GDJS-for-web-app-only is updated, which is
+# almost always during development (any change in GDJS/extensions, or any restart of the app).
+<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/.*
 
 [declarations]
 # lingui-js triggers some Flow errors
 <PROJECT_ROOT>/node_modules/@lingui/core/.*
 # JSS triggers a Flow error
 <PROJECT_ROOT>/node_modules/jss/src/index.js
-# Don't type check the GDJS runtime and extensions copied into node_modules (only used for the web-app),
-# as this would be redundant for JsExtension.js files (see [include] section) of Extensions, and the
-# game engine and extensions are annotated with TypeScript annotations, not Flow.
-<PROJECT_ROOT>/node_modules/GDJS-for-web-app-only/Runtime/Extensions
 
 [include]
 # Type check the declarations of the JavaScript extensions (i.e: JsExtension.js files) with Flow

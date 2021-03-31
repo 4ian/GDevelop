@@ -12,11 +12,13 @@ namespace gd {
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
     gd::PlatformExtension& extension) {
   extension
-      .SetExtensionInformation("BuiltinAudio",
-                               _("Audio"),
-                               _("Builtin audio extension"),
-                               "Florian Rival",
-                               "Open source (MIT License)")
+      .SetExtensionInformation(
+          "BuiltinAudio",
+          _("Audio"),
+          _("GDevelop provides several conditions and actions to play audio "
+            "files. They can be either long musics or short sound effects."),
+          "Florian Rival",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio");
 
 #if defined(GD_IDE_ONLY)
@@ -274,6 +276,74 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .SetParameterLongDescription(_("1 by default."))
       .SetDefaultValue("1")
       .MarkAsSimple();
+
+  extension
+      .AddAction("PreloadMusic",
+                 _("Preload a music file"),
+                 _("Preload a music file in memory."),
+                 _("Preload the music file _PARAM1_"),
+                 _("Audio/Loading"),
+                 "res/actions/music24.png",
+                 "res/actions/music.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("musicfile", _("Audio file (or audio resource name)"))
+      .MarkAsComplex();
+
+  extension
+      .AddAction("PreloadSound",
+                 _("Preload a sound file"),
+                 _("Preload a sound file in memory."),
+                 _("Preload the sound file _PARAM1_"),
+                 _("Audio/Loading"),
+                 "res/actions/son24.png",
+                 "res/actions/son.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("soundfile", _("Sound file (or sound resource name)"))
+      .MarkAsComplex();
+
+  extension
+      .AddAction("UnloadMusic",
+                 _("Unload a music file"),
+                 _(
+                    "Unload a music file from memory. "
+                    "Unloading a music file will cause any music playing it to stop."
+                  ),
+                 _("Unload the music file _PARAM1_"),
+                 _("Audio/Loading"),
+                 "res/actions/music24.png",
+                 "res/actions/music.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("musicfile", _("Audio file (or audio resource name)"))
+      .MarkAsComplex();
+
+  extension
+      .AddAction("UnloadSound",
+                 _("Unload a sound file"),
+                 _(
+                    "Unload a sound file from memory. "
+                    "Unloading a sound file will cause any sounds playing it to stop."
+                  ),
+                 _("Unload the sound file _PARAM1_"),
+                 _("Audio/Loading"),
+                 "res/actions/son24.png",
+                 "res/actions/son.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("soundfile", _("Sound file (or sound resource name)"))
+      .MarkAsComplex();
+
+  extension
+      .AddAction("UnloadAllAudio",
+                 _("Unload all audio"),
+                 _(
+                   "Unload all the audio in memory. "
+                   "This will cause every sound and music of the game to stop."
+                  ),
+                 _("Unload all audio files"),
+                 _("Audio/Loading"),
+                 "res/actions/music24.png",
+                 "res/actions/music.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsComplex();
 
   extension
       .AddCondition("MusicPlaying",

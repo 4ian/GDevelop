@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\change-sprite-animation\\game.json",
+    "projectUuid": "5391d811-92ee-4c43-888d-f999796b7a9c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -156,6 +153,7 @@
       "variables": [
         {
           "name": "switch_animation",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -167,7 +165,7 @@
           "layer": "",
           "locked": false,
           "name": "kenney",
-          "persistentUuid": "523a26f4-6a9c-4983-982b-6fc3c6dde0f8",
+          "persistentUuid": "cff00725-79b0-45cc-9eaf-f36aa4802ee0",
           "width": 0,
           "x": 338.011,
           "y": 257.511,
@@ -183,7 +181,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "dd0c7242-d848-43c0-9b2d-41edd7481520",
+          "persistentUuid": "98dde681-a599-4eff-955d-42c8436de03d",
           "width": 0,
           "x": 144.894,
           "y": 28.0707,

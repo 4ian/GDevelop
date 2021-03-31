@@ -25,7 +25,7 @@ import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoad
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
-import UnsavedChangesContext from './MainFrame/UnsavedChangesContext';
+import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
 
 const gd: libGDevelop = global.gd;
 
@@ -42,8 +42,9 @@ export const create = (authentification: Authentification) => {
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
       eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
+      resourceFetcher={LocalResourceFetcher}
     >
-      {({ i18n, eventsFunctionsExtensionsState }) => (
+      {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[LocalFileStorageProvider]}
@@ -55,46 +56,38 @@ export const create = (authentification: Authentification) => {
             initialFileMetadataToOpen,
             getStorageProvider,
           }) => (
-            <UnsavedChangesContext.Consumer>
-              {unsavedChanges => (
-                <MainFrame
-                  i18n={i18n}
-                  renderMainMenu={props => <ElectronMainMenu {...props} />}
-                  eventsFunctionsExtensionsState={
-                    eventsFunctionsExtensionsState
-                  }
-                  renderPreviewLauncher={(props, ref) => (
-                    <LocalPreviewLauncher {...props} ref={ref} />
-                  )}
-                  renderExportDialog={props => (
-                    <ExportDialog {...props} exporters={getLocalExporters()} />
-                  )}
-                  renderCreateDialog={props => (
-                    <CreateProjectDialog
-                      {...props}
-                      examplesComponent={LocalExamples}
-                      startersComponent={LocalStarters}
-                    />
-                  )}
-                  renderGDJSDevelopmentWatcher={
-                    isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
-                  }
-                  storageProviders={storageProviders}
-                  getStorageProviderOperations={getStorageProviderOperations}
-                  getStorageProvider={getStorageProvider}
-                  resourceSources={localResourceSources}
-                  resourceExternalEditors={localResourceExternalEditors}
-                  extensionsLoader={makeExtensionsLoader({
-                    gd,
-                    objectsEditorService: ObjectsEditorService,
-                    objectsRenderingService: ObjectsRenderingService,
-                    filterExamples: !isDev,
-                  })}
-                  initialFileMetadataToOpen={initialFileMetadataToOpen}
-                  unsavedChanges={unsavedChanges}
+            <MainFrame
+              i18n={i18n}
+              renderMainMenu={props => <ElectronMainMenu {...props} />}
+              renderPreviewLauncher={(props, ref) => (
+                <LocalPreviewLauncher {...props} ref={ref} />
+              )}
+              renderExportDialog={props => (
+                <ExportDialog {...props} exporters={getLocalExporters()} />
+              )}
+              renderCreateDialog={props => (
+                <CreateProjectDialog
+                  {...props}
+                  examplesComponent={LocalExamples}
+                  startersComponent={LocalStarters}
                 />
               )}
-            </UnsavedChangesContext.Consumer>
+              renderGDJSDevelopmentWatcher={
+                isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
+              }
+              storageProviders={storageProviders}
+              getStorageProviderOperations={getStorageProviderOperations}
+              getStorageProvider={getStorageProvider}
+              resourceSources={localResourceSources}
+              resourceExternalEditors={localResourceExternalEditors}
+              extensionsLoader={makeExtensionsLoader({
+                gd,
+                objectsEditorService: ObjectsEditorService,
+                objectsRenderingService: ObjectsRenderingService,
+                filterExamples: !isDev,
+              })}
+              initialFileMetadataToOpen={initialFileMetadataToOpen}
+            />
           )}
         </ProjectStorageProviders>
       )}

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.gametemplates.itch",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\parse-json-from-api\\game.json",
+    "projectUuid": "ecb90557-e954-420c-bbd9-be9fef88d89c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Parse JSON from SWAPI",
     "author": "gametemplates.itch.io",
     "windowWidth": 800,
@@ -147,26 +144,32 @@
       "variables": [
         {
           "name": "person_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "planet_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "person",
+          "type": "string",
           "value": ""
         },
         {
           "name": "num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "prev_num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "planet",
+          "type": "string",
           "value": ""
         }
       ],
@@ -178,7 +181,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "7f8b53c5-00de-4f17-ab66-45dd5ea288bd",
+          "persistentUuid": "b9623b88-fea6-4f51-a55e-f4bac1d04de3",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -194,7 +197,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
-          "persistentUuid": "5c3224ff-b840-4911-a202-ceabca31ee2a",
+          "persistentUuid": "4c7260a8-5064-4c82-87dd-670a1f93b649",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -210,7 +213,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "57a16021-3661-4c4a-bf6a-a577fa9504de",
+          "persistentUuid": "1325f940-3208-4595-bcf2-2ad2ee704690",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,
@@ -588,7 +591,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/people/\" + ToString(Variable(num)) + \"/\"",
                 "\"person\"",
                 "\"GET\"",
@@ -603,7 +606,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/planets/\" + ToString(Variable(num)) + \"/\"",
                 "\"planet\"",
                 "\"GET\"",

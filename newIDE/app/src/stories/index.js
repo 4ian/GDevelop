@@ -3308,15 +3308,17 @@ storiesOf('SpriteEditor and related editors', module)
   .addDecorator(muiDecorator)
   .add('SpriteEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <SpriteEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-      />
+      <DragAndDropContextProvider>
+        <SpriteEditor
+          object={testProject.spriteObject}
+          project={testProject.project}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)
+          }
+          resourceExternalEditors={fakeResourceExternalEditors}
+        />
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ))
   .add('PointsEditor', () => (
@@ -3330,11 +3332,15 @@ storiesOf('SpriteEditor and related editors', module)
   ))
   .add('CollisionMasksEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <CollisionMasksEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourcesLoader={ResourcesLoader}
-      />
+      <DragAndDropContextProvider>
+        <div style={{ height: 500 }}>
+          <CollisionMasksEditor
+            object={testProject.spriteObject}
+            project={testProject.project}
+            resourcesLoader={ResourcesLoader}
+          />
+        </div>
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ));
 

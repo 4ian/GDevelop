@@ -178,12 +178,6 @@ const CollisionMasksEditor = (props: Props) => {
   const editorNodes =
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
-  const containerStyle = {
-    // Fixed height is required for large screens, otherwise
-    // EditorMosaic collapses to zero height
-    height: screenSize === 'small' ? '100%' : 750,
-  };
-
   if (!props.object.getAnimationsCount()) return null;
 
   const editors: { [string]: Editor } = {
@@ -191,31 +185,33 @@ const CollisionMasksEditor = (props: Props) => {
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <ImagePreview
-          resourceName={hasValidSprite ? sprite.getImageName() : ''}
-          resourcesLoader={props.resourcesLoader}
-          project={props.project}
-          onSize={setCurrentSpriteSize}
-          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
-            hasValidSprite && (
-              <CollisionMasksPreview
-                imageWidth={imageWidth}
-                imageHeight={imageHeight}
-                imageZoomFactor={imageZoomFactor}
-                isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
-                polygons={sprite.getCustomCollisionMask()}
-                onPolygonsUpdated={updateCollisionMasks}
-              />
-            )
-          }
-        />
+        <div style={{ display: 'flex', height: '100%' }}>
+          <ImagePreview
+            resourceName={hasValidSprite ? sprite.getImageName() : ''}
+            resourcesLoader={props.resourcesLoader}
+            project={props.project}
+            onSize={setCurrentSpriteSize}
+            renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+              hasValidSprite && (
+                <CollisionMasksPreview
+                  imageWidth={imageWidth}
+                  imageHeight={imageHeight}
+                  imageZoomFactor={imageZoomFactor}
+                  isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                  polygons={sprite.getCustomCollisionMask()}
+                  onPolygonsUpdated={updateCollisionMasks}
+                />
+              )
+            }
+          />
+        </div>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <div style={{ overflowY: 'auto' }}>
+        <div style={{ overflowY: 'scroll' }}>
           <Line>
             <Column expand>
               <SpriteSelector
@@ -288,7 +284,7 @@ const CollisionMasksEditor = (props: Props) => {
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={{ height: '100%' }}>
       <EditorMosaic editors={editors} initialNodes={editorNodes} />
     </div>
   );

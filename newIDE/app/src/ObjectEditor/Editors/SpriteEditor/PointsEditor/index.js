@@ -23,6 +23,7 @@ import EditorMosaic, {
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Background from '../../../../UI/Background';
+import ScrollView from '../../../../UI/ScrollView';
 const gd: libGDevelop = global.gd;
 
 const horizontalMosaicNodes: EditorMosaicNode = {
@@ -186,7 +187,7 @@ const PointsEditor = (props: Props) => {
       noTitleBar: true,
       renderEditor: () => (
         <Background>
-          <div style={{ overflowY: 'auto' }}>
+          <ScrollView>
             <Line>
               <Column expand>
                 <SpriteSelector
@@ -223,7 +224,7 @@ const PointsEditor = (props: Props) => {
                 <Trans>Choose an animation and frame to edit the points</Trans>
               </EmptyMessage>
             )}
-          </div>
+          </ScrollView>
         </Background>
       ),
     },

@@ -24,6 +24,7 @@ import EditorMosaic, {
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Background from '../../../../UI/Background';
+import ScrollView from '../../../../UI/ScrollView';
 const gd: libGDevelop = global.gd;
 
 const horizontalMosaicNodes: EditorMosaicNode = {
@@ -213,7 +214,7 @@ const CollisionMasksEditor = (props: Props) => {
       noTitleBar: true,
       renderEditor: () => (
         <Background>
-          <div style={{ overflowY: 'auto' }}>
+          <ScrollView>
             <Line>
               <Column expand>
                 <SpriteSelector
@@ -283,7 +284,7 @@ const CollisionMasksEditor = (props: Props) => {
                 </Trans>
               </EmptyMessage>
             )}
-          </div>
+          </ScrollView>
         </Background>
       ),
     },

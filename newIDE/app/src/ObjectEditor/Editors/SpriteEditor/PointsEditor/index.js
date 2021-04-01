@@ -17,7 +17,27 @@ import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
 import ResourcesLoader from '../../../../ResourcesLoader';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import EditorMosaic, {
+  type Editor,
+  type EditorMosaicNode,
+} from '../../../../UI/EditorMosaic';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Background from '../../../../UI/Background';
 const gd: libGDevelop = global.gd;
+
+const horizontalMosaicNodes: EditorMosaicNode = {
+  direction: 'row',
+  first: 'preview',
+  second: 'properties',
+  splitPercentage: 50,
+};
+
+const verticalMosaicNodes: EditorMosaicNode = {
+  direction: 'column',
+  first: 'preview',
+  second: 'properties',
+  splitPercentage: 50,
+};
 
 type Props = {|
   object: any, // @todo passed as gdSpriteObject but used as gdObject?
@@ -129,56 +149,89 @@ const PointsEditor = (props: Props) => {
     samePointsForSprites,
   ]);
 
+  // Keep panes vertical for small screens, side-by-side for large screens
+  const screenSize = useResponsiveWindowWidth();
+  const editorNodes =
+    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+
   if (!props.object.getAnimationsCount()) return null;
-  return (
-    <div>
-      <ImagePreview
-        resourceName={hasValidSprite ? sprite.getImageName() : ''}
-        resourcesLoader={props.resourcesLoader}
-        project={props.project}
-        renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
-          hasValidSprite && (
-            <PointsPreview
-              imageWidth={imageWidth}
-              imageHeight={imageHeight}
-              imageZoomFactor={imageZoomFactor}
-              pointsContainer={sprite}
-              onPointsUpdated={updatePoints}
-            />
-          )
-        }
-      />
-      <Line>
-        <Column expand>
-          <SpriteSelector
-            spriteObject={spriteObject}
-            animationIndex={animationIndex}
-            directionIndex={directionIndex}
-            spriteIndex={spriteIndex}
-            chooseAnimation={chooseAnimation}
-            chooseDirection={chooseDirection}
-            chooseSprite={chooseSprite}
-            sameForAllAnimations={samePointsForAnimations}
-            sameForAllSprites={samePointsForSprites}
-            setSameForAllAnimations={setSamePointsForAllAnimations}
-            setSameForAllSprites={setSamePointsForAllSprites}
-            setSameForAllAnimationsLabel={
-              <Trans>Share same points for all animations</Trans>
-            }
-            setSameForAllSpritesLabel={
-              <Trans>Share same points for all sprites of this animation</Trans>
+
+  const editors: { [string]: Editor } = {
+    preview: {
+      type: 'primary',
+      noTitleBar: true,
+      renderEditor: () => (
+        <Background>
+          <ImagePreview
+            resourceName={hasValidSprite ? sprite.getImageName() : ''}
+            resourcesLoader={props.resourcesLoader}
+            project={props.project}
+            renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+              hasValidSprite && (
+                <PointsPreview
+                  imageWidth={imageWidth}
+                  imageHeight={imageHeight}
+                  imageZoomFactor={imageZoomFactor}
+                  pointsContainer={sprite}
+                  onPointsUpdated={updatePoints}
+                />
+              )
             }
           />
-        </Column>
-      </Line>
-      {!!sprite && (
-        <PointsList pointsContainer={sprite} onPointsUpdated={updatePoints} />
-      )}
-      {!sprite && (
-        <EmptyMessage>
-          <Trans>Choose an animation and frame to edit the points</Trans>
-        </EmptyMessage>
-      )}
+        </Background>
+      ),
+    },
+    properties: {
+      type: 'secondary',
+      noTitleBar: true,
+      renderEditor: () => (
+        <Background>
+          <div style={{ overflowY: 'auto' }}>
+            <Line>
+              <Column expand>
+                <SpriteSelector
+                  spriteObject={spriteObject}
+                  animationIndex={animationIndex}
+                  directionIndex={directionIndex}
+                  spriteIndex={spriteIndex}
+                  chooseAnimation={chooseAnimation}
+                  chooseDirection={chooseDirection}
+                  chooseSprite={chooseSprite}
+                  sameForAllAnimations={samePointsForAnimations}
+                  sameForAllSprites={samePointsForSprites}
+                  setSameForAllAnimations={setSamePointsForAllAnimations}
+                  setSameForAllSprites={setSamePointsForAllSprites}
+                  setSameForAllAnimationsLabel={
+                    <Trans>Share same points for all animations</Trans>
+                  }
+                  setSameForAllSpritesLabel={
+                    <Trans>
+                      Share same points for all sprites of this animation
+                    </Trans>
+                  }
+                />
+              </Column>
+            </Line>
+            {!!sprite && (
+              <PointsList
+                pointsContainer={sprite}
+                onPointsUpdated={updatePoints}
+              />
+            )}
+            {!sprite && (
+              <EmptyMessage>
+                <Trans>Choose an animation and frame to edit the points</Trans>
+              </EmptyMessage>
+            )}
+          </div>
+        </Background>
+      ),
+    },
+  };
+
+  return (
+    <div style={{ flex: 1 }}>
+      <EditorMosaic editors={editors} initialNodes={editorNodes} />
     </div>
   );
 };

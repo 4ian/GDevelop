@@ -475,6 +475,9 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
             ]}
             cannotBeDismissed={true}
             noMargin
+            maxWidth="lg"
+            flexBody
+            fullHeight
             onRequestClose={() => this.openPointsEditor(false)}
             open={this.state.pointsEditorOpen}
           >

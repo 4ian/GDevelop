@@ -3323,11 +3323,15 @@ storiesOf('SpriteEditor and related editors', module)
   ))
   .add('PointsEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <PointsEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourcesLoader={ResourcesLoader}
-      />
+      <DragAndDropContextProvider>
+        <FixedHeightFlexContainer height={500}>
+          <PointsEditor
+            object={testProject.spriteObject}
+            project={testProject.project}
+            resourcesLoader={ResourcesLoader}
+          />
+        </FixedHeightFlexContainer>
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ))
   .add('CollisionMasksEditor', () => (

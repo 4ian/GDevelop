@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\move-object-in-circle\\move-object-in-circle.json",
+    "projectUuid": "e31435e1-c455-4de5-9868-48a7c5fd02ad",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -107,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "rect_green.png",
         "kind": "image",
+        "metadata": "",
         "name": "rect_green.png",
         "smoothed": true,
         "userAdded": true
@@ -154,6 +156,7 @@
           "layer": "",
           "locked": false,
           "name": "Char1",
+          "persistentUuid": "4a7b0b68-d3b0-45d0-b332-02cb38771e57",
           "width": 0,
           "x": 242,
           "y": 344,
@@ -169,6 +172,7 @@
           "layer": "",
           "locked": false,
           "name": "Char2",
+          "persistentUuid": "c53eca49-beac-4db3-9f0f-f8f5238b8693",
           "width": 0,
           "x": 525,
           "y": 357,
@@ -184,6 +188,7 @@
           "layer": "",
           "locked": false,
           "name": "InfoText1",
+          "persistentUuid": "7a12b9f9-49db-4939-a702-ae1cb2ae7610",
           "width": 0,
           "x": 198,
           "y": 81,
@@ -199,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "InfoText2",
+          "persistentUuid": "728a6e39-03b3-4f63-a3fa-66f2d655501b",
           "width": 0,
           "x": 474,
           "y": 81,
@@ -211,6 +217,7 @@
       "objects": [
         {
           "name": "Char1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -268,6 +275,7 @@
         },
         {
           "name": "Char2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -328,6 +336,7 @@
           "italic": false,
           "name": "InfoText1",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -346,6 +355,7 @@
           "italic": false,
           "name": "InfoText2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -428,6 +438,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -449,6 +464,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

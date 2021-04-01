@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "1b149547-0cc0-4de8-8d2e-ad478e1221eb",
+    "projectUuid": "599623bb-5272-4f81-a3ca-0d2c5e374999",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -244,6 +244,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cockatrice_playcard.mp3",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -251,6 +253,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/cuckoo.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -258,6 +262,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/Rise.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -265,6 +271,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "sounds/pop.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -334,22 +342,27 @@
       "variables": [
         {
           "name": "first_card_id",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "num_selected",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "second_card_id",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "pairs_earned",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "game_state",
+          "type": "string",
           "value": "player_turn"
         }
       ],
@@ -1004,6 +1017,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "crab"
             }
           ],
@@ -1082,6 +1096,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "seahorse"
             }
           ],
@@ -1160,6 +1175,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "snail"
             }
           ],
@@ -1238,6 +1254,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "seagrass"
             }
           ],
@@ -1316,6 +1333,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "coral"
             }
           ],
@@ -1394,6 +1412,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "anemone"
             }
           ],
@@ -1472,6 +1491,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "plasticbag"
             }
           ],
@@ -1550,6 +1570,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "blowfish"
             }
           ],

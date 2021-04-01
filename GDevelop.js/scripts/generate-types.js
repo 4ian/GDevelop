@@ -202,7 +202,10 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     shell.sed(
       '-i',
       'declare class gdSerializer {',
-      'declare class gdSerializer {\n  static fromJSObject(object: Object): gdSerializerElement;',
+      `declare class gdSerializer {
+  static fromJSObject(object: Object): gdSerializerElement;
+  static toJSObject(element: gdSerializerElement): any;
+`,
       'types/gdserializer.js'
     );
     shell.sed(

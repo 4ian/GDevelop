@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "b97fb44d-b0c7-4a36-b7e8-52712b043afb",
+    "projectUuid": "d5008ea8-c2be-4b6b-8ff2-cf16bb750a6f",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -952,6 +952,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1018,6 +1019,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1107,6 +1109,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1177,6 +1180,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1247,6 +1251,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1317,6 +1322,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1387,6 +1393,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1457,6 +1464,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1527,6 +1535,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1597,6 +1606,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1686,6 +1696,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1737,6 +1748,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1788,6 +1800,7 @@
           "variables": [
             {
               "name": "var",
+              "type": "string",
               "value": "0"
             }
           ],

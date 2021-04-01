@@ -12,7 +12,7 @@ const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
 const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const { getExampleNames } = require('./lib/ExamplesLoader');
 const fs = require('fs').promises;
-var shell = require('shelljs');
+const shell = require('shelljs');
 
 // The base URL where all resources of web-app examples are stored.
 const baseUrl = 'https://resources.gdevelop-app.com/examples';

@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\object-selection\\game.json",
+    "projectUuid": "195c1854-66d5-4936-ae0d-286d120b14c5",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Object selection",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -112,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tankV1.png",
         "smoothed": false,
         "userAdded": true
@@ -159,6 +162,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "b007e787-16d6-4684-8ca1-24e4e8510e82",
           "width": 74,
           "x": 192,
           "y": 114,
@@ -179,6 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "d459030b-8b93-4fca-baaf-dd0ee4ac572b",
           "width": 74,
           "x": 288,
           "y": 114,
@@ -199,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "f9cc51a9-97bb-435d-bc8f-a7326c1d4bef",
           "width": 74,
           "x": 384,
           "y": 114,
@@ -219,6 +225,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "47a540ae-1756-4408-9354-86a0dd8e7f8a",
           "width": 74,
           "x": 480,
           "y": 114,
@@ -239,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "50c32279-648d-4591-b19c-939d3e8a24ab",
           "width": 74,
           "x": 192,
           "y": 205,
@@ -259,6 +267,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "07173f62-ca92-40a6-8adc-436e4a5be268",
           "width": 74,
           "x": 288,
           "y": 205,
@@ -279,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "c6442098-d64c-4175-a76b-c889d1b8d949",
           "width": 74,
           "x": 384,
           "y": 205,
@@ -299,6 +309,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "c837cdd9-5e71-404a-a657-579aba0fb4f9",
           "width": 74,
           "x": 480,
           "y": 205,
@@ -319,6 +330,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "e67a4a1f-f5cb-4d0c-b362-ad1d13218bf9",
           "width": 0,
           "x": 39,
           "y": 415,
@@ -331,6 +343,7 @@
       "objects": [
         {
           "name": "Tank",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -481,6 +494,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -722,6 +736,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -743,6 +762,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

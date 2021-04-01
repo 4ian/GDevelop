@@ -247,6 +247,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -268,6 +269,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -369,6 +371,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -406,6 +409,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -427,6 +431,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -480,6 +485,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -517,6 +523,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -547,6 +554,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -687,6 +695,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1298,13 +1307,16 @@
       "variables": [
         {
           "name": "defaultsRCVariables",
+          "type": "structure",
           "children": [
             {
               "name": "moneyIncrease",
+              "type": "string",
               "value": "5"
             },
             {
               "name": "potionPrice",
+              "type": "string",
               "value": "20"
             }
           ]
@@ -3520,6 +3532,7 @@
       "variables": [
         {
           "name": "error",
+          "type": "string",
           "value": "ok"
         }
       ],
@@ -3573,6 +3586,7 @@
           "initialVariables": [
             {
               "name": "type",
+              "type": "string",
               "value": "email"
             }
           ]
@@ -3610,6 +3624,7 @@
           "initialVariables": [
             {
               "name": "type",
+              "type": "string",
               "value": "password"
             }
           ]
@@ -3810,6 +3825,7 @@
           "variables": [
             {
               "name": "type",
+              "type": "string",
               "value": "null"
             }
           ],
@@ -4864,6 +4880,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -4981,6 +4998,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -5050,6 +5068,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -5071,6 +5090,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -5124,6 +5144,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -5161,6 +5182,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -5191,6 +5213,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -5331,6 +5354,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -5966,83 +5990,103 @@
       "variables": [
         {
           "name": "message",
+          "type": "structure",
           "children": [
             {
               "name": "content",
+              "type": "string",
               "value": ""
             },
             {
               "name": "date",
+              "type": "string",
               "value": ""
             },
             {
               "name": "owner",
+              "type": "string",
               "value": ""
             }
           ]
         },
         {
           "name": "sendMessageStatus",
+          "type": "string",
           "value": ""
         },
         {
           "name": "listMessageStatus",
+          "type": "string",
           "value": ""
         },
         {
           "name": "messagesList",
+          "type": "string",
           "value": ""
         },
         {
           "name": "refreshMessages",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "reloadMessages",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "messageOffset",
+          "type": "string",
           "value": ""
         },
         {
           "name": "messages",
+          "type": "structure",
           "children": [
             {
               "name": "1",
+              "type": "structure",
               "children": [
                 {
                   "name": "content",
+                  "type": "string",
                   "value": "Loading..."
                 },
                 {
                   "name": "date",
+                  "type": "string",
                   "value": " "
                 }
               ]
             },
             {
               "name": "2",
+              "type": "structure",
               "children": [
                 {
                   "name": "content",
+                  "type": "string",
                   "value": "Loading..."
                 },
                 {
                   "name": "date",
+                  "type": "string",
                   "value": " "
                 }
               ]
             },
             {
               "name": "3",
+              "type": "structure",
               "children": [
                 {
                   "name": "content",
+                  "type": "string",
                   "value": "Loading..."
                 },
                 {
                   "name": "date",
+                  "type": "string",
                   "value": " "
                 }
               ]
@@ -6068,6 +6112,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -6089,6 +6134,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -6190,6 +6236,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -6307,6 +6354,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -6328,6 +6376,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -6349,6 +6398,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -6402,6 +6452,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -6455,6 +6506,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -6476,6 +6528,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -6497,6 +6550,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -6511,6 +6565,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -6678,6 +6733,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -6780,6 +6836,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": ""
             }
           ],
@@ -6846,6 +6903,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -6986,6 +7044,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -8683,12 +8742,14 @@
         "string",
         "string manipulation"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Removes every non-alphanumerical characters of a string.",
           "fullName": "Sanitize Text",
           "functionType": "StringExpression",
           "name": "sanitize",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8735,6 +8796,7 @@
           "fullName": "Trim a string",
           "functionType": "StringExpression",
           "name": "trim",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8791,6 +8853,7 @@
           "fullName": "Remove new lines",
           "functionType": "StringExpression",
           "name": "removeNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8837,6 +8900,7 @@
           "fullName": "Count Lines",
           "functionType": "Expression",
           "name": "countNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8868,6 +8932,7 @@
           "fullName": "",
           "functionType": "StringExpression",
           "name": "removeFirstLine",
+          "private": false,
           "sentence": "",
           "events": [
             {

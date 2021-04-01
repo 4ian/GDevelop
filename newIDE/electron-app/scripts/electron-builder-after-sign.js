@@ -15,7 +15,8 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename;
   const appPath = path.join(appOutDir, `${appName}.app`);
 
-  // Bail out if credentials not present
+  // Bail out if credentials not present.
+  // Set up your credentials in newIDE/electron-app/.env
   if (!appleId) {
     console.info(`APPLEID is not defined, skipping macOS notarization...`);
     return;

@@ -471,6 +471,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "life lost sound.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -554,18 +556,22 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "CheckpointX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "CheckpointY",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "PlayerJustDead",
+          "type": "string",
           "value": ""
         }
       ],
@@ -2731,6 +2737,7 @@
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -5577,8 +5584,12 @@
       "name": "Parallax",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/image-move.svg",
       "shortDescription": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
-      "tags": "parallax, tiled",
       "version": "1.0.1",
+      "tags": [
+        "parallax",
+        "tiled"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -5592,6 +5603,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5697,6 +5709,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {

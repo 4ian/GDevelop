@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.codequest",
-    "projectUuid": "10e8a228-3c53-4e5f-bf04-1427da888e0b",
+    "projectUuid": "e651d23e-48c4-4d08-a502-4a594fd07214",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -740,6 +740,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\image\\effect_rotate.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -747,6 +749,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\image\\effect_drop.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -754,6 +758,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_rotate.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -761,6 +767,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_drop.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -768,6 +776,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_click.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -775,6 +785,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_line.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -782,6 +794,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\325261__adam-n__whoosh.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -789,6 +803,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\398608__locky-bee__whoosh.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -796,6 +812,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_fall.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -803,6 +821,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\effect_game_over.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -810,6 +830,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "assets\\sound\\bgm_dark_tetris.mp3",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -849,59 +871,73 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "Level",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "Lines",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "ScorePerLines",
+          "type": "structure",
           "children": [
             {
               "name": "1",
+              "type": "string",
               "value": "50\n"
             },
             {
               "name": "2",
+              "type": "string",
               "value": "150"
             },
             {
               "name": "3",
+              "type": "string",
               "value": "350"
             },
             {
               "name": "4",
+              "type": "string",
               "value": "1000"
             }
           ]
         },
         {
           "name": "EntryDelay",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "DropDelay",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "InputDelay",
+          "type": "string",
           "value": "0.1"
         },
         {
           "name": "LastAction",
+          "type": "string",
           "value": ""
         },
         {
           "name": "IntroDuration",
+          "type": "string",
           "value": "3"
         },
         {
           "name": "CountDownDuration",
+          "type": "string",
           "value": "3"
         }
       ],
@@ -1028,22 +1064,27 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localX",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localY",
+              "type": "string",
               "value": ""
             },
             {
               "name": "x",
+              "type": "string",
               "value": ""
             },
             {
               "name": "y",
+              "type": "string",
               "value": ""
             }
           ],
@@ -1267,22 +1308,27 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localX",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localY",
+              "type": "string",
               "value": ""
             },
             {
               "name": "x",
+              "type": "string",
               "value": ""
             },
             {
               "name": "y",
+              "type": "string",
               "value": ""
             }
           ],
@@ -1506,18 +1552,22 @@
           "variables": [
             {
               "name": "State",
+              "type": "string",
               "value": ""
             },
             {
               "name": "GridDistanceToFall",
+              "type": "string",
               "value": ""
             },
             {
               "name": "GridX",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "GridY",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1748,22 +1798,27 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localX",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localY",
+              "type": "string",
               "value": ""
             },
             {
               "name": "x",
+              "type": "string",
               "value": ""
             },
             {
               "name": "y",
+              "type": "string",
               "value": ""
             }
           ],
@@ -1987,22 +2042,27 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localX",
+              "type": "string",
               "value": ""
             },
             {
               "name": "localY",
+              "type": "string",
               "value": ""
             },
             {
               "name": "x",
+              "type": "string",
               "value": ""
             },
             {
               "name": "y",
+              "type": "string",
               "value": ""
             }
           ],
@@ -21501,12 +21561,14 @@
       "tags": [
         ""
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Initialize",
           "fullName": "Initialize",
           "functionType": "Action",
           "name": "Initialize",
+          "private": false,
           "sentence": "CommonUtils::Initialize _PARAM1_",
           "events": [
             {
@@ -21576,6 +21638,7 @@
           "fullName": "ConsoleLog",
           "functionType": "Action",
           "name": "ConsoleLog",
+          "private": false,
           "sentence": "ConsoleLog _PARAM1_",
           "events": [
             {
@@ -21622,6 +21685,7 @@
           "fullName": "ConsoleLog2",
           "functionType": "Action",
           "name": "ConsoleLog2",
+          "private": false,
           "sentence": "ConsoleLog2 _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_",
           "events": [
             {
@@ -21698,6 +21762,7 @@
           "fullName": "ConsoleLog3",
           "functionType": "Action",
           "name": "ConsoleLog3",
+          "private": false,
           "sentence": "ConsoleLog3 _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_",
           "events": [
             {
@@ -21794,6 +21859,7 @@
           "fullName": "ConsoleLog4",
           "functionType": "Action",
           "name": "ConsoleLog4",
+          "private": false,
           "sentence": "ConsoleLog4 _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_, _PARAM8_",
           "events": [
             {
@@ -21910,6 +21976,7 @@
           "fullName": "ConsoleLog5",
           "functionType": "Action",
           "name": "ConsoleLog5",
+          "private": false,
           "sentence": "ConsoleLog5 _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_, _PARAM8_, _PARAM9_, _PARAM10_",
           "events": [
             {
@@ -22046,6 +22113,7 @@
           "fullName": "ConsoleSceneVariable",
           "functionType": "Action",
           "name": "ConsoleSceneVariable",
+          "private": false,
           "sentence": "ConsoleSceneVariable _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -22102,6 +22170,7 @@
           "fullName": "GetDataPath",
           "functionType": "StringExpression",
           "name": "GetDataPath",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -22158,6 +22227,7 @@
           "fullName": "ToLocaleString",
           "functionType": "StringExpression",
           "name": "ToLocaleString",
+          "private": false,
           "sentence": "ToLocaleString _PARAM1_",
           "events": [
             {
@@ -22204,6 +22274,7 @@
           "fullName": "AlignRight",
           "functionType": "Action",
           "name": "AlignRight",
+          "private": false,
           "sentence": "AlignRight _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -22272,6 +22343,7 @@
           "fullName": "AlignCenterHorizontally",
           "functionType": "Action",
           "name": "AlignCenterHorizontally",
+          "private": false,
           "sentence": "AlignCenterHorizontally _PARAM1_, _PARAM2_",
           "events": [
             {
@@ -22340,6 +22412,7 @@
           "fullName": "ChangeTextAndAlignRight",
           "functionType": "Action",
           "name": "ChangeTextAndAlignRight",
+          "private": false,
           "sentence": "ChangeTextAndAlignRight _PARAM1_, _PARAM2_, _PARAM3_",
           "events": [
             {
@@ -22430,6 +22503,7 @@
           "fullName": "ChangeTextAndAlignCenterHorizontally",
           "functionType": "Action",
           "name": "ChangeTextAndAlignCenterHorizontally",
+          "private": false,
           "sentence": "ChangeTextAndAlignCenterHorizontally _PARAM1_, _PARAM2_, _PARAM3_",
           "events": [
             {
@@ -22532,12 +22606,14 @@
       "tags": [
         ""
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Initialize",
           "fullName": "Initialize",
           "functionType": "Action",
           "name": "Initialize",
+          "private": false,
           "sentence": "TetrisUtils::Initialize",
           "events": [
             {
@@ -23805,6 +23881,7 @@
           "fullName": "SetLayoutInfo",
           "functionType": "Action",
           "name": "SetLayoutInfo",
+          "private": false,
           "sentence": "TetrisUtils::SetLayoutInfo _PARAM1_, _PARAM2_, _PARAM3_,_PARAM4_, _PARAM5_, _PARAM6_",
           "events": [
             {
@@ -23982,6 +24059,7 @@
           "fullName": "GetBlockSize",
           "functionType": "Expression",
           "name": "GetBlockSize",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24027,6 +24105,7 @@
           "fullName": "Piece_GetName",
           "functionType": "StringExpression",
           "name": "Piece_GetName",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24083,6 +24162,7 @@
           "fullName": "Piece_GetSrsType",
           "functionType": "StringExpression",
           "name": "Piece_GetSrsType",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24139,6 +24219,7 @@
           "fullName": "Piece_GetBlockCount",
           "functionType": "Expression",
           "name": "Piece_GetBlockCount",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24195,6 +24276,7 @@
           "fullName": "Piece_GetSize",
           "functionType": "Expression",
           "name": "Piece_GetSize",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24251,6 +24333,7 @@
           "fullName": "Piece_GetBlockLocalX",
           "functionType": "Expression",
           "name": "Piece_GetBlockLocalX",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24317,6 +24400,7 @@
           "fullName": "Piece_GetBlockLocalY",
           "functionType": "Expression",
           "name": "Piece_GetBlockLocalY",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24383,6 +24467,7 @@
           "fullName": "Piece_GetPreviewOffsetX",
           "functionType": "Expression",
           "name": "Piece_GetPreviewOffsetX",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24439,6 +24524,7 @@
           "fullName": "Piece_GetPreviewOffsetY",
           "functionType": "Expression",
           "name": "Piece_GetPreviewOffsetY",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -24495,6 +24581,7 @@
           "fullName": "Block_PutLockedOne",
           "functionType": "Action",
           "name": "Block_PutLockedOne",
+          "private": false,
           "sentence": "Block_PutLockedOne _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_::_PARAM6_, _PARAM7_::_PARAM8_ ",
           "events": [
             {
@@ -24727,6 +24814,7 @@
           "fullName": "Block_PutLockedOnes",
           "functionType": "Action",
           "name": "Block_PutLockedOnes",
+          "private": false,
           "sentence": "Block_PutLockedOnes _PARAM1_, _PARAM2_::_PARAM3_, _PARAM4_::_PARAM5_, _PARAM6_",
           "events": [
             {
@@ -24947,6 +25035,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -25055,6 +25144,7 @@
               "fullName": "SetupLocalPosition",
               "functionType": "Action",
               "name": "SetupLocalPosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetupLocalPosition _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -25170,6 +25260,7 @@
               "fullName": "UpdateNextPosition",
               "functionType": "Action",
               "name": "UpdateNextPosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::UpdateNextPosition _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -25270,6 +25361,7 @@
               "fullName": "UpdateHoldPosition",
               "functionType": "Action",
               "name": "UpdateHoldPosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::UpdateHoldPosition _PARAM2_",
               "events": [
                 {
@@ -25360,6 +25452,7 @@
               "fullName": "UpdatePosition",
               "functionType": "Action",
               "name": "UpdatePosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::UpdatePosition _PARAM2_",
               "events": [
                 {
@@ -25459,6 +25552,7 @@
               "fullName": "SetPosition",
               "functionType": "Action",
               "name": "SetPosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetPosition _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -25553,6 +25647,7 @@
               "fullName": "IsOverlapping",
               "functionType": "Condition",
               "name": "IsOverlapping",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsOverlapping _PARAM2_::_PARAM3_",
               "events": [
                 {
@@ -25673,6 +25768,7 @@
               "fullName": "IsMoveableLeft",
               "functionType": "Condition",
               "name": "IsMoveableLeft",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsMoveableLeft _PARAM2_::_PARAM3_",
               "events": [
                 {
@@ -25793,6 +25889,7 @@
               "fullName": "IsMoveableRight",
               "functionType": "Condition",
               "name": "IsMoveableRight",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsMoveableRight _PARAM2_::_PARAM3_",
               "events": [
                 {
@@ -25913,6 +26010,7 @@
               "fullName": "IsMoveableDown",
               "functionType": "Condition",
               "name": "IsMoveableDown",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsMoveableDown _PARAM2_::_PARAM3_",
               "events": [
                 {
@@ -26059,6 +26157,7 @@
               "fullName": "IsMoveableDownBy",
               "functionType": "Condition",
               "name": "IsMoveableDownBy",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsMoveableDownBy _PARAM2_, _PARAM3_::_PARAM4_",
               "events": [
                 {
@@ -26189,6 +26288,7 @@
               "fullName": "IsRotatable",
               "functionType": "Condition",
               "name": "IsRotatable",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsRotatable _PARAM2_, _PARAM3_::_PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_",
               "events": [
                 {
@@ -26427,6 +26527,7 @@
               "fullName": "RotateLocalPosition",
               "functionType": "Action",
               "name": "RotateLocalPosition",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::RotateLocalPosition _PARAM2_::_PARAM3_, _PARAM4_",
               "events": [
                 {
@@ -26665,6 +26766,7 @@
               "fullName": "MoveLeft",
               "functionType": "Action",
               "name": "MoveLeft",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveLeft",
               "events": [
                 {
@@ -26733,6 +26835,7 @@
               "fullName": "MoveRight",
               "functionType": "Action",
               "name": "MoveRight",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveRight",
               "events": [
                 {
@@ -26801,6 +26904,7 @@
               "fullName": "ConvertToGridX",
               "functionType": "Expression",
               "name": "ConvertToGridX",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -26867,6 +26971,7 @@
               "fullName": "ConvertToGridY",
               "functionType": "Expression",
               "name": "ConvertToGridY",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -26933,6 +27038,7 @@
               "fullName": "FallToFloor",
               "functionType": "Action",
               "name": "FallToFloor",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::FallToFloor _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -27022,6 +27128,7 @@
               "fullName": "AdjustGapAfterFalling",
               "functionType": "Action",
               "name": "AdjustGapAfterFalling",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::AdjustGapAfterFalling _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -27119,6 +27226,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -27188,6 +27296,7 @@
               "fullName": "RemoveAt",
               "functionType": "Action",
               "name": "RemoveAt",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::RemoveAt _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -27277,6 +27386,7 @@
               "fullName": "IsPlaceableAt",
               "functionType": "Condition",
               "name": "IsPlaceableAt",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsPlaceableAt _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -27453,6 +27563,7 @@
               "fullName": "Reset",
               "functionType": "Action",
               "name": "Reset",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::Reset",
               "events": [
                 {
@@ -27613,6 +27724,7 @@
               "fullName": "LogDebug",
               "functionType": "Action",
               "name": "LogDebug",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::LogDebug _PARAM2_",
               "events": [
                 {
@@ -27815,6 +27927,7 @@
               "fullName": "GetFillCount",
               "functionType": "Expression",
               "name": "GetFillCount",
+              "private": false,
               "sentence": "IsPlaceableAt _PARAM0_, _PARAM1_, _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -27993,6 +28106,7 @@
               "fullName": "SetAt",
               "functionType": "Action",
               "name": "SetAt",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetAt _PARAM2_, _PARAM3_, _PARAM4_",
               "events": [
                 {
@@ -28092,6 +28206,7 @@
               "fullName": "PlaceAt",
               "functionType": "Action",
               "name": "PlaceAt",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::PlaceAt _PARAM2_::_PARAM3_",
               "events": [
                 {
@@ -28190,6 +28305,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -30985,6 +31101,7 @@
               "fullName": "SetupType",
               "functionType": "Action",
               "name": "SetupType",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetupType _PARAM2_",
               "events": [
                 {
@@ -31129,6 +31246,7 @@
               "fullName": "GetName",
               "functionType": "StringExpression",
               "name": "GetName",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -31195,6 +31313,7 @@
               "fullName": "GetSize",
               "functionType": "Expression",
               "name": "GetSize",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -31261,6 +31380,7 @@
               "fullName": "GetBlockCount",
               "functionType": "Expression",
               "name": "GetBlockCount",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -31327,6 +31447,7 @@
               "fullName": "CenterAtCreation",
               "functionType": "Action",
               "name": "CenterAtCreation",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::CenterAtCreation",
               "events": [
                 {
@@ -31409,6 +31530,7 @@
               "fullName": "MoveLeft",
               "functionType": "Action",
               "name": "MoveLeft",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveLeft ",
               "events": [
                 {
@@ -31479,6 +31601,7 @@
               "fullName": "MoveRight",
               "functionType": "Action",
               "name": "MoveRight",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveRight",
               "events": [
                 {
@@ -31549,6 +31672,7 @@
               "fullName": "MoveDown",
               "functionType": "Action",
               "name": "MoveDown",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveDown",
               "events": [
                 {
@@ -31619,6 +31743,7 @@
               "fullName": "MoveDownBy",
               "functionType": "Action",
               "name": "MoveDownBy",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveDownBy _PARAM2_ ",
               "events": [
                 {
@@ -31699,6 +31824,7 @@
               "fullName": "MoveBy",
               "functionType": "Action",
               "name": "MoveBy",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::MoveBy _PARAM2_, _PARAM3_ ",
               "events": [
                 {
@@ -31814,6 +31940,7 @@
               "fullName": "TurnSrsType",
               "functionType": "Action",
               "name": "TurnSrsType",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::TurnSrsType _PARAM2_ ",
               "events": [
                 {
@@ -31893,6 +32020,7 @@
               "fullName": "GetGridX",
               "functionType": "Expression",
               "name": "GetGridX",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -31959,6 +32087,7 @@
               "fullName": "GetGridY",
               "functionType": "Expression",
               "name": "GetGridY",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -32025,6 +32154,7 @@
               "fullName": "GetSrsTestCount",
               "functionType": "Expression",
               "name": "GetSrsTestCount",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -32108,6 +32238,7 @@
               "fullName": "GetSrsOffsetX",
               "functionType": "Expression",
               "name": "GetSrsOffsetX",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -32237,6 +32368,7 @@
               "fullName": "GetSrsOffsetY",
               "functionType": "Expression",
               "name": "GetSrsOffsetY",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -32366,6 +32498,7 @@
               "fullName": "SetMovedOrRotated",
               "functionType": "Action",
               "name": "SetMovedOrRotated",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetMovedOrRotated",
               "events": [
                 {
@@ -32435,6 +32568,7 @@
               "fullName": "ResetMovedOrRotated",
               "functionType": "Action",
               "name": "ResetMovedOrRotated",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::ResetMovedOrRotated",
               "events": [
                 {
@@ -32504,6 +32638,7 @@
               "fullName": "IsMovedOrRotated",
               "functionType": "Condition",
               "name": "IsMovedOrRotated",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsMovedOrRotated",
               "events": [
                 {
@@ -32612,6 +32747,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -32692,6 +32828,7 @@
               "fullName": "SetInputDelay",
               "functionType": "Action",
               "name": "SetInputDelay",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetInputDelay _PARAM2_ ",
               "events": [
                 {
@@ -32771,6 +32908,7 @@
               "fullName": "Reset",
               "functionType": "Action",
               "name": "Reset",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::Reset",
               "events": [
                 {
@@ -32851,6 +32989,7 @@
               "fullName": "IsPressed",
               "functionType": "Condition",
               "name": "IsPressed",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsPressed _PARAM2_",
               "events": [
                 {
@@ -32992,6 +33131,7 @@
               "fullName": "IsPressed2",
               "functionType": "Condition",
               "name": "IsPressed2",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsPressed2 _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -33183,6 +33323,7 @@
         "hit",
         "damage"
       ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -33196,6 +33337,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -33390,6 +33532,7 @@
               "fullName": "Flash (blink)",
               "functionType": "Action",
               "name": "Flash",
+              "private": false,
               "sentence": "Make _PARAM0_ blink for _PARAM2_ seconds",
               "events": [
                 {
@@ -33490,6 +33633,7 @@
               "fullName": "Is object flashing",
               "functionType": "Condition",
               "name": "IsFlashing",
+              "private": false,
               "sentence": "_PARAM0_ is flashing",
               "events": [
                 {
@@ -33572,6 +33716,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onOwnerRemovedFromScene",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -33625,6 +33770,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onDeActivate",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -33678,6 +33824,7 @@
               "fullName": "Stop flashing",
               "functionType": "Action",
               "name": "Stop",
+              "private": false,
               "sentence": "Stop flashing _PARAM0_",
               "events": [
                 {
@@ -33796,12 +33943,14 @@
       "tags": [
         ""
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "SetLayoutInfo",
           "fullName": "SetLayoutInfo",
           "functionType": "Action",
           "name": "SetLayoutInfo",
+          "private": false,
           "sentence": "SceneUtils::SetLayoutInfo _PARAM1_",
           "events": [
             {
@@ -33860,6 +34009,7 @@
           "fullName": "Settings_HandleKeyInputButton",
           "functionType": "Action",
           "name": "Settings_HandleKeyInputButton",
+          "private": false,
           "sentence": "Settings_HandleKeyInputButton _PARAM1_, _PARAM2_, _PARAM3_",
           "events": [
             {
@@ -34009,6 +34159,7 @@
           "fullName": "Settings_UpdateKeyInputButton",
           "functionType": "Action",
           "name": "Settings_UpdateKeyInputButton",
+          "private": false,
           "sentence": "Settings_UpdateKeyInputButton _PARAM1_, _PARAM2_, _PARAM3_",
           "events": [
             {
@@ -34114,6 +34265,7 @@
           "fullName": "Settings_HandleVolumeButton",
           "functionType": "Action",
           "name": "Settings_HandleVolumeButton",
+          "private": false,
           "sentence": "Settings_HandleVolumeButton _PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_",
           "events": [
             {
@@ -34400,6 +34552,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onCreated",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -34482,6 +34635,7 @@
               "fullName": "IsPressed",
               "functionType": "Condition",
               "name": "IsPressed",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsPressed",
               "events": [
                 {
@@ -34581,6 +34735,7 @@
               "fullName": "ResetPressed",
               "functionType": "Action",
               "name": "ResetPressed",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::ResetPressed",
               "events": [
                 {
@@ -34650,6 +34805,7 @@
               "fullName": "GetChecked",
               "functionType": "Expression",
               "name": "GetChecked",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsChecked",
               "events": [
                 {
@@ -34716,6 +34872,7 @@
               "fullName": "SetChecked",
               "functionType": "Action",
               "name": "SetChecked",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::SetChecked _PARAM2_, _PARAM3_",
               "events": [
                 {
@@ -34892,6 +35049,7 @@
               "fullName": "HandleEvent",
               "functionType": "Action",
               "name": "HandleEvent",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::HandleEvent _PARAM2_",
               "events": [
                 {
@@ -35251,6 +35409,7 @@
               "fullName": "IsPressed",
               "functionType": "Condition",
               "name": "IsPressed",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::IsPressed",
               "events": [
                 {
@@ -35350,6 +35509,7 @@
               "fullName": "ResetPressed",
               "functionType": "Action",
               "name": "ResetPressed",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::ResetPressed",
               "events": [
                 {
@@ -35419,6 +35579,7 @@
               "fullName": "HandleEvent",
               "functionType": "Action",
               "name": "HandleEvent",
+              "private": false,
               "sentence": "_PARAM0_::_PARAM1_::HandleEvent",
               "events": [
                 {

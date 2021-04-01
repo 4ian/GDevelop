@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -9,17 +9,14 @@
   "properties": {
     "adaptGameResolutionAtRuntime": true,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.lights",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/lights/lights.json",
+    "projectUuid": "4d34aed5-2f3c-45ed-9ca0-4abe6a053931",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Lights Example",
     "author": "",
     "windowWidth": 800,
@@ -183,6 +180,7 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -727,10 +725,18 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "SineMovement",
+      "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -744,6 +750,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {

@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/video-player/video-player.json",
+    "projectUuid": "6d76c83a-504f-4af2-af9f-9d10edcf6929",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Example video",
     "author": "Bouh",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -275,10 +273,12 @@
   "variables": [
     {
       "name": "Fullscreen",
+      "type": "string",
       "value": "0"
     },
     {
       "name": "Cursor",
+      "type": "string",
       "value": "None"
     }
   ],
@@ -319,6 +319,7 @@
           "layer": "",
           "locked": false,
           "name": "Video",
+          "persistentUuid": "dba6fa08-26a0-4176-8405-a2a7fb7cf4d7",
           "width": 625,
           "x": 89,
           "y": 98,
@@ -328,10 +329,12 @@
           "initialVariables": [
             {
               "name": "Variable",
+              "type": "string",
               "value": ""
             },
             {
               "name": "Percent_PositionBar",
+              "type": "string",
               "value": "12"
             }
           ]
@@ -343,6 +346,7 @@
           "layer": "",
           "locked": false,
           "name": "DEBUG_VIDEO",
+          "persistentUuid": "0483de35-0f39-4259-88ae-f96ec6c3267b",
           "width": 0,
           "x": 325,
           "y": 648,
@@ -358,6 +362,7 @@
           "layer": "",
           "locked": false,
           "name": "Explain",
+          "persistentUuid": "b4eec6c7-d3fa-40b6-b721-cf19a764edd8",
           "width": 0,
           "x": 83,
           "y": 467,
@@ -373,6 +378,7 @@
           "layer": "",
           "locked": false,
           "name": "Credit",
+          "persistentUuid": "29874c61-d77b-4518-862a-7452f93aee40",
           "width": 0,
           "x": 306,
           "y": 570,
@@ -388,6 +394,7 @@
           "layer": "",
           "locked": false,
           "name": "Title",
+          "persistentUuid": "ad99f34e-116a-4a71-8412-40c8424b1863",
           "width": 344,
           "x": 260,
           "y": 32,
@@ -400,22 +407,24 @@
       "objects": [
         {
           "name": "Video",
+          "tags": "",
           "type": "Video::VideoObject",
           "variables": [
             {
               "name": "Size_ProgressBar",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "Percent_PositionBar",
+              "type": "string",
               "value": "10"
             }
           ],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "content": {
@@ -427,19 +436,20 @@
         },
         {
           "name": "State_video",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
             {
               "name": "applyEffect",
+              "type": "string",
               "value": "0"
             }
           ],
           "behaviors": [
             {
               "name": "Tween",
-              "type": "Tween::TweenBehavior",
-              "content": {}
+              "type": "Tween::TweenBehavior"
             }
           ],
           "animations": [
@@ -679,6 +689,7 @@
         },
         {
           "name": "Play_Pause",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -862,6 +873,7 @@
         },
         {
           "name": "Volume_Background_Transparent",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -900,6 +912,7 @@
         },
         {
           "name": "Volume_Background_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -938,6 +951,7 @@
         },
         {
           "name": "Volume_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -976,6 +990,7 @@
         },
         {
           "name": "VOLUME_CIRCLE",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1014,6 +1029,7 @@
         },
         {
           "name": "Fullscreen",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1052,6 +1068,7 @@
         },
         {
           "name": "Prevent_click",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1090,6 +1107,7 @@
         },
         {
           "name": "Cursor",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1128,6 +1146,7 @@
         },
         {
           "name": "Sound",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1224,6 +1243,7 @@
         },
         {
           "name": "Time_Background_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1262,6 +1282,7 @@
         },
         {
           "name": "Time_ProgressBar",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1300,6 +1321,7 @@
         },
         {
           "name": "Time_Circle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1341,6 +1363,7 @@
           "italic": false,
           "name": "DEBUG_VIDEO",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1359,6 +1382,7 @@
           "italic": false,
           "name": "TimeCode",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1374,6 +1398,7 @@
         },
         {
           "name": "DEBUG_CIRCLE",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1415,6 +1440,7 @@
           "italic": false,
           "name": "Explain",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1430,6 +1456,7 @@
         },
         {
           "name": "Looped",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1500,6 +1527,7 @@
           "italic": false,
           "name": "Credit",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1518,6 +1546,7 @@
           "italic": false,
           "name": "Title",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -5307,7 +5336,9 @@
                   "folded": false,
                   "type": "BuiltinCommonInstructions::JsCode",
                   "inlineCode": "window.scene = runtimeScene;\nvariables = scene.getVariables();\n\n//currenttime of video object, for more see DEBUG group\ncurrentTime = Math.round(variables.get(\"exp_currentTime\").getAsNumber());\ncurrentTime_formated = variables.get(\"currentTime_formated\");\n\n//duration of video object, for more see debug group\nduration = Math.round(variables.get(\"exp_duration\").getAsNumber());\nduration_formated = variables.get(\"duration_formated\"); //this init the variable\n\n\n\nfunction format_time(time_second) {\n    if (Number.isInteger(time_second)) {\n        date = new Date(null);\n        date.setSeconds(time_second);\n        if (time_second >= 3600) {\n            return date.toISOString().substr(11, 8); // MM:SS\n        } else {\n            return date.toISOString().substr(14, 5); // HH:MM:SS\n        }\n\n\n    }\n}\n\n//update the new variables with time formated, ready to use in this group Time display\nduration_formated.setString(format_time(duration));\ncurrentTime_formated.setString(format_time(currentTime));\n\n",
-                  "parameterObjects": ""
+                  "parameterObjects": "",
+                  "useStrict": false,
+                  "eventsSheetExpanded": false
                 },
                 {
                   "disabled": false,
@@ -6023,6 +6054,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -6040,12 +6076,22 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Progressbar",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UI",
           "visibility": true,
           "cameras": [],
@@ -6063,17 +6109,25 @@
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
+      "author": "",
       "description": "",
       "extensionNamespace": "",
       "fullName": "",
+      "helpPath": "",
+      "iconUrl": "",
       "name": "Utils",
+      "previewIconUrl": "",
+      "shortDescription": "",
       "version": "",
+      "tags": [],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Set the position of a object in %, position is from the objet parent.",
           "fullName": "Position in %",
           "functionType": "Action",
           "name": "Place_pos_in_percentage",
+          "private": false,
           "sentence": "Place the object _PARAM1_ at X:_PARAM3_%, Y:_PARAM4_% from the object parent _PARAM2_, Include : _PARAM5_, Offset :  X:_PARAM6_ Y:_PARAM7_ ",
           "events": [
             {
@@ -6184,6 +6238,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Object to place",
+              "longDescription": "",
               "name": "OBJECT",
               "optional": false,
               "supplementaryInformation": "",
@@ -6193,6 +6248,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Parent object",
+              "longDescription": "",
               "name": "PARENT_OBJECT",
               "optional": false,
               "supplementaryInformation": "",
@@ -6202,6 +6258,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "X %(Number)",
+              "longDescription": "",
               "name": "POS_X",
               "optional": false,
               "supplementaryInformation": "",
@@ -6211,6 +6268,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Y %(Number)",
+              "longDescription": "",
               "name": "POS_Y",
               "optional": false,
               "supplementaryInformation": "",
@@ -6220,6 +6278,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Include or not the dimension of the object ? (0 = no ,1 = yes)",
+              "longDescription": "",
               "name": "INCLUDE",
               "optional": false,
               "supplementaryInformation": "",
@@ -6229,6 +6288,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Offset X px of the object",
+              "longDescription": "",
               "name": "OFFSET_X",
               "optional": false,
               "supplementaryInformation": "",
@@ -6238,6 +6298,7 @@
               "codeOnly": false,
               "defaultValue": "",
               "description": "Offset Y px of the object",
+              "longDescription": "",
               "name": "OFFSET_Y",
               "optional": false,
               "supplementaryInformation": "",
@@ -6246,7 +6307,8 @@
           ],
           "objectGroups": []
         }
-      ]
+      ],
+      "eventsBasedBehaviors": []
     }
   ],
   "externalLayouts": [],

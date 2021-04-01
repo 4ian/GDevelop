@@ -1,4 +1,4 @@
-import { createGdevelopTheme } from '../theme';
+import { createGdevelopTheme } from '../CreateTheme';
 
 import styles from './$THEME_IDVariables.json';
 import './$THEME_IDVariables.css';

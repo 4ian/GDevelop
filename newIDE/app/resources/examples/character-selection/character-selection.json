@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\character-selection\\character_selection.json",
+    "projectUuid": "5c28bd1d-15d9-4ede-af2c-a889f7d328d2",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Platformer",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -111,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "p1_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_stand.png",
         "smoothed": true,
         "userAdded": false
@@ -119,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "p1_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_jump.png",
         "smoothed": true,
         "userAdded": false
@@ -127,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk01.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk01.png",
         "smoothed": true,
         "userAdded": false
@@ -135,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk02.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk02.png",
         "smoothed": true,
         "userAdded": false
@@ -143,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk03.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk03.png",
         "smoothed": true,
         "userAdded": false
@@ -151,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk04.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk04.png",
         "smoothed": true,
         "userAdded": false
@@ -159,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk05.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk05.png",
         "smoothed": true,
         "userAdded": false
@@ -167,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk06.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk06.png",
         "smoothed": true,
         "userAdded": false
@@ -175,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk07.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk07.png",
         "smoothed": true,
         "userAdded": false
@@ -183,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk08.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk08.png",
         "smoothed": true,
         "userAdded": false
@@ -191,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk09.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk09.png",
         "smoothed": true,
         "userAdded": false
@@ -199,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk10.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk10.png",
         "smoothed": true,
         "userAdded": false
@@ -207,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "p1_walk11.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk11.png",
         "smoothed": true,
         "userAdded": false
@@ -215,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "brickWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "brickWall.png",
         "smoothed": true,
         "userAdded": false
@@ -223,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "bridge.png",
         "kind": "image",
+        "metadata": "",
         "name": "bridge.png",
         "smoothed": true,
         "userAdded": false
@@ -231,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "grassHalfMid.png",
         "kind": "image",
+        "metadata": "",
         "name": "grassHalfMid.png",
         "smoothed": true,
         "userAdded": true
@@ -239,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "castleCenter.png",
         "kind": "image",
+        "metadata": "",
         "name": "castleCenter.png",
         "smoothed": true,
         "userAdded": true
@@ -247,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "bridgeLogs.png",
         "kind": "image",
+        "metadata": "",
         "name": "bridgeLogs.png",
         "smoothed": true,
         "userAdded": true
@@ -255,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "Left.png",
         "kind": "image",
+        "metadata": "",
         "name": "Left.png",
         "smoothed": true,
         "userAdded": false
@@ -263,6 +282,7 @@
         "alwaysLoaded": false,
         "file": "Right.png",
         "kind": "image",
+        "metadata": "",
         "name": "Right.png",
         "smoothed": true,
         "userAdded": false
@@ -271,6 +291,7 @@
         "alwaysLoaded": false,
         "file": "ladder_mid.png",
         "kind": "image",
+        "metadata": "",
         "name": "ladder_mid.png",
         "smoothed": true,
         "userAdded": true
@@ -279,6 +300,7 @@
         "alwaysLoaded": false,
         "file": "Grass.png",
         "kind": "image",
+        "metadata": "",
         "name": "grass.png",
         "smoothed": true,
         "userAdded": true
@@ -287,6 +309,7 @@
         "alwaysLoaded": false,
         "file": "PlayerArea.png",
         "kind": "image",
+        "metadata": "",
         "name": "PlayerArea.png",
         "smoothed": true,
         "userAdded": false
@@ -295,6 +318,7 @@
         "alwaysLoaded": false,
         "file": "slimeWalk1.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeWalk1.png",
         "smoothed": true,
         "userAdded": false
@@ -303,6 +327,7 @@
         "alwaysLoaded": false,
         "file": "slimeWalk2.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeWalk2.png",
         "smoothed": true,
         "userAdded": false
@@ -311,6 +336,7 @@
         "alwaysLoaded": false,
         "file": "slimeDead.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeDead.png",
         "smoothed": true,
         "userAdded": false
@@ -319,6 +345,7 @@
         "alwaysLoaded": false,
         "file": "flyFly1.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyFly1.png",
         "smoothed": true,
         "userAdded": false
@@ -327,6 +354,7 @@
         "alwaysLoaded": false,
         "file": "flyFly2.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyFly2.png",
         "smoothed": true,
         "userAdded": false
@@ -335,6 +363,7 @@
         "alwaysLoaded": false,
         "file": "flyDead.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyDead.png",
         "smoothed": true,
         "userAdded": false
@@ -343,6 +372,7 @@
         "alwaysLoaded": false,
         "file": "cloud1.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud1.png",
         "smoothed": false,
         "userAdded": false
@@ -351,6 +381,7 @@
         "alwaysLoaded": false,
         "file": "cloud2.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud2.png",
         "smoothed": false,
         "userAdded": false
@@ -359,6 +390,7 @@
         "alwaysLoaded": false,
         "file": "cloud3.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud3.png",
         "smoothed": false,
         "userAdded": false
@@ -367,6 +399,7 @@
         "alwaysLoaded": false,
         "file": "bush.png",
         "kind": "image",
+        "metadata": "",
         "name": "bush.png",
         "smoothed": true,
         "userAdded": false
@@ -375,6 +408,7 @@
         "alwaysLoaded": false,
         "file": "cactus.png",
         "kind": "image",
+        "metadata": "",
         "name": "cactus.png",
         "smoothed": true,
         "userAdded": false
@@ -383,6 +417,7 @@
         "alwaysLoaded": false,
         "file": "plant.png",
         "kind": "image",
+        "metadata": "",
         "name": "plant.png",
         "smoothed": true,
         "userAdded": false
@@ -391,6 +426,7 @@
         "alwaysLoaded": false,
         "file": "coinGold.png",
         "kind": "image",
+        "metadata": "",
         "name": "coinGold.png",
         "smoothed": true,
         "userAdded": true
@@ -399,6 +435,7 @@
         "alwaysLoaded": false,
         "file": "shadedDark06.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark06.png",
         "smoothed": true,
         "userAdded": false
@@ -407,6 +444,7 @@
         "alwaysLoaded": false,
         "file": "shadedDark05.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark05.png",
         "smoothed": true,
         "userAdded": false
@@ -415,6 +453,7 @@
         "alwaysLoaded": false,
         "file": "shadedDark45.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark45.png",
         "smoothed": true,
         "userAdded": false
@@ -423,6 +462,7 @@
         "alwaysLoaded": false,
         "file": "shadedDark09.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark09.png",
         "smoothed": true,
         "userAdded": false
@@ -431,6 +471,7 @@
         "alwaysLoaded": false,
         "file": "p2_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_stand.png",
         "smoothed": true,
         "userAdded": true
@@ -439,6 +480,7 @@
         "alwaysLoaded": false,
         "file": "p2_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_jump.png",
         "smoothed": true,
         "userAdded": false
@@ -447,6 +489,7 @@
         "alwaysLoaded": false,
         "file": "p2_walk03.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_walk03.png",
         "smoothed": true,
         "userAdded": false
@@ -455,6 +498,7 @@
         "alwaysLoaded": false,
         "file": "p2_walk04.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_walk04.png",
         "smoothed": true,
         "userAdded": false
@@ -463,6 +507,7 @@
         "alwaysLoaded": false,
         "file": "p2_walk05.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_walk05.png",
         "smoothed": true,
         "userAdded": false
@@ -471,6 +516,7 @@
         "alwaysLoaded": false,
         "file": "p2_walk06.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_walk06.png",
         "smoothed": true,
         "userAdded": true
@@ -479,6 +525,7 @@
         "alwaysLoaded": false,
         "file": "p2_walk07.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2_walk07.png",
         "smoothed": true,
         "userAdded": true
@@ -487,6 +534,7 @@
         "alwaysLoaded": false,
         "file": "p3_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_stand.png",
         "smoothed": true,
         "userAdded": true
@@ -495,6 +543,7 @@
         "alwaysLoaded": false,
         "file": "p3_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_jump.png",
         "smoothed": true,
         "userAdded": true
@@ -503,6 +552,7 @@
         "alwaysLoaded": false,
         "file": "p3_walk03.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_walk03.png",
         "smoothed": true,
         "userAdded": true
@@ -511,6 +561,7 @@
         "alwaysLoaded": false,
         "file": "p3_walk04.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_walk04.png",
         "smoothed": true,
         "userAdded": true
@@ -519,6 +570,7 @@
         "alwaysLoaded": false,
         "file": "p3_walk05.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_walk05.png",
         "smoothed": true,
         "userAdded": true
@@ -527,6 +579,7 @@
         "alwaysLoaded": false,
         "file": "p3_walk06.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_walk06.png",
         "smoothed": true,
         "userAdded": true
@@ -535,6 +588,7 @@
         "alwaysLoaded": false,
         "file": "p3_walk07.png",
         "kind": "image",
+        "metadata": "",
         "name": "p3_walk07.png",
         "smoothed": true,
         "userAdded": true
@@ -582,6 +636,7 @@
           "layer": "",
           "locked": false,
           "name": "Player1",
+          "persistentUuid": "11143047-6a34-4ccf-83c3-26fd773d1510",
           "width": 0,
           "x": 225,
           "y": 252,
@@ -597,6 +652,7 @@
           "layer": "",
           "locked": false,
           "name": "Player2",
+          "persistentUuid": "4baefead-bf70-44cb-bbbc-91554bbe6df6",
           "width": 0,
           "x": 353,
           "y": 252,
@@ -612,6 +668,7 @@
           "layer": "",
           "locked": false,
           "name": "Player3",
+          "persistentUuid": "ff8552a7-fa8b-41b8-9021-cad4e2fe4ac7",
           "width": 0,
           "x": 481,
           "y": 252,
@@ -627,6 +684,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "101dd087-a619-4144-81e5-13f19339ab90",
           "width": 0,
           "x": 245,
           "y": 65,
@@ -639,6 +697,7 @@
       "objects": [
         {
           "name": "Player1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -745,6 +804,7 @@
         },
         {
           "name": "Player2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -851,6 +911,7 @@
         },
         {
           "name": "Player3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -960,6 +1021,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1170,6 +1232,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1262,6 +1329,7 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -1273,6 +1341,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "0057a9aa-af72-4115-ba8b-a7f887f5904a",
           "width": 0,
           "x": 742.246,
           "y": 500.569,
@@ -1293,6 +1362,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "d9cf9497-9d35-43a4-8c65-363ebbe02af0",
           "width": 0,
           "x": 933.139,
           "y": 300.692,
@@ -1308,6 +1378,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "61cc45b8-8ed3-4084-b35f-8e31ff2a8fe1",
           "width": 0,
           "x": 755.6,
           "y": 418,
@@ -1323,6 +1394,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "62d4b7b5-dd50-426f-a057-a6f17d501700",
           "width": 0,
           "x": 847.908,
           "y": 359.923,
@@ -1338,6 +1410,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "cc7c05fd-75ba-4428-abb4-a8a587ce51ad",
           "width": 0,
           "x": 1045.68,
           "y": 268.769,
@@ -1353,6 +1426,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "9a0126a6-6180-4995-952d-1fb2989acb9b",
           "width": 0,
           "x": 1116.6,
           "y": 268,
@@ -1368,6 +1442,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "9640ab14-9fae-422f-806f-4a366370eea1",
           "width": 4222.89,
           "x": -583.046,
           "y": 570,
@@ -1383,6 +1458,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledCastlePlatform",
+          "persistentUuid": "8f6b56f0-fb4d-4520-9153-66081ecfdc31",
           "width": 502.923,
           "x": -572.923,
           "y": 83,
@@ -1398,6 +1474,7 @@
           "layer": "",
           "locked": false,
           "name": "MovingPlatform",
+          "persistentUuid": "3cce588f-c4b6-4993-bf2b-425e9fede9d3",
           "width": 0,
           "x": 1195.45,
           "y": 297.615,
@@ -1413,6 +1490,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "53e5fe73-b548-478c-9ebf-dea8f9fc9f6f",
           "width": 0,
           "x": 1890.68,
           "y": 499.692,
@@ -1433,6 +1511,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "347e149f-808c-447f-8e9b-7094dc8e7a9d",
           "width": 0,
           "x": 1673.6,
           "y": 289.692,
@@ -1453,6 +1532,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "93c00a32-5f9c-41e1-a246-cf5001fda2c9",
           "width": 0,
           "x": 1673.6,
           "y": 359.692,
@@ -1468,6 +1548,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "88db1915-7540-4d25-9caa-4dbc117221dc",
           "width": 0,
           "x": 1673.6,
           "y": 499.692,
@@ -1483,6 +1564,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "9da9fa24-a622-4957-9eed-9e8e73768f02",
           "width": 0,
           "x": 1673.6,
           "y": 429.692,
@@ -1498,6 +1580,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "d916a17f-46f7-48aa-b8e0-c6b46eb8bfc8",
           "width": 0,
           "x": 1745.52,
           "y": 499.385,
@@ -1513,6 +1596,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "602c75ab-109a-4b3c-97ed-46545915f615",
           "width": 0,
           "x": 1745.52,
           "y": 429.385,
@@ -1528,6 +1612,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "f5ee5f4f-092a-4b3f-9233-dc62f8ae47ec",
           "width": 0,
           "x": 1818.75,
           "y": 499.692,
@@ -1543,6 +1628,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "8e3fa31d-7255-41d6-92bf-e2ba20e58770",
           "width": 0,
           "x": 1817.75,
           "y": 429.692,
@@ -1563,6 +1649,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "76dc7767-3384-4546-935d-332e41c280c8",
           "width": 0,
           "x": 1667.37,
           "y": 291.246,
@@ -1578,6 +1665,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "169ea9ea-0447-48c1-878f-9e92c6102986",
           "width": 0,
           "x": 1176.98,
           "y": 295.169,
@@ -1593,6 +1681,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "48a426f0-6ffa-4729-94cb-15c37f47de26",
           "width": 0,
           "x": 2976.06,
           "y": 247.692,
@@ -1608,6 +1697,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "03c2b596-120c-46b9-87aa-4098b5dbd45a",
           "width": 0,
           "x": 2593.6,
           "y": 499.231,
@@ -1628,6 +1718,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "d6dcc563-d508-4bab-9042-f48ada478325",
           "width": 0,
           "x": 2665.83,
           "y": 429.231,
@@ -1648,6 +1739,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "07fc6eff-96dc-4d06-9468-004f0f08ee14",
           "width": 0,
           "x": 2665.6,
           "y": 498.769,
@@ -1663,6 +1755,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "e82005b6-e5ce-402a-88b9-39706846234e",
           "width": 0,
           "x": 1745.52,
           "y": 359.385,
@@ -1683,6 +1776,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "9c44fa4a-1062-4342-a426-2db1239caff2",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -1698,6 +1792,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "7a954fc0-f067-4d1c-b71a-202727d075e5",
           "width": 0,
           "x": 194,
           "y": 497.569,
@@ -1718,6 +1813,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "76c439f0-9697-4612-9ea9-558f37e948ac",
           "width": 0,
           "x": 687.677,
           "y": 527.461,
@@ -1733,6 +1829,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "c1a5feef-66f7-49fc-8fe2-4b33f2c5ae50",
           "width": 0,
           "x": 286.2,
           "y": 528.461,
@@ -1748,6 +1845,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "9cd7a5a8-9f90-4f1f-81f0-58df3aacb2f0",
           "width": 0,
           "x": 1971.78,
           "y": 539.016,
@@ -1763,6 +1861,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "7954d85b-b0d9-4ab6-8963-5d2c21c0b705",
           "width": 0,
           "x": 2553.78,
           "y": 538.016,
@@ -1778,6 +1877,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "85066b0e-f089-4502-b720-5b505f1ca62f",
           "width": 0,
           "x": 2181.78,
           "y": 59.0157,
@@ -1798,6 +1898,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "1116086e-f439-40af-aca3-446ad11128ab",
           "width": 0,
           "x": 151.785,
           "y": 182.016,
@@ -1813,6 +1914,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "f49fb6a0-6776-4090-bf55-fb7c2a19e6a9",
           "width": 0,
           "x": 530.784,
           "y": 312.015,
@@ -1833,6 +1935,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "63c237ce-c1a8-4ade-a1ae-9984214e16eb",
           "width": 0,
           "x": 1480.78,
           "y": 134.016,
@@ -1853,6 +1956,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "2636aa21-609f-48c7-ad42-ef33fe899309",
           "width": 0,
           "x": 2078.78,
           "y": 385.016,
@@ -1868,6 +1972,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "288a79e4-c173-4c0c-aab6-98968036ab78",
           "width": 0,
           "x": 1847.78,
           "y": 164.016,
@@ -1888,6 +1993,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "23f9761c-2777-4b99-b4ab-b3020327c493",
           "width": 0,
           "x": 1258.78,
           "y": 357.015,
@@ -1908,6 +2014,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "a3fc7005-234a-470e-82d3-79c6618f85fd",
           "width": 0,
           "x": 664.784,
           "y": 170.016,
@@ -1923,6 +2030,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "35757a34-c7bf-4ec5-b500-09aca40124eb",
           "width": 0,
           "x": 2078.57,
           "y": 503.108,
@@ -1943,6 +2051,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "be1b6c16-adf0-4c52-b432-24a725b979b0",
           "width": 66,
           "x": 1736.78,
           "y": 298.016,
@@ -1963,6 +2072,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "4e079f98-344a-422f-8af7-1a1ceaa1fd70",
           "width": 0,
           "x": 611.785,
           "y": 505.015,
@@ -1978,6 +2088,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "b7aa1c07-fbc7-427e-9c41-56abdc802636",
           "width": 94,
           "x": 1249.78,
           "y": 500.015,
@@ -1993,6 +2104,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "642bdb2b-181d-4e62-b72c-434ad8eae585",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -2008,6 +2120,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2834caae-c6c2-401d-b16f-5709cf7b2658",
           "width": 0,
           "x": 925.784,
           "y": 505.015,
@@ -2023,6 +2136,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "b31f5e86-b666-4500-9bcc-76f1444616ab",
           "width": 0,
           "x": 1413.78,
           "y": 502.015,
@@ -2043,6 +2157,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "b613b9d0-90a3-4a0b-a26b-b9d47a8064b5",
           "width": 58,
           "x": 1371.78,
           "y": 524.016,
@@ -2063,6 +2178,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2e236428-25a5-4e28-aef3-9926f7662113",
           "width": 58,
           "x": 1435.78,
           "y": 525.016,
@@ -2083,6 +2199,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3346d46c-1d5d-4ac1-9aac-4f33a47cff70",
           "width": 58,
           "x": 1756.78,
           "y": 314.016,
@@ -2103,6 +2220,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2230b533-1e8f-4291-ad11-b128649bbfcb",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -2123,6 +2241,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "f87aeed5-8e03-4f3c-a65d-53e044c5bb3e",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -2138,6 +2257,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
+          "persistentUuid": "d18a8354-14ba-486c-af55-ae4a75337981",
           "width": 0,
           "x": 21,
           "y": 11,
@@ -2153,6 +2273,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "d7aa8207-f673-4950-8b23-53532e5ab78b",
           "width": 0,
           "x": 1912.83,
           "y": 443.308,
@@ -2168,6 +2289,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "ab124826-67b0-41fd-b84c-66ea64775463",
           "width": 0,
           "x": 227.769,
           "y": 425.277,
@@ -2183,6 +2305,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "f6666295-c040-4863-9316-33a9e4d2c003",
           "width": 0,
           "x": 514.954,
           "y": 510.092,
@@ -2198,6 +2321,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "1f8d45b7-7605-43bf-b695-07c7e1b4a5bc",
           "width": 0,
           "x": 469.785,
           "y": 513.092,
@@ -2213,6 +2337,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "43cf4ef7-d5d6-4d86-9d8d-645baa0ee76e",
           "width": 0,
           "x": 773.846,
           "y": 359.816,
@@ -2228,6 +2353,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "4bea9dd2-d54b-4a61-8a86-963cfcb72d98",
           "width": 0,
           "x": 859.831,
           "y": 296.262,
@@ -2243,6 +2369,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "5df5d3f0-a789-49f3-959e-7bcd56a08daa",
           "width": 0,
           "x": 953.292,
           "y": 241.431,
@@ -2258,6 +2385,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "6c97f5eb-c385-4700-b18c-a022175ca83c",
           "width": 0,
           "x": 1391.94,
           "y": 245.169,
@@ -2273,6 +2401,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "d7f1066c-a25f-4868-9cdf-1bea3ebf9a04",
           "width": 0,
           "x": 414.954,
           "y": 513.092,
@@ -2288,6 +2417,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "33e6f121-63d3-4908-ab55-4de86fcca5fa",
           "width": 0,
           "x": 1145.78,
           "y": 205.016,
@@ -2303,6 +2433,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "8f438909-52ce-4f46-af9d-16c705e6164c",
           "width": 0,
           "x": 1704.78,
           "y": 206.016,
@@ -2318,6 +2449,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "14221145-5479-443b-a85c-9a2a901a4365",
           "width": 0,
           "x": 2593.78,
           "y": 369.016,
@@ -2333,6 +2465,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "e803e4b0-c211-4cde-9ea5-8958744b7b9f",
           "width": 0,
           "x": 3152.78,
           "y": 370.016,
@@ -2348,6 +2481,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "b354181d-ccc9-4175-ad70-1ec3d0df7c2b",
           "width": 0,
           "x": 3103.78,
           "y": 354.016,
@@ -2363,6 +2497,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "0eace2a1-9743-4c92-add6-db5cba7014d0",
           "width": 0,
           "x": 2832.06,
           "y": 247.692,
@@ -2378,6 +2513,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "c0480455-2361-4b4f-b887-897d1d238089",
           "width": 0,
           "x": 2904.06,
           "y": 247.692,
@@ -2393,6 +2529,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "b30c60d2-c786-4b51-a084-25dc9b0e9ba4",
           "width": 0,
           "x": 2992,
           "y": 192,
@@ -2408,6 +2545,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "a6aaba76-2d85-41dc-99ef-1549b2b3c248",
           "width": 0,
           "x": 2849,
           "y": 194,
@@ -2423,6 +2561,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "cd6e56fd-32a4-4d95-80d2-acec57cfad0e",
           "width": 0,
           "x": 2921,
           "y": 193,
@@ -2438,6 +2577,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "4796c988-d081-45f5-b1d4-4577ec7b5ae6",
           "width": 0,
           "x": 2526,
           "y": 530,
@@ -2453,6 +2593,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "4e18219f-ceb9-41f7-9cae-fa05e0d03afa",
           "width": 0,
           "x": 1983,
           "y": 525,
@@ -2468,6 +2609,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "31da00ba-8f06-42f7-b2e0-6a8163560db4",
           "width": 0,
           "x": 1655.78,
           "y": 190.016,
@@ -2483,6 +2625,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "d4ef03c7-49ed-4099-ae78-6963d8710a1a",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -2498,6 +2641,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "25fe5e68-5081-4705-a454-de438300f565",
           "width": 0,
           "x": 732.6,
           "y": 544.185,
@@ -2513,6 +2657,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "LeftButton",
+          "persistentUuid": "683b9332-c9e3-48f0-92e6-4d5e74cc823a",
           "width": 97.5489,
           "x": 39,
           "y": 448,
@@ -2528,6 +2673,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "7b54a2f0-c625-4482-899b-6bd8273e30c1",
           "width": 94.1152,
           "x": 147,
           "y": 448,
@@ -2543,6 +2689,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "ArrowButtonsBg",
+          "persistentUuid": "fe305834-16d6-44ea-a8ce-6196e1fe790b",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -2558,6 +2705,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "10ebbfad-3c1c-4987-b024-9828aadbbc63",
           "width": 107.992,
           "x": 659,
           "y": 457,
@@ -2570,6 +2718,7 @@
       "objects": [
         {
           "name": "Player1",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -2867,6 +3016,7 @@
         },
         {
           "name": "Player2",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3069,6 +3219,7 @@
         },
         {
           "name": "Player3",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3271,15 +3422,16 @@
         },
         {
           "name": "Platform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ],
@@ -3384,15 +3536,16 @@
         },
         {
           "name": "Jumpthru",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -3450,16 +3603,17 @@
         {
           "height": 70,
           "name": "TiledGrassPlatform",
+          "tags": "",
           "texture": "grassHalfMid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
@@ -3467,31 +3621,33 @@
         {
           "height": 70,
           "name": "TiledCastlePlatform",
+          "tags": "",
           "texture": "castleCenter.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "MovingPlatform",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -3548,6 +3704,7 @@
         },
         {
           "name": "GoLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3605,6 +3762,7 @@
         },
         {
           "name": "GoRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -3663,27 +3821,31 @@
         {
           "height": 70,
           "name": "Ladder",
+          "tags": "",
           "texture": "ladder_mid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Ladder",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Ladder",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "PlayerHitBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -3692,9 +3854,7 @@
               "jumpSpeed": 1000,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "name": "PlatformerObject",
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -3752,16 +3912,20 @@
         },
         {
           "name": "SlimeWalk",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             }
           ],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 5000,
               "canGrabPlatforms": false,
               "deceleration": 5000,
@@ -3770,9 +3934,7 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 75,
-              "name": "PlatformerObject",
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -3914,11 +4076,14 @@
         },
         {
           "name": "Fly",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 500,
               "canGrabPlatforms": false,
               "deceleration": 500,
@@ -3927,9 +4092,7 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 400,
-              "name": "PlatformerObject",
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -4071,6 +4234,7 @@
         },
         {
           "name": "Cloud",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4224,6 +4388,7 @@
         },
         {
           "name": "BackgroundObjects",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4380,6 +4545,7 @@
           "italic": false,
           "name": "Score",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -4395,6 +4561,7 @@
         },
         {
           "name": "Coin",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4452,6 +4619,7 @@
         },
         {
           "name": "CoinIcon",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4509,6 +4677,7 @@
         },
         {
           "name": "LeftButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4566,6 +4735,7 @@
         },
         {
           "name": "RightButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -4623,18 +4793,19 @@
         },
         {
           "name": "JumpButton",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Anchor",
+              "type": "AnchorBehavior::AnchorBehavior",
               "bottomEdgeAnchor": 0,
               "leftEdgeAnchor": 2,
-              "name": "Anchor",
               "relativeToOriginalWindowSize": true,
               "rightEdgeAnchor": 0,
-              "topEdgeAnchor": 2,
-              "type": "AnchorBehavior::AnchorBehavior"
+              "topEdgeAnchor": 2
             }
           ],
           "animations": [
@@ -4690,6 +4861,7 @@
         },
         {
           "name": "ArrowButtonsBg",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -5613,6 +5785,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -5630,6 +5807,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [
@@ -6406,6 +6588,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

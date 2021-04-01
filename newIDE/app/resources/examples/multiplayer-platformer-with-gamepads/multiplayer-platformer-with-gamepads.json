@@ -569,22 +569,27 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "moveXright",
+          "type": "string",
           "value": "false"
         },
         {
           "name": "moveXleft",
+          "type": "string",
           "value": "false"
         },
         {
           "name": "maxSpeed",
+          "type": "string",
           "value": "250"
         },
         {
           "name": "Count_controllers_connected",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -1780,6 +1785,7 @@
           "initialVariables": [
             {
               "name": "Player",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -1806,6 +1812,7 @@
           "initialVariables": [
             {
               "name": "Player",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -3044,6 +3051,7 @@
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -7335,12 +7343,14 @@
         "xbox",
         "ps4"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Get the value of the pressure on a gamepad trigger.",
           "fullName": "Pressure on a gamepad trigger",
           "functionType": "Expression",
           "name": "TriggerPressure",
+          "private": false,
           "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
           "events": [
             {
@@ -7382,6 +7392,7 @@
           "fullName": "Value of a stick force",
           "functionType": "Expression",
           "name": "StickForce",
+          "private": false,
           "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
           "events": [
             {
@@ -7423,6 +7434,7 @@
           "fullName": "Value of a stick rotation",
           "functionType": "Expression",
           "name": "StickRotationValue",
+          "private": false,
           "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
           "events": [
             {
@@ -7464,6 +7476,7 @@
           "fullName": "Value of a gamepad axis",
           "functionType": "Expression",
           "name": "AxisValue",
+          "private": false,
           "sentence": "Player _PARAM1_ push axis _PARAM2_ to _PARAM3_",
           "events": [
             {
@@ -7515,6 +7528,7 @@
           "fullName": "Gamepad button released",
           "functionType": "Condition",
           "name": "C_Button_released",
+          "private": false,
           "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is released",
           "events": [
             {
@@ -7556,6 +7570,7 @@
           "fullName": "Last pressed button (id)",
           "functionType": "Expression",
           "name": "LastButtonID",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -7587,6 +7602,7 @@
           "fullName": "Any gamepad button pressed",
           "functionType": "Condition",
           "name": "C_Any_Button_pressed",
+          "private": false,
           "sentence": "Any button of gamepad _PARAM1_ is pressed",
           "events": [
             {
@@ -7618,6 +7634,7 @@
           "fullName": "Last pressed button (string)",
           "functionType": "StringExpression",
           "name": "LastButtonString",
+          "private": false,
           "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is pressed",
           "events": [
             {
@@ -7659,6 +7676,7 @@
           "fullName": "Gamepad button pressed",
           "functionType": "Condition",
           "name": "C_Button_pressed",
+          "private": false,
           "sentence": "Button _PARAM2_ of gamepad _PARAM1_ is pressed",
           "events": [
             {
@@ -7700,6 +7718,7 @@
           "fullName": "Gamepad deadzone for sticks",
           "functionType": "Expression",
           "name": "Deadzone",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -7739,6 +7758,7 @@
           "fullName": "Set gamepad deadzone for sticks",
           "functionType": "Action",
           "name": "A_Set_deadzone",
+          "private": false,
           "sentence": "Set deadzone for sticks on gamepad: _PARAM1_ to _PARAM2_",
           "events": [
             {
@@ -7780,6 +7800,7 @@
           "fullName": "Gamepad stick pushed (axis)",
           "functionType": "Condition",
           "name": "C_Axis_pushed",
+          "private": false,
           "sentence": "_PARAM2_ stick of gamepad _PARAM1_ is pushed in direction _PARAM3_",
           "events": [
             {
@@ -7831,6 +7852,7 @@
           "fullName": "Connected gamepads number",
           "functionType": "Expression",
           "name": "ConnectedGamepadsCount",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -7859,6 +7881,7 @@
           "fullName": "Gamepad type",
           "functionType": "StringExpression",
           "name": "GamepadType",
+          "private": false,
           "sentence": "Player _PARAM1_ use _PARAM2_ controller",
           "events": [
             {
@@ -7890,6 +7913,7 @@
           "fullName": "Gamepad type",
           "functionType": "Condition",
           "name": "C_Controller_type",
+          "private": false,
           "sentence": "Gamepad _PARAM1_ is a _PARAM2_ controller",
           "events": [
             {
@@ -7931,6 +7955,7 @@
           "fullName": "Gamepad connected",
           "functionType": "Condition",
           "name": "C_Controller_X_is_connected",
+          "private": false,
           "sentence": "Gamepad _PARAM1_ is plugged and connected",
           "events": [
             {
@@ -7962,6 +7987,7 @@
           "fullName": "Gamepad vibration",
           "functionType": "Action",
           "name": "A_Vibrate_controller",
+          "private": false,
           "sentence": "Make gamepad _PARAM1_ vibrate for _PARAM2_ seconds",
           "events": [
             {
@@ -8011,6 +8037,7 @@
           "fullName": "",
           "functionType": "Action",
           "name": "onFirstSceneLoaded",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8039,6 +8066,7 @@
           "fullName": "",
           "functionType": "Action",
           "name": "onScenePostEvents",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -8067,6 +8095,7 @@
           "fullName": "Any gamepad button released",
           "functionType": "Condition",
           "name": "C_any_button_released",
+          "private": false,
           "sentence": "Any button of gamepad _PARAM1_ is released",
           "events": [
             {

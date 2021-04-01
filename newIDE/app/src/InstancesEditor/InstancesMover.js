@@ -7,24 +7,27 @@ export default class InstancesMover {
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+    this.temporaryPoint = [0, 0];
   }
 
   setOptions(options) {
     this.options = options;
   }
 
-  _roundXPosition(x, noGridSnap) {
-    if (!this.options.snap || !this.options.grid || noGridSnap)
-      return Math.round(x);
-
-    return roundPosition(x, this.options.gridWidth, this.options.gridOffsetX);
-  }
-
-  _roundYPosition(y, noGridSnap) {
-    if (!this.options.snap || !this.options.grid || noGridSnap)
-      return Math.round(y);
-
-    return roundPosition(y, this.options.gridHeight, this.options.gridOffsetY);
+  _roundPosition(pos, noGridSnap) {
+    if (!this.options.snap || !this.options.grid || noGridSnap) {
+      pos[0] = Math.round(pos[0]);
+      pos[1] = Math.round(pos[1]);
+      return;
+    }
+    roundPosition(
+      pos,
+      this.options.gridWidth,
+      this.options.gridHeight,
+      this.options.gridOffsetX,
+      this.options.gridOffsetY,
+      this.options.gridType
+    );
   }
 
   _getMoveDeltaX(followAxis) {
@@ -55,19 +58,13 @@ export default class InstancesMover {
           y: selectedInstance.getY(),
         };
       }
-
-      selectedInstance.setX(
-        this._roundXPosition(
-          initialPosition.x + this._getMoveDeltaX(followAxis),
-          noGridSnap
-        )
-      );
-      selectedInstance.setY(
-        this._roundYPosition(
-          initialPosition.y + this._getMoveDeltaY(followAxis),
-          noGridSnap
-        )
-      );
+      this.temporaryPoint[0] =
+        initialPosition.x + this._getMoveDeltaX(followAxis);
+      this.temporaryPoint[1] =
+        initialPosition.y + this._getMoveDeltaY(followAxis);
+      this._roundPosition(this.temporaryPoint, noGridSnap);
+      selectedInstance.setX(this.temporaryPoint[0]);
+      selectedInstance.setY(this.temporaryPoint[1]);
     }
   }
 

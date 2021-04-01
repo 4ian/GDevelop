@@ -19,7 +19,7 @@ namespace gd {
 class GD_CORE_API Serializer {
  public:
 /** \name XML serialization.
- * Serialize a SerializerElement from/to XML.
+ * Convert a gd::SerializerElement from/to XML.
  */
 ///@{
 #if !defined(EMSCRIPTEN)
@@ -34,7 +34,9 @@ class GD_CORE_API Serializer {
   ///@}
 
   /** \name JSON serialization.
-   * Serialize a SerializerElement from/to JSON.
+   * Convert a gd::SerializerElement from/to JSON.
+   * This uses RapidJSON for fast parsing and stringification.
+   * See https://github.com/miloyip/nativejson-benchmark
    */
   ///@{
   /**
@@ -42,13 +44,16 @@ class GD_CORE_API Serializer {
    */
   static gd::String ToJSON(const SerializerElement& element);
 
-  static SerializerElement FromJSON(const std::string& json);
+  /**
+   * \brief Construct a gd::SerializerElement from a JSON string.
+   */
+  static SerializerElement FromJSON(const char* json);
 
   /**
-   * \brief Parse a JSON string and returns a gd::SerializerElement for it.
+   * \brief Construct a gd::SerializerElement from a JSON string.
    */
   static SerializerElement FromJSON(const gd::String& json) {
-    return FromJSON(json.ToUTF8());
+    return FromJSON(json.c_str());
   }
   ///@}
 

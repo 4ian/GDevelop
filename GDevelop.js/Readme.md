@@ -1,6 +1,6 @@
 # GDevelop.js
 
-This is the port of GDevelop core classes to JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
+This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
 > 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
 
@@ -26,12 +26,12 @@ This is the port of GDevelop core classes to JavaScript. This allows [GDevelop C
 ```shell
     cd GDevelop.js
     npm install
-    npm run build -- --dev
+    npm run build
 ```
 
 > ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
 
-> ⏱ The linking (last step) of the build can be very long when `-- --dev` is not specified, so be sure to include it. Only remove it if you are about to deploy a new version.
+-> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`. Be sure to remove it before building a release version, as this disable "link-time optimizations" of the generated WebAssembly module.
 
 - You can then launch GDevelop 5 that will use your build of GDevelop.js:
 

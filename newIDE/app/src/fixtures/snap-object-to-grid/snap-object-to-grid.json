@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "",
-    "projectUuid": "c4943b0d-3aa8-45a5-99ef-a7fa0093e502",
+    "projectUuid": "348ea76f-27e5-42c5-b099-9b0b09561054",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -159,6 +159,7 @@
       "variables": [
         {
           "name": "i",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -170,7 +171,7 @@
           "layer": "",
           "locked": false,
           "name": "Pea",
-          "persistentUuid": "9f1be38c-d379-480e-9923-a5eb055140f4",
+          "persistentUuid": "35923ca0-d586-448e-bae0-6ca23ba84433",
           "width": 32,
           "x": 128,
           "y": 96,
@@ -186,7 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "f2ca332d-9b16-4c15-8604-1326c52b7565",
+          "persistentUuid": "13c94edc-6f60-4c06-ace4-94b117c33ce5",
           "width": 0,
           "x": 288,
           "y": 96,
@@ -202,7 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "20b16000-bb64-46ae-8410-4d20cf98c5f1",
+          "persistentUuid": "3470afe5-4c67-4126-b95b-fa44385b593b",
           "width": 0,
           "x": 0,
           "y": 0,

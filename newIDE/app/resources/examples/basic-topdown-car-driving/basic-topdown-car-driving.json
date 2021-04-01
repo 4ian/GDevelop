@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/basic-topdown-car-driving/basic-topdown-car-driving.json",
+    "projectUuid": "d315f3aa-4cbb-4616-8e85-25676bb3755b",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Basic racing game",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -108,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "police.png",
         "kind": "image",
+        "metadata": "",
         "name": "police.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "voiture.png",
         "kind": "image",
+        "metadata": "",
         "name": "voiture.png",
         "smoothed": true,
         "userAdded": true
@@ -124,6 +126,7 @@
         "alwaysLoaded": false,
         "file": "Skycraper.png",
         "kind": "image",
+        "metadata": "",
         "name": "Skycraper.png",
         "smoothed": true,
         "userAdded": true
@@ -132,6 +135,7 @@
         "alwaysLoaded": false,
         "file": "Barn.png",
         "kind": "image",
+        "metadata": "",
         "name": "Barn.png",
         "smoothed": true,
         "userAdded": true
@@ -140,6 +144,7 @@
         "alwaysLoaded": false,
         "file": "Batiment.png",
         "kind": "image",
+        "metadata": "",
         "name": "Batiment.png",
         "smoothed": true,
         "userAdded": true
@@ -148,6 +153,7 @@
         "alwaysLoaded": false,
         "file": "Mur3D.png",
         "kind": "image",
+        "metadata": "",
         "name": "Mur3D.png",
         "smoothed": true,
         "userAdded": true
@@ -156,6 +162,7 @@
         "alwaysLoaded": false,
         "file": "Shop.png",
         "kind": "image",
+        "metadata": "",
         "name": "Shop.png",
         "smoothed": true,
         "userAdded": true
@@ -164,6 +171,7 @@
         "alwaysLoaded": false,
         "file": "Herbe.png",
         "kind": "image",
+        "metadata": "",
         "name": "Herbe.png",
         "smoothed": true,
         "userAdded": true
@@ -172,6 +180,7 @@
         "alwaysLoaded": false,
         "file": "RouteHorizontale.png",
         "kind": "image",
+        "metadata": "",
         "name": "RouteHorizontale.png",
         "smoothed": true,
         "userAdded": true
@@ -180,6 +189,7 @@
         "alwaysLoaded": false,
         "file": "RouteVerticale.png",
         "kind": "image",
+        "metadata": "",
         "name": "RouteVerticale.png",
         "smoothed": true,
         "userAdded": true
@@ -188,6 +198,7 @@
         "alwaysLoaded": false,
         "file": "etincelle.png",
         "kind": "image",
+        "metadata": "",
         "name": "etincelle.png",
         "smoothed": true,
         "userAdded": true
@@ -196,6 +207,7 @@
         "alwaysLoaded": false,
         "file": "smoke1.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke1.png",
         "smoothed": true,
         "userAdded": true
@@ -204,6 +216,7 @@
         "alwaysLoaded": false,
         "file": "smoke2.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke2.png",
         "smoothed": true,
         "userAdded": true
@@ -212,6 +225,7 @@
         "alwaysLoaded": false,
         "file": "smoke3.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke3.png",
         "smoothed": true,
         "userAdded": true
@@ -220,6 +234,7 @@
         "alwaysLoaded": false,
         "file": "frein.png",
         "kind": "image",
+        "metadata": "",
         "name": "frein.png",
         "smoothed": true,
         "userAdded": true
@@ -228,6 +243,7 @@
         "alwaysLoaded": false,
         "file": "flatDark23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark23.png",
         "smoothed": true,
         "userAdded": true
@@ -236,6 +252,7 @@
         "alwaysLoaded": false,
         "file": "flatDark24.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark24.png",
         "smoothed": true,
         "userAdded": true
@@ -244,6 +261,7 @@
         "alwaysLoaded": false,
         "file": "flatDark35.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark35.png",
         "smoothed": true,
         "userAdded": true
@@ -252,6 +270,7 @@
         "alwaysLoaded": false,
         "file": "flatDark36.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark36.png",
         "smoothed": true,
         "userAdded": true
@@ -259,7 +278,10 @@
       {
         "file": "vroom.wav",
         "kind": "audio",
+        "metadata": "",
         "name": "vroom.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       }
     ],
@@ -305,6 +327,7 @@
           "layer": "",
           "locked": false,
           "name": "Voiture",
+          "persistentUuid": "ea514448-1244-4221-88b5-83a1092a59f8",
           "width": 0,
           "x": 265,
           "y": 119,
@@ -325,6 +348,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "339514bc-876f-4a3a-bb9d-85dced94d331",
           "width": 0,
           "x": 2,
           "y": -190,
@@ -345,6 +369,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "8d3532c1-ad41-4726-b129-f0e67000da36",
           "width": 0,
           "x": 599,
           "y": -190,
@@ -365,6 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "97a52a99-f0f5-45b2-b058-6d5d148bfcad",
           "width": 0,
           "x": -6,
           "y": 260,
@@ -385,6 +411,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "5d0f37ab-59d1-4edf-94e7-e82384b9a536",
           "width": 0,
           "x": 594,
           "y": 258,
@@ -405,6 +432,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "8c4ee44e-2b4c-4bd9-9c80-38dec720215a",
           "width": 0,
           "x": 125,
           "y": 100,
@@ -425,6 +453,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "48d8fdef-b904-4570-ab9e-8d0a77fe1ccf",
           "width": 0,
           "x": 344,
           "y": 100,
@@ -445,6 +474,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "1118ee21-dd50-4204-9d4f-eb45d872cc3a",
           "width": 0,
           "x": 567,
           "y": 100,
@@ -465,6 +495,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "628acebc-9050-4d8f-92b9-b14febfa548c",
           "width": 0,
           "x": -2,
           "y": -617,
@@ -485,6 +516,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "6b488a9e-ffe6-4453-a739-b861bbf0a42f",
           "width": 0,
           "x": 599,
           "y": -617,
@@ -505,6 +537,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "0fabc11a-5d7a-4888-8a18-53f97ad03c3c",
           "width": 0,
           "x": -600,
           "y": -620,
@@ -525,6 +558,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "c767894e-c9e4-46a9-ada3-29890d90548e",
           "width": 0,
           "x": -598,
           "y": -170,
@@ -545,6 +579,7 @@
           "layer": "",
           "locked": false,
           "name": "Fond",
+          "persistentUuid": "207667e6-af8b-4eaa-8432-23a4af57956a",
           "width": 0,
           "x": -600,
           "y": 280,
@@ -565,6 +600,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "cb3f2f2b-54c8-45a6-8a18-31c430c2ca83",
           "width": 0,
           "x": 792,
           "y": 100,
@@ -585,6 +621,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "b785a0e1-3356-44e1-b04a-5c5a30e3e490",
           "width": 0,
           "x": 1016,
           "y": 100,
@@ -605,6 +642,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "13ec6471-644f-46fe-b445-c1e187d20657",
           "width": 0,
           "x": 794,
           "y": 187,
@@ -625,6 +663,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "98b44af1-4b4d-4e0b-99bd-c6a9a13db9b3",
           "width": 0,
           "x": 794,
           "y": 412,
@@ -645,6 +684,7 @@
           "layer": "",
           "locked": false,
           "name": "Route",
+          "persistentUuid": "c584744a-4db6-4479-9018-5f94d85df0f8",
           "width": 0,
           "x": 792,
           "y": 636,
@@ -665,6 +705,7 @@
           "layer": "Interface",
           "locked": false,
           "name": "Speed",
+          "persistentUuid": "40dd14dd-c8fc-4153-aece-f987e7893574",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -680,6 +721,7 @@
           "layer": "Interface",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "fc69f3ab-761c-4bbf-be4f-5c5a66fc8caa",
           "width": 0,
           "x": 245,
           "y": 501,
@@ -695,6 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "5b51c9c3-302f-4bde-a410-c0e65b394135",
           "width": 0,
           "x": 334,
           "y": 16,
@@ -710,6 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "b4d58410-861a-46d4-8302-77e727259708",
           "width": 0,
           "x": 131,
           "y": -304,
@@ -730,6 +774,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "99375ad4-9ef6-4e65-93e5-e72eea586d8b",
           "width": 0,
           "x": 459,
           "y": 337,
@@ -750,6 +795,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "044eb570-d8ae-4497-aeb9-f9bea5065e58",
           "width": 0,
           "x": 192,
           "y": 186,
@@ -770,6 +816,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "bb994b3a-2cf9-4653-b4b9-7cf6d7b4b20e",
           "width": 0,
           "x": 598,
           "y": 189,
@@ -790,6 +837,7 @@
           "layer": "",
           "locked": false,
           "name": "Batiment",
+          "persistentUuid": "a05951fb-d380-4db9-ae43-a0137cb170f1",
           "width": 0,
           "x": 415,
           "y": 189,
@@ -810,6 +858,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btnTurnLeft",
+          "persistentUuid": "adf909d9-e6d4-4c65-9cd3-6d56012095e5",
           "width": 0,
           "x": 19,
           "y": 511,
@@ -825,6 +874,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btnTurnRight",
+          "persistentUuid": "4a2f1298-d19d-4ed6-903e-244b521cf3bf",
           "width": 0,
           "x": 103,
           "y": 510,
@@ -840,6 +890,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btnAccelerate",
+          "persistentUuid": "4f3e530a-1ba9-4e1b-a0c5-3c65227a8403",
           "width": 0,
           "x": 565,
           "y": 496,
@@ -855,6 +906,7 @@
           "layer": "touch",
           "locked": false,
           "name": "btnBreak",
+          "persistentUuid": "8784e5d4-e7fc-46ec-b1d3-369e5f37213b",
           "width": 0,
           "x": 650,
           "y": 451,
@@ -867,6 +919,7 @@
       "objects": [
         {
           "name": "Voiture",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -935,6 +988,7 @@
         },
         {
           "name": "Batiment",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1060,6 +1114,7 @@
         },
         {
           "name": "Fond",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1117,6 +1172,7 @@
         },
         {
           "name": "Route",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1258,6 +1314,7 @@
         },
         {
           "name": "etincelle",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1315,6 +1372,7 @@
         },
         {
           "name": "smoke",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1468,6 +1526,7 @@
         },
         {
           "name": "frein",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1528,6 +1587,7 @@
           "italic": false,
           "name": "Speed",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1546,6 +1606,7 @@
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1561,6 +1622,7 @@
         },
         {
           "name": "btnTurnLeft",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1599,6 +1661,7 @@
         },
         {
           "name": "btnTurnRight",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1637,6 +1700,7 @@
         },
         {
           "name": "btnAccelerate",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1675,6 +1739,7 @@
         },
         {
           "name": "btnBreak",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -3154,8 +3219,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []
@@ -3168,8 +3233,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []
@@ -3182,8 +3247,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []
@@ -3448,6 +3513,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3465,6 +3535,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [
@@ -3482,6 +3557,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "touch",
           "visibility": true,
           "cameras": [],
@@ -3492,6 +3572,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

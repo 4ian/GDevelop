@@ -1740,7 +1740,7 @@ namespace gdjs {
       );
 
       const rayCenterWorldX = (x + endX) / 2;
-      const rayCenterWorldY = (x + endX) / 2;
+      const rayCenterWorldY = (y + endY) / 2;
       const raySqBoundingRadius =
         (endX - x) * (endX - x) + (endY - y) * (endY - y);
 

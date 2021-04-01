@@ -548,7 +548,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectvar", _("Array variable"))
       .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and appended at the "
+            "end of the array."))
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -1230,18 +1232,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("Raycast",
-                    _("Raycast"),
-                    _("Sends a ray from the given source position and angle, "
-                      "intersecting the closest object.\nThe instersected "
-                      "object will become the only one taken into account.\nIf "
-                      "the condition is inverted, the object to be intersected "
-                      "will be the farthest one within the ray radius."),
-                    _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
-                      "result in _PARAM5_, _PARAM6_"),
-                    _("Collision"),
-                    "res/conditions/raycast24.png",
-                    "res/conditions/raycast.png")
+      .AddCondition(
+          "Raycast",
+          _("Raycast"),
+          _("Sends a ray from the given source position and angle, "
+            "intersecting the closest object.\nThe instersected "
+            "object will become the only one taken into account.\nIf "
+            "the condition is inverted, the object to be intersected "
+            "will be the farthest one within the ray radius."),
+          _("Cast a ray from _PARAM1_;_PARAM2_, angle: _PARAM3_ and max "
+            "distance: _PARAM4_px, against _PARAM0_, and save the "
+            "result in _PARAM5_, _PARAM6_"),
+          _("Collision"),
+          "res/conditions/raycast24.png",
+          "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
       .AddParameter("expression", _("Ray source X position"))
       .AddParameter("expression", _("Ray source Y position"))
@@ -1267,7 +1271,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),
-          _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
+          _("Cast a ray from from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
+            "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
           _("Collision"),
           "res/conditions/raycast24.png",

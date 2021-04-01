@@ -1,20 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 96,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
+    "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\candy-dragon\\game.json",
+    "projectUuid": "9eea169c-95e1-4e91-b82f-fa9429a983d4",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -23,6 +25,11 @@
     "maxFPS": 60,
     "minFPS": 10,
     "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -95,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "images/background.png",
         "kind": "image",
+        "metadata": "",
         "name": "background.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +150,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "a07bb949-15fa-4845-b49e-72ee488608c1",
           "width": 0,
           "x": 960,
           "y": 0,
@@ -157,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "background",
+          "persistentUuid": "32c90e03-c34e-4768-8894-326cca8e8493",
           "width": 0,
           "x": 0,
           "y": 0,
@@ -169,6 +179,7 @@
       "objects": [
         {
           "name": "background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -343,6 +354,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -364,6 +380,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

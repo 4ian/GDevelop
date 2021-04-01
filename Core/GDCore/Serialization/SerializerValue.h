@@ -62,6 +62,12 @@ class GD_CORE_API SerializerValue {
   gd::String GetString() const;
 
   /**
+   * Get the string value, without attempting any conversion.
+   * Make sure to check that IsString is true beforehand.
+   */
+  const gd::String& GetRawString() const { return stringValue; };
+
+  /**
    * Get the value, its type being an int.
    */
   int GetInt() const;

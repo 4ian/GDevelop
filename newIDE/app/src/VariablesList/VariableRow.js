@@ -256,7 +256,7 @@ const VariableRow = ({
 
   return (
     <>
-      <TreeTableRow alignItems="flex-start">{columns}</TreeTableRow>
+      <TreeTableRow>{columns}</TreeTableRow>
       {children}
     </>
   );

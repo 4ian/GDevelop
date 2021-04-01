@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectUuid": "5ef64783-5eda-4440-b8ec-87d57bbd6178",
+    "projectUuid": "09744d29-2e3e-462e-8c78-37ab0685a923",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -183,7 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "new",
-          "persistentUuid": "e79a4804-d48e-499e-9c23-f733a65057e6",
+          "persistentUuid": "f50fa845-b43e-494b-91b9-f5def0effcb6",
           "width": 102,
           "x": 332.376,
           "y": 209.327,
@@ -199,7 +199,7 @@
           "layer": "",
           "locked": false,
           "name": "load",
-          "persistentUuid": "4b8801e2-4395-49df-adb9-a7566c28b1af",
+          "persistentUuid": "855a0662-5d97-4054-8ba5-28006d19bc02",
           "width": 109,
           "x": 332.376,
           "y": 305.327,
@@ -215,7 +215,7 @@
           "layer": "",
           "locked": false,
           "name": "new_button",
-          "persistentUuid": "4284be6f-17ef-47e6-b63a-ffef55c3d622",
+          "persistentUuid": "b49685be-5898-4750-bae5-81dd38484594",
           "width": 128,
           "x": 320,
           "y": 192,
@@ -231,7 +231,7 @@
           "layer": "",
           "locked": false,
           "name": "load_button",
-          "persistentUuid": "b5550b8e-c960-4a08-ac93-f4eb6b8977a8",
+          "persistentUuid": "c9ad1ddc-ab7e-4fd1-ba4b-5d202b2e5b24",
           "width": 128,
           "x": 320,
           "y": 288,
@@ -247,7 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "13257554-7ef6-4123-a221-bb1b92d835c0",
+          "persistentUuid": "bdb92fcf-5ba5-4e87-9900-0ea424cb6807",
           "width": 0,
           "x": 4.99999,
           "y": 13,
@@ -649,14 +649,17 @@
       "variables": [
         {
           "name": "posX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "posY",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "score",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -668,7 +671,7 @@
           "layer": "",
           "locked": false,
           "name": "character1",
-          "persistentUuid": "abc75ced-be66-4365-9caf-dabec728dd2c",
+          "persistentUuid": "1db7a14e-2a55-4b7b-89f0-6b1b11ca280f",
           "width": 0,
           "x": 193,
           "y": 129,
@@ -678,6 +681,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -689,7 +693,7 @@
           "layer": "",
           "locked": false,
           "name": "character2",
-          "persistentUuid": "69e65fe3-a1c0-4f95-8294-23993b92fbb4",
+          "persistentUuid": "1ae60bf1-5aae-44d5-888b-08dced7fc581",
           "width": 0,
           "x": 335,
           "y": 276,
@@ -699,6 +703,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -710,7 +715,7 @@
           "layer": "",
           "locked": false,
           "name": "character3",
-          "persistentUuid": "6aec5ded-62ae-480d-8383-36fbd03c46b6",
+          "persistentUuid": "a519af07-0d85-4743-9a3b-7efbfb6ecedf",
           "width": 0,
           "x": 483,
           "y": 121,
@@ -720,6 +725,7 @@
           "initialVariables": [
             {
               "name": "ID",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -731,7 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "save_button",
-          "persistentUuid": "ceedd287-2960-4c57-a6da-b897482b74cf",
+          "persistentUuid": "26af06c0-a145-4782-84d4-9b26c96c14bd",
           "width": 128,
           "x": 640,
           "y": 512,
@@ -747,7 +753,7 @@
           "layer": "",
           "locked": false,
           "name": "save",
-          "persistentUuid": "cead7197-cbc9-4299-9057-d28fdeb632d5",
+          "persistentUuid": "bcbe9b36-4567-4a5a-8d0e-032eeee7360e",
           "width": 53,
           "x": 672,
           "y": 533,
@@ -763,7 +769,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "3632d765-77b5-4624-9ed3-a3ffe1b2fced",
+          "persistentUuid": "d2106e1e-c8d7-4fc5-85c6-c06dac5d9047",
           "width": 0,
           "x": 6.00001,
           "y": 7.99999,
@@ -779,7 +785,7 @@
           "layer": "",
           "locked": false,
           "name": "highscore",
-          "persistentUuid": "dd79cdf6-0d5d-490f-9fae-06d0a70b82aa",
+          "persistentUuid": "c05b6c92-0284-4cff-ae3a-f15e05f9ae21",
           "width": 0,
           "x": 504,
           "y": 477,
@@ -795,7 +801,7 @@
           "layer": "",
           "locked": false,
           "name": "back_button",
-          "persistentUuid": "6d64df87-932e-4487-a80c-b7356d7f0a7b",
+          "persistentUuid": "62311277-2cfc-4ff0-ac5d-daf3717b6199",
           "width": 128,
           "x": 503,
           "y": 512,
@@ -811,7 +817,7 @@
           "layer": "",
           "locked": false,
           "name": "Back",
-          "persistentUuid": "7850aa3f-3573-4437-bb29-c42c28f41110",
+          "persistentUuid": "d03a373e-d728-403a-a080-102a6de14951",
           "width": 0,
           "x": 544,
           "y": 533,

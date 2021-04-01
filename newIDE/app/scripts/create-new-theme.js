@@ -5,21 +5,26 @@ const fs = require('fs');
 const shell = require('shelljs');
 const readThemeRegistry = require('./lib/ReadThemeRegistry');
 
-let theme = args[2];
-if (!theme) {
+let themeName = args[2];
+if (!themeName) {
   shell.echo('❌ Please enter a theme name');
 }
 
-if (!theme.toLowerCase().endsWith('theme')) {
-  theme = theme + 'Theme';
+if (themeName.toLowerCase().endsWith('theme')) {
+  // Remove unnecessary trailing "Theme" from input
+  // eg: "Foo Bar" => "Foo Bar", "Foo Theme" => "Foo", "FooTheme" => "Foo"
+  const lastIndex = themeName.toLowerCase().lastIndexOf('theme');
+  themeName = themeName.slice(0, lastIndex).trim();
 }
 
-const themeId = theme.replace(/\s+/, '');
+// Remove spaces and append 'Theme' to get full theme identifier
+// eg: "Foo Bar" => "FooBarTheme"
+const themeId = themeName.replace(/\s+/, '') + 'Theme';
 
 
 const dir = path.resolve(__dirname, '../src/UI/Theme/', themeId);
 if (fs.existsSync(dir)) {
-  shell.echo('❌ Theme `' + theme + '` already exists');
+  shell.echo('❌ Theme `' + themeName + '` already exists');
   process.exit(0);
 }
 
@@ -45,7 +50,7 @@ shell.echo('✅ Created index.js');
 const registry = readThemeRegistry()
   .concat({
     id: themeId,
-    name: theme,
+    name: themeName,
   });
 
 const imports =

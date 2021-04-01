@@ -1929,20 +1929,32 @@ module.exports = {
         "name": "TopDownMovementBehavior"
       },
       {
-        "fullName": "Mouse and touch",
-        "name": "BuiltinMouse"
+        "fullName": "",
+        "name": ""
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
       }
     ]
   },
@@ -4174,6 +4186,55 @@ module.exports = {
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      }
+    ]
+  },
+  "spatial-sound": {
+    "description": "A small game similar to the Lost Woods of The Legend of Zelda Ocarina of Time, that uses spatial sound.",
+    "usedExtensions": [
+      {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Spatial sound",
+        "name": "SpatialSound"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
       }
     ]
   },

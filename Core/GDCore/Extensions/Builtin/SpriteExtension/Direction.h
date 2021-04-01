@@ -43,14 +43,14 @@ class GD_CORE_API Direction {
   /**
    * \brief Get the time between each sprite
    */
-  inline float GetTimeBetweenFrames() const { return timeBetweenFrame; }
+  inline double GetTimeBetweenFrames() const { return timeBetweenFrame; }
 
   /**
    * \brief Set the time between each sprite
    *
    * \param time Time between each sprite, in seconds.
    */
-  void SetTimeBetweenFrames(float time);
+  void SetTimeBetweenFrames(double time);
 
   /**
    * \brief Return a reference to a sprite of the direction.
@@ -133,7 +133,7 @@ class GD_CORE_API Direction {
 
  private:
   bool loop;               ///< true if the animation must loop.
-  float timeBetweenFrame;  ///< The time between each sprite of the animation.
+  double timeBetweenFrame;  ///< The time between each sprite of the animation.
   std::vector<Sprite> sprites;  ///< The sprites of the direction.
 #if defined(GD_IDE_ONLY)
   gd::String metadata;

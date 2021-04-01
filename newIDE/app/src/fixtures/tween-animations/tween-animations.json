@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectUuid": "b54019f8-84cc-496c-9800-f51f2857a874",
+    "projectUuid": "95a31dcc-5b29-4c46-b309-f5a4eceed811",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -168,10 +168,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "GrowAndShrink"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "6000"
             }
           ]
@@ -198,10 +200,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "JustBounce"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "2000"
             }
           ]
@@ -223,10 +227,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "ColorAndOpacity"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "3000"
             }
           ]
@@ -248,10 +254,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "SpinAndShake"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "4000"
             }
           ]

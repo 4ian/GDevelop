@@ -10,6 +10,7 @@ declare class gdSerializerElement {
   getStringValue(): string;
   getIntValue(): number;
   getDoubleValue(): number;
+  isValueUndefined(): boolean;
   setBoolAttribute(name: string, value: boolean): gdSerializerElement;
   setStringAttribute(name: string, value: string): gdSerializerElement;
   setIntAttribute(name: string, value: number): gdSerializerElement;
@@ -24,6 +25,8 @@ declare class gdSerializerElement {
   getChild(str: string): gdSerializerElement;
   setChild(str: string, element: gdSerializerElement): void;
   hasChild(str: string): boolean;
+  getAllChildren(): gdVectorPairStringSharedPtrSerializerElement;
+  getAllAttributes(): gdMapStringSerializerValue;
   delete(): void;
   ptr: number;
 };

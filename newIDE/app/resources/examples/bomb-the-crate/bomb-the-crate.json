@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/bomb-the-crate/bomb-the-crate.json",
+    "projectUuid": "a38e4262-1ab9-463d-be9f-38b39936e8fc",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Bomb The Crate",
     "author": "Victor Angelo V. Enriquez",
     "windowWidth": 866,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Crate.png",
         "kind": "image",
+        "metadata": "",
         "name": "Crate.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Wall-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Wall-1.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Wall-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Wall-2.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Grass-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Grass-1.png",
         "smoothed": true,
         "userAdded": false
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_1.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_2.png",
         "smoothed": true,
         "userAdded": true
@@ -150,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_3.png",
         "smoothed": true,
         "userAdded": true
@@ -158,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_4.png",
         "smoothed": true,
         "userAdded": true
@@ -166,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_5.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_5.png",
         "smoothed": true,
         "userAdded": true
@@ -174,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Bomb_6.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_6.png",
         "smoothed": true,
         "userAdded": true
@@ -182,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Flame-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-1.png",
         "smoothed": true,
         "userAdded": true
@@ -190,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Flame-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-2.png",
         "smoothed": true,
         "userAdded": true
@@ -198,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Flame-3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-3.png",
         "smoothed": true,
         "userAdded": true
@@ -206,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Flame-4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-4.png",
         "smoothed": true,
         "userAdded": true
@@ -214,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-2.png",
         "smoothed": true,
         "userAdded": false
@@ -222,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-5.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-5.png",
         "smoothed": true,
         "userAdded": true
@@ -230,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-1.png",
         "smoothed": true,
         "userAdded": true
@@ -238,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-9.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-9.png",
         "smoothed": true,
         "userAdded": true
@@ -246,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-10.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-10.png",
         "smoothed": true,
         "userAdded": true
@@ -254,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Right_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Right_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -262,6 +282,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Left_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Left_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -270,6 +291,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Up_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Up_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -278,6 +300,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Down_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Down_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -286,6 +309,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-7.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-7.png",
         "smoothed": true,
         "userAdded": true
@@ -294,6 +318,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-8.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-8.png",
         "smoothed": true,
         "userAdded": true
@@ -302,6 +327,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-6.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-6.png",
         "smoothed": true,
         "userAdded": true
@@ -310,6 +336,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-3.png",
         "smoothed": true,
         "userAdded": true
@@ -318,6 +345,7 @@
         "alwaysLoaded": false,
         "file": "Assets/Player-4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-4.png",
         "smoothed": true,
         "userAdded": true
@@ -400,6 +428,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall1",
+          "persistentUuid": "16bff4c7-db81-4ba9-bafc-889a777a4dff",
           "width": 64,
           "x": 0,
           "y": 0,
@@ -415,6 +444,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall2",
+          "persistentUuid": "3096b3ba-e5e9-48a8-ada9-851a56d22e59",
           "width": 896,
           "x": 0,
           "y": 576,
@@ -430,6 +460,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall2",
+          "persistentUuid": "86b04a6f-4890-42a7-9d41-e84b101e366d",
           "width": 832,
           "x": 64,
           "y": 0,
@@ -445,6 +476,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Wall1",
+          "persistentUuid": "c0f0e744-f155-4791-a22d-46fa42b4eef6",
           "width": 64,
           "x": 832,
           "y": 64,
@@ -460,6 +492,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "d5f2d329-f2ce-42a9-a808-9e28ae265607",
           "width": 0,
           "x": 768,
           "y": 512,
@@ -475,6 +508,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "28cdb374-1cc6-4bdb-ab70-1afb7df14fec",
           "width": 0,
           "x": 448,
           "y": 320,
@@ -490,6 +524,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "ad119146-89e0-4447-b3a3-42094951afd5",
           "width": 0,
           "x": 128,
           "y": 128,
@@ -505,6 +540,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "d4eb5dfc-143f-417e-a418-2acb5480e40e",
           "width": 0,
           "x": 256,
           "y": 320,
@@ -520,6 +556,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "a56bf49e-5cdc-4298-9723-618b2035c961",
           "width": 0,
           "x": 128,
           "y": 448,
@@ -535,6 +572,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "90815c62-7055-4a33-911e-ddfaf3ac933e",
           "width": 0,
           "x": 704,
           "y": 128,
@@ -550,6 +588,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "d19a11ef-7d56-4ee4-b3f5-5abf42a1885c",
           "width": 0,
           "x": 704,
           "y": 448,
@@ -565,6 +604,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "2d092a09-315c-4d39-8a69-40d0f0da9eca",
           "width": 0,
           "x": 640,
           "y": 320,
@@ -580,6 +620,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "22fbe020-f879-4a65-a504-6b207562d568",
           "width": 0,
           "x": 128,
           "y": 256,
@@ -595,6 +636,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "a49999a3-5767-470c-9e04-4e0c5958b1b4",
           "width": 0,
           "x": 448,
           "y": 64,
@@ -610,6 +652,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "90b6d310-be5c-48fe-8454-6e3b923b70f7",
           "width": 0,
           "x": 512,
           "y": 512,
@@ -625,6 +668,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "2802d419-1b11-4127-ada7-4bea2d13363d",
           "width": 0,
           "x": 704,
           "y": 192,
@@ -640,6 +684,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "c37c9675-cb15-43c0-a8b8-86622565dba0",
           "width": 0,
           "x": 64,
           "y": 66,
@@ -655,6 +700,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "d5bfa897-b849-4ceb-8fda-67ba3aefe345",
           "width": 0,
           "x": 192,
           "y": 448,
@@ -670,6 +716,7 @@
           "layer": "UI",
           "locked": true,
           "name": "NewObject",
+          "persistentUuid": "184dbc44-e337-418e-b6a2-04bd252bfc35",
           "width": 0,
           "x": 68,
           "y": 524,
@@ -685,6 +732,7 @@
           "layer": "",
           "locked": true,
           "name": "Tile_Grass",
+          "persistentUuid": "1f1bb3ed-3498-40ed-a0d7-c93e3e09e18a",
           "width": 768,
           "x": 64,
           "y": 64,
@@ -700,6 +748,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "cc325ba5-ea04-4b13-8f3f-aa8fc18a1b42",
           "width": 0,
           "x": 512,
           "y": 256,
@@ -715,6 +764,7 @@
           "layer": "",
           "locked": false,
           "name": "Crate",
+          "persistentUuid": "bf62eb3e-0372-48ae-84ef-af9f5fee8a69",
           "width": 0,
           "x": 448,
           "y": 192,
@@ -727,6 +777,7 @@
       "objects": [
         {
           "name": "Bomb",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -879,6 +930,7 @@
         },
         {
           "name": "Crate",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -917,11 +969,13 @@
         },
         {
           "name": "Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
             {
               "name": "Timer",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1011,6 +1065,7 @@
         },
         {
           "name": "Wall",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1049,11 +1104,13 @@
         },
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [
             {
               "name": "Bombs",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -1676,6 +1733,7 @@
         {
           "height": 64,
           "name": "Tile_Grass",
+          "tags": "",
           "texture": "Grass-1.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1685,6 +1743,7 @@
         {
           "height": 64,
           "name": "Tile_Wall1",
+          "tags": "",
           "texture": "Wall-1.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1694,6 +1753,7 @@
         {
           "height": 64,
           "name": "Tile_Wall2",
+          "tags": "",
           "texture": "Wall-2.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 64,
@@ -1702,6 +1762,7 @@
         },
         {
           "name": "Right_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1759,6 +1820,7 @@
         },
         {
           "name": "Left_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1816,6 +1878,7 @@
         },
         {
           "name": "Up_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1873,6 +1936,7 @@
         },
         {
           "name": "Down_Fire",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1933,6 +1997,7 @@
           "italic": false,
           "name": "NewObject",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -2038,6 +2103,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2055,6 +2125,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UI",
           "visibility": true,
           "cameras": [],
@@ -3133,6 +3208,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

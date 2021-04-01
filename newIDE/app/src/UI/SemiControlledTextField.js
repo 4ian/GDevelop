@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import TextField from './TextField';
+const mexp = require('math-expression-evaluator');
 
 type State = {|
   focused: boolean,
@@ -23,7 +24,7 @@ type Props = {|
     },
   }) => void,
   type?: 'text' | 'number',
-  calculValue?: boolean,
+  evaluateValue?: boolean,
 
   // Some TextField props that can be reused:
   onClick?: () => void,
@@ -71,6 +72,13 @@ export default class SemiControlledTextField extends React.Component<
   componentDidMount() {
     const input = this.getInputNode();
     input.addEventListener('wheel', this._onWheel.bind(this));
+    input.addEventListener('keydown', this._onApply.bind(this));
+  }
+
+  componentWillUnmount() {
+    const input = this.getInputNode();
+    input.removeEventListener('wheel', this._onWheel.bind(this));
+    input.removeEventListener('keydown', this._onApply.bind(this));
   }
 
   forceSetValue(text: string) {
@@ -97,15 +105,35 @@ export default class SemiControlledTextField extends React.Component<
     const { focused, text } = this.state;
 
     if (!focused) return;
-    if (typeof text === 'number') {
+    if (Number.isInteger(text)) {
       let value = 0;
       if (evt.deltaY < 0) {
+        // TODO use keyboard manager?
         value = evt.shiftKey ? 5 : 1;
       } else {
+        // TODO use keyboard manager?
         value = evt.shiftKey ? -5 : -1;
       }
       this.setState({ text: text + value });
       this.props.onChange(text + value);
+    }
+  }
+
+  _evaluateValue(value: string): number {
+    return mexp.eval(value);
+  }
+
+  _onApply(evt) {
+    if (evt.keyCode == 13) {
+      const previousValue = this.state.text;
+      let value = this._evaluateValue(this.state.text);
+      // value can be Infinite or isNaN
+      // maybe worth to move this check in _evaluateValue()
+      if (!Number.isInteger(value)) {
+        value = previousValue;
+      }
+      this.setState({ text: value });
+      this.props.onChange(value);
     }
   }
 
@@ -117,7 +145,7 @@ export default class SemiControlledTextField extends React.Component<
       onFocus,
       onBlur,
       type,
-      calculValue,
+      evaluateValue,
       ...otherProps
     } = this.props;
 
@@ -137,21 +165,22 @@ export default class SemiControlledTextField extends React.Component<
           if (onFocus) onFocus(event);
         }}
         onChange={(event, newValue) => {
+          let value = newValue;
+
           this.setState({
             text: newValue,
           });
 
-          if (!commitOnBlur) onChange(newValue);
+          if (this.props.evaluateValue) {
+            value = this._evaluateValue(newValue);
+          }
+
+          if (!commitOnBlur) onChange(value);
         }}
         onBlur={event => {
           let value = event.currentTarget.value;
-          if (this.props.calculValue) {
-            const rex = /(^\d).*[-+*()/.,].*(\d+$)|(^\d+$)|^((\d)|[-+*()/.,]).((\d)|[-+*()/.,])+$/gm;
-            const regexData = value.match(rex);
-
-            if (regexData) {
-              value = eval(regexData[0]);
-            }
+          if (this.props.evaluateValue) {
+            value = this._evaluateValue(value);
           }
 
           onChange(value);

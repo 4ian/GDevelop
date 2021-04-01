@@ -3333,13 +3333,13 @@ storiesOf('SpriteEditor and related editors', module)
   .add('CollisionMasksEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
       <DragAndDropContextProvider>
-        <div style={{ height: 500 }}>
+        <FixedHeightFlexContainer height={500}>
           <CollisionMasksEditor
             object={testProject.spriteObject}
             project={testProject.project}
             resourcesLoader={ResourcesLoader}
           />
-        </div>
+        </FixedHeightFlexContainer>
       </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ));

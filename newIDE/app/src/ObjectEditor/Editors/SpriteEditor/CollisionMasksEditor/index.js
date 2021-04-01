@@ -23,6 +23,7 @@ import EditorMosaic, {
   type EditorMosaicNode,
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Background from '../../../../UI/Background';
 const gd: libGDevelop = global.gd;
 
 const horizontalMosaicNodes: EditorMosaicNode = {
@@ -185,7 +186,7 @@ const CollisionMasksEditor = (props: Props) => {
       type: 'primary',
       noTitleBar: true,
       renderEditor: () => (
-        <div style={{ display: 'flex', height: '100%' }}>
+        <Background>
           <ImagePreview
             resourceName={hasValidSprite ? sprite.getImageName() : ''}
             resourcesLoader={props.resourcesLoader}
@@ -204,87 +205,92 @@ const CollisionMasksEditor = (props: Props) => {
               )
             }
           />
-        </div>
+        </Background>
       ),
     },
     properties: {
       type: 'secondary',
       noTitleBar: true,
       renderEditor: () => (
-        <div style={{ overflowY: 'scroll' }}>
-          <Line>
-            <Column expand>
-              <SpriteSelector
-                spriteObject={spriteObject}
-                animationIndex={animationIndex}
-                directionIndex={directionIndex}
-                spriteIndex={spriteIndex}
-                chooseAnimation={chooseAnimation}
-                chooseDirection={chooseDirection}
-                chooseSprite={chooseSprite}
-                sameForAllAnimations={sameCollisionMasksForAnimations}
-                sameForAllSprites={sameCollisionMasksForSprites}
-                setSameForAllAnimations={setSameCollisionMasksForAllAnimations}
-                setSameForAllSprites={setSameCollisionMasksForAllSprites}
-                setSameForAllAnimationsLabel={
-                  <Trans>Share same collision masks for all animations</Trans>
-                }
-                setSameForAllSpritesLabel={
-                  <Trans>
-                    Share same collision masks for all sprites of this animation
-                  </Trans>
-                }
-              />
-            </Column>
-          </Line>
-          {!!sprite && !sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
-              <PolygonsList
-                polygons={sprite.getCustomCollisionMask()}
-                onPolygonsUpdated={updateCollisionMasks}
-                spriteWidth={spriteWidth}
-                spriteHeight={spriteHeight}
-              />
-              <Line justifyContent="center">
-                <FlatButton
-                  label={<Trans>Restore the default collision mask</Trans>}
-                  primary={false}
-                  onClick={() => onSetCollisionMaskAutomatic(true)}
+        <Background>
+          <div style={{ overflowY: 'auto' }}>
+            <Line>
+              <Column expand>
+                <SpriteSelector
+                  spriteObject={spriteObject}
+                  animationIndex={animationIndex}
+                  directionIndex={directionIndex}
+                  spriteIndex={spriteIndex}
+                  chooseAnimation={chooseAnimation}
+                  chooseDirection={chooseDirection}
+                  chooseSprite={chooseSprite}
+                  sameForAllAnimations={sameCollisionMasksForAnimations}
+                  sameForAllSprites={sameCollisionMasksForSprites}
+                  setSameForAllAnimations={
+                    setSameCollisionMasksForAllAnimations
+                  }
+                  setSameForAllSprites={setSameCollisionMasksForAllSprites}
+                  setSameForAllAnimationsLabel={
+                    <Trans>Share same collision masks for all animations</Trans>
+                  }
+                  setSameForAllSpritesLabel={
+                    <Trans>
+                      Share same collision masks for all sprites of this
+                      animation
+                    </Trans>
+                  }
                 />
-              </Line>
-            </React.Fragment>
-          )}
-          {!!sprite && sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
+              </Column>
+            </Line>
+            {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+              <React.Fragment>
+                <PolygonsList
+                  polygons={sprite.getCustomCollisionMask()}
+                  onPolygonsUpdated={updateCollisionMasks}
+                  spriteWidth={spriteWidth}
+                  spriteHeight={spriteHeight}
+                />
+                <Line justifyContent="center">
+                  <FlatButton
+                    label={<Trans>Restore the default collision mask</Trans>}
+                    primary={false}
+                    onClick={() => onSetCollisionMaskAutomatic(true)}
+                  />
+                </Line>
+              </React.Fragment>
+            )}
+            {!!sprite && sprite.isCollisionMaskAutomatic() && (
+              <React.Fragment>
+                <EmptyMessage>
+                  <Trans>
+                    This sprite uses the default collision mask, a rectangle
+                    that is as large as the sprite.
+                  </Trans>
+                </EmptyMessage>
+                <Line justifyContent="center">
+                  <FlatButton
+                    label={<Trans>Use a custom collision mask</Trans>}
+                    primary={false}
+                    onClick={() => onSetCollisionMaskAutomatic(false)}
+                  />
+                </Line>
+              </React.Fragment>
+            )}
+            {!sprite && (
               <EmptyMessage>
                 <Trans>
-                  This sprite uses the default collision mask, a rectangle that
-                  is as large as the sprite.
+                  Choose an animation and frame to edit the collision masks
                 </Trans>
               </EmptyMessage>
-              <Line justifyContent="center">
-                <FlatButton
-                  label={<Trans>Use a custom collision mask</Trans>}
-                  primary={false}
-                  onClick={() => onSetCollisionMaskAutomatic(false)}
-                />
-              </Line>
-            </React.Fragment>
-          )}
-          {!sprite && (
-            <EmptyMessage>
-              <Trans>
-                Choose an animation and frame to edit the collision masks
-              </Trans>
-            </EmptyMessage>
-          )}
-        </div>
+            )}
+          </div>
+        </Background>
       ),
     },
   };
 
   return (
-    <div style={{ height: '100%' }}>
+    <div style={{ flex: 1 }}>
       <EditorMosaic editors={editors} initialNodes={editorNodes} />
     </div>
   );

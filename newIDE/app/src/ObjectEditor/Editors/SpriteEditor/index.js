@@ -502,6 +502,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
             ]}
             noMargin
             maxWidth="lg"
+            flexBody
             fullHeight
             cannotBeDismissed={true}
             onRequestClose={() => this.openCollisionMasksEditor(false)}

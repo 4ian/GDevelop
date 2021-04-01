@@ -5,8 +5,9 @@ namespace gdjs {
   export class RuntimeScenePixiRenderer {
     _pixiRenderer: PIXI.Renderer;
     _runtimeScene: gdjs.RuntimeScene;
-    _pixiContainer: any;
+    _pixiContainer: PIXI.Container;
     _debugDraw: PIXI.Graphics | null = null;
+    _debugDrawContainer: PIXI.Container | null = null;
     _profilerText: PIXI.Text | null = null;
     _debugDrawRenderedObjectsPoints: Record<
       number,
@@ -91,16 +92,14 @@ namespace gdjs {
       showPointsNames: boolean,
       showCustomPoints: boolean
     ) {
-      if (!this._debugDraw) {
+      if (!this._debugDraw || !this._debugDrawContainer) {
+        this._debugDrawContainer = new PIXI.Container();
         this._debugDraw = new PIXI.Graphics();
 
         // Add on top of all layers:
-        this._pixiContainer.addChild(this._debugDraw);
+        this._debugDrawContainer.addChild(this._debugDraw);
+        this._pixiContainer.addChild(this._debugDrawContainer);
       }
-
-      // Activate here what you want to be displayed:
-      const displayAABB = true;
-      const displayHitboxesAndSomePoints = true;
       const debugDraw = this._debugDraw;
 
       // Reset the boolean "wasRendered" of all points of objects to false:
@@ -108,227 +107,174 @@ namespace gdjs {
         this._debugDrawRenderedObjectsPoints[id].wasRendered = false;
       }
 
+      const renderObjectPoint = (
+        points: Record<string, PIXI.Text>,
+        name: string,
+        fillColor: integer,
+        x: float,
+        y: float
+      ) => {
+        debugDraw.line.color = fillColor;
+        debugDraw.fill.color = fillColor;
+        debugDraw.drawCircle(x, y, 3);
+
+        if (showPointsNames) {
+          if (!points[name]) {
+            points[name] = new PIXI.Text(name, {
+              fill: fillColor,
+              fontSize: 12,
+            });
+
+            this._debugDrawContainer!.addChild(points[name]);
+          }
+
+          points[name].position.set(x, y);
+        }
+      };
+
       debugDraw.clear();
       debugDraw.beginFill();
       debugDraw.alpha = 0.8;
       debugDraw.lineStyle(2, 0x0000ff, 1);
 
-      if (displayAABB) {
-        for (let i = 0; i < instances.length; i++) {
-          const object = instances[i];
-          const layer = this._runtimeScene.getLayer(object.getLayer());
-          const cameraTopLeftX =
-            layer.getCameraX() - layer.getCameraWidth() / 2;
-          const cameraTopLeftY =
-            layer.getCameraY() - layer.getCameraHeight() / 2;
+      // Draw AABB
+      for (let i = 0; i < instances.length; i++) {
+        const object = instances[i];
+        const layer = this._runtimeScene.getLayer(object.getLayer());
 
-          if (
-            (!object.isVisible() || !layer.isVisible()) &&
-            !showHiddenInstances
-          ) {
-            continue;
+        if (
+          (!object.isVisible() || !layer.isVisible()) &&
+          !showHiddenInstances
+        ) {
+          continue;
+        }
+        const cameraCoords = layersCameraCoordinates[object.getLayer()];
+        const rendererObject = object.getRendererObject();
+        if (!cameraCoords || !rendererObject) {
+          continue;
+        }
+        const aabb = object.getAABB();
+        debugDraw.fill.alpha = 0.2;
+        debugDraw.line.color = 0x778ee8;
+        debugDraw.fill.color = 0x778ee8;
+        debugDraw.drawRect(
+          aabb.min[0] - cameraCoords[0],
+          aabb.min[1] - cameraCoords[1],
+          aabb.max[0] - aabb.min[0],
+          aabb.max[1] - aabb.min[1]
+        );
+      }
+
+      // Draw hitboxes and points
+      for (let i = 0; i < instances.length; i++) {
+        const object = instances[i];
+        const layer = this._runtimeScene.getLayer(object.getLayer());
+
+        if (
+          (!object.isVisible() || !layer.isVisible()) &&
+          !showHiddenInstances
+        ) {
+          continue;
+        }
+        const cameraCoords = layersCameraCoordinates[object.getLayer()];
+        const rendererObject = object.getRendererObject();
+        if (!cameraCoords || !rendererObject) {
+          continue;
+        }
+
+        // Create the structure to store the points in memory
+        const id = object.id;
+        if (!this._debugDrawRenderedObjectsPoints[id]) {
+          this._debugDrawRenderedObjectsPoints[id] = {
+            wasRendered: true,
+            points: {},
+          };
+        }
+        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
+        renderedObjectPoints.wasRendered = true;
+
+        // Draw hitboxes (sub-optimal performance)
+        const hitboxes = object.getHitBoxes();
+        for (let j = 0; j < hitboxes.length; j++) {
+          // Note that this conversion is sub-optimal, but we don't care
+          // as this is for debug draw.
+          const polygon: float[] = [];
+          hitboxes[j].vertices.forEach((point) => {
+            polygon.push(point[0] - cameraCoords[0]);
+            polygon.push(point[1] - cameraCoords[1]);
+          });
+          debugDraw.fill.alpha = 0;
+          debugDraw.line.alpha = 0.5;
+          debugDraw.line.color = 0xff0000;
+          debugDraw.drawPolygon(polygon);
+        }
+
+        // Draw points
+        debugDraw.fill.alpha = 0.3;
+
+        // Draw Center point
+        const centerPointX =
+          object.getDrawableX() + object.getCenterX() - cameraCoords[0];
+        const centerPointY =
+          object.getDrawableY() + object.getCenterY() - cameraCoords[1];
+        renderObjectPoint(
+          renderedObjectPoints.points,
+          'Center',
+          0xffff00,
+          centerPointX,
+          centerPointY
+        );
+
+        // Draw Origin point
+        let originPoint = [
+          object.getDrawableX() - cameraCoords[0],
+          object.getDrawableY() - cameraCoords[1],
+        ];
+        if (object instanceof gdjs.SpriteRuntimeObject) {
+          // For Sprite objects get the position of the origin point.
+          originPoint = object.getPointPosition('origin');
+          originPoint[0] -= cameraCoords[0];
+          originPoint[1] -= cameraCoords[1];
+        }
+
+        renderObjectPoint(
+          renderedObjectPoints.points,
+          'Origin',
+          0xff0000,
+          originPoint[0],
+          originPoint[1]
+        );
+
+        // Draw custom point
+        if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
+          if (!object._animationFrame) continue;
+
+          for (const customPointName in object._animationFrame.points.items) {
+            const customPoint = object.getPointPosition(customPointName);
+            customPoint[0] -= cameraCoords[0];
+            customPoint[1] -= cameraCoords[1];
+
+            renderObjectPoint(
+              renderedObjectPoints.points,
+              customPointName,
+              0x0000ff,
+              customPoint[0],
+              customPoint[1]
+            );
           }
-          const cameraCoords = layersCameraCoordinates[object.getLayer()];
-          const rendererObject = object.getRendererObject();
-          if (!cameraCoords || !rendererObject) {
-            continue;
-          }
-          const aabb = object.getAABB();
-          debugDraw.fill.alpha = 0.2;
-          debugDraw.line.color = 0x778ee8;
-          debugDraw.fill.color = 0x778ee8;
-          debugDraw.drawRect(
-            aabb.min[0] - cameraTopLeftX,
-            aabb.min[1] - cameraTopLeftY,
-            aabb.max[0] - aabb.min[0],
-            aabb.max[1] - aabb.min[1]
-          );
         }
       }
 
-      if (displayHitboxesAndSomePoints) {
-        for (let i = 0; i < instances.length; i++) {
-          const object = instances[i];
-          const id = object.id;
-          const layer = this._runtimeScene.getLayer(object.getLayer());
-          const cameraTopLeftX =
-            layer.getCameraX() - layer.getCameraWidth() / 2;
-          const cameraTopLeftY =
-            layer.getCameraY() - layer.getCameraHeight() / 2;
+      // Clean any point text from an object that is not rendered.
+      for (const objectID in this._debugDrawRenderedObjectsPoints) {
+        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[
+          objectID
+        ];
+        if (renderedObjectPoints.wasRendered) continue;
 
-          if (
-            (!object.isVisible() || !layer.isVisible()) &&
-            !showHiddenInstances
-          ) {
-            continue;
-          }
-          const cameraCoords = layersCameraCoordinates[object.getLayer()];
-          const rendererObject = object.getRendererObject();
-          if (!cameraCoords || !rendererObject) {
-            continue;
-          }
-
-          // Create the structure to store the points in memory
-          if (!this._debugDrawRenderedObjectsPoints[id]) {
-            this._debugDrawRenderedObjectsPoints[id] = {
-              wasRendered: true,
-              points: {},
-            };
-          }
-
-          const renderedObjectTextPoints = this._debugDrawRenderedObjectsPoints[
-            id
-          ];
-
-          // Draw hitboxes (sub-optimal performance)
-          const hitboxes = object.getHitBoxes();
-          for (let j = 0; j < hitboxes.length; j++) {
-            // Note that this conversion is sub-optimal, but we don't care
-            // as this is for debug draw.
-            const polygon: float[] = [];
-            hitboxes[j].vertices.forEach((point) => {
-              if (layer) {
-                polygon.push(point[0] - cameraTopLeftX);
-                polygon.push(point[1] - cameraTopLeftY);
-              }
-            });
-            debugDraw.fill.alpha = 0;
-            debugDraw.line.alpha = 0.5;
-            debugDraw.line.color = 0xff0000;
-            debugDraw.drawPolygon(polygon);
-          }
-
-          // Draw points
-          // Center point of the object, with camera movement
-          const centerPointX =
-            object.getDrawableX() + object.getCenterX() - cameraTopLeftX;
-          const centerPointY =
-            object.getDrawableY() + object.getCenterY() - cameraTopLeftY;
-
-          // Draw Center point
-          debugDraw.fill.alpha = 0.3;
-          debugDraw.line.color = 0xffff00;
-          debugDraw.fill.color = 0xffff00;
-          debugDraw.drawCircle(centerPointX, centerPointY, 3);
-
-          if (showPointsNames) {
-            if (!renderedObjectTextPoints.points['center']) {
-              renderedObjectTextPoints.points['center'] = new PIXI.Text(
-                'Center',
-                {
-                  fill: '#ffff00',
-                  fontSize: 12,
-                }
-              );
-            }
-
-            renderedObjectTextPoints.points['center'].position.set(
-              centerPointX,
-              centerPointY
-            );
-
-            this._pixiContainer.addChild(
-              renderedObjectTextPoints.points['center']
-            );
-          }
-
-          // Draw Origin point
-          // Origin point of the object, with camera movement
-          // For Sprite objects get the position of the origin point.
-          // For others objects that doesn't have origin point the position of the rendered object is used.
-          let originPoint = [
-            object.getDrawableX() - cameraTopLeftX,
-            object.getDrawableY() - cameraTopLeftY,
-          ];
-          if (object instanceof gdjs.SpriteRuntimeObject) {
-            originPoint = object.getPointPosition('origin');
-            originPoint[0] = originPoint[0] - cameraTopLeftX;
-            originPoint[1] = originPoint[1] - cameraTopLeftY;
-          }
-
-          debugDraw.line.color = 0xff0000;
-          debugDraw.fill.color = 0xff0000;
-          debugDraw.drawCircle(originPoint[0], originPoint[1], 3);
-
-          if (showPointsNames) {
-            if (!renderedObjectTextPoints.points['origin']) {
-              renderedObjectTextPoints.points['origin'] = new PIXI.Text(
-                'Origin',
-                {
-                  fill: '#ff0000',
-                  fontSize: 12,
-                }
-              );
-            }
-            renderedObjectTextPoints.points['origin'].position.set(
-              originPoint[0],
-              originPoint[1]
-            );
-
-            // Mark the text points as rendered
-            renderedObjectTextPoints.wasRendered = true;
-            this._pixiContainer.addChild(
-              renderedObjectTextPoints.points['origin']
-            );
-          }
-
-          // Draw custom point
-          if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
-            if (!object._animationFrame) continue;
-            for (let customPointName in object._animationFrame.points[
-              'items'
-            ]) {
-              let customPoint: [float, float];
-              customPoint = object.getPointPosition(customPointName);
-
-              if (showPointsNames) {
-                if (!renderedObjectTextPoints.points[customPointName]) {
-                  renderedObjectTextPoints.points[
-                    customPointName
-                  ] = new PIXI.Text(customPointName, {
-                    fill: '#0000ff',
-                    fontSize: 12,
-                  });
-                }
-
-                renderedObjectTextPoints.points[customPointName].position.set(
-                  customPoint[0] - cameraTopLeftX,
-                  customPoint[1] - cameraTopLeftY
-                );
-
-                // Mark the text points as rendered
-                renderedObjectTextPoints.points[
-                  customPointName
-                ].wasRendered = true;
-                this._pixiContainer.addChild(
-                  renderedObjectTextPoints.points[customPointName]
-                );
-              }
-
-              debugDraw.line.color = 0x0000ff;
-              debugDraw.fill.color = 0x0000ff;
-              debugDraw.drawCircle(
-                customPoint[0] - cameraTopLeftX,
-                customPoint[1] - cameraTopLeftY,
-                3
-              );
-            }
-          }
-
-          // After we've iterated on all objects, maybe some were destroyed. So clean their text points:
-          for (let objectID in this._debugDrawRenderedObjectsPoints) {
-            const renderedObjectTextPoints = this
-              ._debugDrawRenderedObjectsPoints[objectID];
-            if (!renderedObjectTextPoints.wasRendered) {
-              // Clean our point objects
-              for (let name in renderedObjectTextPoints.points) {
-                // Remove from the PIXI container the text point.
-                this._pixiContainer.removeChild(
-                  renderedObjectTextPoints.points[name]
-                );
-              }
-            }
-          }
+        const points = renderedObjectPoints.points;
+        for (const name in points) {
+          this._debugDrawContainer.removeChild(points[name]);
         }
       }
 
@@ -340,21 +286,15 @@ namespace gdjs {
         this._debugDraw.clear();
       }
 
-      if (this._debugDrawRenderedObjectsPoints) {
-        // After we've iterated on all objects, maybe some were destroyed. So clean their text points:
-        for (let objectID in this._debugDrawRenderedObjectsPoints) {
-          const renderedObjectTextPoints = this._debugDrawRenderedObjectsPoints[
-            objectID
-          ];
-          // Clean our point objects
-          for (let name in renderedObjectTextPoints.points) {
-            // Remove from the PIXI container the text point.
-            this._pixiContainer.removeChild(
-              renderedObjectTextPoints.points[name]
-            );
-          }
-        }
+      if (this._debugDrawContainer) {
+        this._debugDrawContainer.destroy({
+          children: true,
+        });
+        this._pixiContainer.removeChild(this._debugDrawContainer);
       }
+      this._debugDraw = null;
+      this._debugDrawContainer = null;
+      this._debugDrawRenderedObjectsPoints = {};
     }
 
     hideCursor(): void {

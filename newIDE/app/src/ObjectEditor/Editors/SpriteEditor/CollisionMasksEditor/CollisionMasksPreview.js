@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
 const styles = {
   container: {
@@ -24,37 +25,31 @@ type Props = {|
   onPolygonsUpdated: () => void,
 |};
 
-type State = {|
-  draggedVertex: ?gdVector2f,
-|};
+const CollisionMasksPreview = (props: Props) => {
+  const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
+  const [draggedVertex, setDraggedVertex] = React.useState<gdVector2f | null>(
+    null
+  );
 
-export default class CollisionMasksPreview extends React.Component<
-  Props,
-  State
-> {
-  _svg: any;
-  state = {
-    draggedVertex: null,
+  const {
+    polygons,
+    imageZoomFactor,
+    imageHeight,
+    imageWidth,
+    isDefaultBoundingBox,
+  } = props;
+
+  const forceUpdate = useForceUpdate();
+
+  const onStartDragVertex = (vertex: gdVector2f) => {
+    if (draggedVertex) return;
+    setDraggedVertex(vertex);
   };
 
-  _onStartDragVertex = (draggedVertex: gdVector2f) => {
-    if (this.state.draggedVertex) return;
-
-    this.setState({
-      draggedVertex,
-    });
-  };
-
-  _onEndDragVertex = () => {
-    const draggingWasDone = !!this.state.draggedVertex;
-    this.setState(
-      {
-        draggedVertex: null,
-      },
-      () => {
-        if (draggingWasDone) this.props.onPolygonsUpdated();
-      }
-    );
+  const onEndDragVertex = () => {
+    const draggingWasDone = !!draggedVertex;
+    if (draggingWasDone) props.onPolygonsUpdated();
+    setDraggedVertex(null);
   };
 
   /**
@@ -63,24 +58,23 @@ export default class CollisionMasksPreview extends React.Component<
    *
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
-  _onPointerMove = (event: any) => {
-    const { draggedVertex } = this.state;
-    if (!draggedVertex) return;
+  const onPointerMove = (event: any) => {
+    if (!draggedVertex || !svgRef.current) return;
 
-    const pointOnScreen = this._svg.createSVGPoint();
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const pointOnScreen = svgRef.current.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    const screenToSvgMatrix = this._svg.getScreenCTM().inverse();
+    // $FlowExpectedError Flow doesn't have SVG typings yet (@facebook/flow#4551)
+    const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
-    draggedVertex.set_x(pointOnSvg.x / this.props.imageZoomFactor);
-    draggedVertex.set_y(pointOnSvg.y / this.props.imageZoomFactor);
-    this.forceUpdate();
+    draggedVertex.set_x(pointOnSvg.x / imageZoomFactor);
+    draggedVertex.set_y(pointOnSvg.y / imageZoomFactor);
+    forceUpdate();
   };
 
-  _renderBoundingBox() {
-    const { imageWidth, imageHeight, imageZoomFactor } = this.props;
-
+  const renderBoundingBox = () => {
     return (
       <polygon
         fill="rgba(255,0,0,0.2)"
@@ -92,11 +86,9 @@ export default class CollisionMasksPreview extends React.Component<
           imageZoomFactor}`}
       />
     );
-  }
+  };
 
-  _renderPolygons() {
-    const { polygons, imageZoomFactor } = this.props;
-
+  const renderPolygons = () => {
     return (
       <React.Fragment>
         {mapVector(polygons, (polygon, i) => {
@@ -121,7 +113,7 @@ export default class CollisionMasksPreview extends React.Component<
           const vertices = polygon.getVertices();
           return mapVector(vertices, (vertex, j) => (
             <circle
-              onPointerDown={event => this._onStartDragVertex(vertex)}
+              onPointerDown={() => onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
               fill="rgba(255,0,0,0.75)"
               strokeWidth={1}
@@ -134,23 +126,21 @@ export default class CollisionMasksPreview extends React.Component<
         })}
       </React.Fragment>
     );
-  }
+  };
 
-  render() {
-    const { isDefaultBoundingBox } = this.props;
+  return (
+    <svg
+      onPointerMove={onPointerMove}
+      onPointerUp={onEndDragVertex}
+      width={imageWidth * imageZoomFactor}
+      height={imageHeight * imageZoomFactor}
+      style={styles.svg}
+      ref={svgRef}
+    >
+      {isDefaultBoundingBox && renderBoundingBox()}
+      {!isDefaultBoundingBox && renderPolygons()}
+    </svg>
+  );
+};
 
-    return (
-      <svg
-        onPointerMove={this._onPointerMove}
-        onPointerUp={this._onEndDragVertex}
-        width={this.props.imageWidth * this.props.imageZoomFactor}
-        height={this.props.imageHeight * this.props.imageZoomFactor}
-        style={styles.svg}
-        ref={svg => (this._svg = svg)}
-      >
-        {isDefaultBoundingBox && this._renderBoundingBox()}
-        {!isDefaultBoundingBox && this._renderPolygons()}
-      </svg>
-    );
-  }
-}
+export default CollisionMasksPreview;

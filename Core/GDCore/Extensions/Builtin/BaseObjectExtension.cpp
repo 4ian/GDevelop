@@ -202,7 +202,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceVersPos",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
-         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
+         _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
            "pixels"),
          _("Movement"),
          "res/actions/force24.png",
@@ -636,7 +636,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceVers",
          _("Add a force to move toward an object"),
          _("Add a force to an object to make it move toward another."),
-         _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
+         _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
          _("Movement"),
          "res/actions/forceVers24.png",
          "res/actions/forceVers.png")

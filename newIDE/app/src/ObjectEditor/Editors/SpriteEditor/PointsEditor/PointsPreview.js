@@ -22,6 +22,8 @@ type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
   imageHeight: number,
+  offsetTop: number,
+  offsetLeft: number,
   imageZoomFactor: number,
   onPointsUpdated: () => void,
 |};
@@ -32,13 +34,20 @@ type State = {|
 |};
 
 const PointsPreview = (props: Props) => {
-  const containerRef = React.useRef<React.ElementRef<'div'> | null>(null);
+  const frameRef = React.useRef<React.ElementRef<'div'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,
     draggedPointKind: null,
   });
 
-  const { pointsContainer, imageWidth, imageHeight, imageZoomFactor } = props;
+  const {
+    pointsContainer,
+    imageWidth,
+    imageHeight,
+    offsetTop,
+    offsetLeft,
+    imageZoomFactor,
+  } = props;
 
   const forceUpdate = useForceUpdate();
 
@@ -70,17 +79,17 @@ const PointsPreview = (props: Props) => {
    */
   const onMouseMove = (event: any) => {
     const { draggedPoint, draggedPointKind } = state;
-    if (!draggedPoint || !containerRef.current) return;
+    if (!draggedPoint || !frameRef.current) return;
 
-    const containerBoundingRect = containerRef.current.getBoundingClientRect();
-    const xOnContainer = event.clientX - containerBoundingRect.left;
-    const yOnContainer = event.clientY - containerBoundingRect.top;
+    const frameBoundingRect = frameRef.current.getBoundingClientRect();
+    const xOnFrame = event.clientX - frameBoundingRect.left;
+    const yOnFrame = event.clientY - frameBoundingRect.top;
 
     if (draggedPointKind === pointKindIdentifiers.CENTER) {
       props.pointsContainer.setDefaultCenterPoint(false);
     }
-    draggedPoint.setX(xOnContainer / props.imageZoomFactor);
-    draggedPoint.setY(yOnContainer / props.imageZoomFactor);
+    draggedPoint.setX(xOnFrame / imageZoomFactor);
+    draggedPoint.setY(xOnFrame / imageZoomFactor);
     forceUpdate();
   };
 
@@ -132,30 +141,39 @@ const PointsPreview = (props: Props) => {
   const centerPoint = pointsContainer.getCenter();
   const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
 
+  const frameStyle = {
+    position: 'absolute',
+    top: offsetTop,
+    left: offsetLeft,
+    width: imageWidth * imageZoomFactor,
+    height: imageHeight * imageZoomFactor,
+  };
+
   return (
     <div
       style={styles.container}
       onPointerMove={onMouseMove}
       onPointerUp={onEndDragPoint}
-      ref={containerRef}
     >
-      {points}
-      {renderPoint(
-        'Origin',
-        originPoint.getX() * imageZoomFactor,
-        originPoint.getY() * imageZoomFactor,
-        pointKindIdentifiers.ORIGIN,
-        originPoint
-      )}
-      {renderPoint(
-        'Center',
-        (!automaticCenterPosition ? centerPoint.getX() : imageWidth / 2) *
-          imageZoomFactor,
-        (!automaticCenterPosition ? centerPoint.getY() : imageHeight / 2) *
-          imageZoomFactor,
-        pointKindIdentifiers.CENTER,
-        centerPoint
-      )}
+      <div style={frameStyle} ref={frameRef}>
+        {points}
+        {renderPoint(
+          'Origin',
+          originPoint.getX() * imageZoomFactor,
+          originPoint.getY() * imageZoomFactor,
+          pointKindIdentifiers.ORIGIN,
+          originPoint
+        )}
+        {renderPoint(
+          'Center',
+          (!automaticCenterPosition ? centerPoint.getX() : imageWidth / 2) *
+            imageZoomFactor,
+          (!automaticCenterPosition ? centerPoint.getY() : imageHeight / 2) *
+            imageZoomFactor,
+          pointKindIdentifiers.CENTER,
+          centerPoint
+        )}
+      </div>
     </div>
   );
 };

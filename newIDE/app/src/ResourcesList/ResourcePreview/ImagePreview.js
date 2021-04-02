@@ -52,6 +52,8 @@ type Props = {|
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
+    offsetTop: number,
+    offsetLeft: number,
     imageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
@@ -168,12 +170,21 @@ export default class ImagePreview extends React.Component<Props, State> {
             visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
           };
 
-          const overlayStyle = {
+          const frameStyle = {
             position: 'absolute',
             top: imagePositionTop + MARGIN,
             left: imagePositionLeft + MARGIN,
             width: imageWidth ? imageWidth * imageZoomFactor : undefined,
             height: imageHeight ? imageHeight * imageZoomFactor : undefined,
+            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          };
+
+          const overlayStyle = {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
             visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
           };
 
@@ -234,13 +245,15 @@ export default class ImagePreview extends React.Component<Props, State> {
                   />
                 )}
                 {imageLoaded && renderOverlay && (
-                  <div style={{ ...overlayStyle, ...styles.box }} />
+                  <div style={{ ...frameStyle, ...styles.box }} />
                 )}
                 {imageLoaded && renderOverlay && (
                   <div style={overlayStyle}>
                     {renderOverlay({
                       imageWidth: imageWidth || 0,
                       imageHeight: imageHeight || 0,
+                      offsetTop: imagePositionTop + MARGIN,
+                      offsetLeft: imagePositionLeft + MARGIN,
                       imageZoomFactor,
                     })}
                   </div>

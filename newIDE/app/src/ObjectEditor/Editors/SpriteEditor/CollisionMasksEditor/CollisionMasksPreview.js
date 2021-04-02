@@ -4,13 +4,6 @@ import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
 const styles = {
-  container: {
-    position: 'relative',
-  },
-  svg: {
-    width: '100%',
-    height: '100%',
-  },
   vertexCircle: {
     cursor: 'move',
   },
@@ -21,6 +14,8 @@ type Props = {|
   isDefaultBoundingBox: boolean,
   imageWidth: number,
   imageHeight: number,
+  offsetTop: number,
+  offsetLeft: number,
   imageZoomFactor: number,
   onPolygonsUpdated: () => void,
 |};
@@ -36,6 +31,8 @@ const CollisionMasksPreview = (props: Props) => {
     imageZoomFactor,
     imageHeight,
     imageWidth,
+    offsetTop,
+    offsetLeft,
     isDefaultBoundingBox,
   } = props;
 
@@ -69,9 +66,25 @@ const CollisionMasksPreview = (props: Props) => {
     const screenToSvgMatrix = svgRef.current.getScreenCTM().inverse();
     const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
-    draggedVertex.set_x(pointOnSvg.x / imageZoomFactor);
-    draggedVertex.set_y(pointOnSvg.y / imageZoomFactor);
+    // Confine vertices to inside the sprite frame
+    const { frameX, frameY } = confinePointToFrame(pointOnSvg.x, pointOnSvg.y);
+
+    draggedVertex.set_x(frameX / imageZoomFactor);
+    draggedVertex.set_y(frameY / imageZoomFactor);
     forceUpdate();
+  };
+
+  /**
+   * Given a point's coordinates, returns new coordinates that
+   * are confined inside the sprite frame.
+   */
+  const confinePointToFrame = (freeX: number, freeY: number) => {
+    const maxX = imageWidth * imageZoomFactor;
+    const maxY = imageHeight * imageZoomFactor;
+
+    const frameX = Math.min(maxX, Math.max(freeX, 0));
+    const frameY = Math.min(maxY, Math.max(freeY, 0));
+    return { frameX, frameY };
   };
 
   const renderBoundingBox = () => {
@@ -128,18 +141,31 @@ const CollisionMasksPreview = (props: Props) => {
     );
   };
 
+  const containerStyle = {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+  };
+
+  const svgStyle = {
+    position: 'absolute',
+    top: offsetTop,
+    left: offsetLeft,
+    width: imageWidth * imageZoomFactor,
+    height: imageHeight * imageZoomFactor,
+  };
+
   return (
-    <svg
+    <div
+      style={containerStyle}
       onPointerMove={onPointerMove}
       onPointerUp={onEndDragVertex}
-      width={imageWidth * imageZoomFactor}
-      height={imageHeight * imageZoomFactor}
-      style={styles.svg}
-      ref={svgRef}
     >
-      {isDefaultBoundingBox && renderBoundingBox()}
-      {!isDefaultBoundingBox && renderPolygons()}
-    </svg>
+      <svg style={svgStyle} ref={svgRef}>
+        {isDefaultBoundingBox && renderBoundingBox()}
+        {!isDefaultBoundingBox && renderPolygons()}
+      </svg>
+    </div>
   );
 };
 

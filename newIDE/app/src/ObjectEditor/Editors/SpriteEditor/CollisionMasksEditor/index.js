@@ -193,12 +193,10 @@ const CollisionMasksEditor = (props: Props) => {
             resourcesLoader={props.resourcesLoader}
             project={props.project}
             onSize={setCurrentSpriteSize}
-            renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+            renderOverlay={overlayProps =>
               hasValidSprite && (
                 <CollisionMasksPreview
-                  imageWidth={imageWidth}
-                  imageHeight={imageHeight}
-                  imageZoomFactor={imageZoomFactor}
+                  {...overlayProps}
                   isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                   polygons={sprite.getCustomCollisionMask()}
                   onPolygonsUpdated={updateCollisionMasks}

@@ -167,12 +167,10 @@ const PointsEditor = (props: Props) => {
             resourceName={hasValidSprite ? sprite.getImageName() : ''}
             resourcesLoader={props.resourcesLoader}
             project={props.project}
-            renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
+            renderOverlay={overlayProps =>
               hasValidSprite && (
                 <PointsPreview
-                  imageWidth={imageWidth}
-                  imageHeight={imageHeight}
-                  imageZoomFactor={imageZoomFactor}
+                  {...overlayProps}
                   pointsContainer={sprite}
                   onPointsUpdated={updatePoints}
                 />

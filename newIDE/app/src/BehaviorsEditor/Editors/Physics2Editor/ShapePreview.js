@@ -235,6 +235,7 @@ const ShapePreview = (props: Props) => {
     left: props.frameOffsetLeft,
     width: props.width * props.zoomFactor,
     height: props.height * props.zoomFactor,
+    overflow: 'visible',
   };
 
   return (

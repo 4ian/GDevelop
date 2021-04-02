@@ -147,6 +147,7 @@ const PointsPreview = (props: Props) => {
     left: offsetLeft,
     width: imageWidth * imageZoomFactor,
     height: imageHeight * imageZoomFactor,
+    overflow: 'visible',
   };
 
   return (

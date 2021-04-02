@@ -25,7 +25,6 @@ const styles = {
     width: '100%',
     border: '#AAAAAA 1px solid',
     overflow: 'scroll',
-    height: '100%',
     background: 'url("res/transparentback.png") repeat',
 
     // The container contains the image and the "overlay" that can display
@@ -49,6 +48,7 @@ type Props = {|
   resourceName: string,
   resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
+  fixedHeight?: number,
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
@@ -142,7 +142,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       <Measure bounds>
         {({ contentRect, measureRef }) => {
           const containerWidth = contentRect.bounds.width;
-          const { resourceName, renderOverlay } = this.props;
+          const { resourceName, renderOverlay, fixedHeight } = this.props;
           const {
             imageHeight,
             imageWidth,
@@ -189,7 +189,7 @@ export default class ImagePreview extends React.Component<Props, State> {
           };
 
           return (
-            <Column expand noMargin>
+            <Column expand noMargin useFullHeight>
               <MiniToolbar>
                 <IconButton
                   onClick={() => this._zoomBy(+0.2)}
@@ -214,7 +214,10 @@ export default class ImagePreview extends React.Component<Props, State> {
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */
                 }
-                style={styles.imagePreviewContainer}
+                style={{
+                  ...styles.imagePreviewContainer,
+                  height: fixedHeight || '100%',
+                }}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;

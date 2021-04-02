@@ -358,6 +358,7 @@ const Physics2Editor = (props: Props) => {
               resourceName={image}
               project={props.project}
               resourcesLoader={resourcesLoader}
+              fixedHeight={200}
               renderOverlay={overlayProps => (
                 <ShapePreview
                   shape={properties.get('shape').getValue()}

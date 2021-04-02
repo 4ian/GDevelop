@@ -89,7 +89,7 @@ const PointsPreview = (props: Props) => {
       props.pointsContainer.setDefaultCenterPoint(false);
     }
     draggedPoint.setX(xOnFrame / imageZoomFactor);
-    draggedPoint.setY(xOnFrame / imageZoomFactor);
+    draggedPoint.setY(yOnFrame / imageZoomFactor);
     forceUpdate();
   };
 

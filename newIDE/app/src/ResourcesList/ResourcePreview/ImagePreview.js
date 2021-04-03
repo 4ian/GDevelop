@@ -24,7 +24,8 @@ const styles = {
     display: 'inline-block',
     width: '100%',
     border: '#AAAAAA 1px solid',
-    overflow: 'scroll',
+    boxSizing: 'border-box',
+    overflow: 'auto',
     background: 'url("res/transparentback.png") repeat',
 
     // The container contains the image and the "overlay" that can display

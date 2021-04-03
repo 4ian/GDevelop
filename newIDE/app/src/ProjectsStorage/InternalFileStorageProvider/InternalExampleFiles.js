@@ -123,14 +123,15 @@ import exampleFile118 from '../../fixtures/text-entry-object/text-entry-object.j
 import exampleFile119 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
 import exampleFile120 from '../../fixtures/text-to-speech/text-to-speech.json';
 import exampleFile121 from '../../fixtures/tilemaps-made-with-tiled-editor/tilemaps-made-with-tiled-editor.json';
-import exampleFile122 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile123 from '../../fixtures/tween-animations/tween-animations.json';
-import exampleFile124 from '../../fixtures/tween-test/tween-test.json';
-import exampleFile125 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile126 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile127 from '../../fixtures/video-player/video-player.json';
-import exampleFile128 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile129 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile122 from '../../fixtures/titan-souls-demo/titan-souls-demo.json';
+import exampleFile123 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile124 from '../../fixtures/tween-animations/tween-animations.json';
+import exampleFile125 from '../../fixtures/tween-test/tween-test.json';
+import exampleFile126 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile127 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile128 from '../../fixtures/video-player/video-player.json';
+import exampleFile129 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile130 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -256,12 +257,13 @@ export default {
   'example://text-fade-in-out': exampleFile119,
   'example://text-to-speech': exampleFile120,
   'example://tilemaps-made-with-tiled-editor': exampleFile121,
-  'example://toggle-music-play-sound': exampleFile122,
-  'example://tween-animations': exampleFile123,
-  'example://tween-test': exampleFile124,
-  'example://type-on-text-effect': exampleFile125,
-  'example://unlock-items': exampleFile126,
-  'example://video-player': exampleFile127,
-  'example://z-depth': exampleFile128,
-  'example://zombie-laser': exampleFile129,
+  'example://titan-souls-demo': exampleFile122,
+  'example://toggle-music-play-sound': exampleFile123,
+  'example://tween-animations': exampleFile124,
+  'example://tween-test': exampleFile125,
+  'example://type-on-text-effect': exampleFile126,
+  'example://unlock-items': exampleFile127,
+  'example://video-player': exampleFile128,
+  'example://z-depth': exampleFile129,
+  'example://zombie-laser': exampleFile130,
 };

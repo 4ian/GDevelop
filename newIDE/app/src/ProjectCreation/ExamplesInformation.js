@@ -2771,6 +2771,10 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "BBCode Text Object",
+        "name": "BBText"
       }
     ]
   },
@@ -4516,6 +4520,59 @@ module.exports = {
       {
         "fullName": "",
         "name": ""
+      }
+    ]
+  },
+  "titan-souls-demo": {
+    "description": "A demo of a top down game where you have to beat a boss that has multiple attacks.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

@@ -189,6 +189,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 15,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 45,
         "snap": false,
         "windowMask": false,

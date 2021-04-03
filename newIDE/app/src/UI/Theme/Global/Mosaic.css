@@ -36,7 +36,7 @@
   border-bottom: 1px solid var(--mosaic-layout-border-color) !important;
   width: 200px;
   margin: auto;
-  bottom: 1px;
+  top: 1px;
   transition: all 0.1s ease-in-out;
 }
 

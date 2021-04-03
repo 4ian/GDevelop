@@ -188,7 +188,6 @@ declare class libGDevelop {
   PanelSpriteObject: Class<gdPanelSpriteObject>;
   ShapePainterObject: Class<gdShapePainterObject>;
   TextEntryObject: Class<gdTextEntryObject>;
-  SkeletonObject: Class<gdSkeletonObject>;
   ParticleEmitterObject_RendererType: Class<ParticleEmitterObject_RendererType>;
   ParticleEmitterObject: Class<gdParticleEmitterObject>;
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;

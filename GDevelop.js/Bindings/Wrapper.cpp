@@ -76,7 +76,6 @@
 #include "../../Extensions/PanelSpriteObject/PanelSpriteObject.h"
 #include "../../Extensions/ParticleSystem/ParticleEmitterObject.h"
 #include "../../Extensions/PrimitiveDrawing/ShapePainterObject.h"
-#include "../../Extensions/SkeletonObject/SkeletonObject.h"
 #include "../../Extensions/TextEntryObject/TextEntryObject.h"
 #include "../../Extensions/TextObject/TextObject.h"
 #include "../../Extensions/TiledSpriteObject/TiledSpriteObject.h"

@@ -125,7 +125,6 @@ const PointsPreview = (props: Props) => {
         }}
         alt=""
         key={name}
-        draggable={false}
         onPointerDown={() => {
           onStartDragPoint(point, kind);
         }}

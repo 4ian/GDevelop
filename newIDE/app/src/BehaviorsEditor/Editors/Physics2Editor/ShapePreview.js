@@ -231,8 +231,8 @@ const ShapePreview = (props: Props) => {
 
   const frameStyle = {
     position: 'absolute',
-    top: props.frameOffsetTop,
-    left: props.frameOffsetLeft,
+    top: props.frameOffsetTop || 0,
+    left: props.frameOffsetLeft || 0,
     width: props.width * props.zoomFactor,
     height: props.height * props.zoomFactor,
     overflow: 'visible',

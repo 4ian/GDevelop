@@ -171,8 +171,8 @@ export default class ImagePreview extends React.Component<Props, State> {
 
           const imageStyle = {
             ...styles.spriteThumbnailImage,
-            top: imagePositionTop,
-            left: imagePositionLeft,
+            top: imagePositionTop || 0,
+            left: imagePositionLeft || 0,
             width: imageWidth ? imageWidth * imageZoomFactor : undefined,
             height: imageHeight ? imageHeight * imageZoomFactor : undefined,
             visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
@@ -180,8 +180,8 @@ export default class ImagePreview extends React.Component<Props, State> {
 
           const frameStyle = {
             position: 'absolute',
-            top: imagePositionTop + MARGIN,
-            left: imagePositionLeft + MARGIN,
+            top: imagePositionTop + MARGIN || 0,
+            left: imagePositionLeft + MARGIN || 0,
             width: imageWidth ? imageWidth * imageZoomFactor : undefined,
             height: imageHeight ? imageHeight * imageZoomFactor : undefined,
             visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader

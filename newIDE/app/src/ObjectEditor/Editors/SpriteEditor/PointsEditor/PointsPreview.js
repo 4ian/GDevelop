@@ -150,8 +150,8 @@ const PointsPreview = (props: Props) => {
 
   const frameStyle = {
     position: 'absolute',
-    top: offsetTop,
-    left: offsetLeft,
+    top: offsetTop || 0,
+    left: offsetLeft || 0,
     width: imageWidth * imageZoomFactor,
     height: imageHeight * imageZoomFactor,
     overflow: 'visible',

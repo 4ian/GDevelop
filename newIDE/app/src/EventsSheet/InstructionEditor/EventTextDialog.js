@@ -62,21 +62,18 @@ const EventTextDialog = (props: Props) => {
       if (eventType === 'BuiltinCommonInstructions::Comment') {
         const commentEvent = gd.asCommentEvent(event);
 
-        // Les couleurs provenant normalement de l'event ne sont pas bonne.
         setTextColor({
           r: commentEvent.getTextColorRed(),
           g: commentEvent.getTextColorGreen(),
           b: commentEvent.getTextColorBlue(),
         });
 
-        // Les couleurs provenant normalement de l'event ne sont pas bonne.
         setBackgroundColor({
           r: commentEvent.getBackgroundColorRed(),
           g: commentEvent.getBackgroundColorGreen(),
           b: commentEvent.getBackgroundColorBlue(),
         });
 
-        // Le texte provenant normalement de l'event n'est pas bon.
         setTextValue(gd.asCommentEvent(event).getComment());
       } else if (eventType === 'BuiltinCommonInstructions::Group') {
         var groupEvent = gd.asGroupEvent(event);
@@ -105,7 +102,7 @@ const EventTextDialog = (props: Props) => {
     [event, eventType]
   );
 
-  const _onApply = React.useCallback(
+  const onApply = React.useCallback(
     () => {
       if (eventType === 'BuiltinCommonInstructions::Comment') {
         //Text value
@@ -143,7 +140,7 @@ const EventTextDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={_onApply}
+      onApply={onApply}
       title={<Trans>Edit the event text</Trans>}
       onRequestClose={onClose}
       cannotBeDismissed={true}
@@ -161,7 +158,7 @@ const EventTextDialog = (props: Props) => {
           label={<Trans>Apply</Trans>}
           primary
           keyboardFocused
-          onClick={_onApply}
+          onClick={onApply}
         />,
       ]}
     >

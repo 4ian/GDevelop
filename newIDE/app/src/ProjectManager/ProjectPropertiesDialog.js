@@ -166,7 +166,7 @@ function ProjectPropertiesDialog(props: Props) {
     onCancel: props.onClose,
   });
 
-  const _onApply = () => {
+  const onApply = () => {
     if (
       applyPropertiesToProject(project, {
         gameResolutionWidth,
@@ -192,7 +192,7 @@ function ProjectPropertiesDialog(props: Props) {
   return (
     <React.Fragment>
       <Dialog
-        onApply={_onApply}
+        onApply={onApply}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}
@@ -203,7 +203,7 @@ function ProjectPropertiesDialog(props: Props) {
           <FlatButton
             label={<Trans>Apply</Trans>}
             primary={true}
-            onClick={_onApply}
+            onClick={onApply}
             key="apply"
           />,
         ]}

@@ -1,13 +1,98 @@
+const path = require('path');
+const {
+  makeFakeAbstractFileSystem,
+} = require('../TestUtils/FakeAbstractFileSystem');
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
+const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS related tests', function () {
   let gd = null;
   beforeAll((done) =>
     initializeGDevelopJs().then((module) => {
       gd = module;
+      makeTestExtensions(gd);
       done();
     })
   );
+
+  describe('Exporter', () => {
+    it('properly exports Cordova files', () => {
+      // Create a project with some content
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setName('My great project with spaces and "quotes"!');
+      project.setVersion("1.2.3");
+      project.getExtensionProperties().setValue("AdMob", "AdMobAppIdAndroid", "my android app id");
+
+      // Prepare a fake file system
+      const fakeIndexHtmlContent = '';
+      const fakeConfigXmlContent = `
+      <widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION">
+          <name>GDJS_PROJECTNAME</name>
+          <platform name="android">
+              <!-- GDJS_ICONS_ANDROID -->
+          </platform>
+          <platform name="ios">
+              <!-- GDJS_ICONS_IOS -->
+          </platform>
+          <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
+      </widget>`;
+      const fakePackageJsonContent = `
+      {
+        "name": "GDJS_GAME_MANGLED_NAME",
+        "displayName": "GDJS_GAME_NAME",
+        "version": "GDJS_GAME_VERSION",
+        "description": "GDJS_GAME_NAME",
+        "author": "GDJS_GAME_AUTHOR"
+      }`;
+      var fs = makeFakeAbstractFileSystem(gd, {
+        '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+      });
+
+      // Export and check the content of written files.
+      const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
+      const exportOptions = new gd.MapStringBoolean();
+      exportOptions.set('exportForCordova', true);
+      expect(
+        exporter.exportWholePixiProject(
+          project,
+          '/fake-export-dir',
+          exportOptions
+        )
+      ).toBe(true);
+      exportOptions.delete();
+      exporter.delete();
+
+      expect(fs.writeToFile).toHaveBeenCalledWith(
+        '/fake-export-dir/config.xml',
+        `
+      <widget id="com.example.gamename" version="1.2.3">
+          <name>My great project with spaces and &quot;quotes&quot;!</name>
+          <platform name="android">
+              
+          </platform>
+          <platform name="ios">
+              
+          </platform>
+          <plugin name=\"gdevelop-cordova-admob-plus\" spec=\"0.43.0\">
+    <variable name=\"APP_ID_ANDROID\" value=\"my android app id\" />
+</plugin>
+      </widget>`
+      );
+      expect(fs.writeToFile).toHaveBeenCalledWith(
+        '/fake-export-dir/package.json',
+        `
+      {
+        \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
+        \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+        \"version\": \"1.2.3\",
+        \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+        \"author\": \"\"
+      }`
+      );
+    });
+  });
 
   describe('LayoutCodeGenerator', () => {
     it('can generate code for a layout', function () {

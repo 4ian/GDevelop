@@ -125,7 +125,8 @@ const PointsPreview = (props: Props) => {
         }}
         alt=""
         key={name}
-        onPointerDown={() => {
+        onPointerDown={e => {
+          e.preventDefault(); // Disable dragging ghost image on Firefox
           onStartDragPoint(point, kind);
         }}
       />

@@ -143,6 +143,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       <Measure bounds>
         {({ contentRect, measureRef }) => {
           const containerWidth = contentRect.bounds.width;
+          const containerHeight = contentRect.bounds.height;
           const { resourceName, renderOverlay, fixedHeight } = this.props;
           const {
             imageHeight,
@@ -154,7 +155,13 @@ export default class ImagePreview extends React.Component<Props, State> {
           const imageLoaded =
             !!imageWidth && !!imageHeight && !this.state.errored;
 
-          const imagePositionTop = 0;
+          // Centre-align the image and overlays
+          const imagePositionTop = Math.max(
+            0,
+            containerHeight / 2 -
+              ((imageHeight || 0) * imageZoomFactor) / 2 -
+              MARGIN
+          );
           const imagePositionLeft = Math.max(
             0,
             containerWidth / 2 -

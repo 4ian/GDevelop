@@ -100,6 +100,12 @@ const PointsPreview = (props: Props) => {
     kind: PointKind,
     point: gdPoint
   ) => {
+    const pointName =
+      kind === pointKindIdentifiers.ORIGIN
+        ? 'Origin'
+        : kind === pointKindIdentifiers.CENTER
+        ? 'Center'
+        : point.getName();
     const imageSrc =
       kind === pointKindIdentifiers.ORIGIN
         ? 'res/originPoint.png'
@@ -109,6 +115,7 @@ const PointsPreview = (props: Props) => {
     return (
       <img
         src={imageSrc}
+        title={pointName}
         style={{
           position: 'absolute',
           left: x,

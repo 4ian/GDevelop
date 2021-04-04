@@ -86,6 +86,7 @@ class PointsListBody extends Component {
               success = false;
             } else {
               point.setName(newName);
+              this._onPointsUpdated();
             }
 
             this.setState({

@@ -49,7 +49,7 @@ export const filterEditableWithEventTextDialog = (
 };
 
 const EventTextDialog = (props: Props) => {
-  const { event, onApply, onClose } = props;
+  const { event, onClose } = props;
 
   const [textValue, setTextValue] = React.useState<string>('');
   const [textColor, setTextColor] = React.useState<RGBColor>(black);
@@ -132,10 +132,10 @@ const EventTextDialog = (props: Props) => {
           backgroundColor.b
         );
       }
-      onApply();
+      props.onApply();
       return;
     },
-    [event, eventType, onApply, textValue, textColor, backgroundColor]
+    [props, event, eventType, textValue, textColor, backgroundColor]
   );
 
   return (

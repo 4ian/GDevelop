@@ -201,7 +201,7 @@ export class StartPage extends React.Component<Props, {||}> {
                     <IconButton
                       className="icon-discord"
                       onClick={() =>
-                        Window.openExternalURL('https://discord.gg/rjdYHvj')
+                        Window.openExternalURL('https://discord.gg/gdevelop')
                       }
                       tooltip={t`GDevelop on Discord`}
                     />

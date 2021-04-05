@@ -46,7 +46,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     resetShortcutsToDefault,
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
-    setDissmissablePanelBackdropClick,
+    setBackdropClickBehavior,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -230,14 +230,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </Text>
           <Line>
             <Toggle
-              onToggle={(e, check) => setDissmissablePanelBackdropClick(check)}
-              toggled={values.useBackdropClickDissmissChanges}
-              labelPosition="right"
-              label={<Trans>Backdrop click dismiss changes</Trans>}
-            />
-          </Line>
-          <Line>
-            <Toggle
               onToggle={(e, check) => setAutosaveOnPreview(check)}
               toggled={values.autosaveOnPreview}
               labelPosition="right"
@@ -263,6 +255,30 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               labelPosition="right"
               label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
+          </Line>
+          <Line>
+            <SelectField
+              floatingLabelText={<Trans>Backdrop click behavior</Trans>}
+              value={values.backdropClickBehavior}
+              onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
+              fullWidth
+            >
+              <SelectOption
+                value="cancel"
+                primaryText="Cancel change"
+                key="cancel"
+              />
+              <SelectOption
+                value="apply"
+                primaryText="Apply change"
+                key="apply"
+              />
+              <SelectOption
+                value="nothing"
+                primaryText="Nothing"
+                key="nothing"
+              />
+            </SelectField>
           </Line>
           {Window.isDev() && (
             <Line>

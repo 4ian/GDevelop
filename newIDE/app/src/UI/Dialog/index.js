@@ -89,8 +89,7 @@ export default (props: Props) => {
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
-  const onBackdropClickDissmissChanges =
-    preferences.values.useBackdropClickDissmissChanges;
+  const backdropClickBehavior = preferences.values.backdropClickBehavior;
 
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -113,15 +112,17 @@ export default (props: Props) => {
           open={open}
           onClose={(event: any, reason: string) => {
             if (reason === 'escapeKeyDown') {
-              if(onRequestClose) onRequestClose();
+              if (onRequestClose) onRequestClose();
             }
 
             if (reason === 'backdropClick') {
-              if (onBackdropClickDissmissChanges || !onApply) {
-              if(onRequestClose) onRequestClose();
-              } else {
-                onApply();
+              if (backdropClickBehavior === 'cancel') {
+                if (onRequestClose) onRequestClose();
               }
+              if (backdropClickBehavior === 'apply') {
+                if (onApply) onApply();
+              }
+              if (backdropClickBehavior === 'nothing') return;
             }
           }}
           fullWidth

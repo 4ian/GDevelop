@@ -60,9 +60,12 @@ namespace gdjs {
     }
 
     /**
-     * Returns all the platforms around the specified object.
-     * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
-     * @return An array with all platforms near the object.
+     * Returns all the obstacles around the specified position.
+     * @param x X position
+     * @param y Y position
+     * @param radius The radius of the search
+     * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
+     * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
      */
     getAllObstaclesAround(
       x: float,
@@ -84,6 +87,30 @@ namespace gdjs {
       const nearbyPlatforms = this._obstaclesRBush.search(searchArea);
       result.length = 0;
       result.push.apply(result, nearbyPlatforms);
+    }
+
+    /**
+     * Returns all the platforms around the specified AABB.
+     * @return An array with all platforms near the AABB.
+     */
+    getAllObstaclesAroundAABB(
+      aabb: AABB,
+      result: gdjs.PathfindingObstacleRuntimeBehavior[]
+    ): any {
+      const searchArea = gdjs.staticObject(
+        PathfindingObstaclesManager.prototype.getAllObstaclesAroundAABB
+      );
+      // @ts-ignore
+      searchArea.minX = aabb.min[0];
+      // @ts-ignore
+      searchArea.minY = aabb.min[1];
+      // @ts-ignore
+      searchArea.maxX = aabb.max[0];
+      // @ts-ignore
+      searchArea.maxY = aabb.max[1];
+      const nearbyObstacles = this._obstaclesRBush.search(searchArea);
+      result.length = 0;
+      result.push.apply(result, nearbyObstacles);
     }
   }
 

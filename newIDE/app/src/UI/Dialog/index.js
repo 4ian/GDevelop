@@ -111,14 +111,14 @@ export default (props: Props) => {
       {size => (
         <DialogMaterialUI
           open={open}
-          onClose={(event: object, reason: string) => {
+          onClose={(event: any, reason: string) => {
             if (reason === 'escapeKeyDown') {
-              onRequestClose();
+              if(onRequestClose) onRequestClose();
             }
 
             if (reason === 'backdropClick') {
               if (onBackdropClickDissmissChanges || !onApply) {
-                onRequestClose();
+              if(onRequestClose) onRequestClose();
               } else {
                 onApply();
               }

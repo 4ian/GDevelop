@@ -69,7 +69,7 @@ export default class InstructionEditorDialog extends React.Component<
 
     return (
       <Dialog
-        onClick={onSubmit}
+        onApply={onSubmit}
         actions={actions}
         open={open}
         cannotBeDismissed={true}

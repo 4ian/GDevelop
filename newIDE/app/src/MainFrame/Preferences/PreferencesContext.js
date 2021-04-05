@@ -183,6 +183,7 @@ export type PreferencesValues = {|
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
   isMenuBarHiddenInPreview: boolean,
+  useBackdropClickDissmissChanges: boolean,
 |};
 
 /**

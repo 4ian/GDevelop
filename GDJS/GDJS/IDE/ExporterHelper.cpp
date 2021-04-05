@@ -41,23 +41,22 @@
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
-  double GetTimeNow() {
-    #if defined(EMSCRIPTEN)
-    double currentTime = emscripten_get_now();
-    return currentTime;
-    #else
-    return 0;
-    #endif
-  }
-  double GetTimeSpent(double previousTime) {
-    return GetTimeNow() - previousTime;
-  }
-  double LogTimeSpent(const gd::String & name, double previousTime) {
-    gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) + "ms");
-    std::cout << std::endl;
-    return GetTimeNow();
-  }
+double GetTimeNow() {
+#if defined(EMSCRIPTEN)
+  double currentTime = emscripten_get_now();
+  return currentTime;
+#else
+  return 0;
+#endif
 }
+double GetTimeSpent(double previousTime) { return GetTimeNow() - previousTime; }
+double LogTimeSpent(const gd::String &name, double previousTime) {
+  gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
+                "ms");
+  std::cout << std::endl;
+  return GetTimeNow();
+}
+}  // namespace
 
 namespace gdjs {
 
@@ -300,9 +299,11 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     const auto &dependency = dependencyAndExtension.GetDependency();
 
     gd::String plugin;
-    plugin += "<plugin name=\"" + dependency.GetExportName();
+    plugin += "<plugin name=\"" +
+              gd::Serializer::ToEscapedXMLString(dependency.GetExportName());
     if (dependency.GetVersion() != "") {
-      plugin += "\" spec=\"" + dependency.GetVersion();
+      plugin += "\" spec=\"" +
+                gd::Serializer::ToEscapedXMLString(dependency.GetVersion());
     }
     plugin += "\">\n";
 
@@ -312,11 +313,14 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
     // For Cordova, all settings are considered a plugin variable.
     for (auto &extraSetting : extraSettingValues) {
-      plugin += "\t\t<variable name=\"" + extraSetting.first + "\" value=\"" +
-                extraSetting.second + "\" />\n";
+      plugin += "    <variable name=\"" +
+                gd::Serializer::ToEscapedXMLString(extraSetting.first) +
+                "\" value=\"" +
+                gd::Serializer::ToEscapedXMLString(extraSetting.second) +
+                "\" />\n";
     }
 
-    plugin += "\t</plugin>";
+    plugin += "</plugin>";
 
     plugins += plugin;
   }

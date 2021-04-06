@@ -6,6 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
+import GDevelopThemeContext from '../Theme/ThemeContext';
 
 const styles = {
   defaultBody: {
@@ -87,6 +88,7 @@ export default (props: Props) => {
     fullHeight,
     noTitleMargin,
   } = props;
+
   const dialogActions = secondaryActions ? (
     <React.Fragment>
       <div key="secondary-actions">{secondaryActions}</div>
@@ -95,11 +97,14 @@ export default (props: Props) => {
   ) : (
     actions
   );
+
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
     ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
+
+  const theme = React.useContext(GDevelopThemeContext);
 
   return (
     <ResponsiveWindowMeasurer>
@@ -109,7 +114,7 @@ export default (props: Props) => {
           onClose={onRequestClose}
           fullWidth
           fullScreen={size === 'small'}
-          className={classNames({
+          className={classNames(theme.dialogRootClassName, {
             'safe-area-aware-container': size === 'small',
           })}
           PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}

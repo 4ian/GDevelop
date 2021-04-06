@@ -44,7 +44,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   };
 
   const addPlayer = (runtimeScene, allowDiagonals) => {
-    const player = new gdjs.RuntimeObject(runtimeScene, {
+    const player = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'player',
       type: '',
       behaviors: [
@@ -66,12 +66,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
         },
       ],
     });
-    player.getWidth = function () {
-      return 100;
-    };
-    player.getHeight = function () {
-      return 100;
-    };
+    player.setCustomWidthAndHeight(100, 100);
     runtimeScene.addObject(player);
     return player;
   };

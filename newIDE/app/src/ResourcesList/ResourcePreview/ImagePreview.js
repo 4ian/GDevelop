@@ -39,9 +39,6 @@ const styles = {
     pointerEvents: 'none',
     margin: MARGIN,
   },
-  box: {
-    border: '1px solid black',
-  },
 };
 
 type Props = {|

@@ -44,7 +44,7 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
-  style: any,
+  style?: any,
   selectable?: boolean,
   selected?: boolean,
   onSelect?: (checked: boolean) => void,

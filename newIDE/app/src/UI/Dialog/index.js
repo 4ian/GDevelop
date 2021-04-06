@@ -6,7 +6,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
-import GDevelopThemeContext from '../Theme/ThemeContext';
 
 const styles = {
   defaultBody: {
@@ -104,8 +103,6 @@ export default (props: Props) => {
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 
-  const theme = React.useContext(GDevelopThemeContext);
-
   return (
     <ResponsiveWindowMeasurer>
       {size => (
@@ -114,7 +111,7 @@ export default (props: Props) => {
           onClose={onRequestClose}
           fullWidth
           fullScreen={size === 'small'}
-          className={classNames(theme.dialogRootClassName, {
+          className={classNames({
             'safe-area-aware-container': size === 'small',
           })}
           PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}

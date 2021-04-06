@@ -25,7 +25,6 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
-import classNames from 'classnames';
 const gd: libGDevelop = global.gd;
 const path = require('path');
 
@@ -312,37 +311,30 @@ export default class SpritesList extends Component<Props, void> {
 
   render() {
     return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <div>
-            <MiniToolbar justifyContent="flex-end" smallest>
-              <DirectionTools
-                direction={this.props.direction}
-                resourcesLoader={this.props.resourcesLoader}
-                project={this.props.project}
-                resourceExternalEditors={this.props.resourceExternalEditors}
-                onEditWith={this.editWith}
-              />
-            </MiniToolbar>
-            <SortableList
-              resourcesLoader={this.props.resourcesLoader}
-              direction={this.props.direction}
-              project={this.props.project}
-              onSortEnd={this.onSortEnd}
-              onAddSprite={this.onAddSprite}
-              selectedSprites={this.props.selectedSprites}
-              onSelectSprite={this.props.onSelectSprite}
-              onSpriteContextMenu={this.props.onSpriteContextMenu}
-              helperClass={classNames(
-                'sortable-helper',
-                muiTheme.sortableRootClassName
-              )}
-              lockAxis="x"
-              axis="x"
-            />
-          </div>
-        )}
-      </ThemeConsumer>
+      <div>
+        <MiniToolbar justifyContent="flex-end" smallest>
+          <DirectionTools
+            direction={this.props.direction}
+            resourcesLoader={this.props.resourcesLoader}
+            project={this.props.project}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            onEditWith={this.editWith}
+          />
+        </MiniToolbar>
+        <SortableList
+          resourcesLoader={this.props.resourcesLoader}
+          direction={this.props.direction}
+          project={this.props.project}
+          onSortEnd={this.onSortEnd}
+          onAddSprite={this.onAddSprite}
+          selectedSprites={this.props.selectedSprites}
+          onSelectSprite={this.props.onSelectSprite}
+          onSpriteContextMenu={this.props.onSpriteContextMenu}
+          helperClass="sortable-helper"
+          lockAxis="x"
+          axis="x"
+        />
+      </div>
     );
   }
 }

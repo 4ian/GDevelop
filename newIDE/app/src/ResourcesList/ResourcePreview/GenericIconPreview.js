@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import checkeredBackgroundStyle from '../CheckeredBackground';
 
 const styles = {
   previewContainer: {
@@ -8,8 +10,6 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: 200,
-    border: '#AAAAAA 1px solid',
-    background: 'url("res/transparentback.png") repeat',
   },
   icon: { width: 60, height: 60 },
 };
@@ -21,8 +21,14 @@ type Props = {|
 /**
  * Display a generic container to display an icon.
  */
-export default ({ renderIcon }: Props) => (
-  <div style={styles.previewContainer}>
-    {renderIcon({ style: styles.icon })}
-  </div>
-);
+export default ({ renderIcon }: Props) => {
+  const theme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <div
+      style={{ ...styles.previewContainer, ...checkeredBackgroundStyle(theme) }}
+    >
+      {renderIcon({ style: styles.icon })}
+    </div>
+  );
+};

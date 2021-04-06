@@ -14,6 +14,7 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import checkeredBackgroundStyle from '../CheckeredBackground';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -227,9 +228,9 @@ const ImagePreview = (props: Props) => {
               }
               style={{
                 ...styles.imagePreviewContainer,
+                ...checkeredBackgroundStyle(theme),
                 height: fixedHeight || '100%',
               }}
-              className="gd-checkered-bg"
               ref={measureRef}
               onWheel={event => {
                 const { deltaY } = event;

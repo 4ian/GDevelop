@@ -3,8 +3,9 @@ import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import checkeredBackgroundStyle from '../CheckeredBackground';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -16,8 +17,6 @@ export const thumbnailContainerStyle = {
   alignItems: 'center',
   lineHeight: SPRITE_SIZE + 'px',
   textAlign: 'center',
-  border: '#AAAAAA 1px solid',
-  borderColor: '#AAAAAA',
 };
 
 const styles = {
@@ -53,6 +52,7 @@ type Props = {|
 
 const ImageThumbnail = (props: Props) => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
+  const theme = React.useContext(GDevelopThemeContext);
 
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
@@ -64,41 +64,40 @@ const ImageThumbnail = (props: Props) => {
     )
   );
 
+  const { selectedBorderColor } = theme.imageThumbnail;
+  const containerStyle = {
+    ...styles.spriteThumbnail,
+    ...checkeredBackgroundStyle(theme),
+    ...(props.selected && {
+      border: `1px solid ${selectedBorderColor}`,
+    }),
+    ...props.style,
+  };
+
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          title={resourceName}
-          style={{
-            ...styles.spriteThumbnail,
-            borderColor: props.selected
-              ? muiTheme.imageThumbnail.selectedBorderColor
-              : undefined,
-            ...props.style,
-          }}
-          className="gd-checkered-bg"
-          onContextMenu={e => {
-            e.stopPropagation();
-            if (onContextMenu) onContextMenu(e.clientX, e.clientY);
-          }}
-          {...longTouchForContextMenuProps}
-        >
-          <CorsAwareImage
-            style={styles.spriteThumbnailImage}
-            alt={resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+    <div
+      title={resourceName}
+      style={containerStyle}
+      onContextMenu={e => {
+        e.stopPropagation();
+        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
+      }}
+      {...longTouchForContextMenuProps}
+    >
+      <CorsAwareImage
+        style={styles.spriteThumbnailImage}
+        alt={resourceName}
+        src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+      />
+      {props.selectable && (
+        <div style={styles.checkboxContainer}>
+          <Checkbox
+            checked={!!props.selected}
+            onCheck={(e, check) => props.onSelect && props.onSelect(check)}
           />
-          {props.selectable && (
-            <div style={styles.checkboxContainer}>
-              <Checkbox
-                checked={!!props.selected}
-                onCheck={(e, check) => props.onSelect && props.onSelect(check)}
-              />
-            </div>
-          )}
         </div>
       )}
-    </ThemeConsumer>
+    </div>
   );
 };
 

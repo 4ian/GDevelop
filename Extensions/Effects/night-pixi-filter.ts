@@ -1,4 +1,5 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class NightPixiFilter extends PIXI.Filter {
     constructor() {
       const vertexShader = undefined;

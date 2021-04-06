@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class ReflectionFilter extends PIXI.Filter {
     constructor(options?: ReflectionFilterOptions);
     mirror: boolean;

@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class ColorMapFilter extends PIXI.Filter {
     constructor(
       colorMap?:

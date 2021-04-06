@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   /**
    * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
    */

@@ -52,10 +52,5 @@ declare namespace gdjs {
   var runtimeGameOptions: gdjs.RuntimeGameOptions;
 }
 
-interface Window {
-  /** The global PIXI object from Pixi.js. */
-  PIXI: typeof import('pixi.js');
-}
-
 /** The global cc object from Cocos2D-Js. */
 declare var cc: any;

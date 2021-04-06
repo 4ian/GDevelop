@@ -5,7 +5,7 @@ import { type GDevelopTheme } from '../UI/Theme';
  * Creates a checkered background using CSS gradients,
  * using colors from provided theme.
  */
-const checkeredBackgroundStyle = (theme: GDevelopTheme) => {
+const getCheckeredBackgroundStyle = (theme: GDevelopTheme) => {
   const light = theme.imagePreview.backgroundLightCell;
   const dark = theme.imagePreview.backgroundDarkCell;
   const borderColor = theme.imagePreview.borderColor;
@@ -24,4 +24,4 @@ const checkeredBackgroundStyle = (theme: GDevelopTheme) => {
   };
 };
 
-export default checkeredBackgroundStyle;
+export default getCheckeredBackgroundStyle;

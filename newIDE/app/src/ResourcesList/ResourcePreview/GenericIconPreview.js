@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-import checkeredBackgroundStyle from '../CheckeredBackground';
+import getCheckeredBackgroundStyle from '../CheckeredBackground';
 
 const styles = {
   previewContainer: {
@@ -26,7 +26,10 @@ export default ({ renderIcon }: Props) => {
 
   return (
     <div
-      style={{ ...styles.previewContainer, ...checkeredBackgroundStyle(theme) }}
+      style={{
+        ...styles.previewContainer,
+        ...getCheckeredBackgroundStyle(theme),
+      }}
     >
       {renderIcon({ style: styles.icon })}
     </div>

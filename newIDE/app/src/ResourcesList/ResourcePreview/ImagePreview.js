@@ -68,48 +68,57 @@ type State = {|
   imageZoomFactor: number,
 |};
 
+const loadStateFrom = (newProps: {
+  project: gdProject,
+  resourceName: string,
+  resourcesLoader: typeof ResourcesLoader,
+}) => {
+  return {
+    errored: false,
+    imageSource: newProps.resourcesLoader.getResourceFullUrl(
+      newProps.project,
+      newProps.resourceName,
+      {}
+    ),
+  };
+};
+
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-export default class ImagePreview extends React.Component<Props, State> {
-  state = {
+const ImagePreview = (props: Props) => {
+  const [state, setState] = React.useState<State>({
     errored: false,
     imageWidth: null,
     imageHeight: null,
     imageZoomFactor: 1,
-    ...this._loadFrom(this.props),
+    ...loadStateFrom(props),
+  });
+
+  React.useEffect(
+    () => {
+      setState(state => ({
+        ...state,
+        ...loadStateFrom({
+          resourceName: props.resourceName,
+          project: props.project,
+          resourcesLoader: props.resourcesLoader,
+        }),
+      }));
+    },
+    [
+      props.resourceName,
+      props.project,
+      props.resourcesLoader,
+      props.resourcePath,
+    ]
+  );
+
+  const handleImageError = () => {
+    setState(state => ({ ...state, errored: true }));
   };
 
-  componentWillReceiveProps(newProps: Props) {
-    if (
-      newProps.resourceName !== this.props.resourceName ||
-      newProps.project !== this.props.project ||
-      newProps.resourcesLoader !== this.props.resourcesLoader ||
-      newProps.resourcePath !== this.props.resourcePath
-    ) {
-      this.setState(this._loadFrom(newProps));
-    }
-  }
-
-  _loadFrom(props: Props): {| errored: boolean, imageSource: ?string |} {
-    const { project, resourceName, resourcesLoader } = props;
-    return {
-      errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(
-        project,
-        resourceName,
-        {}
-      ),
-    };
-  }
-
-  _handleImageError = () => {
-    this.setState({
-      errored: true,
-    });
-  };
-
-  _handleImageLoaded = (e: any) => {
+  const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
     const imageWidth = imgElement
@@ -118,19 +127,17 @@ export default class ImagePreview extends React.Component<Props, State> {
     const imageHeight = imgElement
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
-    this.setState({
-      imageWidth,
-      imageHeight,
-    });
-    if (this.props.onSize) this.props.onSize(imageWidth, imageHeight);
+    setState(state => ({ ...state, imageWidth, imageHeight }));
+    if (props.onSize) props.onSize(imageWidth, imageHeight);
   };
 
-  _zoomBy = (imageZoomFactorDelta: number) => {
-    this._zoomTo(this.state.imageZoomFactor + imageZoomFactorDelta);
+  const zoomBy = (imageZoomFactorDelta: number) => {
+    zoomTo(state.imageZoomFactor + imageZoomFactorDelta);
   };
 
-  _zoomTo = (imageZoomFactor: number) => {
-    this.setState(state => ({
+  const zoomTo = (imageZoomFactor: number) => {
+    setState(state => ({
+      ...state,
       imageZoomFactor: Math.min(
         MAX_ZOOM_FACTOR,
         Math.max(MIN_ZOOM_FACTOR, imageZoomFactor)
@@ -138,142 +145,136 @@ export default class ImagePreview extends React.Component<Props, State> {
     }));
   };
 
-  render() {
-    return (
-      <Measure bounds>
-        {({ contentRect, measureRef }) => {
-          const containerWidth = contentRect.bounds.width;
-          const containerHeight = contentRect.bounds.height;
-          const { resourceName, renderOverlay, fixedHeight } = this.props;
-          const {
-            imageHeight,
-            imageWidth,
-            imageSource,
-            imageZoomFactor,
-          } = this.state;
+  return (
+    <Measure bounds>
+      {({ contentRect, measureRef }) => {
+        const containerWidth = contentRect.bounds.width;
+        const containerHeight = contentRect.bounds.height;
+        const { resourceName, renderOverlay, fixedHeight } = props;
+        const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 
-          const imageLoaded =
-            !!imageWidth && !!imageHeight && !this.state.errored;
+        const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
 
-          // Centre-align the image and overlays
-          const imagePositionTop = Math.max(
-            0,
-            containerHeight / 2 -
-              ((imageHeight || 0) * imageZoomFactor) / 2 -
-              MARGIN
-          );
-          const imagePositionLeft = Math.max(
-            0,
-            containerWidth / 2 -
-              ((imageWidth || 0) * imageZoomFactor) / 2 -
-              MARGIN
-          );
+        // Centre-align the image and overlays
+        const imagePositionTop = Math.max(
+          0,
+          containerHeight / 2 -
+            ((imageHeight || 0) * imageZoomFactor) / 2 -
+            MARGIN
+        );
+        const imagePositionLeft = Math.max(
+          0,
+          containerWidth / 2 -
+            ((imageWidth || 0) * imageZoomFactor) / 2 -
+            MARGIN
+        );
 
-          const imageStyle = {
-            ...styles.spriteThumbnailImage,
-            top: imagePositionTop || 0,
-            left: imagePositionLeft || 0,
-            width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-            height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          };
+        const imageStyle = {
+          ...styles.spriteThumbnailImage,
+          top: imagePositionTop || 0,
+          left: imagePositionLeft || 0,
+          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
+          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+        };
 
-          const frameStyle = {
-            position: 'absolute',
-            top: imagePositionTop + MARGIN || 0,
-            left: imagePositionLeft + MARGIN || 0,
-            width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-            height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          };
+        const frameStyle = {
+          position: 'absolute',
+          top: imagePositionTop + MARGIN || 0,
+          left: imagePositionLeft + MARGIN || 0,
+          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
+          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+        };
 
-          const overlayStyle = {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          };
+        const overlayStyle = {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+        };
 
-          return (
-            <Column expand noMargin useFullHeight>
-              <MiniToolbar>
-                <IconButton
-                  onClick={() => this._zoomBy(+0.2)}
-                  tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
-                >
-                  <ZoomIn />
-                </IconButton>
-                <IconButton
-                  onClick={() => this._zoomBy(-0.2)}
-                  tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
-                >
-                  <ZoomOut />
-                </IconButton>
-                <IconButton
-                  onClick={() => this._zoomTo(1)}
-                  tooltip={t`Restore original size`}
-                >
-                  <ZoomOutMap />
-                </IconButton>
-              </MiniToolbar>
-              <div
-                dir={
-                  'ltr' /* Force LTR layout to avoid issues with image positioning */
-                }
-                style={{
-                  ...styles.imagePreviewContainer,
-                  height: fixedHeight || '100%',
-                }}
-                ref={measureRef}
-                onWheel={event => {
-                  const { deltaY } = event;
-                  //TODO: Use KeyboardShortcuts
-                  if (event.metaKey || event.ctrlKey) {
-                    this._zoomBy(-deltaY / 500);
-                    event.preventDefault();
-                    event.stopPropagation();
-                  } else {
-                    // Let the usual, native vertical or horizontal scrolling happen.
-                  }
-                }}
+        return (
+          <Column expand noMargin useFullHeight>
+            <MiniToolbar>
+              <IconButton
+                onClick={() => zoomBy(+0.2)}
+                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
               >
-                {!!this.state.errored && (
-                  <PlaceholderMessage>
-                    <Text>
-                      <Trans>Unable to load the image</Trans>
-                    </Text>
-                  </PlaceholderMessage>
-                )}
-                {!this.state.errored && (
-                  <CorsAwareImage
-                    style={imageStyle}
-                    alt={resourceName}
-                    src={imageSource}
-                    onError={this._handleImageError}
-                    onLoad={this._handleImageLoaded}
-                  />
-                )}
-                {imageLoaded && renderOverlay && (
-                  <div style={{ ...frameStyle, ...styles.box }} />
-                )}
-                {imageLoaded && renderOverlay && (
-                  <div style={overlayStyle}>
-                    {renderOverlay({
-                      imageWidth: imageWidth || 0,
-                      imageHeight: imageHeight || 0,
-                      offsetTop: imagePositionTop + MARGIN,
-                      offsetLeft: imagePositionLeft + MARGIN,
-                      imageZoomFactor,
-                    })}
-                  </div>
-                )}
-              </div>
-            </Column>
-          );
-        }}
-      </Measure>
-    );
-  }
-}
+                <ZoomIn />
+              </IconButton>
+              <IconButton
+                onClick={() => zoomBy(-0.2)}
+                tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
+              >
+                <ZoomOut />
+              </IconButton>
+              <IconButton
+                onClick={() => zoomTo(1)}
+                tooltip={t`Restore original size`}
+              >
+                <ZoomOutMap />
+              </IconButton>
+            </MiniToolbar>
+            <div
+              dir={
+                'ltr' /* Force LTR layout to avoid issues with image positioning */
+              }
+              style={{
+                ...styles.imagePreviewContainer,
+                height: fixedHeight || '100%',
+              }}
+              ref={measureRef}
+              onWheel={event => {
+                const { deltaY } = event;
+                //TODO: Use KeyboardShortcuts
+                if (event.metaKey || event.ctrlKey) {
+                  zoomBy(-deltaY / 500);
+                  event.preventDefault();
+                  event.stopPropagation();
+                } else {
+                  // Let the usual, native vertical or horizontal scrolling happen.
+                }
+              }}
+            >
+              {!!state.errored && (
+                <PlaceholderMessage>
+                  <Text>
+                    <Trans>Unable to load the image</Trans>
+                  </Text>
+                </PlaceholderMessage>
+              )}
+              {!state.errored && (
+                <CorsAwareImage
+                  style={imageStyle}
+                  alt={resourceName}
+                  src={imageSource}
+                  onError={handleImageError}
+                  onLoad={handleImageLoaded}
+                />
+              )}
+              {imageLoaded && renderOverlay && (
+                <div style={{ ...frameStyle, ...styles.box }} />
+              )}
+              {imageLoaded && renderOverlay && (
+                <div style={overlayStyle}>
+                  {renderOverlay({
+                    imageWidth: imageWidth || 0,
+                    imageHeight: imageHeight || 0,
+                    offsetTop: imagePositionTop + MARGIN,
+                    offsetLeft: imagePositionLeft + MARGIN,
+                    imageZoomFactor,
+                  })}
+                </div>
+              )}
+            </div>
+          </Column>
+        );
+      }}
+    </Measure>
+  );
+};
+
+export default ImagePreview;

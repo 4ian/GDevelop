@@ -334,6 +334,9 @@ namespace gdjs {
         this._yVelocity +=
           this._acceleration * timeDelta * Math.sin(directionInRad);
       } else if (this._stickForce !== 0) {
+        if (!this._allowDiagonals) {
+          this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
+        }
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;

@@ -235,54 +235,43 @@ namespace gdjs {
       this._upKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+      
       let direction = -1;
       if (!this._allowDiagonals) {
         if (this._upKey && !this._downKey) {
           direction = 6;
-        } else {
-          if (!this._upKey && this._downKey) {
-            direction = 2;
-          }
+        } else if (!this._upKey && this._downKey) {
+          direction = 2;
         }
         if (!this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
             direction = 4;
-          } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 0;
-            }
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 0;
           }
         }
       } else {
         if (this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
             direction = 5;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 7;
           } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 7;
-            } else {
-              direction = 6;
-            }
+            direction = 6;
+          }
+        } else if (!this._upKey && this._downKey) {
+          if (this._leftKey && !this._rightKey) {
+            direction = 3;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 1;
+          } else {
+            direction = 2;
           }
         } else {
-          if (!this._upKey && this._downKey) {
-            if (this._leftKey && !this._rightKey) {
-              direction = 3;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 1;
-              } else {
-                direction = 2;
-              }
-            }
-          } else {
-            if (this._leftKey && !this._rightKey) {
-              direction = 4;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 0;
-              }
-            }
+          if (this._leftKey && !this._rightKey) {
+            direction = 4;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 0;
           }
         }
       }

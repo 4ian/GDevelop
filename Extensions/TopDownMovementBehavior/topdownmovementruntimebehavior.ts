@@ -243,12 +243,10 @@ namespace gdjs {
         } else if (!this._upKey && this._downKey) {
           direction = 2;
         }
-        if (!this._upKey && !this._downKey) {
-          if (this._leftKey && !this._rightKey) {
-            direction = 4;
-          } else if (!this._leftKey && this._rightKey) {
-            direction = 0;
-          }
+        if (this._leftKey && !this._rightKey) {
+          direction = 4;
+        } else if (!this._leftKey && this._rightKey) {
+          direction = 0;
         }
       } else {
         if (this._upKey && !this._downKey) {

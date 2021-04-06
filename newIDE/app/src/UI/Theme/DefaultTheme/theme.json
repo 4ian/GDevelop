@@ -150,6 +150,20 @@
       "white": {
         "value": "#fff"
       }
+    },
+    "imagePreview": {
+      "background-light": {
+        "value": "#ffffff"
+      },
+      "background-dark": {
+        "value": "#c0c0c0"
+      },
+      "border-color": {
+        "value": "#aaaaaa"
+      },
+      "frame-border-color": {
+        "value": "#000000"
+      }
     }
   },
   "input": {

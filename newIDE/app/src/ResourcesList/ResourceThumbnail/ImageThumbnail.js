@@ -1,4 +1,6 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
+import ResourcesLoader from '../../ResourcesLoader';
 import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
@@ -21,7 +23,6 @@ export const thumbnailContainerStyle = {
 const styles = {
   spriteThumbnail: {
     ...thumbnailContainerStyle,
-    background: 'url("res/transparentback.png") repeat',
   },
   spriteThumbnailImage: {
     maxWidth: SPRITE_SIZE,
@@ -39,17 +40,20 @@ const styles = {
   },
 };
 
-const ImageThumbnail = ({
-  project,
-  resourceName,
-  resourcesLoader,
-  style,
-  selectable,
-  selected,
-  onSelect,
-  onContextMenu,
-  muiTheme,
-}) => {
+type Props = {|
+  project: gdProject,
+  resourceName: string,
+  resourcesLoader: typeof ResourcesLoader,
+  style: any,
+  selectable?: boolean,
+  selected?: boolean,
+  onSelect?: (checked: boolean) => void,
+  onContextMenu?: (x: number, y: number) => void,
+|};
+
+const ImageThumbnail = (props: Props) => {
+  const { onContextMenu, resourcesLoader, resourceName, project } = props;
+
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
@@ -67,11 +71,12 @@ const ImageThumbnail = ({
           title={resourceName}
           style={{
             ...styles.spriteThumbnail,
-            borderColor: selected
+            borderColor: props.selected
               ? muiTheme.imageThumbnail.selectedBorderColor
               : undefined,
-            ...style,
+            ...props.style,
           }}
+          className="gd-checkered-bg"
           onContextMenu={e => {
             e.stopPropagation();
             if (onContextMenu) onContextMenu(e.clientX, e.clientY);
@@ -83,11 +88,11 @@ const ImageThumbnail = ({
             alt={resourceName}
             src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
           />
-          {selectable && (
+          {props.selectable && (
             <div style={styles.checkboxContainer}>
               <Checkbox
-                checked={selected}
-                onCheck={(e, check) => onSelect(check)}
+                checked={!!props.selected}
+                onCheck={(e, check) => props.onSelect && props.onSelect(check)}
               />
             </div>
           )}

@@ -149,6 +149,20 @@
       "white": {
         "value": "#D6DEEC"
       }
+    },
+    "imagePreview": {
+      "background-light": {
+        "value": "#3b3e45"
+      },
+      "background-dark": {
+        "value": "#252a33"
+      },
+      "border-color": {
+        "value": "#373D4A"
+      },
+      "frame-border-color": {
+        "value": "#5B6371"
+      }
     }
   },
   "input": {

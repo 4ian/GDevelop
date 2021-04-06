@@ -183,6 +183,13 @@ export function createGdevelopTheme(
       imageThumbnail: {
         selectedBorderColor: styles['ThemeSelectionBackgroundColor'],
       },
+      imagePreview: {
+        // Merge with imageThumbnail?
+        backgroundLightCell: styles['ThemeImagePreviewBackgroundLight'],
+        backgroundDarkCell: styles['ThemeImagePreviewBackgroundDark'],
+        borderColor: styles['ThemeImagePreviewBorderColor'],
+        frameBorderColor: styles['ThemeImagePreviewFrameBorderColor'],
+      },
       list: {
         itemsBackgroundColor:
           styles['ThemeSurfaceAlternateCanvasBackgroundColor'],

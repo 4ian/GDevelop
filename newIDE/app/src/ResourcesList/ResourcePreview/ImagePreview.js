@@ -13,6 +13,7 @@ import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -23,10 +24,8 @@ const styles = {
     position: 'relative',
     display: 'inline-block',
     width: '100%',
-    border: '#AAAAAA 1px solid',
     boxSizing: 'border-box',
     overflow: 'auto',
-    background: 'url("res/transparentback.png") repeat',
 
     // The container contains the image and the "overlay" that can display
     // points or polygons that can be drag'n'dropped. `touch-action` must
@@ -145,6 +144,9 @@ const ImagePreview = (props: Props) => {
     }));
   };
 
+  const theme = React.useContext(GDevelopThemeContext);
+  const frameBorderColor = theme.imagePreview.frameBorderColor;
+
   return (
     <Measure bounds>
       {({ contentRect, measureRef }) => {
@@ -185,6 +187,7 @@ const ImagePreview = (props: Props) => {
           width: imageWidth ? imageWidth * imageZoomFactor : undefined,
           height: imageHeight ? imageHeight * imageZoomFactor : undefined,
           visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          border: `1px solid ${frameBorderColor}`,
         };
 
         const overlayStyle = {
@@ -226,6 +229,7 @@ const ImagePreview = (props: Props) => {
                 ...styles.imagePreviewContainer,
                 height: fixedHeight || '100%',
               }}
+              className="gd-checkered-bg"
               ref={measureRef}
               onWheel={event => {
                 const { deltaY } = event;
@@ -255,9 +259,7 @@ const ImagePreview = (props: Props) => {
                   onLoad={handleImageLoaded}
                 />
               )}
-              {imageLoaded && renderOverlay && (
-                <div style={{ ...frameStyle, ...styles.box }} />
-              )}
+              {imageLoaded && renderOverlay && <div style={frameStyle} />}
               {imageLoaded && renderOverlay && (
                 <div style={overlayStyle}>
                   {renderOverlay({

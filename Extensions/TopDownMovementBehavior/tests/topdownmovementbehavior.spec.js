@@ -363,5 +363,67 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
         });
       });
     });
+
+    describe('inputMethod: stick)', function () {
+      [315, 44, 44 + 360, 44 - 360].forEach((angle) => {
+        it(`can move Right with the stick at ${angle}°`, function () {
+          player.setPosition(200, 300);
+          runtimeScene.renderAndStep(1000 / 60);
+
+          for (let i = 0; i < 20; i++) {
+            player.getBehavior(topDownName).simulateStick(angle, 1);
+            runtimeScene.renderAndStep(1000 / 60);
+          }
+
+          expect(player.getX()).to.be.above(200 + 20);
+          expect(player.getY()).to.be(300);
+        });
+      });
+
+      [45, 134].forEach((angle) => {
+        it(`can move Down with the stick at ${angle}°`, function () {
+          player.setPosition(200, 300);
+          runtimeScene.renderAndStep(1000 / 60);
+
+          for (let i = 0; i < 20; i++) {
+            player.getBehavior(topDownName).simulateStick(angle, 1);
+            runtimeScene.renderAndStep(1000 / 60);
+          }
+
+          expect(player.getX()).to.be(200);
+          expect(player.getY()).to.be.above(300 + 20);
+        });
+      });
+
+      [135, 224].forEach((angle) => {
+        it(`can move Left with the stick at ${angle}°`, function () {
+          player.setPosition(200, 300);
+          runtimeScene.renderAndStep(1000 / 60);
+
+          for (let i = 0; i < 20; i++) {
+            player.getBehavior(topDownName).simulateStick(angle, 1);
+            runtimeScene.renderAndStep(1000 / 60);
+          }
+
+          expect(player.getX()).to.be.below(200 - 20);
+          expect(player.getY()).to.be(300);
+        });
+      });
+
+      [225, 314].forEach((angle) => {
+        it(`can move Up with the stick at ${angle}°`, function () {
+          player.setPosition(200, 300);
+          runtimeScene.renderAndStep(1000 / 60);
+
+          for (let i = 0; i < 20; i++) {
+            player.getBehavior(topDownName).simulateStick(angle, 1);
+            runtimeScene.renderAndStep(1000 / 60);
+          }
+
+          expect(player.getX()).to.be(200);
+          expect(player.getY()).to.be.below(300 - 20);
+        });
+      });
+    });
   });
 });

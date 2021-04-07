@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
+describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   const topDownName = 'auto1';
 
   const createScene = () => {

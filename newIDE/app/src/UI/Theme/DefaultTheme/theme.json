@@ -151,12 +151,9 @@
         "value": "#fff"
       }
     },
-    "imagePreview": {
-      "background-light": {
-        "value": "#ffffff"
-      },
-      "background-dark": {
-        "value": "#c0c0c0"
+    "image-preview": {
+      "background-filter": {
+        "value": "none"
       },
       "border-color": {
         "value": "#aaaaaa"

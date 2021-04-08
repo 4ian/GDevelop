@@ -185,8 +185,7 @@ export function createGdevelopTheme(
       },
       imagePreview: {
         // Merge with imageThumbnail?
-        backgroundLightCell: styles['ThemeImagePreviewBackgroundLight'],
-        backgroundDarkCell: styles['ThemeImagePreviewBackgroundDark'],
+        backgroundFilter: styles['ThemeImagePreviewBackgroundFilter'],
         borderColor: styles['ThemeImagePreviewBorderColor'],
         frameBorderColor: styles['ThemeImagePreviewFrameBorderColor'],
       },

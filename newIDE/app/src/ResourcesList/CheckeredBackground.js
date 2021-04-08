@@ -1,27 +1,31 @@
 // @flow
-import { type GDevelopTheme } from '../UI/Theme';
+import * as React from 'react';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+
+type Props = {|
+  style?: Object,
+|};
 
 /**
- * Creates a checkered background using CSS gradients,
- * using colors from provided theme.
+ * Adds a checkered background to the container element.
  */
-const getCheckeredBackgroundStyle = (theme: GDevelopTheme) => {
-  const light = theme.imagePreview.backgroundLightCell;
-  const dark = theme.imagePreview.backgroundDarkCell;
-  const borderColor = theme.imagePreview.borderColor;
+const CheckeredBackground = (props: Props) => {
+  const theme = React.useContext(GDevelopThemeContext);
+  const backgroundStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
 
-  return {
-    backgroundColor: light,
-    backgroundImage: `
-    linear-gradient(45deg, ${dark} 25%, transparent 25%),
-    linear-gradient(-45deg, ${dark} 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, ${dark} 75%),
-    linear-gradient(-45deg, transparent 75%, ${dark} 75%)
-    `,
-    backgroundSize: '16px 16px',
-    backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px',
-    border: `1px solid ${borderColor}`,
+    // Apply a theme-defined CSS filter on static checkered background
+    background: 'url("res/transparentback.png") repeat',
+    filter: theme.imagePreview.backgroundFilter || 'none',
+
+    ...props.style,
   };
+
+  return <div style={backgroundStyle} />;
 };
 
-export default getCheckeredBackgroundStyle;
+export default CheckeredBackground;

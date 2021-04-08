@@ -14,7 +14,7 @@ import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-import getCheckeredBackgroundStyle from '../CheckeredBackground';
+import CheckeredBackground from '../CheckeredBackground';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
@@ -143,7 +143,8 @@ const ImagePreview = (props: Props) => {
   };
 
   const theme = React.useContext(GDevelopThemeContext);
-  const frameBorderColor = theme.imagePreview.frameBorderColor;
+  const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
+  const previewBorderColor = theme.imagePreview.borderColor || '#aaa';
 
   return (
     <Measure bounds>
@@ -225,7 +226,7 @@ const ImagePreview = (props: Props) => {
               }
               style={{
                 ...styles.imagePreviewContainer,
-                ...getCheckeredBackgroundStyle(theme),
+                border: `1px solid ${previewBorderColor}`,
                 height: fixedHeight || '100%',
               }}
               ref={measureRef}
@@ -241,6 +242,7 @@ const ImagePreview = (props: Props) => {
                 }
               }}
             >
+              <CheckeredBackground />
               {!!state.errored && (
                 <PlaceholderMessage>
                   <Text>

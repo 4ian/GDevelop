@@ -5,7 +5,7 @@ import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
-import getCheckeredBackgroundStyle from '../CheckeredBackground';
+import CheckeredBackground from '../CheckeredBackground';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -24,6 +24,7 @@ const styles = {
     ...thumbnailContainerStyle,
   },
   spriteThumbnailImage: {
+    position: 'relative',
     maxWidth: SPRITE_SIZE,
     maxHeight: SPRITE_SIZE,
     verticalAlign: 'middle',
@@ -65,12 +66,12 @@ const ImageThumbnail = (props: Props) => {
   );
 
   const { selectedBorderColor } = theme.imageThumbnail;
+  const normalBorderColor = theme.imagePreview.borderColor;
+  const borderColor = props.selected ? selectedBorderColor : normalBorderColor;
+
   const containerStyle = {
     ...styles.spriteThumbnail,
-    ...getCheckeredBackgroundStyle(theme),
-    ...(props.selected && {
-      border: `1px solid ${selectedBorderColor}`,
-    }),
+    border: `1px solid ${borderColor}`,
     ...props.style,
   };
 
@@ -84,6 +85,7 @@ const ImageThumbnail = (props: Props) => {
       }}
       {...longTouchForContextMenuProps}
     >
+      <CheckeredBackground />
       <CorsAwareImage
         style={styles.spriteThumbnailImage}
         alt={resourceName}

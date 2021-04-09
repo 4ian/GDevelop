@@ -14,6 +14,7 @@ declare global {
    *
    * Note that we also modified the bundled `pixi.js` file to create a global variable called
    * `GlobalPIXIModule`, containing the `PIXI` object.
+   * Note that we could use `export as namespace`, but this crash the TypeScript compiler.
    */
   namespace GlobalPIXIModule {
     export import PIXI = PixiModule;

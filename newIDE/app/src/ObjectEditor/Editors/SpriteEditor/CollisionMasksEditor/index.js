@@ -42,7 +42,7 @@ const verticalMosaicNodes: EditorMosaicNode = {
 };
 
 type Props = {|
-  object: any, // @todo passed as gdSpriteObject but used as gdObject?
+  object: gdSpriteObject,
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
 |};

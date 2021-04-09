@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class MultiColorReplaceFilter extends PIXI.Filter {
     constructor(
       replacements: Array<number[] | number[][]>,

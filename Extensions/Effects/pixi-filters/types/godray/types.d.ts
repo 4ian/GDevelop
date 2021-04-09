@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class GodrayFilter extends PIXI.Filter {
     constructor(options?: GodrayFilterOptions);
     angle: number;

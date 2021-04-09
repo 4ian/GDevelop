@@ -5,6 +5,7 @@ This project is released under the MIT License.
 */
 
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class ParticleEmitterObjectPixiRenderer {
     renderer: any;
     emitter: any;

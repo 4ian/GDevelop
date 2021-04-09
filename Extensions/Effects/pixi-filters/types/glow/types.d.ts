@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class GlowFilter extends PIXI.Filter {
     constructor(options?: GlowFilterOptions);
     color: number;

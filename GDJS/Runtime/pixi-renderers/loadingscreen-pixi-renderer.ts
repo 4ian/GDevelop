@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   class LoadingScreenPixiRenderer {
     _pixiRenderer: any;
     _loadingScreen: any;

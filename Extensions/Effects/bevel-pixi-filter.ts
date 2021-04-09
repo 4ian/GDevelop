@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const bevelFilter = filter as PIXI.filters.BevelFilter;
+      const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
       if (parameterName === 'rotation') {
         bevelFilter.rotation = value;
       } else if (parameterName === 'thickness') {
@@ -21,7 +21,7 @@ namespace gdjs {
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
-      const bevelFilter = filter as PIXI.filters.BevelFilter;
+      const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
       if (parameterName === 'lightColor') {
         bevelFilter.lightColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
           value

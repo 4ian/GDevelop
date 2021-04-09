@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class SimpleLightmapFilter extends PIXI.Filter {
     constructor(texture: PIXI.Texture, color?: number[] | number);
     alpha: number;

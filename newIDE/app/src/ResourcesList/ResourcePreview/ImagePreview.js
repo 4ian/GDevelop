@@ -21,10 +21,15 @@ const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
 
 const styles = {
+  contentContainer: {
+    position: 'relative',
+    height: '100%',
+    overflow: 'hidden',
+  },
   imagePreviewContainer: {
     position: 'relative',
-    display: 'inline-block',
     width: '100%',
+    height: '100%',
     boxSizing: 'border-box',
     overflow: 'auto',
 
@@ -221,56 +226,62 @@ const ImagePreview = (props: Props) => {
               </IconButton>
             </MiniToolbar>
             <div
-              dir={
-                'ltr' /* Force LTR layout to avoid issues with image positioning */
-              }
               style={{
-                ...styles.imagePreviewContainer,
-                border: `1px solid ${previewBorderColor}`,
+                ...styles.contentContainer,
                 height: fixedHeight || '100%',
-              }}
-              ref={measureRef}
-              onWheel={event => {
-                const { deltaY } = event;
-                //TODO: Use KeyboardShortcuts
-                if (event.metaKey || event.ctrlKey) {
-                  zoomBy(-deltaY / 500);
-                  event.preventDefault();
-                  event.stopPropagation();
-                } else {
-                  // Let the usual, native vertical or horizontal scrolling happen.
-                }
               }}
             >
               <CheckeredBackground />
-              {!!state.errored && (
-                <PlaceholderMessage>
-                  <Text>
-                    <Trans>Unable to load the image</Trans>
-                  </Text>
-                </PlaceholderMessage>
-              )}
-              {!state.errored && (
-                <CorsAwareImage
-                  style={imageStyle}
-                  alt={resourceName}
-                  src={imageSource}
-                  onError={handleImageError}
-                  onLoad={handleImageLoaded}
-                />
-              )}
-              {imageLoaded && renderOverlay && <div style={frameStyle} />}
-              {imageLoaded && renderOverlay && (
-                <div style={overlayStyle}>
-                  {renderOverlay({
-                    imageWidth: imageWidth || 0,
-                    imageHeight: imageHeight || 0,
-                    offsetTop: imagePositionTop + MARGIN,
-                    offsetLeft: imagePositionLeft + MARGIN,
-                    imageZoomFactor,
-                  })}
-                </div>
-              )}
+              <div
+                dir={
+                  'ltr' /* Force LTR layout to avoid issues with image positioning */
+                }
+                style={{
+                  ...styles.imagePreviewContainer,
+                  border: `1px solid ${previewBorderColor}`,
+                }}
+                ref={measureRef}
+                onWheel={event => {
+                  const { deltaY } = event;
+                  //TODO: Use KeyboardShortcuts
+                  if (event.metaKey || event.ctrlKey) {
+                    zoomBy(-deltaY / 500);
+                    event.preventDefault();
+                    event.stopPropagation();
+                  } else {
+                    // Let the usual, native vertical or horizontal scrolling happen.
+                  }
+                }}
+              >
+                {!!state.errored && (
+                  <PlaceholderMessage>
+                    <Text>
+                      <Trans>Unable to load the image</Trans>
+                    </Text>
+                  </PlaceholderMessage>
+                )}
+                {!state.errored && (
+                  <CorsAwareImage
+                    style={imageStyle}
+                    alt={resourceName}
+                    src={imageSource}
+                    onError={handleImageError}
+                    onLoad={handleImageLoaded}
+                  />
+                )}
+                {imageLoaded && renderOverlay && <div style={frameStyle} />}
+                {imageLoaded && renderOverlay && (
+                  <div style={overlayStyle}>
+                    {renderOverlay({
+                      imageWidth: imageWidth || 0,
+                      imageHeight: imageHeight || 0,
+                      offsetTop: imagePositionTop + MARGIN,
+                      offsetLeft: imagePositionLeft + MARGIN,
+                      imageZoomFactor,
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </Column>
         );

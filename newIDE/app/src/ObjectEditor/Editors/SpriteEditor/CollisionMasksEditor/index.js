@@ -212,7 +212,7 @@ const CollisionMasksEditor = (props: Props) => {
       noTitleBar: true,
       renderEditor: () => (
         <Background>
-          <ScrollView>
+          <ScrollView autoHideScrollbar>
             <Line>
               <Column expand>
                 <SpriteSelector

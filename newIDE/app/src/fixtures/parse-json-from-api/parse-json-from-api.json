@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.gametemplates.itch",
-    "projectUuid": "cde5fb8a-9be0-473c-ac05-82876fc00624",
+    "projectUuid": "ecb90557-e954-420c-bbd9-be9fef88d89c",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -135,6 +135,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -144,26 +145,32 @@
       "variables": [
         {
           "name": "person_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "planet_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "person",
+          "type": "string",
           "value": ""
         },
         {
           "name": "num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "prev_num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "planet",
+          "type": "string",
           "value": ""
         }
       ],
@@ -175,7 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
-          "persistentUuid": "1b2711d4-d80b-446f-9281-a5f93e36439f",
+          "persistentUuid": "b9623b88-fea6-4f51-a55e-f4bac1d04de3",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -191,7 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
-          "persistentUuid": "8a2b402e-577c-48f9-84ca-88c8c2dfa5b3",
+          "persistentUuid": "4c7260a8-5064-4c82-87dd-670a1f93b649",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -207,7 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "6b840bde-081c-4d25-aece-232febc88801",
+          "persistentUuid": "1325f940-3208-4595-bcf2-2ad2ee704690",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,
@@ -585,7 +592,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/people/\" + ToString(Variable(num)) + \"/\"",
                 "\"person\"",
                 "\"GET\"",
@@ -600,7 +607,7 @@
                 "value": "SendRequest"
               },
               "parameters": [
-                "\"https://swapi.co/\"",
+                "\"https://swapi.dev/\"",
                 "\"api/planets/\" + ToString(Variable(num)) + \"/\"",
                 "\"planet\"",
                 "\"GET\"",

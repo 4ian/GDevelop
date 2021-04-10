@@ -19,7 +19,7 @@
     "jsdoc-typeof-plugin": "^1.0.0",
     "lebab": "^3.1.0",
     "minimist": "^1.2.5",
-    "pixi.js": "5.3.0",
+    "pixi.js": "6.0.1",
     "prettier": "2.1.2",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.8.4",
@@ -28,7 +28,7 @@
   "scripts": {
     "check-types": "tsc",
     "build": "node scripts/build.js",
-    "test": "cd tests && npm test",
+    "test": "cd tests && npm run test-benchmark",
     "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"

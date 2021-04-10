@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export interface ZoomBlurFilterOptions {
     strength?: number;
     center?: PIXI.Point | [number, number];

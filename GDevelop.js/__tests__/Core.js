@@ -1,5 +1,8 @@
 const initializeGDevelopJs = require('../../Binaries/embuild/GDevelop.js/libGD.js');
 const path = require('path');
+const {
+  makeFakeAbstractFileSystem,
+} = require('../TestUtils/FakeAbstractFileSystem');
 const extend = require('extend');
 
 describe('libGD.js', function () {
@@ -567,7 +570,7 @@ describe('libGD.js', function () {
           .get('Animation')
           .getValue()
       ).toBe('2');
-      expect(initialInstance.getRawFloatProperty('animation')).toBe(2);
+      expect(initialInstance.getRawDoubleProperty('animation')).toBe(2);
     });
     it('can be serialized', function () {
       expect(initialInstance.serializeTo).not.toBe(undefined);
@@ -1567,7 +1570,7 @@ describe('libGD.js', function () {
           return true;
         }
         if (propertyName === 'My other instance property') {
-          instance.setRawFloatProperty('instanceprop2', parseFloat(newValue));
+          instance.setRawDoubleProperty('instanceprop2', parseFloat(newValue));
           return true;
         }
 
@@ -1586,7 +1589,7 @@ describe('libGD.js', function () {
           .setValue(instance.getRawStringProperty('instanceprop1'));
         properties
           .getOrCreate('My other instance property')
-          .setValue(instance.getRawFloatProperty('instanceprop2').toString())
+          .setValue(instance.getRawDoubleProperty('instanceprop2').toString())
           .setType('number');
 
         return properties;
@@ -2374,24 +2377,7 @@ describe('libGD.js', function () {
       project.getResourcesManager().addResource(resource4);
       project.getResourcesManager().addResource(resource5);
 
-      // Create a fake file system
-      const fs = new gd.AbstractFileSystemJS();
-      fs.mkDir = fs.clearDir = function () {};
-      fs.getTempDir = function (path) {
-        return '/tmp/';
-      };
-      fs.fileNameFrom = function (fullpath) {
-        return path.posix.basename(fullpath);
-      };
-      fs.dirNameFrom = function (fullpath) {
-        return path.posix.dirname(fullpath);
-      };
-      fs.makeAbsolute = function (relativePath, baseDirectory) {
-        return path.posix.resolve(baseDirectory, relativePath);
-      };
-      fs.makeRelative = function (absolutePath, baseDirectory) {
-        return path.posix.relative(baseDirectory, absolutePath);
-      };
+      const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that ResourcesMergingHelper can update the filenames
       const resourcesMergingHelper = new gd.ResourcesMergingHelper(fs);
@@ -2449,37 +2435,7 @@ describe('libGD.js', function () {
       project.getResourcesManager().addResource(resource4);
       project.getResourcesManager().addResource(resource5);
 
-      // Create a fake file system
-      const fs = new gd.AbstractFileSystemJS();
-      fs.mkDir = fs.clearDir = function () {};
-      fs.getTempDir = function (path) {
-        return '/tmp/';
-      };
-      fs.fileNameFrom = function (fullPath) {
-        return path.posix.basename(fullPath);
-      };
-      fs.dirNameFrom = function (fullPath) {
-        return path.posix.dirname(fullPath);
-      };
-      fs.makeAbsolute = function (relativePath, baseDirectory) {
-        return path.posix.resolve(baseDirectory, relativePath);
-      };
-      fs.makeRelative = function (absolutePath, baseDirectory) {
-        return path.posix.relative(baseDirectory, absolutePath);
-      };
-      fs.isAbsolute = function (fullPath) {
-        return path.posix.isAbsolute(fullPath);
-      };
-      fs.dirExists = function (directoryPath) {
-        return true; // Fake that all directory required exist.
-      };
-
-      // In particular, create a mock copyFile, that we can track to verify
-      // files are properly copied.
-      fs.copyFile = jest.fn();
-      fs.copyFile.mockImplementation(function (srcPath, destPath) {
-        return true;
-      });
+      const fs = makeFakeAbstractFileSystem(gd, {});
 
       // Check that resources can be copied to another folder:
       // * including absolute files.

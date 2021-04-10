@@ -1,24 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PlaneAndClouds\\game.json",
+    "projectUuid": "188ff23c-4bdb-49e0-b736-e3574b135756",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -31,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -172,6 +171,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -187,6 +187,7 @@
           "layer": "",
           "locked": false,
           "name": "Plane",
+          "persistentUuid": "fc17c0d9-94ac-42b3-9c0f-eba88e80c56c",
           "width": 0,
           "x": 368,
           "y": 279,
@@ -202,6 +203,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "9a20aa37-119c-4743-b02e-66aa7ff844d2",
           "width": 0,
           "x": 112,
           "y": 367,
@@ -222,6 +224,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "fb151270-f2d9-41f7-aeea-e867b328687e",
           "width": 0,
           "x": 667,
           "y": 507,
@@ -242,6 +245,7 @@
           "layer": "",
           "locked": false,
           "name": "Cloud",
+          "persistentUuid": "1bbc5aed-dce2-4b3b-a8c7-5f3de4f76dea",
           "width": 0,
           "x": 617,
           "y": 92,
@@ -257,6 +261,7 @@
           "layer": "",
           "locked": false,
           "name": "Smoke",
+          "persistentUuid": "59116d4b-3a8e-4eb8-8dbd-a441484b44e3",
           "width": 0,
           "x": 362,
           "y": 303,
@@ -269,6 +274,7 @@
       "objects": [
         {
           "name": "Plane",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -323,6 +329,7 @@
         },
         {
           "name": "Cloud",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -454,7 +461,7 @@
           "particleGreen1": 255,
           "particleGreen2": 255,
           "particleLifeTimeMax": 0.5,
-          "particleLifeTimeMin": 0.2,
+          "particleLifeTimeMin": 0.20000000298023224,
           "particleRed1": 255,
           "particleRed2": 255,
           "particleSize1": 100,
@@ -466,6 +473,7 @@
           "rendererParam2": 10,
           "rendererType": "Quad",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "Smoke.png",
           "type": "ParticleSystem::ParticleEmitter",
@@ -510,7 +518,7 @@
           "particleGreen1": 185,
           "particleGreen2": 255,
           "particleLifeTimeMax": 0.25,
-          "particleLifeTimeMin": 0.15,
+          "particleLifeTimeMin": 0.15000000596046448,
           "particleRed1": 255,
           "particleRed2": 255,
           "particleSize1": 100,
@@ -522,6 +530,7 @@
           "rendererParam2": 1,
           "rendererType": "Line",
           "sizeParam": "Mutable",
+          "tags": "",
           "tank": -1,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -673,9 +682,9 @@
               "parameters": [
                 "Smoke",
                 "=",
-                "Plane.PointX(Smoke)",
+                "Plane.PointX(\"Smoke\")",
                 "=",
-                "Plane.PointY(Smoke)"
+                "Plane.PointY(\"Smoke\")"
               ],
               "subInstructions": []
             },
@@ -737,7 +746,7 @@
               "parameters": [
                 "",
                 "=",
-                "Plane.PointX(Centre)*1.5",
+                "Plane.PointX(\"Centre\")*1.5",
                 "\"UpperLayer\"",
                 ""
               ],
@@ -751,7 +760,7 @@
               "parameters": [
                 "",
                 "=",
-                "Plane.PointY(Centre)*1.5",
+                "Plane.PointY(\"Centre\")*1.5",
                 "\"UpperLayer\"",
                 ""
               ],
@@ -803,9 +812,9 @@
               "parameters": [
                 "Bullet",
                 "=",
-                "Plane.PointX(GunA)",
+                "Plane.PointX(\"GunA\")",
                 "=",
-                "Plane.PointY(GunA)"
+                "Plane.PointY(\"GunA\")"
               ],
               "subInstructions": []
             },
@@ -852,9 +861,9 @@
               "parameters": [
                 "Bullet",
                 "=",
-                "Plane.PointX(GunB)",
+                "Plane.PointX(\"GunB\")",
                 "=",
-                "Plane.PointY(GunB)"
+                "Plane.PointY(\"GunB\")"
               ],
               "subInstructions": []
             },
@@ -1011,8 +1020,8 @@
                   "parameters": [
                     "",
                     "Cloud",
-                    "Plane.PointX(Centre) + 700*cos(ToRad(Variable(random_angle)))",
-                    "Plane.PointY(Centre) + 700*sin(ToRad(Variable(random_angle)))",
+                    "Plane.PointX(\"Centre\") + 700*cos(ToRad(Variable(random_angle)))",
+                    "Plane.PointY(\"Centre\") + 700*sin(ToRad(Variable(random_angle)))",
                     ""
                   ],
                   "subInstructions": []
@@ -1120,9 +1129,9 @@
                       "parameters": [
                         "Cloud",
                         "=",
-                        "Cloud.X() + (1.5 -1)*Plane.PointX(Centre)",
+                        "Cloud.X() + (1.5 -1)*Plane.PointX(\"Centre\")",
                         "=",
-                        "Cloud.Y() + (1.5 -1)*Plane.PointY(Centre)"
+                        "Cloud.Y() + (1.5 -1)*Plane.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1193,8 +1202,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Plane.PointX(GunA)",
-                    "Plane.PointY(GunA)",
+                    "Plane.PointX(\"GunA\")",
+                    "Plane.PointY(\"GunA\")",
                     ""
                   ],
                   "subInstructions": []
@@ -1241,8 +1250,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Plane.PointX(GunB)",
-                    "Plane.PointY(GunB)",
+                    "Plane.PointX(\"GunB\")",
+                    "Plane.PointY(\"GunB\")",
                     ""
                   ],
                   "subInstructions": []
@@ -1550,6 +1559,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1567,6 +1581,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "UpperLayer",
           "visibility": true,
           "cameras": [],

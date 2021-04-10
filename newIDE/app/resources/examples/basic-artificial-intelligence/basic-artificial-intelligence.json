@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\basic-artificial-intelligence\\basic-artificial-intelligence.json",
+    "projectUuid": "1f3aac9c-5b30-4bfa-a066-996f8ee0f84e",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Basic artificial intelligence",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -113,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "bordure2.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure2.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank1",
         "smoothed": false,
         "userAdded": true
@@ -129,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "tankV2.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank2",
         "smoothed": false,
         "userAdded": true
@@ -137,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "tankV3.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank3",
         "smoothed": false,
         "userAdded": true
@@ -145,6 +150,7 @@
         "alwaysLoaded": false,
         "file": "tankV4.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank4",
         "smoothed": false,
         "userAdded": true
@@ -153,6 +159,7 @@
         "alwaysLoaded": false,
         "file": "tankV5.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank5",
         "smoothed": false,
         "userAdded": true
@@ -161,6 +168,7 @@
         "alwaysLoaded": false,
         "file": "tankV6.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank6",
         "smoothed": false,
         "userAdded": true
@@ -169,6 +177,7 @@
         "alwaysLoaded": false,
         "file": "tankV7.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank7",
         "smoothed": false,
         "userAdded": true
@@ -177,6 +186,7 @@
         "alwaysLoaded": false,
         "file": "bordure.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure.png",
         "smoothed": false,
         "userAdded": true
@@ -185,6 +195,7 @@
         "alwaysLoaded": false,
         "file": "TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -193,6 +204,7 @@
         "alwaysLoaded": false,
         "file": "alert.png",
         "kind": "image",
+        "metadata": "",
         "name": "alert.png",
         "smoothed": true,
         "userAdded": false
@@ -225,6 +237,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -246,10 +259,12 @@
       "variables": [
         {
           "name": "IntersectionX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "IntersectionY",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -261,6 +276,7 @@
           "layer": "",
           "locked": false,
           "name": "Perso",
+          "persistentUuid": "83302d31-7886-487b-8f20-d350402923a3",
           "width": 0,
           "x": 272,
           "y": 83,
@@ -281,6 +297,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "5af4f6c9-bd84-424d-acfa-89dc569e9ff8",
           "width": 0,
           "x": 384,
           "y": 256,
@@ -301,6 +318,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "e68c92a6-2704-4654-8441-4c6c225eed9f",
           "width": 0,
           "x": 548,
           "y": 57,
@@ -321,6 +339,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "c76c2679-d6f0-4350-90a4-9873ded0c4c7",
           "width": 0,
           "x": 545,
           "y": 220,
@@ -341,6 +360,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "22fdb07d-0dc7-4a80-8404-e13a625b7505",
           "width": 0,
           "x": 107,
           "y": 44,
@@ -361,6 +381,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "ac7c10dc-03c5-4b95-9af5-0f78bdae87bd",
           "width": 0,
           "x": 111,
           "y": 101,
@@ -381,6 +402,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "cb47abd1-8cf8-4a16-8d49-c31104999ba7",
           "width": 0,
           "x": 109,
           "y": 188,
@@ -401,6 +423,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "c5648975-57f3-4680-87f8-edffe3ec377f",
           "width": 0,
           "x": 480,
           "y": 256,
@@ -421,6 +444,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "88d13f85-a12b-465d-9616-472d8bfaedf3",
           "width": 0,
           "x": 576,
           "y": 256,
@@ -441,6 +465,7 @@
           "layer": "Interface",
           "locked": false,
           "name": "Note",
+          "persistentUuid": "1e5365a4-582d-46d3-a18f-aacd63f90bd8",
           "width": 0,
           "x": 5,
           "y": 548,
@@ -456,6 +481,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "de3da2fb-a187-4dc5-a14b-b80ea1ab7edc",
           "width": 0,
           "x": 160,
           "y": -32,
@@ -476,6 +502,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "df568ba7-937e-4b53-8d29-7d99f627a975",
           "width": 0,
           "x": 640,
           "y": 160,
@@ -496,6 +523,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "fa57a5b2-d1bd-4bac-a988-597a4dd2ec90",
           "width": 0,
           "x": 640,
           "y": 64,
@@ -516,6 +544,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "c2c21fee-8875-4520-9f85-0172ac31fca1",
           "width": 0,
           "x": 640,
           "y": -32,
@@ -536,6 +565,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "f6c2ce7c-9867-4585-b8e3-bc8a6359a42c",
           "width": 0,
           "x": 384,
           "y": -32,
@@ -556,6 +586,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "010dfdb6-2082-4445-84cc-a10f3a1671a3",
           "width": 0,
           "x": 384,
           "y": 64,
@@ -576,6 +607,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "a4ea836f-8d6c-480e-9c6b-18e2c624cfc8",
           "width": 0,
           "x": 160,
           "y": 160,
@@ -596,6 +628,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "74ba08d5-4aa9-48a7-808f-91be29a5159e",
           "width": 0,
           "x": 160,
           "y": 64,
@@ -613,6 +646,7 @@
       "objects": [
         {
           "name": "Perso",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -670,6 +704,7 @@
         },
         {
           "name": "Mur",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -737,6 +772,7 @@
         },
         {
           "name": "IA",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1061,6 +1097,7 @@
           "italic": false,
           "name": "Note",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1076,6 +1113,7 @@
         },
         {
           "name": "Alert",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1474,8 +1512,8 @@
               "parameters": [
                 "",
                 "Alert",
-                "IA.PointX(Center)",
-                "IA.PointY(Center)",
+                "IA.PointX(\"Center\")",
+                "IA.PointY(\"Center\")",
                 ""
               ],
               "subInstructions": []
@@ -1915,6 +1953,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1932,6 +1975,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [
@@ -1953,6 +2001,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

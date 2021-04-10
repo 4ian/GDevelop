@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\basic-ai-with-pathfinding\\basic-ai-with-pathfinding.json",
+    "projectUuid": "da15f95f-aa24-42b1-80de-2ec37934d585",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Basic artificial intelligence",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -113,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "bordure2.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure2.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank1",
         "smoothed": false,
         "userAdded": true
@@ -129,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "tankV2.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank2",
         "smoothed": false,
         "userAdded": true
@@ -137,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "tankV3.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank3",
         "smoothed": false,
         "userAdded": true
@@ -145,6 +150,7 @@
         "alwaysLoaded": false,
         "file": "tankV4.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank4",
         "smoothed": false,
         "userAdded": true
@@ -153,6 +159,7 @@
         "alwaysLoaded": false,
         "file": "tankV5.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank5",
         "smoothed": false,
         "userAdded": true
@@ -161,6 +168,7 @@
         "alwaysLoaded": false,
         "file": "tankV6.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank6",
         "smoothed": false,
         "userAdded": true
@@ -169,6 +177,7 @@
         "alwaysLoaded": false,
         "file": "tankV7.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank7",
         "smoothed": false,
         "userAdded": true
@@ -177,6 +186,7 @@
         "alwaysLoaded": false,
         "file": "bordure.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure.png",
         "smoothed": false,
         "userAdded": true
@@ -185,6 +195,7 @@
         "alwaysLoaded": false,
         "file": "TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -193,6 +204,7 @@
         "alwaysLoaded": false,
         "file": "alert.png",
         "kind": "image",
+        "metadata": "",
         "name": "alert.png",
         "smoothed": true,
         "userAdded": false
@@ -201,6 +213,7 @@
         "alwaysLoaded": false,
         "file": "tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tankV1.png",
         "smoothed": true,
         "userAdded": true
@@ -233,6 +246,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -254,10 +268,12 @@
       "variables": [
         {
           "name": "IntersectionX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "IntersectionY",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -269,6 +285,7 @@
           "layer": "",
           "locked": false,
           "name": "Perso",
+          "persistentUuid": "733d49c4-b302-4392-a7ec-235b4ca9875d",
           "width": 0,
           "x": 286,
           "y": 37,
@@ -289,6 +306,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "b918766e-92be-44c5-bd39-78fd2bbec2b9",
           "width": 0,
           "x": 384,
           "y": 448,
@@ -309,6 +327,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "ef8923f8-3cd2-4d97-b183-0610cb3ed10f",
           "width": 0,
           "x": 548,
           "y": 57,
@@ -329,6 +348,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "cba44fe7-eb6a-459b-821c-17755cc8621b",
           "width": 0,
           "x": 555,
           "y": 166,
@@ -349,6 +369,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "fce3015f-858a-47af-9b35-67b88f83abac",
           "width": 0,
           "x": 107,
           "y": 44,
@@ -369,6 +390,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "59020bd1-4a3b-4002-83b9-a878ed1c115e",
           "width": 0,
           "x": 111,
           "y": 101,
@@ -389,6 +411,7 @@
           "layer": "",
           "locked": false,
           "name": "IA",
+          "persistentUuid": "bfe0095c-e35a-447d-a236-d4893e001ebe",
           "width": 0,
           "x": 109,
           "y": 188,
@@ -409,6 +432,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "576d1eb8-5672-4355-b18a-2adae6639f45",
           "width": 0,
           "x": 480,
           "y": 256,
@@ -429,6 +453,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "2ae24cce-47eb-4468-a4be-f0fcff792149",
           "width": 0,
           "x": 352,
           "y": 384,
@@ -449,6 +474,7 @@
           "layer": "Interface",
           "locked": false,
           "name": "Note",
+          "persistentUuid": "a6535303-fd89-4904-ab8c-a93e3ce26bf4",
           "width": 0,
           "x": 5,
           "y": 548,
@@ -464,6 +490,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "10d2c240-f39a-4b67-aa5b-017531e6e779",
           "width": 0,
           "x": 96,
           "y": 224,
@@ -484,6 +511,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "76669157-098e-4315-a67e-33814745a61c",
           "width": 0,
           "x": 288,
           "y": 352,
@@ -504,6 +532,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "59809bee-b176-490f-8013-71f8d4045a21",
           "width": 0,
           "x": 384,
           "y": 256,
@@ -524,6 +553,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "43ef1e64-5558-4df9-9cc4-06f966804a25",
           "width": 0,
           "x": -32,
           "y": -64,
@@ -544,6 +574,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "3311fcf3-6ba1-49ab-95d8-758cc2cd70d2",
           "width": 0,
           "x": 384,
           "y": -64,
@@ -564,6 +595,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "a707d004-06b1-4be9-8a5a-a9e05fb6e758",
           "width": 0,
           "x": 160,
           "y": -64,
@@ -584,6 +616,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "2f31f74e-8d17-4a0d-99e2-606da7a5b959",
           "width": 0,
           "x": 640,
           "y": 160,
@@ -604,6 +637,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "e4119a3f-16d9-46e0-a234-f22e81b7b5d1",
           "width": 0,
           "x": 640,
           "y": 64,
@@ -624,6 +658,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "5e010659-68ec-408d-80a2-f1643ed948e7",
           "width": 0,
           "x": 640,
           "y": -32,
@@ -644,6 +679,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "762f419f-419e-4ef9-8794-4b09455b69ac",
           "width": 0,
           "x": 352,
           "y": 256,
@@ -664,6 +700,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "547e24cb-2681-40ff-ac32-ed2a1446519a",
           "width": 0,
           "x": 160,
           "y": 128,
@@ -684,6 +721,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "557109c7-75d6-4ea1-aa1a-4026c9cb96a7",
           "width": 0,
           "x": 160,
           "y": 32,
@@ -704,6 +742,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "06407d83-3fdf-4203-a75e-5a613376b7c9",
           "width": 0,
           "x": 576,
           "y": 256,
@@ -724,6 +763,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "3ba5596b-4d50-4535-9f67-b8e2d6f5749c",
           "width": 0,
           "x": 418,
           "y": -65,
@@ -744,6 +784,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "b88040b7-be33-49ec-83a0-3e6239fd3ac8",
           "width": 0,
           "x": 512,
           "y": -64,
@@ -764,6 +805,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "a3bdb011-1c81-4610-866a-3f1f70f1bd0a",
           "width": 0,
           "x": 608,
           "y": -64,
@@ -784,6 +826,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "e27f2663-0061-402e-a292-4d66a78e2645",
           "width": 0,
           "x": 64,
           "y": -64,
@@ -804,6 +847,7 @@
           "layer": "",
           "locked": false,
           "name": "Mur",
+          "persistentUuid": "c22355e5-e620-42b2-afe6-62cd60aa8cc0",
           "width": 0,
           "x": 384,
           "y": 32,
@@ -821,6 +865,7 @@
       "objects": [
         {
           "name": "Perso",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -878,15 +923,16 @@
         },
         {
           "name": "Mur",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "cost": 2,
-              "impassable": true,
               "name": "PathfindingObstacle",
-              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
             }
           ],
           "animations": [
@@ -952,11 +998,14 @@
         },
         {
           "name": "IA",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
               "acceleration": 50,
               "allowDiagonals": true,
               "angleOffset": 0,
@@ -965,9 +1014,7 @@
               "cellWidth": 30,
               "extraBorder": 0,
               "maxSpeed": 50,
-              "name": "Pathfinding",
-              "rotateObject": true,
-              "type": "PathfindingBehavior::PathfindingBehavior"
+              "rotateObject": true
             }
           ],
           "animations": [
@@ -1290,6 +1337,7 @@
           "italic": false,
           "name": "Note",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -1305,6 +1353,7 @@
         },
         {
           "name": "Alert",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -1703,8 +1752,8 @@
               "parameters": [
                 "",
                 "Alert",
-                "IA.PointX(Center)",
-                "IA.PointY(Center)",
+                "IA.PointX(\"Center\")",
+                "IA.PointY(\"Center\")",
                 ""
               ],
               "subInstructions": []
@@ -2107,6 +2156,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -2124,6 +2178,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Interface",
           "visibility": true,
           "cameras": [
@@ -2154,6 +2213,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -179,6 +179,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -188,26 +189,32 @@
       "variables": [
         {
           "name": "x",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "y",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "sizeX",
+          "type": "string",
           "value": "16"
         },
         {
           "name": "sizeY",
+          "type": "string",
           "value": "16"
         },
         {
           "name": "s",
+          "type": "string",
           "value": "10"
         },
         {
           "name": "looping",
+          "type": "string",
           "value": "1"
         }
       ],
@@ -1465,12 +1472,14 @@
         "conversions",
         "coordinates"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Returns a term from the Fibonacci sequence.",
           "fullName": "Fibonacci numbers",
           "functionType": "Expression",
           "name": "Fibonacci",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1502,6 +1511,7 @@
           "fullName": "Slope",
           "functionType": "Expression",
           "name": "Slope",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1563,6 +1573,7 @@
           "fullName": "Map",
           "functionType": "Expression",
           "name": "Map",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1634,6 +1645,7 @@
           "fullName": "Hypotenuse length",
           "functionType": "Expression",
           "name": "Hypot",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1675,6 +1687,7 @@
           "fullName": "Greatest common factor (gcf)",
           "functionType": "Expression",
           "name": "Gcf",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1716,6 +1729,7 @@
           "fullName": "Lowest common multiple (lcm)",
           "functionType": "Expression",
           "name": "Lcm",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1757,6 +1771,7 @@
           "fullName": "Factorial",
           "functionType": "Expression",
           "name": "Factorial",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1788,6 +1803,7 @@
           "fullName": "Polar coordinate to Cartesian X value",
           "functionType": "Expression",
           "name": "PolarToCartesianX",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1829,6 +1845,7 @@
           "fullName": "Polar coordinate to Cartesian Y value",
           "functionType": "Expression",
           "name": "PolarToCartesianY",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1870,6 +1887,7 @@
           "fullName": "Isometric coordinate to Cartesian X value",
           "functionType": "Expression",
           "name": "IsoToCartesianX",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1911,6 +1929,7 @@
           "fullName": "Isometric coordinate to Cartesian Y value",
           "functionType": "Expression",
           "name": "IisoToCartesianY",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1952,6 +1971,7 @@
           "fullName": "Golden ratio",
           "functionType": "Expression",
           "name": "GoldenRatio",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -1982,6 +2002,7 @@
           "fullName": "Pi (π)",
           "functionType": "Expression",
           "name": "Pi",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2010,6 +2031,7 @@
           "fullName": "Half Pi",
           "functionType": "Expression",
           "name": "HalfPi",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2030,6 +2052,7 @@
           "fullName": "Natural logarithm of e",
           "functionType": "Expression",
           "name": "E",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2050,6 +2073,7 @@
           "fullName": "Natural logarithm of 2",
           "functionType": "Expression",
           "name": "Ln2",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2070,6 +2094,7 @@
           "fullName": "Natural logarithm of 10",
           "functionType": "Expression",
           "name": "Ln10",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2090,6 +2115,7 @@
           "fullName": "Base 2 logarithm of e",
           "functionType": "Expression",
           "name": "Log2e",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2110,6 +2136,7 @@
           "fullName": "Base 10 logarithm of e",
           "functionType": "Expression",
           "name": "Log10e",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2130,6 +2157,7 @@
           "fullName": "Square root of 2",
           "functionType": "Expression",
           "name": "Sqrt2",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2150,6 +2178,7 @@
           "fullName": "Square root of 1/2",
           "functionType": "Expression",
           "name": "Sqrt1_2",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2170,6 +2199,7 @@
           "fullName": "Quarter Pi",
           "functionType": "Expression",
           "name": "QuarterPi",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2204,12 +2234,14 @@
         "simplex noise",
         "procedural generation"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "",
           "fullName": "",
           "functionType": "Action",
           "name": "onFirstSceneLoaded",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2230,6 +2262,7 @@
           "fullName": "Set the seed used for noise generation",
           "functionType": "Action",
           "name": "noiseSeed",
+          "private": false,
           "sentence": "Set noise seed to _PARAM1_",
           "events": [
             {
@@ -2261,6 +2294,7 @@
           "fullName": "Current seed",
           "functionType": "Expression",
           "name": "currentSeed",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2281,6 +2315,7 @@
           "fullName": "Simplex 3D noise ",
           "functionType": "Expression",
           "name": "simplex3",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2332,6 +2367,7 @@
           "fullName": "Simplex 2D noise ",
           "functionType": "Expression",
           "name": "simplex2",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2373,6 +2409,7 @@
           "fullName": "Perlin 3D noise ",
           "functionType": "Expression",
           "name": "perlin3",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -2424,6 +2461,7 @@
           "fullName": "Perlin 2D noise ",
           "functionType": "Expression",
           "name": "perlin2",
+          "private": false,
           "sentence": "",
           "events": [
             {

@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/GDevelop projects/My project1343/move-object-with-mouse-joint.json",
+    "projectUuid": "8f076399-898f-4bc1-8a26-8f003c902329",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": true,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Proyecto",
     "author": "",
     "windowWidth": 700,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -149,6 +147,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 80,
+        "gridType": "rectangular",
         "gridWidth": 70,
         "snap": true,
         "windowMask": false,
@@ -158,6 +157,7 @@
       "variables": [
         {
           "name": "MouseJointId",
+          "type": "string",
           "value": ""
         }
       ],
@@ -169,6 +169,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "e6dc3f3b-8b1d-4de1-9078-37e5d2e55acf",
           "width": 0,
           "x": 630,
           "y": 360,
@@ -184,6 +185,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "8de838dd-d01a-4d0d-ab6a-9dbfe622d40d",
           "width": 0,
           "x": 0,
           "y": 360,
@@ -199,6 +201,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "b814f977-4375-47b6-8d75-d8d0018df67d",
           "width": 0,
           "x": 70,
           "y": 360,
@@ -214,6 +217,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "fba6243e-5197-43e0-853b-2ed5d78903b6",
           "width": 0,
           "x": 140,
           "y": 360,
@@ -229,6 +233,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "f4d2d2ae-afa8-4026-b0d8-01a37dbfa7d6",
           "width": 0,
           "x": 210,
           "y": 360,
@@ -244,6 +249,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "1f7f3828-a8a2-4a96-a51b-11b62656355b",
           "width": 0,
           "x": 280,
           "y": 360,
@@ -259,6 +265,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "3e0aaae7-135e-4cd0-a251-cf45622f6203",
           "width": 0,
           "x": 350,
           "y": 360,
@@ -274,6 +281,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "69986bd7-846f-46e5-9d6e-1a7388f8702c",
           "width": 0,
           "x": 280,
           "y": 144,
@@ -289,6 +297,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "56a64468-38fa-44aa-92e4-2195d05ab7d4",
           "width": 0,
           "x": 490,
           "y": 144,
@@ -304,6 +313,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "390856c5-3820-43f4-ab16-cb02f58ff585",
           "width": 0,
           "x": 630,
           "y": 144,
@@ -319,6 +329,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "79093fe1-a938-4277-91c1-53f474b0a579",
           "width": 0,
           "x": 420,
           "y": 144,
@@ -334,6 +345,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "453baa99-f981-4cb0-b15d-d71ea0dd935c",
           "width": 0,
           "x": 560,
           "y": 144,
@@ -349,6 +361,7 @@
           "layer": "",
           "locked": false,
           "name": "Ground",
+          "persistentUuid": "cab4ba46-5e20-4856-989d-b9de0bc50cff",
           "width": 0,
           "x": 350,
           "y": 144,
@@ -364,6 +377,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "a897bf89-b0a1-4d51-bf21-53cd239d73bf",
           "width": 0,
           "x": 70,
           "y": 144,
@@ -379,6 +393,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "131281e1-8b78-480e-b6f4-9538eb6f08ba",
           "width": 70,
           "x": 700,
           "y": 0,
@@ -394,6 +409,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "8b75642e-0367-4fd7-831a-671ce5bdd1f9",
           "width": 840,
           "x": -70,
           "y": -72,
@@ -409,6 +425,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "ae3a9979-7955-4d72-9eaa-b44c9d50171c",
           "width": 840,
           "x": -70,
           "y": 576,
@@ -424,6 +441,7 @@
           "layer": "",
           "locked": false,
           "name": "Border",
+          "persistentUuid": "2fc58065-8699-4544-8e75-4572aed8e08f",
           "width": 70,
           "x": -70,
           "y": 0,
@@ -436,6 +454,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -443,27 +462,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Dynamic",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Circle",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Circle",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Dynamic"
             }
           ],
           "animations": [
@@ -519,6 +536,7 @@
         },
         {
           "name": "Ground",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -526,27 +544,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ],
           "animations": [
@@ -603,6 +619,7 @@
         {
           "height": 32,
           "name": "Border",
+          "tags": "",
           "texture": "Grass.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 32,
@@ -611,27 +628,25 @@
             {
               "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
-              "content": {
-                "type": "Static",
-                "bullet": false,
-                "fixedRotation": false,
-                "canSleep": true,
-                "shape": "Box",
-                "shapeDimensionA": 0,
-                "shapeDimensionB": 0,
-                "shapeOffsetX": 0,
-                "shapeOffsetY": 0,
-                "polygonOrigin": "Center",
-                "vertices": [],
-                "density": 1,
-                "friction": 0.3,
-                "restitution": 0.1,
-                "linearDamping": 0.1,
-                "angularDamping": 0.1,
-                "gravityScale": 1,
-                "layers": 1,
-                "masks": 1
-              }
+              "bullet": false,
+              "fixedRotation": false,
+              "canSleep": true,
+              "shape": "Box",
+              "shapeDimensionA": 0,
+              "shapeDimensionB": 0,
+              "shapeOffsetX": 0,
+              "shapeOffsetY": 0,
+              "polygonOrigin": "Center",
+              "vertices": [],
+              "density": 1,
+              "friction": 0.3,
+              "restitution": 0.1,
+              "linearDamping": 0.1,
+              "angularDamping": 0.1,
+              "gravityScale": 1,
+              "layers": 1,
+              "masks": 1,
+              "bodyType": "Static"
             }
           ]
         }
@@ -796,6 +811,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -817,12 +837,10 @@
         {
           "name": "Physics2",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }

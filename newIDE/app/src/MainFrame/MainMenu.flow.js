@@ -10,7 +10,7 @@ export type MainMenuProps = {|
   onOpenRecentFile: (
     fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
   ) => void,
-  onSaveProject: () => void,
+  onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseProject: () => Promise<void>,
   onCloseApp: () => void,

@@ -6,7 +6,6 @@ namespace gdjs {
         .getGame()
         .getImageManager()
         .getPIXITexture(effectData.stringParameters.colorMapTexture);
-      const colorMapSprite = new PIXI.Sprite(colorMapTexture);
       const colorMapFilter = new PIXI.filters.ColorMapFilter(
         colorMapTexture,
         effectData.booleanParameters.nearest,
@@ -20,7 +19,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const colorMapFilter = filter as PIXI.filters.ColorMapFilter;
+      const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {
         colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(
           value / 100,
@@ -31,7 +30,7 @@ namespace gdjs {
     },
     updateStringParameter: function (filter, parameterName, value) {},
     updateBooleanParameter: function (filter, parameterName, value) {
-      const colorMapFilter = filter as PIXI.filters.ColorMapFilter;
+      const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
       if (parameterName === 'nearest') {
         colorMapFilter.nearest = value;
       }

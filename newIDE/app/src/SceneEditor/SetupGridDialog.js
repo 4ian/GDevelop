@@ -2,6 +2,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
+import Checkbox from '../UI/Checkbox';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Dialog from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
@@ -14,13 +15,14 @@ export default class SetupGridDialog extends Component {
     };
   }
 
-  _onApply = () => {
+  onApply = () => {
     this.props.onApply({
       gridWidth: this.state.gridWidth,
       gridHeight: this.state.gridHeight,
       gridOffsetX: this.state.gridOffsetX,
       gridOffsetY: this.state.gridOffsetY,
       gridColor: this.state.gridColor,
+      gridType: this.state.gridType,
     });
   };
 
@@ -37,12 +39,13 @@ export default class SetupGridDialog extends Component {
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
-        onClick={this._onApply}
+        onClick={this.onApply}
       />,
     ];
 
     return (
       <Dialog
+        onApply={this.onApply}
         title={<Trans>Edit Grid Options</Trans>}
         actions={actions}
         cannotBeDismissed={true}
@@ -69,7 +72,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridWidth}
               onChange={(e, value) =>
-                this.setState({ gridWidth: parseInt(value, 10) })
+                this.setState({ gridWidth: parseFloat(value) })
               }
             />
             <TextField
@@ -78,7 +81,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridHeight}
               onChange={(e, value) =>
-                this.setState({ gridHeight: parseInt(value, 10) })
+                this.setState({ gridHeight: parseFloat(value) })
               }
             />
           </ResponsiveLineStackLayout>
@@ -89,7 +92,7 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridOffsetX}
               onChange={(e, value) =>
-                this.setState({ gridOffsetX: parseInt(value, 10) })
+                this.setState({ gridOffsetX: parseFloat(value) })
               }
             />
             <TextField
@@ -98,7 +101,18 @@ export default class SetupGridDialog extends Component {
               type="number"
               value={this.state.gridOffsetY}
               onChange={(e, value) =>
-                this.setState({ gridOffsetY: parseInt(value, 10) })
+                this.setState({ gridOffsetY: parseFloat(value) })
+              }
+            />
+          </ResponsiveLineStackLayout>
+          <ResponsiveLineStackLayout noMargin expand>
+            <Checkbox
+              checked={this.state.gridType === 'isometric'}
+              label={<Trans>Isometric</Trans>}
+              onCheck={(e, check) =>
+                this.setState({
+                  gridType: check ? 'isometric' : 'rectangular',
+                })
               }
             />
           </ResponsiveLineStackLayout>

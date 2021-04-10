@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class AdjustmentFilter extends PIXI.Filter {
     constructor(options?: AdjustmentOptions);
     gamma: number;

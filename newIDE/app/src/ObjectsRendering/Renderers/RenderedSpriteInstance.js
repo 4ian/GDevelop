@@ -104,7 +104,7 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   const spriteObject = gd.asSpriteObject(this._associatedObject);
   if (spriteObject.hasNoAnimations()) return false;
 
-  this._renderedAnimation = this._instance.getRawFloatProperty('animation');
+  this._renderedAnimation = this._instance.getRawDoubleProperty('animation');
   if (this._renderedAnimation >= spriteObject.getAnimationsCount())
     this._renderedAnimation = 0;
 
@@ -164,9 +164,9 @@ RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function() {
 };
 
 RenderedSpriteInstance.prototype.update = function() {
-  const animation = this._instance.getRawFloatProperty('animation');
+  const animation = this._instance.getRawDoubleProperty('animation');
   if (this._renderedAnimation !== animation) {
-    this.updatePIXITexture();
+    this.updatePIXITextureAndSprite();
   } else {
     this.updatePIXISprite();
   }

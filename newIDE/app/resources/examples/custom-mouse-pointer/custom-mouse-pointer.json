@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\custom-mouse-pointer\\game.json",
+    "projectUuid": "d054898e-fc04-4a8c-b9bd-140a4c0357c6",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "mouse-pointer.png",
         "kind": "image",
+        "metadata": "",
         "name": "mouse-pointer.png",
         "smoothed": true,
         "userAdded": false
@@ -134,6 +135,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -149,6 +151,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "8c07f596-680b-44e0-b08e-7cd39d442947",
           "width": 0,
           "x": 288,
           "y": 64,
@@ -164,6 +167,7 @@
           "layer": "",
           "locked": false,
           "name": "MousePointer",
+          "persistentUuid": "a96d2fdf-8052-48c6-bbe9-3a42e14bdac2",
           "width": 0,
           "x": 369,
           "y": 214,
@@ -176,6 +180,7 @@
       "objects": [
         {
           "name": "MousePointer",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -217,6 +222,7 @@
           "italic": false,
           "name": "Message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -333,6 +339,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -354,6 +365,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

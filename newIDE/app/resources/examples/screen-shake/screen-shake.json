@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.screenshake",
-    "projectFile": "G:\\Games\\Screen Shake\\ScreenShake.json",
+    "projectUuid": "30f7dee1-7b76-4bad-a3db-981b9258f013",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Screen Shake Example",
     "author": "Zat",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -254,6 +252,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
@@ -272,10 +271,12 @@
       "variables": [
         {
           "name": "Shakey",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "yPos",
+          "type": "string",
           "value": ""
         }
       ],
@@ -287,6 +288,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "1909d89a-d943-4860-8646-dff2b3e58918",
           "width": 0,
           "x": 37.1229,
           "y": 290.508,
@@ -302,6 +304,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "c6c7f5b5-e464-46cf-84f1-5c6155e446e8",
           "width": 0,
           "x": 208,
           "y": 310,
@@ -317,6 +320,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "a60ed73c-ab9f-4e93-ac72-a7afbcc78ec3",
           "width": 0,
           "x": 213,
           "y": 487,
@@ -332,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "55574b41-7d81-47c9-a7e3-09d26ddf7098",
           "width": 0,
           "x": 438,
           "y": 393,
@@ -347,6 +352,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "68084a20-7f7e-4e07-8f72-ad56daafef27",
           "width": 1038,
           "x": -193,
           "y": 572,
@@ -362,6 +368,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "35e7c68e-17dc-41f7-8d53-17af758786e0",
           "width": 0,
           "x": 49.2766,
           "y": 291.738,
@@ -377,6 +384,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "e686af76-81dd-4469-b431-aaab959cf0d6",
           "width": 0,
           "x": 194,
           "y": 500.569,
@@ -397,6 +405,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "fc7e99a1-7b5d-403a-a523-86a2530d9889",
           "width": 0,
           "x": 536.785,
           "y": 503.015,
@@ -412,6 +421,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2d5f0758-4e7c-48d7-ac5f-7357f7628aee",
           "width": 0,
           "x": -43,
           "y": 501,
@@ -432,6 +442,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "dc647ac6-170e-407e-a365-238c179314a0",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -444,6 +455,7 @@
       "objects": [
         {
           "name": "Player",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -741,15 +753,16 @@
         },
         {
           "name": "Jumpthru",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "Jumpthru",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "Jumpthru",
               "yGrabOffset": 0
             }
           ],
@@ -807,27 +820,31 @@
         {
           "height": 70,
           "name": "TiledGrassPlatform",
+          "tags": "",
           "texture": "grassHalfMid.png",
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
           "behaviors": [
             {
-              "canBeGrabbed": true,
               "name": "Platform",
-              "platformType": "NormalPlatform",
               "type": "PlatformBehavior::PlatformBehavior",
+              "canBeGrabbed": true,
+              "platformType": "NormalPlatform",
               "yGrabOffset": 0
             }
           ]
         },
         {
           "name": "PlayerHitBox",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
+              "name": "PlatformerObject",
+              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "acceleration": 1500,
               "canGrabPlatforms": false,
               "deceleration": 1500,
@@ -836,10 +853,8 @@
               "jumpSpeed": 1000,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "name": "PlatformerObject",
               "roundCoordinates": true,
               "slopeMaxAngle": 0,
-              "type": "PlatformBehavior::PlatformerObjectBehavior",
               "xGrabTolerance": 10,
               "yGrabOffset": 0
             }
@@ -897,6 +912,7 @@
         },
         {
           "name": "BackgroundObjects",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -1632,6 +1648,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1649,6 +1670,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

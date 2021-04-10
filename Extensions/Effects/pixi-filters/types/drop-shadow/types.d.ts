@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class DropShadowFilter extends PIXI.Filter {
     constructor(options?: DropShadowFilterOptions);
     alpha: number;

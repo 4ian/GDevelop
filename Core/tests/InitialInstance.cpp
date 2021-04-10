@@ -19,8 +19,8 @@
 TEST_CASE("InitialInstance", "[common][instances]") {
   gd::InitialInstance instance;
 
-  SECTION("GetRawFloatProperty") {
-    REQUIRE(instance.GetRawFloatProperty("NotExistingProperty") == 0);
+  SECTION("GetRawDoubleProperty") {
+    REQUIRE(instance.GetRawDoubleProperty("NotExistingProperty") == 0);
   }
 
   SECTION("GetRawStringProperty") {

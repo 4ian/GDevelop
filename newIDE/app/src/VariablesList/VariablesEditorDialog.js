@@ -41,6 +41,7 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
+      onApply={onApply}
       noMargin
       actions={[
         <FlatButton

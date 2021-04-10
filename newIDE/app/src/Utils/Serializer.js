@@ -16,6 +16,8 @@ export function serializeToJSObject(
 ) {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
+
+  // JSON.parse + toJSON is 30% faster than gd.Serializer.toJSObject.
   const object = JSON.parse(gd.Serializer.toJSON(serializedElement));
   serializedElement.delete();
 
@@ -36,6 +38,8 @@ export function serializeToJSON(
 ): string {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
+
+  // toJSON is 20% faster than gd.Serializer.toJSObject + JSON.stringify.
   const json = gd.Serializer.toJSON(serializedElement);
   serializedElement.delete();
 

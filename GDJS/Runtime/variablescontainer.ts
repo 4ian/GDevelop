@@ -187,7 +187,9 @@ namespace gdjs {
      * This container has no state and always returns the bad variable ( see VariablesContainer.badVariable ).
      * @static
      */
-    static badVariablesContainer = {
+    static badVariablesContainer: VariablesContainer = {
+      _variables: new Hashtable(),
+      _variablesArray: [],
       has: function () {
         return false;
       },
@@ -213,16 +215,32 @@ namespace gdjs {
      * This variable has no state and always return 0 or the empty string.
      * @static
      */
-    static badVariable = {
+    static badVariable: Variable = {
+      _type: 'number',
+      _bool: false,
+      _children: {},
+      _childrenArray: [],
+      _str: '',
+      _undefinedInContainer: true,
+      _value: 0,
+      reinitialize: () => {},
+      addChild: () => gdjs.VariablesContainer.badVariable,
+      castTo: () => {},
+      clearChildren: () => {},
+      clone: () => gdjs.VariablesContainer.badVariable,
+      getChildrenCount: () => 0,
+      replaceChildren: () => {},
+      replaceChildrenArray: () => {},
       getType: function () {
         return 'number';
       },
       isPrimitive: function () {
         return true;
       },
-      getChild: function () {
-        return gdjs.VariablesContainer.badVariable;
-      },
+      setValue: () => {},
+      getValue: () => 0,
+      getChild: () => gdjs.VariablesContainer.badVariable,
+      getChildAt: () => gdjs.VariablesContainer.badVariable,
       hasChild: function () {
         return false;
       },
@@ -251,7 +269,7 @@ namespace gdjs {
         return 0;
       },
       getAsBoolean: function () {
-        return 'false';
+        return false;
       },
       getAllChildren: function () {
         return {};
@@ -259,12 +277,8 @@ namespace gdjs {
       getAllChildrenArray: function () {
         return [];
       },
-      getAtIndex: function () {
-        return gdjs.VariablesContainer.badVariable;
-      },
-      push: function () {
-        return;
-      },
+      pushVariableCopy: () => {},
+      pushValue: () => {},
       removeAtIndex: function () {
         return;
       },
@@ -290,7 +304,7 @@ namespace gdjs {
         return;
       },
       isUndefinedInContainer: function () {
-        return;
+        return true;
       },
     };
   }

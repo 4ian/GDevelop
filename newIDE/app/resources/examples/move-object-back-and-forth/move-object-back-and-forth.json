@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\move-object-back-and-forth\\game.json",
+    "projectUuid": "fc73c930-f924-4164-9ff6-6ac1a2dda22c",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "box.png",
         "kind": "image",
+        "metadata": "",
         "name": "box.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +135,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -149,6 +151,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "04031216-51b9-469c-8d04-c311ac993a3a",
           "width": 0,
           "x": 238,
           "y": 228,
@@ -164,6 +167,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "f85203f3-9531-4e99-9717-cdab47d789cf",
           "width": 0,
           "x": 110,
           "y": 228,
@@ -179,6 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "7913a192-83f5-43da-8420-dd75d6225d5f",
           "width": 0,
           "x": 174,
           "y": 292,
@@ -194,6 +199,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "33bedc58-4dda-4c44-b1f0-b475d2592821",
           "width": 0,
           "x": 622,
           "y": 228,
@@ -209,6 +215,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "30ebcb3b-2c11-4c44-938f-bf4265574a16",
           "width": 0,
           "x": 302,
           "y": 292,
@@ -224,6 +231,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "9abbc72f-f60a-403c-965f-b2ea154c9f0c",
           "width": 0,
           "x": 366,
           "y": 228,
@@ -239,6 +247,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "2b7d0ba0-0a69-4e12-8219-e1bdd8286418",
           "width": 0,
           "x": 430,
           "y": 292,
@@ -254,6 +263,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "98625d87-c7f8-4ad0-b7df-654302e1eb0f",
           "width": 0,
           "x": 494,
           "y": 228,
@@ -269,6 +279,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "9ff0db65-e01d-468a-8a33-da3fa5a86ca5",
           "width": 0,
           "x": 558,
           "y": 292,
@@ -281,6 +292,7 @@
       "objects": [
         {
           "name": "Box",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -879,6 +891,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -900,6 +917,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

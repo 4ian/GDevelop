@@ -4,47 +4,53 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
-  type FloatPoint = [float, float];
   /**
    * Allows an object to move in 4 or 8 directions, with customizable speed, accelerations
    * and rotation.
    */
   export class TopDownMovementRuntimeBehavior extends gdjs.RuntimeBehavior {
-    static TOP_DOWN = 0;
-    static PIXEL_ISOMETRY = 1;
-    static TRUE_ISOMETRY = 2;
-    static CUSTOM_ISOMETRY = 2;
-
     //Behavior configuration:
-    _allowDiagonals: any;
-    _acceleration: any;
-    _deceleration: any;
-    _maxSpeed: any;
-    _angularMaxSpeed: any;
-    _rotateObject: any;
-    _angleOffset: any;
-    _ignoreDefaultControls: any;
-    _movementAngleOffset: float;
+    private _allowDiagonals: boolean;
+    private _acceleration: float;
+    private _deceleration: float;
+    private _maxSpeed: float;
+    private _angularMaxSpeed: float;
+    private _rotateObject: boolean;
+    private _angleOffset: float;
+    private _ignoreDefaultControls: boolean;
+    private _movementAngleOffset: float;
 
     /** The latest angle of movement, in degrees. */
-    _angle: float = 0;
+    private _angle: float = 0;
 
     //Attributes used when moving
-    _x: float = 0;
-    _y: float = 0;
-    _xVelocity: float = 0;
-    _yVelocity: float = 0;
-    _angularSpeed: float = 0;
-    _leftKey: boolean = false;
-    _rightKey: boolean = false;
-    _upKey: boolean = false;
-    _downKey: boolean = false;
+    private _x: float = 0;
+    private _y: float = 0;
+    private _xVelocity: float = 0;
+    private _yVelocity: float = 0;
+    private _angularSpeed: float = 0;
+
+    // Inputs
+    private _leftKey: boolean = false;
+    private _rightKey: boolean = false;
+    private _upKey: boolean = false;
+    private _downKey: boolean = false;
+    private _leftKeyPressedDuration: integer = -1;
+    private _rightKeyPressedDuration: integer = -1;
+    private _upKeyPressedDuration: integer = -1;
+    private _downKeyPressedDuration: integer = -1;
+    private _stickAngle: float = 0;
+    private _stickForce: float = 0;
 
     // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
-    _basisTransformation: BasisTransformation | null;
-    _temporaryPointForTransformations: FloatPoint = [0, 0];
+    private _basisTransformation: gdjs.TopDownMovementRuntimeBehavior.BasisTransformation | null;
+    private _temporaryPointForTransformations: FloatPoint = [0, 0];
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._allowDiagonals = behaviorData.allowDiagonals;
       this._acceleration = behaviorData.acceleration;
@@ -109,12 +115,16 @@ namespace gdjs {
     }
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
-      if (viewpoint == 'PixelIsometry') {
-        this._basisTransformation = new IsometryTransformation(Math.atan(0.5));
-      } else if (viewpoint == 'TrueIsometry') {
-        this._basisTransformation = new IsometryTransformation(Math.PI / 6);
-      } else if (viewpoint == 'CustomIsometry') {
-        this._basisTransformation = new IsometryTransformation(
+      if (viewpoint === 'PixelIsometry') {
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.atan(0.5)
+        );
+      } else if (viewpoint === 'TrueIsometry') {
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+          Math.PI / 6
+        );
+      } else if (viewpoint === 'CustomIsometry') {
+        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
           (customIsometryAngle * Math.PI) / 180
         );
       } else {
@@ -122,7 +132,7 @@ namespace gdjs {
       }
     }
 
-    setAcceleration(acceleration): void {
+    setAcceleration(acceleration: float): void {
       this._acceleration = acceleration;
     }
 
@@ -130,7 +140,7 @@ namespace gdjs {
       return this._acceleration;
     }
 
-    setDeceleration(deceleration): void {
+    setDeceleration(deceleration: float): void {
       this._deceleration = deceleration;
     }
 
@@ -138,7 +148,7 @@ namespace gdjs {
       return this._deceleration;
     }
 
-    setMaxSpeed(maxSpeed): void {
+    setMaxSpeed(maxSpeed: float): void {
       this._maxSpeed = maxSpeed;
     }
 
@@ -146,7 +156,7 @@ namespace gdjs {
       return this._maxSpeed;
     }
 
-    setAngularMaxSpeed(angularMaxSpeed): void {
+    setAngularMaxSpeed(angularMaxSpeed: float): void {
       this._angularMaxSpeed = angularMaxSpeed;
     }
 
@@ -154,7 +164,7 @@ namespace gdjs {
       return this._angularMaxSpeed;
     }
 
-    setAngleOffset(angleOffset): void {
+    setAngleOffset(angleOffset: float): void {
       this._angleOffset = angleOffset;
     }
 
@@ -162,7 +172,7 @@ namespace gdjs {
       return this._angleOffset;
     }
 
-    allowDiagonals(allow) {
+    allowDiagonals(allow: boolean) {
       this._allowDiagonals = allow;
     }
 
@@ -170,7 +180,7 @@ namespace gdjs {
       return this._allowDiagonals;
     }
 
-    setRotateObject(allow): void {
+    setRotateObject(allow: boolean): void {
       this._rotateObject = allow;
     }
 
@@ -208,13 +218,11 @@ namespace gdjs {
       return this._movementAngleOffset;
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
       const DOWNKEY = 40;
-      const object = this.owner;
-      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
 
       //Get the player input:
       // @ts-ignore
@@ -233,62 +241,91 @@ namespace gdjs {
       this._upKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+
       let direction = -1;
-      let directionInRad = 0;
-      let directionInDeg = 0;
       if (!this._allowDiagonals) {
+        const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+
+        if (!this._leftKey) {
+          this._leftKeyPressedDuration = 0;
+        } else {
+          this._leftKeyPressedDuration += elapsedTime;
+        }
+        if (!this._rightKey) {
+          this._rightKeyPressedDuration = 0;
+        } else {
+          this._rightKeyPressedDuration += elapsedTime;
+        }
+        if (!this._downKey) {
+          this._downKeyPressedDuration = 0;
+        } else {
+          this._downKeyPressedDuration += elapsedTime;
+        }
+        if (!this._upKey) {
+          this._upKeyPressedDuration = 0;
+        } else {
+          this._upKeyPressedDuration += elapsedTime;
+        }
+
         if (this._upKey && !this._downKey) {
           direction = 6;
-        } else {
-          if (!this._upKey && this._downKey) {
-            direction = 2;
-          }
+        } else if (!this._upKey && this._downKey) {
+          direction = 2;
         }
-        if (!this._upKey && !this._downKey) {
-          if (this._leftKey && !this._rightKey) {
-            direction = 4;
-          } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 0;
-            }
-          }
+        // when 2 keys are pressed for diagonals the most recently pressed win
+        if (
+          this._leftKey &&
+          !this._rightKey &&
+          (this._upKey === this._downKey ||
+            (this._upKey &&
+              this._leftKeyPressedDuration < this._upKeyPressedDuration) ||
+            (this._downKey &&
+              this._leftKeyPressedDuration < this._downKeyPressedDuration))
+        ) {
+          direction = 4;
+        } else if (
+          this._rightKey &&
+          !this._leftKey &&
+          (this._upKey === this._downKey ||
+            (this._upKey &&
+              this._rightKeyPressedDuration < this._upKeyPressedDuration) ||
+            (this._downKey &&
+              this._rightKeyPressedDuration < this._downKeyPressedDuration))
+        ) {
+          direction = 0;
         }
       } else {
         if (this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
             direction = 5;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 7;
           } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 7;
-            } else {
-              direction = 6;
-            }
+            direction = 6;
+          }
+        } else if (!this._upKey && this._downKey) {
+          if (this._leftKey && !this._rightKey) {
+            direction = 3;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 1;
+          } else {
+            direction = 2;
           }
         } else {
-          if (!this._upKey && this._downKey) {
-            if (this._leftKey && !this._rightKey) {
-              direction = 3;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 1;
-              } else {
-                direction = 2;
-              }
-            }
-          } else {
-            if (this._leftKey && !this._rightKey) {
-              direction = 4;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 0;
-              }
-            }
+          if (this._leftKey && !this._rightKey) {
+            direction = 4;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 0;
           }
         }
       }
 
+      const object = this.owner;
+      const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      let directionInRad = 0;
+      let directionInDeg = 0;
       //Update the speed of the object
-      if (direction != -1) {
+      if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
@@ -296,6 +333,17 @@ namespace gdjs {
           this._acceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity +=
           this._acceleration * timeDelta * Math.sin(directionInRad);
+      } else if (this._stickForce !== 0) {
+        if (!this._allowDiagonals) {
+          this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
+        }
+        directionInDeg = this._stickAngle + this._movementAngleOffset;
+        directionInRad = (directionInDeg * Math.PI) / 180;
+        const norm = this._acceleration * timeDelta * this._stickForce;
+        this._xVelocity += norm * Math.cos(directionInRad);
+        this._yVelocity += norm * Math.sin(directionInRad);
+
+        this._stickForce = 0;
       } else {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
         directionInDeg =
@@ -327,12 +375,12 @@ namespace gdjs {
       //No acceleration for angular speed for now
 
       //Position object
-      if (this._basisTransformation == null) {
-        // Top-down pointview
+      if (this._basisTransformation === null) {
+        // Top-down viewpoint
         object.setX(object.getX() + this._xVelocity * timeDelta);
         object.setY(object.getY() + this._yVelocity * timeDelta);
       } else {
-        // Isometry pointview
+        // Isometry viewpoint
         const point = this._temporaryPointForTransformations;
         point[0] = this._xVelocity * timeDelta;
         point[1] = this._yVelocity * timeDelta;
@@ -359,7 +407,7 @@ namespace gdjs {
       this._downKey = false;
     }
 
-    simulateControl(input) {
+    simulateControl(input: string) {
       if (input === 'Left') {
         this._leftKey = true;
       } else if (input === 'Right') {
@@ -371,7 +419,7 @@ namespace gdjs {
       }
     }
 
-    ignoreDefaultControls(ignore) {
+    ignoreDefaultControls(ignore: boolean) {
       this._ignoreDefaultControls = ignore;
     }
 
@@ -390,47 +438,56 @@ namespace gdjs {
     simulateDownKey() {
       this._downKey = true;
     }
+
+    simulateStick(stickAngle: float, stickForce: float) {
+      this._stickAngle = stickAngle % 360;
+      this._stickForce = Math.max(0, Math.min(1, stickForce));
+    }
   }
-
-  export interface BasisTransformation {
-    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
-  }
-
-  export class IsometryTransformation implements BasisTransformation {
-    _screen: float[][];
-
-    /**
-     * @param angle between the x axis and the projected isometric x axis.
-     * @throws if the angle is not in ]0; pi/4[. Note that 0 is a front viewpoint and pi/4 a top-down viewpoint.
-     */
-    constructor(angle: float) {
-      if (angle <= 0 || angle >= Math.PI / 4)
-        throw new RangeError(
-          'An isometry angle must be in ]0; pi/4] but was: ' + angle
-        );
-
-      const alpha = Math.asin(Math.tan(angle));
-      const sinA = Math.sin(alpha);
-      const cosB = Math.cos(Math.PI / 4);
-      const sinB = cosB;
-      // https://en.wikipedia.org/wiki/Isometric_projection
-      //
-      //   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
-      //   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
-      //   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
-      this._screen = [
-        [cosB, -sinB],
-        [sinA * sinB, sinA * cosB],
-      ];
+  export namespace TopDownMovementRuntimeBehavior {
+    export interface BasisTransformation {
+      toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
     }
 
-    toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
-      const x =
-        this._screen[0][0] * worldPoint[0] + this._screen[0][1] * worldPoint[1];
-      const y =
-        this._screen[1][0] * worldPoint[0] + this._screen[1][1] * worldPoint[1];
-      screenPoint[0] = x;
-      screenPoint[1] = y;
+    export class IsometryTransformation
+      implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation {
+      private _screen: float[][];
+
+      /**
+       * @param angle between the x axis and the projected isometric x axis.
+       * @throws if the angle is not in ]0; pi/4[. Note that 0 is a front viewpoint and pi/4 a top-down viewpoint.
+       */
+      constructor(angle: float) {
+        if (angle <= 0 || angle >= Math.PI / 4)
+          throw new RangeError(
+            'An isometry angle must be in ]0; pi/4] but was: ' + angle
+          );
+
+        const alpha = Math.asin(Math.tan(angle));
+        const sinA = Math.sin(alpha);
+        const cosB = Math.cos(Math.PI / 4);
+        const sinB = cosB;
+        // https://en.wikipedia.org/wiki/Isometric_projection
+        //
+        //   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
+        //   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
+        //   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
+        this._screen = [
+          [cosB, -sinB],
+          [sinA * sinB, sinA * cosB],
+        ];
+      }
+
+      toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void {
+        const x =
+          this._screen[0][0] * worldPoint[0] +
+          this._screen[0][1] * worldPoint[1];
+        const y =
+          this._screen[1][0] * worldPoint[0] +
+          this._screen[1][1] * worldPoint[1];
+        screenPoint[0] = x;
+        screenPoint[1] = y;
+      }
     }
   }
 

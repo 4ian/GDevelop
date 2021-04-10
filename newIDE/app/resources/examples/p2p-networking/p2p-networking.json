@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.multiplayergame",
-    "projectUuid": "4e5a640f-64c8-45c4-97a3-8bf51ce318b1",
+    "projectUuid": "bd20e427-37f0-452d-ba93-372d1563cd4d",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -189,6 +189,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -1405,6 +1406,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -1531,6 +1533,7 @@
           "initialVariables": [
             {
               "name": "game",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -2103,6 +2106,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -2128,6 +2132,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -2149,6 +2154,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -2170,6 +2176,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "3"
             }
           ]
@@ -2191,6 +2198,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "8"
             }
           ]
@@ -2212,6 +2220,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "7"
             }
           ]
@@ -2233,6 +2242,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "6"
             }
           ]
@@ -2254,6 +2264,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -2275,6 +2286,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "5"
             }
           ]
@@ -2289,6 +2301,7 @@
           "variables": [
             {
               "name": "id",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -2698,16 +2711,23 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
-        "zoomFactor": 0.9168
+        "zoomFactor": 0.869050000000001
       },
       "objectsGroups": [],
       "variables": [
         {
           "name": "textBox",
+          "type": "string",
           "value": "~~Begin of conversation~~"
+        },
+        {
+          "name": "textBoxChanged",
+          "type": "boolean",
+          "value": false
         }
       ],
       "instances": [
@@ -2730,25 +2750,9 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 438,
-          "layer": "",
-          "locked": false,
-          "name": "ChatBox",
-          "persistentUuid": "5f2f3009-7186-4186-b74f-e9c08fefdd04",
-          "width": 664,
-          "x": 76,
-          "y": 66,
-          "zOrder": 2,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": true,
           "height": 507,
           "layer": "",
-          "locked": false,
+          "locked": true,
           "name": "ChatBoxSprite",
           "persistentUuid": "51196764-54f8-4094-8155-b9e0e64009f9",
           "width": 724,
@@ -2822,6 +2826,22 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 205,
+          "layer": "",
+          "locked": false,
+          "name": "ChatBox",
+          "persistentUuid": "da65c15f-034d-43d9-862f-b103969924c0",
+          "width": 664,
+          "x": 76,
+          "y": 60,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -2845,22 +2865,20 @@
           }
         },
         {
-          "bold": false,
-          "italic": false,
           "name": "ChatBox",
-          "smoothed": true,
           "tags": "",
-          "type": "TextObject::Text",
-          "underlined": false,
+          "type": "BBText::BBText",
           "variables": [],
           "behaviors": [],
-          "string": "~~Begin of conversation~~",
-          "font": "",
-          "characterSize": 15,
-          "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
+          "content": {
+            "text": "~~Begin of conversation~~",
+            "opacity": 255,
+            "fontSize": 15,
+            "visible": true,
+            "color": "#000000",
+            "fontFamily": "Arial",
+            "align": "left",
+            "wordWrap": true
           }
         },
         {
@@ -3022,69 +3040,6 @@
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Handle text entry",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextEntryObject::String"
-                  },
-                  "parameters": [
-                    "Entry",
-                    "=",
-                    "Sanitizer::trim(Entry.String(), 50)"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "EntryText",
-                    "=",
-                    "Entry.String()"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Handle sending",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -3093,7 +3048,7 @@
                     "value": "Egal"
                   },
                   "parameters": [
-                    "StrLength(Sanitizer::sanitize(Entry.String()))",
+                    "StrLength(Sanitizer::removeNewLines(Sanitizer::sanitize(Entry.String())))",
                     "!=",
                     "0"
                   ],
@@ -3165,12 +3120,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "TextObject::String"
+                    "value": "BBText::SetBBText"
                   },
                   "parameters": [
                     "ChatBox",
                     "+",
-                    "NewLine() + \"You: \" + Sanitizer::removeNewLines(Entry.String())"
+                    "NewLine() + \"You: \" + Sanitizer::removeNewLines(Sanitizer::sanitize(Entry.String()))"
                   ],
                   "subInstructions": []
                 },
@@ -3181,7 +3136,7 @@
                   },
                   "parameters": [
                     "\"message\"",
-                    "Entry.String()"
+                    "Sanitizer::removeNewLines(Sanitizer::sanitize(Entry.String()))"
                   ],
                   "subInstructions": []
                 },
@@ -3194,6 +3149,17 @@
                     "Entry",
                     "=",
                     "\"\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "textBoxChanged",
+                    "True"
                   ],
                   "subInstructions": []
                 }
@@ -3209,7 +3175,7 @@
           "colorR": 74,
           "creationTime": 0,
           "disabled": false,
-          "folded": false,
+          "folded": true,
           "name": "Receiving messages",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -3235,12 +3201,23 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "TextObject::String"
+                    "value": "BBText::SetBBText"
                   },
                   "parameters": [
                     "ChatBox",
                     "+",
-                    "NewLine() + \"Other: \" + Sanitizer::removeNewLines(P2P::GetEventData(\"message\"))"
+                    "NewLine() + \"Other: \" + Sanitizer::removeNewLines(Sanitizer::sanitize(P2P::GetEventData(\"message\")))"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetSceneVariableAsBoolean"
+                  },
+                  "parameters": [
+                    "textBoxChanged",
+                    "True"
                   ],
                   "subInstructions": []
                 }
@@ -3273,7 +3250,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Make sure newest message is always visible by removing older messages",
+              "comment": "Make sure newest message is always visible by removing older messages when the text box is updated",
               "comment2": ""
             },
             {
@@ -3284,26 +3261,97 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "Egal"
+                    "value": "SceneVariableAsBoolean"
                   },
                   "parameters": [
-                    "Sanitizer::countNewLines(VariableString(textBox))",
-                    ">=",
-                    "28"
+                    "textBoxChanged",
+                    "True"
                   ],
                   "subInstructions": []
                 }
               ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "infiniteLoopWarning": true,
+                  "type": "BuiltinCommonInstructions::While",
+                  "whileConditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "ChatBox.Height()",
+                        ">",
+                        "480"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BBText::SetBBText"
+                      },
+                      "parameters": [
+                        "ChatBox",
+                        "=",
+                        "Sanitizer::removeFirstLine(ChatBox.GetBBText())"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Display text entry",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
               "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextEntryObject::String"
+                  },
+                  "parameters": [
+                    "Entry",
+                    "=",
+                    "Sanitizer::removeNewLines(Sanitizer::sanitize(Sanitizer::trim(Entry.String(), 70)))"
+                  ],
+                  "subInstructions": []
+                },
                 {
                   "type": {
                     "inverted": false,
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "ChatBox",
+                    "EntryText",
                     "=",
-                    "Sanitizer::removeFirstLine(EntryText.String())"
+                    "Entry.String()"
                   ],
                   "subInstructions": []
                 }
@@ -3370,6 +3418,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -3586,12 +3635,14 @@
         "paste",
         "write"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Read the text from the clipboard asynchronously. As this is \"asynchronous\", this means that the variable won't be immediately filled with the text from the clipboard. Instead, it will be filled a few milliseconds later.\n\nNote also that on some platforms (like on web browsers), the user will be asked for permissions to read from the clipboard.\n\nThis only works on Windows, macOS, Linux and web browsers.",
           "fullName": "Get text from the clipboard (Windows, macOS, Linux, web browser)",
           "functionType": "Action",
           "name": "ReadTextCrossPlaform",
+          "private": false,
           "sentence": "Read clipboard and store text in _PARAM1_",
           "events": [
             {
@@ -3623,6 +3674,7 @@
           "fullName": "Get text from the clipboard (Windows, macOS, Linux)",
           "functionType": "StringExpression",
           "name": "ReadText",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3658,6 +3710,7 @@
           "fullName": "Write text to the clipboard (Windows, macOS, Linux, web browser)",
           "functionType": "Action",
           "name": "WriteText",
+          "private": false,
           "sentence": "Write _PARAM1_ to clipboard",
           "events": [
             {
@@ -3703,12 +3756,14 @@
         "string",
         "string manipulation"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Removes every non-alphanumerical characters of a string.",
           "fullName": "Sanitize Text",
           "functionType": "StringExpression",
           "name": "sanitize",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3730,7 +3785,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\W/g, '');",
+              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/[^a-zA-Z\\d\\s:]/g, '');",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -3755,6 +3810,7 @@
           "fullName": "Trim a string",
           "functionType": "StringExpression",
           "name": "trim",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3811,6 +3867,7 @@
           "fullName": "Remove new lines",
           "functionType": "StringExpression",
           "name": "removeNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3857,6 +3914,7 @@
           "fullName": "Count Lines",
           "functionType": "Expression",
           "name": "countNewLines",
+          "private": false,
           "sentence": "",
           "events": [
             {
@@ -3888,6 +3946,7 @@
           "fullName": "",
           "functionType": "StringExpression",
           "name": "removeFirstLine",
+          "private": false,
           "sentence": "",
           "events": [
             {

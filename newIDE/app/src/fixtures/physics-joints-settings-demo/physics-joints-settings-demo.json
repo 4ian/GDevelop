@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectUuid": "7236d272-c12e-462c-8456-74c82635c1c5",
+    "projectUuid": "6dd77614-cf90-45ad-a14e-e3f731d878d8",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -353,6 +353,7 @@
       "variables": [
         {
           "name": "action",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -400,6 +401,7 @@
       "variables": [
         {
           "name": "prop",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -424,6 +426,7 @@
       "variables": [
         {
           "name": "prop",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -519,49 +522,61 @@
   "variables": [
     {
       "name": "Scenes",
+      "type": "structure",
       "children": [
         {
           "name": "0",
+          "type": "string",
           "value": "DistanceJoint"
         },
         {
           "name": "1",
+          "type": "string",
           "value": "RevoluteJoint"
         },
         {
           "name": "10",
+          "type": "string",
           "value": "MotorJoint"
         },
         {
           "name": "2",
+          "type": "string",
           "value": "PrismaticJoint"
         },
         {
           "name": "3",
+          "type": "string",
           "value": "PulleyJoint"
         },
         {
           "name": "4",
+          "type": "string",
           "value": "GearJoint"
         },
         {
           "name": "5",
+          "type": "string",
           "value": "MouseJoint"
         },
         {
           "name": "6",
+          "type": "string",
           "value": "WheelJoint"
         },
         {
           "name": "7",
+          "type": "string",
           "value": "WeldJoint"
         },
         {
           "name": "8",
+          "type": "string",
           "value": "RopeJoint"
         },
         {
           "name": "9",
+          "type": "string",
           "value": "FrictionJoint"
         }
       ]
@@ -589,6 +604,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -616,7 +632,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "1dac4cd7-55c0-4283-ab8f-91196aa751a6",
+          "persistentUuid": "6bae23be-2025-47d7-b61b-c319292fbd56",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -632,7 +648,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "14c0e168-df86-4008-a215-3cd12f4cc7f1",
+          "persistentUuid": "c87bc784-9b95-43b6-8200-4324790127a3",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -648,7 +664,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "836e5fc7-bdd7-4808-bbe3-b72eecd04cbd",
+          "persistentUuid": "dc0e9ca7-f7d4-4084-92e6-5cbc52b1c37d",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -664,7 +680,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "e1c4a2f1-dbdf-4d4f-854c-acef9a7e86d1",
+          "persistentUuid": "4b7f5bd5-ea99-4cd3-98d7-060e733dfdd9",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -680,7 +696,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "2c58a1ff-f10d-4dc4-a90f-96f921fb7f18",
+          "persistentUuid": "83e65617-224a-4124-bf20-d688113e9d1c",
           "width": 0,
           "x": 123,
           "y": 433,
@@ -696,7 +712,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "58f5b14c-328e-4493-a501-5b416c3b00b5",
+          "persistentUuid": "20095e02-9fef-4678-b08c-ae7317122188",
           "width": 0,
           "x": 367,
           "y": 121,
@@ -712,7 +728,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "0bc52ea0-91f2-42e7-ae92-2158f4833a7f",
+          "persistentUuid": "ca40af9b-389b-43d5-a2e2-6a3c3a9dc96f",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -728,7 +744,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "b3394e0e-31b7-487a-bafe-cf0c9acc6be4",
+          "persistentUuid": "1097961b-604a-494c-bc29-249cb6803b77",
           "width": 0,
           "x": 668,
           "y": 251,
@@ -738,6 +754,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -749,7 +766,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "146f6312-54f0-451e-ae1a-7c95f783b10c",
+          "persistentUuid": "f0868cae-8844-496d-a159-d5284bd843c0",
           "width": 0,
           "x": 587,
           "y": 248,
@@ -759,6 +776,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -770,7 +788,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "ca37b801-30bb-4088-99ee-87ca4c430ace",
+          "persistentUuid": "1848e705-3768-47cd-8a00-46fad3ab4ce7",
           "width": 0,
           "x": 529,
           "y": 251,
@@ -780,6 +798,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -791,7 +810,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "fb75f887-c5bc-453a-8547-47d065023c4f",
+          "persistentUuid": "2e3516d6-6d3f-4202-b79a-249d4a6a9c4b",
           "width": 0,
           "x": 586,
           "y": 218,
@@ -801,6 +820,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -812,7 +832,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "db93ffdc-3d72-4dec-aece-f8e1eb826d56",
+          "persistentUuid": "61431d3d-792f-48cf-be60-ef31518548c7",
           "width": 0,
           "x": 667,
           "y": 104,
@@ -822,6 +842,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_length"
             }
           ]
@@ -833,7 +854,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "6364e2c9-5be6-48be-beba-35f0f4873d59",
+          "persistentUuid": "0a516471-d11c-4a15-8cc7-f8e4805b3975",
           "width": 0,
           "x": 586,
           "y": 101,
@@ -843,6 +864,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length"
             }
           ]
@@ -854,7 +876,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "d335c212-c9e2-4875-af70-4164169b992b",
+          "persistentUuid": "a2a7c5ea-78b1-48b0-8c47-89525f2434a2",
           "width": 0,
           "x": 528,
           "y": 104,
@@ -864,6 +886,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_length"
             }
           ]
@@ -875,7 +898,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "cf13a210-5ebb-453b-877d-8b0d143c49eb",
+          "persistentUuid": "e9a165ed-d321-4b55-bf25-255a1e0defe0",
           "width": 0,
           "x": 585,
           "y": 72,
@@ -885,6 +908,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length"
             }
           ]
@@ -896,7 +920,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "3a940842-6bc5-41c7-8cd1-eae9440834fe",
+          "persistentUuid": "35d0bb09-8742-4f5c-8c1c-6ddb1ca141ef",
           "width": 0,
           "x": 667,
           "y": 179,
@@ -906,6 +930,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -917,7 +942,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "2f8877cc-4632-4d86-95f8-5ea41d01b8e6",
+          "persistentUuid": "bbe3b14e-85f4-45f9-82be-9dd167821355",
           "width": 0,
           "x": 586,
           "y": 176,
@@ -927,6 +952,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -938,7 +964,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "81127a00-5409-4b75-90a1-35c590aa795a",
+          "persistentUuid": "6db5e28b-10e8-4aed-b538-c20c0b0c5551",
           "width": 0,
           "x": 528,
           "y": 179,
@@ -948,6 +974,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -959,7 +986,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "1e88334c-536d-454d-a8d4-82a043353a3f",
+          "persistentUuid": "5f2da828-321b-4cc7-a844-2cac4c7cb049",
           "width": 0,
           "x": 585,
           "y": 146,
@@ -969,6 +996,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -1696,6 +1724,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -1723,7 +1752,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "55a0691e-f38e-487a-9e05-97287f3c7b91",
+          "persistentUuid": "849e9b9b-9fee-4b71-a914-0b2a458469b0",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -1739,7 +1768,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "67d140a9-68a2-4667-b26d-f20523495c34",
+          "persistentUuid": "f3bfcc43-9c3b-42e7-ba74-5cc25cfeb7fa",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -1755,7 +1784,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "990fb9c0-95cc-44d4-b609-f0d675fd8bce",
+          "persistentUuid": "b19466c5-6fff-4ac2-85c9-3c7d63b92936",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -1771,7 +1800,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "6ba6c0e3-bba1-45c1-b8ed-890de8b84258",
+          "persistentUuid": "474f5fc6-2c53-4177-beec-545faaa93f28",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1787,7 +1816,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "6cee27c1-12d7-4b09-861e-d5083fce867a",
+          "persistentUuid": "84fabe14-565e-454d-b8ff-154dbf6679ae",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -1803,7 +1832,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "e7b2273d-1a32-4344-b1c1-19f65439c1ee",
+          "persistentUuid": "70243c01-d836-4969-8ad2-7ca8d1a102de",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -1819,7 +1848,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "9873cd26-ce91-405e-946b-99c44f113593",
+          "persistentUuid": "e8c519d1-f875-47e3-9309-1905836f359b",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -1835,7 +1864,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "5dd8cef9-14cb-4fa4-bc8e-1f85f83b147f",
+          "persistentUuid": "cc2d2776-71c0-4896-8bf6-24db6e530434",
           "width": 0,
           "x": 713,
           "y": 448,
@@ -1845,6 +1874,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_torque"
             }
           ]
@@ -1856,7 +1886,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "64b20ccc-b3b6-403c-8965-47ca25e2b40d",
+          "persistentUuid": "792c446a-f207-4b32-8343-0ff23f329dd2",
           "width": 0,
           "x": 632,
           "y": 445,
@@ -1866,6 +1896,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -1877,7 +1908,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "d97de02d-8f15-4a8f-b5b3-04dd4539f6b1",
+          "persistentUuid": "ae199c35-e4ac-47d3-9f97-a1f4fcc14355",
           "width": 0,
           "x": 574,
           "y": 448,
@@ -1887,6 +1918,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_torque"
             }
           ]
@@ -1898,7 +1930,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "0c22c1b7-696f-43a2-952c-f9f80e2433e8",
+          "persistentUuid": "cc34f295-f9ae-4abf-952b-aa2f926bdece",
           "width": 0,
           "x": 573,
           "y": 413,
@@ -1908,6 +1940,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -1919,7 +1952,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "b039de1f-01f7-479a-b955-cbda303f9232",
+          "persistentUuid": "836b8a19-eaec-41a6-a1f5-73ce540c465c",
           "width": 0,
           "x": 714,
           "y": 282,
@@ -1929,6 +1962,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -1940,7 +1974,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "230ecc21-d811-4912-b787-46f9d2d7c745",
+          "persistentUuid": "243e1fa3-3eac-44e1-b4d4-b80327fe7c07",
           "width": 0,
           "x": 458,
           "y": 59,
@@ -1950,6 +1984,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -1961,7 +1996,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "b1f8532a-333c-4d4c-8406-e11fa6a41aca",
+          "persistentUuid": "ac2733a7-e70a-4d16-afa4-056a9df5eee3",
           "width": 0,
           "x": 575,
           "y": 282,
@@ -1971,6 +2006,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -1982,7 +2018,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "c401001c-227c-4f73-ac48-8cbbfe833a20",
+          "persistentUuid": "afaf6dd5-cd23-4235-b539-3cd01ceb8df9",
           "width": 0,
           "x": 417,
           "y": 35,
@@ -1992,6 +2028,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -2003,7 +2040,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "c4f7649c-4e15-46c8-ac12-be9fdb86faf0",
+          "persistentUuid": "0ec7fc0e-519b-4a65-b15f-d701004d4176",
           "width": 0,
           "x": 714,
           "y": 364,
@@ -2013,6 +2050,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -2024,7 +2062,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "7dbb5689-3976-4501-adcb-ce3b6f832c8c",
+          "persistentUuid": "f437a2c7-e0c1-49a5-83e3-498d1ade9ea1",
           "width": 0,
           "x": 460,
           "y": 277,
@@ -2034,6 +2072,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -2045,7 +2084,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "1130a86c-d6f1-4199-a2fe-ccb5de36c125",
+          "persistentUuid": "4c6b224a-cb1e-4687-8ad2-1716c34dd620",
           "width": 0,
           "x": 575,
           "y": 364,
@@ -2055,6 +2094,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -2066,7 +2106,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "b0046ae7-9bcf-4fa3-89af-6ed1de707861",
+          "persistentUuid": "f22ea819-883a-4c27-938c-af08e706f253",
           "width": 0,
           "x": 421,
           "y": 247,
@@ -2076,6 +2116,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -2087,7 +2128,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "1b3bde01-fd69-4d51-bcbe-7d08a05da3f8",
+          "persistentUuid": "796bbef6-ec82-4f6e-8b77-9b0a2df085ea",
           "width": 0,
           "x": 633,
           "y": 279,
@@ -2097,6 +2138,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -2108,7 +2150,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "a697b154-75b7-4c98-b0a8-8d2b0435a4e9",
+          "persistentUuid": "41a77bd0-753c-435c-b085-16a2bf7d9b71",
           "width": 0,
           "x": 623,
           "y": 250,
@@ -2118,6 +2160,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -2129,7 +2172,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "5022b828-4a23-4e23-b2fc-dfcf09071703",
+          "persistentUuid": "5488424b-bc08-4e15-95d8-623d04b53a59",
           "width": 0,
           "x": 633,
           "y": 361,
@@ -2139,6 +2182,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -2150,7 +2194,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "89bbda11-ec1f-4444-9507-1a405523f2ae",
+          "persistentUuid": "e76cb280-2bad-40cb-954a-3ca5d6ca11c5",
           "width": 0,
           "x": 596,
           "y": 330,
@@ -2160,6 +2204,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -2171,7 +2216,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "1a61e756-cd34-4225-a761-bd0a18bf7060",
+          "persistentUuid": "6003d8c5-afd3-49f9-be05-8e451975a0f5",
           "width": 0,
           "x": 713,
           "y": 204,
@@ -2181,6 +2226,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_angle"
             }
           ]
@@ -2192,7 +2238,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "ba8ddbf6-5c00-4f5e-b863-629c5294a2c8",
+          "persistentUuid": "e28acc1a-9850-40bc-9d19-59d437cd6c08",
           "width": 0,
           "x": 632,
           "y": 201,
@@ -2202,6 +2248,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_angle"
             }
           ]
@@ -2213,7 +2260,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "e60e27af-e0c2-4d9b-9871-e62ff861d533",
+          "persistentUuid": "2e6ee9a7-cb2e-4dc3-a6a1-cebfd9ef6d88",
           "width": 0,
           "x": 574,
           "y": 204,
@@ -2223,6 +2270,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_angle"
             }
           ]
@@ -2234,7 +2282,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "b69c1eeb-5b46-4f72-bb25-9aab195515b2",
+          "persistentUuid": "09da3914-b2f7-4fa9-9d8c-b7ccb510abac",
           "width": 0,
           "x": 607,
           "y": 171,
@@ -2244,6 +2292,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_angle"
             }
           ]
@@ -2255,7 +2304,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "c0ed4572-4032-46ba-91a8-fabfd56661f0",
+          "persistentUuid": "9166f8b4-76b8-4a48-b908-1e1068776e05",
           "width": 0,
           "x": 712,
           "y": 57,
@@ -2265,6 +2314,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_limits"
             }
           ]
@@ -2276,7 +2326,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "346c6087-e6ed-485f-bfa2-2d2ba7a37671",
+          "persistentUuid": "9214eec3-fbd8-48b0-9a37-ae005c6fd6fe",
           "width": 0,
           "x": 573,
           "y": 57,
@@ -2286,6 +2336,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_limits"
             }
           ]
@@ -2297,7 +2348,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "fac9ad25-96c8-4209-8623-de7fdb84ae32",
+          "persistentUuid": "353cfa0e-ba9c-4b53-b946-e4448a1d9187",
           "width": 0,
           "x": 712,
           "y": 132,
@@ -2307,6 +2358,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_min_angle"
             }
           ]
@@ -2318,7 +2370,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "782152ed-a427-4ed9-b0b7-1c7156832342",
+          "persistentUuid": "e7b3cecc-5b21-4dba-9771-930719fbaa47",
           "width": 0,
           "x": 573,
           "y": 132,
@@ -2328,6 +2380,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_min_angle"
             }
           ]
@@ -2339,7 +2392,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "b8502879-5b1a-4efc-9741-75871499dd04",
+          "persistentUuid": "7a8722d2-a447-464f-81c0-3bdc67c2e9cf",
           "width": 0,
           "x": 631,
           "y": 54,
@@ -2349,6 +2402,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -2360,7 +2414,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "a8639eeb-63f2-43b2-8d82-6b19873ae824",
+          "persistentUuid": "9410e8db-4c84-4f7e-ae7d-50baa3862ecc",
           "width": 0,
           "x": 622,
           "y": 25,
@@ -2370,6 +2424,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -2381,7 +2436,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "c1529e87-3ea7-478f-93da-54c47d7e25d9",
+          "persistentUuid": "061eab45-7d3d-4ce2-a504-e59d853e915b",
           "width": 0,
           "x": 631,
           "y": 129,
@@ -2391,6 +2446,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_angle"
             }
           ]
@@ -2402,7 +2458,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "3ed6bf4a-861b-45c3-87cb-6cf43464190e",
+          "persistentUuid": "22a9741b-a90b-4b49-a2c3-6df42772f876",
           "width": 0,
           "x": 607,
           "y": 98,
@@ -2412,6 +2468,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_angle"
             }
           ]
@@ -2423,7 +2480,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "4e62043c-ef56-44ca-8d49-884ba65ad829",
+          "persistentUuid": "2e4b3aff-79d3-463d-a322-300c74cbda44",
           "width": 0,
           "x": 458,
           "y": 203,
@@ -2433,6 +2490,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -2444,7 +2502,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "b146ccea-b248-4a44-aa3d-be9cce3f1574",
+          "persistentUuid": "6b408cae-756e-4b06-bfc9-956bad9360e8",
           "width": 0,
           "x": 457,
           "y": 173,
@@ -2454,6 +2512,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -2465,7 +2524,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "df39fc32-e27c-42be-a8c0-1f2b3ffb353e",
+          "persistentUuid": "2168b138-a902-4a23-bb69-6a2a8cd4c863",
           "width": 0,
           "x": 458,
           "y": 128,
@@ -2475,6 +2534,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "angle"
             }
           ]
@@ -2486,7 +2546,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "cd0c03a7-ffff-484d-9391-c2883d84ef34",
+          "persistentUuid": "cf824929-8a39-4e75-a5f4-8139f9a4ceed",
           "width": 0,
           "x": 457,
           "y": 99,
@@ -2496,6 +2556,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "angle"
             }
           ]
@@ -4004,6 +4065,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -4031,7 +4093,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "60cf81f0-807d-44f1-9b78-97d5fd0d8fd5",
+          "persistentUuid": "d6d1ee66-de73-4470-ae4b-5c5d70a3da66",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -4047,7 +4109,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "377c14b8-f3d0-40a7-99b9-1d06fe01f553",
+          "persistentUuid": "574e5a25-0c05-4501-8e24-7862fc60e24e",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -4063,7 +4125,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "74ae659a-2404-471d-a841-eb7604f485c7",
+          "persistentUuid": "208932f9-5b6f-46fd-b639-7e23cb9bef38",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -4079,7 +4141,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "cbaafef7-b4a7-47b7-a499-e1b7704fd210",
+          "persistentUuid": "1191b5ac-5283-4ac3-a75f-bb11afaa45bf",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -4095,7 +4157,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "24a6cb3b-302b-4b69-9215-0a30fe237728",
+          "persistentUuid": "4dbaed9e-15ed-4755-9fc6-51149f9202f3",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -4111,7 +4173,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "43101197-0c8b-4736-820e-bf1cae8cdab6",
+          "persistentUuid": "5f3dd2e6-1b42-461d-b464-29a0d423701c",
           "width": 0,
           "x": 413,
           "y": 420,
@@ -4127,7 +4189,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "73529d46-5c42-4fcd-aa8b-fa14c3890956",
+          "persistentUuid": "7e3f3020-b881-447a-bb3e-71ee3f294ac0",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -4143,7 +4205,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "269945e2-3bbb-49de-9d60-6611b2a8813f",
+          "persistentUuid": "b381db03-b357-4b99-a7f3-e0490a41fd48",
           "width": 0,
           "x": 713,
           "y": 448,
@@ -4153,6 +4215,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_force"
             }
           ]
@@ -4164,7 +4227,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "12948e0e-7246-430d-8357-98821980e1f3",
+          "persistentUuid": "ae2b3922-3737-4d62-b6f6-2f1730a4fb9f",
           "width": 0,
           "x": 632,
           "y": 445,
@@ -4174,6 +4237,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_force"
             }
           ]
@@ -4185,7 +4249,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "d1fbc291-42a8-4977-a00e-24dd2678b540",
+          "persistentUuid": "9a202f07-1789-425a-9003-7483932a3e25",
           "width": 0,
           "x": 574,
           "y": 448,
@@ -4195,6 +4259,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_force"
             }
           ]
@@ -4206,7 +4271,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "3a0da384-da0f-433e-9a4b-8243eb5e16bf",
+          "persistentUuid": "4ba84913-fec7-4494-a901-013a557b773f",
           "width": 0,
           "x": 573,
           "y": 413,
@@ -4216,6 +4281,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_force"
             }
           ]
@@ -4227,7 +4293,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "a75690cd-7d47-4294-91bf-01e97581f770",
+          "persistentUuid": "3d941622-99fb-4f27-bcdf-cb68454f5f43",
           "width": 0,
           "x": 714,
           "y": 282,
@@ -4237,6 +4303,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -4248,7 +4315,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "77e4a2a0-9f41-41e8-ace9-cf404e0ec58f",
+          "persistentUuid": "89f02545-c372-4ee2-a3ed-efc798b003c3",
           "width": 0,
           "x": 457,
           "y": 58,
@@ -4258,6 +4325,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -4269,7 +4337,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "dbbb96b6-00ab-44ad-9765-8005c69a470f",
+          "persistentUuid": "a4e897fb-092a-41da-88e7-9547c3b0969a",
           "width": 0,
           "x": 575,
           "y": 282,
@@ -4279,6 +4347,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -4290,7 +4359,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "7fbf5bb6-ecb6-4c9d-8797-13218e4cd295",
+          "persistentUuid": "1d48b5c7-9f65-4d5f-9660-416e8bb19fa9",
           "width": 0,
           "x": 416,
           "y": 34,
@@ -4300,6 +4369,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -4311,7 +4381,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "f36afe2f-ac14-40f2-a6b3-9d7fcc860ac5",
+          "persistentUuid": "02ca0f18-a01c-4ede-a2d5-1960a125b14d",
           "width": 0,
           "x": 714,
           "y": 364,
@@ -4321,6 +4391,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -4332,7 +4403,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "570b645c-64a1-4454-bf3a-a77889555a65",
+          "persistentUuid": "97bf5f27-ffa7-4488-a0eb-630f8dd6f0ab",
           "width": 0,
           "x": 466,
           "y": 347,
@@ -4342,6 +4413,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_force"
             }
           ]
@@ -4353,7 +4425,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "bf866b23-ffd6-483a-96a5-ad5cd90cc4b2",
+          "persistentUuid": "d9eaf8d2-6a4e-49ec-bb33-12df2c78f3ec",
           "width": 0,
           "x": 575,
           "y": 364,
@@ -4363,6 +4435,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -4374,7 +4447,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "fe899e65-4a72-49dc-8902-dfe16328c15d",
+          "persistentUuid": "2dfb19e6-2759-49f5-ab0a-bcdd7b4196ee",
           "width": 0,
           "x": 427,
           "y": 317,
@@ -4384,6 +4457,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_force"
             }
           ]
@@ -4395,7 +4469,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "6a1f86b8-485f-4a8d-b4e1-a9941f76a8fa",
+          "persistentUuid": "30330d73-1f8b-4594-af7e-faa6bdf2ef46",
           "width": 0,
           "x": 633,
           "y": 279,
@@ -4405,6 +4479,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -4416,7 +4491,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "94341455-04a3-45b6-9a1a-8a2f351d8415",
+          "persistentUuid": "29da2e3f-ce2e-4f75-8ce2-cf960642e1d5",
           "width": 0,
           "x": 623,
           "y": 250,
@@ -4426,6 +4501,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -4437,7 +4513,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "f1b390d4-7dfd-4075-aa93-56dc11556d27",
+          "persistentUuid": "5de022b4-2c44-4d7e-8290-43ee13c06e0a",
           "width": 0,
           "x": 633,
           "y": 361,
@@ -4447,6 +4523,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -4458,7 +4535,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "ffee9a70-736f-4f34-a0e8-cd354f90dd11",
+          "persistentUuid": "bee7d0fe-e87b-4e0c-ad4f-7fb7254a2b86",
           "width": 0,
           "x": 596,
           "y": 330,
@@ -4468,6 +4545,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -4479,7 +4557,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "ee8733f8-4b7c-4cd1-b197-4e6f16894e0b",
+          "persistentUuid": "3d5ddb6a-2f08-4878-917a-a11e8d992792",
           "width": 0,
           "x": 713,
           "y": 204,
@@ -4489,6 +4567,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_translation"
             }
           ]
@@ -4500,7 +4579,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "835108ec-319f-46c3-adeb-dbfbcdcb45f9",
+          "persistentUuid": "6c7706e5-b67a-4f01-8c8f-378b77e5d018",
           "width": 0,
           "x": 632,
           "y": 201,
@@ -4510,6 +4589,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_translation"
             }
           ]
@@ -4521,7 +4601,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "42200f0d-51e4-4561-a9d8-461caa0217cd",
+          "persistentUuid": "baa878d9-e151-40f4-97b6-c5b1fa595e97",
           "width": 0,
           "x": 574,
           "y": 204,
@@ -4531,6 +4611,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_translation"
             }
           ]
@@ -4542,7 +4623,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "f5b5ec3c-29bb-4ca4-98c3-27eceea0eca3",
+          "persistentUuid": "52d2d4b3-5c01-48ff-a802-f40b4f2ec654",
           "width": 0,
           "x": 607,
           "y": 171,
@@ -4552,6 +4633,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_translation"
             }
           ]
@@ -4563,7 +4645,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "9f46488b-c3ca-4cc8-9f65-0114b117bea3",
+          "persistentUuid": "c758513b-5f1f-4823-81e6-8c9ddf05bc52",
           "width": 0,
           "x": 712,
           "y": 57,
@@ -4573,6 +4655,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_limits"
             }
           ]
@@ -4584,7 +4667,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "04b2f1db-81b5-4baa-b222-ecd62d1fa9cd",
+          "persistentUuid": "e58f2fb1-930b-4016-865c-8a6eed20a922",
           "width": 0,
           "x": 573,
           "y": 57,
@@ -4594,6 +4677,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_limits"
             }
           ]
@@ -4605,7 +4689,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "7d32556a-948c-4a1c-8165-80fdd4bbe016",
+          "persistentUuid": "0da3072b-3552-4673-ace0-9d78e48b121b",
           "width": 0,
           "x": 712,
           "y": 132,
@@ -4615,6 +4699,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_min_translation"
             }
           ]
@@ -4626,7 +4711,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "79ce3184-3497-4316-8dca-5342cb159b01",
+          "persistentUuid": "a3fc4142-c1dd-44eb-8ea9-f343e6804633",
           "width": 0,
           "x": 573,
           "y": 132,
@@ -4636,6 +4721,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_min_translation"
             }
           ]
@@ -4647,7 +4733,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "9290c634-83db-4905-8ee1-b7f174bbe3ea",
+          "persistentUuid": "c2f166e4-8ee6-49ea-8f2e-c29336df6490",
           "width": 0,
           "x": 631,
           "y": 54,
@@ -4657,6 +4743,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -4668,7 +4755,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "426e4da6-f2c6-4913-9fc3-2daa8ecbfa74",
+          "persistentUuid": "9de8f4dc-7c81-490c-8ed2-b811186ed67b",
           "width": 0,
           "x": 622,
           "y": 25,
@@ -4678,6 +4765,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -4689,7 +4777,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "36515007-b067-4e6b-80db-8c760347a0d1",
+          "persistentUuid": "eb2c6716-fc2a-4d40-9423-21c5d8bcf927",
           "width": 0,
           "x": 631,
           "y": 129,
@@ -4699,6 +4787,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_translation"
             }
           ]
@@ -4710,7 +4799,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "f7a38f61-e2a5-468b-9f45-885d1c02df57",
+          "persistentUuid": "795ed21a-0d2e-402a-bfd4-533a8db57c35",
           "width": 0,
           "x": 607,
           "y": 98,
@@ -4720,6 +4809,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_translation"
             }
           ]
@@ -4731,7 +4821,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "b55deaf3-2e8d-46cb-b052-5b3360f026db",
+          "persistentUuid": "3cee8d5a-d5bd-4b0d-bd52-ed547a97c1eb",
           "width": 0,
           "x": 464,
           "y": 273,
@@ -4741,6 +4831,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -4752,7 +4843,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "da175cd8-6568-47fa-ab36-4642c93d3be5",
+          "persistentUuid": "2ee15452-4ee4-47ea-95cd-29ca49d0725d",
           "width": 0,
           "x": 463,
           "y": 243,
@@ -4762,6 +4853,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -4773,7 +4865,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "6b3c83e3-03e1-47f0-aa3f-e970e5174b1f",
+          "persistentUuid": "9a4a34c9-d8af-4b6b-88c7-afe15720076d",
           "width": 0,
           "x": 464,
           "y": 198,
@@ -4783,6 +4875,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -4794,7 +4887,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "ec443e0e-03ea-4548-81d3-99c266965466",
+          "persistentUuid": "857cdb2d-ddf9-49fe-acbc-e14adcad0393",
           "width": 0,
           "x": 463,
           "y": 169,
@@ -4804,6 +4897,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -4815,7 +4909,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "c4a1dc14-0ecf-4012-ae9d-185a13312baa",
+          "persistentUuid": "d3cc1fe7-3285-4ac0-b02d-3307e61d4610",
           "width": 0,
           "x": 464,
           "y": 129,
@@ -4825,6 +4919,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -4836,7 +4931,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "64041b3a-01ef-4b54-8d61-46f937bd1a1c",
+          "persistentUuid": "c2bdadfd-775a-4ddb-9d4e-ff387f62a397",
           "width": 0,
           "x": 423,
           "y": 105,
@@ -4846,6 +4941,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -6399,6 +6495,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -6426,7 +6523,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "5b61e444-1c38-45d6-8cd5-41297d77869e",
+          "persistentUuid": "c285f8e5-4933-4a87-a961-d8ab32a7b08a",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -6442,7 +6539,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "15b6f2b9-fc5e-48d7-841a-f9f4b91ebc02",
+          "persistentUuid": "7e791c5e-fe0f-4210-be95-7d45049d750c",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -6458,7 +6555,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "7dd6973b-ced5-4ea6-8a69-6e9c1d0c3ae1",
+          "persistentUuid": "b7aa0e31-178e-485b-9210-c395c87c2808",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -6474,7 +6571,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "f05efe7e-f6a7-4ad3-9bf0-45528a67a181",
+          "persistentUuid": "a6990ab0-d603-46eb-80d2-c2a99e7ae6d4",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -6490,7 +6587,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "afce43cf-84cd-43f4-92bb-6f6526f7e9bd",
+          "persistentUuid": "851335e3-ff9c-499d-a30b-0566b8df7f39",
           "width": 0,
           "x": 114,
           "y": 308,
@@ -6506,7 +6603,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "307573d7-8be0-44e2-8ec2-72ce52e583ab",
+          "persistentUuid": "a228b970-111b-4b71-8def-8cd707294667",
           "width": 0,
           "x": 491,
           "y": 443,
@@ -6522,7 +6619,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "28d29bd5-52d1-48a1-822c-b40bebd20e36",
+          "persistentUuid": "7872616f-92be-4334-b482-af3c6a27b7eb",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -6538,7 +6635,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "71c8cb09-e80b-44ce-847b-9c6bb09fa507",
+          "persistentUuid": "29244067-b49b-4504-9c24-ae1706965644",
           "width": 0,
           "x": 636,
           "y": 67,
@@ -6548,6 +6645,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_a"
             }
           ]
@@ -6559,7 +6657,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "b13a0cce-35ab-4993-a917-4c9de99799a3",
+          "persistentUuid": "24f6a040-a3b4-4b70-9401-2e780e91da06",
           "width": 0,
           "x": 635,
           "y": 41,
@@ -6569,6 +6667,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_a"
             }
           ]
@@ -6580,7 +6679,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "4617c800-4091-453d-91d7-2a7b245ea40e",
+          "persistentUuid": "2ef40727-4843-4fc5-8c2c-b9450a8d8738",
           "width": 0,
           "x": 666,
           "y": 358,
@@ -6590,6 +6689,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -6601,7 +6701,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "2c790f22-5868-4151-b272-b6e36e6a5072",
+          "persistentUuid": "29dbfe2c-41fa-4c93-9f27-aa6e7e2020e6",
           "width": 0,
           "x": 650,
           "y": 328,
@@ -6611,6 +6711,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -6622,7 +6723,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "430c2d76-55d3-418e-b236-51b1e36f877e",
+          "persistentUuid": "4c181984-c0e2-48c4-83ab-b8e6f152d03a",
           "width": 0,
           "x": 653,
           "y": 282,
@@ -6632,6 +6733,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_b"
             }
           ]
@@ -6643,7 +6745,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "a6e04279-85b2-4a45-9169-e146a539b79f",
+          "persistentUuid": "6417c97c-0970-4468-8488-e5ed327cf91e",
           "width": 0,
           "x": 639,
           "y": 254,
@@ -6653,6 +6755,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_b"
             }
           ]
@@ -6664,7 +6767,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "2847d71d-e52b-443c-ad31-83122110d6b7",
+          "persistentUuid": "a7f98ae4-e6b5-453c-b7c7-9cd293be0fbe",
           "width": 0,
           "x": 654,
           "y": 205,
@@ -6674,6 +6777,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_a"
             }
           ]
@@ -6685,7 +6789,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "5bf3a583-0000-4123-800c-6a2da8e42457",
+          "persistentUuid": "b80f9926-517f-4d0b-9941-4dcb6dc0005e",
           "width": 0,
           "x": 640,
           "y": 178,
@@ -6695,6 +6799,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_a"
             }
           ]
@@ -6706,7 +6811,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "e8636e31-49f5-40e4-86fb-cde0b6119eb3",
+          "persistentUuid": "b8480e96-ea80-46ea-911a-dd12031bbeef",
           "width": 0,
           "x": 637,
           "y": 138,
@@ -6716,6 +6821,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_b"
             }
           ]
@@ -6727,7 +6833,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "83bcb241-df25-4b86-b8b5-c0f13268b197",
+          "persistentUuid": "cc5b0334-60f7-44f0-91bb-e79522b14b5f",
           "width": 0,
           "x": 637,
           "y": 112,
@@ -6737,6 +6843,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_b"
             }
           ]
@@ -7296,6 +7403,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -7323,7 +7431,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "d20b9e09-2d10-4cff-b63c-74a9a17fef09",
+          "persistentUuid": "25273513-f40b-45f3-8465-2bb4675604d2",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -7339,7 +7447,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "f1d85392-2186-4f30-8fff-c2b5362f84c0",
+          "persistentUuid": "1ccf11a3-5333-4e3f-9238-f1efa80b485a",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -7355,7 +7463,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "43c78665-dc32-4aa5-a7ba-5bb3b9721f86",
+          "persistentUuid": "8202b880-93ff-4e41-950a-b1211627346d",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -7365,6 +7473,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "bottom"
             }
           ]
@@ -7376,7 +7485,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "61a8d712-8589-4cb2-a532-c9260cb2d7ed",
+          "persistentUuid": "1004b8d1-cea5-4df7-9969-1c308d757795",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -7392,7 +7501,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "6449587a-e47a-43de-9c88-9ddda579b3fd",
+          "persistentUuid": "49163c75-c70e-4db2-909e-925a25f26699",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -7408,7 +7517,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "f12ea371-b6b5-477f-bfd0-05cfedab8977",
+          "persistentUuid": "e5a7c86c-614e-492b-a5b9-312b5097a7bc",
           "width": 0,
           "x": 413,
           "y": 420,
@@ -7424,7 +7533,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "1e54a6dc-7ce3-4aeb-8beb-cde66ab3a09d",
+          "persistentUuid": "5206fa01-889e-44a6-b2cf-5556024a02a5",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -7440,7 +7549,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "cb9e303a-5675-456f-b148-8616002a0264",
+          "persistentUuid": "88f25ed6-ff5b-4ea7-a3db-e1efd9488021",
           "width": 0,
           "x": 727,
           "y": 200,
@@ -7450,6 +7559,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_ratio"
             }
           ]
@@ -7461,7 +7571,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "8bce827c-0e1c-4633-8398-3e9e99af78f0",
+          "persistentUuid": "5b0ebf79-dd9e-416e-ba28-ae1494e71c07",
           "width": 0,
           "x": 646,
           "y": 197,
@@ -7471,6 +7581,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -7482,7 +7593,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "9e345d21-8dd1-46fb-8852-0c33341ca675",
+          "persistentUuid": "0b8e4d42-f162-4f95-9011-4959237406ce",
           "width": 0,
           "x": 588,
           "y": 200,
@@ -7492,6 +7603,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_ratio"
             }
           ]
@@ -7503,7 +7615,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "2f501f03-6191-43e7-b05b-f5acf6fbe771",
+          "persistentUuid": "15a06dd7-42af-4e9c-82e8-8b72ac4192bc",
           "width": 0,
           "x": 635,
           "y": 167,
@@ -7513,6 +7625,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -7524,7 +7637,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "275a79f5-a982-4e78-a40b-99d360e3eaa4",
+          "persistentUuid": "d5754698-f8ce-4cf1-8dd3-92eaef4be7dd",
           "width": 0,
           "x": 635,
           "y": 58,
@@ -7534,6 +7647,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "first_joint"
             }
           ]
@@ -7545,7 +7659,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "022526a1-0371-4242-8972-a2df4c56d2f1",
+          "persistentUuid": "60e8423e-15e9-4b3c-b72f-30de53581601",
           "width": 0,
           "x": 606,
           "y": 36,
@@ -7555,6 +7669,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "first_joint"
             }
           ]
@@ -7566,7 +7681,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "697cbab1-6c8f-4bc3-8300-df761f07a631",
+          "persistentUuid": "5be2f2c1-b46f-4361-ba88-c4b4171580c3",
           "width": 0,
           "x": 642,
           "y": 129,
@@ -7576,6 +7691,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "second_joint"
             }
           ]
@@ -7587,7 +7703,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "17289b95-b7dd-4969-bc3c-70a9c387a166",
+          "persistentUuid": "d3a3a893-ad88-4e42-9233-371c5e381690",
           "width": 0,
           "x": 609,
           "y": 106,
@@ -7597,6 +7713,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "second_joint"
             }
           ]
@@ -8186,6 +8303,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -8213,7 +8331,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "be3f17bb-2972-4838-9a02-be29456b486f",
+          "persistentUuid": "bf52bbdd-c94e-4aa6-9bba-d51a35409696",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -8229,7 +8347,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "b2dcdac6-1045-4c46-b632-a66416b86f6e",
+          "persistentUuid": "cd77deea-7e71-444b-8cc8-5d32a699ed70",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -8245,7 +8363,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "c3ca0ad0-14e5-438a-95c7-8f1b660643bd",
+          "persistentUuid": "8d786965-edb4-4bf2-81ba-2913fe4d647c",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -8261,7 +8379,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "170f1bff-c4a3-4a40-8917-1c92b5c268d6",
+          "persistentUuid": "e1c44477-ad98-431e-881d-b5a311598cde",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -8277,7 +8395,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "690c9385-b119-489e-b042-6f0d7734af61",
+          "persistentUuid": "0c234c78-5065-4910-a507-451d37af0ae6",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -8293,7 +8411,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "2b5479f6-1820-4c52-81cc-11e4343fb7e0",
+          "persistentUuid": "d9ef7ce0-554b-4d6b-9971-6b7e3bc45523",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -8309,7 +8427,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "1b3f4401-1fc9-45a8-bf07-eb3b57174878",
+          "persistentUuid": "ee9ec07f-3d1c-4f96-973f-c95abbc8ad72",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -8325,7 +8443,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "0037b3aa-fb79-4764-b424-25b12cc87ce5",
+          "persistentUuid": "3309415c-75d5-469f-8753-ad1136deeec1",
           "width": 0,
           "x": 673,
           "y": 295,
@@ -8335,6 +8453,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -8346,7 +8465,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "d813daf8-d008-4a45-9f04-22dada39e8ab",
+          "persistentUuid": "a13b1041-a24c-4976-be92-63b459cde2a5",
           "width": 0,
           "x": 592,
           "y": 292,
@@ -8356,6 +8475,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -8367,7 +8487,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "1b73628a-6ae1-4d68-8f6a-cda5c5759f3a",
+          "persistentUuid": "e12c3a25-2e09-4722-a820-1bcdc4cea31a",
           "width": 0,
           "x": 534,
           "y": 295,
@@ -8377,6 +8497,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -8388,7 +8509,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "bb3eab62-a43c-45a7-a139-ff715d060847",
+          "persistentUuid": "11021929-5b96-40ef-acc2-70a5e8525911",
           "width": 0,
           "x": 591,
           "y": 262,
@@ -8398,6 +8519,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -8409,7 +8531,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "d5762726-59b1-4149-8d0d-75f7bc33526f",
+          "persistentUuid": "a9692a8d-801c-434c-ae84-13e532a4cd0f",
           "width": 0,
           "x": 672,
           "y": 148,
@@ -8419,6 +8541,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -8430,7 +8553,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "d2259cc9-9aa9-4045-9665-33baf664d118",
+          "persistentUuid": "0cbafc41-6365-4eeb-a319-22a744fc5303",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -8440,6 +8563,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "target"
             }
           ]
@@ -8451,7 +8575,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "12653866-7496-4108-9cf4-9be4bb95f8cf",
+          "persistentUuid": "5e036580-580e-4db5-b22b-45e995ce588a",
           "width": 0,
           "x": 533,
           "y": 148,
@@ -8461,6 +8585,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -8472,7 +8597,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "c0100772-3498-4637-b613-56862d9a05bf",
+          "persistentUuid": "64cc4410-2a9d-4691-84c9-d2d40b507dcd",
           "width": 0,
           "x": 588,
           "y": 46,
@@ -8482,6 +8607,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "target"
             }
           ]
@@ -8493,7 +8619,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "8d09b7fc-0f7f-4adf-b3b1-aa71756ff332",
+          "persistentUuid": "35dc1fbb-8f61-4a77-8d26-c10024023837",
           "width": 0,
           "x": 672,
           "y": 223,
@@ -8503,6 +8629,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -8514,7 +8641,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "b47fe836-6768-40ca-82b0-9a96a718df10",
+          "persistentUuid": "8ecc34f6-cda4-4e50-950c-078bd2de9fa4",
           "width": 0,
           "x": 591,
           "y": 220,
@@ -8524,6 +8651,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -8535,7 +8663,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "3af938de-60e8-4a66-81a9-3770f1643c37",
+          "persistentUuid": "3227fc94-ffe2-4bf9-bbfc-00c6982bb23c",
           "width": 0,
           "x": 533,
           "y": 223,
@@ -8545,6 +8673,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -8556,7 +8685,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "dbededd2-f104-41df-8538-ef914e63b387",
+          "persistentUuid": "680e9862-9dab-4c6c-a508-5602cf032246",
           "width": 0,
           "x": 590,
           "y": 190,
@@ -8566,6 +8695,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -8577,7 +8707,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "4f8427b1-918a-4233-908d-ce91e3565f1c",
+          "persistentUuid": "2de8be35-e606-4633-8bc9-e687fcc1aac9",
           "width": 0,
           "x": 591,
           "y": 145,
@@ -8587,6 +8717,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -8598,7 +8729,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "58c9b67c-347d-44b8-9f49-d3a83c35fe85",
+          "persistentUuid": "ac6162f3-07f0-4fc1-a7e4-a046c7ec4963",
           "width": 0,
           "x": 578,
           "y": 116,
@@ -8608,6 +8739,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -9264,6 +9396,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -9291,7 +9424,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "e450fd9e-e1a5-4c38-838f-27e4e2ffa476",
+          "persistentUuid": "566cf8f0-ac4c-42f2-b262-6b8ba071a455",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -9307,7 +9440,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "9dcfc954-76b3-4ecd-b3ce-4c25a71258b9",
+          "persistentUuid": "2b5d80e1-b23e-4917-a9b6-8d6b79744ae5",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -9323,7 +9456,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "660fc280-ed16-4614-9db0-e56f303b16c4",
+          "persistentUuid": "0212689e-912a-4b36-bbc7-26a447f4c957",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -9339,7 +9472,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "e7fefff3-5ac3-4c47-ae72-aca405990650",
+          "persistentUuid": "6cc72ffc-8ba2-40f6-9eb2-de942e2af198",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -9355,7 +9488,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "5713cd4e-5911-47c1-bec4-ac082e631be6",
+          "persistentUuid": "3dd5fecf-d690-494e-ae84-145d6c7848fd",
           "width": 78,
           "x": 121,
           "y": 123,
@@ -9371,7 +9504,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "ff804369-473b-4d5b-aa7e-1e061c9045d4",
+          "persistentUuid": "dfd9adf1-515e-4da7-9ab1-4af762df0265",
           "width": 0,
           "x": 209,
           "y": 451,
@@ -9381,6 +9514,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "front"
             }
           ]
@@ -9392,7 +9526,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "b91fb46a-f163-4234-979e-0c73a8ec23a0",
+          "persistentUuid": "10a073df-61df-4ae7-80d6-247c5b25dfe3",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -9408,7 +9542,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "c4e3d109-630d-4229-aca3-25e9d7f1a7b1",
+          "persistentUuid": "3d7608d8-bc9d-4a88-9854-04a999cec936",
           "width": 0,
           "x": 710,
           "y": 351,
@@ -9418,6 +9552,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -9429,7 +9564,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "ae296222-49cd-40a0-8346-f533103ee542",
+          "persistentUuid": "8e675131-260e-4fb2-bcb0-c05cfbb0ce5c",
           "width": 0,
           "x": 629,
           "y": 348,
@@ -9439,6 +9574,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -9450,7 +9586,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "2a6e07fa-a2e4-47da-a762-a33cf10b7fa2",
+          "persistentUuid": "bd678502-959a-46e9-a6a5-90924d84508d",
           "width": 0,
           "x": 571,
           "y": 351,
@@ -9460,6 +9596,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -9471,7 +9608,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "d218922a-d0dd-4be5-90c8-83b39f6a2441",
+          "persistentUuid": "66ee8562-561b-40d9-a02c-0a358afe2805",
           "width": 0,
           "x": 611,
           "y": 319,
@@ -9481,6 +9618,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -9492,7 +9630,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "4ef64ced-7066-49d4-832e-1330295356bd",
+          "persistentUuid": "c96aa352-8a06-4c05-a9ff-a4b155b46f0e",
           "width": 0,
           "x": 706,
           "y": 61,
@@ -9502,6 +9640,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -9513,7 +9652,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "89428fb8-ed75-4092-b4b3-ed55fb56b07f",
+          "persistentUuid": "f2f97e43-6b42-4d5f-afb3-715e998e0f6b",
           "width": 0,
           "x": 457,
           "y": 58,
@@ -9523,6 +9662,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -9534,7 +9674,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "a74423f7-436a-4c2f-9fce-7250a49b903d",
+          "persistentUuid": "92b78997-60c6-41da-aca0-431c51cce02c",
           "width": 0,
           "x": 567,
           "y": 61,
@@ -9544,6 +9684,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -9555,7 +9696,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "23a63e9e-72c7-47b1-b6b0-9b643c1a6200",
+          "persistentUuid": "6ea8c07e-fe5b-46fd-8bf3-396deece938b",
           "width": 0,
           "x": 416,
           "y": 34,
@@ -9565,6 +9706,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -9576,7 +9718,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "9997a6a6-9fa4-4770-8ef2-bb6458203cf1",
+          "persistentUuid": "cace951e-d15c-433b-8069-5f4b68c8619d",
           "width": 0,
           "x": 711,
           "y": 280,
@@ -9586,6 +9728,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -9597,7 +9740,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "29cfef76-2062-4e48-8652-eb3bdff4a4b8",
+          "persistentUuid": "48290d5f-e539-4155-a953-9dbaa8f0ba89",
           "width": 0,
           "x": 460,
           "y": 280,
@@ -9607,6 +9750,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -9618,7 +9762,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "8ab83693-9340-4850-b980-87532d2f3548",
+          "persistentUuid": "b3acaadd-7910-49cb-a5a0-961dad2408d2",
           "width": 0,
           "x": 572,
           "y": 280,
@@ -9628,6 +9772,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -9639,7 +9784,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "6942a6a7-a82f-487a-b0ab-9e2a321b5204",
+          "persistentUuid": "a8620b95-de6a-4eff-8797-73109e0b6e88",
           "width": 0,
           "x": 421,
           "y": 250,
@@ -9649,6 +9794,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -9660,7 +9806,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "a4c4c5fe-a1e1-4800-9bf3-058c73b05bd8",
+          "persistentUuid": "e7925b75-d30e-4bcd-976e-41f733996695",
           "width": 0,
           "x": 625,
           "y": 58,
@@ -9670,6 +9816,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -9681,7 +9828,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "234b4197-347e-4f49-82c1-0bdb310df43e",
+          "persistentUuid": "7e97ab21-4c19-43f6-ae6b-1454c7cae779",
           "width": 0,
           "x": 615,
           "y": 29,
@@ -9691,6 +9838,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -9702,7 +9850,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "ea1f498f-9e26-4830-85dc-8de0c6284b58",
+          "persistentUuid": "c2b9b26a-58cb-46af-a286-100658872c9f",
           "width": 0,
           "x": 630,
           "y": 277,
@@ -9712,6 +9860,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -9723,7 +9872,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "1ee421ba-b906-4871-9c68-a1f28e665276",
+          "persistentUuid": "d7834458-e03c-415e-8e5c-ef48d62f5e80",
           "width": 0,
           "x": 600,
           "y": 246,
@@ -9733,6 +9882,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -9744,7 +9894,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "3957ad4c-4b7a-40b2-9ef0-69cb33977e5f",
+          "persistentUuid": "eb0f9939-d4a8-43d9-a6a8-421dbe6dc7c7",
           "width": 0,
           "x": 458,
           "y": 206,
@@ -9754,6 +9904,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -9765,7 +9916,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "6d03b07c-5096-46a9-b6af-ec21ba134755",
+          "persistentUuid": "676aae00-7253-4c49-9432-02cae0b650a6",
           "width": 0,
           "x": 457,
           "y": 176,
@@ -9775,6 +9926,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -9786,7 +9938,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "ea6e4e0a-9b11-4474-bcf6-74a9326053af",
+          "persistentUuid": "e999149d-e6d8-4544-83ff-54ed9c6c115b",
           "width": 0,
           "x": 458,
           "y": 131,
@@ -9796,6 +9948,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -9807,7 +9960,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "cf915a9a-095b-4eaf-9060-18d394a470f1",
+          "persistentUuid": "0fe259dd-2e73-424f-bc1c-400a6abd0649",
           "width": 0,
           "x": 457,
           "y": 102,
@@ -9817,6 +9970,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -9828,7 +9982,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "e285bb20-fdd5-437b-878d-22a120981d6d",
+          "persistentUuid": "6a133696-0e79-4a4e-b6cf-721370feffb7",
           "width": 0,
           "x": 106,
           "y": 450,
@@ -9838,6 +9992,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "back"
             }
           ]
@@ -9849,7 +10004,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "58d4879a-e590-4fb8-b967-5384a70adc31",
+          "persistentUuid": "388b1b3d-9aa3-4f88-abea-efb9867a6d05",
           "width": 0,
           "x": 711,
           "y": 209,
@@ -9859,6 +10014,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_torque"
             }
           ]
@@ -9870,7 +10026,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "0e020f77-f93c-48bd-919a-dc12bcb01be5",
+          "persistentUuid": "e200c2cc-840d-4159-83fb-37549093cb77",
           "width": 0,
           "x": 630,
           "y": 206,
@@ -9880,6 +10036,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -9891,7 +10048,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "a2c90711-b576-48cd-ab8e-e1309b153d63",
+          "persistentUuid": "aa5a5f81-84a8-4f22-87c7-edfd49481179",
           "width": 0,
           "x": 572,
           "y": 209,
@@ -9901,6 +10058,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_torque"
             }
           ]
@@ -9912,7 +10070,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "cd991c0b-05aa-46b6-8c8f-5bb9f5567af6",
+          "persistentUuid": "5bd56e14-00ea-4ef5-af8a-5f7d330fd1d0",
           "width": 0,
           "x": 571,
           "y": 174,
@@ -9922,6 +10080,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -9933,7 +10092,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "3374914b-77c1-4d34-be32-84776e77dffb",
+          "persistentUuid": "0bb8ba69-2ceb-4410-8b6f-1bb567192a10",
           "width": 0,
           "x": 708,
           "y": 136,
@@ -9943,6 +10102,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -9954,7 +10114,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "16e42bdd-10b1-4318-a698-620263baa536",
+          "persistentUuid": "dcc456ec-a965-4cb6-8cbd-b44afd14fc5b",
           "width": 0,
           "x": 569,
           "y": 136,
@@ -9964,6 +10124,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -9975,7 +10136,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "362aa8dc-cad1-4150-9980-481a886d98a7",
+          "persistentUuid": "40d1acce-81a0-4b87-bcd3-231a2b991fe1",
           "width": 0,
           "x": 627,
           "y": 133,
@@ -9985,6 +10146,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -9996,7 +10158,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "76e2aff5-92f8-46f7-8976-4e3390d2121d",
+          "persistentUuid": "42a86cd6-be8c-4289-b3c8-5583302dc886",
           "width": 0,
           "x": 590,
           "y": 102,
@@ -10006,6 +10168,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -11372,6 +11535,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -11399,7 +11563,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "26721fb1-4224-4da3-a876-a51c01b28bfa",
+          "persistentUuid": "2dd21cc2-6225-446b-8468-5a18e8ef1e35",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -11415,7 +11579,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "a7c00e6c-1d06-4126-9572-cef0e18beb7f",
+          "persistentUuid": "5e13bf21-a447-4ea4-aed6-3afda4777cfb",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -11431,7 +11595,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "9d477e4b-c67d-4e27-a7f0-71e8747459e1",
+          "persistentUuid": "8bad9989-8c31-403d-ab4b-a5d9fd9948e0",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -11447,7 +11611,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "be6c3b05-be46-4091-82c4-a9e5fdc7d23b",
+          "persistentUuid": "8fc10ad9-bc5d-490e-8272-8a24614662ac",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -11463,7 +11627,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "567bd9db-f9c7-4e03-b4f6-568e05513a0b",
+          "persistentUuid": "40ca8aae-3dff-44d4-9231-db7c6fb289cc",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -11479,7 +11643,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "db596557-644e-4080-be29-f6ee67b331ce",
+          "persistentUuid": "fba1ce9d-041b-4ea1-a877-930b11c1f9de",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -11495,7 +11659,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "63555941-c302-43d2-8b77-b532b5f49a0e",
+          "persistentUuid": "fa041046-b288-4219-9bd0-ce010cdb6306",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -11511,7 +11675,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "3a7bf0eb-ae4d-4da4-ad51-3164cca23306",
+          "persistentUuid": "c794f10e-6dff-48a1-8b37-fc2e3d63c1aa",
           "width": 0,
           "x": 668,
           "y": 251,
@@ -11521,6 +11685,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -11532,7 +11697,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "2520aba0-ef8f-4700-8ae1-833e8d1a486f",
+          "persistentUuid": "27bed8ce-0936-457b-8dc6-5372cc5e69f7",
           "width": 0,
           "x": 587,
           "y": 248,
@@ -11542,6 +11707,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -11553,7 +11719,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "1222e18c-4138-4fdb-8a93-718dc68c4e0b",
+          "persistentUuid": "f2a996de-f943-4e43-8e9f-34c8c21dd744",
           "width": 0,
           "x": 529,
           "y": 251,
@@ -11563,6 +11729,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -11574,7 +11741,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "68f01581-b2c0-4c70-8ddd-f5366b76796d",
+          "persistentUuid": "f4c453b9-2864-4939-ac1d-c4e4b8ee5972",
           "width": 0,
           "x": 586,
           "y": 218,
@@ -11584,6 +11751,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -11595,7 +11763,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "c5761a97-5dcb-4358-ac7f-fd463a599b3f",
+          "persistentUuid": "32729638-9377-442a-917b-c360dafb5724",
           "width": 0,
           "x": 586,
           "y": 101,
@@ -11605,6 +11773,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -11616,7 +11785,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "abe86f20-9f8a-4527-9623-7603598da2c4",
+          "persistentUuid": "05b670fa-0b5b-4719-976c-c568924f9531",
           "width": 0,
           "x": 585,
           "y": 72,
@@ -11626,6 +11795,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -11637,7 +11807,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "9dac3ab7-f805-470f-8827-d761edd55712",
+          "persistentUuid": "5b6e6252-33db-4d7a-abc4-37aeaaf47d91",
           "width": 0,
           "x": 667,
           "y": 179,
@@ -11647,6 +11817,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -11658,7 +11829,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "d546084c-ac4f-44e3-8ac2-54ff001b3041",
+          "persistentUuid": "8d5b5ba1-0845-4d35-aa30-31b167af980c",
           "width": 0,
           "x": 586,
           "y": 176,
@@ -11668,6 +11839,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -11679,7 +11851,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "ed2c689e-2255-42be-a2dc-11a0c6731b83",
+          "persistentUuid": "cd607b32-804b-4428-9141-7b39243612a2",
           "width": 0,
           "x": 528,
           "y": 179,
@@ -11689,6 +11861,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -11700,7 +11873,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "5d275eef-94b0-4bff-9e3d-88df0b6c5c14",
+          "persistentUuid": "dbcf0529-2223-4165-b957-bae136eb0bc1",
           "width": 0,
           "x": 585,
           "y": 146,
@@ -11710,6 +11883,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -12290,6 +12464,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -12317,7 +12492,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "721db1c7-158c-4e3a-8abb-83d86d309da4",
+          "persistentUuid": "6864aee3-5d63-49d3-b18b-1b0e8d2f94ed",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -12333,7 +12508,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "6f4bab78-0300-4f05-acd6-585b5eb60716",
+          "persistentUuid": "086d5e72-207b-48ad-b1f2-415f36e20aa2",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -12349,7 +12524,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "9f002fd6-1e44-4604-be09-498ad14bf6d2",
+          "persistentUuid": "a475252b-7597-4cec-856c-19de570ae476",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -12365,7 +12540,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "cb9bf95c-de5b-478b-9c68-b62ec026fa5e",
+          "persistentUuid": "6fea1e2e-58d5-43e3-8548-9ba642678bb8",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -12381,7 +12556,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "570e21ea-7b9a-4730-b7d9-4eef942801d0",
+          "persistentUuid": "404657b1-9376-4090-b898-3bfa5de200f9",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -12397,7 +12572,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "7607ed9d-44ca-49b8-84d1-1daf2b11d947",
+          "persistentUuid": "46562520-6dfc-4c0c-9a11-42205ebff99d",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -12413,7 +12588,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "2234b96c-1b07-461e-aa48-54d9a70afa08",
+          "persistentUuid": "312a076c-dd31-49be-8ef5-63990387ccee",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -12429,7 +12604,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "d4f8c4a8-fe55-43b8-981d-a1fa8c129643",
+          "persistentUuid": "bac5736e-0a5a-416e-8279-cfa351a0bb6e",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -12439,6 +12614,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_length"
             }
           ]
@@ -12450,7 +12626,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "a1e2208a-93a7-4c8b-a267-0daa4509a072",
+          "persistentUuid": "9007c583-c50a-4d0a-b27c-94aefb340078",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -12460,6 +12636,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_length"
             }
           ]
@@ -12471,7 +12648,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "517319fd-4af5-4cbe-b9a1-3e4d803685b4",
+          "persistentUuid": "491fd26e-9416-426d-bd97-a2bed5c1e4e6",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -12481,6 +12658,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_length"
             }
           ]
@@ -12492,7 +12670,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "c69491dc-57c5-4f84-a622-fdd67255eb71",
+          "persistentUuid": "0f3a8e25-2168-4f08-9988-4557c0ace865",
           "width": 0,
           "x": 588,
           "y": 45,
@@ -12502,6 +12680,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_length"
             }
           ]
@@ -12853,6 +13032,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -12880,7 +13060,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "214cd649-3052-4188-b8cf-20b9eb48f300",
+          "persistentUuid": "aee3095a-aed9-4269-84a2-daca687f10cf",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -12896,7 +13076,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "77a95c6e-388f-4f10-a957-0b6ed93c2fec",
+          "persistentUuid": "8e6aef0d-4c0b-4503-92e1-2c0058eab7f5",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -12912,7 +13092,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "dbb2597d-9cec-4076-aa82-8c693edb855a",
+          "persistentUuid": "3c540eae-d330-4b5b-87af-63a8c4a3973f",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -12928,7 +13108,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "d5f48c55-86f6-4fba-a60d-36ba31eafd35",
+          "persistentUuid": "a4c00e51-0612-48c7-9cc2-c06a0387462b",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -12944,7 +13124,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "c4b387da-51e6-46e4-9f4f-0d8012897eda",
+          "persistentUuid": "e54fc49a-e8b7-4824-be71-58034f67ee4f",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -12960,7 +13140,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "9533ed25-80c2-43cc-b3fd-ea5ba21b2e01",
+          "persistentUuid": "f935e459-31e6-404e-9515-d746ecdb717e",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -12976,7 +13156,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "baca36a7-979e-47da-9f91-6fc541d34d66",
+          "persistentUuid": "a4cb4c5e-db38-4b3f-b02c-1292fed9dc7f",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -12992,7 +13172,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "c02b7438-ab15-4473-b5ee-84178d242066",
+          "persistentUuid": "a0a73bf3-abd0-402c-b89d-f9e665f38001",
           "width": 0,
           "x": 670,
           "y": 162,
@@ -13002,6 +13182,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_torque"
             }
           ]
@@ -13013,7 +13194,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "7c09bfef-ea20-4256-93e8-685b0a1578af",
+          "persistentUuid": "68074af1-07be-4aef-90cf-0eb6f614a17a",
           "width": 0,
           "x": 589,
           "y": 159,
@@ -13023,6 +13204,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -13034,7 +13216,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "51d1068f-1142-4bec-b5c0-a31823daf868",
+          "persistentUuid": "65f0ba46-b125-41e4-878c-86d3f17d557c",
           "width": 0,
           "x": 531,
           "y": 162,
@@ -13044,6 +13226,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_torque"
             }
           ]
@@ -13055,7 +13238,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "e903d41b-c413-472b-836b-f8f5d647def0",
+          "persistentUuid": "a7df22a9-fb2e-49c6-a089-8bd22d1950a8",
           "width": 0,
           "x": 588,
           "y": 129,
@@ -13065,6 +13248,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -13076,7 +13260,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "19685240-f9cb-4081-9d2b-b6e8492256d7",
+          "persistentUuid": "5beae774-5297-4c6d-a750-1b9f19ec3ce1",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -13086,6 +13270,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -13097,7 +13282,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "a54b0043-169a-43ed-8b25-dd2f5f87f865",
+          "persistentUuid": "ecd337cd-df55-43de-a446-71cb0a194462",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -13107,6 +13292,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -13118,7 +13304,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "68477939-6bb9-4b52-a92b-8bb677f9e971",
+          "persistentUuid": "2ca50105-a930-4553-978f-72e9cd15b296",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -13128,6 +13314,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -13139,7 +13326,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "6c7714d2-bd21-40b3-b919-19f8642e6d47",
+          "persistentUuid": "5b15060c-fc8e-4cb4-b57b-9bb55fad00b6",
           "width": 0,
           "x": 588,
           "y": 45,
@@ -13149,6 +13336,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -13669,6 +13857,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -13696,7 +13885,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "b992b864-1fff-43c1-9566-c6963978c5ef",
+          "persistentUuid": "5dee2a8b-61d9-4027-9bae-d4cb85f69b8f",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -13712,7 +13901,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "73303b6d-4cda-4eaf-b88f-690791f190bc",
+          "persistentUuid": "be4a2cdd-d7b8-45e5-8e3a-b449cb2bd192",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -13728,7 +13917,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "37389b17-5800-4faa-9840-bcd3936dfa1e",
+          "persistentUuid": "87c71c07-2833-4564-92b8-6e2005c1bee0",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -13744,7 +13933,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
-          "persistentUuid": "6033335d-6409-47f3-941d-e84ff8945441",
+          "persistentUuid": "95cef973-7679-4020-9807-54e7a91517e4",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -13760,7 +13949,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
-          "persistentUuid": "508ff049-b833-4a8d-a8b4-5ae8b4e802c3",
+          "persistentUuid": "f26ff960-7efb-432b-94b8-502c199bdb2a",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -13776,7 +13965,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
-          "persistentUuid": "8f3c7cdc-d1b5-4add-a533-a4b527faf3c9",
+          "persistentUuid": "e668a48c-4a4a-4b12-a094-d8f8693e9125",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -13792,7 +13981,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
-          "persistentUuid": "6ece6c7f-3345-4310-be92-1e076b6f621a",
+          "persistentUuid": "989d1f13-6937-4697-9e96-f9a32b86733b",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -13808,7 +13997,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "0c36221a-3532-4ae9-849d-757960201c61",
+          "persistentUuid": "5e94d1a3-1eba-4565-9583-109ff168260a",
           "width": 0,
           "x": 669,
           "y": 427,
@@ -13818,6 +14007,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_correction"
             }
           ]
@@ -13829,7 +14019,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "80f53287-b07c-46e0-be96-6297eee006df",
+          "persistentUuid": "63e38e0b-d871-47a0-becc-6d381b609002",
           "width": 0,
           "x": 588,
           "y": 424,
@@ -13839,6 +14029,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "correction"
             }
           ]
@@ -13850,7 +14041,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "dc4cb315-3f38-44a8-98bf-e863928b3429",
+          "persistentUuid": "b2c51fea-9771-4846-b198-b446b5b59e86",
           "width": 0,
           "x": 530,
           "y": 427,
@@ -13860,6 +14051,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_correction"
             }
           ]
@@ -13871,7 +14063,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "9ad5c180-0ed6-426f-81d8-b3fb619af648",
+          "persistentUuid": "9c6819cf-0185-4db2-acc0-2869b4302c53",
           "width": 0,
           "x": 575,
           "y": 393,
@@ -13881,6 +14073,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "correction"
             }
           ]
@@ -13892,7 +14085,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "439239bc-322c-40b3-b949-90282e49e184",
+          "persistentUuid": "d7d4f060-b9a1-47fe-ab92-b4834deace25",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -13902,6 +14095,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_x"
             }
           ]
@@ -13913,7 +14107,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "d49285f6-1e3a-45cc-9131-de554e38c395",
+          "persistentUuid": "df69fa75-49f7-409b-8c16-68929963908f",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -13923,6 +14117,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_x"
             }
           ]
@@ -13934,7 +14129,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "02f7788b-e6ff-45c3-acdf-7eb97ad24aa7",
+          "persistentUuid": "96e3dcf2-c880-4e84-977f-154bb8cf471e",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -13944,6 +14139,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_x"
             }
           ]
@@ -13955,7 +14151,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "6214f3b4-221b-4fad-bf8f-0378ca62fb5e",
+          "persistentUuid": "3bce588d-d483-4c00-b917-70a0c61245f5",
           "width": 0,
           "x": 579,
           "y": 45,
@@ -13965,6 +14161,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_x"
             }
           ]
@@ -13976,7 +14173,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "e8675479-3f12-42ef-aec1-2a489ce153d7",
+          "persistentUuid": "b65072f7-579f-42bd-b819-68a5d7d059aa",
           "width": 0,
           "x": 670,
           "y": 148,
@@ -13986,6 +14183,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_y"
             }
           ]
@@ -13997,7 +14195,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "99adc5e9-1ad1-484a-b5ba-413ef2f826db",
+          "persistentUuid": "42019030-9167-4f16-ac12-a982076f11c4",
           "width": 0,
           "x": 589,
           "y": 145,
@@ -14007,6 +14205,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_y"
             }
           ]
@@ -14018,7 +14217,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "28e8f52f-e408-40d6-ab95-83139d5e5804",
+          "persistentUuid": "9b7b1336-4d05-400a-81e0-e9052fd3fab8",
           "width": 0,
           "x": 531,
           "y": 148,
@@ -14028,6 +14227,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_y"
             }
           ]
@@ -14039,7 +14239,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "6b98a2aa-c1df-4361-92df-251f5161a79b",
+          "persistentUuid": "8fdc7d5c-c839-4f6c-a676-a2217ba87ca4",
           "width": 0,
           "x": 581,
           "y": 115,
@@ -14049,6 +14249,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_y"
             }
           ]
@@ -14060,7 +14261,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "968ee01e-e352-4011-82bf-2d06bf46c7b8",
+          "persistentUuid": "23bb5eae-3e99-48a1-94ff-3385300eb8a8",
           "width": 0,
           "x": 668,
           "y": 220,
@@ -14070,6 +14271,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_angle"
             }
           ]
@@ -14081,7 +14283,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "c4685541-eddc-4d86-bf67-692a2529646d",
+          "persistentUuid": "f2aa4afe-0f52-4483-8318-3e48f6cf56bb",
           "width": 0,
           "x": 587,
           "y": 217,
@@ -14091,6 +14293,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_angle"
             }
           ]
@@ -14102,7 +14305,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "aa8dba99-0962-4c83-a1a4-489e781f8679",
+          "persistentUuid": "94aa4b75-2bbe-43f1-a141-9bc1946b7614",
           "width": 0,
           "x": 529,
           "y": 220,
@@ -14112,6 +14315,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_angle"
             }
           ]
@@ -14123,7 +14327,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "aa4ec4c3-8253-4889-a55e-7b1c64ea9d4e",
+          "persistentUuid": "e138847f-8c5e-4e44-b795-4e96d60bbf05",
           "width": 0,
           "x": 574,
           "y": 186,
@@ -14133,6 +14337,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_angle"
             }
           ]
@@ -14144,7 +14349,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "0d97fca7-23c5-4ee2-83c3-34bf5d446e87",
+          "persistentUuid": "97f12d3a-c8f1-4d42-9a3a-277426cdcb53",
           "width": 0,
           "x": 669,
           "y": 292,
@@ -14154,6 +14359,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -14165,7 +14371,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "f0423ca2-78d5-49fc-8902-ad13abd576c0",
+          "persistentUuid": "0748d8ee-628a-466e-a2e5-9c3aa5cf96ed",
           "width": 0,
           "x": 588,
           "y": 289,
@@ -14175,6 +14381,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -14186,7 +14393,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "b2b02c53-b1af-4a6b-9bd5-1e5865947c98",
+          "persistentUuid": "1d103a81-622b-4560-aba2-0a0fc52a4d2f",
           "width": 0,
           "x": 530,
           "y": 292,
@@ -14196,6 +14403,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -14207,7 +14415,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "861f88cb-42fb-4717-98c3-46a922b1c372",
+          "persistentUuid": "cdaa99ff-f074-4c71-9075-1845b00c2076",
           "width": 0,
           "x": 575,
           "y": 258,
@@ -14217,6 +14425,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -14228,7 +14437,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "40e73dd8-9811-4fbd-af44-c927352bc9e0",
+          "persistentUuid": "a7ad1cf0-2637-4389-a66c-eec844f6fdeb",
           "width": 0,
           "x": 669,
           "y": 360,
@@ -14238,6 +14447,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_torque"
             }
           ]
@@ -14249,7 +14459,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
-          "persistentUuid": "456c5a15-5490-4152-bcd2-dffa113e9dd0",
+          "persistentUuid": "6787aa2a-ebd9-4cb2-8fad-a78aa0e1fb80",
           "width": 0,
           "x": 588,
           "y": 357,
@@ -14259,6 +14469,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -14270,7 +14481,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
-          "persistentUuid": "0a459028-f90b-47b0-abeb-047e08054bec",
+          "persistentUuid": "c0ff39ef-9fd0-4933-ae4b-c2616ae76f6a",
           "width": 0,
           "x": 530,
           "y": 360,
@@ -14280,6 +14491,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_torque"
             }
           ]
@@ -14291,7 +14503,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
-          "persistentUuid": "f135bb5c-60fc-4e34-ba00-ce020982ae37",
+          "persistentUuid": "ba580ea0-6382-47a3-bbed-6ae141f2e9f5",
           "width": 0,
           "x": 575,
           "y": 326,
@@ -14301,6 +14513,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]

@@ -1929,20 +1929,32 @@ module.exports = {
         "name": "TopDownMovementBehavior"
       },
       {
-        "fullName": "Mouse and touch",
-        "name": "BuiltinMouse"
+        "fullName": "",
+        "name": ""
       },
       {
-        "fullName": "Features for all objects",
-        "name": "BuiltinObject"
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
       },
       {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
       }
     ]
   },
@@ -2759,6 +2771,10 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "BBCode Text Object",
+        "name": "BBText"
       }
     ]
   },
@@ -4177,6 +4193,55 @@ module.exports = {
       }
     ]
   },
+  "spatial-sound": {
+    "description": "A small game similar to the Lost Woods of The Legend of Zelda Ocarina of Time, that uses spatial sound.",
+    "usedExtensions": [
+      {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Spatial sound",
+        "name": "SpatialSound"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      }
+    ]
+  },
   "splash-screen": {
     "description": "Show how to create a splashscreen at the beginning of your game.",
     "usedExtensions": [
@@ -4455,6 +4520,59 @@ module.exports = {
       {
         "fullName": "",
         "name": ""
+      }
+    ]
+  },
+  "titan-souls-demo": {
+    "description": "A demo of a top down game where you have to beat a boss that has multiple attacks.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

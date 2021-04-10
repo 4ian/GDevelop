@@ -56,15 +56,6 @@ module.exports = function (grunt) {
     }
   }
 
-  // Clean alternative artifacts
-  if (isDev) {
-    if (fs.existsSync(path.join(buildOutputPath, 'libGD.js.mem')))
-      fs.unlinkSync(path.join(buildOutputPath, 'libGD.js.mem'));
-  } else {
-    if (fs.existsSync(path.join(buildOutputPath, 'libGD.wasm')))
-      fs.unlinkSync(path.join(buildOutputPath, 'libGD.wasm'));
-  }
-
   grunt.initConfig({
     mkdir: {
       embuild: {
@@ -84,8 +75,6 @@ module.exports = function (grunt) {
             ...cmakeGeneratorArgs,
             '../..',
             '-DFULL_VERSION_NUMBER=FALSE',
-            // Use wasm for faster builds in development.
-            isDev ? '-DUSE_WASM=TRUE' : '-DUSE_WASM=FALSE',
             // Disable link time optimizations for slightly faster build time.
             isDev
               ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'
@@ -139,7 +128,6 @@ module.exports = function (grunt) {
         src: [
           buildPath,
           buildOutputPath + 'libGD.js',
-          buildOutputPath + 'libGD.js.mem',
           buildOutputPath + 'libGD.wasm',
         ],
       },

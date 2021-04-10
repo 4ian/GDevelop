@@ -3,12 +3,15 @@
  * Copyright 2013-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
+
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
    */
   export class LayerPixiRenderer {
-    _pixiContainer: any;
+    _pixiContainer: PIXI.Container;
 
     _filters: Record<string, gdjs.PixiFiltersTools.Filter> = {};
     _layer: any;
@@ -154,6 +157,7 @@ namespace gdjs {
 
       //Extend the pixi object with a z order.
       for (let i = 0, len = this._pixiContainer.children.length; i < len; ++i) {
+        // @ts-ignore - we added a "zOrder" property.
         if (this._pixiContainer.children[i].zOrder >= zOrder) {
           //TODO : Dichotomic search
           this._pixiContainer.addChildAt(child, i);

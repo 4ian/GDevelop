@@ -410,6 +410,7 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled
         onAdd={() => {
           const variable = new gd.Variable();
+          variable.setString('');
           const name = newNameGenerator('Variable', name =>
             inheritedVariablesContainer
               ? inheritedVariablesContainer.has(name) ||

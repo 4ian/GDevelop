@@ -1,1 +1,294 @@
-{"firstLayout":"","gdVersion":{"build":96,"major":4,"minor":0,"revision":0},"properties":{"folderProject":false,"linuxExecutableFilename":"","macExecutableFilename":"","packageName":"com.example.gamename","projectFile":"C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\rotate-toward-mouse\\game.json","useExternalSourceFiles":false,"winExecutableFilename":"","winExecutableIconFile":"","name":"Project","author":"","windowWidth":800,"windowHeight":600,"latestCompilationDirectory":"","maxFPS":60,"minFPS":10,"verticalSync":false,"extensions":[{"name":"BuiltinObject"},{"name":"BuiltinAudio"},{"name":"BuiltinVariables"},{"name":"BuiltinTime"},{"name":"BuiltinMouse"},{"name":"BuiltinKeyboard"},{"name":"BuiltinJoystick"},{"name":"BuiltinCamera"},{"name":"BuiltinWindow"},{"name":"BuiltinFile"},{"name":"BuiltinNetwork"},{"name":"BuiltinScene"},{"name":"BuiltinAdvanced"},{"name":"Sprite"},{"name":"BuiltinCommonInstructions"},{"name":"BuiltinCommonConversions"},{"name":"BuiltinStringInstructions"},{"name":"BuiltinMathematicalTools"},{"name":"BuiltinExternalLayouts"}],"platforms":[{"name":"GDevelop JS platform"}],"currentPlatform":"GDevelop JS platform"},"resources":{"resources":[{"alwaysLoaded":false,"file":"p1_jump.png","kind":"image","name":"p1_jump.png","smoothed":true,"userAdded":true},{"alwaysLoaded":false,"file":"coinGold.png","kind":"image","name":"coinGold.png","smoothed":true,"userAdded":false},{"alwaysLoaded":false,"file":"images/manBlue_machine.png","kind":"image","name":"manBlue_machine.png","smoothed":true,"userAdded":false}],"resourceFolders":[]},"objects":[],"objectsGroups":[],"variables":[],"layouts":[{"b":209,"disableInputWhenNotFocused":true,"mangledName":"NewScene","name":"NewScene","oglFOV":90,"oglZFar":500,"oglZNear":1,"r":209,"standardSortMethod":true,"stopSoundsOnStartup":true,"title":"","v":209,"uiSettings":{"grid":false,"gridB":255,"gridG":180,"gridHeight":32,"gridOffsetX":0,"gridOffsetY":0,"gridR":158,"gridWidth":32,"snap":true,"windowMask":false,"zoomFactor":1},"objectsGroups":[],"variables":[],"instances":[{"angle":0,"customSize":false,"height":0,"layer":"","locked":false,"name":"kenney","width":0,"x":335.312,"y":292.07,"zOrder":1,"numberProperties":[],"stringProperties":[],"initialVariables":[]}],"objects":[{"name":"kenney","type":"Sprite","updateIfNotVisible":false,"variables":[],"behaviors":[],"animations":[{"name":"","useMultipleDirections":false,"directions":[{"looping":false,"timeBetweenFrames":1,"sprites":[{"hasCustomCollisionMask":false,"image":"manBlue_machine.png","points":[],"originPoint":{"name":"origine","x":0,"y":0},"centerPoint":{"automatic":true,"name":"centre","x":0,"y":0},"customCollisionMask":[]}]}]}]}],"events":[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"rotate kenney toward the positition of the pointer by 0 degree / second measn immediate rotation","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"inverted":false,"value":"RotateTowardPosition"},"parameters":["kenney","MouseX()","MouseY()","0",""],"subInstructions":[]}],"events":[]}],"layers":[{"name":"","visibility":true,"cameras":[{"defaultSize":true,"defaultViewport":true,"height":0,"viewportBottom":1,"viewportLeft":0,"viewportRight":1,"viewportTop":0,"width":0}],"effects":[]}],"behaviorsSharedData":[]}],"externalEvents":[],"externalLayouts":[],"externalSourceFiles":[]}
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": false,
+    "folderProject": false,
+    "orientation": "default",
+    "packageName": "com.example.gamename",
+    "projectUuid": "222682ca-6117-451b-9fd8-3cbb5a36f763",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "p1_jump.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "p1_jump.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "coinGold.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "coinGold.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "images/manBlue_machine.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "manBlue_machine.png",
+        "smoothed": true,
+        "userAdded": false
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "NewScene",
+      "name": "NewScene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "kenney",
+          "persistentUuid": "c446b999-26e3-4c7a-aab6-532e1fe1e915",
+          "width": 0,
+          "x": 335.312,
+          "y": 292.07,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "kenney",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "manBlue_machine.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "rotate kenney toward the positition of the pointer by 0 degree / second measn immediate rotation",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "RotateTowardPosition"
+              },
+              "parameters": [
+                "kenney",
+                "MouseX()",
+                "MouseY()",
+                "0",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

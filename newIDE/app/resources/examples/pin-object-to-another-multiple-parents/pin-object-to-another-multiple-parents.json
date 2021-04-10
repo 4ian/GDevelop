@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json",
+    "projectUuid": "8f77c09d-9600-48a5-9c1b-8fe2a7d82e29",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -108,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "parent.png",
         "kind": "image",
+        "metadata": "",
         "name": "parent.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "child.png",
         "kind": "image",
+        "metadata": "",
         "name": "child.png",
         "smoothed": true,
         "userAdded": true
@@ -148,6 +150,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -163,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "a8f0334f-fc0f-4634-b56b-dbc4b131bcdb",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -178,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "93b81182-ae7f-45fa-9ce7-54f7fba22891",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -187,6 +192,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -198,6 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "d2e3e3eb-7668-44c7-b850-6c632e1392b7",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -207,6 +214,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -218,6 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "920a5f4b-2acc-43ec-9392-49e787d13e2c",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -227,6 +236,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -238,6 +248,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "8527d4cf-1bd8-42f3-ab9a-9357d9bcdbef",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -247,6 +258,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -258,6 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "ceed2c07-4a4f-4419-96e5-a67bd9fcf076",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -267,6 +280,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -278,6 +292,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "6dad68c9-ae94-4b2a-9ee3-7fde7db34aa5",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -287,6 +302,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -298,6 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "82f87224-cb85-43fc-9670-799f84496df4",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -307,6 +324,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -318,6 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "50cb698e-a11d-49b9-975b-67b0e8b797f1",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -327,6 +346,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -338,6 +358,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -353,6 +374,7 @@
         },
         {
           "name": "parent",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -415,6 +437,7 @@
         },
         {
           "name": "child",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -607,7 +630,7 @@
                             "child",
                             "AngleToParent",
                             "=",
-                            "ToDeg(atan2(child.PointY(Centre) - parent.PointY(Centre), child.PointX(Centre) - parent.PointX(Centre)))"
+                            "ToDeg(atan2(child.PointY(\"Centre\") - parent.PointY(\"Centre\"), child.PointX(\"Centre\") - parent.PointX(\"Centre\")))"
                           ],
                           "subInstructions": []
                         }
@@ -806,6 +829,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -897,7 +925,7 @@
                     "child",
                     "distanceX",
                     "=",
-                    "parent.PointX(Centre) - child.PointX(Centre)"
+                    "parent.PointX(\"Centre\") - child.PointX(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -910,7 +938,7 @@
                     "child",
                     "distanceY",
                     "=",
-                    "parent.PointY(Centre) - child.PointY(Centre)"
+                    "parent.PointY(\"Centre\") - child.PointY(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -939,9 +967,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointX(Centre)",
+                        "child.PointX(\"Centre\")",
                         ">",
-                        "parent.PointX(Centre)"
+                        "parent.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -974,9 +1002,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointX(Centre)",
+                        "child.PointX(\"Centre\")",
                         "<",
-                        "parent.PointX(Centre)"
+                        "parent.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1009,9 +1037,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointY(Centre)",
+                        "child.PointY(\"Centre\")",
                         ">",
-                        "parent.PointY(Centre)"
+                        "parent.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1044,9 +1072,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointY(Centre)",
+                        "child.PointY(\"Centre\")",
                         "<",
-                        "parent.PointY(Centre)"
+                        "parent.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1075,6 +1103,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

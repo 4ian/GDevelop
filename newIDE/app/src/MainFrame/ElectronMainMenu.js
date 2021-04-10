@@ -229,7 +229,7 @@ const buildAndSendMenuTemplate = (
       },
       {
         label: i18n._(t`Community Discord Chat`),
-        onClickOpenLink: 'https://discord.gg/rjdYHvj',
+        onClickOpenLink: 'https://discord.gg/gdevelop',
       },
       { type: 'separator' },
       {

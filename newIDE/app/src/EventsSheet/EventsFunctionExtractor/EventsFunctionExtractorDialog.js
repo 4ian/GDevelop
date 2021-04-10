@@ -101,8 +101,17 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     );
     const hasLotsOfParameters = functionHasLotsOfParameters(eventsFunction);
 
+    const onApply = () => {
+      if (!canCreateEventsFunction(project, extensionName, eventsFunction)) {
+        onClose();
+      } else {
+        onCreate(extensionName, eventsFunction);
+      }
+    };
+
     return (
       <Dialog
+        onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
         secondaryActions={
           <HelpButton helpPagePath="/events/functions/extract-events" />
@@ -120,7 +129,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             disabled={
               !canCreateEventsFunction(project, extensionName, eventsFunction)
             }
-            onClick={() => onCreate(extensionName, eventsFunction)}
+            onClick={onApply}
           />,
         ]}
         cannotBeDismissed={true}

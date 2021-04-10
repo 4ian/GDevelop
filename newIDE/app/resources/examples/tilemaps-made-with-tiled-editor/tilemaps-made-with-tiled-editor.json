@@ -225,6 +225,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -234,10 +235,12 @@
       "variables": [
         {
           "name": "displayMode",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "Variable",
+          "type": "string",
           "value": ""
         }
       ],
@@ -1419,12 +1422,14 @@
         "scroll",
         "gestures"
       ],
+      "dependencies": [],
       "eventsFunctions": [
         {
           "description": "Drag camera with the pointer",
           "fullName": "Drag camera with the pointer",
           "functionType": "Action",
           "name": "DragCameraWithPointer",
+          "private": false,
           "sentence": "Drag camera _PARAM1_ on layer _PARAM2_ in _PARAM3_ direction with the pointer",
           "events": [
             {

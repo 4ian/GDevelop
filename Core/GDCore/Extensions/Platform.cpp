@@ -14,7 +14,7 @@ using namespace std;
 
 namespace gd {
 
-Platform::Platform(): enableExtensionLoadingLogs(true) {}
+Platform::Platform(): enableExtensionLoadingLogs(false) {}
 
 Platform::~Platform() {}
 

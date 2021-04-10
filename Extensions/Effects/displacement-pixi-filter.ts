@@ -1,4 +1,5 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('Displacement', {
     makePIXIFilter: function (layer, effectData) {
       const displacementMapTexture = layer
@@ -15,7 +16,8 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const displacementFilter = filter as PIXI.filters.DisplacementFilter;
+      // @ts-ignore - unsure why PIXI.filters is not recognised.
+      const displacementFilter = (filter as unknown) as PIXI.filters.DisplacementFilter;
       if (parameterName === 'scaleX') {
         displacementFilter.scale.x = value;
       }

@@ -78,6 +78,8 @@ declare class libGDevelop {
   PropertyDescriptor: Class<gdPropertyDescriptor>;
   NamedPropertyDescriptor: Class<gdNamedPropertyDescriptor>;
   MapStringPropertyDescriptor: Class<gdMapStringPropertyDescriptor>;
+  MapStringSerializerValue: Class<gdMapStringSerializerValue>;
+  VectorPairStringSharedPtrSerializerElement: Class<gdVectorPairStringSharedPtrSerializerElement>;
   Resource: Class<gdResource>;
   ResourcesManager: Class<gdResourcesManager>;
   ImageResource: Class<gdImageResource>;
@@ -93,6 +95,7 @@ declare class libGDevelop {
   InitialInstanceJSFunctor: Class<gdInitialInstanceJSFunctor>;
   SerializerValue: Class<gdSerializerValue>;
   SerializerElement: Class<gdSerializerElement>;
+  SharedPtrSerializerElement: Class<gdSharedPtrSerializerElement>;
   Serializer: Class<gdSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
@@ -185,7 +188,6 @@ declare class libGDevelop {
   PanelSpriteObject: Class<gdPanelSpriteObject>;
   ShapePainterObject: Class<gdShapePainterObject>;
   TextEntryObject: Class<gdTextEntryObject>;
-  SkeletonObject: Class<gdSkeletonObject>;
   ParticleEmitterObject_RendererType: Class<ParticleEmitterObject_RendererType>;
   ParticleEmitterObject: Class<gdParticleEmitterObject>;
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;

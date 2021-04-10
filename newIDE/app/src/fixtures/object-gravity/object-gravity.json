@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "",
-    "projectUuid": "5224afd0-0cd1-46ed-a2fb-6531f6e16d2a",
+    "projectUuid": "1afc2dd3-9b1b-45ef-b99d-a65365bf7033",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -174,6 +174,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": true,
@@ -183,18 +184,22 @@
       "variables": [
         {
           "name": "Direction",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "ObjDir",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "x",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "y",
+          "type": "string",
           "value": "0"
         }
       ],
@@ -206,7 +211,7 @@
           "layer": "",
           "locked": false,
           "name": "Planet",
-          "persistentUuid": "5f00534e-8f85-4b04-ae85-42b7949a647b",
+          "persistentUuid": "772c3b6d-bad2-40c0-8a3f-5470a1bb2249",
           "width": 0,
           "x": 287,
           "y": 193,
@@ -222,7 +227,7 @@
           "layer": "",
           "locked": false,
           "name": "SpaceGuy",
-          "persistentUuid": "18fc51ed-a51b-4d2e-9a7d-aa1101e9bf87",
+          "persistentUuid": "3fd40436-8ba0-44cd-a811-ebe2c09cf5da",
           "width": 0,
           "x": 389,
           "y": 458,
@@ -238,7 +243,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
-          "persistentUuid": "f0c41d99-e71e-4ea1-bbba-89f97ecc3026",
+          "persistentUuid": "1a4e9e53-2eba-4d22-87a8-d7a559b34f5b",
           "width": 0,
           "x": 8,
           "y": 12,
@@ -254,7 +259,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnLeft",
-          "persistentUuid": "008e656c-a8e0-4790-8b5a-e0181e4d2a7b",
+          "persistentUuid": "4ea8695e-9f62-4da4-b70b-ba06eb13d7dc",
           "width": 0,
           "x": 32,
           "y": 480,
@@ -270,7 +275,7 @@
           "layer": "Touch",
           "locked": false,
           "name": "BtnRight",
-          "persistentUuid": "7494a8ae-1a03-4be0-98b7-d96997a6ea63",
+          "persistentUuid": "985ac4e5-4d32-475c-99a8-6a38b672a70c",
           "width": 0,
           "x": 128,
           "y": 480,
@@ -286,7 +291,7 @@
           "layer": "",
           "locked": false,
           "name": "BtnJump",
-          "persistentUuid": "30146c9a-ac2d-46d3-b737-f69313df9693",
+          "persistentUuid": "0e752b65-9df4-4399-9dd6-4b7d24e8c1c4",
           "width": 0,
           "x": 620,
           "y": 427,

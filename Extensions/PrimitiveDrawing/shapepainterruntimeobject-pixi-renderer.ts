@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: any;
     _graphics: any;

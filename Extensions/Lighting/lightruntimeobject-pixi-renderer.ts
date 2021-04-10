@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   /**
    * Pixi renderer for light runtime objects.
    */
@@ -13,7 +15,7 @@ namespace gdjs {
     _defaultVertexBuffer: any;
     _vertexBuffer: any;
     _indexBuffer: any;
-    _light: PIXI.Mesh | null = null;
+    _light: PIXI.Mesh<PIXI.Shader> | null = null;
     _isPreview: boolean;
     _debugMode: any = null;
     _debugLight: PIXI.Container | null = null;
@@ -161,12 +163,11 @@ namespace gdjs {
         .addAttribute('aVertexPosition', this._vertexBuffer, 2)
         .addIndex(this._indexBuffer);
       if (!this._light) {
-        // @ts-ignore
         this._light = new PIXI.Mesh(geometry, shader);
         this._light.blendMode = PIXI.BLEND_MODES.ADD;
       } else {
         this._light.shader = shader;
-        // @ts-ignore
+        // @ts-ignore - replacing the read-only geometry
         this._light.geometry = geometry;
       }
     }

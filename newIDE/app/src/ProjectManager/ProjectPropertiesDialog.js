@@ -166,9 +166,33 @@ function ProjectPropertiesDialog(props: Props) {
     onCancel: props.onClose,
   });
 
+  const onApply = () => {
+    if (
+      applyPropertiesToProject(project, {
+        gameResolutionWidth,
+        gameResolutionHeight,
+        adaptGameResolutionAtRuntime,
+        name,
+        author,
+        version,
+        packageName,
+        orientation,
+        scaleMode,
+        sizeOnStartupMode,
+        showGDevelopSplash,
+        minFPS,
+        maxFPS,
+        isFolderProject,
+        useDeprecatedZeroAsDefaultZOrder,
+      })
+    )
+      props.onApply();
+  };
+
   return (
     <React.Fragment>
       <Dialog
+        onApply={onApply}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}
@@ -179,28 +203,7 @@ function ProjectPropertiesDialog(props: Props) {
           <FlatButton
             label={<Trans>Apply</Trans>}
             primary={true}
-            onClick={() => {
-              if (
-                applyPropertiesToProject(project, {
-                  gameResolutionWidth,
-                  gameResolutionHeight,
-                  adaptGameResolutionAtRuntime,
-                  name,
-                  author,
-                  version,
-                  packageName,
-                  orientation,
-                  scaleMode,
-                  sizeOnStartupMode,
-                  showGDevelopSplash,
-                  minFPS,
-                  maxFPS,
-                  isFolderProject,
-                  useDeprecatedZeroAsDefaultZOrder,
-                })
-              )
-                props.onApply();
-            }}
+            onClick={onApply}
             key="apply"
           />,
         ]}

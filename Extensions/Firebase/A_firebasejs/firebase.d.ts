@@ -5059,7 +5059,7 @@ declare namespace firebase.analytics {
     VIEW_ITEM = 'view_item',
     VIEW_ITEM_LIST = 'view_item_list',
     VIEW_PROMOTION = 'view_promotion',
-    VIEW_SEARCH_RESULTS = 'view_search_results'
+    VIEW_SEARCH_RESULTS = 'view_search_results',
   }
 
   export type Currency = string | number;
@@ -9255,9 +9255,9 @@ declare namespace firebase.firestore {
    * `exists` property will always be true and `data()` will never return
    * 'undefined'.
    */
-  export class QueryDocumentSnapshot<
-    T = DocumentData
-  > extends DocumentSnapshot<T> {
+  export class QueryDocumentSnapshot<T = DocumentData> extends DocumentSnapshot<
+    T
+  > {
     private constructor();
 
     /**

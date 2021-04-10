@@ -9089,7 +9089,26 @@ declare namespace firebase.firestore {
      * provided converter will convert between Firestore data and your custom
      * type U.
      *
-     * @param converter Converts objects to and from Firestore.
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
+     * @return A DocumentReference<U> that uses the provided converter.
+     */
+    withConverter(converter: null): DocumentReference<DocumentData>;
+    /**
+     * Applies a custom data converter to this DocumentReference, allowing you
+     * to use your own custom model objects with Firestore. When you call
+     * set(), get(), etc. on the returned DocumentReference instance, the
+     * provided converter will convert between Firestore data and your custom
+     * type U.
+     *
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
      * @return A DocumentReference<U> that uses the provided converter.
      */
     withConverter<U>(
@@ -9544,7 +9563,25 @@ declare namespace firebase.firestore {
      * returned Query, the provided converter will convert between Firestore
      * data and your custom type U.
      *
-     * @param converter Converts objects to and from Firestore.
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
+     * @return A Query<U> that uses the provided converter.
+     */
+    withConverter(converter: null): Query<DocumentData>;
+    /**
+     * Applies a custom data converter to this Query, allowing you to use your
+     * own custom model objects with Firestore. When you call get() on the
+     * returned Query, the provided converter will convert between Firestore
+     * data and your custom type U.
+     *
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
      * @return A Query<U> that uses the provided converter.
      */
     withConverter<U>(converter: FirestoreDataConverter<U>): Query<U>;
@@ -9700,7 +9737,25 @@ declare namespace firebase.firestore {
      * on the returned CollectionReference instance, the provided converter will
      * convert between Firestore data and your custom type U.
      *
-     * @param converter Converts objects to and from Firestore.
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
+     * @return A CollectionReference<U> that uses the provided converter.
+     */
+    withConverter(converter: null): CollectionReference<DocumentData>;
+    /**
+     * Applies a custom data converter to this CollectionReference, allowing you
+     * to use your own custom model objects with Firestore. When you call add()
+     * on the returned CollectionReference instance, the provided converter will
+     * convert between Firestore data and your custom type U.
+     *
+     * Passing in `null` as the converter parameter removes the current
+     * converter.
+     *
+     * @param converter Converts objects to and from Firestore. Passing in
+     * `null` removes the current converter.
      * @return A CollectionReference<U> that uses the provided converter.
      */
     withConverter<U>(

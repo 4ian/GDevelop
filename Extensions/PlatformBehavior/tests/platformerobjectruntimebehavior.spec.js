@@ -22,7 +22,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
   };
 
   const addPlatformObject = (runtimeScene) => {
-    const platform = new gdjs.RuntimeObject(runtimeScene, {
+    const platform = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj2',
       type: '',
       behaviors: [
@@ -32,19 +32,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         },
       ],
     });
-    platform.getWidth = function () {
-      return 60;
-    };
-    platform.getHeight = function () {
-      return 32;
-    };
+    platform.setCustomWidthAndHeight(60, 32);
     runtimeScene.addObject(platform);
 
     return platform;
   };
 
   const addLadderObject = (runtimeScene) => {
-    const ladder = new gdjs.RuntimeObject(runtimeScene, {
+    const ladder = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj3',
       type: '',
       behaviors: [
@@ -55,12 +50,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         },
       ],
     });
-    ladder.getWidth = function () {
-      return 20;
-    };
-    ladder.getHeight = function () {
-      return 60;
-    };
+    ladder.setCustomWidthAndHeight(20, 60);
     runtimeScene.addObject(ladder);
 
     return ladder;
@@ -75,7 +65,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object in the air.
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -94,12 +84,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
       object.setPosition(0, -100);
 
@@ -266,6 +251,27 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
       // move the platform away
       platform.setPosition(-100, -100);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
+    it('falls when a platform is removed', function () {
+      object.setPosition(0, -32);
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Check the object is on the platform
+      expect(object.getY()).to.be.within(-31, -30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Remove the platform
+      runtimeScene.markObjectForDeletion(platform);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);

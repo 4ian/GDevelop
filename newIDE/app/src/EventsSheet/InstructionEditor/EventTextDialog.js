@@ -55,7 +55,7 @@ const EventTextDialog = (props: Props) => {
   const [textColor, setTextColor] = React.useState<RGBColor>(black);
   const [backgroundColor, setBackgroundColor] = React.useState<RGBColor>(black);
 
-  const eventType = event.getType(); // OK
+  const eventType = event.getType();
 
   React.useEffect(
     () => {

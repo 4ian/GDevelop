@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { type I18n } from '@lingui/core';
 
 import React from 'react';
@@ -169,6 +169,23 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             </Column>
           </Line>
           <Text size="title">
+            <Trans>Dialogs</Trans>
+          </Text>
+          <Line>
+            <SelectField
+              floatingLabelText={<Trans>Dialog backdrop click behavior</Trans>}
+              value={values.backdropClickBehavior}
+              onChange={(e, i, value: string) =>
+                setBackdropClickBehavior(value)
+              }
+              fullWidth
+            >
+              <SelectOption value="cancel" primaryText={t`Cancel changes`} />
+              <SelectOption value="apply" primaryText={t`Apply changes`} />
+              <SelectOption value="nothing" primaryText={t`Do nothing`} />
+            </SelectField>
+          </Line>
+          <Text size="title">
             <Trans>Updates</Trans>
           </Text>
           <Line>
@@ -255,30 +272,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               labelPosition="right"
               label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
-          </Line>
-          <Line>
-            <SelectField
-              floatingLabelText={<Trans>Backdrop click behavior</Trans>}
-              value={values.backdropClickBehavior}
-              onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
-              fullWidth
-            >
-              <SelectOption
-                value="cancel"
-                primaryText="Cancel change"
-                key="cancel"
-              />
-              <SelectOption
-                value="apply"
-                primaryText="Apply change"
-                key="apply"
-              />
-              <SelectOption
-                value="nothing"
-                primaryText="Nothing"
-                key="nothing"
-              />
-            </SelectField>
           </Line>
           {Window.isDev() && (
             <Line>

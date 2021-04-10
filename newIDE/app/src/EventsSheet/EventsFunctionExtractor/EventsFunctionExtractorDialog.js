@@ -102,7 +102,11 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     const hasLotsOfParameters = functionHasLotsOfParameters(eventsFunction);
 
     const onApply = () => {
-      onCreate(extensionName, eventsFunction);
+      if (!canCreateEventsFunction(project, extensionName, eventsFunction)) {
+        onClose();
+      } else {
+        onCreate(extensionName, eventsFunction);
+      }
     };
 
     return (

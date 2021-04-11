@@ -1823,6 +1823,59 @@ module.exports = {
       }
     ]
   },
+  "goose-bomberman": {
+    "description": "A bomberman-like game where each player controls a goose. Includes a title screen where you can choose the map and between 2 to 4 players, and bonuses.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "health-bar": {
     "description": "The platform example game adapted to add a health bar to the player, that is decreased when the player touches an enemy.",
     "usedExtensions": [

@@ -8,6 +8,7 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -108,13 +109,25 @@ export default class InlineParameterEditor extends React.Component<
     const instruction = this.props.instruction;
     if (!instruction) return null;
 
+    const onRequestClose = () => {
+      if (this.state.instructionMetadata)
+        setupInstructionParameters(
+          this.props.globalObjectsContainer,
+          this.props.objectsContainer,
+          instruction,
+          this.state.instructionMetadata,
+          instruction.getParameter(this.props.parameterIndex)
+        );
+      this.props.onRequestClose();
+    };
+
     const { ParameterComponent } = this.state;
 
     return (
       <InlinePopover
         open={this.props.open}
         anchorEl={this.props.anchorEl}
-        onRequestClose={this.props.onRequestClose}
+        onRequestClose={onRequestClose}
       >
         <ParameterComponent
           instruction={instruction}
@@ -123,7 +136,7 @@ export default class InlineParameterEditor extends React.Component<
           parameterIndex={this.props.parameterIndex}
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
-          onRequestClose={this.props.onRequestClose}
+          onRequestClose={onRequestClose}
           project={this.props.project}
           scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}

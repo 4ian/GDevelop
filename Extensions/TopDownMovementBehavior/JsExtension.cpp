@@ -27,7 +27,16 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior")
         .SetIncludeFile(
             "Extensions/TopDownMovementBehavior/"
-            "topdownmovementruntimebehavior.js");
+            "topdownmovementruntimebehavior.js")
+	     .AddIncludeFile(
+	         "Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js");
+
+    GetBehaviorMetadata("TopDownMovementBehavior::TopDownObstacleBehavior")
+        .SetIncludeFile(
+            "Extensions/TopDownMovementBehavior/"
+            "topdownmovementruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js");
 
     std::map<gd::String, gd::InstructionMetadata>& autActions =
         GetAllActionsForBehavior(
@@ -103,6 +112,10 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         .SetFunctionName("ignoreDefaultControls");
     autActions["TopDownMovementBehavior::SimulateStick"].SetFunctionName(
         "simulateStick");
+    autActions["TopDownMovementBehavior::EnableAssistance"].SetFunctionName(
+        "enableAssistance");
+    autConditions["TopDownMovementBehavior::IsAssistanceEnable"].SetFunctionName(
+        "isAssistanceEnable");
 
     autExpressions["Acceleration"].SetFunctionName("getAcceleration");
     autExpressions["Deceleration"].SetFunctionName("getDeceleration");

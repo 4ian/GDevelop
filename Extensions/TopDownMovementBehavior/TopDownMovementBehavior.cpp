@@ -40,6 +40,7 @@ void TopDownMovementBehavior::InitializeContent(
   behaviorContent.SetAttribute("viewpoint", "TopDown");
   behaviorContent.SetAttribute("customIsometryAngle", 30);
   behaviorContent.SetAttribute("movementAngleOffset", 0);
+  behaviorContent.SetAttribute("enableAssistance", false);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -100,6 +101,11 @@ TopDownMovementBehavior::GetProperties(
       .SetDescription(_(
           "Usually 0, unless you choose an *Isometry* viewpoint in which case "
           "-45 is recommended."));
+  properties[_("Enable obstacles bypass assistance")]
+      .SetValue(behaviorContent.GetBoolAttribute("enableAssistance")
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
 
   return properties;
 }
@@ -148,6 +154,10 @@ bool TopDownMovementBehavior::UpdateProperty(
   }
   if (name == _("Movement angle offset")) {
     behaviorContent.SetAttribute("movementAngleOffset", value.To<float>());
+  }
+  if (name == _("Enable obstacles bypass assistance")) {
+    behaviorContent.SetAttribute("enableAssistance", (value != "0"));
+    return true;
   }
 
   if (value.To<float>() < 0) return false;

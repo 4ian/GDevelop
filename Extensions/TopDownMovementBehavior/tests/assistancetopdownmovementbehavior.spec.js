@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
+describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   describe('Assistance', function () {
     const topDownName = 'auto1';
 
@@ -122,7 +122,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from below.
@@ -142,7 +141,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateStick(0, 1);
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from below.
@@ -168,7 +166,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from below.
@@ -196,7 +193,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug('position: ' + player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from below.
@@ -224,7 +220,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from below.
@@ -244,7 +239,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // The player bypassed the obstacle from above.
@@ -264,7 +258,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be.below(obstacle.getX());
@@ -283,7 +276,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be.below(obstacle.getX());
@@ -302,7 +294,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateDownKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() + obstacle.getWidth());
@@ -321,7 +312,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateDownKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
@@ -340,9 +330,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(
-          player.getX() + ' ; ' + player.getY() + obstacle.getHeight()
-        );
       }
 
       expect(player.getX()).to.be(obstacle.getX() + obstacle.getWidth());
@@ -361,7 +348,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
@@ -380,7 +366,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
@@ -399,7 +384,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() + obstacle.getWidth());
@@ -418,7 +402,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateDownKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX());
@@ -437,7 +420,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX());
@@ -457,7 +439,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
@@ -477,7 +458,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() + obstacle.getWidth());
@@ -497,7 +477,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateDownKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(playerX);
@@ -517,7 +496,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(playerX);
@@ -545,7 +523,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateDownKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be.above(obstacle.getX());
@@ -572,7 +549,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateUpKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be.above(obstacle2.getX());
@@ -599,7 +575,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateDownKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be.below(obstacle.getX());
@@ -626,7 +601,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateUpKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be.below(obstacle2.getX());
@@ -653,7 +627,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateRightKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be(obstacle.getX() + obstacle.getWidth());
@@ -680,7 +653,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
             player.getBehavior(topDownName).simulateLeftKey();
           }
           runtimeScene.renderAndStep(1000 / 60);
-          console.debug(player.getX() + ' ; ' + player.getY());
         }
 
         expect(player.getX()).to.be(obstacle2.getX() - player.getWidth());
@@ -703,7 +675,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
         player.getBehavior(topDownName).simulateRightKey();
         player.getBehavior(topDownName).simulateDownKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
 
         expect(player.getX()).to.be(playerX);
         expect(player.getY()).to.be.above(playerLastY);
@@ -725,7 +696,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - obstacle.getWidth());
@@ -748,7 +718,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be.above(obstacle.getX());
@@ -771,7 +740,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(
@@ -794,7 +762,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 90; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - obstacle.getWidth());
@@ -815,7 +782,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 50; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       expect(player.getX()).to.be(obstacle.getX() - obstacle.getWidth());
@@ -827,7 +793,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 10; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
       // still no change
       expect(player.getX()).to.be(obstacle.getX() - obstacle.getWidth());
@@ -840,7 +805,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 60; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
       // the object moved
       expect(player.getX()).to.be.above(obstacle.getX());
@@ -860,7 +824,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 47; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // the player is bypassing the obstacle
@@ -879,7 +842,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 20; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // the player continued its path
@@ -903,7 +865,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 47; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // the player is bypassing the obstacle
@@ -936,7 +897,6 @@ describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
       for (let i = 0; i < 10; i++) {
         player.getBehavior(topDownName).simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        console.debug(player.getX() + ' ; ' + player.getY());
       }
 
       // the player didn't moved

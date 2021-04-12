@@ -117,45 +117,11 @@ namespace gdjs {
       searchArea.maxY = maxY;
       var nearbyObstacles = this._obstacleRBush.search(searchArea);
 
-      // Sometimes RBush.search returns several times the player.
-      // Could it be a bug?
-
-      // FIXME This is just to ease tests, to be remove
-      var debug = '' + excluded.length + '\n';
-      for (var i = 0; i < excluded.length; i++) {
-        debug += excluded[i].id + '\n';
-      }
       for (var i = 0; i < nearbyObstacles.length; i++) {
-        const obstacleAABB: gdjs.AABB = nearbyObstacles[i].getHitBoxesAABB();
-        const obstacleMinX: number = obstacleAABB.min[0];
-        const obstacleMinY: number = obstacleAABB.min[1];
-        const obstacleMaxX: number = obstacleAABB.max[0];
-        const obstacleMaxY: number = obstacleAABB.max[1];
-        debug +=
-          nearbyObstacles[i].owner.id +
-          ' : ' +
-          obstacleMinX +
-          ' ' +
-          obstacleMinY +
-          ' -> ' +
-          obstacleMaxX +
-          ' ' +
-          obstacleMaxY +
-          '\n';
-
-        if (excluded.indexOf(nearbyObstacles[i].owner) < 0) {
-          // FIXME This is just to ease tests, to be remove
-          if (nearbyObstacles[i].owner instanceof gdjs.SpriteRuntimeObject) {
-            var alpha = 64 + 128 * Math.random();
-            nearbyObstacles[i].owner.setOpacity(alpha);
-            this._runtimeScene.getVariables().get('Debug').setString(debug);
-          }
-
+        if (!excluded.includes(nearbyObstacles[i].owner)) {
           return true;
         }
       }
-      //this._runtimeScene.getVariables().get("Debug").setString(debug);
-
       return false;
     }
   }

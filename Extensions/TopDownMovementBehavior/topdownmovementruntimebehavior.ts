@@ -353,7 +353,6 @@ namespace gdjs {
         let inputDirection: float;
         if (stickIsUsed) {
           inputDirection = this._getStickDirection();
-          console.debug('inputDirection: ' + inputDirection);
         } else {
           inputDirection = direction;
         }
@@ -363,7 +362,6 @@ namespace gdjs {
         );
         if (assistanceDirection !== -1) {
           if (stickIsUsed) {
-            console.debug('assistanceDirection: ' + assistanceDirection);
             this._stickAngle = assistanceDirection * 45;
           } else {
             direction = assistanceDirection;
@@ -426,9 +424,6 @@ namespace gdjs {
 
       //Position object
       if (this._isAssistanceEnable) {
-        // FIXME This is just to ease tests, to be removed
-        console.debug('Velocity: ' + this._xVelocity + ' ; ' + this._yVelocity);
-
         this._assistance.shift(
           this._xVelocity * timeDelta,
           this._yVelocity * timeDelta
@@ -666,33 +661,6 @@ namespace gdjs {
       this._deltasY = [0, 1, 1, 1, 0, -1, -1, -1];
     }
 
-    /**
-     * FIXME This is just to ease tests, to be removed
-     */
-    setAnimation(object: RuntimeObject, animation: integer) {
-      console.debug(object.id + ' : ' + animation);
-      if (object instanceof gdjs.SpriteRuntimeObject) {
-        object.setAnimation(animation);
-      }
-    }
-    /**
-     * FIXME This is just to ease tests, to be removed
-     */
-    getAnimation(object: RuntimeObject): integer {
-      if (object instanceof gdjs.SpriteRuntimeObject) {
-        return object.getAnimation();
-      }
-      return 0;
-    }
-    /**
-     * FIXME This is just to ease tests, to be removed
-     */
-    setOpacity(object: RuntimeObject, opacity: integer) {
-      if (object instanceof gdjs.SpriteRuntimeObject) {
-        object.setOpacity(opacity);
-      }
-    }
-
     almostEquals(a: float, b: float) {
       return b - Assistance.epsilon < a && a < b + Assistance.epsilon;
     }
@@ -757,10 +725,6 @@ namespace gdjs {
       const width: float = maxX - minX;
       const height: float = maxY - minY;
 
-      // FIXME This is just to ease tests, to be removed
-      let debug = '';
-      //runtimeScene.getVariables().get("Debug").setString(minX + ", " + minY + " -> " + maxX + ", " + maxY + "\n");
-
       // This affectation has no meaning, it will be override.
       let bypassedObstacleAABB: AABB | null = null;
 
@@ -791,19 +755,6 @@ namespace gdjs {
           Math.min(minY, Math.ceil(minY + deltaY)) < obstacleMaxY
         ) {
           this._collidingObjects.push(obstacle);
-          // FIXME This is just to ease tests, to be removed
-          this.setAnimation(obstacle, 0);
-          this.setOpacity(obstacle, 64 + 128 * Math.random());
-          debug +=
-            'obstacle: ' +
-            obstacleMinX / 64 +
-            ', ' +
-            obstacleMinY / 64 +
-            ' -> ' +
-            obstacleMaxX / 64 +
-            ', ' +
-            obstacleMaxY / 64 +
-            '\n';
 
           // The player is corner to corner to the obstacle.
           // The assistance will depend on other obstacles.
@@ -815,36 +766,24 @@ namespace gdjs {
           ) {
             assistanceRight++;
             assistanceDown++;
-
-            // FIXME This is just to ease tests, to be removed
-            this.setAnimation(obstacle, 9);
           } else if (
             this.almostEquals(maxX, obstacleMinX) &&
             this.almostEquals(minY, obstacleMaxY)
           ) {
             assistanceRight++;
             assistanceUp++;
-
-            // FIXME This is just to ease tests, to be removed
-            this.setAnimation(obstacle, 10);
           } else if (
             this.almostEquals(minX, obstacleMaxX) &&
             this.almostEquals(minY, obstacleMaxY)
           ) {
             assistanceLeft++;
             assistanceUp++;
-
-            // FIXME This is just to ease tests, to be removed
-            this.setAnimation(obstacle, 8);
           } else if (
             this.almostEquals(minX, obstacleMaxX) &&
             this.almostEquals(maxY, obstacleMinY)
           ) {
             assistanceLeft++;
             assistanceDown++;
-
-            // FIXME This is just to ease tests, to be removed
-            this.setAnimation(obstacle, 7);
           } else if (
             (upKey && this.almostEquals(minY, obstacleMaxY)) ||
             (downKey && this.almostEquals(maxY, obstacleMinY))
@@ -861,9 +800,6 @@ namespace gdjs {
             ) {
               assistanceLeft++;
               assistanceRight++;
-
-              // FIXME This is just to ease tests, to be removed
-              this.setAnimation(obstacle, 5);
             }
             // The player is on the corner of the obstacle.
             // (not the exact corner, see corner affectation)
@@ -881,18 +817,6 @@ namespace gdjs {
                 stopMinX = obstacleMinX - width;
                 bypassedObstacleAABB = obstacleAABB;
               }
-              // FIXME This is just to ease tests, to be removed
-              this.setAnimation(obstacle, 3);
-              debug +=
-                'assistanceLeft: ' +
-                obstacleMinX +
-                ', ' +
-                obstacleMinY +
-                ' -> ' +
-                obstacleMaxX +
-                ', ' +
-                obstacleMaxY +
-                '\n';
             } else if (
               !leftKey &&
               obstacleMaxX - corner <= minX &&
@@ -905,9 +829,6 @@ namespace gdjs {
                 stopMaxX = obstacleMaxX;
                 bypassedObstacleAABB = obstacleAABB;
               }
-              // FIXME This is just to ease tests, to be removed
-              this.setAnimation(obstacle, 1);
-              //debug += "assistanceRight: " + obstacleMinX + ", " + obstacleMinY + " -> " + obstacleMaxX + ", " + obstacleMaxY + "\n";
             }
           } else if (
             (leftKey && this.almostEquals(minX, obstacleMaxX)) ||
@@ -925,9 +846,6 @@ namespace gdjs {
             ) {
               assistanceUp++;
               assistanceDown++;
-
-              // FIXME This is just to ease tests, to be removed
-              this.setAnimation(obstacle, 6);
             }
             // The player is on the corner of the obstacle.
             // (not the exact corner, see corner affectation)
@@ -943,15 +861,6 @@ namespace gdjs {
                 stopMinY = obstacleMinY - height;
                 bypassedObstacleAABB = obstacleAABB;
               }
-              // FIXME This is just to ease tests, to be removed
-              if (this.getAnimation(obstacle) === 3) {
-                this.setAnimation(obstacle, 8);
-              } else if (this.getAnimation(obstacle) === 1) {
-                this.setAnimation(obstacle, 10);
-              } else {
-                this.setAnimation(obstacle, 4);
-              }
-              //debug += "assistanceUp: " + obstacleMinX + ", " + obstacleMinY + " -> " + obstacleMaxX + ", " + obstacleMaxY + "\n";
             } else if (
               !upKey &&
               obstacleMaxY - corner <= minY &&
@@ -964,48 +873,14 @@ namespace gdjs {
                 stopMaxY = obstacleMaxY;
                 bypassedObstacleAABB = obstacleAABB;
               }
-              // FIXME This is just to ease tests, to be removed
-              if (this.getAnimation(obstacle) === 3) {
-                this.setAnimation(obstacle, 7);
-              } else if (this.getAnimation(obstacle) === 1) {
-                this.setAnimation(obstacle, 9);
-              } else {
-                this.setAnimation(obstacle, 2);
-              }
-              //debug += "assistanceDown: " + obstacleMinX + ", " + obstacleMinY + " -> " + obstacleMaxX + ", " + obstacleMaxY + "\n";
             }
           }
         }
       }
 
-      // FIXME This is just to ease tests, to be removed
-      debug +=
-        'assistanceLeft: ' +
-        assistanceLeft +
-        '\n' +
-        'assistanceRight: ' +
-        assistanceRight +
-        '\n' +
-        'assistanceUp: ' +
-        assistanceUp +
-        '\n' +
-        'assistanceDown: ' +
-        assistanceDown +
-        '\n' +
-        minX / 64 +
-        ', ' +
-        minY / 64 +
-        ' -> ' +
-        maxX / 64 +
-        ', ' +
-        maxY / 64 +
-        '\n';
-      runtimeScene.getVariables().get('Debug').setString(debug);
-
       // This may happen when the player is in the corner of 2 perpendicular walls.
       // No assistance is needed.
       if (assistanceLeft && assistanceRight && assistanceUp && assistanceDown) {
-        console.debug('Against perpendicular walls: No Assist');
         return this.noAssistance();
       }
       // This may happen when the player goes in diagonal against a wall.
@@ -1017,12 +892,9 @@ namespace gdjs {
         isBypassX = false;
         if (leftKey && !rightKey) {
           assistanceDirection = 4;
-          console.debug('Slide on walls: Go Right');
         } else if (rightKey && !leftKey) {
           assistanceDirection = 0;
-          console.debug('Slide on walls: Go Left');
         } else {
-          console.debug('Against walls: No Assist');
           // Contradictory decisions are dismissed.
           //
           // This can happen, for instance, with a wall composed of squares.
@@ -1035,12 +907,9 @@ namespace gdjs {
         isBypassY = false;
         if (upKey && !downKey) {
           assistanceDirection = 6;
-          console.debug('Slide on walls: Go Up');
         } else if (downKey && !upKey) {
           assistanceDirection = 2;
-          console.debug('Slide on walls: Go Down');
         } else {
-          console.debug('Against walls: No Assist');
           // see previous comment
           return this.noAssistance();
         }
@@ -1060,10 +929,8 @@ namespace gdjs {
               Math.abs(this._behavior._yVelocity))
         ) {
           assistanceDirection = 2;
-          console.debug('Corner TopLeft: Go Down');
         } else {
           assistanceDirection = 0;
-          console.debug('Corner TopLeft: Go Right');
         }
       } else if (assistanceLeft && assistanceDown) {
         if (
@@ -1075,10 +942,8 @@ namespace gdjs {
               Math.abs(this._behavior._yVelocity))
         ) {
           assistanceDirection = 2;
-          console.debug('Corner TopRight: Go Down');
         } else {
           assistanceDirection = 4;
-          console.debug('Corner TopRight: Go Left');
         }
       } else if (assistanceLeft && assistanceUp) {
         if (
@@ -1090,10 +955,8 @@ namespace gdjs {
               Math.abs(this._behavior._yVelocity))
         ) {
           assistanceDirection = 6;
-          console.debug('Corner DownRight: Go Up');
         } else {
           assistanceDirection = 4;
-          console.debug('Corner DownRight: Go Left');
         }
       } else if (assistanceRight && assistanceUp) {
         if (
@@ -1105,58 +968,21 @@ namespace gdjs {
               Math.abs(this._behavior._yVelocity))
         ) {
           assistanceDirection = 6;
-          console.debug('Corner DownLeft: Go Up');
         } else {
           assistanceDirection = 0;
-          console.debug('Corner DownLeft: Go Right');
         }
       } else {
         // Slide on the corner of an obstacle to bypass it.
         // Every tricky cases are already handled .
         if (assistanceLeft) {
-          console.debug(
-            'Go Left (Left: %s, Down: %s, Right: %s, Up: %s)',
-            assistanceLeft,
-            assistanceDown,
-            assistanceRight,
-            assistanceUp
-          );
           assistanceDirection = 4;
         } else if (assistanceRight) {
-          console.debug(
-            'Go Right (Left: %s, Down: %s, Right: %s, Up: %s)',
-            assistanceLeft,
-            assistanceDown,
-            assistanceRight,
-            assistanceUp
-          );
           assistanceDirection = 0;
         } else if (assistanceUp) {
-          console.debug(
-            'Go Up (Left: %s, Down: %s, Right: %s, Up: %s)',
-            assistanceLeft,
-            assistanceDown,
-            assistanceRight,
-            assistanceUp
-          );
           assistanceDirection = 6;
         } else if (assistanceDown) {
-          console.debug(
-            'Go Down (Left: %s, Down: %s, Right: %s, Up: %s)',
-            assistanceLeft,
-            assistanceDown,
-            assistanceRight,
-            assistanceUp
-          );
           assistanceDirection = 2;
         } else {
-          console.debug(
-            'No Assist (Left: %s, Down: %s, Right: %s, Up: %s)',
-            assistanceLeft,
-            assistanceDown,
-            assistanceRight,
-            assistanceUp
-          );
           return this.noAssistance();
         }
       }
@@ -1181,7 +1007,6 @@ namespace gdjs {
         // and the player releases and presses agin the key.
         // Because, doing it automatically would seems weird.
         if (this._lastAnyObstacle) {
-          console.debug('Obstacle was in the bypass way: No Assist');
           return this.noAssistance();
         }
       } else if (isBypassX || isBypassY) {
@@ -1293,7 +1118,6 @@ namespace gdjs {
         this._needToCheckBypassWay = false;
 
         if (anyObstacle) {
-          console.debug('Obstacle in the bypass way: No Assist');
           return this.noAssistance();
         }
       }
@@ -1349,21 +1173,6 @@ namespace gdjs {
       const leftKey: boolean = 3 <= direction && direction <= 5;
       const upKey: boolean = 5 <= direction && direction <= 7;
 
-      console.debug(
-        'stop ' +
-          this._result._isBypassX +
-          ': ' +
-          this._result._stopMinX +
-          ' --> ' +
-          this._result._stopMaxX +
-          '  ;  ' +
-          this._result._isBypassY +
-          ': ' +
-          this._result._stopMinY +
-          ' --> ' +
-          this._result._stopMaxY
-      );
-
       // Alignment: avoid to go too far and kind of drift or oscillate in front of a hole.
       if (
         this._result._isBypassX &&
@@ -1384,13 +1193,6 @@ namespace gdjs {
               this._behavior._yVelocity * this._behavior._yVelocity
           );
         this._behavior._xVelocity = 0;
-
-        // FIXME This is just to ease tests, to be removed
-        this.setAnimation(
-          this._behavior.owner,
-          (this.getAnimation(this._behavior.owner) + 1) % 6
-        );
-        console.debug('Align X');
       }
       if (
         this._result._isBypassY &&
@@ -1411,13 +1213,6 @@ namespace gdjs {
               this._behavior._yVelocity * this._behavior._yVelocity
           );
         this._behavior._yVelocity = 0;
-
-        // FIXME This is just to ease tests, to be removed
-        this.setAnimation(
-          this._behavior.owner,
-          (this.getAnimation(this._behavior.owner) + 1) % 6
-        );
-        console.debug('Align Y');
       }
     }
 
@@ -1426,12 +1221,6 @@ namespace gdjs {
      */
     _separateFromObstacles() {
       const object = this._behavior.owner;
-      console.debug(
-        'separateFromObstacles x:' +
-          this._behavior._transformedPosition[0] +
-          ' y:' +
-          this._behavior._transformedPosition[1]
-      );
       const objectAABB: gdjs.AABB = this.getHitBoxesAABB();
       const minX: float = objectAABB.min[0];
       const minY: float = objectAABB.min[1];
@@ -1480,12 +1269,6 @@ namespace gdjs {
         }
         this.separateFrom(obstacleBehavior);
       }
-      console.debug(
-        'separateFromObstacles done x:' +
-          this._behavior._transformedPosition[0] +
-          ' y:' +
-          this._behavior._transformedPosition[1]
-      );
     }
 
     /**

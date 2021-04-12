@@ -105,7 +105,8 @@ TopDownMovementBehavior::GetProperties(
       .SetValue(behaviorContent.GetBoolAttribute("enableAssistance")
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .SetDescription(_("Obstacles must have the TopDownObstacle behavior."));
 
   return properties;
 }

@@ -30,7 +30,6 @@ export const getDeprecatedBehaviorsInformation = (): {
 export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
-  'SkeletonObject::Skeleton': true,
   'TileMap::TileMap': true,
 });
 
@@ -49,16 +48,6 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`Video format supported can vary according to devices and browsers. For maximum compatibility, use H.264/mp4 file format (and AAC for audio).`,
-    },
-  ],
-  'SkeletonObject::Skeleton': [
-    {
-      kind: 'warning',
-      message: t`This object is experimental and not actively maintained. It might have bugs or incomplete support in GDevelop. A maintainer is searched to improve the object implementation and solve any issue. Your help is welcome!`,
-    },
-    {
-      kind: 'info',
-      message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
     },
   ],
   'TileMap::TileMap': [

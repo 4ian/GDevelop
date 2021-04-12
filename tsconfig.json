@@ -43,7 +43,6 @@
     "GDJS/Runtime/FacebookInstantGames",
     "GDJS/Runtime/libs/CocoonJS",
     "Extensions/**/JsExtension.js",
-    "Extensions/SkeletonObject",
     "Extensions/Effects/pixi-filters/filter-alpha.js"
   ]
 }

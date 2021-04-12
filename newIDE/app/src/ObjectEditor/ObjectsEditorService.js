@@ -108,11 +108,5 @@ export default {
       castToObjectType: object => gd.asParticleEmitterObject(object),
       helpPagePath: '/objects/particles_emitter',
     },
-    'SkeletonObject::Skeleton': {
-      component: ObjectPropertiesEditor,
-      createNewObject: () => new gd.SkeletonObject(''),
-      castToObjectType: object => gd.castObject(object, gd.SkeletonObject),
-      helpPagePath: '/objects/skeleton',
-    },
   },
 };

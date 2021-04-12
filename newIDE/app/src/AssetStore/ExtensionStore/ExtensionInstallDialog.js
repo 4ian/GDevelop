@@ -141,6 +141,9 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               <Text noMargin size="title">
                 {extensionShortHeader.fullName}
               </Text>
+              <Text noMargin size="body2">
+                <Trans>Version:</Trans> {' ' + extensionShortHeader.version}
+              </Text>
             </Column>
           </Line>
           <Text noMargin>{extensionShortHeader.shortDescription}</Text>

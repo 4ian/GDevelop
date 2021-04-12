@@ -1313,7 +1313,6 @@ namespace gdjs {
     }
 
     shift(deltaX: float, deltaY: float) {
-      //FIXME use a relative hitBox to avoid rounding errors
       this._behavior._transformedPosition[0] += deltaX;
       this._behavior._transformedPosition[1] += deltaY;
     }

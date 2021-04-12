@@ -827,16 +827,18 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
       }
 
       // the player is bypassing the obstacle
-      expect(player.getX()).to.be(
-        obstacle.getX() - player.getWidth()
-      );
+      expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
       expect(player.getY()).to.be.within(
-        obstacle.getY() + obstacle.getHeight() - (bypassDistance - 1), 
-        obstacle.getY() + obstacle.getHeight() - bypassDistance * 1 / 2);
+        obstacle.getY() + obstacle.getHeight() - (bypassDistance - 1),
+        obstacle.getY() + obstacle.getHeight() - (bypassDistance * 1) / 2
+      );
 
       const inTheWayObstacle = addObstacle(runtimeScene);
       // a right way shorter than the bypass way
-      inTheWayObstacle.setPosition(obstacle.getX() + 1, obstacle.getY() + obstacle.getHeight());
+      inTheWayObstacle.setPosition(
+        obstacle.getX() + 1,
+        obstacle.getY() + obstacle.getHeight()
+      );
 
       // still holding the key
       for (let i = 0; i < 20; i++) {
@@ -868,27 +870,28 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
       }
 
       // the player is bypassing the obstacle
-      expect(player.getX()).to.be(
-        obstacle.getX() - player.getWidth()
-      );
+      expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
       expect(player.getY()).to.be.within(
-        obstacle.getY() + obstacle.getHeight() - (bypassDistance - 1), 
-        obstacle.getY() + obstacle.getHeight() - bypassDistance * 1 / 2);
+        obstacle.getY() + obstacle.getHeight() - (bypassDistance - 1),
+        obstacle.getY() + obstacle.getHeight() - (bypassDistance * 1) / 2
+      );
 
       const inTheWayObstacle = addObstacle(runtimeScene);
       // a right way shorter than the bypass way
-      inTheWayObstacle.setPosition(obstacle.getX() + 1, obstacle.getY() + obstacle.getHeight());
-      
+      inTheWayObstacle.setPosition(
+        obstacle.getX() + 1,
+        obstacle.getY() + obstacle.getHeight()
+      );
+
       // release the key
       for (let i = 0; i < 20; i++) {
         runtimeScene.renderAndStep(1000 / 60);
       }
       // the player is still in the bypass way
-      expect(player.getX()).to.be(
-        obstacle.getX() - player.getWidth()
-      );
+      expect(player.getX()).to.be(obstacle.getX() - player.getWidth());
       expect(player.getY()).to.be.below(
-        obstacle.getY() + obstacle.getHeight() - bypassDistance * 1 / 4);
+        obstacle.getY() + obstacle.getHeight() - (bypassDistance * 1) / 4
+      );
 
       const playerX = player.getX();
       const playerY = player.getY();

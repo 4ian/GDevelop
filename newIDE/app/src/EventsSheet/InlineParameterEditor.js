@@ -9,6 +9,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
+import { getObjectParameterIndex } from '../InstructionOrExpression/EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -110,14 +111,20 @@ export default class InlineParameterEditor extends React.Component<
     if (!instruction) return null;
 
     const onRequestClose = () => {
-      if (this.state.instructionMetadata)
+      if (this.state.instructionMetadata) {
+        const objectParameterIndex = getObjectParameterIndex(
+          this.state.instructionMetadata
+        );
         setupInstructionParameters(
           this.props.globalObjectsContainer,
           this.props.objectsContainer,
           instruction,
           this.state.instructionMetadata,
-          instruction.getParameter(this.props.parameterIndex)
+          objectParameterIndex
+            ? instruction.getParameter(objectParameterIndex)
+            : null
         );
+      }
       this.props.onRequestClose();
     };
 

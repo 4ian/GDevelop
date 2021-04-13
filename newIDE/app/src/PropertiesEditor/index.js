@@ -30,6 +30,7 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
+import { Line } from '../UI/Grid';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -238,7 +239,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               getFieldLabel(this.props.instances, field)
             ) : (
               <React.Fragment>
-                {getFieldLabel(this.props.instances, field)}{' '}
+                <Line noMargin>
+                  {getFieldLabel(this.props.instances, field)}
+                </Line>
                 <FormHelperText style={{ display: 'inline' }}>
                   <MarkdownText source={description} />
                 </FormHelperText>

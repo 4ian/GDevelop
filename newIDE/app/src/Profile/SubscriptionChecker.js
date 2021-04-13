@@ -127,8 +127,9 @@ export class SubscriptionCheckDialog extends React.Component<
             <Star style={styles.icon} />
             <Text style={styles.iconText}>
               <Trans>
-                Having a subscription allows you to use the one-click export and
-                disable the GDevelop splashscreen during loading!
+                Get a subscription to gain more automatic exports and remove the
+                loading screens and this message asking you to get a
+                subscription.
               </Trans>
             </Text>
           </Line>

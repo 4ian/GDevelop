@@ -142,7 +142,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
                 {extensionShortHeader.fullName}
               </Text>
               <Text noMargin size="body2">
-                <Trans>Version:</Trans> {' ' + extensionShortHeader.version}
+                <Trans>Version {' ' + extensionShortHeader.version}</Trans>
               </Text>
             </Column>
           </Line>

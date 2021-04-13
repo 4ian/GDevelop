@@ -128,7 +128,7 @@ export class SubscriptionCheckDialog extends React.Component<
             <Text style={styles.iconText}>
               <Trans>
                 Get a subscription to gain more automatic exports and remove the
-                loading screens and this message asking you to get a
+                GDevelop splashscreen and this message asking you to get a
                 subscription.
               </Trans>
             </Text>

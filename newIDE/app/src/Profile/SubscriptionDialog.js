@@ -189,10 +189,10 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                         <Text>
                           <Trans>
                             Get a subscription to gain more automatic exports
-                            and remove the loading screens and messages asking
-                            you to get a subscription. With a subscription, you're also
-                            supporting the development of GDevelop, which is an
-                            open-source software.
+                            and remove the GDevelop splashscreen and messages
+                            asking you to get a subscription. With a
+                            subscription, you're also supporting the development
+                            of GDevelop, which is an open-source software.
                           </Trans>
                         </Text>
                       </Line>

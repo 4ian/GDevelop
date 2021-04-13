@@ -138,6 +138,32 @@ export function getMuiOverrides(
         fontWeight: 400, // Lower a bit the weight of buttons
       },
     },
+    // Make MuiAccordion much more compact than default.
+    // Some (or all) of these styles can be removed on MUIv5,
+    // which introduces `disableGutters` prop for compactness.
+    MuiAccordion: {
+      root: {
+        '&$expanded': {
+          margin: 0,
+        },
+      },
+    },
+    MuiAccordionSummary: {
+      root: {
+        '&$expanded': {
+          minHeight: null,
+        },
+      },
+      content: {
+        margin: 0,
+        '&$expanded': {
+          margin: 0,
+        },
+      },
+      expandIcon: {
+        padding: 0,
+      },
+    },
   };
 }
 

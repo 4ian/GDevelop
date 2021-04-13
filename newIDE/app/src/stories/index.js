@@ -185,6 +185,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
+import Delete from '@material-ui/icons/Delete';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
@@ -231,6 +232,12 @@ import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
+import {
+  Accordion,
+  AccordionActions,
+  AccordionHeader,
+  AccordionBody,
+} from '../UI/Accordion';
 
 configureActions({
   depth: 2,
@@ -1098,6 +1105,50 @@ storiesOf('UI Building Blocks/Checkbox', module)
       <Checkbox label={'My label'} checked={true} />
       <Checkbox label={'My label 2'} checked={false} />
     </div>
+  ));
+
+storiesOf('UI Building Blocks/Accordion', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <Accordion>
+      <AccordionHeader
+        actions={[
+          <IconButton key="delete" size="small" onClick={action('Delete')}>
+            <Delete />
+          </IconButton>,
+        ]}
+      >
+        <Text>Quadrilateral</Text>
+      </AccordionHeader>
+      <AccordionBody>
+        <Text>
+          This is a quadrilateral. A quadrilateral has four points. If yours has
+          more, count again - you may be misled.
+        </Text>
+      </AccordionBody>
+      <AccordionActions
+        actions={[
+          <FlatButton
+            primary
+            key="ok"
+            label="Gotcha"
+            onClick={action('Primary action')}
+          />,
+        ]}
+        secondaryActions={[
+          <FlatButton
+            key="ignore"
+            label="Ignore"
+            onClick={action('Secondary action')}
+          />,
+          <FlatButton
+            key="count"
+            label="Count"
+            onClick={action('Secondary action')}
+          />,
+        ]}
+      />
+    </Accordion>
   ));
 
 storiesOf('UI Building Blocks/PlaceholderMessage', module)

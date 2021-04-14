@@ -10,7 +10,11 @@ namespace gdjs {
        */
       export const onAppCreated: Array<() => void> = [];
 
-      gdjs.registerFirstRuntimeSceneLoadedCallback((runtimeScene) => {
+      /**
+       * Sets up the Firebase SDK. Only exported for testing purposes.
+       * @internal
+       */
+      export const _setupFirebase = (runtimeScene: gdjs.RuntimeScene) => {
         let firebaseConfig;
         try {
           firebaseConfig = JSON.parse(
@@ -25,7 +29,9 @@ namespace gdjs {
         }
         firebase.initializeApp(firebaseConfig);
         for (let func of onAppCreated) func();
-      });
+      }
+
+      gdjs.registerFirstRuntimeSceneLoadedCallback(_setupFirebase);
     }
   }
 }

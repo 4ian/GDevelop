@@ -102,6 +102,18 @@ const VerticesTable = (props: VerticesTableProps) => {
           ))}
         </TableBody>
       </Table>
+      <Line justifyContent="center">
+        <FlatButton
+          icon={<AddIcon size="small" />}
+          label={<Trans>Add a vertex</Trans>}
+          onClick={() => {
+            const newVertice = new gd.Vector2f();
+            props.vertices.push_back(newVertice);
+            newVertice.delete();
+            props.onUpdated();
+          }}
+        />
+      </Line>
       <Spacer />
       <Spacer />
       <Spacer />
@@ -151,18 +163,6 @@ const PolygonSection = (props: PolygonSectionProps) => {
     >
       <DeleteIcon />
     </IconButton>,
-    // <FlatButton
-    //   key="add-vertex"
-    //   icon={<AddIcon size="small" />}
-    //   label={<Trans>Add a vertex</Trans>}
-    //   onClick={ev => {
-    //     ev.stopPropagation();
-    //     const newVertice = new gd.Vector2f();
-    //     vertices.push_back(newVertice);
-    //     newVertice.delete();
-    //     props.onUpdated();
-    //   }}
-    // />,
   ];
 
   return (

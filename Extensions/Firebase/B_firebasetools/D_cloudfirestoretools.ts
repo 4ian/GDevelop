@@ -279,7 +279,7 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (callbackValueVariable)
-                callbackValueVariable.setString(doc.exists ? 'true' : 'false');
+                callbackValueVariable.setBoolean(doc.exists);
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')
@@ -312,10 +312,10 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (callbackValueVariable)
-                callbackValueVariable.setString(
-                  doc.get(field, { serverTimestamps: 'estimate' }) === undefined
-                    ? 'false'
-                    : 'true'
+                callbackValueVariable.setBoolean(
+                  doc.get(field, { serverTimestamps: 'estimate' }) !==
+                    undefined &&
+                    doc.get(field, { serverTimestamps: 'estimate' }) !== null
                 );
             })
             .catch((error) => {

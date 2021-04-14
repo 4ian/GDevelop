@@ -254,10 +254,10 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                callbackValueVariable.setString(
-                  snapshot.exists() && snapshot.val() !== null
-                    ? 'true'
-                    : 'false'
+                callbackValueVariable.setBoolean(
+                  snapshot.exists() &&
+                    snapshot.val() !== null &&
+                    snapshot.val() !== undefined
                 );
             })
             .catch((error) => {
@@ -288,10 +288,10 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                callbackValueVariable.setString(
-                  snapshot.val() == null || snapshot.val()[field] == null
-                    ? 'false'
-                    : 'true'
+                callbackValueVariable.setBoolean(
+                  snapshot.exists() &&
+                    snapshot.val()[field] !== null &&
+                    snapshot.val()[field] !== undefined
                 );
             })
             .catch((error) => {

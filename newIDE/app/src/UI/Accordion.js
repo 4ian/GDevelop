@@ -5,7 +5,7 @@ import MUIAccordionSummary from '@material-ui/core/AccordionSummary';
 import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
 import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { IconButton } from '@material-ui/core';
+import IconButton from './IconButton';
 
 type AccordionHeadProps = {|
   children: React.Node,

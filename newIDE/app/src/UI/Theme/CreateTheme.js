@@ -143,8 +143,21 @@ export function getMuiOverrides(
     // which introduces `disableGutters` prop for compactness.
     MuiAccordion: {
       root: {
+        margin: '5px 0',
         '&$expanded': {
-          margin: 0,
+          margin: '5px 0',
+          '&:first-child': {
+            marginTop: 5,
+          },
+          '&:before': {
+            opacity: 1,
+          },
+        },
+        '&:not(:last-child)': {
+          borderBottom: 0,
+        },
+        '&:before': {
+          display: 'none',
         },
       },
     },

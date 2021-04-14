@@ -6,6 +6,14 @@ import MUIAccordionDetails from '@material-ui/core/AccordionDetails';
 import MUIAccordionActions from '@material-ui/core/AccordionActions';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import IconButton from './IconButton';
+import GDevelopThemeContext from './Theme/ThemeContext';
+
+const styles = {
+  bodyRoot: {
+    // Remove body padding
+    padding: 0,
+  },
+};
 
 type AccordionHeadProps = {|
   children: React.Node,
@@ -38,6 +46,10 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
 
 type AccordionBodyProps = {|
   children: React.Node,
+  style?: Object,
+
+  // Removes all padding in body container
+  disableGutters?: boolean,
 |};
 
 /**
@@ -45,7 +57,13 @@ type AccordionBodyProps = {|
  * Based on Material-UI AccordionDetails.
  */
 export const AccordionBody = (props: AccordionBodyProps) => {
-  return <MUIAccordionDetails>{props.children}</MUIAccordionDetails>;
+  return (
+    <MUIAccordionDetails
+      style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
+    >
+      {props.children}
+    </MUIAccordionDetails>
+  );
 };
 
 type AccordionActionsProps = {|
@@ -93,10 +111,14 @@ type AccordionProps = {|
  */
 export const Accordion = (props: AccordionProps) => {
   const { costlyBody, ...otherProps } = props;
+  const theme = React.useContext(GDevelopThemeContext);
+
   return (
     <MUIAccordion
       {...otherProps}
       square
+      elevation={0}
+      style={{ border: `1px solid ${theme.toolbar.separatorColor}` }}
       TransitionProps={{ unmountOnExit: !!costlyBody }}
     />
   );

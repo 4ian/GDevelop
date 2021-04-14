@@ -10,5 +10,6 @@ export default {
   },
   toolColumn: {
     width: 48,
+    height: 32,
   },
 };

@@ -4,7 +4,6 @@ import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
 import TextField from '../../../../UI/TextField';
-import Warning from '@material-ui/icons/Warning';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 

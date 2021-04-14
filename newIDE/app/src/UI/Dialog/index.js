@@ -30,6 +30,9 @@ const styles = {
   noTitleMargin: {
     padding: 0,
   },
+  fullHeightModal: {
+    minHeight: 'calc(100% - 64px)',
+  },
 };
 
 // We support a subset of the props supported by Material-UI v0.x Dialog
@@ -116,6 +119,7 @@ export default (props: Props) => {
   ) : (
     actions
   );
+
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
     ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
@@ -143,8 +147,8 @@ export default (props: Props) => {
       fullScreen={size === 'small'}
       className={classNames({
         'safe-area-aware-container': size === 'small',
-        'full-height-modal': fullHeight,
       })}
+      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
     >

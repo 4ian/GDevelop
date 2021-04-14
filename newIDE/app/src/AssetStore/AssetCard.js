@@ -4,16 +4,17 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
+import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 
 const paddingSize = 10;
 const styles = {
-  previewBackground: {
-    background: 'url("res/transparentback.png") repeat',
+  previewContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
   },
   previewImage: {
+    position: 'relative',
     objectFit: 'contain',
     verticalAlign: 'middle',
     pointerEvents: 'none',
@@ -54,7 +55,8 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
-        <div style={{ ...styles.previewBackground, width: size, height: size }}>
+        <div style={{ ...styles.previewContainer, width: size, height: size }}>
+          <CheckeredBackground />
           <CorsAwareImage
             key={assetShortHeader.previewImageUrls[0]}
             style={{

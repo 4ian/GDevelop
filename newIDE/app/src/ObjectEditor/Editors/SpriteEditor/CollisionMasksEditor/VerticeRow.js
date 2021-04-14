@@ -1,21 +1,22 @@
+// @flow
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
 import TextField from '../../../../UI/TextField';
-import Warning from '@material-ui/icons/Warning';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 
-const VerticeRow = ({
-  hasWarning,
-  canRemove,
-  onRemove,
-  verticeX,
-  verticeY,
-  onChangeVerticeX,
-  onChangeVerticeY,
-}) => (
+type Props = {|
+  canRemove: boolean,
+  onRemove: () => void,
+  verticeX: number,
+  verticeY: number,
+  onChangeVerticeX: (value: number) => void,
+  onChangeVerticeY: (value: number) => void,
+|};
+
+const VerticeRow = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (
       <TableRow
@@ -23,35 +24,36 @@ const VerticeRow = ({
           backgroundColor: muiTheme.list.itemsBackgroundColor,
         }}
       >
-        <TableRowColumn style={styles.handleColumn}>
-          {/* <DragHandle /> Reordering vertices is not supported for now */}
-        </TableRowColumn>
-        <TableRowColumn>{hasWarning && <Warning />}</TableRowColumn>
+        <TableRowColumn />
         <TableRowColumn style={styles.coordinateColumn}>
           <TextField
             margin="none"
-            value={verticeX}
+            value={props.verticeX}
             type="number"
             id="vertice-x"
             onChange={(e, value) =>
-              onChangeVerticeX(parseFloat(value || 0, 10))
+              props.onChangeVerticeX(parseFloat(value || 0))
             }
           />
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn}>
           <TextField
             margin="none"
-            value={verticeY}
+            value={props.verticeY}
             type="number"
             id="vertice-y"
             onChange={(e, value) =>
-              onChangeVerticeY(parseFloat(value || 0, 10))
+              props.onChangeVerticeY(parseFloat(value || 0))
             }
           />
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>
-          {!!onRemove && (
-            <IconButton size="small" onClick={onRemove} disabled={!canRemove}>
+          {!!props.onRemove && (
+            <IconButton
+              size="small"
+              onClick={props.onRemove}
+              disabled={!props.canRemove}
+            >
               <Delete />
             </IconButton>
           )}

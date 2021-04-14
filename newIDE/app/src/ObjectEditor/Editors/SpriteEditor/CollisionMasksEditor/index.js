@@ -1,5 +1,6 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import React from 'react';
 import FlatButton from '../../../../UI/FlatButton';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
@@ -15,118 +16,128 @@ import {
 import SpriteSelector from '../Utils/SpriteSelector';
 import Window from '../../../../Utils/Window';
 import every from 'lodash/every';
+import ResourcesLoader from '../../../../ResourcesLoader';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import EditorMosaic, {
+  type Editor,
+  type EditorMosaicNode,
+} from '../../../../UI/EditorMosaic';
+import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Background from '../../../../UI/Background';
+import ScrollView from '../../../../UI/ScrollView';
 const gd: libGDevelop = global.gd;
 
-export default class CollisionMasksEditor extends Component {
-  state = {
-    animationIndex: 0,
-    directionIndex: 0,
-    spriteIndex: 0,
-    sameCollisionMasksForAnimations: true,
-    sameCollisionMasksForSprites: true,
-    spriteWidth: 0,
-    spriteHeight: 0,
-  };
+const horizontalMosaicNodes: EditorMosaicNode = {
+  direction: 'row',
+  first: 'preview',
+  second: 'properties',
+  splitPercentage: 50,
+};
 
-  componentDidMount() {
-    this._updateSameCollisionMasksToggles();
-  }
+const verticalMosaicNodes: EditorMosaicNode = {
+  direction: 'column',
+  first: 'preview',
+  second: 'properties',
+  splitPercentage: 50,
+};
 
-  _updateCollisionMasks = () => {
-    const { object } = this.props;
-    const { animationIndex, directionIndex, spriteIndex } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
+type Props = {|
+  object: gdSpriteObject,
+  resourcesLoader: typeof ResourcesLoader,
+  project: gdProject,
+|};
 
-    const { animation, sprite } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+const CollisionMasksEditor = (props: Props) => {
+  const [animationIndex, setAnimationIndex] = React.useState(0);
+  const [directionIndex, setDirectionIndex] = React.useState(0);
+  const [spriteIndex, setSpriteIndex] = React.useState(0);
+  const [
+    sameCollisionMasksForAnimations,
+    setSameCollisionMasksForAnimations,
+  ] = React.useState<boolean>(true);
+  const [
+    sameCollisionMasksForSprites,
+    setSameCollisionMasksForSprites,
+  ] = React.useState<boolean>(true);
+  const [spriteWidth, setSpriteWidth] = React.useState(0);
+  const [spriteHeight, setSpriteHeight] = React.useState(0);
+  const forceUpdate = useForceUpdate();
 
-    if (animation && sprite) {
-      if (this.state.sameCollisionMasksForAnimations) {
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
-          const otherAnimation = spriteObject.getAnimation(i);
-          copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
-        });
-      } else if (this.state.sameCollisionMasksForSprites) {
-        copyAnimationsSpriteCollisionMasks(sprite, animation);
+  const spriteObject = gd.asSpriteObject(props.object);
+  const { animation, sprite, hasValidSprite } = getCurrentElements(
+    spriteObject,
+    animationIndex,
+    directionIndex,
+    spriteIndex
+  );
+
+  const updateCollisionMasks = React.useCallback(
+    () => {
+      if (animation && sprite) {
+        if (sameCollisionMasksForAnimations) {
+          mapFor(0, spriteObject.getAnimationsCount(), i => {
+            const otherAnimation = spriteObject.getAnimation(i);
+            copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
+          });
+        } else if (sameCollisionMasksForSprites) {
+          copyAnimationsSpriteCollisionMasks(sprite, animation);
+        }
       }
-    }
 
-    this.forceUpdate(); // Refresh the preview and the list
-  };
-
-  chooseAnimation = index => {
-    this.setState(
-      {
-        animationIndex: index,
-        directionIndex: 0,
-        spriteIndex: 0,
-      },
-      () => this._updateSameCollisionMasksToggles()
-    );
-  };
-
-  chooseDirection = index => {
-    this.setState({
-      directionIndex: index,
-      spriteIndex: 0,
-    });
-  };
-
-  chooseSprite = index => {
-    this.setState({
-      spriteIndex: index,
-    });
-  };
-
-  _updateSameCollisionMasksToggles = () => {
-    const { object } = this.props;
-    const { animationIndex, directionIndex, spriteIndex } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
-
-    const { animation, sprite } = getCurrentElements(
+      forceUpdate(); // Refresh the preview and the list
+    },
+    [
+      animation,
+      sprite,
       spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+      sameCollisionMasksForAnimations,
+      sameCollisionMasksForSprites,
+      forceUpdate,
+    ]
+  );
+
+  const chooseAnimation = index => {
+    setAnimationIndex(index);
+    setDirectionIndex(0);
+    setSpriteIndex(0);
+  };
+
+  const chooseDirection = index => {
+    setDirectionIndex(index);
+    setSpriteIndex(0);
+  };
+
+  const chooseSprite = index => {
+    setSpriteIndex(index);
+  };
+
+  const updateSameCollisionMasksToggles = () => {
     if (!animation || !sprite) return;
 
-    this.setState({
-      sameCollisionMasksForAnimations: every(
+    setSameCollisionMasksForAnimations(
+      every(
         mapFor(0, spriteObject.getAnimationsCount(), i => {
           const otherAnimation = spriteObject.getAnimation(i);
           return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
         })
-      ),
-      sameCollisionMasksForSprites: allSpritesHaveSameCollisionMasksAs(
-        sprite,
-        animation
-      ),
-    });
-  };
-
-  _onSetCollisionMaskAutomatic = (automatic: boolean = true) => {
-    const { object } = this.props;
-    const { animationIndex, directionIndex, spriteIndex } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
-
-    const { sprite } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
+      )
     );
-    if (!sprite) return;
 
-    sprite.setCollisionMaskAutomatic(automatic);
-    this._updateCollisionMasks();
+    setSameCollisionMasksForSprites(
+      allSpritesHaveSameCollisionMasksAs(sprite, animation)
+    );
   };
 
-  _setSameCollisionMasksForAllAnimations = enable => {
+  const onSetCollisionMaskAutomatic = React.useCallback(
+    (automatic: boolean = true) => {
+      if (!sprite) return;
+      sprite.setCollisionMaskAutomatic(automatic);
+      updateCollisionMasks();
+    },
+    [sprite, updateCollisionMasks]
+  );
+
+  const setSameCollisionMasksForAllAnimations = (enable: boolean) => {
     if (enable) {
       const answer = Window.showConfirmDialog(
         "Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?"
@@ -134,157 +145,154 @@ export default class CollisionMasksEditor extends Component {
       if (!answer) return;
     }
 
-    this.setState(
-      {
-        sameCollisionMasksForAnimations: enable,
-        sameCollisionMasksForSprites: enable
-          ? true
-          : this.state.sameCollisionMasksForSprites,
-      },
-      () => {
-        this._updateCollisionMasks();
-      }
-    );
+    setSameCollisionMasksForAnimations(enable);
+    setSameCollisionMasksForSprites(enable || sameCollisionMasksForSprites);
   };
 
-  _setSameCollisionMasksForAllSprites = enable => {
+  const setSameCollisionMasksForAllSprites = (enable: boolean) => {
     if (enable) {
       const answer = Window.showConfirmDialog(
-        "Having the same collision masks for all frames will erase and reset all the other frames collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the frames of the animation?"
+        "Having the same collision masks for all animations will erase and reset all the other animations collision masks. This can't be undone. Are you sure you want to share these collision masks amongst all the animations of the object?"
       );
       if (!answer) return;
     }
 
-    this.setState(
-      {
-        sameCollisionMasksForAnimations: enable
-          ? this.state.sameCollisionMasksForAnimations
-          : false,
-        sameCollisionMasksForSprites: enable,
-      },
-      () => {
-        this._updateCollisionMasks();
-      }
+    setSameCollisionMasksForAnimations(
+      enable && sameCollisionMasksForAnimations
     );
+    setSameCollisionMasksForSprites(enable);
   };
 
-  _setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
-    this.setState({
-      spriteWidth,
-      spriteHeight,
-    });
+  const setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
+    setSpriteWidth(spriteWidth);
+    setSpriteHeight(spriteHeight);
   };
 
-  render() {
-    const { object, resourcesLoader, project } = this.props;
-    const {
-      sameCollisionMasksForAnimations,
-      sameCollisionMasksForSprites,
-      animationIndex,
-      directionIndex,
-      spriteIndex,
-      spriteWidth,
-      spriteHeight,
-    } = this.state;
-    const spriteObject = gd.asSpriteObject(object);
+  React.useEffect(updateCollisionMasks, [
+    sameCollisionMasksForAnimations,
+    sameCollisionMasksForSprites,
+  ]);
 
-    if (!object.getAnimationsCount()) return null;
-    const { hasValidSprite, sprite } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+  React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
 
-    return (
-      <div>
-        <ImagePreview
-          resourceName={hasValidSprite ? sprite.getImageName() : ''}
-          resourcesLoader={resourcesLoader}
-          project={project}
-          onSize={this._setCurrentSpriteSize}
-          renderOverlay={({ imageWidth, imageHeight, imageZoomFactor }) =>
-            hasValidSprite && (
-              <CollisionMasksPreview
-                imageWidth={imageWidth}
-                imageHeight={imageHeight}
-                imageZoomFactor={imageZoomFactor}
-                isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
-                polygons={sprite.getCustomCollisionMask()}
-                onPolygonsUpdated={this._updateCollisionMasks}
-              />
-            )
-          }
-        />
-        <Line>
-          <Column expand>
-            <SpriteSelector
-              spriteObject={spriteObject}
-              animationIndex={animationIndex}
-              directionIndex={directionIndex}
-              spriteIndex={spriteIndex}
-              chooseAnimation={this.chooseAnimation}
-              chooseDirection={this.chooseDirection}
-              chooseSprite={this.chooseSprite}
-              sameForAllAnimations={sameCollisionMasksForAnimations}
-              sameForAllSprites={sameCollisionMasksForSprites}
-              setSameForAllAnimations={
-                this._setSameCollisionMasksForAllAnimations
-              }
-              setSameForAllSprites={this._setSameCollisionMasksForAllSprites}
-              setSameForAllAnimationsLabel={
-                <Trans>Share same collision masks for all animations</Trans>
-              }
-              setSameForAllSpritesLabel={
+  // Keep panes vertical for small screens, side-by-side for large screens
+  const screenSize = useResponsiveWindowWidth();
+  const editorNodes =
+    screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
+
+  if (!props.object.getAnimationsCount()) return null;
+
+  const editors: { [string]: Editor } = {
+    preview: {
+      type: 'primary',
+      noTitleBar: true,
+      renderEditor: () => (
+        <Background>
+          <ImagePreview
+            resourceName={hasValidSprite ? sprite.getImageName() : ''}
+            resourcesLoader={props.resourcesLoader}
+            project={props.project}
+            onSize={setCurrentSpriteSize}
+            renderOverlay={overlayProps =>
+              hasValidSprite && (
+                <CollisionMasksPreview
+                  {...overlayProps}
+                  isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+                  polygons={sprite.getCustomCollisionMask()}
+                  onPolygonsUpdated={updateCollisionMasks}
+                />
+              )
+            }
+          />
+        </Background>
+      ),
+    },
+    properties: {
+      type: 'secondary',
+      noTitleBar: true,
+      renderEditor: () => (
+        <Background>
+          <ScrollView>
+            <Line>
+              <Column expand>
+                <SpriteSelector
+                  spriteObject={spriteObject}
+                  animationIndex={animationIndex}
+                  directionIndex={directionIndex}
+                  spriteIndex={spriteIndex}
+                  chooseAnimation={chooseAnimation}
+                  chooseDirection={chooseDirection}
+                  chooseSprite={chooseSprite}
+                  sameForAllAnimations={sameCollisionMasksForAnimations}
+                  sameForAllSprites={sameCollisionMasksForSprites}
+                  setSameForAllAnimations={
+                    setSameCollisionMasksForAllAnimations
+                  }
+                  setSameForAllSprites={setSameCollisionMasksForAllSprites}
+                  setSameForAllAnimationsLabel={
+                    <Trans>Share same collision masks for all animations</Trans>
+                  }
+                  setSameForAllSpritesLabel={
+                    <Trans>
+                      Share same collision masks for all sprites of this
+                      animation
+                    </Trans>
+                  }
+                />
+              </Column>
+            </Line>
+            {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+              <React.Fragment>
+                <PolygonsList
+                  polygons={sprite.getCustomCollisionMask()}
+                  onPolygonsUpdated={updateCollisionMasks}
+                  spriteWidth={spriteWidth}
+                  spriteHeight={spriteHeight}
+                />
+                <Line justifyContent="center">
+                  <FlatButton
+                    label={<Trans>Restore the default collision mask</Trans>}
+                    primary={false}
+                    onClick={() => onSetCollisionMaskAutomatic(true)}
+                  />
+                </Line>
+              </React.Fragment>
+            )}
+            {!!sprite && sprite.isCollisionMaskAutomatic() && (
+              <React.Fragment>
+                <EmptyMessage>
+                  <Trans>
+                    This sprite uses the default collision mask, a rectangle
+                    that is as large as the sprite.
+                  </Trans>
+                </EmptyMessage>
+                <Line justifyContent="center">
+                  <FlatButton
+                    label={<Trans>Use a custom collision mask</Trans>}
+                    primary={false}
+                    onClick={() => onSetCollisionMaskAutomatic(false)}
+                  />
+                </Line>
+              </React.Fragment>
+            )}
+            {!sprite && (
+              <EmptyMessage>
                 <Trans>
-                  Share same collision masks for all sprites of this animation
+                  Choose an animation and frame to edit the collision masks
                 </Trans>
-              }
-            />
-          </Column>
-        </Line>
-        {!!sprite && !sprite.isCollisionMaskAutomatic() && (
-          <React.Fragment>
-            <PolygonsList
-              polygons={sprite.getCustomCollisionMask()}
-              onPolygonsUpdated={this._updateCollisionMasks}
-              spriteWidth={spriteWidth}
-              spriteHeight={spriteHeight}
-            />
-            <Line justifyContent="center">
-              <FlatButton
-                label={<Trans>Restore the default collision mask</Trans>}
-                primary={false}
-                onClick={() => this._onSetCollisionMaskAutomatic(true)}
-              />
-            </Line>
-          </React.Fragment>
-        )}
-        {!!sprite && sprite.isCollisionMaskAutomatic() && (
-          <React.Fragment>
-            <EmptyMessage>
-              <Trans>
-                This sprite uses the default collision mask, a rectangle that is
-                as large as the sprite.
-              </Trans>
-            </EmptyMessage>
-            <Line justifyContent="center">
-              <FlatButton
-                label={<Trans>Use a custom collision mask</Trans>}
-                primary={false}
-                onClick={() => this._onSetCollisionMaskAutomatic(false)}
-              />
-            </Line>
-          </React.Fragment>
-        )}
-        {!sprite && (
-          <EmptyMessage>
-            <Trans>
-              Choose an animation and frame to edit the collision masks
-            </Trans>
-          </EmptyMessage>
-        )}
-      </div>
-    );
-  }
-}
+              </EmptyMessage>
+            )}
+          </ScrollView>
+        </Background>
+      ),
+    },
+  };
+
+  return (
+    <div style={{ flex: 1 }}>
+      <EditorMosaic editors={editors} initialNodes={editorNodes} />
+    </div>
+  );
+};
+
+export default CollisionMasksEditor;

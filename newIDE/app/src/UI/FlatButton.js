@@ -7,7 +7,7 @@ import { Spacer } from './Grid';
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   label: React.Node,
-  onClick: ?() => void,
+  onClick: ?(ev: any) => void,
   primary?: boolean,
   disabled?: boolean,
   keyboardFocused?: boolean,

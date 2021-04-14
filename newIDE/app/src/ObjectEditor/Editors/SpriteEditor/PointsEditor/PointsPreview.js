@@ -1,6 +1,7 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
+import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
 const styles = {
   container: {
@@ -21,6 +22,8 @@ type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
   imageHeight: number,
+  offsetTop: number,
+  offsetLeft: number,
   imageZoomFactor: number,
   onPointsUpdated: () => void,
 |};
@@ -30,33 +33,42 @@ type State = {|
   draggedPointKind: ?PointKind,
 |};
 
-export default class PointsPreview extends React.Component<Props, State> {
-  _container: ?any;
-  state = {
+const PointsPreview = (props: Props) => {
+  const frameRef = React.useRef<React.ElementRef<'div'> | null>(null);
+  const [state, setState] = React.useState<State>({
     draggedPoint: null,
     draggedPointKind: null,
-  };
+  });
 
-  _onStartDragPoint = (draggedPoint: gdPoint, draggedPointKind: PointKind) => {
-    if (this.state.draggedPoint) return;
+  const {
+    pointsContainer,
+    imageWidth,
+    imageHeight,
+    offsetTop,
+    offsetLeft,
+    imageZoomFactor,
+  } = props;
 
-    this.setState({
+  const forceUpdate = useForceUpdate();
+
+  const onStartDragPoint = (
+    draggedPoint: gdPoint,
+    draggedPointKind: PointKind
+  ) => {
+    if (state.draggedPoint) return;
+    setState({
       draggedPoint,
       draggedPointKind,
     });
   };
 
-  _onEndDragPoint = () => {
-    const draggingWasDone = !!this.state.draggedPoint;
-    this.setState(
-      {
-        draggedPoint: null,
-        draggedPointKind: null,
-      },
-      () => {
-        if (draggingWasDone) this.props.onPointsUpdated();
-      }
-    );
+  const onEndDragPoint = () => {
+    const draggingWasDone = !!state.draggedPoint;
+    if (draggingWasDone) props.onPointsUpdated();
+    setState({
+      draggedPoint: null,
+      draggedPointKind: null,
+    });
   };
 
   /**
@@ -65,29 +77,35 @@ export default class PointsPreview extends React.Component<Props, State> {
    *
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
-  _onMouseMove = (event: any) => {
-    const { draggedPoint, draggedPointKind } = this.state;
-    if (!draggedPoint || !this._container) return;
+  const onMouseMove = (event: any) => {
+    const { draggedPoint, draggedPointKind } = state;
+    if (!draggedPoint || !frameRef.current) return;
 
-    const containerBoundingRect = this._container.getBoundingClientRect();
-    const xOnContainer = event.clientX - containerBoundingRect.left;
-    const yOnContainer = event.clientY - containerBoundingRect.top;
+    const frameBoundingRect = frameRef.current.getBoundingClientRect();
+    const xOnFrame = event.clientX - frameBoundingRect.left;
+    const yOnFrame = event.clientY - frameBoundingRect.top;
 
     if (draggedPointKind === pointKindIdentifiers.CENTER) {
-      this.props.pointsContainer.setDefaultCenterPoint(false);
+      props.pointsContainer.setDefaultCenterPoint(false);
     }
-    draggedPoint.setX(xOnContainer / this.props.imageZoomFactor);
-    draggedPoint.setY(yOnContainer / this.props.imageZoomFactor);
-    this.forceUpdate();
+    draggedPoint.setX(xOnFrame / imageZoomFactor);
+    draggedPoint.setY(yOnFrame / imageZoomFactor);
+    forceUpdate();
   };
 
-  _renderPoint = (
+  const renderPoint = (
     name: string,
     x: number,
     y: number,
     kind: PointKind,
     point: gdPoint
   ) => {
+    const pointName =
+      kind === pointKindIdentifiers.ORIGIN
+        ? 'Origin'
+        : kind === pointKindIdentifiers.CENTER
+        ? 'Center'
+        : point.getName();
     const imageSrc =
       kind === pointKindIdentifiers.ORIGIN
         ? 'res/originPoint.png'
@@ -97,6 +115,7 @@ export default class PointsPreview extends React.Component<Props, State> {
     return (
       <img
         src={imageSrc}
+        title={pointName}
         style={{
           position: 'absolute',
           left: x,
@@ -106,51 +125,54 @@ export default class PointsPreview extends React.Component<Props, State> {
         }}
         alt=""
         key={name}
-        onPointerDown={() => {
-          this._onStartDragPoint(point, kind);
+        onPointerDown={e => {
+          e.preventDefault(); // Disable dragging ghost image on Firefox
+          onStartDragPoint(point, kind);
         }}
       />
     );
   };
 
-  render() {
-    const {
-      pointsContainer,
-      imageWidth,
-      imageHeight,
-      imageZoomFactor,
-    } = this.props;
-    const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
-    const points = mapVector(nonDefaultPoints, (point, i) =>
-      this._renderPoint(
-        point.getName(),
-        point.getX() * imageZoomFactor,
-        point.getY() * imageZoomFactor,
-        pointKindIdentifiers.NORMAL,
-        point
-      )
-    );
+  const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
+  const points = mapVector(nonDefaultPoints, (point, i) =>
+    renderPoint(
+      point.getName(),
+      point.getX() * imageZoomFactor,
+      point.getY() * imageZoomFactor,
+      pointKindIdentifiers.NORMAL,
+      point
+    )
+  );
 
-    const originPoint = pointsContainer.getOrigin();
-    const centerPoint = pointsContainer.getCenter();
-    const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
+  const originPoint = pointsContainer.getOrigin();
+  const centerPoint = pointsContainer.getCenter();
+  const automaticCenterPosition = pointsContainer.isDefaultCenterPoint();
 
-    return (
-      <div
-        style={styles.container}
-        onPointerMove={this._onMouseMove}
-        onPointerUp={this._onEndDragPoint}
-        ref={container => (this._container = container)}
-      >
+  const frameStyle = {
+    position: 'absolute',
+    top: offsetTop || 0,
+    left: offsetLeft || 0,
+    width: imageWidth * imageZoomFactor,
+    height: imageHeight * imageZoomFactor,
+    overflow: 'visible',
+  };
+
+  return (
+    <div
+      style={styles.container}
+      onPointerMove={onMouseMove}
+      onPointerUp={onEndDragPoint}
+    >
+      <div style={frameStyle} ref={frameRef}>
         {points}
-        {this._renderPoint(
+        {renderPoint(
           'Origin',
           originPoint.getX() * imageZoomFactor,
           originPoint.getY() * imageZoomFactor,
           pointKindIdentifiers.ORIGIN,
           originPoint
         )}
-        {this._renderPoint(
+        {renderPoint(
           'Center',
           (!automaticCenterPosition ? centerPoint.getX() : imageWidth / 2) *
             imageZoomFactor,
@@ -160,6 +182,8 @@ export default class PointsPreview extends React.Component<Props, State> {
           centerPoint
         )}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
+export default PointsPreview;

@@ -25,12 +25,15 @@ import AddIcon from '@material-ui/icons/Add';
 import FlatButton from '../../../../UI/FlatButton';
 import { Trans, t } from '@lingui/macro';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
+import RaisedButton from '../../../../UI/RaisedButton';
+import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 const gd = global.gd;
 
 const SortableVerticeRow = SortableElement(VerticeRow);
 
 type VerticesTableProps = {|
   vertices: gdVectorVector2f,
+  hasWarning: boolean,
   onUpdated: () => void,
 
   // Sprite size is useful to make sure polygon vertices
@@ -40,6 +43,9 @@ type VerticesTableProps = {|
 |};
 
 const VerticesTable = (props: VerticesTableProps) => {
+  const theme = React.useContext(GDevelopThemeContext);
+  const warningColor = theme.message.warning;
+
   const updateVerticeX = (vertice, newValue) => {
     // Ensure vertice stays inside the sprite bounding box.
     vertice.set_x(Math.min(props.spriteWidth, Math.max(newValue, 0)));
@@ -58,7 +64,16 @@ const VerticesTable = (props: VerticesTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHeaderColumn style={styles.handleColumn} />
-            <TableHeaderColumn> </TableHeaderColumn>
+            <TableHeaderColumn>
+              {props.hasWarning && (
+                <Line alignItems="center" noMargin>
+                  <WarningIcon size="small" style={{ color: warningColor }} />
+                  <Text displayInlineAsSpan style={{ marginLeft: 5 }}>
+                    Polygon is not convex!
+                  </Text>
+                </Line>
+              )}
+            </TableHeaderColumn>
             <TableHeaderColumn style={styles.coordinateColumn}>
               X
             </TableHeaderColumn>
@@ -83,8 +98,6 @@ const VerticesTable = (props: VerticesTableProps) => {
                 props.onUpdated();
               }}
               canRemove={props.vertices.size() > 3}
-              // hasWarning={!isConvex}
-              hasWarning={false}
             />
           ))}
         </TableBody>
@@ -110,25 +123,23 @@ type PolygonSectionProps = {|
 |};
 
 const PolygonSection = (props: PolygonSectionProps) => {
+  const theme = React.useContext(GDevelopThemeContext);
+  const warningColor = theme.message.warning;
+
   const vertices = props.polygon.getVertices();
   const verticesCount = vertices.size();
   const isConvex = props.polygon.isConvex();
 
   const polygonActions = [
-    <IconButton
-      key="add-vertex"
-      size="small"
-      tooltip={t`Add new vertex`}
-      onClick={ev => {
-        ev.stopPropagation();
-        const newVertice = new gd.Vector2f();
-        vertices.push_back(newVertice);
-        newVertice.delete();
-        props.onUpdated();
-      }}
-    >
-      <AddIcon />
-    </IconButton>,
+    isConvex ? null : (
+      <IconButton
+        key="not-convex"
+        size="small"
+        tooltip={t`Polygon is not convex!`}
+      >
+        <WarningIcon style={{ color: warningColor }} />
+      </IconButton>
+    ),
     <IconButton
       key="delete-mask"
       size="small"
@@ -140,6 +151,18 @@ const PolygonSection = (props: PolygonSectionProps) => {
     >
       <DeleteIcon />
     </IconButton>,
+    // <FlatButton
+    //   key="add-vertex"
+    //   icon={<AddIcon size="small" />}
+    //   label={<Trans>Add a vertex</Trans>}
+    //   onClick={ev => {
+    //     ev.stopPropagation();
+    //     const newVertice = new gd.Vector2f();
+    //     vertices.push_back(newVertice);
+    //     newVertice.delete();
+    //     props.onUpdated();
+    //   }}
+    // />,
   ];
 
   return (
@@ -150,15 +173,11 @@ const PolygonSection = (props: PolygonSectionProps) => {
           {verticesCount === 4 && `Quadrilateral`}
           {verticesCount >= 5 && `Polygon with ${verticesCount} vertices`}
         </Text>
-        {!isConvex && (
-          <IconButton>
-            <WarningIcon />
-          </IconButton>
-        )}
       </AccordionHeader>
       <AccordionBody disableGutters>
         <SortableVerticesTable
           vertices={vertices}
+          hasWarning={!isConvex}
           onUpdated={props.onUpdated}
           spriteWidth={props.spriteWidth}
           spriteHeight={props.spriteHeight}
@@ -205,10 +224,10 @@ const PolygonsList = (props: PolygonsListProps) => {
         <Spacer />
         <Spacer />
         <Line alignItems="center" justifyContent="center">
-          <FlatButton
+          <RaisedButton
+            primary
             icon={<AddIcon />}
             label={<Trans>Add collision mask</Trans>}
-            primary={false}
             onClick={() => {
               const newPolygon = gd.Polygon2d.createRectangle(32, 32);
               newPolygon.move(props.spriteWidth / 2, props.spriteHeight / 2);

@@ -9,7 +9,6 @@ import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 
 type Props = {|
-  hasWarning: boolean,
   canRemove: boolean,
   onRemove: () => void,
   verticeX: number,
@@ -29,7 +28,7 @@ const VerticeRow = (props: Props) => (
         <TableRowColumn style={styles.handleColumn}>
           {/* <DragHandle /> Reordering vertices is not supported for now */}
         </TableRowColumn>
-        <TableRowColumn>{props.hasWarning && <Warning />}</TableRowColumn>
+        <TableRowColumn> </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn}>
           <TextField
             margin="none"

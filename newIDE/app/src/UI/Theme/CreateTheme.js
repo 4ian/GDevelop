@@ -223,7 +223,6 @@ export function createGdevelopTheme(
         selectedBorderColor: styles['ThemeSelectionBackgroundColor'],
       },
       imagePreview: {
-        // Merge with imageThumbnail?
         backgroundFilter: styles['ThemeImagePreviewBackgroundFilter'],
         borderColor: styles['ThemeImagePreviewBorderColor'],
         frameBorderColor: styles['ThemeImagePreviewFrameBorderColor'],

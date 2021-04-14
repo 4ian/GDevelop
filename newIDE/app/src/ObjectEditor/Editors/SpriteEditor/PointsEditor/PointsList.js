@@ -195,8 +195,6 @@ const PointsList = (props: PointsListProps) => {
         />
       </Table>
       <Spacer />
-      <Spacer />
-      <Spacer />
       <Line alignItems="center" justifyContent="center">
         <RaisedButton
           primary

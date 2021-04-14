@@ -24,10 +24,7 @@ const VerticeRow = (props: Props) => (
           backgroundColor: muiTheme.list.itemsBackgroundColor,
         }}
       >
-        <TableRowColumn style={styles.handleColumn}>
-          {/* <DragHandle /> Reordering vertices is not supported for now */}
-        </TableRowColumn>
-        <TableRowColumn> </TableRowColumn>
+        <TableRowColumn />
         <TableRowColumn style={styles.coordinateColumn}>
           <TextField
             margin="none"

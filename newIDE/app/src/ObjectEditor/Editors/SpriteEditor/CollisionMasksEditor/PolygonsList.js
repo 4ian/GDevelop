@@ -26,6 +26,7 @@ import FlatButton from '../../../../UI/FlatButton';
 import { Trans, t } from '@lingui/macro';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
+import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 const gd = global.gd;
 
@@ -43,9 +44,6 @@ type VerticesTableProps = {|
 |};
 
 const VerticesTable = (props: VerticesTableProps) => {
-  const theme = React.useContext(GDevelopThemeContext);
-  const warningColor = theme.message.warning;
-
   const updateVerticeX = (vertice, newValue) => {
     // Ensure vertice stays inside the sprite bounding box.
     vertice.set_x(Math.min(props.spriteWidth, Math.max(newValue, 0)));
@@ -60,20 +58,19 @@ const VerticesTable = (props: VerticesTableProps) => {
 
   return (
     <Column expand>
+      {props.hasWarning && (
+        <AlertMessage kind="warning">
+          <Trans>
+            The polygon is not convex. Ensure it is, otherwise the collision
+            mask won't work.
+          </Trans>
+        </AlertMessage>
+      )}
+      <Spacer />
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHeaderColumn style={styles.handleColumn} />
-            <TableHeaderColumn>
-              {props.hasWarning && (
-                <Line alignItems="center" noMargin>
-                  <WarningIcon size="small" style={{ color: warningColor }} />
-                  <Text displayInlineAsSpan style={{ marginLeft: 5 }}>
-                    Polygon is not convex!
-                  </Text>
-                </Line>
-              )}
-            </TableHeaderColumn>
+            <TableHeaderColumn />
             <TableHeaderColumn style={styles.coordinateColumn}>
               X
             </TableHeaderColumn>
@@ -114,9 +111,6 @@ const VerticesTable = (props: VerticesTableProps) => {
           }}
         />
       </Line>
-      <Spacer />
-      <Spacer />
-      <Spacer />
     </Column>
   );
 };
@@ -220,9 +214,6 @@ const PolygonsList = (props: PolygonsListProps) => {
             spriteHeight={props.spriteHeight}
           />
         ))}
-        <Spacer />
-        <Spacer />
-        <Spacer />
         <Line alignItems="center" justifyContent="center">
           <RaisedButton
             primary

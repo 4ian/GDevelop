@@ -8,6 +8,19 @@ type Props = {|
 
 /**
  * Adds a checkered background to the container element.
+ * This component is made to be used as background for sprite editors
+ * and previews. Example usage:
+ * ```
+ * <ContainerElement>
+ *   <CheckeredBackground />
+ *   <SpriteResource />
+ *   (... and any overlays ...)
+ * </ContainerElement>
+ * ```
+ *
+ * If while using this, the background overflows out of the parent element
+ * (or it just doesn't work as expected), ensure that the parent element and
+ * at least one of the sibling elements have `position: relative` set.
  */
 const CheckeredBackground = (props: Props) => {
   const theme = React.useContext(GDevelopThemeContext);

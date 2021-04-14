@@ -185,7 +185,7 @@ const PointsEditor = (props: Props) => {
       noTitleBar: true,
       renderEditor: () => (
         <Background>
-          <ScrollView autoHideScrollbar>
+          <ScrollView>
             <Line>
               <Column expand>
                 <SpriteSelector

@@ -14,11 +14,13 @@ import { mapVector } from '../../../../Utils/MapFor';
 import Window from '../../../../Utils/Window';
 import styles from './styles';
 import PointRow from './PointRow';
-import AddPointRow from './AddPointRow';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
+import RaisedButton from '../../../../UI/RaisedButton';
+import { Trans } from '@lingui/macro';
+import AddIcon from '@material-ui/icons/Add';
 const gd: libGDevelop = global.gd;
 
-const SortableAddPointRow = SortableElement(AddPointRow);
 const SortablePointRow = SortableElement(PointRow);
 
 type PointsListBodyProps = {|
@@ -153,24 +155,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
     />
   );
 
-  const addRow = (
-    <SortableAddPointRow
-      index={0}
-      key={'add-point-row'}
-      disabled
-      onAdd={() => {
-        const name = newNameGenerator('Point', name =>
-          pointsContainer.hasPoint(name)
-        );
-        const point = new gd.Point(name);
-        pointsContainer.addPoint(point);
-        point.delete();
-        onPointsUpdated();
-      }}
-    />
-  );
-
-  return <TableBody>{[originRow, centerRow, ...pointsRows, addRow]}</TableBody>;
+  return <TableBody>{[originRow, centerRow, ...pointsRows]}</TableBody>;
 };
 
 const SortablePointsListBody = SortableContainer(PointsListBody);
@@ -183,31 +168,52 @@ type PointsListProps = {|
 
 const PointsList = (props: PointsListProps) => {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHeaderColumn style={styles.handleColumn} />
-          <TableHeaderColumn>Point name</TableHeaderColumn>
-          <TableHeaderColumn style={styles.coordinateColumn}>
-            X
-          </TableHeaderColumn>
-          <TableHeaderColumn style={styles.coordinateColumn}>
-            Y
-          </TableHeaderColumn>
-          <TableRowColumn style={styles.toolColumn} />
-        </TableRow>
-      </TableHeader>
-      <SortablePointsListBody
-        pointsContainer={props.pointsContainer}
-        onPointsUpdated={props.onPointsUpdated}
-        onSortEnd={({ oldIndex, newIndex }) => {
-          // Reordering points is not supported for now
-        }}
-        helperClass="sortable-helper"
-        useDragHandle
-        lockToContainerEdges
-      />
-    </Table>
+    <Column expand>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderColumn style={styles.handleColumn} />
+            <TableHeaderColumn>Point name</TableHeaderColumn>
+            <TableHeaderColumn style={styles.coordinateColumn}>
+              X
+            </TableHeaderColumn>
+            <TableHeaderColumn style={styles.coordinateColumn}>
+              Y
+            </TableHeaderColumn>
+            <TableRowColumn style={styles.toolColumn} />
+          </TableRow>
+        </TableHeader>
+        <SortablePointsListBody
+          pointsContainer={props.pointsContainer}
+          onPointsUpdated={props.onPointsUpdated}
+          onSortEnd={({ oldIndex, newIndex }) => {
+            // Reordering points is not supported for now
+          }}
+          helperClass="sortable-helper"
+          useDragHandle
+          lockToContainerEdges
+        />
+      </Table>
+      <Spacer />
+      <Spacer />
+      <Spacer />
+      <Line alignItems="center" justifyContent="center">
+        <RaisedButton
+          primary
+          icon={<AddIcon />}
+          label={<Trans>Add a point</Trans>}
+          onClick={() => {
+            const name = newNameGenerator('Point', name =>
+              props.pointsContainer.hasPoint(name)
+            );
+            const point = new gd.Point(name);
+            props.pointsContainer.addPoint(point);
+            point.delete();
+            props.onPointsUpdated();
+          }}
+        />
+      </Line>
+    </Column>
   );
 };
 

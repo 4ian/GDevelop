@@ -45,7 +45,6 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/IDE",
                 "${workspaceRoot}/GDCpp",
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",

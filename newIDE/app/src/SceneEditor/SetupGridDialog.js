@@ -15,7 +15,7 @@ export default class SetupGridDialog extends Component {
     };
   }
 
-  _onApply = () => {
+  onApply = () => {
     this.props.onApply({
       gridWidth: this.state.gridWidth,
       gridHeight: this.state.gridHeight,
@@ -39,12 +39,13 @@ export default class SetupGridDialog extends Component {
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
-        onClick={this._onApply}
+        onClick={this.onApply}
       />,
     ];
 
     return (
       <Dialog
+        onApply={this.onApply}
         title={<Trans>Edit Grid Options</Trans>}
         actions={actions}
         cannotBeDismissed={true}

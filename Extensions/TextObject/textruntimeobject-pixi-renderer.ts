@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   class TextRuntimeObjectPixiRenderer {
     _object: gdjs.TextRuntimeObject;
     _fontManager: any;
@@ -59,6 +61,7 @@ namespace gdjs {
       } else {
         style.fillGradientType = PIXI.TEXT_GRADIENT.LINEAR_HORIZONTAL;
       }
+      // @ts-ignore
       style.align = this._object._textAlign;
       style.wordWrap = this._object._wrapping;
       style.wordWrapWidth = this._object._wrappingWidth;

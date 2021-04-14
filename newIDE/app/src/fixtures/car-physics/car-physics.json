@@ -177,6 +177,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 80,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,

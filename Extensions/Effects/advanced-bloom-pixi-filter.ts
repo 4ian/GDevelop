@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const advancedBloomFilter = filter as PIXI.filters.AdvancedBloomFilter;
+      const advancedBloomFilter = (filter as unknown) as PIXI.filters.AdvancedBloomFilter;
       if (parameterName === 'threshold') {
         advancedBloomFilter.threshold = value;
       } else if (parameterName === 'bloomScale') {

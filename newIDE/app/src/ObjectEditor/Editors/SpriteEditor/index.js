@@ -444,7 +444,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           extraBottomTools={
             <ResponsiveLineStackLayout noMargin>
               <RaisedButton
-                label={<Trans>Edit hitboxes</Trans>}
+                label={<Trans>Edit collision masks</Trans>}
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}

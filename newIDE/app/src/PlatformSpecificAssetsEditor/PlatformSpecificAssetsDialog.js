@@ -193,7 +193,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     });
   };
 
-  _onApply = () => {
+  onApply = () => {
     const { project } = this.props;
     const {
       desktopIconResourceNames,
@@ -233,7 +233,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
-        onClick={this._onApply}
+        onClick={this.onApply}
       />,
     ];
     const {
@@ -250,6 +250,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
+        onApply={this.onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}

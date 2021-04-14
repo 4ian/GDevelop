@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
-import Dialog from '@material-ui/core/Dialog';
+import { Dialog as DialogMaterialUI } from '@material-ui/core';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { ResponsiveWindowMeasurer } from '../Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 const styles = {
   defaultBody: {
@@ -41,9 +42,26 @@ type Props = {|
   title?: React.Node,
   actions?: React.Node,
   secondaryActions?: React.Node,
-  onRequestClose?: () => void,
 
-  cannotBeDismissed?: boolean, //Force the user to use one of the actions in the Dialog. If true, the dialog can't be closed by clicking outside or pressing Escape.
+  /**
+   * Callback called when the dialog is asking to be closed
+   * (either by Escape key or a click outside, according to preferences).
+   * This is the default way of closing a dialog and should almost always be
+   * specified - unless your dialog is an representing an uninteruptible process.
+   *
+   * If `onApply` is also specified, this must be interpreted as a "cancelling"
+   * of changes.
+   */
+  onRequestClose?: () => void,
+  /**
+   * Is specified, will be called when the dialog is dismissed in a way where changes
+   * must be kept.
+   * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
+   * single `onRequestClose`.
+   */
+  onApply?: () => void,
+
+  cannotBeDismissed?: boolean, // Currently unused.
 
   children: React.Node, // The content of the dialog
 
@@ -74,6 +92,7 @@ type DialogContentStyle = {
  */
 export default (props: Props) => {
   const {
+    onApply,
     secondaryActions,
     actions,
     open,
@@ -87,6 +106,10 @@ export default (props: Props) => {
     fullHeight,
     noTitleMargin,
   } = props;
+
+  const preferences = React.useContext(PreferencesContext);
+  const backdropClickBehavior = preferences.values.backdropClickBehavior;
+  const size = useResponsiveWindowWidth();
 
   const dialogActions = secondaryActions ? (
     <React.Fragment>
@@ -104,40 +127,46 @@ export default (props: Props) => {
   };
 
   return (
-    <ResponsiveWindowMeasurer>
-      {size => (
-        <Dialog
-          open={open}
-          onClose={onRequestClose}
-          fullWidth
-          fullScreen={size === 'small'}
-          className={classNames({
-            'safe-area-aware-container': size === 'small',
-          })}
-          PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
-          maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
-          disableBackdropClick={false}
-          disableEscapeKeyDown={false}
-        >
-          {title && (
-            <DialogTitle
-              style={noTitleMargin ? styles.noTitleMargin : undefined}
-            >
-              {title}
-            </DialogTitle>
-          )}
-          <DialogContent style={dialogContentStyle}>{children}</DialogContent>
-          <DialogActions
-            style={
-              secondaryActions
-                ? styles.actionsContainerWithSecondaryActions
-                : undefined
-            }
-          >
-            {dialogActions}
-          </DialogActions>
-        </Dialog>
+    <DialogMaterialUI
+      open={open}
+      onClose={(event: any, reason: string) => {
+        if (reason === 'escapeKeyDown') {
+          if (onRequestClose) onRequestClose();
+        } else if (reason === 'backdropClick') {
+          if (backdropClickBehavior === 'cancel') {
+            if (onRequestClose) onRequestClose();
+          } else if (backdropClickBehavior === 'apply') {
+            if (onApply) onApply();
+            else if (onRequestClose) onRequestClose();
+          } else if (backdropClickBehavior === 'nothing') {
+            return;
+          }
+        }
+      }}
+      fullWidth
+      fullScreen={size === 'small'}
+      className={classNames({
+        'safe-area-aware-container': size === 'small',
+      })}
+      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
+      maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
+      disableBackdropClick={false}
+    >
+      {title && (
+        <DialogTitle style={noTitleMargin ? styles.noTitleMargin : undefined}>
+          {title}
+        </DialogTitle>
       )}
-    </ResponsiveWindowMeasurer>
+      <DialogContent style={dialogContentStyle}>{children}</DialogContent>
+      <DialogActions
+        style={
+          secondaryActions
+            ? styles.actionsContainerWithSecondaryActions
+            : undefined
+        }
+      >
+        {dialogActions}
+      </DialogActions>
+    </DialogMaterialUI>
   );
 };

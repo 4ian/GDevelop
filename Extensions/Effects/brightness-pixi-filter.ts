@@ -1,4 +1,5 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('Brightness', {
     makePIXIFilter: function (layer, effectData) {
       const brightness = new PIXI.filters.ColorMatrixFilter();
@@ -7,7 +8,8 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const brightnessFilter = filter as PIXI.filters.ColorMatrixFilter;
+      // @ts-ignore - unsure why PIXI.filters is not recognised.
+      const brightnessFilter = (filter as unknown) as PIXI.filters.ColorMatrixFilter;
       if (parameterName !== 'brightness') {
         return;
       }

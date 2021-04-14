@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   class CrossHatchFilter extends PIXI.Filter {
     constructor();
   }

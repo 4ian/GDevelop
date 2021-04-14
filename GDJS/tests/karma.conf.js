@@ -68,6 +68,8 @@ module.exports = function(config) {
       '../Runtime-dist/Extensions/Lighting/lightobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
 
       // Test extensions:
       './tests/Extensions/**.js',

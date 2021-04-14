@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const kawaseBlurFilter = filter as PIXI.filters.KawaseBlurFilter;
+      const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
       if (parameterName === 'pixelizeX') {
         // @ts-ignore: fix these wrong parameters
         kawaseBlurFilter.pixelizeX = value;

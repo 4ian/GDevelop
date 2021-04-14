@@ -215,6 +215,8 @@ namespace gdjs {
 
     renderDebugDraw() {}
 
+    clearDebugDraw() {}
+
     // Not implemented
     hideCursor(): void {}
 

@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
@@ -50,7 +52,7 @@ namespace gdjs {
         height: this._game.getGameResolutionHeight(),
         preserveDrawingBuffer: true,
         antialias: false,
-      });
+      }) as PIXI.Renderer;
       parentElement.appendChild(
         // add the renderer view element to the DOM
         this._pixiRenderer.view

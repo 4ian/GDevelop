@@ -6,13 +6,13 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const colorReplaceFilter = filter as PIXI.filters.ColorReplaceFilter;
+      const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
       if (parameterName === 'epsilon') {
         colorReplaceFilter.epsilon = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
-      const colorReplaceFilter = filter as PIXI.filters.ColorReplaceFilter;
+      const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
       if (parameterName === 'originalColor') {
         colorReplaceFilter.originalColor = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
           value

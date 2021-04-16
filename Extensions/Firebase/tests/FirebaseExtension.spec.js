@@ -44,6 +44,10 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
   // Increase the timeout to work on low connections as well.
   this.timeout('5s');
 
+  const namespace = `temp-test-${Math.random()
+    .toString()
+    .replace('.', '-')}-${Date.now()}`;
+
   before(function setupFirebase() {
     gdjs.evtTools.firebaseTools._setupFirebase({
       getGame: () => ({
@@ -54,9 +58,10 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
 
   describe('Firebase database', () => {
     it('should write and read back a variable from the database', async () => {
+      const path = namespace + '/variable';
       await promisifyCallbackVariables((callback) => {
         gdjs.evtTools.firebaseTools.database.writeVariable(
-          'hello',
+          path,
           variable,
           callback
         );
@@ -65,7 +70,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
       const fetchedVariable = await promisifyCallbackVariables(
         (callback, result) =>
           gdjs.evtTools.firebaseTools.database.getVariable(
-            'hello',
+            path,
             result,
             callback
           )
@@ -75,9 +80,10 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     });
 
     it('should write and read back a field from the database', async function () {
+      const path = namespace + '/field';
       await promisifyCallbackVariables((callback) => {
         gdjs.evtTools.firebaseTools.database.writeField(
-          'world',
+          path,
           'hello',
           1,
           callback
@@ -87,7 +93,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
       const fetchedVariable = await promisifyCallbackVariables(
         (callback, result) =>
           gdjs.evtTools.firebaseTools.database.getField(
-            'world',
+            path,
             'hello',
             result,
             callback
@@ -99,19 +105,23 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     });
 
     it('should update a field from the database', async function () {
+      const path = namespace + '/update';
+
+      // Populate with data to update
       await firebase
         .database()
-        .ref('world')
+        .ref(path)
         .set({ hello: 'Hello', goodbye: 'Goodbye' });
+
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.database.updateField(
-          'world',
+          path,
           'hello',
           'Good day',
           callback
         )
       );
-      expect((await firebase.database().ref('world').get()).val()).to.eql({
+      expect((await firebase.database().ref(path).get()).val()).to.eql({
         hello: 'Good day',
         goodbye: 'Goodbye',
       });
@@ -126,29 +136,32 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.database.updateVariable(
-          'world',
+          path,
           updater,
           callback
         )
       );
 
-      expect((await firebase.database().ref('world').get()).val()).to.eql({
+      expect((await firebase.database().ref(path).get()).val()).to.eql({
         hello: 'Good day',
         goodbye: 'See you later',
       });
     });
 
-    it('should delete a field from the database', async function () {
+    it('should delete and detect presence of a field from the database', async function () {
+      const path = namespace + '/delete';
+
+      // Populate with data to delete
       await firebase
         .database()
-        .ref('test')
+        .ref(path)
         .set({ hello: 'Hello', goodbye: 'Goodbye' });
 
       expect(
         (
           await promisifyCallbackVariables((callback, result) =>
             gdjs.evtTools.firebaseTools.database.hasVariable(
-              'test',
+              path,
               result,
               callback
             )
@@ -160,7 +173,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         (
           await promisifyCallbackVariables((callback, result) =>
             gdjs.evtTools.firebaseTools.database.hasField(
-              'test',
+              path,
               'hello',
               result,
               callback
@@ -171,7 +184,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.database.deleteField(
-          'test',
+          path,
           'hello',
           callback
         )
@@ -181,7 +194,7 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         (
           await promisifyCallbackVariables((callback, result) =>
             gdjs.evtTools.firebaseTools.database.hasField(
-              'test',
+              path,
               'hello',
               result,
               callback
@@ -191,14 +204,14 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
       ).to.not.be.ok();
 
       await promisifyCallbackVariables((callback) =>
-        gdjs.evtTools.firebaseTools.database.deleteVariable('test', callback)
+        gdjs.evtTools.firebaseTools.database.deleteVariable(path, callback)
       );
 
       expect(
         (
           await promisifyCallbackVariables((callback, result) =>
             gdjs.evtTools.firebaseTools.database.hasVariable(
-              'test',
+              path,
               result,
               callback
             )
@@ -206,5 +219,8 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         ).getValue()
       ).to.not.be.ok();
     });
+
+    // Delete the temporary namespace to not bloat the DB
+    after(() => firebase.database().ref(namespace).remove());
   });
 });

@@ -287,12 +287,12 @@ namespace gdjs {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
 
-              if (typeof callbackValueVariable !== 'undefined')
+              if (typeof callbackValueVariable !== 'undefined') {
+                const value = snapshot.val()[field];
                 callbackValueVariable.setBoolean(
-                  snapshot.exists() &&
-                    snapshot.val()[field] !== null &&
-                    snapshot.val()[field] !== undefined
+                  snapshot.exists() && value !== null && value !== undefined
                 );
+              }
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')

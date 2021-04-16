@@ -311,12 +311,12 @@ namespace gdjs {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
 
-              if (callbackValueVariable)
+              if (callbackValueVariable) {
+                const value = doc.get(field, { serverTimestamps: 'estimate' });
                 callbackValueVariable.setBoolean(
-                  doc.get(field, { serverTimestamps: 'estimate' }) !==
-                    undefined &&
-                    doc.get(field, { serverTimestamps: 'estimate' }) !== null
+                  doc.exists && value !== undefined && value !== null
                 );
+              }
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')

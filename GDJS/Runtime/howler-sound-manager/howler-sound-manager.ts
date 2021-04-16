@@ -107,7 +107,7 @@ namespace gdjs {
      */
     playing(): boolean {
       return (
-        (this._id !== null ? this._howl.playing(this._id) : false) ||
+        (this._id !== null ? this._howl.playing(this._id) : true) ||
         !this.isLoaded() // Loading is considered playing
       );
     }

@@ -27,6 +27,8 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 const gd: libGDevelop = global.gd;
 
+// Empty comment - will remove later
+
 const AddBehaviorLine = ({ onAdd }) => (
   <Column>
     <Line justifyContent="flex-end" expand>

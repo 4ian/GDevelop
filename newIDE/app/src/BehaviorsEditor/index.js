@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component } from 'react';
+import * as React from 'react';
 import TextField from '../UI/TextField';
 import Add from '@material-ui/icons/Add';
 import Delete from '@material-ui/icons/Delete';
@@ -25,9 +25,8 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import { getBehaviorTutorialHints } from '../Hints';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
+import useForceUpdate from '../Utils/UseForceUpdate';
 const gd: libGDevelop = global.gd;
-
-// Empty comment - will remove later
 
 const AddBehaviorLine = ({ onAdd }) => (
   <Column>
@@ -52,58 +51,44 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
-type State = {|
-  newBehaviorDialogOpen: boolean,
-|};
+const BehaviorsEditor = (props: Props) => {
+  const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
+    false
+  );
 
-export default class BehaviorsEditor extends Component<Props, State> {
-  state = { newBehaviorDialogOpen: false };
+  const { object, project } = props;
+  const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
+  const forceUpdate = useForceUpdate();
 
-  chooseNewBehavior = () => {
-    this.setState({
-      newBehaviorDialogOpen: true,
-    });
-  };
-
-  _hasBehaviorWithType = (type: string) => {
-    const { object } = this.props;
-    const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
-
+  const hasBehaviorWithType = (type: string) => {
     return allBehaviorNames
       .map(behaviorName => object.getBehavior(behaviorName))
       .map(behavior => behavior.getTypeName())
       .filter(behaviorType => behaviorType === type).length;
   };
 
-  addBehavior = (type: string, defaultName: string) => {
-    const { object, project } = this.props;
+  const addBehavior = (type: string, defaultName: string) => {
+    setNewBehaviorDialogOpen(false);
 
-    this.setState(
-      {
-        newBehaviorDialogOpen: false,
-      },
-      () => {
-        if (this._hasBehaviorWithType(type)) {
-          const answer = Window.showConfirmDialog(
-            "There is already a behavior of this type attached to the object. It's possible to add again this behavior but it's unusual and may not be always supported properly. Are you sure you want to add again this behavior?"
-          );
+    if (hasBehaviorWithType(type)) {
+      const answer = Window.showConfirmDialog(
+        "There is already a behavior of this type attached to the object. It's possible to add again this behavior but it's unusual and may not be always supported properly. Are you sure you want to add again this behavior?"
+      );
 
-          if (!answer) return;
-        }
+      if (!answer) return;
+    }
 
-        const name = newNameGenerator(defaultName, name =>
-          object.hasBehaviorNamed(name)
-        );
-        object.addNewBehavior(project, type, name);
-
-        this.forceUpdate();
-        if (this.props.onSizeUpdated) this.props.onSizeUpdated();
-        this.props.onUpdateBehaviorsSharedData();
-      }
+    const name = newNameGenerator(defaultName, name =>
+      object.hasBehaviorNamed(name)
     );
+    object.addNewBehavior(project, type, name);
+
+    forceUpdate();
+    if (props.onSizeUpdated) props.onSizeUpdated();
+    props.onUpdateBehaviorsSharedData();
   };
 
-  _onChangeBehaviorName = (
+  const onChangeBehaviorName = (
     behaviorContent: gdBehaviorContent,
     newName: string
   ) => {
@@ -113,135 +98,124 @@ export default class BehaviorsEditor extends Component<Props, State> {
     // (or in a parent).
     // Renaming a behavior is something that is really rare anyway! :)
 
-    const { object } = this.props;
     if (object.hasBehaviorNamed(newName)) return;
-
     object.renameBehavior(behaviorContent.getName(), newName);
-    this.forceUpdate();
+    forceUpdate();
   };
 
-  _onRemoveBehavior = (behaviorName: string) => {
-    const { object } = this.props;
+  const onRemoveBehavior = (behaviorName: string) => {
     const answer = Window.showConfirmDialog(
       "Are you sure you want to remove this behavior? This can't be undone."
     );
 
     if (answer) {
       object.removeBehavior(behaviorName);
-      this.forceUpdate();
-      if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+      if (props.onSizeUpdated) props.onSizeUpdated();
     }
   };
 
-  render() {
-    const { object, project } = this.props;
-    const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
-
-    return (
-      <div>
-        {allBehaviorNames
-          .map((behaviorName, index) => {
-            const behaviorContent = object.getBehavior(behaviorName);
-            const behaviorTypeName = behaviorContent.getTypeName();
-            const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
-            if (isNullPtr(gd, behavior)) {
-              return (
-                <div key={index}>
-                  <MiniToolbar>
-                    <MiniToolbarText>
-                      <Trans>Unknown behavior</Trans>{' '}
-                    </MiniToolbarText>
-                    <Column noMargin expand>
-                      <TextField margin="none" value={behaviorName} disabled />
-                    </Column>
-                    <IconButton
-                      onClick={() => this._onRemoveBehavior(behaviorName)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </MiniToolbar>
-                  <EmptyMessage>
-                    <Trans>
-                      This behavior is unknown. It might be a behavior that was
-                      defined in an extension and that was later removed. You
-                      should delete it.
-                    </Trans>
-                  </EmptyMessage>
-                </div>
-              );
-            }
-
-            const BehaviorComponent = BehaviorsEditorService.getEditor(
-              behaviorTypeName
-            );
-            const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
-
+  return (
+    <div>
+      {allBehaviorNames
+        .map((behaviorName, index) => {
+          const behaviorContent = object.getBehavior(behaviorName);
+          const behaviorTypeName = behaviorContent.getTypeName();
+          const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
+          if (isNullPtr(gd, behavior)) {
             return (
               <div key={index}>
                 <MiniToolbar>
                   <MiniToolbarText>
-                    <Trans>Behavior</Trans>{' '}
+                    <Trans>Unknown behavior</Trans>{' '}
                   </MiniToolbarText>
                   <Column noMargin expand>
-                    <TextField
-                      value={behaviorName}
-                      hintText={t`Behavior name`}
-                      margin="none"
-                      fullWidth
-                      disabled
-                      onChange={(e, text) =>
-                        this._onChangeBehaviorName(behaviorContent, text)
-                      }
-                    />
+                    <TextField margin="none" value={behaviorName} disabled />
                   </Column>
-                  <IconButton
-                    onClick={() => this._onRemoveBehavior(behaviorName)}
-                  >
+                  <IconButton onClick={() => onRemoveBehavior(behaviorName)}>
                     <Delete />
                   </IconButton>
-                  <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
                 </MiniToolbar>
-                {tutorialHints.length ? (
-                  <Line>
-                    <ColumnStackLayout expand>
-                      {tutorialHints.map(tutorialHint => (
-                        <DismissableTutorialMessage
-                          key={tutorialHint.identifier}
-                          tutorialHint={tutorialHint}
-                        />
-                      ))}
-                    </ColumnStackLayout>
-                  </Line>
-                ) : null}
-                <Line>
-                  <BehaviorComponent
-                    behavior={behavior}
-                    behaviorContent={behaviorContent}
-                    project={project}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
-                  />
-                </Line>
+                <EmptyMessage>
+                  <Trans>
+                    This behavior is unknown. It might be a behavior that was
+                    defined in an extension and that was later removed. You
+                    should delete it.
+                  </Trans>
+                </EmptyMessage>
               </div>
             );
-          })
-          .concat(
-            <AddBehaviorLine
-              key="add-behavior-line"
-              onAdd={this.chooseNewBehavior}
-            />
-          )}
-        {this.state.newBehaviorDialogOpen && (
-          <NewBehaviorDialog
-            open={this.state.newBehaviorDialogOpen}
-            objectType={object.getType()}
-            onClose={() => this.setState({ newBehaviorDialogOpen: false })}
-            onChoose={this.addBehavior}
-            project={project}
+          }
+
+          const BehaviorComponent = BehaviorsEditorService.getEditor(
+            behaviorTypeName
+          );
+          const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
+
+          return (
+            <div key={index}>
+              <MiniToolbar>
+                <MiniToolbarText>
+                  <Trans>Behavior</Trans>{' '}
+                </MiniToolbarText>
+                <Column noMargin expand>
+                  <TextField
+                    value={behaviorName}
+                    hintText={t`Behavior name`}
+                    margin="none"
+                    fullWidth
+                    disabled
+                    onChange={(e, text) =>
+                      onChangeBehaviorName(behaviorContent, text)
+                    }
+                  />
+                </Column>
+                <IconButton onClick={() => onRemoveBehavior(behaviorName)}>
+                  <Delete />
+                </IconButton>
+                <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
+              </MiniToolbar>
+              {tutorialHints.length ? (
+                <Line>
+                  <ColumnStackLayout expand>
+                    {tutorialHints.map(tutorialHint => (
+                      <DismissableTutorialMessage
+                        key={tutorialHint.identifier}
+                        tutorialHint={tutorialHint}
+                      />
+                    ))}
+                  </ColumnStackLayout>
+                </Line>
+              ) : null}
+              <Line>
+                <BehaviorComponent
+                  behavior={behavior}
+                  behaviorContent={behaviorContent}
+                  project={project}
+                  resourceSources={props.resourceSources}
+                  onChooseResource={props.onChooseResource}
+                  resourceExternalEditors={props.resourceExternalEditors}
+                />
+              </Line>
+            </div>
+          );
+        })
+        .concat(
+          <AddBehaviorLine
+            key="add-behavior-line"
+            onAdd={() => setNewBehaviorDialogOpen(true)}
           />
         )}
-      </div>
-    );
-  }
-}
+      {newBehaviorDialogOpen && (
+        <NewBehaviorDialog
+          open={newBehaviorDialogOpen}
+          objectType={object.getType()}
+          onClose={() => setNewBehaviorDialogOpen(false)}
+          onChoose={addBehavior}
+          project={project}
+        />
+      )}
+    </div>
+  );
+};
+
+export default BehaviorsEditor;

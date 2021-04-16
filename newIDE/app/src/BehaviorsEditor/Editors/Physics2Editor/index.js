@@ -87,6 +87,10 @@ const Physics2Editor = (props: Props) => {
   };
 
   const properties = behavior.getProperties(behaviorContent.getContent());
+  console.log(
+    properties.get('vertices').getValue(),
+    typeof properties.get('vertices').getValue()
+  );
   const bits = Array(16).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
@@ -359,43 +363,49 @@ const Physics2Editor = (props: Props) => {
               project={props.project}
               resourcesLoader={resourcesLoader}
               fixedHeight={200}
-              renderOverlay={overlayProps => (
-                <ShapePreview
-                  shape={properties.get('shape').getValue()}
-                  dimensionA={parseFloat(
-                    properties.get('shapeDimensionA').getValue()
-                  )}
-                  dimensionB={parseFloat(
-                    properties.get('shapeDimensionB').getValue()
-                  )}
-                  offsetX={parseFloat(
-                    properties.get('shapeOffsetX').getValue()
-                  )}
-                  offsetY={parseFloat(
-                    properties.get('shapeOffsetY').getValue()
-                  )}
-                  polygonOrigin={properties.get('polygonOrigin').getValue()}
-                  vertices={JSON.parse(properties.get('vertices').getValue())}
-                  width={overlayProps.imageWidth}
-                  height={overlayProps.imageHeight}
-                  frameOffsetTop={overlayProps.offsetTop}
-                  frameOffsetLeft={overlayProps.offsetLeft}
-                  zoomFactor={overlayProps.imageZoomFactor}
-                  onMoveVertex={(index, newX, newY) => {
-                    let vertices = JSON.parse(
-                      properties.get('vertices').getValue()
-                    );
-                    vertices[index].x = newX;
-                    vertices[index].y = newY;
-                    behavior.updateProperty(
-                      behaviorContent.getContent(),
-                      'vertices',
-                      JSON.stringify(vertices)
-                    );
-                    forceUpdate();
-                  }}
-                />
-              )}
+              renderOverlay={overlayProps => {
+                console.log(
+                  properties.get('vertices').getValue(),
+                  typeof properties.get('vertices').getValue()
+                );
+                return (
+                  <ShapePreview
+                    shape={properties.get('shape').getValue()}
+                    dimensionA={parseFloat(
+                      properties.get('shapeDimensionA').getValue()
+                    )}
+                    dimensionB={parseFloat(
+                      properties.get('shapeDimensionB').getValue()
+                    )}
+                    offsetX={parseFloat(
+                      properties.get('shapeOffsetX').getValue()
+                    )}
+                    offsetY={parseFloat(
+                      properties.get('shapeOffsetY').getValue()
+                    )}
+                    polygonOrigin={properties.get('polygonOrigin').getValue()}
+                    vertices={JSON.parse(properties.get('vertices').getValue())}
+                    width={overlayProps.imageWidth}
+                    height={overlayProps.imageHeight}
+                    frameOffsetTop={overlayProps.offsetTop}
+                    frameOffsetLeft={overlayProps.offsetLeft}
+                    zoomFactor={overlayProps.imageZoomFactor}
+                    onMoveVertex={(index, newX, newY) => {
+                      let vertices = JSON.parse(
+                        properties.get('vertices').getValue()
+                      );
+                      vertices[index].x = newX;
+                      vertices[index].y = newY;
+                      behavior.updateProperty(
+                        behaviorContent.getContent(),
+                        'vertices',
+                        JSON.stringify(vertices)
+                      );
+                      forceUpdate();
+                    }}
+                  />
+                );
+              }}
             />
           </div>
         </Line>

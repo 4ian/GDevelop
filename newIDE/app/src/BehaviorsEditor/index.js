@@ -26,6 +26,7 @@ import { getBehaviorTutorialHints } from '../Hints';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 const gd: libGDevelop = global.gd;
 
 const AddBehaviorLine = ({ onAdd }) => (
@@ -115,7 +116,7 @@ const BehaviorsEditor = (props: Props) => {
   };
 
   return (
-    <div>
+    <Column expand>
       {allBehaviorNames
         .map((behaviorName, index) => {
           const behaviorContent = object.getBehavior(behaviorName);
@@ -123,26 +124,37 @@ const BehaviorsEditor = (props: Props) => {
           const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
           if (isNullPtr(gd, behavior)) {
             return (
-              <div key={index}>
-                <MiniToolbar>
+              <Accordion key={index}>
+                <AccordionHeader
+                  actions={[
+                    <IconButton
+                      key="delete"
+                      onClick={ev => {
+                        ev.stopPropagation();
+                        onRemoveBehavior(behaviorName);
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>,
+                  ]}
+                >
                   <MiniToolbarText>
                     <Trans>Unknown behavior</Trans>{' '}
                   </MiniToolbarText>
                   <Column noMargin expand>
                     <TextField margin="none" value={behaviorName} disabled />
                   </Column>
-                  <IconButton onClick={() => onRemoveBehavior(behaviorName)}>
-                    <Delete />
-                  </IconButton>
-                </MiniToolbar>
-                <EmptyMessage>
-                  <Trans>
-                    This behavior is unknown. It might be a behavior that was
-                    defined in an extension and that was later removed. You
-                    should delete it.
-                  </Trans>
-                </EmptyMessage>
-              </div>
+                </AccordionHeader>
+                <AccordionBody>
+                  <EmptyMessage>
+                    <Trans>
+                      This behavior is unknown. It might be a behavior that was
+                      defined in an extension and that was later removed. You
+                      should delete it.
+                    </Trans>
+                  </EmptyMessage>
+                </AccordionBody>
+              </Accordion>
             );
           }
 
@@ -152,8 +164,25 @@ const BehaviorsEditor = (props: Props) => {
           const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
 
           return (
-            <div key={index}>
-              <MiniToolbar>
+            <Accordion key={index}>
+              <AccordionHeader
+                actions={[
+                  <IconButton
+                    key="delete"
+                    size="small"
+                    onClick={ev => {
+                      ev.stopPropagation();
+                      onRemoveBehavior(behaviorName);
+                    }}
+                  >
+                    <Delete />
+                  </IconButton>,
+                  <HelpIcon
+                    key="help"
+                    helpPagePath={getBehaviorHelpPagePath(behavior)}
+                  />,
+                ]}
+              >
                 <MiniToolbarText>
                   <Trans>Behavior</Trans>{' '}
                 </MiniToolbarText>
@@ -169,34 +198,34 @@ const BehaviorsEditor = (props: Props) => {
                     }
                   />
                 </Column>
-                <IconButton onClick={() => onRemoveBehavior(behaviorName)}>
-                  <Delete />
-                </IconButton>
-                <HelpIcon helpPagePath={getBehaviorHelpPagePath(behavior)} />
-              </MiniToolbar>
-              {tutorialHints.length ? (
-                <Line>
-                  <ColumnStackLayout expand>
-                    {tutorialHints.map(tutorialHint => (
-                      <DismissableTutorialMessage
-                        key={tutorialHint.identifier}
-                        tutorialHint={tutorialHint}
-                      />
-                    ))}
-                  </ColumnStackLayout>
-                </Line>
-              ) : null}
-              <Line>
-                <BehaviorComponent
-                  behavior={behavior}
-                  behaviorContent={behaviorContent}
-                  project={project}
-                  resourceSources={props.resourceSources}
-                  onChooseResource={props.onChooseResource}
-                  resourceExternalEditors={props.resourceExternalEditors}
-                />
-              </Line>
-            </div>
+              </AccordionHeader>
+              <AccordionBody disableGutters>
+                <Column expand>
+                  {tutorialHints.length ? (
+                    <Line>
+                      <ColumnStackLayout expand>
+                        {tutorialHints.map(tutorialHint => (
+                          <DismissableTutorialMessage
+                            key={tutorialHint.identifier}
+                            tutorialHint={tutorialHint}
+                          />
+                        ))}
+                      </ColumnStackLayout>
+                    </Line>
+                  ) : null}
+                  <Line>
+                    <BehaviorComponent
+                      behavior={behavior}
+                      behaviorContent={behaviorContent}
+                      project={project}
+                      resourceSources={props.resourceSources}
+                      onChooseResource={props.onChooseResource}
+                      resourceExternalEditors={props.resourceExternalEditors}
+                    />
+                  </Line>
+                </Column>
+              </AccordionBody>
+            </Accordion>
           );
         })
         .concat(
@@ -214,7 +243,7 @@ const BehaviorsEditor = (props: Props) => {
           project={project}
         />
       )}
-    </div>
+    </Column>
   );
 };
 

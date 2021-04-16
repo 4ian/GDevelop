@@ -55,7 +55,7 @@ namespace gdjs {
         };
 
         // Initialization step required by firebase analytics
-        gdjs.registerFirstRuntimeSceneLoadedCallback(() => {
+        gdjs.evtTools.firebaseTools.onAppCreated.push(() => {
           analytics = firebase.analytics();
         });
 

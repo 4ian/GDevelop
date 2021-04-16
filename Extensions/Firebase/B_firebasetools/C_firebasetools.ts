@@ -14,10 +14,9 @@ namespace gdjs {
        * Sets up the Firebase SDK. Only exported for testing purposes.
        * @internal
        */
-      export const _setupFirebase = (runtimeScene: gdjs.RuntimeScene) => {
-        let firebaseConfig;
+      export const _setupFirebase = async (runtimeScene: gdjs.RuntimeScene) => {
         try {
-          firebaseConfig = JSON.parse(
+          var firebaseConfig = JSON.parse(
             //@ts-expect-error We have a try catch to catch this potential error.
             runtimeScene
               .getGame()
@@ -27,9 +26,11 @@ namespace gdjs {
           console.error('The Firebase configuration is invalid! Error: ' + e);
           return;
         }
+        if (typeof firebaseConfig !== 'object') return;
+        if (firebase.apps.length !== 0) await firebase.app().delete();
         firebase.initializeApp(firebaseConfig);
         for (let func of onAppCreated) func();
-      }
+      };
 
       gdjs.registerFirstRuntimeSceneLoadedCallback(_setupFirebase);
     }

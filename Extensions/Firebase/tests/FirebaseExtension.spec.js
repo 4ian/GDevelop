@@ -40,7 +40,7 @@ gdjs.evtTools.network._objectToVariable(
 
 // The tests require an internet connection, as a real Firebase instance is used.
 const describeIfOnline = navigator.onLine ? describe : describe.skip;
-describeIfOnline('Firebase extension', function () {
+describeIfOnline('Firebase extension end-to-end tests', function () {
   // Increase the timeout to work on low connections as well.
   this.timeout('5s');
 

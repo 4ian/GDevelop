@@ -70,7 +70,6 @@ module.exports = function (config) {
       '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/Firebase/A_firebasejs/*.js',
       '../Runtime-dist/Extensions/Firebase/B_firebasetools/*.js',
-      '../../Extensions/Firebase/tests/FirebaseCallbackRemover.js',
 
       // Test extensions:
       './tests/Extensions/**.js',

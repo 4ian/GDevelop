@@ -204,6 +204,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
   objectStrExpressions["Layer"].SetFunctionName("getLayer");
   objectExpressions["XFromAngleAndDistance"].SetFunctionName("getXFromAngleAndDistance");
+  objectExpressions["YFromAngleAndDistance"].SetFunctionName("getYFromAngleAndDistance");
 
   GetAllActions()["Create"].SetFunctionName(
       "gdjs.evtTools.object.createObjectOnScene");

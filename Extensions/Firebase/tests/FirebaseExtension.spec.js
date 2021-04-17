@@ -223,4 +223,182 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
     // Delete the temporary namespace to not bloat the DB
     after(() => firebase.database().ref(namespace).remove());
   });
+
+  describe('Cloud Firestore', () => {
+    it('should write and read back a variable from Firestore', async () => {
+      await promisifyCallbackVariables((callback) => {
+        gdjs.evtTools.firebaseTools.firestore.writeDocument(
+          namespace,
+          'variable',
+          variable,
+          callback
+        );
+      });
+
+      const fetchedVariable = await promisifyCallbackVariables(
+        (callback, result) =>
+          gdjs.evtTools.firebaseTools.firestore.getDocument(
+            namespace,
+            'variable',
+            result,
+            callback
+          )
+      );
+
+      expect(fetchedVariable).to.eql(variable);
+    });
+
+    it('should write and read back a field from Firestore', async function () {
+      await promisifyCallbackVariables((callback) => {
+        gdjs.evtTools.firebaseTools.firestore.writeField(
+          namespace,
+          'field',
+          'hello',
+          1,
+          callback
+        );
+      });
+
+      const fetchedVariable = await promisifyCallbackVariables(
+        (callback, result) =>
+          gdjs.evtTools.firebaseTools.firestore.getField(
+            namespace,
+            'field',
+            'hello',
+            result,
+            callback
+          )
+      );
+
+      expect(fetchedVariable.getType()).to.be.string('number');
+      expect(fetchedVariable.getAsNumber()).to.be.equal(1);
+    });
+
+    it('should update a field from Firestore', async function () {
+      const doc = firebase.firestore().doc(namespace + '/update');
+
+      // Populate with data to update
+      await doc.set({ hello: 'Hello', goodbye: 'Goodbye' });
+
+      await promisifyCallbackVariables((callback) =>
+        gdjs.evtTools.firebaseTools.firestore.updateField(
+          namespace,
+          'update',
+          'hello',
+          'Good day',
+          callback
+        )
+      );
+      expect((await doc.get()).data()).to.eql({
+        hello: 'Good day',
+        goodbye: 'Goodbye',
+      });
+
+      const updater = new gdjs.Variable();
+      gdjs.evtTools.network._objectToVariable(
+        {
+          goodbye: 'See you later',
+        },
+        updater
+      );
+
+      await promisifyCallbackVariables((callback) =>
+        gdjs.evtTools.firebaseTools.firestore.updateDocument(
+          namespace,
+          'update',
+          updater,
+          callback
+        )
+      );
+      expect((await doc.get()).data()).to.eql({
+        hello: 'Good day',
+        goodbye: 'See you later',
+      });
+    });
+
+    it('should delete and detect presence of a field from Firestore', async function () {
+      const doc = firebase.firestore().doc(namespace + '/delete');
+
+      // Populate with data to delete
+      await doc.set({ hello: 'Hello', goodbye: 'Goodbye' });
+
+      expect(
+        (
+          await promisifyCallbackVariables((callback, result) =>
+            gdjs.evtTools.firebaseTools.firestore.hasDocument(
+              namespace,
+              'delete',
+              result,
+              callback
+            )
+          )
+        ).getValue()
+      ).to.be.ok();
+
+      expect(
+        (
+          await promisifyCallbackVariables((callback, result) =>
+            gdjs.evtTools.firebaseTools.firestore.hasField(
+              namespace,
+              'delete',
+              'hello',
+              result,
+              callback
+            )
+          )
+        ).getValue()
+      ).to.be.ok();
+
+      await promisifyCallbackVariables((callback) =>
+        gdjs.evtTools.firebaseTools.firestore.deleteField(
+          namespace,
+          'delete',
+          'hello',
+          callback
+        )
+      );
+
+      expect(
+        (
+          await promisifyCallbackVariables((callback, result) =>
+            gdjs.evtTools.firebaseTools.firestore.hasField(
+              namespace,
+              'delete',
+              'hello',
+              result,
+              callback
+            )
+          )
+        ).getValue()
+      ).to.not.be.ok();
+
+      await promisifyCallbackVariables((callback) =>
+        gdjs.evtTools.firebaseTools.firestore.deleteDocument(
+          namespace,
+          'delete',
+          callback
+        )
+      );
+
+      expect(
+        (
+          await promisifyCallbackVariables((callback, result) =>
+            gdjs.evtTools.firebaseTools.firestore.hasDocument(
+              namespace,
+              'delete',
+              result,
+              callback
+            )
+          )
+        ).getValue()
+      ).to.not.be.ok();
+    });
+
+    // Delete the temporary namespace to not bloat the DB
+    after(async () =>
+      (
+        await firebase.firestore().collection(namespace).get()
+      ).forEach(({ ref }) => ref.delete())
+    );
+  });
 });

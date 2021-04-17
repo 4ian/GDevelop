@@ -1498,6 +1498,16 @@ namespace gdjs {
     }
 
     /**
+     * Compute the X position when given an angle and distance relative to the starting object.
+     * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+     * @param angle The angle, in degrees.
+     * @param distance The distance from the object, in pixels
+     */
+    getXFromAngleAndDistance(angle: float, distance: float): float {
+      return this.getDrawableX() + distance * Math.cos(gdjs.toRad(angle));
+    }
+
+    /**
      * Get the angle, in degrees, from the *object center* to a position.
      * @param targetX Target X position
      * @param targetY Target Y position

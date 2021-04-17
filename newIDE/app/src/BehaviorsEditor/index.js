@@ -179,6 +179,7 @@ const BehaviorsEditor = (props: Props) => {
                   </IconButton>,
                   <HelpIcon
                     key="help"
+                    size="small"
                     helpPagePath={getBehaviorHelpPagePath(behavior)}
                   />,
                 ]}

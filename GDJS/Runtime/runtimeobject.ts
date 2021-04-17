@@ -1505,7 +1505,8 @@ namespace gdjs {
      */
     getXFromAngleAndDistance(angle: float, distance: float): float {
       return (
-        this.getDrawableX() + this.getCenterX() -
+        this.getDrawableX() +
+        this.getCenterX() -
         distance * Math.cos(gdjs.toRad(angle))
       );
     }
@@ -1518,7 +1519,8 @@ namespace gdjs {
      */
     getYFromAngleAndDistance(angle: float, distance: float): float {
       return (
-        this.getDrawableY() + this.getCenterY() -
+        this.getDrawableY() +
+        this.getCenterY() -
         distance * Math.sin(gdjs.toRad(angle))
       );
     }

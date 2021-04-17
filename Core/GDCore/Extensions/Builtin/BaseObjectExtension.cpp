@@ -998,7 +998,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Angle between two objects"),
                     _("Compute the angle between two objects. If you need the "
                       "angle to an arbitrary position, use AngleToPosition."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
@@ -1032,7 +1032,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Compute the angle between the object center and a "
                       "\"target\" position. If you need the angle between two "
                       "objects, use AngleToObject."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))

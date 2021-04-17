@@ -7,7 +7,7 @@ import Add from '@material-ui/icons/Add';
 import Delete from '@material-ui/icons/Delete';
 import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
@@ -124,7 +124,7 @@ const BehaviorsEditor = (props: Props) => {
           const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
           if (isNullPtr(gd, behavior)) {
             return (
-              <Accordion key={index}>
+              <Accordion key={index} defaultExpanded>
                 <AccordionHeader
                   actions={[
                     <IconButton
@@ -164,7 +164,7 @@ const BehaviorsEditor = (props: Props) => {
           const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
 
           return (
-            <Accordion key={index}>
+            <Accordion key={index} defaultExpanded>
               <AccordionHeader
                 actions={[
                   <IconButton

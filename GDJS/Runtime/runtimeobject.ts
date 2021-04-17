@@ -1504,7 +1504,10 @@ namespace gdjs {
      * @param distance The distance from the object, in pixels
      */
     getXFromAngleAndDistance(angle: float, distance: float): float {
-      return this.getDrawableX() + distance * Math.cos(gdjs.toRad(angle));
+      return (
+        this.getDrawableX() + this.getCenterX() -
+        distance * Math.cos(gdjs.toRad(angle))
+      );
     }
 
     /**
@@ -1514,7 +1517,10 @@ namespace gdjs {
      * @param distance The distance from the object, in pixels
      */
     getYFromAngleAndDistance(angle: float, distance: float): float {
-      return this.getDrawableX() + distance * Math.sin(gdjs.toRad(angle));
+      return (
+        this.getDrawableY() + this.getCenterY() -
+        distance * Math.sin(gdjs.toRad(angle))
+      );
     }
 
     /**

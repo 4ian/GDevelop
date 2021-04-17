@@ -401,4 +401,59 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
       ).forEach(({ ref }) => ref.delete())
     );
   });
+
+  describe('Firebase authentication', () => {
+    before(async () => firebase.auth().signOut());
+
+    it('Prevents logging in with invalid credentials', async () => {
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+
+      let errors = false;
+      try {
+        await promisifyCallbackVariables((callback) =>
+          gdjs.evtTools.firebaseTools.auth.signInWithEmail(
+            'yes@example.com',
+            'InvalidPassword321',
+            callback
+          )
+        );
+      } catch (e) {
+        errors = true;
+      }
+
+      // No error was throwm, there is an issue
+      if (!errors)
+        throw new Error('Expected wrong credentials to prevent login');
+
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+    });
+
+    it('Let users log in', async () => {
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.not.be.ok();
+      await promisifyCallbackVariables((callback) =>
+        gdjs.evtTools.firebaseTools.auth.signInWithEmail(
+          'yes@example.com',
+          'ASecurePassword123',
+          callback
+        )
+      );
+      expect(gdjs.evtTools.firebaseTools.auth.isAuthentified()).to.be.ok();
+    });
+
+    it('Let users get/set basic profile data', async () => {
+      await gdjs.evtTools.firebaseTools.auth.userManagement.setDisplayName(
+        'Hello'
+      );
+      expect(
+        gdjs.evtTools.firebaseTools.auth.userManagement.getDisplayName()
+      ).to.be.string('Hello');
+
+      await gdjs.evtTools.firebaseTools.auth.userManagement.setDisplayName(
+        'World'
+      );
+      expect(
+        gdjs.evtTools.firebaseTools.auth.userManagement.getDisplayName()
+      ).to.be.string('World');
+    });
+  });
 });

@@ -312,9 +312,10 @@ namespace gdjs {
            */
           export const setDisplayName = (newDisplayName: string) => {
             if (currentUser)
-              currentUser.updateProfile({
+              return currentUser.updateProfile({
                 displayName: newDisplayName,
               });
+            return Promise.reject('Sign in before setting displayName');
           };
 
           /**
@@ -322,9 +323,10 @@ namespace gdjs {
            */
           export const setPhotoURL = (newPhotoURL: string) => {
             if (currentUser)
-              currentUser.updateProfile({
+              return currentUser.updateProfile({
                 photoURL: newPhotoURL,
               });
+            return Promise.reject('Sign in before setting photoURL');
           };
 
           /**

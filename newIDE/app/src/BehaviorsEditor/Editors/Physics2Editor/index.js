@@ -368,6 +368,12 @@ const Physics2Editor = (props: Props) => {
               resourcesLoader={resourcesLoader}
               fixedHeight={200}
               renderOverlay={overlayProps => {
+                // The result from `getProperties` is temporary, and because this renderOverlay
+                // function can be called outside of the render, we must get the properties again.
+                const properties = behavior.getProperties(
+                  behaviorContent.getContent()
+                );
+
                 return (
                   <ShapePreview
                     shape={properties.get('shape').getValue()}

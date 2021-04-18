@@ -127,7 +127,7 @@ const BehaviorsEditor = (props: Props) => {
           const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
           if (isNullPtr(gd, behavior)) {
             return (
-              <Accordion key={index} defaultExpanded>
+              <Accordion key={behaviorName} defaultExpanded>
                 <AccordionHeader
                   actions={[
                     <IconButton
@@ -170,7 +170,7 @@ const BehaviorsEditor = (props: Props) => {
           );
 
           return (
-            <Accordion key={index} defaultExpanded>
+            <Accordion key={behaviorName} defaultExpanded>
               <AccordionHeader
                 actions={[
                   <IconButton

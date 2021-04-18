@@ -67,4 +67,14 @@ export default class InstancesSelection {
       this.selection.splice(i, 1);
     }
   }
+
+  unselectInstancesOfObject(objectName: string) {
+    for (let i = 0; i < this.selection.length; ) {
+      if (this.selection[i].getObjectName() === objectName) {
+        this.selection.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  }
 }

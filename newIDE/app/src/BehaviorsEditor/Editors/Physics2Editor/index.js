@@ -88,13 +88,17 @@ const Physics2Editor = (props: Props) => {
 
   const properties = behavior.getProperties(behaviorContent.getContent());
   console.log(
-    properties.get('vertices').getValue(),
-    typeof properties.get('vertices').getValue()
+    'From Physics2 behavior:',
+    behavior.ptr,
+    behaviorContent.ptr,
+    properties.ptr
   );
   const bits = Array(16).fill(null);
   const shape = properties.get('shape').getValue();
   const layersValues = parseInt(properties.get('layers').getValue(), 10);
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
+
+  console.log('Physics2 editor rendered!');
 
   return (
     <Column expand>
@@ -364,10 +368,6 @@ const Physics2Editor = (props: Props) => {
               resourcesLoader={resourcesLoader}
               fixedHeight={200}
               renderOverlay={overlayProps => {
-                console.log(
-                  properties.get('vertices').getValue(),
-                  typeof properties.get('vertices').getValue()
-                );
                 return (
                   <ShapePreview
                     shape={properties.get('shape').getValue()}

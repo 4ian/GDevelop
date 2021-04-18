@@ -458,6 +458,36 @@ namespace gdjs {
       export const trunc = function (x: float): number {
         return x | 0;
       };
+
+      /**
+       * Compute the X position when given an angle and distance relative to the starting position.
+       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+       * @param positionX The position on X-axis, in pixels.
+       * @param angle The angle, in degrees.
+       * @param distance The distance from the object, in pixels.
+       */
+      export const XFromAngleAndDistance = function (
+        positionX: float,
+        angle: float,
+        distance: float
+      ): number {
+        return positionX + distance * Math.cos(gdjs.toRad(angle));
+      };
+
+      /**
+       * Compute the Y position when given an angle and distance relative to the starting position.
+       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+       * @param positionY The position on Y-axis, in pixels.
+       * @param angle The angle, in degrees.
+       * @param distance The distance from the object, in pixels.
+       */
+      export const YFromAngleAndDistance = function (
+        positionY: float,
+        angle: float,
+        distance: float
+      ): number {
+        return positionY + distance * Math.sin(gdjs.toRad(angle));
+      };
     }
   }
 }

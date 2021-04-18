@@ -135,6 +135,12 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["lerp"]
       .SetFunctionName("GDpriv::MathematicalTools::lerp")
       .SetIncludeFile("GDCpp/Extensions/Builtin/MathematicalTools.h");
+  GetAllExpressions()["XFromAngleAndDistance"]
+      .SetFunctionName("GDpriv::MathematicalTools::XFromAngleAndDistance")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MathematicalTools.h");
+  GetAllExpressions()["XFromAngleAndDistance"]
+      .SetFunctionName("GDpriv::MathematicalTools::YFromAngleAndDistance")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/MathematicalTools.h");
 
 #endif
 }

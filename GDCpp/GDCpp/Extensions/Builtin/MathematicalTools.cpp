@@ -78,5 +78,8 @@ double GD_API angleDifference(double angle1, double angle2) {
 
 double GD_API lerp(double a, double b, double x) { return a + (b - a) * x; }
 
+double GD_API XFromAngleAndDistance(double positionX, double angle, double distance) { return positionX + distance * ::cos(((angle / 180) * 3.1415)); }
+double GD_API YFromAngleAndDistance(double positionY, double angle, double distance) { return positionY + distance * ::sin(((angle / 180) * 3.1415)); }
+
 }  // namespace MathematicalTools
 }  // namespace GDpriv

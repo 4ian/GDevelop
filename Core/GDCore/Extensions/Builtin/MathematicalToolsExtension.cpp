@@ -379,6 +379,32 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("b (in a+(b-a)*x)"))
       .AddParameter("expression", _("x (in a+(b-a)*x)"));
 
+  extension
+      .AddExpression("XFromAngleAndDistance",
+                     _("X position from angle and distance"),
+                     _("Compute the X position when given an angle and distance "
+                      "relative to the starting position. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Starting X position"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
+
+  extension
+      .AddExpression("YFromAngleAndDistance",
+                     _("Y position from angle and distance"),
+                     _("Compute the Y position when given an angle and distance "
+                      "relative to the starting position. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                     _("Mathematical tools"),
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Starting Y position"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
+
 #endif
 }
 

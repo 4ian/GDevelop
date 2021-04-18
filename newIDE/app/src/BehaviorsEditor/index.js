@@ -200,8 +200,8 @@ const BehaviorsEditor = (props: Props) => {
                   />
                 </Column>
               </AccordionHeader>
-              <AccordionBody disableGutters>
-                <Column expand>
+              <AccordionBody>
+                <Column expand noMargin>
                   {tutorialHints.length ? (
                     <Line>
                       <ColumnStackLayout expand>

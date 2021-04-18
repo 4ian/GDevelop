@@ -27,6 +27,7 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd: libGDevelop = global.gd;
 
 const AddBehaviorLine = ({ onAdd }) => (
@@ -60,6 +61,8 @@ const BehaviorsEditor = (props: Props) => {
   const { object, project } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
   const forceUpdate = useForceUpdate();
+
+  const { values } = React.useContext(PreferencesContext);
 
   const hasBehaviorWithType = (type: string) => {
     return allBehaviorNames
@@ -162,6 +165,9 @@ const BehaviorsEditor = (props: Props) => {
             behaviorTypeName
           );
           const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
+          const enabledTutorialHints = tutorialHints.filter(
+            hint => !values.hiddenTutorialHints[hint.identifier]
+          );
 
           return (
             <Accordion key={index} defaultExpanded>
@@ -202,7 +208,7 @@ const BehaviorsEditor = (props: Props) => {
               </AccordionHeader>
               <AccordionBody>
                 <Column expand noMargin>
-                  {tutorialHints.length ? (
+                  {enabledTutorialHints.length ? (
                     <Line>
                       <ColumnStackLayout expand>
                         {tutorialHints.map(tutorialHint => (

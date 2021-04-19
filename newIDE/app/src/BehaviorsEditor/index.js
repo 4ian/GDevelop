@@ -27,6 +27,7 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
+import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd: libGDevelop = global.gd;
 
@@ -120,6 +121,13 @@ const BehaviorsEditor = (props: Props) => {
 
   return (
     <Column expand>
+      {allBehaviorNames.length === 0 && (
+        <div style={{ height: 300, display: 'flex' }}>
+          <Line expand alignItems="center" justifyContent="center">
+            <EmptyBehaviorsPlaceholder />
+          </Line>
+        </div>
+      )}
       {allBehaviorNames.map((behaviorName, index) => {
         const behaviorContent = object.getBehavior(behaviorName);
         const behaviorTypeName = behaviorContent.getTypeName();

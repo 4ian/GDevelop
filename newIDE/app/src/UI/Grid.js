@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 const marginsSize = 4;
 
 /**
@@ -6,7 +7,14 @@ const marginsSize = 4;
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Line = props => (
+export const Line = (props: {|
+  children?: React.Node,
+  noMargin?: boolean,
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  overflow?: string,
+|}) => (
   <div
     style={{
       display: 'flex',
@@ -27,7 +35,14 @@ export const Line = props => (
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Column = props => (
+export const Column = (props: {|
+  children?: React.Node,
+  noMargin?: boolean,
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  useFullHeight?: boolean,
+|}) => (
   <div
     style={{
       display: 'flex',
@@ -52,7 +67,7 @@ export const Column = props => (
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = props => (
+export const Spacer = () => (
   <span
     style={{
       width: marginsSize,

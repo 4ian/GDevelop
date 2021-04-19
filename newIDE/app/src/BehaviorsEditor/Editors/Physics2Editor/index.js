@@ -90,7 +90,11 @@ const Physics2Editor = (props: Props) => {
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
   return (
-    <Column expand>
+    <Column
+      expand
+      // Avoid overflow on small screens
+      noOverflowParent
+    >
       <Line>
         <SelectField
           key={'bodyType'}

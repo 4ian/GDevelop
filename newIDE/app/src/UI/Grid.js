@@ -42,6 +42,7 @@ export const Column = (props: {|
   justifyContent?: string,
   expand?: boolean,
   useFullHeight?: boolean,
+  noOverflowParent?: boolean,
 |}) => (
   <div
     style={{
@@ -56,6 +57,11 @@ export const Column = (props: {|
       // all the height (if set to flex: 1) and to *not* grow
       // larger than the parent.
       minHeight: props.useFullHeight ? '0' : undefined,
+      // In some cases, if some flex children cannot contract to
+      // within `Column`, it is possible for Column to overflow
+      // outside its parent. Setting min-width to 0 avoids this.
+      // See: https://stackoverflow.com/a/36247448/6199068
+      minWidth: props.noOverflowParent ? 0 : undefined,
     }}
   >
     {props.children}

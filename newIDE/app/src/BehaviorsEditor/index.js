@@ -214,7 +214,12 @@ const BehaviorsEditor = (props: Props) => {
               </Column>
             </AccordionHeader>
             <AccordionBody>
-              <Column expand noMargin>
+              <Column
+                expand
+                noMargin
+                // Avoid Physics2 behavior overflow on small screens
+                noOverflowParent
+              >
                 {enabledTutorialHints.length ? (
                   <Line>
                     <ColumnStackLayout expand>

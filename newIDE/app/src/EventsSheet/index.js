@@ -82,6 +82,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import { shouldCloseOrCancel } from '../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -132,6 +133,7 @@ type State = {|
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
   inlineEditingChangesMade: boolean,
+  inlineEditingPreviousValue: string,
 
   analyzedEventsContextResult: ?EventsContextResult,
 
@@ -209,6 +211,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
     inlineEditingChangesMade: false,
+    inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
 
@@ -565,7 +568,27 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  closeParameterEditor = () => {
+  closeParameterEditor = (event: SyntheticKeyboardEvent<HTMLInputElement>) => {
+    if (event && shouldCloseOrCancel(event)) {
+      const { instruction, parameterIndex } = this.state.editedParameter;
+      if (!instruction || !this.state.inlineEditingPreviousValue) return;
+      // TODO
+      // first press on Escape isn't working, the state inlineEditingPreviousValue in undefined, the next are correct.
+      // Somewhere the state isn't correctly updated i guess.
+      console.log('Cancel changes:' + this.state.inlineEditingPreviousValue);
+      instruction.setParameter(
+        parameterIndex,
+        this.state.inlineEditingPreviousValue
+      );
+
+      this.setState({
+        inlineEditingChangesMade: true,
+        inlineEditingAnchorEl: null,
+        inlineEditing: false,
+      });
+      return;
+    }
+
     if (this.state.inlineEditingChangesMade) {
       this._saveChangesToHistory();
     }
@@ -1138,7 +1161,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={this.closeParameterEditor}
+                          onRequestClose={event => {
+                            this.closeParameterEditor(event);
+                          }}
                           project={project}
                           scope={scope}
                           globalObjectsContainer={globalObjectsContainer}
@@ -1156,6 +1181,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                             if (!instruction) return;
                             instruction.setParameter(parameterIndex, value);
                             this.setState({
+                              inlineEditingPreviousValue: instruction.getParameter(
+                                parameterIndex
+                              ),
                               inlineEditingChangesMade: true,
                             });
                             if (this._searchPanel)

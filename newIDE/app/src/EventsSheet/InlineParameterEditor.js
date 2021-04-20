@@ -123,7 +123,9 @@ export default class InlineParameterEditor extends React.Component<
           parameterIndex={this.props.parameterIndex}
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
-          onRequestClose={this.props.onRequestClose}
+          onRequestClose={event => {
+            this.props.onRequestClose(event);
+          }}
           project={this.props.project}
           scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}

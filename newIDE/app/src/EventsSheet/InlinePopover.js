@@ -84,7 +84,7 @@ export default function InlinePopover(props: Props) {
           // and stop its propagation (for example, the GenericExpressionField
           // when showing autocompletion), which is fine.
           if (shouldCloseOrCancel(event)) {
-            props.onRequestClose();
+            props.onRequestClose(event);
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

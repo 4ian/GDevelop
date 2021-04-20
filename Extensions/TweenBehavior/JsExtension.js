@@ -503,6 +503,13 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .addParameter(
+        'yesorno',
+        _('Use HSL instead of RGB to create tween colors'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectColorTween');
 

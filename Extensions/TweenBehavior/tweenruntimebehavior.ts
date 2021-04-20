@@ -601,6 +601,7 @@ namespace gdjs {
      * @param toColorStr The target color
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
+     * @param useHSLColorTransition Tween using HSL color mappings, rather than direct RGB line
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
      */
     addObjectColorTween(
@@ -608,9 +609,12 @@ namespace gdjs {
       toColorStr: string,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      useHSLColorTransition: boolean
     ) {
       const that = this;
+      
+      let fromColorAsHSL : number[] = [], toColorAsHSL : number[] = [];
       if (!this._isActive) {
         return;
       }
@@ -632,30 +636,70 @@ namespace gdjs {
         this.removeTween(identifier);
       }
       // @ts-ignore - objects are duck typed
-      const fromColor = this.owner.getColor().split(';');
-      let toColor = toColorStr.split(';');
+      let fromColor: any[] = this.owner.getColor().split(';');
+      if (useHSLColorTransition) {
+        fromColor = fromColor.map((x: Number) => Number(x) / 255);
+        let v = Math.max(fromColor[0], fromColor[1], fromColor[2]), c = v - Math.min(fromColor[0], fromColor[1], fromColor[2]), f = (1 - Math.abs(v + v - c - 1));
+        let h = c && ((v === fromColor[0]) ? (fromColor[1] - fromColor[2]) / c: ((v === fromColor[1]) ? 2 + (fromColor[2] - fromColor[0]) / c: 4 + (fromColor[0] - fromColor[1]) / c)); 
+        fromColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
+      }
+      let toColor: any[] = toColorStr.split(';');
       if (toColor.length !== 3) {
         return;
+      }
+      if(useHSLColorTransition) {
+        toColor = toColor.map((x: Number) => Number(x) / 255);
+        let v = Math.max(toColor[0], toColor[1], toColor[2]), c = v - Math.min(toColor[0], toColor[1], toColor[2]), f = (1 - Math.abs(v + v - c - 1));
+        let h = c && ((v === toColor[0]) ? (toColor[1] - toColor[2]) / c: ((v === toColor[1]) ? 2 + (toColor[2] - toColor[0]) / c: 4 + (toColor[0] - toColor[1]) / c)); 
+        toColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
       }
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
-      newTweenable.setConfig({
-        from: { red: fromColor[0], green: fromColor[1], blue: fromColor[2] },
-        to: { red: toColor[0], green: toColor[1], blue: toColor[2] },
-        duration: durationValue,
-        easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setColor(
-            Math.floor(state.red) +
-              ';' +
-              Math.floor(state.green) +
-              ';' +
-              Math.floor(state.blue)
-          );
-        },
-      });
+      if(useHSLColorTransition) {
+        newTweenable.setConfig({
+          from: { hue: fromColorAsHSL[0], saturation: fromColorAsHSL[1], lightness: fromColorAsHSL[2] },
+          to: { hue: toColorAsHSL[0], saturation: toColorAsHSL[1], lightness: toColorAsHSL[2] },
+          duration: durationValue,
+          easing: easingValue,
+          step: function step(state) {
+
+            const h = state.hue;
+            const s = state.saturation / 100;
+            const l = state.lightness / 100;
+
+            const a = s * Math.min(l, 1 - l);
+            const f = (n = 0, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 
+        
+            const rgbFromHslColor = [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+            // @ts-ignore - objects are duck typed
+            that.owner.setColor(
+              Math.floor(rgbFromHslColor[0]) +
+                ';' +
+              Math.floor(rgbFromHslColor[1]) +
+                ';' +
+              Math.floor(rgbFromHslColor[2])
+            );
+          },
+        });
+      } else {
+        newTweenable.setConfig({
+          from: { red: fromColor[0], green: fromColor[1], blue: fromColor[2] },
+          to: { red: toColor[0], green: toColor[1], blue: toColor[2] },
+          duration: durationValue,
+          easing: easingValue,
+          step: function step(state) {
+            // @ts-ignore - objects are duck typed
+            that.owner.setColor(
+              Math.floor(state.red) +
+                ';' +
+                Math.floor(state.green) +
+                ';' +
+                Math.floor(state.blue)
+            );
+          },
+        });
+      }
       this._addTween(
         identifier,
         newTweenable,

@@ -7,6 +7,7 @@
 #include "GDCore/Project/Variable.h"
 
 #include <sstream>
+#include <cmath>
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
@@ -91,7 +92,9 @@ double Variable::GetValue() const {
   if (type == Type::Number) {
     return value;
   } else if (type == Type::String) {
-    return str.To<double>();
+    double retVal = str.To<double>();
+    if(std::isnan(retVal)) retVal = 0.0;
+    return retVal;
   } else if (type == Type::Boolean) {
     return boolVal ? 1.0 : 0.0;
   }

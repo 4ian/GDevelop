@@ -530,9 +530,9 @@ module.exports = {
       .addParameter('object', _('Object'), '', false) //0
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) //1
       .addParameter('string', _('Tween Identifier'), '', false) //2
-      .addParameter('number', _('To hue'), '', false) //3
-      .addParameter('number', _('To saturation'), '', false) //4
-      .addParameter('number', _('To lightness'), '', false) //5
+      .addParameter('expression', _('To hue'), '', false) //3
+      .addParameter('expression', _('To saturation'), '', false) //4
+      .addParameter('expression', _('To lightness'), '', false) //5
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false) //6
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration'), '', false) //7

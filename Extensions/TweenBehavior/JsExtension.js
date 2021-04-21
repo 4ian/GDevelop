@@ -527,15 +527,15 @@ module.exports = {
         'JsPlatform/Extensions/tween_behavior24.png',
         'JsPlatform/Extensions/tween_behavior32.png'
       )
-      .addParameter('object', _('Object'), '', false) //0
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) //1
-      .addParameter('string', _('Tween Identifier'), '', false) //2
-      .addParameter('number', _('To hue'), '', false) //3
-      .addParameter('number', _('To saturation'), '', false) //4
-      .addParameter('number', _('To lightness'), '', false) //5
-      .addParameter('stringWithSelector', _('Easing'), easingChoices, false) //6
+      .addParameter('object', _('Object'), '', false) 
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) 
+      .addParameter('string', _('Tween Identifier'), '', false) 
+      .addParameter('number', _('To hue'), '', false) 
+      .addParameter('number', _('To saturation'), '', false) 
+      .addParameter('number', _('To lightness'), '', false) 
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false) 
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false) //7
+      .addParameter('expression', _('Duration'), '', false) 
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),

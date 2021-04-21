@@ -521,7 +521,7 @@ module.exports = {
           'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Leave any empty to use the original color\'s HSL value(s).'
         ),
         _(
-          'Tween the color of _PARAM0_ to H: _PARAM3_ S: _PARAM4_ L: _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_'
+          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ S: _PARAM4_ L: _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_'
         ),
         _('Color'),
         'JsPlatform/Extensions/tween_behavior24.png',

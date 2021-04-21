@@ -514,6 +514,40 @@ module.exports = {
       .setFunctionName('addObjectColorTween');
 
     behavior
+      .addAction(
+        'AddObjectColorHSLTween',
+        _('Add object HSL color tween'),
+        _(
+          'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Leave empty to use the original color\'s HSL value(s).'
+        ),
+        _(
+          'Tween the color of _PARAM0_ to H: _PARAM3_ S: _PARAM4_ L: _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_'
+        ),
+        _('Color'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false) //0
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) //1
+      .addParameter('string', _('Tween Identifier'), '', false) //2
+      .addParameter('number', _('To hue'), '', false) //3
+      .addParameter('number', _('To saturation'), '', false) //4
+      .addParameter('number', _('To lightness'), '', false) //5
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false) //6
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration'), '', false) //7
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectColorHSLTween');
+
+
+    behavior
       .addCondition(
         'Exists',
         _('Tween exists'),

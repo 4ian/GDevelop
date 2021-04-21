@@ -1,3 +1,5 @@
+import { isNumber } from "util";
+
 namespace gdjs {
   declare var shifty: any;
   namespace shifty {
@@ -601,8 +603,8 @@ namespace gdjs {
      * @param toColorStr The target color
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
-     * @param useHSLColorTransition Tween using HSL color mappings, rather than direct RGB line
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param useHSLColorTransition Tween using HSL color mappings, rather than direct RGB line
      */
     addObjectColorTween(
       identifier: string,
@@ -708,6 +710,126 @@ namespace gdjs {
       );
       this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
+
+
+
+    /**
+     * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * @param identifier Unique id to idenfify the tween
+     * @param toHue The target hue, or the same as the from color's hue if blank
+     * @param toSaturation The target saturation, or the same as the from color's saturation if blank
+     * @param toHue The target lightness, or the same as the from color's lightness if blank
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    
+    addObjectColorHSLTween(
+      identifier: string,
+      toHue: string,
+      toSaturation: string,
+      toLightness: string,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean,
+    ) {
+      const that = this;
+      
+      let fromColorAsHSL : number[] = [], toColorAsHSL : number[] = [];
+      if (!this._isActive) {
+        return;
+      }
+      // @ts-ignore - objects are duck typed
+      if (!this.owner.getColor || !this.owner.setColor) {
+        return;
+      }
+      if (!!TweenRuntimeBehavior.easings[easingValue]) {
+        return;
+      }
+      
+      if (this._tweenExists(identifier)) {
+        this.removeTween(identifier);
+      }
+      
+      // @ts-ignore - objects are duck typed
+      let fromColor: any[] = this.owner.getColor().split(';');
+      fromColor = fromColor.map((x: Number) => Number(x) / 255);
+      let v = Math.max(fromColor[0], fromColor[1], fromColor[2]), c = v - Math.min(fromColor[0], fromColor[1], fromColor[2]), f = (1 - Math.abs(v + v - c - 1));
+      let h = c && ((v === fromColor[0]) ? (fromColor[1] - fromColor[2]) / c: ((v === fromColor[1]) ? 2 + (fromColor[2] - fromColor[0]) / c: 4 + (fromColor[0] - fromColor[1]) / c)); 
+      fromColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
+
+      let toH: number = 0, toS: number = 0, toL: number = 0;
+      if(!Number.isNaN(Number.parseFloat(toHue))) {
+        toH = parseFloat(toHue);
+      } else if(toHue.trim() === "") {
+        toH = fromColorAsHSL[0];
+      } else {
+        return;
+      }
+      if(!Number.isNaN(Number.parseFloat(toSaturation))) {
+        toS = parseFloat(toSaturation);
+        toS = Math.min(Math.max(toS, 0), 100); // Clamp
+      } else if(toSaturation.trim() === "") {
+        toS = fromColorAsHSL[1];
+      } else {
+        return;
+      }
+      if(!Number.isNaN(Number.parseFloat(toLightness))) {
+        toL = parseFloat(toLightness);
+        toL = Math.min(Math.max(toL, 0), 100); // Clamp
+      } else if(toLightness.trim() === "") {
+        toL = fromColorAsHSL[2];
+      } else {
+        return;
+      }
+      toColorAsHSL = [toH, toS, toL];
+
+      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
+        this._runtimeScene
+      );
+      
+      newTweenable.setConfig({
+        from: { hue: fromColorAsHSL[0], saturation: fromColorAsHSL[1], lightness: fromColorAsHSL[2] },
+        to: { hue: toColorAsHSL[0], saturation: toColorAsHSL[1], lightness: toColorAsHSL[2] },
+        duration: durationValue,
+        easing: easingValue,
+        step: function step(state) {
+          let h = state.hue %= 360;
+          if (h < 0) {
+              h += 360;
+          }
+          const s = state.saturation / 100;
+          const l = state.lightness / 100;
+
+          const a = s * Math.min(l, 1 - l);
+          const f = (n = 0, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 
+      
+          const rgbFromHslColor = [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+          // @ts-ignore - objects are duck typed
+          that.owner.setColor(
+            Math.floor(rgbFromHslColor[0]) +
+              ';' +
+            Math.floor(rgbFromHslColor[1]) +
+              ';' +
+            Math.floor(rgbFromHslColor[2])
+          );
+        },
+      });
+      
+
+      
+      this._addTween(
+        identifier,
+        newTweenable,
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue
+      );
+      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
+      
+    }
+
+
+
 
     /**
      * Add a text object character size tween.

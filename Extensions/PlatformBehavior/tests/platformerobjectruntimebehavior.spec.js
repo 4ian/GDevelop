@@ -777,6 +777,26 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
     });
+
+    it('can fall through the jumpthru from the left side', function () {
+      object.setPosition(0, -100);
+      jumpthru.setPosition(12, -90);
+      jumpthru.setCustomWidthAndHeight(60, 100);
+
+      // Check the jumpthru let the platformer object go through.
+      for (let i = 0; i < 10; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      }
+      // Overlapping the jumpthru
+      expect(object.getX()).to.above(5);
+      expect(object.getY()).to.be.within(-100, -80);
+    });
   });
 
   describe('(rounded coordinates, moving platforms)', function () {

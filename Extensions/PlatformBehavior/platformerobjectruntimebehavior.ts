@@ -188,7 +188,7 @@ namespace gdjs {
       this._requestedDeltaX += this._updateSpeed(timeDelta);
 
       //0.2) Track changes in object size
-      this._state.beforeUpdatingObstacles();
+      this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
 
       //0.3) Update list of platforms around/related to the object
@@ -1137,7 +1137,7 @@ namespace gdjs {
      * Called before the obstacle search.
      * The object position may need adjustments to handle external changes.
      */
-    beforeUpdatingObstacles(): void;
+    beforeUpdatingObstacles(timeDelta: float): void;
     /**
      * Check if transitions to other states are needed and apply them before moving horizontally.
      */
@@ -1190,7 +1190,7 @@ namespace gdjs {
       this._floorLastY = this._floorPlatform!.owner.getY();
     }
 
-    beforeUpdatingObstacles() {
+    beforeUpdatingObstacles(timeDelta: float) {
       const object = this._behavior.owner;
       //Stick the object to the floor if its height has changed.
       if (this._oldHeight !== object.getHeight()) {
@@ -1363,7 +1363,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -1429,7 +1429,7 @@ namespace gdjs {
       this._currentJumpSpeed = 0;
     }
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -1509,7 +1509,7 @@ namespace gdjs {
       this._grabbedPlatform = null;
     }
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {
       const behavior = this._behavior;
@@ -1575,7 +1575,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 

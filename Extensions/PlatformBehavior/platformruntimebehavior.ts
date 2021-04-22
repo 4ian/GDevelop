@@ -12,7 +12,7 @@ namespace gdjs {
    * (see PlatformRuntimeBehavior.getManager).
    */
   export class PlatformObjectsManager {
-    _platformRBush: any;
+    private _platformRBush: any;
 
     /**
      * @param object The object
@@ -45,7 +45,7 @@ namespace gdjs {
     /**
      * Add a platform to the list of existing platforms.
      */
-    addPlatform(platformBehavior) {
+    addPlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
       this._platformRBush.insert(platformBehavior);
     }
 
@@ -53,7 +53,7 @@ namespace gdjs {
      * Remove a platform from the list of existing platforms. Be sure that the platform was
      * added before.
      */
-    removePlatform(platformBehavior) {
+    removePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
       this._platformRBush.remove(platformBehavior);
     }
 
@@ -62,7 +62,11 @@ namespace gdjs {
      * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
      * @return An array with all platforms near the object.
      */
-    getAllPlatformsAround(object, maxMovementLength: number, result): any {
+    getAllPlatformsAround(
+      object: gdjs.RuntimeObject,
+      maxMovementLength: number,
+      result: gdjs.PlatformRuntimeBehavior[]
+    ): any {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const ow = object.getWidth();
@@ -92,29 +96,31 @@ namespace gdjs {
    */
   export class PlatformRuntimeBehavior extends gdjs.RuntimeBehavior {
     //Load the platform type
-    _platformType: any;
-    _canBeGrabbed: any;
-    _yGrabOffset: any;
+    _platformType: integer;
+    _canBeGrabbed: boolean;
+    _yGrabOffset: float;
 
     //Note that we can't use getX(), getWidth()... of owner here: The owner is not fully constructed.
-    _oldX: number = 0;
-    _oldY: number = 0;
+    _oldX: float = 0;
+    _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    _manager: any;
+    _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._platformType = behaviorData.platformType;
-      if (this._platformType == 'Ladder') {
+      if (behaviorData.platformType === 'Ladder') {
         this._platformType = PlatformRuntimeBehavior.LADDER;
+      } else if (behaviorData.platformType === 'Jumpthru') {
+        this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
       } else {
-        if (this._platformType == 'Jumpthru') {
-          this._platformType = PlatformRuntimeBehavior.JUMPTHRU;
-        } else {
-          this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
-        }
+        this._platformType = PlatformRuntimeBehavior.NORMALPLAFTORM;
       }
       this._canBeGrabbed = behaviorData.canBeGrabbed || false;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
@@ -140,7 +146,7 @@ namespace gdjs {
       }
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //Scene change is not supported
       /*if ( parentScene != &scene ) //Parent scene has changed
             {
@@ -180,7 +186,7 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene) {}
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     onActivate() {
       if (this._registeredInManager) {
@@ -198,7 +204,7 @@ namespace gdjs {
       this._registeredInManager = false;
     }
 
-    changePlatformType(platformType) {
+    changePlatformType(platformType: string) {
       if (platformType === 'Ladder') {
         this._platformType = PlatformRuntimeBehavior.LADDER;
       } else if (platformType === 'Jumpthru') {

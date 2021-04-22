@@ -919,7 +919,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // the platform is slightly overlapping the top of the object
       platform.setY(object.getY() - platform.getHeight() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // Check that the object falls
+      // Check that the object stays on the floor
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isMoving()).to.be(false);

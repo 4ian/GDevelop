@@ -1,9 +1,25 @@
-import { isNumber } from "util";
-
 namespace gdjs {
   declare var shifty: any;
   namespace shifty {
     export type Tweenable = any;
+  }
+
+  function rgbToHsl(col: number[]): number[] {
+    col[0] /= 255;
+    col[1] /= 255;
+    col[2] /= 255;
+    let v = Math.max(col[0], col[1], col[2]), c = v - Math.min(col[0], col[1], col[2]), f = (1 - Math.abs(v + v - c - 1));
+    let h = c && ((v === col[0]) ? (col[1] - col[2]) / c: ((v === col[1]) ? 2 + (col[2] - col[0]) / c: 4 + (col[0] - col[1]) / c)); 
+    return [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
+  }
+
+  function hslToRgb(hsl: number[]): number[] {
+    const h = hsl[0];
+    const s = hsl[1] / 100;
+    const l = hsl[2] / 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n = 0, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 
+    return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];    
   }
 
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
@@ -640,40 +656,27 @@ namespace gdjs {
       // @ts-ignore - objects are duck typed
       let fromColor: any[] = this.owner.getColor().split(';');
       if (useHSLColorTransition) {
-        fromColor = fromColor.map((x: Number) => Number(x) / 255);
-        let v = Math.max(fromColor[0], fromColor[1], fromColor[2]), c = v - Math.min(fromColor[0], fromColor[1], fromColor[2]), f = (1 - Math.abs(v + v - c - 1));
-        let h = c && ((v === fromColor[0]) ? (fromColor[1] - fromColor[2]) / c: ((v === fromColor[1]) ? 2 + (fromColor[2] - fromColor[0]) / c: 4 + (fromColor[0] - fromColor[1]) / c)); 
-        fromColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
+        fromColorAsHSL = rgbToHsl(fromColor);
       }
       let toColor: any[] = toColorStr.split(';');
       if (toColor.length !== 3) {
         return;
       }
-      if(useHSLColorTransition) {
-        toColor = toColor.map((x: Number) => Number(x) / 255);
-        let v = Math.max(toColor[0], toColor[1], toColor[2]), c = v - Math.min(toColor[0], toColor[1], toColor[2]), f = (1 - Math.abs(v + v - c - 1));
-        let h = c && ((v === toColor[0]) ? (toColor[1] - toColor[2]) / c: ((v === toColor[1]) ? 2 + (toColor[2] - toColor[0]) / c: 4 + (toColor[0] - toColor[1]) / c)); 
-        toColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
-      }
+
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
+
       if(useHSLColorTransition) {
+        toColorAsHSL = rgbToHsl(toColor);
+
         newTweenable.setConfig({
           from: { hue: fromColorAsHSL[0], saturation: fromColorAsHSL[1], lightness: fromColorAsHSL[2] },
           to: { hue: toColorAsHSL[0], saturation: toColorAsHSL[1], lightness: toColorAsHSL[2] },
           duration: durationValue,
           easing: easingValue,
           step: function step(state) {
-
-            const h = state.hue;
-            const s = state.saturation / 100;
-            const l = state.lightness / 100;
-
-            const a = s * Math.min(l, 1 - l);
-            const f = (n = 0, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 
-        
-            const rgbFromHslColor = [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+            const rgbFromHslColor = hslToRgb([state.hue, state.saturation, state.lightness]);
             // @ts-ignore - objects are duck typed
             that.owner.setColor(
               Math.floor(rgbFromHslColor[0]) +
@@ -717,6 +720,7 @@ namespace gdjs {
      * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
      * @param identifier Unique id to idenfify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
+     * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
      * @param toHue The target lightness, or the same as the from color's lightness if blank
      * @param easingValue Type of easing
@@ -727,6 +731,7 @@ namespace gdjs {
     addObjectColorHSLTween(
       identifier: string,
       toHue: string,
+      animateHue: string,
       toSaturation: string,
       toLightness: string,
       easingValue: string,
@@ -759,29 +764,33 @@ namespace gdjs {
       fromColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
 
       let toH: number = 0, toS: number = 0, toL: number = 0;
-      if(!Number.isNaN(Number.parseFloat(toHue))) {
-        toH = parseFloat(toHue);
-      } else if(toHue.trim() === "") {
+      if(animateHue === "no" || toHue.trim() === "") {
         toH = fromColorAsHSL[0];
+      }
+      else if(!Number.isNaN(Number.parseFloat(toHue))) {
+        toH = parseFloat(toHue);
       } else {
         return;
       }
-      if(!Number.isNaN(Number.parseFloat(toSaturation))) {
+      
+      if("-1" === toSaturation.trim() || "" === toSaturation.trim()) {
+        toS = fromColorAsHSL[1];
+      } else if(!Number.isNaN(Number.parseFloat(toSaturation))) {
         toS = parseFloat(toSaturation);
         toS = Math.min(Math.max(toS, 0), 100); // Clamp
-      } else if(toSaturation.trim() === "") {
-        toS = fromColorAsHSL[1];
       } else {
         return;
       }
-      if(!Number.isNaN(Number.parseFloat(toLightness))) {
+
+      if("-1" === toLightness.trim() || "" === toLightness.trim()) {
+        toL = fromColorAsHSL[2];
+      } else if(!Number.isNaN(Number.parseFloat(toLightness))) {
         toL = parseFloat(toLightness);
         toL = Math.min(Math.max(toL, 0), 100); // Clamp
-      } else if(toLightness.trim() === "") {
-        toL = fromColorAsHSL[2];
       } else {
         return;
       }
+
       toColorAsHSL = [toH, toS, toL];
 
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
@@ -1294,3 +1303,4 @@ namespace gdjs {
     return TweenRuntimeBehavior._currentTweenTime;
   };
 }
+

@@ -518,7 +518,7 @@ module.exports = {
         'AddObjectColorHSLTween',
         _('Add object HSL color tween'),
         _(
-          'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Leave any empty to use the original color\'s HSL value(s).'
+          'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Use -1 for S and L to use original color\'s S/L value(s).'
         ),
         _(
           'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ S: _PARAM4_ L: _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_'
@@ -530,9 +530,13 @@ module.exports = {
       .addParameter('object', _('Object'), '', false) 
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) 
       .addParameter('string', _('Tween Identifier'), '', false) 
-      .addParameter('number', _('To hue'), '', false) 
-      .addParameter('number', _('To saturation'), '', false) 
-      .addParameter('number', _('To lightness'), '', false) 
+      .addParameter('expression', _('To hue'), '', false) 
+      .addParameter('animateHue', _('Animate Hue'), '', false)
+      .setDefaultValue('yes')
+      .addParameter('expression', _('To saturation'), '', false) 
+      .setDefaultValue('-1')
+      .addParameter('expression', _('To lightness'), '', false) 
+      .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false) 
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration'), '', false) 

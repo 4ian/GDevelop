@@ -182,14 +182,6 @@ export function getMuiOverrides(
         padding: 8,
       },
     },
-    // Avoid double border between buttons in ButtonGroup
-    MuiButtonGroup: {
-      groupedContainedHorizontal: {
-        '&:not(:last-child)': {
-          borderRight: 'none',
-        },
-      },
-    },
   };
 }
 

@@ -51,7 +51,7 @@ const BitGroupEditor = (props: {|
 |}) => {
   return (
     <div style={{ overflowX: 'auto', flex: 1 }}>
-      <ButtonGroup variant="contained" disableElevation fullWidth>
+      <ButtonGroup disableElevation fullWidth>
         {props.bits.map((bit, index) => (
           <Button
             key={index}

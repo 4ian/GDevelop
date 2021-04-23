@@ -104,6 +104,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       cannotBeDismissed={true}
       open={props.open}
       noTitleMargin
+      fullHeight
       title={
         <div>
           <Tabs value={currentTab} onChange={setCurrentTab}>

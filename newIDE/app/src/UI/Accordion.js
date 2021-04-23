@@ -36,7 +36,9 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
         )
       }
     >
-      <div style={{ flexGrow: 1 }}>{props.children}</div>
+      <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+        {props.children}
+      </div>
       {props.actions && (
         <div style={{ flexGrow: 0, alignSelf: 'center' }}>{props.actions}</div>
       )}

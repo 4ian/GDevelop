@@ -1387,7 +1387,8 @@ namespace gdjs {
         const tentativeStartY = object.getY() + 1;
         object.setY(
           behavior._roundCoordinates
-            ? Math.round(tentativeStartY)
+            ? // tentativeStartY is already incremented, floor avoid to jump from more than one pixel
+              Math.floor(tentativeStartY)
             : tentativeStartY
         );
         let step = 0;

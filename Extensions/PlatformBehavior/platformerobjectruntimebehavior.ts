@@ -1410,10 +1410,34 @@ namespace gdjs {
         if (noMoreOnFloor) {
           object.setY(oldY);
         } else {
-          object.setY(
-            //Floor touched: Go back 1 pixel over.
-            object.getY() - 1
-          );
+          if (behavior._roundCoordinates) {
+            object.setY(
+              //Floor touched: Go back 1 pixel over.
+              object.getY() - 1
+            );
+          } else {
+            // Moving platforms won't always be right on a pixel
+            // Avoid a gap between the object and the platform
+            const beforeSeparationX = object.getX();
+            const beforeSeparationY = object.getY();
+            object.separateFromObjects(
+              [this._floorPlatform!.owner],
+              this._behavior._ignoreTouchingEdges
+            );
+            const deltaX = object.getX() - beforeSeparationX;
+            const deltaY = object.getY() - beforeSeparationY;
+            if (
+              deltaX < gdjs.PlatformerObjectRuntimeBehavior.epsilon &&
+              deltaX > -gdjs.PlatformerObjectRuntimeBehavior.epsilon &&
+              deltaY >= -1 &&
+              deltaY < gdjs.PlatformerObjectRuntimeBehavior.epsilon
+            ) {
+              object.setX(beforeSeparationX);
+              object.setY(Math.min(beforeSeparationY, object.getY()));
+            } else {
+              object.setPosition(beforeSeparationX, beforeSeparationY - 1);
+            }
+          }
         }
       }
     }

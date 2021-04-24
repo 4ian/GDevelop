@@ -622,13 +622,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           false
         );
       }
-      // The jump finishes one frame before going back to the floor
-      // because the gravity is not applied on the first step.
-      runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getBehavior('auto1').isJumping()).to.be(false);
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
-      expect(object.getY()).to.be(-31);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
@@ -1965,11 +1958,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
       }
-      // Falling 1 frame
-      object.getBehavior('auto1').simulateRightKey();
-      runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
       // and directly on the floor
       object.getBehavior('auto1').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);

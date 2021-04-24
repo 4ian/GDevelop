@@ -1,4 +1,0 @@
-This is a modified version of the firebase js sdk. Original can be found on https://github.com/firebase/firebase-js-sdk .
-The version used is 7.20.0.
-Changelist:
-Removed links to sourcemaps.

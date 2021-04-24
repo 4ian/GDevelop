@@ -1,0 +1,6 @@
+This is the firebase js sdk, downloadable from https://firebase.google.com/docs/web/setup/#expandable-8. 
+The file and sourcemaps names have been modified to be loaded properly by GDevelop.
+The source can be found on https://github.com/firebase/firebase-js-sdk.
+Type definitions can be found at https://www.unpkg.com/firebase/index.d.ts. 
+They have been modified to remove the exports at the bottom in order to work with GDevelop.
+The version of the Firebase SDK used is 8.3.3.

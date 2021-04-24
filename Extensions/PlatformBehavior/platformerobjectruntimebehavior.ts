@@ -65,6 +65,8 @@ namespace gdjs {
     _requestedDeltaY: float = 0;
     _lastDeltaY: float = 0;
 
+    static epsilon: float = 1 / (2 << 16);
+
     constructor(
       runtimeScene: gdjs.RuntimeScene,
       behaviorData,
@@ -1306,16 +1308,24 @@ namespace gdjs {
       const behavior = this._behavior;
       const object = behavior.owner;
 
-      //Follow the floor
-      if (
-        gdjs.RuntimeObject.collisionTest(
+      let isCollidingPlatform: boolean;
+      {
+        // Because of rounding errors the collision test can do false positives.
+        // So, the object need to be slightly shifted upward.
+        const oldY = object.getY();
+        object.setY(oldY - gdjs.PlatformerObjectRuntimeBehavior.epsilon);
+        isCollidingPlatform = gdjs.RuntimeObject.collisionTest(
           object,
           this._floorPlatform!.owner,
           behavior._ignoreTouchingEdges
         )
-      ) {
+        object.setY(oldY);
+      }
+
+      //Follow the floor
+      if (isCollidingPlatform) {
         //Floor is getting up, as the object is colliding with it.
-        let oldY = object.getY();
+        const oldY = object.getY();
         let step = 0;
         let stillInFloor = false;
         do {
@@ -1373,7 +1383,7 @@ namespace gdjs {
         }
       } else {
         //Floor is flat or get down.
-        let oldY = object.getY();
+        const oldY = object.getY();
         const tentativeStartY = object.getY() + 1;
         object.setY(
           behavior._roundCoordinates

@@ -469,7 +469,7 @@ namespace gdjs {
         angle: float,
         distance: float
       ): number {
-        return distance * Math.cos(gdjs.toRad(angle));
+        return distance !== 0 ? distance * Math.cos(gdjs.toRad(angle)) : 0;
       };
 
       /**
@@ -482,7 +482,7 @@ namespace gdjs {
         angle: float,
         distance: float
       ): number {
-        return distance * Math.sin(gdjs.toRad(angle));
+        return distance !== 0 ? distance * Math.sin(gdjs.toRad(angle)) : 0;
       };
     }
   }

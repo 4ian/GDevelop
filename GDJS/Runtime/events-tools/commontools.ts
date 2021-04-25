@@ -461,7 +461,7 @@ namespace gdjs {
 
       /**
        * Compute the X position when given an angle and distance relative to the origin (0;0).
-       * This is also known as g=etting the cartesian coordinates of a 2D vector, using its polar coordinates.
+       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
        * @param angle The angle, in degrees.
        * @param distance The distance from the object, in pixels.
        */
@@ -469,7 +469,7 @@ namespace gdjs {
         angle: float,
         distance: float
       ): number {
-        return distance !== 0 ? distance * Math.cos(gdjs.toRad(angle)) : 0;
+        return distance * Math.cos(gdjs.toRad(angle));
       };
 
       /**
@@ -482,7 +482,7 @@ namespace gdjs {
         angle: float,
         distance: float
       ): number {
-        return distance !== 0 ? distance * Math.sin(gdjs.toRad(angle)) : 0;
+        return distance * Math.sin(gdjs.toRad(angle));
       };
     }
   }

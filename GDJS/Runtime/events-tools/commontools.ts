@@ -460,13 +460,12 @@ namespace gdjs {
       };
 
       /**
-       * Compute the X position when given an angle and distance relative to the starting position.
-       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
-       * @param positionX The position on X-axis, in pixels.
+       * Compute the X position when given an angle and distance relative to the origin (0;0).
+       * This is also known as g=etting the cartesian coordinates of a 2D vector, using its polar coordinates.
        * @param angle The angle, in degrees.
        * @param distance The distance from the object, in pixels.
        */
-      export const XFromAngleAndDistance = function (
+      export const getXFromAngleAndDistance = function (
         angle: float,
         distance: float
       ): number {
@@ -474,13 +473,12 @@ namespace gdjs {
       };
 
       /**
-       * Compute the Y position when given an angle and distance relative to the starting position.
+       * Compute the Y position when given an angle and distance relative to the origin (0;0).
        * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
-       * @param positionY The position on Y-axis, in pixels.
        * @param angle The angle, in degrees.
        * @param distance The distance from the object, in pixels.
        */
-      export const YFromAngleAndDistance = function (
+      export const getYFromAngleAndDistance = function (
         angle: float,
         distance: float
       ): number {

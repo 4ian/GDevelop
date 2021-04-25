@@ -59,8 +59,8 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["round"].SetFunctionName("Math.round");
   GetAllExpressions()["trunc"].SetFunctionName("gdjs.evtTools.common.trunc");
   GetAllExpressions()["lerp"].SetFunctionName("gdjs.evtTools.common.lerp");
-  GetAllExpressions()["XFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.XFromAngleAndDistance");
-  GetAllExpressions()["YFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.YFromAngleAndDistance");
+  GetAllExpressions()["XFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getXFromAngleAndDistance");
+  GetAllExpressions()["YFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getYFromAngleAndDistance");
 
   StripUnimplementedInstructionsAndExpressions();
 }

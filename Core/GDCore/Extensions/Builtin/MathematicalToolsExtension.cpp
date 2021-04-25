@@ -383,7 +383,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("XFromAngleAndDistance",
                      _("X position from angle and distance"),
                      _("Compute the X position when given an angle and distance "
-                      "relative to the starting position. This is also known as "
+                      "relative to the origin (0;0). This is also known as "
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                      _("Mathematical tools"),
@@ -395,7 +395,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("YFromAngleAndDistance",
                      _("Y position from angle and distance"),
                      _("Compute the Y position when given an angle and distance "
-                      "relative to the starting position. This is also known as "
+                      "relative to the origin (0;0). This is also known as "
                       "getting the cartesian coordinates of a 2D vector, using "
                       "its polar coordinates."),
                      _("Mathematical tools"),

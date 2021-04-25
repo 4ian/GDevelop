@@ -395,12 +395,12 @@ namespace gdjs {
       scene: gdjs.RuntimeScene
     ): void {
       this.rotateTowardAngle(
-        (Math.atan2(
-          y - (this.getDrawableY() + this.getCenterY()),
-          x - (this.getDrawableX() + this.getCenterX())
-        ) *
-          180) /
-          Math.PI,
+        gdjs.toDegrees(
+          Math.atan2(
+            y - (this.getDrawableY() + this.getCenterY()),
+            x - (this.getDrawableX() + this.getCenterX())
+          )
+        ),
         speed,
         scene
       );
@@ -848,7 +848,7 @@ namespace gdjs {
      * @param multiplier Set the force multiplier
      */
     addPolarForce(angle: float, len: float, multiplier: integer): void {
-      const angleInRadians = (angle / 180) * 3.14159;
+      const angleInRadians = gdjs.toRad(angle);
 
       //TODO: Benchmark with Math.PI
       const forceX = Math.cos(angleInRadians) * len;
@@ -869,12 +869,12 @@ namespace gdjs {
       len: float,
       multiplier: integer
     ): void {
-      const angle = Math.atan2(
+      const angleInRadians = Math.atan2(
         y - (this.getDrawableY() + this.getCenterY()),
         x - (this.getDrawableX() + this.getCenterX())
       );
-      const forceX = Math.cos(angle) * len;
-      const forceY = Math.sin(angle) * len;
+      const forceX = Math.cos(angleInRadians) * len;
+      const forceY = Math.sin(angleInRadians) * len;
       this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
     }
 
@@ -1043,7 +1043,7 @@ namespace gdjs {
         this.hitBoxes[0].vertices[3][0] = 0 - centerX;
         this.hitBoxes[0].vertices[3][1] = height - centerY;
       }
-      this.hitBoxes[0].rotate((this.getAngle() / 180) * Math.PI);
+      this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
       this.hitBoxes[0].move(
         this.getDrawableX() + centerX,
         this.getDrawableY() + centerY
@@ -1494,7 +1494,35 @@ namespace gdjs {
         this.getDrawableY() +
         this.getCenterY() -
         (otherObject.getDrawableY() + otherObject.getCenterY());
-      return (Math.atan2(-y, -x) * 180) / Math.PI;
+      return gdjs.toDegrees(Math.atan2(-y, -x));
+    }
+
+    /**
+     * Compute the X position when given an angle and distance relative to the starting object.
+     * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+     * @param angle The angle, in degrees.
+     * @param distance The distance from the object, in pixels
+     */
+    getXFromAngleAndDistance(angle: float, distance: float): float {
+      return (
+        this.getDrawableX() +
+        this.getCenterX() +
+        distance * Math.cos(gdjs.toRad(angle))
+      );
+    }
+
+    /**
+     * Compute the Y position when given an angle and distance relative to the starting object.
+     * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+     * @param angle The angle, in degrees.
+     * @param distance The distance from the object, in pixels
+     */
+    getYFromAngleAndDistance(angle: float, distance: float): float {
+      return (
+        this.getDrawableY() +
+        this.getCenterY() +
+        distance * Math.sin(gdjs.toRad(angle))
+      );
     }
 
     /**
@@ -1505,7 +1533,7 @@ namespace gdjs {
     getAngleToPosition(targetX: float, targetY: float): float {
       const x = this.getDrawableX() + this.getCenterX() - targetX;
       const y = this.getDrawableY() + this.getCenterY() - targetY;
-      return (Math.atan2(-y, -x) * 180) / Math.PI;
+      return gdjs.toDegrees(Math.atan2(-y, -x));
     }
 
     /**
@@ -1523,19 +1551,19 @@ namespace gdjs {
       distance: float,
       angleInDegrees: float
     ): void {
-      const angle = (angleInDegrees / 180) * 3.14159;
+      const angleInRadians = gdjs.toRad(angleInDegrees);
 
       // Offset the position by the center, as PutAround* methods should position the center
       // of the object (just like GetSqDistanceTo, RaycastTest uses center too).
       this.setX(
         x +
-          Math.cos(angle) * distance +
+          Math.cos(angleInRadians) * distance +
           this.getX() -
           (this.getDrawableX() + this.getCenterX())
       );
       this.setY(
         y +
-          Math.sin(angle) * distance +
+          Math.sin(angleInRadians) * distance +
           this.getY() -
           (this.getDrawableY() + this.getCenterY())
       );

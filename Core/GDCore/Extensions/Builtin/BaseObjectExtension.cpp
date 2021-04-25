@@ -998,17 +998,41 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Angle between two objects"),
                     _("Compute the angle between two objects. If you need the "
                       "angle to an arbitrary position, use AngleToPosition."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
+
+   obj.AddExpression("XFromAngleAndDistance",
+                    _("X position from angle and distance"),
+                    _("Compute the X position when given an angle and distance "
+                      "relative to the starting object. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
+
+   obj.AddExpression("YFromAngleAndDistance",
+                    _("Y position from angle and distance"),
+                    _("Compute the Y position when given an angle and distance "
+                      "relative to the starting object. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
 
   obj.AddExpression("AngleToPosition",
                     _("Angle between an object and a position"),
                     _("Compute the angle between the object center and a "
                       "\"target\" position. If you need the angle between two "
                       "objects, use AngleToObject."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))

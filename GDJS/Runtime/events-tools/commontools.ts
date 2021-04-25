@@ -467,11 +467,10 @@ namespace gdjs {
        * @param distance The distance from the object, in pixels.
        */
       export const XFromAngleAndDistance = function (
-        positionX: float,
         angle: float,
         distance: float
       ): number {
-        return positionX + distance * Math.cos(gdjs.toRad(angle));
+        return distance * Math.cos(gdjs.toRad(angle));
       };
 
       /**
@@ -482,11 +481,10 @@ namespace gdjs {
        * @param distance The distance from the object, in pixels.
        */
       export const YFromAngleAndDistance = function (
-        positionY: float,
         angle: float,
         distance: float
       ): number {
-        return positionY + distance * Math.sin(gdjs.toRad(angle));
+        return distance * Math.sin(gdjs.toRad(angle));
       };
     }
   }

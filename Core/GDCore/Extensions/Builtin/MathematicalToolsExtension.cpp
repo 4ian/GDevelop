@@ -388,7 +388,6 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                       "its polar coordinates."),
                      _("Mathematical tools"),
                      "res/mathfunction.png")
-      .AddParameter("expression", _("Starting X position"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
@@ -401,7 +400,6 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                       "its polar coordinates."),
                      _("Mathematical tools"),
                      "res/mathfunction.png")
-      .AddParameter("expression", _("Starting Y position"))
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 

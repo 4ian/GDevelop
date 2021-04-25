@@ -44,46 +44,61 @@ class GD_CORE_API ForEachChildVariableEvent : public gd::BaseEvent {
    *
    * It is the structure variable that will be iterated on.
    */
-  const gd::String& GetIterableVariableName() const { return iterableVariableName; };
+  const gd::String& GetIterableVariableName() const {
+    return iterableVariableName;
+  };
 
   /**
    * \brief Set the iterable variable name attached to the event.
    *
    * It is the structure variable that will be iterated on.
    */
-  void SetIterableVariableName(gd::String newName) { iterableVariableName = newName; };
+  void SetIterableVariableName(gd::String newName) {
+    iterableVariableName = newName;
+    InvalidateCache();
+  };
 
   /**
    * \brief Get the value iterator variable attached to the event.
    *
-   * It is the variable that will contain the value of the 
+   * It is the variable that will contain the value of the
    * iterable's child being iterated on.
    */
-  const gd::String& GetValueIteratorVariableName() const { return valueIteratorVariableName; };
+  const gd::String& GetValueIteratorVariableName() const {
+    return valueIteratorVariableName;
+  };
 
   /**
    * \brief Set the value iterator variable attached to the event.
    *
-   * It is the variable that will contain the value of the 
+   * It is the variable that will contain the value of the
    * iterable's child being iterated on.
    */
-  void SetValueIteratorVariableName(gd::String newName) { valueIteratorVariableName = newName; };
+  void SetValueIteratorVariableName(gd::String newName) {
+    valueIteratorVariableName = newName;
+    InvalidateCache();
+  };
 
   /**
    * \brief Get the key iterator variable attached to the event.
    *
-   * It is the variable that will contain the name of the 
+   * It is the variable that will contain the name of the
    * iterable's child being iterated on.
    */
-  const gd::String& GetKeyIteratorVariableName() const { return keyIteratorVariableName; };
+  const gd::String& GetKeyIteratorVariableName() const {
+    return keyIteratorVariableName;
+  };
 
   /**
    * \brief Set the key iterator variable attached to the event.
    *
-   * It is the variable that will contain the name of the 
+   * It is the variable that will contain the name of the
    * iterable's child being iterated on.
    */
-  void SetKeyIteratorVariableName(gd::String newName) { keyIteratorVariableName = newName; };
+  void SetKeyIteratorVariableName(gd::String newName) {
+    keyIteratorVariableName = newName;
+    InvalidateCache();
+  };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;

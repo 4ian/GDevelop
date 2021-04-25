@@ -13,7 +13,7 @@
 namespace gd {
 class Instruction;
 class Project;
-}
+}  // namespace gd
 class EventsCodeGenerationContext;
 
 namespace gd {
@@ -38,7 +38,10 @@ class GD_CORE_API GroupEvent : public gd::BaseEvent {
   /**
    * \brief Change the name of the group.
    */
-  void SetName(const gd::String& name_) { name = name_; }
+  void SetName(const gd::String& name_) {
+    name = name_;
+    InvalidateCache();
+  }
 
   /**
    * \brief Get the source of the group.

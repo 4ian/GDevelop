@@ -11,7 +11,7 @@
 namespace gd {
 class Instruction;
 class Project;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -25,7 +25,7 @@ namespace gd {
  */
 class GD_CORE_API WhileEvent : public gd::BaseEvent {
  public:
-  WhileEvent() : infiniteLoopWarning(true), justCreatedByTheUser(true){};
+  WhileEvent();
   virtual ~WhileEvent(){};
   virtual gd::WhileEvent* Clone() const { return new WhileEvent(*this); }
 
@@ -47,6 +47,7 @@ class GD_CORE_API WhileEvent : public gd::BaseEvent {
   gd::InstructionsList& GetWhileConditions() { return whileConditions; };
   void SetWhileConditions(gd::InstructionsList& whileConditions_) {
     whileConditions = whileConditions_;
+    InvalidateCache();
   };
 
   bool HasInfiniteLoopWarning() const { return infiniteLoopWarning; }

@@ -6,12 +6,20 @@
 
 #if defined(GD_IDE_ONLY)
 #include "WhileEvent.h"
+
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;
 
 namespace gd {
+
+WhileEvent::WhileEvent()
+    : infiniteLoopWarning(true), justCreatedByTheUser(true) {
+      actions.SetParent(this);
+      conditions.SetParent(this);
+      //TODO events.SetParent(this);
+    }
 
 vector<gd::InstructionsList*> WhileEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;

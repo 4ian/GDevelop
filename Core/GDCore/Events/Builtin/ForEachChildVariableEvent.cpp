@@ -5,6 +5,7 @@
  */
 
 #include "ForEachChildVariableEvent.h"
+
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
@@ -13,16 +14,24 @@ using namespace std;
 namespace gd {
 
 ForEachChildVariableEvent::ForEachChildVariableEvent()
-    : BaseEvent(), valueIteratorVariableName("child"), keyIteratorVariableName(""), iterableVariableName("") {}
+    : BaseEvent(),
+      valueIteratorVariableName("child"),
+      keyIteratorVariableName(""),
+      iterableVariableName("") {
+  actions.SetParent(this);
+  conditions.SetParent(this);
+}
 
-vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllConditionsVectors() {
+vector<gd::InstructionsList*>
+ForEachChildVariableEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
   allConditions.push_back(&conditions);
 
   return allConditions;
 }
 
-vector<gd::InstructionsList*> ForEachChildVariableEvent::GetAllActionsVectors() {
+vector<gd::InstructionsList*>
+ForEachChildVariableEvent::GetAllActionsVectors() {
   vector<gd::InstructionsList*> allActions;
   allActions.push_back(&actions);
 
@@ -47,7 +56,8 @@ ForEachChildVariableEvent::GetAllActionsVectors() const {
 
 void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
   element.AddChild("iterableVariableName").SetValue(iterableVariableName);
-  element.AddChild("valueIteratorVariableName").SetValue(valueIteratorVariableName);
+  element.AddChild("valueIteratorVariableName")
+      .SetValue(valueIteratorVariableName);
   element.AddChild("keyIteratorVariableName").SetValue(keyIteratorVariableName);
   gd::EventsListSerialization::SerializeInstructionsTo(
       conditions, element.AddChild("conditions"));
@@ -57,11 +67,16 @@ void ForEachChildVariableEvent::SerializeTo(SerializerElement& element) const {
                                                  element.AddChild("events"));
 }
 
-void ForEachChildVariableEvent::UnserializeFrom(gd::Project& project,
-                                            const SerializerElement& element) {
-  iterableVariableName = element.GetChild("iterableVariableName", 0, "").GetValue().GetString();
-  valueIteratorVariableName = element.GetChild("valueIteratorVariableName", 0, "").GetValue().GetString();
-  keyIteratorVariableName = element.GetChild("keyIteratorVariableName", 0, "").GetValue().GetString();
+void ForEachChildVariableEvent::UnserializeFrom(
+    gd::Project& project, const SerializerElement& element) {
+  iterableVariableName =
+      element.GetChild("iterableVariableName", 0, "").GetValue().GetString();
+  valueIteratorVariableName =
+      element.GetChild("valueIteratorVariableName", 0, "")
+          .GetValue()
+          .GetString();
+  keyIteratorVariableName =
+      element.GetChild("keyIteratorVariableName", 0, "").GetValue().GetString();
   gd::EventsListSerialization::UnserializeInstructionsFrom(
       project, conditions, element.GetChild("conditions", 0, "Conditions"));
   gd::EventsListSerialization::UnserializeInstructionsFrom(

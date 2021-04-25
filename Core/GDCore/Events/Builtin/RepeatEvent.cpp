@@ -5,6 +5,7 @@
  */
 
 #include "RepeatEvent.h"
+
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
@@ -15,7 +16,10 @@ namespace gd {
 RepeatEvent::RepeatEvent()
     : BaseEvent(),
       repeatNumberExpression(""),
-      repeatNumberExpressionSelected(false) {}
+      repeatNumberExpressionSelected(false) {
+  actions.SetParent(this);
+  conditions.SetParent(this);
+}
 
 vector<gd::InstructionsList*> RepeatEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -32,7 +36,7 @@ vector<gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() {
 }
 
 vector<pair<gd::Expression*, gd::ParameterMetadata> >
-    RepeatEvent::GetAllExpressionsWithMetadata() {
+RepeatEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
       allExpressionsWithMetadata;
   auto metadata = gd::ParameterMetadata().SetType("expression");
@@ -58,7 +62,7 @@ vector<const gd::InstructionsList*> RepeatEvent::GetAllActionsVectors() const {
 }
 
 vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
-    RepeatEvent::GetAllExpressionsWithMetadata() const {
+RepeatEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
   auto metadata = gd::ParameterMetadata().SetType("expression");

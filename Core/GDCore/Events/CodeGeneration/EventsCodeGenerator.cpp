@@ -259,6 +259,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     gd::Instruction& condition,
     gd::String returnBoolean,
     EventsCodeGenerationContext& context) {
+  if (condition.HasCache()) return condition.GetLatestCache();
   gd::String conditionCode;
 
   gd::InstructionMetadata instrInfos =
@@ -269,6 +270,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       std::max(maxConditionsListsSize, condition.GetSubInstructions().size());
 
   if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+    conditionCode += "{";
+
     context.EnterCustomCondition();
     conditionCode += GenerateReferenceToUpperScopeBoolean(
         "conditionTrue", returnBoolean, context);
@@ -278,116 +281,122 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         std::max(maxCustomConditionsDepth, context.GetCurrentConditionDepth());
     context.LeaveCustomCondition();
 
-    return "{" + conditionCode + "}\n";
-  }
-
-  // Insert code only parameters and be sure there is no lack of parameter.
-  while (condition.GetParameters().size() < instrInfos.parameters.size()) {
-    vector<gd::Expression> parameters = condition.GetParameters();
-    parameters.push_back(gd::Expression(""));
-    condition.SetParameters(parameters);
-  }
-
-  // Verify that there are no mismatchs between object type in parameters.
-  for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
-      gd::String objectInParameter =
-          condition.GetParameter(pNb).GetPlainString();
-
-      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
-              objectInParameter)) {
-        condition.SetParameter(pNb, gd::Expression(""));
-        condition.SetType("");
-      } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
-                     instrInfos.parameters[pNb].supplementaryInformation) {
-        condition.SetParameter(pNb, gd::Expression(""));
-        condition.SetType("");
-      }
-    }
-  }
-
-  if (instrInfos.IsObjectInstruction()) {
-    gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
-    if (!objectName.empty() && !instrInfos.parameters.empty()) {
-      std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        // Set up the context
-        const ObjectMetadata& objInfo =
-            MetadataProvider::GetObjectMetadata(platform, objectType);
-        AddIncludeFiles(objInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
-
-        // Prepare arguments and generate the condition whole code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            condition.GetParameters(), instrInfos.parameters, context);
-        conditionCode += GenerateObjectCondition(realObjects[i],
-                                                 objInfo,
-                                                 arguments,
-                                                 instrInfos,
-                                                 returnBoolean,
-                                                 condition.IsInverted(),
-                                                 context);
-
-        context.SetNoCurrentObject();
-      }
-    }
-  } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String behaviorType =
-        gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
-                              GetObjectsAndGroups(),
-                              condition.GetParameter(1).GetPlainString());
-    if (instrInfos.parameters.size() >= 2) {
-      std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
-        AddIncludeFiles(autoInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
-
-        // Prepare arguments and generate the whole condition code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            condition.GetParameters(), instrInfos.parameters, context);
-        conditionCode += GenerateBehaviorCondition(
-            realObjects[i],
-            condition.GetParameter(1).GetPlainString(),
-            autoInfo,
-            arguments,
-            instrInfos,
-            returnBoolean,
-            condition.IsInverted(),
-            context);
-
-        context.SetNoCurrentObject();
-      }
-    }
+    conditionCode += "}\n";
   } else {
-    std::vector<std::pair<gd::String, gd::String> >
-        supplementaryParametersTypes;
-    supplementaryParametersTypes.push_back(std::make_pair(
-        "conditionInverted", condition.IsInverted() ? "true" : "false"));
-    vector<gd::String> arguments =
-        GenerateParametersCodes(condition.GetParameters(),
-                                instrInfos.parameters,
-                                context,
-                                &supplementaryParametersTypes);
+    // Insert code only parameters and be sure there is no lack of parameter.
+    while (condition.GetParameters().size() < instrInfos.parameters.size()) {
+      vector<gd::Expression> parameters = condition.GetParameters();
+      parameters.push_back(gd::Expression(""));
+      condition.SetParameters(parameters);
+    }
 
-    conditionCode += GenerateFreeCondition(
-        arguments, instrInfos, returnBoolean, condition.IsInverted(), context);
+    // Verify that there are no mismatchs between object type in parameters.
+    for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
+      if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
+        gd::String objectInParameter =
+            condition.GetParameter(pNb).GetPlainString();
+
+        if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+            !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+            !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
+            !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
+                objectInParameter)) {
+          condition.SetParameter(pNb, gd::Expression(""));
+          condition.SetType("");
+        } else if (!instrInfos.parameters[pNb]
+                        .supplementaryInformation.empty() &&
+                   gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                       GetObjectsAndGroups(),
+                                       objectInParameter) !=
+                       instrInfos.parameters[pNb].supplementaryInformation) {
+          condition.SetParameter(pNb, gd::Expression(""));
+          condition.SetType("");
+        }
+      }
+    }
+
+    if (instrInfos.IsObjectInstruction()) {
+      gd::String objectName = condition.GetParameter(0).GetPlainString();
+      gd::String objectType = gd::GetTypeOfObject(
+          GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+      if (!objectName.empty() && !instrInfos.parameters.empty()) {
+        std::vector<gd::String> realObjects =
+            ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0; i < realObjects.size(); ++i) {
+          // Set up the context
+          const ObjectMetadata& objInfo =
+              MetadataProvider::GetObjectMetadata(platform, objectType);
+          AddIncludeFiles(objInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
+
+          // Prepare arguments and generate the condition whole code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              condition.GetParameters(), instrInfos.parameters, context);
+          conditionCode += GenerateObjectCondition(realObjects[i],
+                                                   objInfo,
+                                                   arguments,
+                                                   instrInfos,
+                                                   returnBoolean,
+                                                   condition.IsInverted(),
+                                                   context);
+
+          context.SetNoCurrentObject();
+        }
+      }
+    } else if (instrInfos.IsBehaviorInstruction()) {
+      gd::String objectName = condition.GetParameter(0).GetPlainString();
+      gd::String behaviorType =
+          gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
+                                GetObjectsAndGroups(),
+                                condition.GetParameter(1).GetPlainString());
+      if (instrInfos.parameters.size() >= 2) {
+        std::vector<gd::String> realObjects =
+            ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0; i < realObjects.size(); ++i) {
+          // Setup context
+          const BehaviorMetadata& autoInfo =
+              MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+          AddIncludeFiles(autoInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
+
+          // Prepare arguments and generate the whole condition code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              condition.GetParameters(), instrInfos.parameters, context);
+          conditionCode += GenerateBehaviorCondition(
+              realObjects[i],
+              condition.GetParameter(1).GetPlainString(),
+              autoInfo,
+              arguments,
+              instrInfos,
+              returnBoolean,
+              condition.IsInverted(),
+              context);
+
+          context.SetNoCurrentObject();
+        }
+      }
+    } else {
+      std::vector<std::pair<gd::String, gd::String> >
+          supplementaryParametersTypes;
+      supplementaryParametersTypes.push_back(std::make_pair(
+          "conditionInverted", condition.IsInverted() ? "true" : "false"));
+      vector<gd::String> arguments =
+          GenerateParametersCodes(condition.GetParameters(),
+                                  instrInfos.parameters,
+                                  context,
+                                  &supplementaryParametersTypes);
+
+      conditionCode += GenerateFreeCondition(arguments,
+                                             instrInfos,
+                                             returnBoolean,
+                                             condition.IsInverted(),
+                                             context);
+    }
   }
+
+  condition.CacheValue(conditionCode);
 
   return conditionCode;
 }
@@ -398,6 +407,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
  */
 gd::String EventsCodeGenerator::GenerateConditionsListCode(
     gd::InstructionsList& conditions, EventsCodeGenerationContext& context) {
+  if (conditions.HasCache()) return conditions.GetLatestCache();
   gd::String outputCode;
 
   for (std::size_t i = 0; i < conditions.size(); ++i)
@@ -430,6 +440,8 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
 
   maxConditionsListsSize = std::max(maxConditionsListsSize, conditions.size());
 
+  conditions.CacheValue(outputCode);
+
   return outputCode;
 }
 
@@ -438,6 +450,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
  */
 gd::String EventsCodeGenerator::GenerateActionCode(
     gd::Instruction& action, EventsCodeGenerationContext& context) {
+  if (action.HasCache()) return action.GetLatestCache();
   gd::String actionCode;
 
   gd::InstructionMetadata instrInfos =
@@ -446,102 +459,106 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
 
   if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
-    return instrInfos.codeExtraInformation.customCodeGenerator(
+    actionCode = instrInfos.codeExtraInformation.customCodeGenerator(
         action, *this, context);
-  }
-
-  // Be sure there is no lack of parameter.
-  while (action.GetParameters().size() < instrInfos.parameters.size()) {
-    vector<gd::Expression> parameters = action.GetParameters();
-    parameters.push_back(gd::Expression(""));
-    action.SetParameters(parameters);
-  }
-
-  // Verify that there are no mismatchs between object type in parameters.
-  for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
-      gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
-      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
-          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
-              objectInParameter)) {
-        action.SetParameter(pNb, gd::Expression(""));
-        action.SetType("");
-      } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
-                                     GetObjectsAndGroups(),
-                                     objectInParameter) !=
-                     instrInfos.parameters[pNb].supplementaryInformation) {
-        action.SetParameter(pNb, gd::Expression(""));
-        action.SetType("");
-      }
-    }
-  }
-
-  // Call free function first if available
-  if (instrInfos.IsObjectInstruction()) {
-    gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
-
-    if (!instrInfos.parameters.empty()) {
-      std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        // Setup context
-        const ObjectMetadata& objInfo =
-            MetadataProvider::GetObjectMetadata(platform, objectType);
-        AddIncludeFiles(objInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
-
-        // Prepare arguments and generate the whole action code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            action.GetParameters(), instrInfos.parameters, context);
-        actionCode += GenerateObjectAction(
-            realObjects[i], objInfo, arguments, instrInfos, context);
-
-        context.SetNoCurrentObject();
-      }
-    }
-  } else if (instrInfos.IsBehaviorInstruction()) {
-    gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String behaviorType =
-        gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
-                              GetObjectsAndGroups(),
-                              action.GetParameter(1).GetPlainString());
-
-    if (instrInfos.parameters.size() >= 2) {
-      std::vector<gd::String> realObjects =
-          ExpandObjectsName(objectName, context);
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        // Setup context
-        const BehaviorMetadata& autoInfo =
-            MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
-        AddIncludeFiles(autoInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
-
-        // Prepare arguments and generate the whole action code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            action.GetParameters(), instrInfos.parameters, context);
-        actionCode +=
-            GenerateBehaviorAction(realObjects[i],
-                                   action.GetParameter(1).GetPlainString(),
-                                   autoInfo,
-                                   arguments,
-                                   instrInfos,
-                                   context);
-
-        context.SetNoCurrentObject();
-      }
-    }
   } else {
-    vector<gd::String> arguments = GenerateParametersCodes(
-        action.GetParameters(), instrInfos.parameters, context);
-    actionCode += GenerateFreeAction(arguments, instrInfos, context);
+    // Be sure there is no lack of parameter.
+    while (action.GetParameters().size() < instrInfos.parameters.size()) {
+      vector<gd::Expression> parameters = action.GetParameters();
+      parameters.push_back(gd::Expression(""));
+      action.SetParameters(parameters);
+    }
+
+    // Verify that there are no mismatchs between object type in parameters.
+    for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
+      if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
+        gd::String objectInParameter =
+            action.GetParameter(pNb).GetPlainString();
+        if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+            !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+            !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
+            !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
+                objectInParameter)) {
+          action.SetParameter(pNb, gd::Expression(""));
+          action.SetType("");
+        } else if (!instrInfos.parameters[pNb]
+                        .supplementaryInformation.empty() &&
+                   gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                       GetObjectsAndGroups(),
+                                       objectInParameter) !=
+                       instrInfos.parameters[pNb].supplementaryInformation) {
+          action.SetParameter(pNb, gd::Expression(""));
+          action.SetType("");
+        }
+      }
+    }
+
+    // Call free function first if available
+    if (instrInfos.IsObjectInstruction()) {
+      gd::String objectName = action.GetParameter(0).GetPlainString();
+      gd::String objectType = gd::GetTypeOfObject(
+          GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+
+      if (!instrInfos.parameters.empty()) {
+        std::vector<gd::String> realObjects =
+            ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0; i < realObjects.size(); ++i) {
+          // Setup context
+          const ObjectMetadata& objInfo =
+              MetadataProvider::GetObjectMetadata(platform, objectType);
+          AddIncludeFiles(objInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
+
+          // Prepare arguments and generate the whole action code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              action.GetParameters(), instrInfos.parameters, context);
+          actionCode += GenerateObjectAction(
+              realObjects[i], objInfo, arguments, instrInfos, context);
+
+          context.SetNoCurrentObject();
+        }
+      }
+    } else if (instrInfos.IsBehaviorInstruction()) {
+      gd::String objectName = action.GetParameter(0).GetPlainString();
+      gd::String behaviorType =
+          gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
+                                GetObjectsAndGroups(),
+                                action.GetParameter(1).GetPlainString());
+
+      if (instrInfos.parameters.size() >= 2) {
+        std::vector<gd::String> realObjects =
+            ExpandObjectsName(objectName, context);
+        for (std::size_t i = 0; i < realObjects.size(); ++i) {
+          // Setup context
+          const BehaviorMetadata& autoInfo =
+              MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+          AddIncludeFiles(autoInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
+
+          // Prepare arguments and generate the whole action code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              action.GetParameters(), instrInfos.parameters, context);
+          actionCode +=
+              GenerateBehaviorAction(realObjects[i],
+                                     action.GetParameter(1).GetPlainString(),
+                                     autoInfo,
+                                     arguments,
+                                     instrInfos,
+                                     context);
+
+          context.SetNoCurrentObject();
+        }
+      }
+    } else {
+      vector<gd::String> arguments = GenerateParametersCodes(
+          action.GetParameters(), instrInfos.parameters, context);
+      actionCode += GenerateFreeAction(arguments, instrInfos, context);
+    }
   }
+
+  action.CacheValue(actionCode);
 
   return actionCode;
 }
@@ -551,6 +568,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
  */
 gd::String EventsCodeGenerator::GenerateActionsListCode(
     gd::InstructionsList& actions, EventsCodeGenerationContext& context) {
+  if (actions.HasCache()) return actions.GetLatestCache();
   gd::String outputCode;
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     gd::String actionCode = GenerateActionCode(actions[aId], context);
@@ -559,6 +577,8 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     if (!actions[aId].GetType().empty()) outputCode += actionCode;
     outputCode += "}";
   }
+
+  actions.CacheValue(outputCode);
 
   return outputCode;
 }
@@ -752,6 +772,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
  */
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, const EventsCodeGenerationContext& parentContext) {
+  if (events.HasCache()) return events.GetLatestCache();
   gd::String output;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     // Each event has its own context : Objects picked in an event are totally
@@ -780,6 +801,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     output += "\n" + scopeBegin + "\n" + declarationsCode + "\n" +
               eventCoreCode + "\n" + scopeEnd + "\n";
   }
+
+  events.CacheValue(output);
 
   return output;
 }

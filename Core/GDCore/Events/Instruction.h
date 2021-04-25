@@ -11,6 +11,7 @@
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Cacheable.h"
 
 namespace gd {
 
@@ -27,7 +28,7 @@ namespace gd {
  *
  * \ingroup Events
  */
-class GD_CORE_API Instruction {
+class GD_CORE_API Instruction : public gd::Cacheable {
  public:
   /**
    * \brief Default constructor
@@ -58,7 +59,10 @@ class GD_CORE_API Instruction {
    * \brief Change the instruction type
    * \param val The new type of the instruction
    */
-  void SetType(const gd::String& newType) { type = newType; }
+  void SetType(const gd::String& newType) {
+    type = newType;
+    InvalidateCache();
+  }
 
   /**
    * \brief Return true if the condition is inverted
@@ -70,7 +74,10 @@ class GD_CORE_API Instruction {
    * \brief Set if the instruction is inverted or not.
    * \param inverted true if the condition must be set as inverted
    */
-  void SetInverted(bool inverted_) { inverted = inverted_; }
+  void SetInverted(bool inverted_) {
+    inverted = inverted_;
+    InvalidateCache();
+  }
 
   /**
    * \brief Return the number of parameters of the instruction.
@@ -119,6 +126,7 @@ class GD_CORE_API Instruction {
    */
   inline void SetParameters(const std::vector<gd::Expression>& val) {
     parameters = val;
+    InvalidateCache();
   }
 
   /**
@@ -139,7 +147,9 @@ class GD_CORE_API Instruction {
    * Useful to get reference to the original instruction in memory during code
    * generation, to ensure stable unique identifiers.
    */
-  std::weak_ptr<Instruction> GetOriginalInstruction() { return originalInstruction; };
+  std::weak_ptr<Instruction> GetOriginalInstruction() {
+    return originalInstruction;
+  };
 
   friend std::shared_ptr<Instruction> CloneRememberingOriginalElement(
       std::shared_ptr<Instruction> instruction);

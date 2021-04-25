@@ -5,6 +5,7 @@
  */
 
 #include "StandardEvent.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -15,7 +16,10 @@ using namespace std;
 
 namespace gd {
 
-StandardEvent::StandardEvent() : BaseEvent() {}
+StandardEvent::StandardEvent() : BaseEvent() {
+  actions.SetParent(this);
+  conditions.SetParent(this);
+}
 
 StandardEvent::~StandardEvent(){};
 

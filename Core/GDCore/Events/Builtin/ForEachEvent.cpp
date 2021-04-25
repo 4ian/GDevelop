@@ -5,6 +5,7 @@
  */
 
 #include "ForEachEvent.h"
+
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -15,7 +16,11 @@ using namespace std;
 namespace gd {
 
 ForEachEvent::ForEachEvent()
-    : BaseEvent(), objectsToPick(""), objectsToPickSelected(false) {}
+    : BaseEvent(), objectsToPick(""), objectsToPickSelected(false) {
+  actions.SetParent(this);
+  conditions.SetParent(this);
+  // TODO events.SetParent(this);
+}
 
 vector<gd::InstructionsList*> ForEachEvent::GetAllConditionsVectors() {
   vector<gd::InstructionsList*> allConditions;
@@ -32,7 +37,7 @@ vector<gd::InstructionsList*> ForEachEvent::GetAllActionsVectors() {
 }
 
 vector<pair<gd::Expression*, gd::ParameterMetadata> >
-    ForEachEvent::GetAllExpressionsWithMetadata() {
+ForEachEvent::GetAllExpressionsWithMetadata() {
   vector<pair<gd::Expression*, gd::ParameterMetadata> >
       allExpressionsWithMetadata;
   auto metadata = gd::ParameterMetadata().SetType("object");
@@ -58,7 +63,7 @@ vector<const gd::InstructionsList*> ForEachEvent::GetAllActionsVectors() const {
 }
 
 vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
-    ForEachEvent::GetAllExpressionsWithMetadata() const {
+ForEachEvent::GetAllExpressionsWithMetadata() const {
   vector<pair<const gd::Expression*, const gd::ParameterMetadata> >
       allExpressionsWithMetadata;
   auto metadata = gd::ParameterMetadata().SetType("object");

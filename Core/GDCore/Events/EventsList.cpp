@@ -5,6 +5,7 @@
  */
 
 #include "EventsList.h"
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Log.h"
@@ -23,33 +24,40 @@ void EventsList::InsertEvents(const EventsList& otherEvents,
   if (end >= otherEvents.size()) end = otherEvents.size() - 1;
 
   for (std::size_t insertPos = 0; insertPos <= (end - begin); insertPos++) {
+    auto event =
+        CloneRememberingOriginalEvent(otherEvents.events[begin + insertPos]);
+    event->SetParent(this);
     if (position != (size_t)-1 && position + insertPos < events.size())
-      events.insert(
-          events.begin() + position + insertPos,
-          CloneRememberingOriginalEvent(otherEvents.events[begin + insertPos]));
+      events.insert(events.begin() + position + insertPos, event);
     else
-      events.push_back(
-          CloneRememberingOriginalEvent(otherEvents.events[begin + insertPos]));
+      events.push_back(event);
   }
+
+  InvalidateCache();
 }
 
 gd::BaseEvent& EventsList::InsertEvent(const gd::BaseEvent& evt,
                                        size_t position) {
   std::shared_ptr<gd::BaseEvent> event(evt.Clone());
+  event->SetParent(this);
   if (position < events.size())
     events.insert(events.begin() + position, event);
   else
     events.push_back(event);
+
+  InvalidateCache();
 
   return *event;
 }
 
 void EventsList::InsertEvent(std::shared_ptr<gd::BaseEvent> event,
                              size_t position) {
+  event->SetParent(this);
   if (position < events.size())
     events.insert(events.begin() + position, event);
   else
     events.push_back(event);
+  InvalidateCache();
 }
 
 gd::BaseEvent& EventsList::InsertNewEvent(gd::Project& project,
@@ -67,12 +75,14 @@ gd::BaseEvent& EventsList::InsertNewEvent(gd::Project& project,
 
 void EventsList::RemoveEvent(size_t index) {
   events.erase(events.begin() + index);
+  InvalidateCache();
 }
 
 void EventsList::RemoveEvent(const gd::BaseEvent& event) {
   for (size_t i = 0; i < events.size(); ++i) {
     if (events[i].get() == &event) {
       events.erase(events.begin() + i);
+      InvalidateCache();
       return;
     }
   }
@@ -100,13 +110,13 @@ bool EventsList::Contains(const gd::BaseEvent& eventToSearch,
 }
 
 bool EventsList::MoveEventToAnotherEventsList(const gd::BaseEvent& eventToMove,
-                                  gd::EventsList& newEventsList,
-                                  std::size_t newPosition) {
-
+                                              gd::EventsList& newEventsList,
+                                              std::size_t newPosition) {
   for (std::size_t i = 0; i < GetEventsCount(); ++i) {
     if (events[i].get() == &eventToMove) {
       std::shared_ptr<BaseEvent> event = events[i];
       events.erase(events.begin() + i);
+      InvalidateCache();
 
       newEventsList.InsertEvent(event, newPosition);
       return true;
@@ -126,8 +136,14 @@ EventsList& EventsList::operator=(const EventsList& other) {
 
 void EventsList::Init(const gd::EventsList& other) {
   events.clear();
-  for (size_t i = 0; i < other.events.size(); ++i)
-    events.push_back(CloneRememberingOriginalEvent(other.events[i]));
+
+  for (size_t i = 0; i < other.events.size(); ++i) {
+    auto event = CloneRememberingOriginalEvent(other.events[i]);
+    event->SetParent(this);
+    events.push_back(event);
+  }
+
+  InvalidateCache();
 }
 
 }  // namespace gd

@@ -5,6 +5,7 @@
  */
 
 #include "GroupEvent.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -17,7 +18,9 @@ using namespace std;
 namespace gd {
 
 GroupEvent::GroupEvent()
-    : BaseEvent(), creationTime(0), colorR(74), colorG(176), colorB(228) {}
+    : BaseEvent(), creationTime(0), colorR(74), colorG(176), colorB(228) {
+  // TODO events.SetParent(this);
+}
 
 vector<gd::String> GroupEvent::GetAllSearchableStrings() const {
   vector<gd::String> allSearchableStrings;
@@ -68,6 +71,5 @@ void GroupEvent::SetBackgroundColor(unsigned int colorR_,
   colorG = colorG_;
   colorB = colorB_;
 }
-
 
 }  // namespace gd

@@ -8,7 +8,9 @@
 #define GDCORE_EVENTSLIST_H
 #include <memory>
 #include <vector>
+
 #include "GDCore/String.h"
+#include "GDCore/Tools/Cacheable.h"
 namespace gd {
 class Project;
 }
@@ -30,7 +32,7 @@ namespace gd {
  * \see BaseEvent
  * \ingroup Events
  */
-class GD_CORE_API EventsList {
+class GD_CORE_API EventsList : public gd::Cacheable {
  public:
   EventsList();
   EventsList(const EventsList&);
@@ -130,7 +132,10 @@ class GD_CORE_API EventsList {
   /**
    * \brief Clear the list of events.
    */
-  void Clear() { return events.clear(); };
+  void Clear() {
+    events.clear();
+    InvalidateCache();
+  };
 
   /** \name Utilities
    * Utility methods

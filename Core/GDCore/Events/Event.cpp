@@ -5,6 +5,7 @@
  */
 
 #include "GDCore/Events/Event.h"
+
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Extensions/Platform.h"
@@ -27,42 +28,54 @@ bool BaseEvent::HasSubEvents() const { return !GetSubEvents().IsEmpty(); }
 gd::String BaseEvent::GenerateEventCode(
     gd::EventsCodeGenerator& codeGenerator,
     gd::EventsCodeGenerationContext& context) {
+  // Check for disabled before the cache as disabling doesn't invalidate the
+  // cache.
   if (IsDisabled()) return "";
 
+  // If the event hasn't changed, return the latest generated code
+  if (HasCache()) return GetLatestCache();
+
+  gd::String eventCode = "";
   try {
-    if (type.empty()) return "";
+    if (!type.empty()) {
+      const gd::Platform& platform = codeGenerator.GetPlatform();
 
-    const gd::Platform& platform = codeGenerator.GetPlatform();
+      // First try to guess the extension used
+      gd::String eventNamespace = type.substr(0, type.find("::"));
+      std::shared_ptr<gd::PlatformExtension> guessedExtension =
+          platform.GetExtension(eventNamespace);
 
-    // First try to guess the extension used
-    gd::String eventNamespace = type.substr(0, type.find("::"));
-    std::shared_ptr<gd::PlatformExtension> guessedExtension =
-        platform.GetExtension(eventNamespace);
-    if (guessedExtension) {
-      std::map<gd::String, gd::EventMetadata>& allEvents =
-          guessedExtension->GetAllEvents();
-      if (allEvents.find(type) != allEvents.end())
-        return allEvents[type].codeGeneration(*this, codeGenerator, context);
-    }
+      if (guessedExtension) {
+        std::map<gd::String, gd::EventMetadata>& allEvents =
+            guessedExtension->GetAllEvents();
+        if (allEvents.find(type) != allEvents.end())
+          eventCode =
+              allEvents[type].codeGeneration(*this, codeGenerator, context);
+      } else {
+        // Else make a search in all the extensions
+        for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size();
+             ++i) {
+          std::shared_ptr<gd::PlatformExtension> extension =
+              platform.GetAllPlatformExtensions()[i];
+          if (!extension) continue;
 
-    // Else make a search in all the extensions
-    for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size();
-         ++i) {
-      std::shared_ptr<gd::PlatformExtension> extension =
-          platform.GetAllPlatformExtensions()[i];
-      if (!extension) continue;
-
-      std::map<gd::String, gd::EventMetadata>& allEvents =
-          extension->GetAllEvents();
-      if (allEvents.find(type) != allEvents.end())
-        return allEvents[type].codeGeneration(*this, codeGenerator, context);
+          std::map<gd::String, gd::EventMetadata>& allEvents =
+              extension->GetAllEvents();
+          if (allEvents.find(type) != allEvents.end())
+            eventCode =
+                allEvents[type].codeGeneration(*this, codeGenerator, context);
+        }
+      }
     }
   } catch (...) {
     std::cout << "ERROR: Exception caught during code generation for event \""
               << type << "\"." << std::endl;
   }
 
-  return "";
+  // Cache the generated code
+  CacheValue(eventCode);
+
+  return eventCode;
 }
 
 void BaseEvent::Preprocess(gd::EventsCodeGenerator& codeGenerator,

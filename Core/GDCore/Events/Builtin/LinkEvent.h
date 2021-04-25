@@ -41,7 +41,10 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
    * Change the link target (i.e. the scene or external events the link refers
    * to).
    */
-  void SetTarget(const gd::String& target_) { target = target_; };
+  void SetTarget(const gd::String& target_) {
+    target = target_;
+    InvalidateCache();
+  };
 
   /**
    * Return the include config.
@@ -51,11 +54,15 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
   /**
    * Return true if the link event must include all the events of the target.
    */
-  void SetIncludeAllEvents() { includeConfig = INCLUDE_ALL; }
+  void SetIncludeAllEvents() {
+    includeConfig = INCLUDE_ALL;
+    InvalidateCache();
+  }
 
   void SetIncludeEventsGroup(const gd::String& name) {
     includeConfig = INCLUDE_EVENTS_GROUP;
     eventsGroupName = name;
+    InvalidateCache();
   }
 
   /**
@@ -67,6 +74,7 @@ class GD_CORE_API LinkEvent : public gd::BaseEvent {
     includeConfig = INCLUDE_BY_INDEX;
     includeStart = includeStart_;
     includeEnd = includeEnd_;
+    InvalidateCache();
   }
 
   gd::String GetEventsGroupName() const { return eventsGroupName; }

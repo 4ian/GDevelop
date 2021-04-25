@@ -20,6 +20,7 @@ gd::Expression Instruction::badExpression("");
 
 Instruction::Instruction(gd::String type_) : type(type_), inverted(false) {
   parameters.reserve(8);
+  subInstructions.SetParent(this);
 }
 
 Instruction::Instruction(gd::String type_,
@@ -27,6 +28,7 @@ Instruction::Instruction(gd::String type_,
                          bool inverted_)
     : type(type_), inverted(inverted_), parameters(parameters_) {
   parameters.reserve(8);
+  subInstructions.SetParent(this);
 }
 
 const gd::Expression& Instruction::GetParameter(std::size_t index) const {
@@ -45,6 +47,7 @@ void Instruction::SetParametersCount(std::size_t size) {
   while (size < parameters.size())
     parameters.erase(parameters.begin() + parameters.size() - 1);
   while (size > parameters.size()) parameters.push_back(gd::Expression(""));
+  InvalidateCache();
 }
 
 void Instruction::SetParameter(std::size_t nb, const gd::Expression& val) {
@@ -53,6 +56,7 @@ void Instruction::SetParameter(std::size_t nb, const gd::Expression& val) {
     return;
   }
   parameters[nb] = val;
+  InvalidateCache();
 }
 
 std::shared_ptr<Instruction> GD_CORE_API

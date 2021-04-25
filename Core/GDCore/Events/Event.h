@@ -10,10 +10,12 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionsList.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/Cacheable.h"
 namespace gd {
 class EventsList;
 class MainFrameWrapper;
@@ -24,7 +26,7 @@ class EventsCodeGenerationContext;
 class Platform;
 class SerializerElement;
 class Instruction;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -39,7 +41,7 @@ typedef std::shared_ptr<BaseEvent> BaseEventSPtr;
  *
  * \ingroup Events
  */
-class GD_CORE_API BaseEvent {
+class GD_CORE_API BaseEvent : public gd::Cacheable {
  public:
   BaseEvent();
   virtual ~BaseEvent(){};
@@ -128,17 +130,21 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
-   * \brief Return a list of all expressions of the event, each with their associated metadata.
-   * \note Used to preprocess or search in the expressions of the event.
+   * \brief Return a list of all expressions of the event, each with their
+   * associated metadata. \note Used to preprocess or search in the expressions
+   * of the event.
    */
   virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata() {
+  GetAllExpressionsWithMetadata() {
     std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> > noExpr;
     return noExpr;
   };
-  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata() const {
-    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> > noExpr;
+
+  virtual std::vector<
+      std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+  GetAllExpressionsWithMetadata() const {
+    std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+        noExpr;
     return noExpr;
   };
 
@@ -242,7 +248,10 @@ class GD_CORE_API BaseEvent {
   /**
    * \brief Change the event type
    */
-  void SetType(gd::String type_) { type = type_; };
+  void SetType(gd::String type_) {
+    type = type_;
+    InvalidateCache();
+  };
 
   /**
    * \brief Set if the event if disabled or not

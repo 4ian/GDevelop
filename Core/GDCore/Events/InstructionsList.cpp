@@ -5,6 +5,7 @@
  */
 
 #include "InstructionsList.h"
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Project/Project.h"
 #include "Serialization.h"
@@ -23,12 +24,15 @@ void InstructionsList::InsertInstructions(const InstructionsList& list,
     const Instruction& instruction = *list.elements[begin + insertPos];
     std::shared_ptr<Instruction> copiedInstruction =
         std::make_shared<Instruction>(instruction);
+    copiedInstruction->SetParent(this);
     if (position != (size_t)-1 && position + insertPos < elements.size())
       elements.insert(elements.begin() + position + insertPos,
                       copiedInstruction);
     else
       elements.push_back(copiedInstruction);
   }
+
+  InvalidateCache();
 }
 
 void InstructionsList::SerializeTo(SerializerElement& element) const {

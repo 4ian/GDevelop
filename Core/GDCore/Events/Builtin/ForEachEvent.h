@@ -12,7 +12,7 @@ namespace gd {
 class Instruction;
 class Project;
 class Layout;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -45,18 +45,20 @@ class GD_CORE_API ForEachEvent : public gd::BaseEvent {
   };
   void SetObjectToPick(gd::String objectsToPick_) {
     objectsToPick = gd::Expression(objectsToPick_);
+    InvalidateCache();
   };
 
   virtual std::vector<const gd::InstructionsList*> GetAllConditionsVectors()
       const;
   virtual std::vector<const gd::InstructionsList*> GetAllActionsVectors() const;
-  virtual std::vector<std::pair<const gd::Expression*, const gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata() const;
+  virtual std::vector<
+      std::pair<const gd::Expression*, const gd::ParameterMetadata> >
+  GetAllExpressionsWithMetadata() const;
 
   virtual std::vector<gd::InstructionsList*> GetAllConditionsVectors();
   virtual std::vector<gd::InstructionsList*> GetAllActionsVectors();
   virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
-      GetAllExpressionsWithMetadata();
+  GetAllExpressionsWithMetadata();
 
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,

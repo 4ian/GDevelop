@@ -1050,6 +1050,102 @@ module.exports = {
 
     extension
       .addAction(
+        'FirestoreEnablePersistence',
+        _('Enable persistence'),
+        _(
+          'When persistence is enabled, all data that is fetched ' +
+            'from the database is being automatically stored to allow to ' +
+            'continue accessing the data if cut off from the network, instead of waiting for reconnection.\n' +
+            'This needs to be called before any other firestore operation, else it will fail.'
+        ),
+        _('Enable persistence'),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('firebase.firestore().enablePersistence');
+
+    extension
+      .addAction(
+        'FirestoreDisablePersistence',
+        _('Disable persistence'),
+        _(
+          'Disables the storing of fetched data and clear all the data that has been stored.\n' +
+            'This needs to be called before any other firestore operation, else it will fail.'
+        ),
+        _('Disable persistence'),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('firebase.firestore().clearPersistence');
+
+    extension
+      .addAction(
+        'FirestoreEnableNetwork',
+        _('Reenable network'),
+        _('Reenables the connection to the database after disabling it.'),
+        _('Reenable network'),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('firebase.firestore().enableNetwork');
+
+    extension
+      .addAction(
+        'FirestoreDisableNetwork',
+        _('Disable network'),
+        _(
+          'Disables the connection to the database.\n' +
+            'While the network is disabled, any read operations will return results from ' +
+            'cache, and any write operations will be queued until the network is restored.'
+        ),
+        _('Disable network'),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('firebase.firestore().disableNetwork');
+
+    extension
+      .addAction(
         'FirestoreWriteDocument',
         _('Write a document to firestore'),
         _('Writes a document (variable) to cloud firestore.'),

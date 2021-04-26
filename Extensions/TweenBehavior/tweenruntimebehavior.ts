@@ -731,10 +731,10 @@ namespace gdjs {
     
     addObjectColorHSLTween(
       identifier: string,
-      toHue: string,
+      toHue: number,
       animateHue: boolean,
-      toSaturation: string,
-      toLightness: string,
+      toSaturation: number,
+      toLightness: number,
       easingValue: string,
       durationValue: float,
       destroyObjectWhenFinished: boolean,
@@ -764,16 +764,16 @@ namespace gdjs {
       let toH: number = 0, toS: number = 0, toL: number = 0;
       if(animateHue === false || toHue.toString().trim() === "") { 
         toH = fromColorAsHSL[0];
-      } else if(!Number.isNaN(Number.parseFloat(toHue))) { // Can't check for falsy because 0 is a valid hue.
-        toH = parseFloat(toHue);
+      } else if(!Number.isNaN(toHue)) { // Can't check for falsy because 0 is a valid hue.
+        toH = toHue;
       } else {
         return;
       }
 
       if("-1" === toSaturation.toString().trim() || "" === toSaturation.toString().trim()) {
         toS = fromColorAsHSL[1];
-      } else if(!Number.isNaN(Number.parseFloat(toSaturation))) {
-        toS = parseFloat(toSaturation);
+      } else if(!Number.isNaN(toSaturation)) {
+        toS = toSaturation;
         toS = Math.min(Math.max(toS, 0), 100); // Clamp
       } else {
         return;
@@ -781,8 +781,8 @@ namespace gdjs {
 
       if("-1" === toLightness.toString().trim() || "" === toLightness.toString().trim()) {
         toL = fromColorAsHSL[2];
-      } else if(!Number.isNaN(Number.parseFloat(toLightness))) {
-        toL = parseFloat(toLightness);
+      } else if(!Number.isNaN(toLightness)) {
+        toL = toLightness;
         toL = Math.min(Math.max(toL, 0), 100); // Clamp
       } else {
         return;

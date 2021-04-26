@@ -521,7 +521,7 @@ module.exports = {
           'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Use -1 for S and L to use original color\'s S/L value(s).'
         ),
         _(
-          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ S: _PARAM4_ L: _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_'
+          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_) S: _PARAM5_ L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
         ),
         _('Color'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -530,12 +530,12 @@ module.exports = {
       .addParameter('object', _('Object'), '', false) 
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) 
       .addParameter('string', _('Tween Identifier'), '', false) 
-      .addParameter('expression', _('To hue'), '', false) 
-      .addParameter('animateHue', _('Animate Hue'), '', false)
+      .addParameter('expression', _('To Hue'), '', false) 
+      .addParameter('yesorno', _('Animate Hue'), '', false)
       .setDefaultValue('yes')
-      .addParameter('expression', _('To saturation'), '', false) 
+      .addParameter('expression', _('To Saturation (-1 to ignore)'), '', false) 
       .setDefaultValue('-1')
-      .addParameter('expression', _('To lightness'), '', false) 
+      .addParameter('expression', _('To Lightness (-1 to ignore)'), '', false) 
       .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false) 
       .setDefaultValue('linear')

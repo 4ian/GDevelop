@@ -14,7 +14,10 @@ namespace gdjs {
   }
 
   function hslToRgb(hsl: number[]): number[] {
-    const h = hsl[0];
+    let h = hsl[0] %= 360;
+    if (h < 0) {
+        h += 360;
+    }
     const s = hsl[1] / 100;
     const l = hsl[2] / 100;
     const a = s * Math.min(l, 1 - l);
@@ -714,8 +717,6 @@ namespace gdjs {
       this._setupTweenEnding(identifier, destroyObjectWhenFinished);
     }
 
-
-
     /**
      * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
      * @param identifier Unique id to idenfify the tween
@@ -731,7 +732,7 @@ namespace gdjs {
     addObjectColorHSLTween(
       identifier: string,
       toHue: string,
-      animateHue: string,
+      animateHue: boolean,
       toSaturation: string,
       toLightness: string,
       easingValue: string,
@@ -758,22 +759,18 @@ namespace gdjs {
       
       // @ts-ignore - objects are duck typed
       let fromColor: any[] = this.owner.getColor().split(';');
-      fromColor = fromColor.map((x: Number) => Number(x) / 255);
-      let v = Math.max(fromColor[0], fromColor[1], fromColor[2]), c = v - Math.min(fromColor[0], fromColor[1], fromColor[2]), f = (1 - Math.abs(v + v - c - 1));
-      let h = c && ((v === fromColor[0]) ? (fromColor[1] - fromColor[2]) / c: ((v === fromColor[1]) ? 2 + (fromColor[2] - fromColor[0]) / c: 4 + (fromColor[0] - fromColor[1]) / c)); 
-      fromColorAsHSL = [Math.round(60 * (h < 0 ? h + 6: h)), Math.round((f ? c / f: 0) * 100), Math.round(((v + v - c) / 2) * 100)];
+      fromColorAsHSL = rgbToHsl(fromColor);
 
       let toH: number = 0, toS: number = 0, toL: number = 0;
-      if(animateHue === "no" || toHue.trim() === "") {
+      if(animateHue === false || toHue.toString().trim() === "") { 
         toH = fromColorAsHSL[0];
-      }
-      else if(!Number.isNaN(Number.parseFloat(toHue))) {
+      } else if(!Number.isNaN(Number.parseFloat(toHue))) { // Can't check for falsy because 0 is a valid hue.
         toH = parseFloat(toHue);
       } else {
         return;
       }
-      
-      if("-1" === toSaturation.trim() || "" === toSaturation.trim()) {
+
+      if("-1" === toSaturation.toString().trim() || "" === toSaturation.toString().trim()) {
         toS = fromColorAsHSL[1];
       } else if(!Number.isNaN(Number.parseFloat(toSaturation))) {
         toS = parseFloat(toSaturation);
@@ -782,7 +779,7 @@ namespace gdjs {
         return;
       }
 
-      if("-1" === toLightness.trim() || "" === toLightness.trim()) {
+      if("-1" === toLightness.toString().trim() || "" === toLightness.toString().trim()) {
         toL = fromColorAsHSL[2];
       } else if(!Number.isNaN(Number.parseFloat(toLightness))) {
         toL = parseFloat(toLightness);
@@ -803,17 +800,7 @@ namespace gdjs {
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
-          let h = state.hue %= 360;
-          if (h < 0) {
-              h += 360;
-          }
-          const s = state.saturation / 100;
-          const l = state.lightness / 100;
-
-          const a = s * Math.min(l, 1 - l);
-          const f = (n = 0, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 
-      
-          const rgbFromHslColor = [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+          const rgbFromHslColor = hslToRgb([state.hue, state.saturation, state.lightness]);
           // @ts-ignore - objects are duck typed
           that.owner.setColor(
             Math.floor(rgbFromHslColor[0]) +
@@ -825,8 +812,6 @@ namespace gdjs {
         },
       });
       
-
-      
       this._addTween(
         identifier,
         newTweenable,
@@ -834,11 +819,7 @@ namespace gdjs {
         durationValue
       );
       this._setupTweenEnding(identifier, destroyObjectWhenFinished);
-      
     }
-
-
-
 
     /**
      * Add a text object character size tween.

@@ -770,7 +770,7 @@ namespace gdjs {
         return;
       }
 
-      if("-1" === toSaturation.toString().trim() || "" === toSaturation.toString().trim()) {
+      if(-1 === toSaturation || "" === toSaturation.toString().trim()) {
         toS = fromColorAsHSL[1];
       } else if(!Number.isNaN(toSaturation)) {
         toS = toSaturation;
@@ -779,7 +779,7 @@ namespace gdjs {
         return;
       }
 
-      if("-1" === toLightness.toString().trim() || "" === toLightness.toString().trim()) {
+      if(-1 === toLightness || "" === toLightness.toString().trim()) {
         toL = fromColorAsHSL[2];
       } else if(!Number.isNaN(toLightness)) {
         toL = toLightness;

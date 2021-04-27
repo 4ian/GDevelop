@@ -317,15 +317,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Return a reference to the vector containing the names of extensions used by
    * the project.
    */
-  const std::vector<gd::String>& GetUsedExtensions() const {
-    return extensionsUsed;
-  };
-
-  /**
-   * Return a reference to the vector containing the names of extensions used by
-   * the project.
-   */
-  std::vector<gd::String>& GetUsedExtensions() { return extensionsUsed; };
+  std::vector<gd::String>& GetUsedExtensions();
 
 #if defined(GD_IDE_ONLY)
   /**

@@ -102,9 +102,10 @@ describe('libGD.js', function () {
     });
 
     it('should have a list of extensions', function () {
-      expect(typeof project.getUsedExtensions().size()).toBe('number');
-      project.getUsedExtensions().clear();
-      expect(project.getUsedExtensions().size()).toBe(0);
+      const extensionsVector = project.getUsedExtensions();
+      expect(typeof extensionsVector.size()).toBe('number');
+      extensionsVector.clear();
+      expect(extensionsVector.size()).toBe(0);
     });
 
     it('handles events functions extensions', function () {

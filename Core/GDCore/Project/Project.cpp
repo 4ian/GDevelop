@@ -20,6 +20,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
@@ -79,28 +80,6 @@ Project::Project()
 #endif
 {
   imageManager->SetResourcesManager(&resourcesManager);
-#if defined(GD_IDE_ONLY)
-  // Game use builtin extensions by default
-  extensionsUsed.push_back("BuiltinObject");
-  extensionsUsed.push_back("BuiltinAudio");
-  extensionsUsed.push_back("BuiltinVariables");
-  extensionsUsed.push_back("BuiltinTime");
-  extensionsUsed.push_back("BuiltinMouse");
-  extensionsUsed.push_back("BuiltinKeyboard");
-  extensionsUsed.push_back("BuiltinJoystick");
-  extensionsUsed.push_back("BuiltinCamera");
-  extensionsUsed.push_back("BuiltinWindow");
-  extensionsUsed.push_back("BuiltinFile");
-  extensionsUsed.push_back("BuiltinNetwork");
-  extensionsUsed.push_back("BuiltinScene");
-  extensionsUsed.push_back("BuiltinAdvanced");
-  extensionsUsed.push_back("Sprite");
-  extensionsUsed.push_back("BuiltinCommonInstructions");
-  extensionsUsed.push_back("BuiltinCommonConversions");
-  extensionsUsed.push_back("BuiltinStringInstructions");
-  extensionsUsed.push_back("BuiltinMathematicalTools");
-  extensionsUsed.push_back("BuiltinExternalLayouts");
-#endif
 
 #if !defined(GD_IDE_ONLY)
   platforms.push_back(&CppPlatform::Get());
@@ -110,6 +89,14 @@ Project::Project()
 Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
+
+std::vector<gd::String>& Project::GetUsedExtensions() {
+  std::set<gd::String> extensionsSet =
+      gd::UsedExtensionsFinder::ScanProject(*this);
+  extensionsUsed.clear();
+  extensionsUsed.assign(extensionsSet.begin(), extensionsSet.end());
+  return extensionsUsed;
+};
 
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
@@ -651,18 +638,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 #endif
 
-  const SerializerElement& extensionsElement =
-      propElement.GetChild("extensions", 0, "Extensions");
-  extensionsElement.ConsiderAsArrayOf("extension", "Extension");
-  for (std::size_t i = 0; i < extensionsElement.GetChildrenCount(); ++i) {
-    gd::String extensionName =
-        extensionsElement.GetChild(i).GetStringAttribute("name");
-    if (find(GetUsedExtensions().begin(),
-             GetUsedExtensions().end(),
-             extensionName) == GetUsedExtensions().end())
-      GetUsedExtensions().push_back(extensionName);
-  }
-
 #if defined(GD_IDE_ONLY)
   currentPlatform = NULL;
   gd::String currentPlatformName =
@@ -729,52 +704,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
 #endif
 // End of Compatibility code
-
-// Compatibility code
-#if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
-                                     gdMinorVersion,
-                                     revision,
-                                     gdBuildVersion,
-                                     2,
-                                     2,
-                                     1,
-                                     10822)) {
-    if (std::find(GetUsedExtensions().begin(),
-                  GetUsedExtensions().end(),
-                  "BuiltinExternalLayouts") == GetUsedExtensions().end())
-      GetUsedExtensions().push_back("BuiltinExternalLayouts");
-  }
-#endif
-
-// Compatibility code
-#if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
-                                     gdMinorVersion,
-                                     revision,
-                                     gdBuildVersion,
-                                     3,
-                                     3,
-                                     3,
-                                     0)) {
-    if (std::find(GetUsedExtensions().begin(),
-                  GetUsedExtensions().end(),
-                  "AStarBehavior") != GetUsedExtensions().end()) {
-      GetUsedExtensions().erase(std::remove(GetUsedExtensions().begin(),
-                                            GetUsedExtensions().end(),
-                                            "AStarBehavior"),
-                                GetUsedExtensions().end());
-      GetUsedExtensions().push_back("PathfindingBehavior");
-      updateText +=
-          _("The project is using the pathfinding behavior. This behavior has "
-            "been replaced by a new one:\n");
-      updateText +=
-          _("You must add the new 'Pathfinding' behavior to the objects that "
-            "need to be moved, and add the 'Pathfinding Obstacle' to the "
-            "objects that must act as obstacles.");
-    }
-  }
-#endif
 
 // Compatibility code
 #if defined(GD_IDE_ONLY)
@@ -916,12 +845,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   // end of compatibility code
 
   extensionProperties.SerializeTo(propElement.AddChild("extensionProperties"));
-
-  SerializerElement& extensionsElement = propElement.AddChild("extensions");
-  extensionsElement.ConsiderAsArrayOf("extension");
-  for (std::size_t i = 0; i < GetUsedExtensions().size(); ++i)
-    extensionsElement.AddChild("extension")
-        .SetAttribute("name", GetUsedExtensions()[i]);
 
   SerializerElement& platformsElement = propElement.AddChild("platforms");
   platformsElement.ConsiderAsArrayOf("platform");

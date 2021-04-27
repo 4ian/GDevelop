@@ -12,6 +12,7 @@ import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
 import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
+const os = optionalRequire('os');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
@@ -149,7 +150,7 @@ export default class LocalPreviewLauncher extends React.Component<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
-      const outputDir = path.join(fileSystem.getTempDir(), 'preview');
+      const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().uid}`);
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {

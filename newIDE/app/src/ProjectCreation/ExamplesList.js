@@ -139,10 +139,10 @@ export default class LocalExamples extends React.Component<Props, State> {
                   const exampleInformation = getExampleInformation(exampleName);
                   if (
                     (searchText &&
-                      (!fuzzyOrEmptyFilter(searchText, exampleFullName) &&
-                        exampleInformation.searchableDescription.indexOf(
-                          lowercaseSearchText
-                        ) === -1)) ||
+                      !fuzzyOrEmptyFilter(searchText, exampleFullName) &&
+                      exampleInformation.searchableDescription.indexOf(
+                        lowercaseSearchText
+                      ) === -1) ||
                     !isUsingExtension(
                       exampleInformation.usedExtensions,
                       chosenExtensionName

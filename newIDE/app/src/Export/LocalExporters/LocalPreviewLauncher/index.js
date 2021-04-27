@@ -150,7 +150,10 @@ export default class LocalPreviewLauncher extends React.Component<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
-      const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().uid}`);
+      const outputDir = path.join(
+        fileSystem.getTempDir(),
+        `preview-${os.userInfo().uid}`
+      );
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
 
       return {

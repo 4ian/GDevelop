@@ -90,14 +90,6 @@ Project::~Project() {}
 
 void Project::ResetProjectUuid() { projectUuid = UUID::MakeUuid4(); }
 
-std::vector<gd::String>& Project::GetUsedExtensions() {
-  std::set<gd::String> extensionsSet =
-      gd::UsedExtensionsFinder::ScanProject(*this);
-  extensionsUsed.clear();
-  extensionsUsed.assign(extensionsSet.begin(), extensionsSet.end());
-  return extensionsUsed;
-};
-
 std::unique_ptr<gd::Object> Project::CreateObject(
     const gd::String& type,
     const gd::String& name,
@@ -705,22 +697,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 #endif
 // End of Compatibility code
 
-// Compatibility code
-#if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
-                                     gdMinorVersion,
-                                     revision,
-                                     gdBuildVersion,
-                                     4,
-                                     0,
-                                     85,
-                                     0)) {
-    for (unsigned int i = 0; i < extensionsUsed.size(); ++i)
-      extensionsUsed[i] =
-          extensionsUsed[i].FindAndReplace("Automatism", "Behavior");
-  }
-#endif
-
 #if defined(GD_IDE_ONLY)
   GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
@@ -1044,7 +1020,6 @@ void Project::Init(const gd::Project& game) {
 
   currentPlatform = game.currentPlatform;
 #endif
-  extensionsUsed = game.extensionsUsed;
   platforms = game.platforms;
 
   resourcesManager = game.resourcesManager;

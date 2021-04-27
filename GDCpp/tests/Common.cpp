@@ -54,8 +54,6 @@ TEST_CASE("gd::Project", "[common]") {
       gd::Project copy = project;
 
       REQUIRE(copy.GetName() == "MyName");
-      REQUIRE(copy.GetUsedExtensions().size() ==
-              project.GetUsedExtensions().size());
     }
   }
 }

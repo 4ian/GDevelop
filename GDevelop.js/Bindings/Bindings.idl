@@ -350,7 +350,6 @@ interface Project {
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
-    [Const, Ref] VectorString GetUsedExtensions();
     [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();

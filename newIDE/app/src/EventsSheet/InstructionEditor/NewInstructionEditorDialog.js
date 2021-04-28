@@ -275,8 +275,8 @@ export default function NewInstructionEditorDialog({
               helpPagePath={instructionHelpPage || '/events'}
               label={
                 !instructionHelpPage ||
-                (windowWidth === 'small' ||
-                  step === 'object-or-free-instructions') ? (
+                windowWidth === 'small' ||
+                step === 'object-or-free-instructions' ? (
                   <Trans>Help</Trans>
                 ) : isCondition ? (
                   <Trans>Help for this condition</Trans>

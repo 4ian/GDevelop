@@ -17,7 +17,7 @@ export const makeLocalEventsFunctionCodeWriter = ({
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   // The generated code for extensions will be stored in a temporary directory
   const outputDir =
-    os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().uid}`;
+    os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().username}`;
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
       console.error(

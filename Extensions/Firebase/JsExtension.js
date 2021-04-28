@@ -1056,7 +1056,7 @@ module.exports = {
           'When persistence is enabled, all data that is fetched ' +
             'from the database is being automatically stored to allow to ' +
             'continue accessing the data if cut off from the network, instead of waiting for reconnection.\n' +
-            'This needs to be called before any other firestore operation, else it will fail.'
+            'This needs to be called before any other firestore operation, otherwise it will fail.'
         ),
         _('Enable persistence'),
         _('Firebase/Cloud Firestore'),
@@ -1080,7 +1080,7 @@ module.exports = {
         _('Disable persistence'),
         _(
           'Disables the storing of fetched data and clear all the data that has been stored.\n' +
-            'This needs to be called before any other firestore operation, else it will fail.'
+            'This needs to be called before any other firestore operation, otherwise it will fail.'
         ),
         _('Disable persistence'),
         _('Firebase/Cloud Firestore'),
@@ -1101,9 +1101,9 @@ module.exports = {
     extension
       .addAction(
         'FirestoreEnableNetwork',
-        _('Reenable network'),
-        _('Reenables the connection to the database after disabling it.'),
-        _('Reenable network'),
+        _('Re-enable network'),
+        _('Re-enables the connection to the database after disabling it.'),
+        _('Re-enable network'),
         _('Firebase/Cloud Firestore'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'

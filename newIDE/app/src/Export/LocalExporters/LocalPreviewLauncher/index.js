@@ -13,6 +13,7 @@ import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
 import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
+const os = optionalRequire('os');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;

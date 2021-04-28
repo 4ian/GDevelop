@@ -1659,10 +1659,7 @@ const MainFrame = (props: Props) => {
         // display a picker that does not play nice with material-ui's overlays.
         openProjectManager(false);
       }
-      setState(state => ({
-        ...state,
-        saveToStorageProviderDialogOpen: open,
-      }));
+      setState(state => ({ ...state, saveToStorageProviderDialogOpen: open }));
     },
     [setState]
   );

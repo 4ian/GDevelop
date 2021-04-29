@@ -3749,14 +3749,14 @@
             {
               "type": {
                 "inverted": false,
-                "value": "MettreXY"
+                "value": "SetCenter"
               },
               "parameters": [
                 "Player",
                 "=",
-                "PlayerHitBox.X()-12",
+                "PlayerHitBox.CenterX()",
                 "=",
-                "PlayerHitBox.Y()"
+                "PlayerHitBox.CenterY()"
               ],
               "subInstructions": []
             }

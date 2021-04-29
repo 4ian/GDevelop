@@ -792,6 +792,8 @@ namespace gdjs {
 
     /**
      * Return the X position of the object center, **relative to the object X position** (`getDrawableX`).
+     * Use `getCenterXInScene` to get the position of the center in the scene.
+     *
      * @return the X position of the object center, relative to `getDrawableX()`.
      */
     getCenterX(): float {
@@ -800,10 +802,54 @@ namespace gdjs {
 
     /**
      * Return the Y position of the object center, **relative to the object position** (`getDrawableY`).
+     * Use `getCenterYInScene` to get the position of the center in the scene.
+     *
      * @return the Y position of the object center, relative to `getDrawableY()`.
      */
     getCenterY(): float {
       return this.getHeight() / 2;
+    }
+
+    /**
+     * Return the X position of the object center, **relative to the scene origin**.
+     * @returns the X position of the object center, **relative to the scene origin**.
+     */
+    getCenterXInScene(): float {
+      return this.getDrawableX() + this.getCenterX();
+    }
+
+    /**
+     * Return the Y position of the object center, **relative to the scene origin**.
+     * @returns the Y position of the object center, **relative to the scene origin**.
+     */
+    getCenterYInScene(): float {
+      return this.getDrawableY() + this.getCenterY();
+    }
+
+    /**
+     * Change the object center position in the scene.
+     * @param x The new X position of the center in the scene.
+     * @param y The new Y position of the center in the scene.
+     */
+    setCenterPositionInScene(x: float, y: float): void {
+      this.setX(x + this.x - (this.getDrawableX() + this.getCenterX()));
+      this.setY(y + this.y - (this.getDrawableY() + this.getCenterY()));
+    }
+
+    /**
+     * Change the object center X position in the scene.
+     * @param x The new X position of the center in the scene.
+     */
+    setCenterXInScene(x: float): void {
+      this.setX(x + this.x - (this.getDrawableX() + this.getCenterX()));
+    }
+
+    /**
+     * Change the object center Y position in the scene.
+     * @param x The new Y position of the center in the scene.
+     */
+    setCenterYInScene(y: float): void {
+      this.setY(y + this.y - (this.getDrawableY() + this.getCenterY()));
     }
 
     //Forces :
@@ -1553,20 +1599,8 @@ namespace gdjs {
     ): void {
       const angleInRadians = gdjs.toRad(angleInDegrees);
 
-      // Offset the position by the center, as PutAround* methods should position the center
-      // of the object (just like GetSqDistanceTo, RaycastTest uses center too).
-      this.setX(
-        x +
-          Math.cos(angleInRadians) * distance +
-          this.getX() -
-          (this.getDrawableX() + this.getCenterX())
-      );
-      this.setY(
-        y +
-          Math.sin(angleInRadians) * distance +
-          this.getY() -
-          (this.getDrawableY() + this.getCenterY())
-      );
+      this.setCenterXInScene(x + Math.cos(angleInRadians) * distance);
+      this.setCenterYInScene(y + Math.sin(angleInRadians) * distance);
     }
 
     /**

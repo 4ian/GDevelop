@@ -758,35 +758,12 @@ namespace gdjs {
       }
       
       // @ts-ignore - objects are duck typed
-      let fromColor: any[] = this.owner.getColor().split(';');
+      let fromColor: number[] = this.owner.getColor().split(';');
       fromColorAsHSL = rgbToHsl(fromColor);
 
-      let toH: number = 0, toS: number = 0, toL: number = 0;
-      if(animateHue === false || toHue.toString().trim() === "") { 
-        toH = fromColorAsHSL[0];
-      } else if(!Number.isNaN(toHue)) { // Can't check for falsy because 0 is a valid hue.
-        toH = toHue;
-      } else {
-        return;
-      }
-
-      if(-1 === toSaturation || "" === toSaturation.toString().trim()) {
-        toS = fromColorAsHSL[1];
-      } else if(!Number.isNaN(toSaturation)) {
-        toS = toSaturation;
-        toS = Math.min(Math.max(toS, 0), 100); // Clamp
-      } else {
-        return;
-      }
-
-      if(-1 === toLightness || "" === toLightness.toString().trim()) {
-        toL = fromColorAsHSL[2];
-      } else if(!Number.isNaN(toLightness)) {
-        toL = toLightness;
-        toL = Math.min(Math.max(toL, 0), 100); // Clamp
-      } else {
-        return;
-      }
+      const toH = animateHue ? toHue : fromColorAsHSL[0];
+      const toS = -1 === toSaturation ? fromColorAsHSL[1] : Math.min(Math.max(toSaturation, 0), 100); 
+      const toL = -1 === toLightness ? fromColorAsHSL[2] : Math.min(Math.max(toLightness, 0), 100); 
 
       toColorAsHSL = [toH, toS, toL];
 

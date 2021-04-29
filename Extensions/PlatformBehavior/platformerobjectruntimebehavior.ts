@@ -1308,22 +1308,18 @@ namespace gdjs {
       const behavior = this._behavior;
       const object = behavior.owner;
 
-      let isCollidingPlatform: boolean;
-      {
-        // Because of rounding errors the collision test can do false positives.
-        // So, the object need to be slightly shifted upward.
-        const oldY = object.getY();
-        object.setY(oldY - gdjs.PlatformerObjectRuntimeBehavior.epsilon);
-        isCollidingPlatform = gdjs.RuntimeObject.collisionTest(
+      //Follow the floor
+
+      // Because of rounding errors when separating objects
+      // the collision test can do false positives.
+      // So, margin error is used.
+      if (
+        gdjs.RuntimeObject.collisionTestWithMargin(
           object,
           this._floorPlatform!.owner,
-          behavior._ignoreTouchingEdges
+          gdjs.PlatformerObjectRuntimeBehavior.epsilon
         )
-        object.setY(oldY);
-      }
-
-      //Follow the floor
-      if (isCollidingPlatform) {
+      ) {
         //Floor is getting up, as the object is colliding with it.
         const oldY = object.getY();
         let step = 0;

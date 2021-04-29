@@ -1774,6 +1774,77 @@ namespace gdjs {
     }
 
     /**
+     * Return true if the hitboxes of two objects are overlapping
+     * @static
+     * @param obj1 The first runtimeObject
+     * @param obj2 The second runtimeObject
+     * @param errorMargin polygon that has a move axis under this margin won't be considered in collision.
+     * @return true if obj1 and obj2 are in collision
+     */
+    static collisionTestWithMargin(
+      obj1: gdjs.RuntimeObject,
+      obj2: gdjs.RuntimeObject,
+      errorMargin: float
+    ): boolean {
+      //First check if bounding circle are too far.
+      const o1centerX = obj1.getCenterX();
+      const o1centerY = obj1.getCenterY();
+      const obj1BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj1.getWidth(),
+          obj1.getHeight(),
+          o1centerX,
+          o1centerY
+        )
+      );
+
+      const o2centerX = obj2.getCenterX();
+      const o2centerY = obj2.getCenterY();
+      const obj2BoundingRadius = Math.sqrt(
+        computeSqBoundingRadius(
+          obj2.getWidth(),
+          obj2.getHeight(),
+          o2centerX,
+          o2centerY
+        )
+      );
+
+      const diffX =
+        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
+      const diffY =
+        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      if (
+        Math.sqrt(diffX * diffX + diffY * diffY) >
+        obj1BoundingRadius + obj2BoundingRadius
+      ) {
+        return false;
+      }
+
+      // Do a real check if necessary.
+      const hitBoxes1 = obj1.getHitBoxes();
+      const hitBoxes2 = obj2.getHitBoxes();
+      for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
+        for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+          const collisionTestResult = gdjs.Polygon.collisionTest(
+            hitBoxes1[k],
+            hitBoxes2[l],
+            true
+          );
+          if (
+            collisionTestResult.move_axis[0] *
+              collisionTestResult.move_axis[0] +
+              collisionTestResult.move_axis[1] *
+                collisionTestResult.move_axis[1] >
+            errorMargin * errorMargin
+          ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    /**
      * @param x The raycast source X
      * @param y The raycast source Y
      * @param endX The raycast end position X

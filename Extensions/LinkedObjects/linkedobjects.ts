@@ -7,7 +7,7 @@ namespace gdjs {
    * Manages the links between objects.
    */
   export class LinksManager {
-    private links: { [objectId: integer]: gdjs.RuntimeObject[] } = {};
+    private links: { [objectId: number]: gdjs.RuntimeObject[] } = {};
 
     /**
      * Get the links manager of a scene.

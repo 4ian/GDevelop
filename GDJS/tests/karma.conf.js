@@ -10,7 +10,12 @@ module.exports = function (config) {
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
-    client: { mocha: { reporter: 'html' } },
+    client: {
+      mocha: {
+        reporter: 'html',
+        timeout: 5000, // Give a bit more time for CIs (the default 2s can be too low sometimes)
+      },
+    },
     files: [
       'node_modules/expect.js/index.js',
 

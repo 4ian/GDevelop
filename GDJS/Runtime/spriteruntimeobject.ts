@@ -501,7 +501,6 @@ namespace gdjs {
     /**
      * Ensure the sprite is ready to be displayed: the proper animation frame
      * is set and the renderer is up to date (position, angle, alpha, flip, blend mode...).
-     * @param runtimeScene
      */
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
       if (this._animationFrameDirty) {

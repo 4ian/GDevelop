@@ -31,7 +31,16 @@ export default {
     }
   },
   getTempDir: function() {
-    return path.join(os.tmpdir(), `GDTMP-${os.userInfo().username}`);
+    var valueToReturn ;
+    try {
+      valueToReturn = path.join(os.tmpdir(), `GDTMP-${os.userInfo().username}`);
+    }catch (error) {
+      valueToReturn = path.join(os.tmpdir(), `GDTMP-${os.userInfo().uid}`);
+    }
+    finally {
+      return valueToReturn ;
+    }
+     
   },
   fileNameFrom: function(fullPath) {
     if (this._isExternalUrl(fullPath)) return fullPath;

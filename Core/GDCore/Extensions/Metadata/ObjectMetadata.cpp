@@ -123,7 +123,10 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedCondition(
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
-      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+      GetName().empty()
+          ? name // Don't insert a namespace separator for the base object.
+          : GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                            nameWithNamespace,
                                                            fullname,
@@ -148,7 +151,10 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedAction(
     const gd::String& smallicon) {
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
-      GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+      GetName().empty()
+          ? name // Don't insert a namespace separator for the base object.
+          : GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
+
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                         nameWithNamespace,
                                                         fullname,

@@ -84,6 +84,15 @@ namespace gdjs {
     }
 
     /**
+     * Update a platform from the list of existing platforms. Be sure that the platform was
+     * added before.
+     */
+    updatePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
+      this._platformRBush.remove(platformBehavior);
+      this._platformRBush.insert(platformBehavior);
+    }
+
+    /**
      * Returns all the platforms around the specified object.
      * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
      * @return An array with all platforms near the object.
@@ -213,8 +222,7 @@ namespace gdjs {
         this._oldHeight !== this.owner.getHeight()
       ) {
         if (this._registeredInManager) {
-          this._manager.removePlatform(this);
-          this._manager.addPlatform(this);
+          this._manager.updatePlatform(this);
         }
         this._oldX = this.owner.getX();
         this._oldY = this.owner.getY();

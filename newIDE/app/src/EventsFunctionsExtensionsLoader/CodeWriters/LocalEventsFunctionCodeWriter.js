@@ -16,14 +16,14 @@ export const makeLocalEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   // The generated code for extensions will be stored in a temporary directory
-  var outputDirTemp ;
+  const outputDirTemp = { value: "" };
   try {
-    outputDirTemp = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().username}`;
+    outputDirTemp.value = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().username}`;
   }
   catch (error) {
-    outputDirTemp = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().uid}`;
+    outputDirTemp.value = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().uid}`;
   }
-  const outputDir = outputDirTemp ;
+  const outputDir = outputDirTemp.value;
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
       console.error(

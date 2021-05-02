@@ -20,26 +20,26 @@ const gd: libGDevelop = global.gd;
 
 type Props = {|
   getIncludeFileHashs: () => { [string]: number },
-  onExport?: () => void,
-  onChangeSubscription?: () => void,
+    onExport ?: () => void,
+    onChangeSubscription ?: () => void,
 |};
 
 type State = {|
   networkPreviewDialogOpen: boolean,
-  networkPreviewHost: ?string,
-  networkPreviewPort: ?number,
-  networkPreviewError: ?any,
-  hotReloadsCount: number,
-  previewGamePath: ?string,
-  devToolsOpen: boolean,
-  previewBrowserWindowConfig: ?{
-    width: number,
+    networkPreviewHost: ?string,
+      networkPreviewPort: ?number,
+        networkPreviewError: ?any,
+          hotReloadsCount: number,
+            previewGamePath: ?string,
+              devToolsOpen: boolean,
+                previewBrowserWindowConfig: ?{
+  width: number,
     height: number,
-    useContentSize: boolean,
-    title: string,
-    backgroundColor: string,
+      useContentSize: boolean,
+        title: string,
+          backgroundColor: string,
   },
-  hideMenuBar: boolean,
+hideMenuBar: boolean,
 |};
 
 export default class LocalPreviewLauncher extends React.Component<
@@ -151,19 +151,19 @@ export default class LocalPreviewLauncher extends React.Component<
         localFileSystem
       );
       try {
-         const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().username}`);
-         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-         return {
-           outputDir,
-           exporter,
-         };
+        const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().username}`);
+        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+        return {
+          outputDir,
+          exporter,
+        };
       } catch (error) {
-         const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().uid}`);
-         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-         return {
-           outputDir,
-           exporter,
-         };
+        const outputDir = path.join(fileSystem.getTempDir(), `preview-${os.userInfo().uid}`);
+        const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+        return {
+          outputDir,
+          exporter,
+        };
       }
 
     });

@@ -12,18 +12,20 @@ const fs = optionalRequire('fs');
  * Create the EventsFunctionCodeWriter that writes generated code for events functions
  * to local files.
  */
+function getUsername(): string {
+  try {
+    return os.userInfo().uid;
+  } catch (e) {
+    return '';
+  }
+}
 export const makeLocalEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   // The generated code for extensions will be stored in a temporary directory
-  const outputDirTemp = { value: "" };
-  try {
-    outputDirTemp.value = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().username}`;
-  }
-  catch (error) {
-    outputDirTemp.value = os.tmpdir() + `/GDGeneratedEventsFunctions-${os.userInfo().uid}`;
-  }
-  const outputDir = outputDirTemp.value;
+
+  const outputDir =
+    os.tmpdir() + `/GDGeneratedEventsFunctions-` + getUsername();
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
       console.error(

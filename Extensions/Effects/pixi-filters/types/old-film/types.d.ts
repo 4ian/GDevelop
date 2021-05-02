@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class OldFilmFilter extends PIXI.Filter {
     constructor(options?: OldFilmFilterOptions, seed?: number);
     constructor(seed?: number);

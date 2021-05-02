@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   /**
    * The renderer for a gdjs.SpriteRuntimeObject using Pixi.js.
    */

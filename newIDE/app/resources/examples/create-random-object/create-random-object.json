@@ -1,25 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\create-random-object\\game.json",
+    "projectUuid": "8beabff0-9ad7-4235-abb5-d2083d82171e",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "@ddabrahim gametemplates.itch.io",
     "windowWidth": 800,
@@ -32,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -218,6 +216,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -269,6 +268,7 @@
           "layer": "",
           "locked": false,
           "name": "Message",
+          "persistentUuid": "aa918cde-c891-433a-b619-b6159441b195",
           "width": 0,
           "x": 173,
           "y": 42,
@@ -804,6 +804,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

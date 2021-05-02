@@ -1,5 +1,5 @@
 // @flow
-import { serializeToJSObject } from '../../Utils/Serializer';
+import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
 import { type FileMetadata } from '../index';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import {
@@ -42,35 +42,26 @@ const checkFileContent = (filePath: string, expectedContent: string) => {
   });
 };
 
-const writeJSONFile = (object: Object, filePath: string): Promise<void> => {
-  if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
+const writeAndCheckFile = async (
+  content: string,
+  filePath: string
+): Promise<void> => {
+  if (!fs) throw new Error('Filesystem is not supported.');
+  if (content === '')
+    throw new Error('The content to save on disk is empty. Aborting.');
 
-  try {
-    const content = JSON.stringify(object, null, 2);
-    if (content === '') {
-      return Promise.reject(
-        new Error('The content to save on disk is empty. Aborting.')
-      );
-    }
+  await fs.ensureDir(path.dirname(filePath));
 
-    return fs
-      .ensureDir(path.dirname(filePath))
-      .then(
-        () =>
-          new Promise((resolve, reject) => {
-            fs.writeFile(filePath, content, (err: ?Error) => {
-              if (err) {
-                return reject(err);
-              }
+  await fs.writeFile(filePath, content);
+  await checkFileContent(filePath, content);
+};
 
-              return resolve();
-            });
-          })
-      )
-      .then(() => checkFileContent(filePath, content));
-  } catch (stringifyException) {
-    return Promise.reject(stringifyException);
-  }
+const writeAndCheckFormattedJSONFile = async (
+  object: Object,
+  filePath: string
+): Promise<void> => {
+  const content = JSON.stringify(object, null, 2);
+  await writeAndCheckFile(content, filePath);
 };
 
 const writeProjectFiles = (
@@ -79,7 +70,6 @@ const writeProjectFiles = (
   projectPath: string
 ): Promise<void> => {
   const serializedProjectObject = serializeToJSObject(project);
-
   if (project.isFolderProject()) {
     const partialObjects = split(serializedProjectObject, {
       pathSeparator: '/',
@@ -98,7 +88,7 @@ const writeProjectFiles = (
 
     return Promise.all(
       partialObjects.map(partialObject => {
-        return writeJSONFile(
+        return writeAndCheckFormattedJSONFile(
           partialObject.object,
           path.join(projectPath, partialObject.reference) + '.json'
         ).catch(err => {
@@ -107,13 +97,19 @@ const writeProjectFiles = (
         });
       })
     ).then(() => {
-      return writeJSONFile(serializedProjectObject, filePath).catch(err => {
+      return writeAndCheckFormattedJSONFile(
+        serializedProjectObject,
+        filePath
+      ).catch(err => {
         console.error('Unable to write the split project:', err);
         throw err;
       });
     });
   } else {
-    return writeJSONFile(serializedProjectObject, filePath).catch(err => {
+    return writeAndCheckFormattedJSONFile(
+      serializedProjectObject,
+      filePath
+    ).catch(err => {
       console.error('Unable to write the project:', err);
       throw err;
     });
@@ -193,7 +189,7 @@ export const onAutoSaveProject = (
   fileMetadata: FileMetadata
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
-  return writeJSONFile(serializeToJSObject(project), autoSavePath).catch(
+  return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
     err => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;

@@ -183,6 +183,7 @@ export type PreferencesValues = {|
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
   isMenuBarHiddenInPreview: boolean,
+  backdropClickBehavior: string,
 |};
 
 /**
@@ -233,6 +234,7 @@ export type Preferences = {|
   setNewObjectDialogDefaultTab: ('asset-store' | 'new-object') => void,
   getIsMenuBarHiddenInPreview: () => boolean,
   setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
+  setBackdropClickBehavior: (value: string) => void,
 |};
 
 export const initialPreferences = {
@@ -263,6 +265,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
+    backdropClickBehavior: 'cancel',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -303,6 +306,7 @@ export const initialPreferences = {
   setNewObjectDialogDefaultTab: () => {},
   getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
+  setBackdropClickBehavior: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

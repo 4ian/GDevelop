@@ -55,12 +55,18 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={enumerateVariables(variablesContainer).map(
-              variableName => ({
-                text: variableName,
-                value: variableName,
-              })
-            )}
+            dataSource={enumerateVariables(variablesContainer)
+              .map(({ name, isValidName }) =>
+                isValidName
+                  ? {
+                      text: name,
+                      value: name,
+                    }
+                  : // Hide invalid variable names - they would not
+                    // be parsed correctly anyway.
+                    null
+              )
+              .filter(Boolean)}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

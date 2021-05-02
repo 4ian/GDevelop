@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/text-fade-in-out/text-fade-in-out.json",
+    "projectUuid": "649ddf05-1936-4694-84b8-975611c3f1a4",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -128,6 +128,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -143,6 +144,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeOutText",
+          "persistentUuid": "e6775b8c-6806-4042-880a-1991015f0d47",
           "width": 0,
           "x": 220,
           "y": 264,
@@ -158,6 +160,7 @@
           "italic": false,
           "name": "FadeOutText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -269,6 +272,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -309,6 +317,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -324,6 +333,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInOutText",
+          "persistentUuid": "6c92f0d1-a94e-4e79-be62-3d472f7b4ff1",
           "width": 0,
           "x": 190,
           "y": 264,
@@ -339,6 +349,7 @@
           "italic": false,
           "name": "FadeInOutText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -450,6 +461,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -490,6 +506,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -505,6 +522,7 @@
           "layer": "",
           "locked": false,
           "name": "FadeInText",
+          "persistentUuid": "5b4aa2f5-e2ce-4efc-a80d-a941fe1195bf",
           "width": 0,
           "x": 230,
           "y": 264,
@@ -520,6 +538,7 @@
           "italic": false,
           "name": "FadeInText",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -631,6 +650,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -652,6 +676,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

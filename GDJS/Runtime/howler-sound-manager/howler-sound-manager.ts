@@ -107,7 +107,7 @@ namespace gdjs {
      */
     playing(): boolean {
       return (
-        (this._id !== null ? this._howl.playing(this._id) : false) ||
+        (this._id !== null ? this._howl.playing(this._id) : true) ||
         !this.isLoaded() // Loading is considered playing
       );
     }
@@ -248,8 +248,11 @@ namespace gdjs {
      */
     on(event: HowlEvent, handler: HowlCallback): this {
       if (event === 'play') {
-        if (this._id === null) this._onPlay.push(handler);
-        else this._howl.on(event, handler, this._id);
+        if (this._id === null) {
+          this._onPlay.push(handler);
+        } else {
+          this._howl.on(event, handler, this._id);
+        }
       } else if (this._id === null)
         this.once('play', () => this.on(event, handler));
       else this._howl.on(event, handler, this._id);
@@ -259,11 +262,23 @@ namespace gdjs {
 
     /**
      * Adds an event listener to the howl that removes itself after being called.
+     * If the event is `play` and the sound is being played, the handler is
+     * called synchronously.
      */
     once(event: HowlEvent, handler: HowlCallback): this {
       if (event === 'play') {
-        if (this._id === null) this._oncePlay.push(handler);
-        else this._howl.once(event, handler, this._id);
+        if (this._id === null) {
+          this._oncePlay.push(handler);
+        } else if (this.playing()) {
+          // Immediately call the handler if the sound is already playing.
+          // This is useful for sounds that were just started and have a `.once('play', ...)`
+          // handler added on them to set up the volume/rate/loop. If we don't do it
+          // synchronously, the sound can play for a tiny bit at the default volume and rate.
+          // See https://github.com/4ian/GDevelop/issues/2490.
+          handler(this._id);
+        } else {
+          this._howl.once(event, handler, this._id);
+        }
       } else if (this._id === null)
         this.once('play', () => this.once(event, handler));
       else this._howl.once(event, handler, this._id);

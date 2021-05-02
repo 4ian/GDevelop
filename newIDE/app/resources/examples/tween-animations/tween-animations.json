@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Sebastian\\workspace\\GDevelop\\newIDE\\app\\resources\\examples\\tween-animations\\tween-animations.json",
+    "projectUuid": "95a31dcc-5b29-4c46-b309-f5a4eceed811",
     "scaleMode": "nearest",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Tween Animation Examples",
     "author": "",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -141,6 +138,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -171,10 +169,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "GrowAndShrink"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "6000"
             }
           ]
@@ -201,10 +201,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "JustBounce"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "2000"
             }
           ]
@@ -226,10 +228,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "ColorAndOpacity"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "3000"
             }
           ]
@@ -251,10 +255,12 @@
           "initialVariables": [
             {
               "name": "Name",
+              "type": "string",
               "value": "SpinAndShake"
             },
             {
               "name": "BounceTime",
+              "type": "string",
               "value": "4000"
             }
           ]
@@ -1131,6 +1137,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [

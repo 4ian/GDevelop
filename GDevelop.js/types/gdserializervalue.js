@@ -4,6 +4,11 @@ declare class gdSerializerValue {
   getString(): string;
   getInt(): number;
   getDouble(): number;
+  getRawString(): string;
+  isBoolean(): boolean;
+  isString(): boolean;
+  isInt(): boolean;
+  isDouble(): boolean;
   delete(): void;
   ptr: number;
 };

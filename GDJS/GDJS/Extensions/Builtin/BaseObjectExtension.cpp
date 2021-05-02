@@ -39,6 +39,14 @@ BaseObjectExtension::BaseObjectExtension() {
       "runtimeobject.js");
   objectConditions["PosY"].SetFunctionName("getY").SetIncludeFile(
       "runtimeobject.js");
+  objectConditions["CenterX"].SetFunctionName("getCenterXInScene");
+  objectConditions["CenterY"].SetFunctionName("getCenterYInScene");
+  objectActions["SetCenterX"]
+      .SetFunctionName("setCenterXInScene")
+      .SetGetter("getCenterXInScene");
+  objectActions["SetCenterY"]
+      .SetFunctionName("setCenterYInScene")
+      .SetGetter("getCenterYInScene");
   objectActions["SetAngle"]
       .SetFunctionName("setAngle")
       .SetGetter("getAngle")
@@ -168,6 +176,8 @@ BaseObjectExtension::BaseObjectExtension() {
 
   objectExpressions["X"].SetFunctionName("getX");
   objectExpressions["Y"].SetFunctionName("getY");
+  objectExpressions["CenterX"].SetFunctionName("getCenterXInScene");
+  objectExpressions["CenterY"].SetFunctionName("getCenterYInScene");
   objectExpressions["ZOrder"].SetFunctionName("getZOrder");
   objectExpressions["Plan"].SetFunctionName("getZOrder");  // Deprecated
   objectExpressions["Width"].SetFunctionName("getWidth");
@@ -203,6 +213,10 @@ BaseObjectExtension::BaseObjectExtension() {
       "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
   objectStrExpressions["Layer"].SetFunctionName("getLayer");
+  objectExpressions["XFromAngleAndDistance"].SetFunctionName(
+      "getXFromAngleAndDistance");
+  objectExpressions["YFromAngleAndDistance"].SetFunctionName(
+      "getYFromAngleAndDistance");
 
   GetAllActions()["Create"].SetFunctionName(
       "gdjs.evtTools.object.createObjectOnScene");
@@ -288,59 +302,56 @@ BaseObjectExtension::BaseObjectExtension() {
         return "runtimeScene.updateObjectsForces();";
       });
 
+  auto isNotAssignmentOperator = [](const gd::String &op) {
+    return op == "/" || op == "*" || op == "-" || op == "+";
+  };
+
   objectActions["MettreXY"].codeExtraInformation.SetCustomCodeGenerator(
-      [](gd::Instruction &instruction,
-         gd::EventsCodeGenerator &codeGenerator,
-         gd::EventsCodeGenerationContext &context) -> gd::String {
+      [&](gd::Instruction &instruction,
+          gd::EventsCodeGenerator &codeGenerator,
+          gd::EventsCodeGenerationContext &context) -> gd::String {
         gd::String outputCode;
 
-        std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(
+        auto realObjects = codeGenerator.ExpandObjectsName(
             instruction.GetParameter(0).GetPlainString(), context);
-        for (std::size_t i = 0; i < realObjects.size(); ++i) {
-          context.SetCurrentObject(realObjects[i]);
-          context.ObjectsListNeeded(realObjects[i]);
+        for (auto &realObjectName : realObjects) {
+          context.SetCurrentObject(realObjectName);
+          context.ObjectsListNeeded(realObjectName);
 
-          gd::String newX, newY;
+          gd::String objectListName =
+              codeGenerator.GetObjectListName(realObjectName, context);
 
           gd::String expression1Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameters()[2].GetPlainString());
+                  instruction.GetParameter(2).GetPlainString());
 
           gd::String expression2Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameters()[4].GetPlainString());
+                  instruction.GetParameter(4).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
-          if (op1 == "=" || op1.empty())
-            newX = expression1Code;
-          else if (op1 == "/" || op1 == "*" || op1 == "-" || op1 == "+")
-            newX = codeGenerator.GetObjectListName(realObjects[i], context) +
-                   "[i].getX() " + op1 + expression1Code;
-          else
-            return "";
+          gd::String newX =
+              isNotAssignmentOperator(op1)
+                  ? (objectListName + "[i].getX() " + op1 + expression1Code)
+                  : expression1Code;
+
           gd::String op2 = instruction.GetParameter(3).GetPlainString();
-          if (op2 == "=" || op2.empty())
-            newY = expression2Code;
-          else if (op2 == "/" || op2 == "*" || op2 == "-" || op2 == "+")
-            newY = codeGenerator.GetObjectListName(realObjects[i], context) +
-                   "[i].getY() " + op2 + expression2Code;
-          else
-            return "";
+          gd::String newY =
+              isNotAssignmentOperator(op2)
+                  ? (objectListName + "[i].getY() " + op2 + expression2Code)
+                  : expression2Code;
 
           gd::String call =
-              codeGenerator.GetObjectListName(realObjects[i], context) +
-              "[i].setPosition(" + newX + "," + newY + ")";
+              objectListName + "[i].setPosition(" + newX + "," + newY + ")";
 
-          outputCode +=
-              "for(var i = 0, len = " +
-              codeGenerator.GetObjectListName(realObjects[i], context) +
-              ".length ;i < len;++i) {\n";
+          outputCode += "for(var i = 0, len = " + objectListName +
+                        ".length ;i < len;++i) {\n";
           outputCode += "    " + call + ";\n";
           outputCode += "}\n";
 
@@ -350,48 +361,63 @@ BaseObjectExtension::BaseObjectExtension() {
         return outputCode;
       });
 
-  StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
-                                                   // listed here:
-  /*
-          obj.AddAction("AddForceTournePos",
-                         _("Add a force so as to move around a position"),
-                         _("Add a force to an object so as it rotates toward a
-     position.\nNote that the moving is not precise, especially if the speed is
-     high.\nTo position an object around a position more precisly, use the
-     actions in the category  \"Position\"."),
-                         _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with
-     _PARAM3_�/sec and _PARAM4_ pixels away"),
-                         _("Displacement"),
-                         "res/actions/forceTourne24.png",
-                         "res/actions/forceTourne.png")
+  objectActions["SetCenter"].codeExtraInformation.SetCustomCodeGenerator(
+      [&](gd::Instruction &instruction,
+          gd::EventsCodeGenerator &codeGenerator,
+          gd::EventsCodeGenerationContext &context) -> gd::String {
+        gd::String outputCode;
 
-              .AddParameter("object", _("Object"))
-              .AddParameter("expression", _("X position of the center"))
-              .AddParameter("expression", _("Y position of the center"))
-              .AddParameter("expression", _("Speed ( in Degrees per seconds )"))
-              .AddParameter("expression", _("Distance ( in pixels )"))
-              .AddParameter("expression", _("Damping ( Default : 0 )"))
-              .SetFunctionName("AddForceToMoveAround");
+        auto realObjects = codeGenerator.ExpandObjectsName(
+            instruction.GetParameter(0).GetPlainString(), context);
+        for (auto &realObjectName : realObjects) {
+          context.SetCurrentObject(realObjectName);
+          context.ObjectsListNeeded(realObjectName);
 
-          obj.AddAction("AddForceTourne",
-                         _("Add a force so as to move around an object"),
-                         _("Add a force to an object so as it rotates around
-     another.\nNote that the moving is not precise, especially if the speed is
-     high.\nTo position an object around a position more precisly, use the
-     actions in the category  \"Position\"."),
-                         _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_�/sec
-     and _PARAM3_ pixels away"),
-                         _("Displacement"),
-                         "res/actions/forceTourne24.png",
-                         "res/actions/forceTourne.png")
+          gd::String objectListName =
+              codeGenerator.GetObjectListName(realObjectName, context);
 
-              .AddParameter("object", _("Object"))
-              .AddParameter("objectPtr", _("Rotate around this object"))
-              .AddParameter("expression", _("Speed ( Degrees per second )"))
-              .AddParameter("expression", _("Distance ( in pixel )"))
-              .AddParameter("expression", _("Damping ( Default : 0 )"))
-              .SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDCpp/Extensions/Builtin/ObjectTools.h");
-  */
+          gd::String expression1Code =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator,
+                  context,
+                  "number",
+                  instruction.GetParameter(2).GetPlainString());
+
+          gd::String expression2Code =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator,
+                  context,
+                  "number",
+                  instruction.GetParameter(4).GetPlainString());
+
+          gd::String op1 = instruction.GetParameter(1).GetPlainString();
+          gd::String newX = isNotAssignmentOperator(op1)
+                                ? (objectListName + "[i].getCenterXInScene() " +
+                                   op1 + expression1Code)
+                                : expression1Code;
+
+          gd::String op2 = instruction.GetParameter(3).GetPlainString();
+          gd::String newY = isNotAssignmentOperator(op2)
+                                ? (objectListName + "[i].getCenterYInScene() " +
+                                   op2 + expression2Code)
+                                : expression2Code;
+
+          gd::String call = objectListName + "[i].setCenterPositionInScene(" +
+                            newX + "," + newY + ")";
+
+          outputCode += "for(var i = 0, len = " + objectListName +
+                        ".length ;i < len;++i) {\n";
+          outputCode += "    " + call + ";\n";
+          outputCode += "}\n";
+
+          context.SetNoCurrentObject();
+        }
+
+        return outputCode;
+      });
+
+  // "AddForceTournePos" and "AddForceTourne" are deprecated and not implemented
+  StripUnimplementedInstructionsAndExpressions();
 }
 
 }  // namespace gdjs

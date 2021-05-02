@@ -1,1 +1,422 @@
-{"firstLayout":"","gdVersion":{"build":96,"major":4,"minor":0,"revision":0},"properties":{"folderProject":false,"linuxExecutableFilename":"","macExecutableFilename":"","packageName":"","projectFile":"C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\splash-screen\\game.json","useExternalSourceFiles":false,"winExecutableFilename":"","winExecutableIconFile":"","name":"Project","author":"","windowWidth":800,"windowHeight":600,"latestCompilationDirectory":"","maxFPS":60,"minFPS":10,"verticalSync":false,"extensions":[{"name":"BuiltinObject"},{"name":"BuiltinAudio"},{"name":"BuiltinVariables"},{"name":"BuiltinTime"},{"name":"BuiltinMouse"},{"name":"BuiltinKeyboard"},{"name":"BuiltinJoystick"},{"name":"BuiltinCamera"},{"name":"BuiltinWindow"},{"name":"BuiltinFile"},{"name":"BuiltinNetwork"},{"name":"BuiltinScene"},{"name":"BuiltinAdvanced"},{"name":"Sprite"},{"name":"BuiltinCommonInstructions"},{"name":"BuiltinCommonConversions"},{"name":"BuiltinStringInstructions"},{"name":"BuiltinMathematicalTools"},{"name":"BuiltinExternalLayouts"}],"platforms":[{"name":"GDevelop JS platform"}],"currentPlatform":"GDevelop JS platform"},"resources":{"resources":[{"alwaysLoaded":false,"file":"gdlogo.png","kind":"image","name":"gdlogo.png","smoothed":true,"userAdded":true}],"resourceFolders":[]},"objects":[],"objectsGroups":[],"variables":[],"layouts":[{"b":0,"disableInputWhenNotFocused":true,"mangledName":"GDSplash","name":"GDSplash","oglFOV":90,"oglZFar":500,"oglZNear":1,"r":0,"standardSortMethod":false,"stopSoundsOnStartup":true,"title":"","v":0,"uiSettings":{"grid":false,"gridB":255,"gridG":180,"gridHeight":32,"gridOffsetX":0,"gridOffsetY":0,"gridR":158,"gridWidth":32,"snap":true,"windowMask":true,"zoomFactor":1},"objectsGroups":[],"variables":[{"name":"SceneAfterSplash","value":""}],"instances":[{"angle":0,"customSize":false,"height":0,"layer":"","locked":false,"name":"logo","width":0,"x":383.5,"y":270,"zOrder":1,"numberProperties":[],"stringProperties":[],"initialVariables":[]}],"objects":[{"name":"logo","type":"Sprite","updateIfNotVisible":true,"variables":[],"behaviors":[],"animations":[{"name":"","useMultipleDirections":false,"directions":[{"looping":false,"timeBetweenFrames":1,"sprites":[{"hasCustomCollisionMask":false,"image":"gdlogo.png","points":[],"originPoint":{"name":"origine","x":179,"y":55},"centerPoint":{"automatic":true,"name":"centre","x":179.5,"y":55},"customCollisionMask":[[{"x":0,"y":0},{"x":359,"y":0},{"x":359,"y":110},{"x":0,"y":110}]]}]}]}]}],"events":[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"At the beginning play sound and set the logo to be in the middle of the screen and set the opacitity of the logo to 0","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"DepartScene"},"parameters":[""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"PlaySound"},"parameters":["","gdjingle.ogg","","100","1"],"subInstructions":[]},{"type":{"inverted":false,"value":"MettreXY"},"parameters":["logo","=","SceneWindowWidth()/2","=","SceneWindowHeight()/2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Opacity"},"parameters":["logo","=","0"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"Increase the opacitity of the logo","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[],"actions":[{"type":{"inverted":false,"value":"Opacity"},"parameters":["logo","+","TimeDelta()*15"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Comment","color":{"b":109,"g":230,"r":255,"textB":0,"textG":0,"textR":0},"comment":"If the opacity of the logo >= 100, change the scene...","comment2":""},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"Opacity"},"parameters":["logo",">=","100"],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Scene"},"parameters":["","VariableString(SceneAfterSplash)"],"subInstructions":[]}],"events":[]}],"layers":[{"name":"","visibility":true,"cameras":[{"defaultSize":true,"defaultViewport":true,"height":0,"viewportBottom":1,"viewportLeft":0,"viewportRight":1,"viewportTop":0,"width":0}],"effects":[]}],"behaviorsSharedData":[]}],"externalEvents":[],"externalLayouts":[],"externalSourceFiles":[]}
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": false,
+    "folderProject": false,
+    "orientation": "default",
+    "packageName": "",
+    "projectUuid": "389f6a3d-20cd-43df-9c72-57128e0a3c55",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "gdlogo.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "gdlogo.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "GDSplash",
+      "name": "GDSplash",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 0,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 0,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": true,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "SceneAfterSplash",
+          "type": "string",
+          "value": ""
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "logo",
+          "persistentUuid": "da93d3ee-58e5-4902-9623-aa5737759ecc",
+          "width": 0,
+          "x": 383.5,
+          "y": 270,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "logo",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "gdlogo.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 179,
+                        "y": 55
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 179.5,
+                        "y": 55
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 359,
+                            "y": 0
+                          },
+                          {
+                            "x": 359,
+                            "y": 110
+                          },
+                          {
+                            "x": 0,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "At the beginning play sound and set the logo to be in the middle of the screen and set the opacitity of the logo to 0",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "PlaySound"
+              },
+              "parameters": [
+                "",
+                "gdjingle.ogg",
+                "",
+                "100",
+                "1"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "logo",
+                "=",
+                "SceneWindowWidth()/2",
+                "=",
+                "SceneWindowHeight()/2"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "logo",
+                "=",
+                "0"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Increase the opacitity of the logo",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "logo",
+                "+",
+                "TimeDelta()*15"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If the opacity of the logo >= 100, change the scene...",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Opacity"
+              },
+              "parameters": [
+                "logo",
+                ">=",
+                "100"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "VariableString(SceneAfterSplash)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

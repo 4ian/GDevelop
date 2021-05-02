@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class MotionBlurFilter extends PIXI.Filter {
     constructor(
       velocity: PIXI.ObservablePoint | PIXI.Point | number[],

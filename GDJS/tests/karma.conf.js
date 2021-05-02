@@ -1,7 +1,21 @@
-module.exports = function(config) {
+module.exports = function (config) {
+  const testFiles = ['../../Extensions/**/tests/**.spec.js', './tests/**/*.js'];
+
+  const benchmarkFiles = [
+    './benchmarks/init.js',
+    '../../Extensions/**/benchmark/**.benchmark.js',
+    './benchmarks/**/*.js',
+  ];
+
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
+    client: {
+      mocha: {
+        reporter: 'html',
+        timeout: 5000, // Give a bit more time for CIs (the default 2s can be too low sometimes)
+      },
+    },
     files: [
       'node_modules/expect.js/index.js',
 
@@ -58,21 +72,28 @@ module.exports = function(config) {
       '../Runtime-dist/Extensions/Lighting/lightobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
+      '../Runtime-dist/Extensions/Firebase/A_firebasejs/*.js',
+      '../Runtime-dist/Extensions/Firebase/B_firebasetools/*.js',
 
       // Test extensions:
       './tests/Extensions/**.js',
 
       //All tests files:
       './tests-utils/init.pixiruntimegamewithassets.js',
-      '../../Extensions/**/tests/**.spec.js',
-      './tests/**/*.js',
-
-      //All benchmark files:
-      './benchmarks/init.js',
-      './benchmarks/**/*.js',
 
       // Assets
-      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false}
-    ]
+      {
+        pattern: './tests-utils/assets/*.jpg',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+
+      ...testFiles,
+      ...(config.enableBenchmarks ? benchmarkFiles : []),
+    ],
   });
 };

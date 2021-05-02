@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\load-image-from-url\\game.json",
+    "projectUuid": "7ac3158c-1f43-4ff4-b017-be1a9eece276",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "Credits.png",
         "kind": "image",
+        "metadata": "",
         "name": "Credits.png",
         "smoothed": true,
         "userAdded": false
@@ -134,6 +135,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -149,6 +151,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_1",
+          "persistentUuid": "18f5d57f-226c-4830-985e-fe5a855ce4d3",
           "width": 0,
           "x": 164,
           "y": 10,
@@ -164,6 +167,7 @@
           "layer": "",
           "locked": false,
           "name": "My_picture",
+          "persistentUuid": "d6a79113-a133-42c3-9ed1-76277308f557",
           "width": 0,
           "x": 136,
           "y": 192,
@@ -179,6 +183,7 @@
           "layer": "",
           "locked": false,
           "name": "sentence_explain_2",
+          "persistentUuid": "e54b0ac2-e136-4b4d-96ea-ca73687b163b",
           "width": 0,
           "x": 147,
           "y": 74,
@@ -194,6 +199,7 @@
           "layer": "",
           "locked": false,
           "name": "bybouhandlizard",
+          "persistentUuid": "ca204bb8-37aa-4b27-8a93-1f0d45a04ce7",
           "width": 0,
           "x": 208,
           "y": 441,
@@ -209,6 +215,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
+          "persistentUuid": "37a612f6-040b-4aa3-a43c-0a64818fcbfa",
           "width": 0,
           "x": 981,
           "y": 44,
@@ -224,6 +231,7 @@
           "layer": "",
           "locked": false,
           "name": "CopyOfNewObject",
+          "persistentUuid": "4b380943-1969-48c6-a9b0-debba0d471db",
           "width": 0,
           "x": 459,
           "y": 156,
@@ -236,6 +244,7 @@
       "objects": [
         {
           "name": "My_picture",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -277,6 +286,7 @@
           "italic": false,
           "name": "sentence_explain_1",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -295,6 +305,7 @@
           "italic": false,
           "name": "sentence_explain_2",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -313,6 +324,7 @@
           "italic": false,
           "name": "bybouhandlizard",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -526,13 +538,20 @@
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": "\nvar object = runtimeScene.getVariables().get(\"object\").getAsString(); //get object from scene variable\nvar anim = runtimeScene.getVariables().get(\"animation\").getAsNumber(); //get animation number from scene variable\nvar url = runtimeScene.getVariables().get(\"url\").getAsString(); // get the url from scene variable\n\nruntimeScene.myCallback = function(loader, resources){ // loader and ressources come from PIXI.Loader.shared\n\n    var mySprite= resources[\"Sprite_Logo_GDevelop\"]; //get the image from PIXI ressources\n    \n    var game = runtimeScene.getGame(); //get the game currently running\n    \n    var object_texture_image = runtimeScene.getObjects(object); // Get all the objects called \"My_picture\"\n\n    var object_texture_image_renderer = object_texture_image[anim].getRendererObject(); // get the frist (and unique) objet called \"My_picture\" and get this renderer (PIXI sprite)\n\n    object_texture_image_renderer.texture = mySprite.texture; // change the texture in renderer (PIXI sprite)\n  \n\n};\n\nPIXI.Loader.shared.reset(); // reset the loader because if you press many times M key the ressources \"Sprite_Logo_GDevelop\" exist and crash your application\nPIXI.Loader.shared.add(\"Sprite_Logo_GDevelop\", url);  // here change the URL for get you own images from web !\nPIXI.Loader.shared.load(runtimeScene.myCallback); // Use callback for load the new image",
-              "parameterObjects": ""
+              "parameterObjects": "",
+              "useStrict": false,
+              "eventsSheetExpanded": false
             }
           ]
         }
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -554,6 +573,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

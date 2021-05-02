@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "",
-    "projectUuid": "a202ce56-da05-4ae7-80d9-3850cb864c4b",
+    "projectUuid": "8f77c09d-9600-48a5-9c1b-8fe2a7d82e29",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -150,6 +150,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -165,7 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "e49608a6-315b-4670-8130-85790319720a",
+          "persistentUuid": "a8f0334f-fc0f-4634-b56b-dbc4b131bcdb",
           "width": 0,
           "x": 8,
           "y": 14,
@@ -181,7 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "b36de0d2-107f-46d3-8f0e-b9452c441df5",
+          "persistentUuid": "93b81182-ae7f-45fa-9ce7-54f7fba22891",
           "width": 0,
           "x": 173,
           "y": 405,
@@ -191,6 +192,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -202,7 +204,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "868488f5-1726-469a-943f-978dd570673b",
+          "persistentUuid": "d2e3e3eb-7668-44c7-b850-6c632e1392b7",
           "width": 0,
           "x": 616,
           "y": 485,
@@ -212,6 +214,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -223,7 +226,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "5fc97a85-d442-4ab4-b90c-1e80b8efc219",
+          "persistentUuid": "920a5f4b-2acc-43ec-9392-49e787d13e2c",
           "width": 103.698,
           "x": 83,
           "y": 520,
@@ -233,6 +236,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -244,7 +248,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "e5b0a585-2178-4c9b-97b4-079a2971b851",
+          "persistentUuid": "8527d4cf-1bd8-42f3-ab9a-9357d9bcdbef",
           "width": 57.9741,
           "x": 457,
           "y": 486,
@@ -254,6 +258,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -265,7 +270,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "fe9322eb-3c5a-4102-bf81-595fe12aa379",
+          "persistentUuid": "ceed2c07-4a4f-4419-96e5-a67bd9fcf076",
           "width": 52,
           "x": 256,
           "y": 252,
@@ -275,6 +280,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "1"
             }
           ]
@@ -286,7 +292,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "37a76933-b931-45a0-acf2-df42c5b1e98c",
+          "persistentUuid": "6dad68c9-ae94-4b2a-9ee3-7fde7db34aa5",
           "width": 98.9224,
           "x": 675,
           "y": 373,
@@ -296,6 +302,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "2"
             }
           ]
@@ -307,7 +314,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
-          "persistentUuid": "e7fd1ac4-f13f-4777-87ae-42b7d6b21228",
+          "persistentUuid": "82f87224-cb85-43fc-9670-799f84496df4",
           "width": 100,
           "x": 480,
           "y": 196,
@@ -317,6 +324,7 @@
           "initialVariables": [
             {
               "name": "parent",
+              "type": "string",
               "value": "4"
             }
           ]
@@ -328,7 +336,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
-          "persistentUuid": "707c7b88-47bd-45a7-a0bc-70973d418b2e",
+          "persistentUuid": "50cb698e-a11d-49b9-975b-67b0e8b797f1",
           "width": 61.8433,
           "x": 436,
           "y": 209,
@@ -338,6 +346,7 @@
           "initialVariables": [
             {
               "name": "id",
+              "type": "string",
               "value": "4"
             }
           ]

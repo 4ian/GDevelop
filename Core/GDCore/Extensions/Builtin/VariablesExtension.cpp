@@ -291,7 +291,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddAction("SceneVariablePush",
                  _("Append variable to a scene array"),
                  _("Appends a variable at the end of a scene array variable."),
-                 _("Append variable _PARAM0_ to array variable _PARAM1_"),
+                 _("Append variable _PARAM1_ to array variable _PARAM0_"),
                  _("Variables/Collections/Arrays"),
                  "res/actions/var24.png",
                  "res/actions/var.png")

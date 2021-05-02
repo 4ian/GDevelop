@@ -185,6 +185,7 @@ import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import IconButton from '../UI/IconButton';
 import FilterList from '@material-ui/icons/FilterList';
 import Brush from '@material-ui/icons/Brush';
+import Delete from '@material-ui/icons/Delete';
 import RaisedButtonWithMenu from '../UI/RaisedButtonWithMenu';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import fakeResourceExternalEditors from './FakeResourceExternalEditors';
@@ -231,6 +232,12 @@ import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
+import {
+  Accordion,
+  AccordionActions,
+  AccordionHeader,
+  AccordionBody,
+} from '../UI/Accordion';
 
 configureActions({
   depth: 2,
@@ -1098,6 +1105,61 @@ storiesOf('UI Building Blocks/Checkbox', module)
       <Checkbox label={'My label'} checked={true} />
       <Checkbox label={'My label 2'} checked={false} />
     </div>
+  ));
+
+storiesOf('UI Building Blocks/Accordion', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <React.Fragment>
+      {[0, 1, 2].map(idx => (
+        <Accordion key={idx}>
+          <AccordionHeader
+            actions={[
+              <IconButton
+                key="delete"
+                size="small"
+                onClick={ev => {
+                  ev.stopPropagation();
+                  action('Header action')();
+                }}
+              >
+                <Delete />
+              </IconButton>,
+            ]}
+          >
+            <Text>
+              {idx === 0 ? 'Simple accordion' : null}
+              {idx === 1 ? 'Accordion with no body padding' : null}
+              {idx === 2 ? 'Accordion with actions' : null}
+            </Text>
+          </AccordionHeader>
+          <AccordionBody disableGutters={idx === 1}>
+            <Text>
+              This is a quadrilateral. A quadrilateral has four points. If yours
+              has more, count again - you may be misled.
+            </Text>
+          </AccordionBody>
+          {idx === 2 && (
+            <AccordionActions
+              actions={[
+                <FlatButton
+                  primary
+                  label="Count"
+                  onClick={action('Primary action')}
+                />,
+              ]}
+              secondaryActions={[
+                <FlatButton
+                  label="Ignore"
+                  onClick={action('Secondary action')}
+                />,
+              ]}
+            />
+          )}
+        </Accordion>
+      ))}
+    </React.Fragment>
   ));
 
 storiesOf('UI Building Blocks/PlaceholderMessage', module)
@@ -3308,33 +3370,43 @@ storiesOf('SpriteEditor and related editors', module)
   .addDecorator(muiDecorator)
   .add('SpriteEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <SpriteEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)
-        }
-        resourceExternalEditors={fakeResourceExternalEditors}
-      />
+      <DragAndDropContextProvider>
+        <SpriteEditor
+          object={testProject.spriteObject}
+          project={testProject.project}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)
+          }
+          resourceExternalEditors={fakeResourceExternalEditors}
+        />
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ))
   .add('PointsEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <PointsEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourcesLoader={ResourcesLoader}
-      />
+      <DragAndDropContextProvider>
+        <FixedHeightFlexContainer height={500}>
+          <PointsEditor
+            object={testProject.spriteObject}
+            project={testProject.project}
+            resourcesLoader={ResourcesLoader}
+          />
+        </FixedHeightFlexContainer>
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ))
   .add('CollisionMasksEditor', () => (
     <SerializedObjectDisplay object={testProject.spriteObject}>
-      <CollisionMasksEditor
-        object={testProject.spriteObject}
-        project={testProject.project}
-        resourcesLoader={ResourcesLoader}
-      />
+      <DragAndDropContextProvider>
+        <FixedHeightFlexContainer height={500}>
+          <CollisionMasksEditor
+            object={testProject.spriteObject}
+            project={testProject.project}
+            resourcesLoader={ResourcesLoader}
+          />
+        </FixedHeightFlexContainer>
+      </DragAndDropContextProvider>
     </SerializedObjectDisplay>
   ));
 

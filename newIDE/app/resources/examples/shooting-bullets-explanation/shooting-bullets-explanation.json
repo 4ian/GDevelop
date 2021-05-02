@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shooting-bullets-explanation\\shooting-bullets-explanation.json",
+    "projectUuid": "06990296-9479-45ae-9a69-b7498acb5ed5",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Basic explanation about shooting bullets",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -107,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "Bullet.png",
         "kind": "image",
+        "metadata": "",
         "name": "Tir.png",
         "smoothed": true,
         "userAdded": true
@@ -115,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "tank1fr1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank1fr1.png",
         "smoothed": true,
         "userAdded": true
@@ -123,6 +126,7 @@
         "alwaysLoaded": false,
         "file": "Pointer-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pointer-Standard.png",
         "smoothed": true,
         "userAdded": true
@@ -155,6 +159,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": false,
         "windowMask": false,
@@ -170,6 +175,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "dbbbce5f-fa82-4e8e-a2c6-bb0534493e3e",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -190,6 +196,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "437c6f15-3fb9-41c2-b19e-d703cd5d5ea8",
           "width": 0,
           "x": 476.5,
           "y": 213.5,
@@ -202,14 +209,15 @@
       "objects": [
         {
           "name": "Bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -265,6 +273,7 @@
         },
         {
           "name": "Tank",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -328,6 +337,7 @@
         },
         {
           "name": "Target",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -438,8 +448,8 @@
               "parameters": [
                 "",
                 "Bullet",
-                "Tank.PointX(Canon)",
-                "Tank.PointY(Canon)",
+                "Tank.PointX(\"Canon\")",
+                "Tank.PointY(\"Canon\")",
                 ""
               ],
               "subInstructions": []
@@ -510,6 +520,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -550,6 +565,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": false,
         "windowMask": false,
@@ -565,6 +581,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "c06518fb-d931-4865-bd8a-b9a6af9b8734",
           "width": 0,
           "x": 520,
           "y": 216,
@@ -585,6 +602,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "a44c2d31-a260-45d6-aa1f-25d5ebdade63",
           "width": 0,
           "x": 337,
           "y": 215,
@@ -605,6 +623,7 @@
           "layer": "",
           "locked": false,
           "name": "Tank",
+          "persistentUuid": "ef3c80f5-37a1-4b41-b6bb-41380e97bad9",
           "width": 0,
           "x": 138,
           "y": 201,
@@ -625,6 +644,7 @@
           "layer": "",
           "locked": false,
           "name": "Target",
+          "persistentUuid": "d75810ef-86a0-4459-b454-9c86b710b275",
           "width": 0,
           "x": 608.5,
           "y": 178.5,
@@ -637,14 +657,15 @@
       "objects": [
         {
           "name": "Bullet",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [
             {
-              "extraBorder": 0,
               "name": "DestroyOutside",
-              "type": "DestroyOutsideBehavior::DestroyOutside"
+              "type": "DestroyOutsideBehavior::DestroyOutside",
+              "extraBorder": 0
             }
           ],
           "animations": [
@@ -700,6 +721,7 @@
         },
         {
           "name": "Tank",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -763,6 +785,7 @@
         },
         {
           "name": "Target",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -893,8 +916,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Tank.PointX(Canon)",
-                    "Tank.PointY(Canon)",
+                    "Tank.PointX(\"Canon\")",
+                    "Tank.PointY(\"Canon\")",
                     ""
                   ],
                   "subInstructions": []
@@ -971,6 +994,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -992,6 +1020,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

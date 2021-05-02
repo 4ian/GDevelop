@@ -278,7 +278,7 @@ describe('InstallAsset', () => {
             .getBehavior('MyBehavior')
             .getContent()
         )
-      ).toBe('{"property1": "Overriden value","property2": true}');
+      ).toBe('{"property1":"Overriden value","property2":true}');
     });
 
     it('installs an object asset in the project, adding the required events', async () => {

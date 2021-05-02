@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/parallax/parallax.json",
+    "projectUuid": "d0826a31-d275-460b-a918-460864809464",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Project",
     "author": "",
     "windowWidth": 600,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -101,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "Vegetation_(middle_layer).png",
         "kind": "image",
+        "metadata": "",
         "name": "Vegetation_(middle_layer).png",
         "smoothed": true,
         "userAdded": true
@@ -109,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "Ground_(front_layer).png",
         "kind": "image",
+        "metadata": "",
         "name": "Ground_(front_layer).png",
         "smoothed": true,
         "userAdded": true
@@ -117,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "Sky_back_layer.png",
         "kind": "image",
+        "metadata": "",
         "name": "Sky_back_layer.png",
         "smoothed": true,
         "userAdded": true
@@ -125,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "Elisa_standing.png",
         "kind": "image",
+        "metadata": "",
         "name": "Elisa_standing.png",
         "smoothed": true,
         "userAdded": true
@@ -157,6 +162,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -172,6 +178,7 @@
           "layer": "",
           "locked": false,
           "name": "ObjectToFollow",
+          "persistentUuid": "08780f2f-a2fc-4701-a58a-2aac61e4bba0",
           "width": 0,
           "x": -128,
           "y": 320,
@@ -187,6 +194,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "9158bd08-2171-4cd5-8da5-a2155549ada5",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -202,6 +210,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "5c39bf06-6e63-49cc-8b52-f14d89a5bf99",
           "width": 0,
           "x": -640,
           "y": -32,
@@ -222,6 +231,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "a043c250-1d67-44af-b5eb-800bdec4454f",
           "width": 0,
           "x": -608,
           "y": -32,
@@ -242,6 +252,7 @@
           "layer": "Layer3",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "57e712c7-5ffa-40a1-869a-3f1021fe4917",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -262,6 +273,7 @@
           "layer": "Layer2",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "c6dc540b-4b74-4038-8705-d7f3c6d5883d",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -282,6 +294,7 @@
           "layer": "Layer4",
           "locked": false,
           "name": "Background",
+          "persistentUuid": "a58f7530-5114-4919-b563-82b5aa9f8b0b",
           "width": 0,
           "x": 0,
           "y": -32,
@@ -294,6 +307,7 @@
       "objects": [
         {
           "name": "Background",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -447,6 +461,7 @@
         },
         {
           "name": "ObjectToFollow",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -689,6 +704,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer4",
           "visibility": true,
           "cameras": [
@@ -706,6 +726,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer3",
           "visibility": true,
           "cameras": [
@@ -723,6 +748,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "Layer2",
           "visibility": true,
           "cameras": [
@@ -740,6 +770,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -761,6 +796,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

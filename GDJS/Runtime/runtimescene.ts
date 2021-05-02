@@ -43,6 +43,12 @@ namespace gdjs {
     _instancesRemoved: gdjs.RuntimeObject[] = [];
     _profiler: gdjs.Profiler | null = null;
 
+    // Options for the debug draw:
+    _debugDrawEnabled: boolean = false;
+    _debugDrawShowHiddenInstances: boolean = false;
+    _debugDrawShowPointsNames: boolean = false;
+    _debugDrawShowCustomPoints: boolean = false;
+
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
 
@@ -58,6 +64,7 @@ namespace gdjs {
       this._initialBehaviorSharedData = new Hashtable();
       this._renderer = new gdjs.RuntimeSceneRenderer(
         this,
+        // @ts-ignore
         runtimeGame ? runtimeGame.getRenderer() : null
       );
       this._variables = new gdjs.VariablesContainer();
@@ -79,9 +86,27 @@ namespace gdjs {
     }
 
     /**
+     * Activate or deactivate the debug visualization for collisions and points.
+     */
+    enableDebugDraw(
+      enableDebugDraw: boolean,
+      showHiddenInstances: boolean,
+      showPointsNames: boolean,
+      showCustomPoints: boolean
+    ): void {
+      if (this._debugDrawEnabled && !enableDebugDraw) {
+        this.getRenderer().clearDebugDraw();
+      }
+
+      this._debugDrawEnabled = enableDebugDraw;
+      this._debugDrawShowHiddenInstances = showHiddenInstances;
+      this._debugDrawShowPointsNames = showPointsNames;
+      this._debugDrawShowCustomPoints = showCustomPoints;
+    }
+
+    /**
      * Should be called when the canvas where the scene is rendered has been resized.
      * See gdjs.RuntimeGame.startGameLoop in particular.
-     * @memberof gdjs.RuntimeScene
      */
     onGameResolutionResized() {
       for (const name in this._layers.items) {
@@ -503,13 +528,17 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      const renderDebugDraw = false;
-      if (renderDebugDraw && this._layersCameraCoordinates) {
+      if (this._debugDrawEnabled && this._layersCameraCoordinates) {
+        this._updateLayersCameraCoordinates(1);
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
-          this._layersCameraCoordinates
+          this._layersCameraCoordinates,
+          this._debugDrawShowHiddenInstances,
+          this._debugDrawShowPointsNames,
+          this._debugDrawShowCustomPoints
         );
       }
+
       this._isJustResumed = false;
       this.render();
       if (this._profiler) {
@@ -528,7 +557,7 @@ namespace gdjs {
       this._renderer.render();
     }
 
-    _updateLayersCameraCoordinates() {
+    _updateLayersCameraCoordinates(scale: float) {
       this._layersCameraCoordinates = this._layersCameraCoordinates || {};
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
@@ -537,13 +566,13 @@ namespace gdjs {
             name
           ] || [0, 0, 0, 0];
           this._layersCameraCoordinates[name][0] =
-            theLayer.getCameraX() - theLayer.getCameraWidth();
+            theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
           this._layersCameraCoordinates[name][1] =
-            theLayer.getCameraY() - theLayer.getCameraHeight();
+            theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
           this._layersCameraCoordinates[name][2] =
-            theLayer.getCameraX() + theLayer.getCameraWidth();
+            theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
           this._layersCameraCoordinates[name][3] =
-            theLayer.getCameraY() + theLayer.getCameraHeight();
+            theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
         }
       }
     }
@@ -579,9 +608,15 @@ namespace gdjs {
         }
         return;
       } else {
-        //After first frame, optimise rendering by setting only objects
-        //near camera as visible.
-        this._updateLayersCameraCoordinates();
+        // After first frame, optimise rendering by setting only objects
+        // near camera as visible.
+        // TODO: For compatibility, pass a scale of `2`,
+        // meaning that size of cameras will be multiplied by 2 and so objects
+        // will be hidden if they are outside of this *larger* camera area.
+        // Useful for objects not properly reporting their visibility AABB,
+        // (so we have a "safety margin") but these objects should be fixed
+        // instead.
+        this._updateLayersCameraCoordinates(2);
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
           const object = this._allInstancesList[i];
@@ -595,8 +630,8 @@ namespace gdjs {
           } else {
             const aabb = object.getVisibilityAABB();
             if (
-              aabb &&
               // If no AABB is returned, the object should always be visible
+              aabb &&
               (aabb.min[0] > cameraCoords[2] ||
                 aabb.min[1] > cameraCoords[3] ||
                 aabb.max[0] < cameraCoords[0] ||

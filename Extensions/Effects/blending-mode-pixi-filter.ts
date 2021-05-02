@@ -1,4 +1,5 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('BlendingMode', {
     makePIXIFilter: function (layer, effectData) {
       const blendingModeFilter = new PIXI.filters.AlphaFilter();
@@ -6,7 +7,8 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const blendingModeFilter = filter as PIXI.filters.AlphaFilter;
+      // @ts-ignore - unsure why PIXI.filters is not recognised.
+      const blendingModeFilter = (filter as unknown) as PIXI.filters.AlphaFilter;
       if (parameterName === 'alpha') {
         blendingModeFilter.alpha = value;
       } else if (parameterName === 'blendmode') {

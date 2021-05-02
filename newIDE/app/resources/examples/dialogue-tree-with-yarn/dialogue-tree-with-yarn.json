@@ -1,26 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 98,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
     "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/home/fox/DEV/GDevelop/newIDE/app/resources/examples/dialogue-tree-with-yarn/dialogue-tree-with-yarn.json",
+    "projectUuid": "a37fdc97-2575-4877-8164-826b7f530a88",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Npc Example",
     "author": "Todor Imreorov aka blurymind",
     "windowWidth": 800,
@@ -33,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -682,6 +679,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\jump.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -689,6 +688,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\item.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": false
       },
       {
@@ -696,6 +697,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "other\\sounds\\the_valley.ogg",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -831,18 +834,22 @@
   "variables": [
     {
       "name": "textScrollSpd",
+      "type": "string",
       "value": "0.02"
     },
     {
       "name": "optionIndex",
+      "type": "string",
       "value": "0"
     },
     {
       "name": "yarnState",
+      "type": "string",
       "value": ""
     },
     {
       "name": "textScrollSpdMultiplier",
+      "type": "string",
       "value": "1"
     }
   ],
@@ -868,6 +875,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
@@ -951,10 +959,12 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "debugYarn",
+          "type": "string",
           "value": "true"
         }
       ],
@@ -966,6 +976,7 @@
           "layer": "",
           "locked": false,
           "name": "Player",
+          "persistentUuid": "068bfe87-6ad9-44e4-861f-a60e4859ff94",
           "width": 0,
           "x": 159,
           "y": 519,
@@ -981,6 +992,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "837e7b4e-011f-428e-984c-10de02a0ac9e",
           "width": 0,
           "x": 487,
           "y": 524,
@@ -996,6 +1008,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "9488112b-0546-443a-aa92-2568cd541c3a",
           "width": 0,
           "x": 263,
           "y": 485,
@@ -1011,6 +1024,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "01b21d74-9ec9-449d-afa0-d3b8043ee884",
           "width": 0,
           "x": 127,
           "y": 580,
@@ -1026,6 +1040,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "7df22b07-063f-4809-8b3a-21a8aa462e1e",
           "width": 0,
           "x": -516,
           "y": 541,
@@ -1041,6 +1056,7 @@
           "layer": "",
           "locked": false,
           "name": "TiledGrassPlatform",
+          "persistentUuid": "65bb3499-1bcd-4efc-893f-48dbaa88b299",
           "width": 1972,
           "x": -583.046,
           "y": 570,
@@ -1056,6 +1072,7 @@
           "layer": "",
           "locked": false,
           "name": "PlayerHitBox",
+          "persistentUuid": "f85d2862-9a59-4d96-b586-f8bd814555fa",
           "width": 45,
           "x": 183,
           "y": 523,
@@ -1071,6 +1088,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "bbf87267-5293-43c2-ab02-3f9c68541a88",
           "width": 0,
           "x": 687.677,
           "y": 527.461,
@@ -1086,6 +1104,7 @@
           "layer": "",
           "locked": false,
           "name": "SlimeWalk",
+          "persistentUuid": "0f3d64ab-13b2-4893-969d-d19193094aa2",
           "width": 0,
           "x": 286.2,
           "y": 528.461,
@@ -1095,6 +1114,7 @@
           "initialVariables": [
             {
               "name": "dialogueBranch",
+              "type": "string",
               "value": "ant"
             }
           ]
@@ -1106,6 +1126,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "223d3ab3-b000-403f-bc30-acba37076829",
           "width": 0,
           "x": -222,
           "y": 513,
@@ -1121,6 +1142,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "07f8497a-e50b-458e-a336-d1a60d5d2618",
           "width": 94,
           "x": 1162,
           "y": 491,
@@ -1136,6 +1158,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "7d6c6d8d-aa4f-4edb-ac13-d82c01ad2ca6",
           "width": 0,
           "x": 544,
           "y": 439,
@@ -1151,6 +1174,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "2c84876b-a5b3-4d44-aeb5-e1185e76fbf8",
           "width": 0,
           "x": 925.784,
           "y": 505.015,
@@ -1166,6 +1190,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "0a4b79fd-04e7-4e94-81ab-c361de2527ba",
           "width": 0,
           "x": 1090,
           "y": 519,
@@ -1186,6 +1211,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "34cce7be-274e-4c89-988e-a4fb689bf856",
           "width": 0,
           "x": -49,
           "y": 522,
@@ -1206,6 +1232,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "Score",
+          "persistentUuid": "403af088-bc8b-4f2c-9775-02c7ecac8e65",
           "width": 0,
           "x": 66,
           "y": 4,
@@ -1221,6 +1248,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "CoinIcon",
+          "persistentUuid": "c3ae8029-f4dd-4713-bd08-1749cb632d50",
           "width": 44,
           "x": 15,
           "y": 11,
@@ -1236,6 +1264,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "c6d596ae-d01e-4fc5-82e9-bcab96523c1b",
           "width": 0,
           "x": 227.769,
           "y": 425.277,
@@ -1251,6 +1280,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "df4c6991-1a37-4744-81fc-1ebb0390c078",
           "width": 0,
           "x": 514.954,
           "y": 510.092,
@@ -1266,6 +1296,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "16e2cf24-8fc0-4b85-bbd3-5f27d6ee6f78",
           "width": 0,
           "x": 469.785,
           "y": 513.092,
@@ -1281,6 +1312,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "0985c65d-89e1-4c8b-bb91-de5989408513",
           "width": 0,
           "x": 773.846,
           "y": 359.816,
@@ -1296,6 +1328,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "e49959ef-5794-4cd7-bd8b-ebf60d15afed",
           "width": 0,
           "x": 859.831,
           "y": 296.262,
@@ -1311,6 +1344,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "cf524529-cf55-42ca-af62-f3bd83b1f1e8",
           "width": 0,
           "x": 953.292,
           "y": 241.431,
@@ -1326,6 +1360,7 @@
           "layer": "",
           "locked": false,
           "name": "Coin",
+          "persistentUuid": "028a8278-a2c6-4439-b518-fed1dc34ea4e",
           "width": 0,
           "x": 414.954,
           "y": 513.092,
@@ -1341,6 +1376,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "8c5ae63a-d1f4-44b4-8df0-b3dca8178607",
           "width": 0,
           "x": -41,
           "y": 353,
@@ -1356,6 +1392,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "8c952955-2b0b-48c2-a26b-fcbf3d442c7c",
           "width": 0,
           "x": 518,
           "y": 354,
@@ -1371,6 +1408,7 @@
           "layer": "",
           "locked": false,
           "name": "Fly",
+          "persistentUuid": "5ad66df7-4fb7-40e9-9e92-dba3e174d8da",
           "width": 0,
           "x": 363,
           "y": 315,
@@ -1386,6 +1424,7 @@
           "layer": "",
           "locked": false,
           "name": "GoRight",
+          "persistentUuid": "132ace1b-431a-4180-a11b-b8efd286beec",
           "width": 0,
           "x": 265.877,
           "y": 545.185,
@@ -1401,6 +1440,7 @@
           "layer": "",
           "locked": false,
           "name": "GoLeft",
+          "persistentUuid": "061dd06c-b9bf-44fc-885c-0993c1ceb3e4",
           "width": 0,
           "x": 732.6,
           "y": 544.185,
@@ -1416,6 +1456,7 @@
           "layer": "GUI",
           "locked": true,
           "name": "LeftButton",
+          "persistentUuid": "977cc4c6-5fe9-42b7-9498-64c93a43dad6",
           "width": 97.5489,
           "x": 30,
           "y": 448,
@@ -1431,6 +1472,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "RightButton",
+          "persistentUuid": "73022c22-5d8b-4f90-aaeb-d96a2a9e4952",
           "width": 94.1152,
           "x": 147,
           "y": 448,
@@ -1446,6 +1488,7 @@
           "layer": "GUI",
           "locked": true,
           "name": "ArrowButtonsBg",
+          "persistentUuid": "21c2a123-2de1-4973-9c0c-d7e9d518322b",
           "width": 202.235,
           "x": 39,
           "y": 384,
@@ -1461,6 +1504,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "JumpButton",
+          "persistentUuid": "18270b00-2337-4fc4-bd7f-65c1eed7f79e",
           "width": 107.992,
           "x": 659,
           "y": 457,
@@ -1476,6 +1520,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "b044f89e-5c34-4c6c-a543-10e94177122a",
           "width": 1725,
           "x": -299,
           "y": 109,
@@ -1491,6 +1536,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "4cb250cd-7d82-4ce3-86c3-ceed9da4f61b",
           "width": 1654,
           "x": -276,
           "y": 230,
@@ -1506,6 +1552,7 @@
           "layer": "BG",
           "locked": false,
           "name": "clouds",
+          "persistentUuid": "614525a7-c7a7-4cce-bc7d-b0d40a86c369",
           "width": 1765,
           "x": -229,
           "y": 113,
@@ -1521,6 +1568,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "651844e0-a0d5-4849-88ac-de4fdebcb262",
           "width": 1654,
           "x": -228,
           "y": 343,
@@ -1536,6 +1584,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "4568fa9a-cb53-4303-a6f9-29bf53fbee3a",
           "width": 1725,
           "x": -396,
           "y": 161,
@@ -1551,6 +1600,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "6ca21071-7c1d-42ff-a0e4-aac32f2a5df7",
           "width": 1725,
           "x": -361,
           "y": 283,
@@ -1566,6 +1616,7 @@
           "layer": "BG",
           "locked": false,
           "name": "trees",
+          "persistentUuid": "93769c66-ba8c-409b-b54a-dffc252b19e1",
           "width": 1654,
           "x": -257,
           "y": 420,
@@ -1581,6 +1632,7 @@
           "layer": "BG",
           "locked": false,
           "name": "mountains",
+          "persistentUuid": "64263958-4980-4370-b76f-52dccc6f0934",
           "width": 1725,
           "x": -366,
           "y": 141,
@@ -1596,6 +1648,7 @@
           "layer": "",
           "locked": false,
           "name": "NewObject",
+          "persistentUuid": "5e224872-b8eb-4899-a4f2-ae5b1ec465a1",
           "width": 167,
           "x": -368,
           "y": 429,
@@ -1611,6 +1664,7 @@
           "layer": "",
           "locked": false,
           "name": "sign",
+          "persistentUuid": "8e4fa9e8-44df-4308-bfc4-e14f295e91d8",
           "width": 0,
           "x": 178,
           "y": 512,
@@ -1626,6 +1680,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "questionChoicesText",
+          "persistentUuid": "3a4b4ed1-c534-4247-ad47-a709e1325970",
           "width": 0,
           "x": 112,
           "y": 147,
@@ -1641,6 +1696,7 @@
           "layer": "",
           "locked": false,
           "name": "Ant",
+          "persistentUuid": "f04c4b41-4f2c-40d6-8ce4-29dbf7044dd5",
           "width": 0,
           "x": 402,
           "y": 530,
@@ -1656,6 +1712,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "textBg",
+          "persistentUuid": "4aeaa6a0-fa9d-4dee-8854-86f3947cce18",
           "width": 772,
           "x": 8,
           "y": 93,
@@ -1671,6 +1728,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "avatars",
+          "persistentUuid": "7795ae3e-f6ee-42ac-818f-5ec40bbf2916",
           "width": 0,
           "x": 22,
           "y": 114,
@@ -1686,6 +1744,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "4ba7b054-ebeb-4815-8010-475312eaf21b",
           "width": 0,
           "x": -778,
           "y": 480,
@@ -1701,6 +1760,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "f8576041-0b71-48d8-bbbe-78890931f3db",
           "width": 0,
           "x": -724,
           "y": 630,
@@ -1716,6 +1776,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "3ab9f6ed-bdf0-44a6-a853-3c886942f81b",
           "width": 0,
           "x": -622,
           "y": 533,
@@ -1731,6 +1792,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "316027b5-fadc-4a1c-8efb-8d817dbfc661",
           "width": 0,
           "x": -461,
           "y": 557,
@@ -1746,6 +1808,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "4e437fa6-bf48-4f8a-a789-da560753c993",
           "width": 0,
           "x": -355,
           "y": 521,
@@ -1761,6 +1824,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "e8c6bc22-7d4c-451f-8f30-ee00c767b317",
           "width": 0,
           "x": -697,
           "y": 537,
@@ -1776,6 +1840,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "007b28f1-a1e1-4c80-94ed-774cefe1db19",
           "width": 0,
           "x": -500,
           "y": 496,
@@ -1791,6 +1856,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "99f0c5c6-5f7b-4055-ac27-1ec976e85d83",
           "width": 0,
           "x": -685,
           "y": 617,
@@ -1806,6 +1872,7 @@
           "layer": "",
           "locked": false,
           "name": "crumb",
+          "persistentUuid": "99ab9601-a7f4-4fc5-b5c3-b711b14d392d",
           "width": 0,
           "x": -385,
           "y": 373,
@@ -1821,6 +1888,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "b9b7895f-ff84-46eb-bb7b-e66a50ce2983",
           "width": 0,
           "x": -86,
           "y": 584,
@@ -1841,6 +1909,7 @@
           "layer": "",
           "locked": false,
           "name": "Platform",
+          "persistentUuid": "547b3008-a927-484e-8331-a41e25884826",
           "width": 0,
           "x": 1295,
           "y": 414,
@@ -1856,6 +1925,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "6f711f5f-17dd-4f35-99a7-792e782c208f",
           "width": 0,
           "x": 1543,
           "y": 443,
@@ -1871,6 +1941,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "ace42231-cbe6-444f-997e-468f11f30916",
           "width": 0,
           "x": 968,
           "y": 543,
@@ -1886,6 +1957,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "6caa04fc-44b1-4c44-80a3-0894e2ba99ed",
           "width": 0,
           "x": 1443,
           "y": 453,
@@ -1901,6 +1973,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "5f1a8b5e-3290-486b-8fd9-5dd253506c41",
           "width": 0,
           "x": 1487,
           "y": 550,
@@ -1916,6 +1989,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "c0b8c284-2358-442c-80f3-84e910a73035",
           "width": 0,
           "x": 1289,
           "y": 519,
@@ -1931,6 +2005,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "e10d8e71-8bb7-4606-9f10-c6146b47c751",
           "width": 0,
           "x": 1367,
           "y": 535,
@@ -1946,6 +2021,7 @@
           "layer": "",
           "locked": false,
           "name": "BackgroundObjects",
+          "persistentUuid": "7a4de01c-7f61-4723-ad45-13642f3bca70",
           "width": 0,
           "x": 1418,
           "y": 575,
@@ -1961,6 +2037,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "c03fd9e1-1b39-4a57-8f0d-ecbd991b7fda",
           "width": 0,
           "x": 1392,
           "y": 567,
@@ -1976,6 +2053,7 @@
           "layer": "",
           "locked": false,
           "name": "Jumpthru",
+          "persistentUuid": "89b2d0e0-8694-411c-95e9-a8ba64a408ce",
           "width": 0,
           "x": 1369,
           "y": 591,
@@ -1991,6 +2069,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "DialogueTreeBBtextObject",
+          "persistentUuid": "460fed3b-98a6-4f6a-bb1b-b0fd378b82ff",
           "width": 543,
           "x": 108,
           "y": 98,
@@ -2006,6 +2085,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "commandsDebug",
+          "persistentUuid": "02a59e6a-e6e6-4a90-943d-97ac2f415d33",
           "width": 0,
           "x": 5,
           "y": 10,
@@ -2021,6 +2101,7 @@
           "layer": "GUI",
           "locked": false,
           "name": "fullTextDebug",
+          "persistentUuid": "49fd86b7-489a-42bc-acdc-5096aca0b5bf",
           "width": 0,
           "x": 353,
           "y": 10,
@@ -2036,6 +2117,7 @@
           "layer": "",
           "locked": false,
           "name": "enemy2",
+          "persistentUuid": "da5f6c19-98c4-45c5-910b-546e639f015b",
           "width": 0,
           "x": -268,
           "y": 390,
@@ -3323,10 +3405,12 @@
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "dialogueBranch",
+              "type": "string",
               "value": "cricket"
             }
           ],
@@ -3536,14 +3620,17 @@
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             },
             {
               "name": "state",
+              "type": "string",
               "value": "walking"
             },
             {
               "name": "dialogueBranch",
+              "type": "string",
               "value": "ant"
             }
           ],
@@ -5151,10 +5238,12 @@
           "variables": [
             {
               "name": "state",
+              "type": "string",
               "value": "sign"
             },
             {
               "name": "dialogueBranch",
+              "type": "string",
               "value": "Start"
             }
           ],
@@ -5422,6 +5511,7 @@
           "variables": [
             {
               "name": "dialogueBranch",
+              "type": "string",
               "value": "crumb"
             }
           ],
@@ -7915,12 +8005,22 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "BG",
           "visibility": true,
           "cameras": [],
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7938,6 +8038,11 @@
           "effects": []
         },
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "GUI",
           "visibility": true,
           "cameras": [

@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const asciiFilter = filter as PIXI.filters.AsciiFilter;
+      const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
       if (parameterName === 'size') {
         asciiFilter.size = value;
       }

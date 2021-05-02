@@ -19,7 +19,6 @@ npm-debug.log
 
 # GD library
 public/libGD.js
-public/libGD.js.mem
 public/libGD.wasm
 
 # Third party editors

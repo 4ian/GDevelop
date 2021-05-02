@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "landscape",
     "packageName": "com.example.zatgamename",
-    "projectUuid": "4bbe67aa-5581-4f59-8915-e7f410aaaa4f",
+    "projectUuid": "fc9f069a-8f65-43dd-b2c8-0e9d6e3371f1",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -420,6 +420,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -524,66 +525,82 @@
       "variables": [
         {
           "name": "maxSpeed",
+          "type": "string",
           "value": ""
         },
         {
           "name": "bikeSpeed",
+          "type": "string",
           "value": ""
         },
         {
           "name": "Accel",
+          "type": "string",
           "value": ""
         },
         {
           "name": "mouseJoint",
+          "type": "string",
           "value": ""
         },
         {
           "name": "height",
+          "type": "string",
           "value": ""
         },
         {
           "name": "clearance",
+          "type": "string",
           "value": ""
         },
         {
           "name": "dummy",
+          "type": "string",
           "value": ""
         },
         {
           "name": "speedLerp",
+          "type": "string",
           "value": ""
         },
         {
           "name": "followX",
+          "type": "string",
           "value": ""
         },
         {
           "name": "followY",
+          "type": "string",
           "value": ""
         },
         {
           "name": "started",
+          "type": "string",
           "value": ""
         },
         {
           "name": "finished",
+          "type": "string",
           "value": ""
         },
         {
           "name": "myElapsed",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "seatForce",
+          "type": "string",
           "value": ""
         },
         {
           "name": "maxForce",
+          "type": "string",
           "value": ""
         },
         {
           "name": "indicatorForce",
+          "type": "string",
           "value": ""
         }
       ],

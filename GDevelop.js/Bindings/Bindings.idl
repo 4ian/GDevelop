@@ -727,6 +727,22 @@ interface MapStringPropertyDescriptor {
     [Value] VectorString MAP_keys();
 };
 
+interface MapStringSerializerValue {
+    void MapStringSerializerValue();
+
+    [Ref] SerializerValue MAP_getOrCreate([Const] DOMString name);
+    [Ref] SerializerValue MAP_get([Const] DOMString name);
+    void MAP_set([Const] DOMString name, [Const, Ref] SerializerValue prop);
+    boolean MAP_has([Const] DOMString name);
+    [Value] VectorString MAP_keys();
+};
+
+interface VectorPairStringSharedPtrSerializerElement {
+    unsigned long size();
+    [Const, Ref] DOMString WRAPPED_GetString(unsigned long id);
+    [Value] SharedPtrSerializerElement WRAPPED_GetSharedPtrSerializerElement(unsigned long id);
+};
+
 interface Resource {
     void Resource();
 
@@ -834,9 +850,9 @@ interface InitialInstance {
 
     void UpdateCustomProperty([Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout layout);
     [Value] MapStringPropertyDescriptor GetCustomProperties([Ref] Project project, [Ref] Layout layout);
-    float GetRawFloatProperty([Const] DOMString name);
+    float GetRawDoubleProperty([Const] DOMString name);
     [Const, Ref] DOMString GetRawStringProperty([Const] DOMString name);
-    void SetRawFloatProperty([Const] DOMString name, float value);
+    void SetRawDoubleProperty([Const] DOMString name, float value);
     void SetRawStringProperty([Const] DOMString name, [Const] DOMString value);
 
     [Ref] VariablesContainer GetVariables();
@@ -891,6 +907,13 @@ interface SerializerValue {
     [Const, Value] DOMString GetString();
     long GetInt();
     float GetDouble();
+
+    [Const, Value] DOMString GetRawString();
+
+    boolean IsBoolean();
+    boolean IsString();
+    boolean IsInt();
+    boolean IsDouble();
 };
 
 interface SerializerElement {
@@ -900,13 +923,15 @@ interface SerializerElement {
     void SetBoolValue(boolean value);
     void SetStringValue([Const] DOMString value);
     void SetIntValue(long value);
-    void SetDoubleValue(float value);
+    void SetDoubleValue(double value);
 
     [Const, Ref] SerializerValue GetValue();
     boolean GetBoolValue();
     [Const, Value] DOMString GetStringValue();
     long GetIntValue();
-    float GetDoubleValue();
+    double GetDoubleValue();
+
+    boolean IsValueUndefined();
 
     // Setting and reading attributes (will be serialized as children in JSON,
     // but the setter/getter are faster to type and offer better semantic compared
@@ -914,12 +939,12 @@ interface SerializerElement {
     [Ref] SerializerElement SetBoolAttribute([Const] DOMString name, boolean value);
     [Ref] SerializerElement SetStringAttribute([Const] DOMString name, [Const] DOMString value);
     [Ref] SerializerElement SetIntAttribute([Const] DOMString name, long value);
-    [Ref] SerializerElement SetDoubleAttribute([Const] DOMString name, float value);
+    [Ref] SerializerElement SetDoubleAttribute([Const] DOMString name, double value);
 
     boolean GetBoolAttribute([Const] DOMString name);
     [Const, Value] DOMString GetStringAttribute([Const] DOMString name);
     long GetIntAttribute([Const] DOMString name);
-    float GetDoubleAttribute([Const] DOMString name);
+    double GetDoubleAttribute([Const] DOMString name);
 
     // Use the element as an array:
     void ConsiderAsArray();
@@ -930,6 +955,14 @@ interface SerializerElement {
     [Ref] SerializerElement GetChild([Const] DOMString str);
     void WRAPPED_SetChild([Const] DOMString str, [Const, Ref] SerializerElement element);
     boolean HasChild([Const] DOMString str);
+
+    [Const, Ref] VectorPairStringSharedPtrSerializerElement GetAllChildren();
+    [Const, Ref] MapStringSerializerValue GetAllAttributes();
+};
+
+interface SharedPtrSerializerElement {
+    SerializerElement get();
+    void reset();
 };
 
 interface Serializer {
@@ -2465,37 +2498,6 @@ interface TextEntryObject {
     void TextEntryObject([Const] DOMString name);
 };
 TextEntryObject implements gdObject;
-
-interface SkeletonObject {
-    void SkeletonObject([Const] DOMString name);
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-};
 
 enum ParticleEmitterObject_RendererType {
   "ParticleEmitterObject::Point",

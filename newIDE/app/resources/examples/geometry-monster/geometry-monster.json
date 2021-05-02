@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "portrait",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/geometry-monster/geometry-monster.json",
+    "projectUuid": "e4a4abea-67ac-42ff-b18a-6d7f485444b8",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -246,6 +246,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "monster.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -271,6 +273,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "killed.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -445,6 +449,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -823,6 +828,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -850,6 +856,7 @@
       "variables": [
         {
           "name": "GameSpeed",
+          "type": "string",
           "value": "100"
         }
       ],
@@ -3434,12 +3441,18 @@
       "description": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
       "extensionNamespace": "",
       "fullName": "Stay On Screen",
+      "helpPath": "",
       "iconUrl": "",
       "name": "StayOnScreen",
       "previewIconUrl": "",
       "shortDescription": "Force the object to stay visible on the screen by setting back its position inside the viewport of the camera.",
-      "tags": "positioning, camera, screen",
       "version": "0.0.1",
+      "tags": [
+        "positioning",
+        "camera",
+        "screen"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3453,6 +3466,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -3560,12 +3574,18 @@
       "description": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
       "extensionNamespace": "",
       "fullName": "Sine (or ellipsis) Movement",
+      "helpPath": "",
       "iconUrl": "",
       "name": "SineMovement",
       "previewIconUrl": "",
       "shortDescription": "Allow an object to move smoothly on the X and/or Y axis following a sine wave, or an ellipsis.",
-      "tags": "sine, ellipsis, movement",
       "version": "0.0.1",
+      "tags": [
+        "sine",
+        "ellipsis",
+        "movement"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3579,6 +3599,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -3825,12 +3846,21 @@
       "description": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nAfter adding this to an object, you have to **trigger the effect** by using the **Flash action**.",
       "extensionNamespace": "",
       "fullName": "Flash (blink)",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Flash",
       "previewIconUrl": "",
       "shortDescription": "Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.",
-      "tags": "flash, blink, visible, invisible, hit, damage",
       "version": "1.0.0",
+      "tags": [
+        "flash",
+        "blink",
+        "visible",
+        "invisible",
+        "hit",
+        "damage"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -3844,6 +3874,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4038,6 +4069,7 @@
               "fullName": "Flash (blink)",
               "functionType": "Action",
               "name": "Flash",
+              "private": false,
               "sentence": "Make _PARAM0_ blink for _PARAM2_ seconds",
               "events": [
                 {
@@ -4138,6 +4170,7 @@
               "fullName": "Is object flashing",
               "functionType": "Condition",
               "name": "IsFlashing",
+              "private": false,
               "sentence": "_PARAM0_ is flashing",
               "events": [
                 {
@@ -4220,6 +4253,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onOwnerRemovedFromScene",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4273,6 +4307,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "onDeActivate",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4326,6 +4361,7 @@
               "fullName": "Stop flashing",
               "functionType": "Action",
               "name": "Stop",
+              "private": false,
               "sentence": "Stop flashing _PARAM0_",
               "events": [
                 {
@@ -4435,12 +4471,20 @@
       "description": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
       "extensionNamespace": "",
       "fullName": "Health (life points and damages for objects)",
+      "helpPath": "",
       "iconUrl": "",
       "name": "Health",
       "previewIconUrl": "",
       "shortDescription": "Add actions and conditions to manage the life of the object. Object can get damages, lose some health and you can check with a condition if it's dead.",
-      "tags": "health, life, damage, hit, heal",
       "version": "0.0.1",
+      "tags": [
+        "health",
+        "life",
+        "damage",
+        "hit",
+        "heal"
+      ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -4454,6 +4498,7 @@
               "fullName": "Damage the object",
               "functionType": "Action",
               "name": "Hit",
+              "private": false,
               "sentence": "Damage _PARAM0_, removing _PARAM2_ from its health",
               "events": [
                 {
@@ -4586,6 +4631,7 @@
               "fullName": "Is dead",
               "functionType": "Condition",
               "name": "IsDead",
+              "private": false,
               "sentence": "_PARAM0_ is dead",
               "events": [
                 {
@@ -4670,6 +4716,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPreEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -4723,6 +4770,7 @@
               "fullName": "Is just damaged",
               "functionType": "Condition",
               "name": "IsJustDamaged",
+              "private": false,
               "sentence": "_PARAM0_ has just been damaged",
               "events": [
                 {
@@ -4805,6 +4853,7 @@
               "fullName": "Heal the object",
               "functionType": "Action",
               "name": "Heal",
+              "private": false,
               "sentence": "Heal _PARAM0_, adding _PARAM2_ to its health",
               "events": [
                 {
@@ -4905,6 +4954,7 @@
               "fullName": "Change object health",
               "functionType": "Action",
               "name": "SetHealth",
+              "private": false,
               "sentence": "Set health of _PARAM0_ to _PARAM2_",
               "events": [
                 {
@@ -5005,6 +5055,7 @@
               "fullName": "Health",
               "functionType": "Expression",
               "name": "Health",
+              "private": false,
               "sentence": "",
               "events": [
                 {

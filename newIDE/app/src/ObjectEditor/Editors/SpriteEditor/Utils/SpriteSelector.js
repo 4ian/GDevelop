@@ -28,8 +28,8 @@ type Props = {|
   setSameForAllAnimations: boolean => void,
   setSameForAllSprites: boolean => void,
 
-  setSameForAllAnimationsLabel: string,
-  setSameForAllSpritesLabel: string,
+  setSameForAllAnimationsLabel: string | React.Node,
+  setSameForAllSpritesLabel: string | React.Node,
 |};
 
 /**

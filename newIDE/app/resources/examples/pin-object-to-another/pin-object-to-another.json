@@ -1,23 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another/pin-object-to-another.json",
+    "projectUuid": "54e1fbf6-2c58-4e53-aa01-9197355f5f02",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -30,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -108,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "parent.png",
         "kind": "image",
+        "metadata": "",
         "name": "parent.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "child.png",
         "kind": "image",
+        "metadata": "",
         "name": "child.png",
         "smoothed": true,
         "userAdded": true
@@ -148,6 +150,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -163,6 +166,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "4f85f7b7-1ca6-43b7-b128-3a70a34d10f3",
           "width": 0,
           "x": 10,
           "y": 12.5,
@@ -178,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "parent",
+          "persistentUuid": "c2c064f7-e291-4878-a6a5-2631abb6a216",
           "width": 0,
           "x": 406,
           "y": 343,
@@ -193,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "674b3467-0c43-4341-b451-64c153d9cdda",
           "width": 54.7414,
           "x": 516,
           "y": 215,
@@ -208,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "24b83690-0d97-479b-8887-8bd2d58b2633",
           "width": 215.06,
           "x": 373,
           "y": 198,
@@ -223,6 +230,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "71836db6-b35f-4526-a253-e4a26bd2cedf",
           "width": 160.345,
           "x": 566,
           "y": 455,
@@ -238,6 +246,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "1c531c36-d895-4e66-a4b2-03c952b6e60e",
           "width": 100,
           "x": 233.433,
           "y": 453.542,
@@ -253,6 +262,7 @@
           "layer": "",
           "locked": false,
           "name": "child",
+          "persistentUuid": "de434308-ccba-4897-abd9-bff5eb15c6c1",
           "width": 73.0603,
           "x": 216,
           "y": 221,
@@ -268,6 +278,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -283,6 +294,7 @@
         },
         {
           "name": "parent",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -345,6 +357,7 @@
         },
         {
           "name": "child",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
@@ -662,6 +675,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -683,6 +701,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

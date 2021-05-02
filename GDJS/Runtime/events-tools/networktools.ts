@@ -168,11 +168,13 @@ namespace gdjs {
       ) {
         if (obj === null) {
           variable.setString('null');
-        } else if (
-          (typeof obj === 'number' || typeof obj === 'string') &&
-          !isNaN(obj as number)
-        ) {
-          variable.setNumber(obj as number);
+        } else if (typeof obj === 'number') {
+          if (Number.isNaN(obj)) {
+            console.warn('Variables cannot be set to NaN, setting it to 0.');
+            variable.setNumber(0);
+          } else {
+            variable.setNumber(obj);
+          }
         } else if (typeof obj === 'string') {
           variable.setString(obj);
         } else if (typeof obj === 'undefined') {
@@ -195,9 +197,6 @@ namespace gdjs {
           }
         } else if (typeof obj === 'symbol') {
           variable.setString(obj.toString());
-        } else if (typeof obj === 'number' && isNaN(obj)) {
-          console.warn('Variables cannot be set to NaN, setting it to 0.');
-          variable.setNumber(0);
         } else if (typeof obj === 'bigint') {
           if (obj > Number.MAX_SAFE_INTEGER)
             console.warn(

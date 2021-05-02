@@ -158,7 +158,7 @@ namespace gdjs {
    * @param angleInDegrees The angle in degrees.
    */
   export const toRad = function (angleInDegrees: float): float {
-    return (angleInDegrees / 180) * 3.14159;
+    return (angleInDegrees / 180) * Math.PI;
   };
 
   /**
@@ -166,7 +166,7 @@ namespace gdjs {
    * @param angleInRadians The angle in radians.
    */
   export const toDegrees = function (angleInRadians: float): float {
-    return (angleInRadians * 180) / 3.14159;
+    return (angleInRadians * 180) / Math.PI;
   };
 
   /**

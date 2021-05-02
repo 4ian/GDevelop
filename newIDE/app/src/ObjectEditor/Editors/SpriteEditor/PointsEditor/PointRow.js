@@ -1,5 +1,6 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React from 'react';
+import * as React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
@@ -9,18 +10,20 @@ import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 import Text from '../../../../UI/Text';
 
-const PointRow = ({
-  pointName,
-  nameError,
-  onBlur,
-  onRemove,
-  pointX,
-  pointY,
-  onChangePointX,
-  onChangePointY,
-  onEdit,
-  isAutomatic,
-}) => (
+type Props = {|
+  pointName: string,
+  nameError: boolean,
+  onBlur?: (ev: any) => void,
+  onRemove?: (ev: any) => void,
+  onEdit?: (ev: any) => void,
+  pointX: number,
+  pointY: number,
+  onChangePointX: (value: number) => void,
+  onChangePointY: (value: number) => void,
+  isAutomatic?: Boolean,
+|};
+
+const PointRow = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (
       <TableRow
@@ -34,23 +37,25 @@ const PointRow = ({
         <TableRowColumn>
           <TextField
             margin="none"
-            defaultValue={pointName || 'Base layer'}
-            id={pointName}
+            defaultValue={props.pointName || 'Unnamed point'}
+            id={props.pointName}
             fullWidth
-            errorText={nameError ? 'This name is already taken' : undefined}
-            disabled={!onBlur}
-            onBlur={onBlur}
+            errorText={
+              props.nameError ? 'This name is already taken' : undefined
+            }
+            disabled={!props.onBlur}
+            onBlur={props.onBlur}
           />
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn}>
-          {!isAutomatic ? (
+          {!props.isAutomatic ? (
             <TextField
               margin="none"
-              value={pointX}
+              value={props.pointX}
               type="number"
               id="point-x"
               onChange={(e, value) =>
-                onChangePointX(parseFloat(value || 0, 10))
+                props.onChangePointX(parseFloat(value || 0))
               }
             />
           ) : (
@@ -60,14 +65,14 @@ const PointRow = ({
           )}
         </TableRowColumn>
         <TableRowColumn style={styles.coordinateColumn}>
-          {!isAutomatic ? (
+          {!props.isAutomatic ? (
             <TextField
               margin="none"
-              value={pointY}
+              value={props.pointY}
               type="number"
               id="point-y"
               onChange={(e, value) =>
-                onChangePointY(parseFloat(value || 0, 10))
+                props.onChangePointY(parseFloat(value || 0))
               }
             />
           ) : (
@@ -77,13 +82,13 @@ const PointRow = ({
           )}
         </TableRowColumn>
         <TableRowColumn style={styles.toolColumn}>
-          {!!onRemove && (
-            <IconButton size="small" onClick={onRemove}>
+          {!!props.onRemove && (
+            <IconButton size="small" onClick={props.onRemove}>
               <Delete />
             </IconButton>
           )}
-          {!!onEdit && (
-            <IconButton size="small" onClick={onEdit}>
+          {!!props.onEdit && (
+            <IconButton size="small" onClick={props.onEdit}>
               <Edit />
             </IconButton>
           )}

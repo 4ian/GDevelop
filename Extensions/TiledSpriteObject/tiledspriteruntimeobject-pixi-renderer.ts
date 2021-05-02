@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   class TiledSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.TiledSpriteRuntimeObject;
     _tiledSprite: PIXI.TilingSprite;

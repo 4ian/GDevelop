@@ -38,8 +38,13 @@ export const onInstanceAdded = (
   layout: gdLayout,
   project: gdProject
 ): ?InfoBarDetails => {
-  const additionalWork =
-    objectType[layout.getObject(instance.getObjectName()).getType()];
+  const objectName = instance.getObjectName();
+  let object: ?gdObject = null;
+  if (layout.hasObjectNamed(objectName)) object = layout.getObject(objectName);
+  else if (project.hasObjectNamed(objectName))
+    object = project.getObject(objectName);
+
+  const additionalWork = object ? objectType[object.getType()] : null;
   if (additionalWork) {
     additionalWork.onInstanceAdded(instance, layout, project);
     return additionalWork.getInfoBarDetails('onInstanceAdded');

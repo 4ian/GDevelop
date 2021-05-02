@@ -31,7 +31,6 @@ export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
   'BitmapText::BitmapTextObject': true,
-  'SkeletonObject::Skeleton': true,
   'TileMap::TileMap': true,
 });
 
@@ -64,16 +63,6 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`The font size is stored directly inside the font. If you want to change it, export again your font using an external editor like bmFont. Click on the help button to learn more.`,
-    },
-  ],
-  'SkeletonObject::Skeleton': [
-    {
-      kind: 'warning',
-      message: t`This object is experimental and not actively maintained. It might have bugs or incomplete support in GDevelop. A maintainer is searched to improve the object implementation and solve any issue. Your help is welcome!`,
-    },
-    {
-      kind: 'info',
-      message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
     },
   ],
   'TileMap::TileMap': [

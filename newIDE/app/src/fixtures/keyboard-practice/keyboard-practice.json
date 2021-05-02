@@ -11,7 +11,7 @@
     "folderProject": false,
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectUuid": "a6928b82-baed-4dfc-af28-8effb71a8c59",
+    "projectUuid": "0b0cc75b-d424-45e2-aa55-99f5ceba9cb2",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useDeprecatedZeroAsDefaultZOrder": true,
@@ -612,6 +612,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -714,7 +715,7 @@
           "layer": "",
           "locked": false,
           "name": "a",
-          "persistentUuid": "7da0eb45-619f-41e7-8be8-247424f7336a",
+          "persistentUuid": "fdd57c20-5600-423d-ba29-95815e4e9fb4",
           "width": 64,
           "x": 112,
           "y": 272,
@@ -724,6 +725,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "a"
             }
           ]
@@ -735,7 +737,7 @@
           "layer": "",
           "locked": false,
           "name": "q",
-          "persistentUuid": "c8ff7a97-891b-466f-ad62-5b8d435d8d96",
+          "persistentUuid": "930ec62e-679c-4db7-be4d-b21ca5c0069c",
           "width": 64,
           "x": 80,
           "y": 208,
@@ -745,6 +747,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "q"
             }
           ]
@@ -756,7 +759,7 @@
           "layer": "",
           "locked": false,
           "name": "w",
-          "persistentUuid": "879f3768-4616-43a7-9b1e-d7bc3bf1885e",
+          "persistentUuid": "d40e3b0b-dd27-4402-95ad-33e77964f769",
           "width": 64,
           "x": 144,
           "y": 208,
@@ -766,6 +769,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "w"
             }
           ]
@@ -777,7 +781,7 @@
           "layer": "",
           "locked": false,
           "name": "e",
-          "persistentUuid": "cac4199a-3792-4948-9ab0-8b681b7efd4d",
+          "persistentUuid": "032b9bf7-a080-442e-83ed-29926a974954",
           "width": 64,
           "x": 208,
           "y": 208,
@@ -787,6 +791,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "e"
             }
           ]
@@ -798,7 +803,7 @@
           "layer": "",
           "locked": false,
           "name": "r",
-          "persistentUuid": "0ebfa67b-1002-4c7e-a3ae-9c26d085b42e",
+          "persistentUuid": "5c3b8e94-c957-4910-87af-9899ce3d6d53",
           "width": 64,
           "x": 272,
           "y": 208,
@@ -808,6 +813,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "r"
             }
           ]
@@ -819,7 +825,7 @@
           "layer": "",
           "locked": false,
           "name": "t",
-          "persistentUuid": "cd99e515-6208-4262-ad8d-e3fe035b50ac",
+          "persistentUuid": "2fdb4a48-a73d-4c25-ade9-301e64d46ae2",
           "width": 64,
           "x": 336,
           "y": 208,
@@ -829,6 +835,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "t"
             }
           ]
@@ -840,7 +847,7 @@
           "layer": "",
           "locked": false,
           "name": "y",
-          "persistentUuid": "0347c2af-71bf-49e6-b5d5-5e000f492fc4",
+          "persistentUuid": "300f5864-1522-4eaa-b20e-73bd78b9f9c7",
           "width": 64,
           "x": 400,
           "y": 208,
@@ -850,6 +857,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "y"
             }
           ]
@@ -861,7 +869,7 @@
           "layer": "",
           "locked": false,
           "name": "u",
-          "persistentUuid": "7012c76d-45e0-4122-af9c-44d7a5e34840",
+          "persistentUuid": "816d0fdf-3530-457e-9200-ee89faa806fa",
           "width": 64,
           "x": 464,
           "y": 208,
@@ -871,6 +879,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "u"
             }
           ]
@@ -882,7 +891,7 @@
           "layer": "",
           "locked": false,
           "name": "i",
-          "persistentUuid": "69e5e9da-957a-4647-8559-8a26e46ad466",
+          "persistentUuid": "53389ab7-521d-450b-9c8c-b747acc4c0e2",
           "width": 64,
           "x": 528,
           "y": 208,
@@ -892,6 +901,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "i"
             }
           ]
@@ -903,7 +913,7 @@
           "layer": "",
           "locked": false,
           "name": "o",
-          "persistentUuid": "2fe199c3-4c9f-49e4-946f-ced74eb3c783",
+          "persistentUuid": "9107f2bd-d3cc-448e-b3c4-41e9d6929162",
           "width": 64,
           "x": 592,
           "y": 208,
@@ -913,6 +923,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "o"
             }
           ]
@@ -924,7 +935,7 @@
           "layer": "",
           "locked": false,
           "name": "p",
-          "persistentUuid": "a562f50f-945f-4324-9e04-d585d758bb56",
+          "persistentUuid": "31ef098a-77da-415b-bac2-9382d4978544",
           "width": 64,
           "x": 656,
           "y": 208,
@@ -934,6 +945,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "p"
             }
           ]
@@ -945,7 +957,7 @@
           "layer": "",
           "locked": false,
           "name": "s",
-          "persistentUuid": "52305313-ae82-4616-a3a0-999ed19b3205",
+          "persistentUuid": "96621aa4-acea-4948-b3c7-02c1deadf8b7",
           "width": 64,
           "x": 176,
           "y": 272,
@@ -955,6 +967,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "s"
             }
           ]
@@ -966,7 +979,7 @@
           "layer": "",
           "locked": false,
           "name": "d",
-          "persistentUuid": "45e9f177-5378-405f-bbee-4b979ed552b2",
+          "persistentUuid": "a823b77d-c616-4ee6-b4b6-08c07d76f643",
           "width": 64,
           "x": 240,
           "y": 272,
@@ -976,6 +989,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "d"
             }
           ]
@@ -987,7 +1001,7 @@
           "layer": "",
           "locked": false,
           "name": "f",
-          "persistentUuid": "b5fe6b84-d167-41b2-bd54-f74586b0c6b3",
+          "persistentUuid": "f2c609cc-95c3-4b59-a62c-bfeede76144c",
           "width": 64,
           "x": 304,
           "y": 272,
@@ -997,6 +1011,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "f"
             }
           ]
@@ -1008,7 +1023,7 @@
           "layer": "",
           "locked": false,
           "name": "g",
-          "persistentUuid": "ed68b3ab-d319-47f1-9e7e-6b271feab868",
+          "persistentUuid": "db96b684-7915-41fa-a537-b758b7d258f2",
           "width": 64,
           "x": 368,
           "y": 272,
@@ -1018,6 +1033,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "g"
             }
           ]
@@ -1029,7 +1045,7 @@
           "layer": "",
           "locked": false,
           "name": "h",
-          "persistentUuid": "f9000678-63fd-4750-b767-073389490d74",
+          "persistentUuid": "fde34137-b381-4454-beca-c9180a3ca53c",
           "width": 64,
           "x": 432,
           "y": 272,
@@ -1039,6 +1055,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "h"
             }
           ]
@@ -1050,7 +1067,7 @@
           "layer": "",
           "locked": false,
           "name": "j",
-          "persistentUuid": "31d2e553-1799-443b-841a-85d063f6605f",
+          "persistentUuid": "33895473-81d0-417d-9611-eeb832008485",
           "width": 64,
           "x": 496,
           "y": 272,
@@ -1060,6 +1077,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "j"
             }
           ]
@@ -1071,7 +1089,7 @@
           "layer": "",
           "locked": false,
           "name": "k",
-          "persistentUuid": "0bff042c-6568-4f99-83ea-77bfddea2596",
+          "persistentUuid": "99e1fd4d-a3b4-4edb-8c01-e66342fea20c",
           "width": 64,
           "x": 560,
           "y": 272,
@@ -1081,6 +1099,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "k"
             }
           ]
@@ -1092,7 +1111,7 @@
           "layer": "",
           "locked": false,
           "name": "l",
-          "persistentUuid": "678a395b-7e27-489f-8bd6-030cc747b51f",
+          "persistentUuid": "65786e3c-43df-4847-b15f-126633479a20",
           "width": 64,
           "x": 624,
           "y": 272,
@@ -1102,6 +1121,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "l"
             }
           ]
@@ -1113,7 +1133,7 @@
           "layer": "",
           "locked": false,
           "name": "z",
-          "persistentUuid": "4fac077f-f957-4f55-ab1b-b57acb83cabc",
+          "persistentUuid": "6c5226c7-abbc-4246-9f26-15473abd8096",
           "width": 64,
           "x": 176,
           "y": 336,
@@ -1123,6 +1143,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "z"
             }
           ]
@@ -1134,7 +1155,7 @@
           "layer": "",
           "locked": false,
           "name": "x",
-          "persistentUuid": "ad756ad2-6c47-45e1-9c00-249de5fb4593",
+          "persistentUuid": "e925865e-537b-4597-9791-8a945efcadb7",
           "width": 64,
           "x": 240,
           "y": 336,
@@ -1144,6 +1165,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "x"
             }
           ]
@@ -1155,7 +1177,7 @@
           "layer": "",
           "locked": false,
           "name": "c",
-          "persistentUuid": "bf6c9796-031a-4b54-ae02-a626bd21b102",
+          "persistentUuid": "ca5f1b4e-2614-4012-8d80-c5c00c42e814",
           "width": 64,
           "x": 304,
           "y": 336,
@@ -1165,6 +1187,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "c"
             }
           ]
@@ -1176,7 +1199,7 @@
           "layer": "",
           "locked": false,
           "name": "v",
-          "persistentUuid": "81190924-c7f8-4d0d-84e6-c88c055c7562",
+          "persistentUuid": "d5bb30d2-2a76-40a2-899f-15018ebc4231",
           "width": 64,
           "x": 368,
           "y": 336,
@@ -1186,6 +1209,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "v"
             }
           ]
@@ -1197,7 +1221,7 @@
           "layer": "",
           "locked": false,
           "name": "b",
-          "persistentUuid": "5b40e7af-372b-4264-a113-2291f42abbe6",
+          "persistentUuid": "0cf0aee8-56df-4b03-811e-169880306345",
           "width": 64,
           "x": 432,
           "y": 336,
@@ -1207,6 +1231,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "b"
             }
           ]
@@ -1218,7 +1243,7 @@
           "layer": "",
           "locked": false,
           "name": "n",
-          "persistentUuid": "9314beaf-26a5-4e80-a67a-eacec4e12351",
+          "persistentUuid": "5b584a31-c520-423f-a2c2-e56fa80196e4",
           "width": 64,
           "x": 496,
           "y": 336,
@@ -1228,6 +1253,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "n"
             }
           ]
@@ -1239,7 +1265,7 @@
           "layer": "",
           "locked": false,
           "name": "m",
-          "persistentUuid": "c4f0d00f-2a7e-4881-9dcc-cc1b8da94edd",
+          "persistentUuid": "31451f69-4542-40bf-836b-ee038af68ced",
           "width": 64,
           "x": 560,
           "y": 336,
@@ -1249,6 +1275,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "m"
             }
           ]
@@ -1260,7 +1287,7 @@
           "layer": "",
           "locked": false,
           "name": "space",
-          "persistentUuid": "7d825fbc-2788-4e03-ba20-05c37ccdb4ea",
+          "persistentUuid": "cbb1094b-88dc-4b2b-b3fb-e5a750521b1f",
           "width": 192,
           "x": 304,
           "y": 400,
@@ -1270,6 +1297,7 @@
           "initialVariables": [
             {
               "name": "key",
+              "type": "string",
               "value": "Space"
             }
           ]
@@ -1281,7 +1309,7 @@
           "layer": "",
           "locked": false,
           "name": "txt_keys_pressed",
-          "persistentUuid": "6a5877b2-761f-448d-8c1a-5def63e4e517",
+          "persistentUuid": "c5493f33-8c62-4dfa-836a-d162617ba78e",
           "width": 0,
           "x": 0,
           "y": 32,
@@ -1297,7 +1325,7 @@
           "layer": "",
           "locked": false,
           "name": "time",
-          "persistentUuid": "fbe2931e-e0de-4603-946f-8a7e8e605627",
+          "persistentUuid": "d850a970-385f-4bfb-a019-30771c7d4d11",
           "width": 0,
           "x": 0,
           "y": 64,
@@ -4116,6 +4144,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -4131,7 +4160,7 @@
           "layer": "",
           "locked": false,
           "name": "gameover",
-          "persistentUuid": "bc5d2ad6-8d0f-4029-bb12-06a02db8bf5f",
+          "persistentUuid": "90331bcf-91f0-49b3-bd09-e7b87b54be9e",
           "width": 0,
           "x": 296.485,
           "y": 67.7129,
@@ -4147,7 +4176,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
-          "persistentUuid": "20cc162e-9831-43bc-bee7-9aa95f868c30",
+          "persistentUuid": "0b74d6d2-0870-4862-8df4-8aae68e3a254",
           "width": 0,
           "x": 176.694,
           "y": 160,
@@ -4163,7 +4192,7 @@
           "layer": "",
           "locked": false,
           "name": "playagain",
-          "persistentUuid": "71ab73fa-9208-4bf1-a043-45cd732bc286",
+          "persistentUuid": "71fdb33d-179c-440a-ba5d-6c48bc0b9a13",
           "width": 0,
           "x": 326.434,
           "y": 253.287,

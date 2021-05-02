@@ -8,7 +8,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const pixelateFilter = filter as PIXI.filters.PixelateFilter;
+      const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter;
       if (parameterName === 'size') {
         pixelateFilter.size = value;
       }

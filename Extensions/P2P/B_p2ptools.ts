@@ -82,6 +82,11 @@ namespace gdjs {
       }
 
       /**
+       * The optional peer ID. Only used if explicitly overridden.
+       */
+      let peerId: string | null = null;
+
+      /**
        * The peer to peer configuration.
        */
       let peerConfig: Peer.PeerJSOption = { debug: 1 };
@@ -133,7 +138,11 @@ namespace gdjs {
        */
       const loadPeerJS = () => {
         if (peer !== null) return;
-        peer = new Peer(peerConfig);
+        if (peerId !== null) {
+          peer = new Peer(peerId, peerConfig);
+        } else {
+          peer = new Peer(peerConfig);
+        }
         peer.on('open', () => {
           ready = true;
         });
@@ -359,6 +368,15 @@ namespace gdjs {
        * this server should only be used for quick testing in development.
        */
       export const useDefaultBrokerServer = loadPeerJS;
+
+      /**
+       * Overrides the default peer ID. Must be called before connecting to a
+       * broker.
+       * @param id The peer ID to use when connecting to a broker.
+       */
+      export const overrideId = (id: string) => {
+        peerId = id;
+      };
 
       /**
        * Returns the own current peer ID.

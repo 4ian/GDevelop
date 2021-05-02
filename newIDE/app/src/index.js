@@ -66,7 +66,15 @@ class Bootstrapper extends Component<{}, State> {
         return;
       }
 
-      initializeGDevelopJs().then(gd => {
+      initializeGDevelopJs({
+        // Override the resolved URL for the .wasm file,
+        // to ensure a new version is fetched when the version changes.
+        locateFile: (path: string, prefix: string) => {
+          return (
+            prefix + path + `?cache-buster=${VersionMetadata.versionWithHash}`
+          );
+        },
+      }).then(gd => {
         global.gd = gd;
         GD_STARTUP_TIMES.push([
           'libGD.js initialization done',

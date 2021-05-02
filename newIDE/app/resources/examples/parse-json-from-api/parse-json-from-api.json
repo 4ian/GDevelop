@@ -1,20 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 96,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
+    "orientation": "default",
     "packageName": "com.gametemplates.itch",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\parse-json-from-api\\game.json",
+    "projectUuid": "ecb90557-e954-420c-bbd9-be9fef88d89c",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Parse JSON from SWAPI",
     "author": "gametemplates.itch.io",
     "windowWidth": 800,
@@ -23,6 +25,11 @@
     "maxFPS": 60,
     "minFPS": 10,
     "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -95,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "sw.png",
         "kind": "image",
+        "metadata": "",
         "name": "sw.png",
         "smoothed": true,
         "userAdded": false
@@ -127,6 +135,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -136,26 +145,32 @@
       "variables": [
         {
           "name": "person_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "planet_json",
+          "type": "string",
           "value": ""
         },
         {
           "name": "person",
+          "type": "string",
           "value": ""
         },
         {
           "name": "num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "prev_num",
+          "type": "string",
           "value": "1"
         },
         {
           "name": "planet",
+          "type": "string",
           "value": ""
         }
       ],
@@ -167,6 +182,7 @@
           "layer": "",
           "locked": false,
           "name": "logo",
+          "persistentUuid": "b9623b88-fea6-4f51-a55e-f4bac1d04de3",
           "width": 0,
           "x": 258.297,
           "y": 33.2376,
@@ -182,6 +198,7 @@
           "layer": "",
           "locked": false,
           "name": "person",
+          "persistentUuid": "4c7260a8-5064-4c82-87dd-670a1f93b649",
           "width": 0,
           "x": 255.89,
           "y": 240.911,
@@ -197,6 +214,7 @@
           "layer": "",
           "locked": false,
           "name": "message",
+          "persistentUuid": "1325f940-3208-4595-bcf2-2ad2ee704690",
           "width": 0,
           "x": 20.7414,
           "y": 565.168,
@@ -209,6 +227,7 @@
       "objects": [
         {
           "name": "logo",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
@@ -250,6 +269,7 @@
           "italic": false,
           "name": "person",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -268,6 +288,7 @@
           "italic": false,
           "name": "message",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -414,6 +435,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -654,6 +680,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

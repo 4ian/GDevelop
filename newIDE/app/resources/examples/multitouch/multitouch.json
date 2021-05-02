@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\multitouch\\multitouch.json",
+    "projectUuid": "7c1cd509-d95b-4222-b14f-d2ca1f5a6212",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Projet",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "Pointer-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pointer-Standard.png",
         "smoothed": true,
         "userAdded": false
@@ -136,6 +138,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -151,6 +154,7 @@
           "layer": "",
           "locked": false,
           "name": "Explanation",
+          "persistentUuid": "3ba868fc-3a6f-45d6-85a4-41876397e9c7",
           "width": 0,
           "x": 63,
           "y": 28,
@@ -163,11 +167,13 @@
       "objects": [
         {
           "name": "Marker",
+          "tags": "",
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [
             {
               "name": "TouchId",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -228,6 +234,7 @@
           "italic": false,
           "name": "Explanation",
           "smoothed": true,
+          "tags": "",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
@@ -409,6 +416,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -430,6 +442,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

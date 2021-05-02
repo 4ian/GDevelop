@@ -1,22 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.particles.explosions",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/particles-explosions/particles-explosions.json",
+    "projectUuid": "ff9eed51-d69d-4272-a486-2e524e9c99c1",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
+    "version": "1.0.0",
     "name": "Explosions",
     "author": "",
     "windowWidth": 800,
@@ -29,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": true
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -104,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "ExplosionTexture.png",
         "kind": "image",
+        "metadata": "",
         "name": "ExplosionTexture.png",
         "smoothed": true,
         "userAdded": true
@@ -136,6 +138,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -182,7 +185,7 @@
           "particleGreen1": 128,
           "particleGreen2": 50,
           "particleLifeTimeMax": 1.5,
-          "particleLifeTimeMin": 0.7,
+          "particleLifeTimeMin": 0.699999988079071,
           "particleRed1": 255,
           "particleRed2": 50,
           "particleSize1": 100,
@@ -194,6 +197,7 @@
           "rendererParam2": 20,
           "rendererType": "Quad",
           "sizeParam": "Random",
+          "tags": "",
           "tank": 100,
           "textureParticleName": "ExplosionTexture.png",
           "type": "ParticleSystem::ParticleEmitter",
@@ -238,7 +242,7 @@
           "particleGreen1": 76,
           "particleGreen2": 255,
           "particleLifeTimeMax": 1,
-          "particleLifeTimeMin": 0.7,
+          "particleLifeTimeMin": 0.699999988079071,
           "particleRed1": 153,
           "particleRed2": 255,
           "particleSize1": 100,
@@ -250,6 +254,7 @@
           "rendererParam2": 6,
           "rendererType": "Line",
           "sizeParam": "Random",
+          "tags": "",
           "tank": 40,
           "textureParticleName": "",
           "type": "ParticleSystem::ParticleEmitter",
@@ -292,11 +297,11 @@
           "particleGravityY": 0,
           "particleGravityZ": 30,
           "particleGreen1": 25,
-          "particleGreen2": 0.8,
+          "particleGreen2": 0.800000011920929,
           "particleLifeTimeMax": 2,
-          "particleLifeTimeMin": 0.7,
+          "particleLifeTimeMin": 0.699999988079071,
           "particleRed1": 25,
-          "particleRed2": 0.1,
+          "particleRed2": 0.10000000149011612,
           "particleSize1": 100,
           "particleSize2": 100,
           "particleSizeRandomness1": 0,
@@ -306,6 +311,7 @@
           "rendererParam2": 20,
           "rendererType": "Quad",
           "sizeParam": "Random",
+          "tags": "",
           "tank": 50,
           "textureParticleName": "ExplosionTexture.png",
           "type": "ParticleSystem::ParticleEmitter",
@@ -393,6 +399,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -414,6 +425,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

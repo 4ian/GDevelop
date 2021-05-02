@@ -38,23 +38,15 @@ if (!shell.test('-f', path.join(sourcePath, 'libGD.js'))) {
 // Copy the files built locally
 const sourceJsFile = path.join(sourcePath, 'libGD.js');
 const sourceWasmFile = path.join(sourcePath, 'libGD.wasm');
-const sourceJsMemFile = path.join(sourcePath, 'libGD.js.mem');
-
-// Clean any artifact already present
-shell.rm('-f', path.join(destinationPath, 'libGD.js.mem'));
-shell.rm('-f', path.join(destinationPath, 'libGD.wasm'));
-shell.rm('-f', path.join(destinationTestPath, 'libGD.js.mem'));
-shell.rm('-f', path.join(destinationTestPath, 'libGD.wasm'));
 
 // Copy the wasm or memory file.
 if (shell.test('-f', sourceWasmFile)) {
   copyLibGdJsFile(sourceWasmFile);
-} else if (shell.test('-f', sourceJsMemFile)) {
-  copyLibGdJsFile(sourceJsMemFile);
 } else {
   shell.echo(
-    `❌ At least libGD.js.mem or libGD.wasm should exist in ${sourcePath}.`
+    `❌ libGD.wasm should exist in ${sourcePath}.`
   );
+  shell.exit(1);
 }
 
 // Copy the JS file.
@@ -69,4 +61,5 @@ if (
   shell.echo(
     '❌ Error while copying libGD.js from Binaries/embuild/GDevelop.js to public and node_modules folders of newIDE/app'
   );
+  shell.exit(1);
 }

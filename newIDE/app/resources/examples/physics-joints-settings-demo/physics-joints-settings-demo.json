@@ -1,24 +1,22 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 99,
     "major": 4,
     "minor": 0,
     "revision": 0
   },
   "properties": {
-    "adMobAppId": "",
+    "adaptGameResolutionAtRuntime": false,
     "folderProject": false,
-    "linuxExecutableFilename": "",
-    "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\Maciel\\Programacion\\gdevelop\\PhysikTests\\Physics2JointsSettingsTest\\game.json",
+    "projectUuid": "6dd77614-cf90-45ad-a14e-e3f731d878d8",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
+    "useDeprecatedZeroAsDefaultZOrder": true,
     "useExternalSourceFiles": false,
     "version": "1.0.0",
-    "winExecutableFilename": "",
-    "winExecutableIconFile": "",
     "name": "Project",
     "author": "",
     "windowWidth": 800,
@@ -31,6 +29,7 @@
     "loadingScreen": {
       "showGDevelopSplash": false
     },
+    "extensionProperties": [],
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -132,6 +131,7 @@
   "objects": [
     {
       "name": "Box",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -139,25 +139,23 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Dynamic",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Box",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.3,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1,
-            "canSleep": true
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Box",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.3,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "canSleep": true,
+          "bodyType": "Dynamic"
         }
       ],
       "animations": [
@@ -200,6 +198,7 @@
     },
     {
       "name": "Circle",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -207,25 +206,23 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Dynamic",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Circle",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.9,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1,
-            "canSleep": true
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Circle",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.9,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "canSleep": true,
+          "bodyType": "Dynamic"
         }
       ],
       "animations": [
@@ -268,6 +265,7 @@
     },
     {
       "name": "Wall",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -275,24 +273,22 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "type": "Static",
-            "bullet": false,
-            "fixedRotation": false,
-            "shape": "Box",
-            "shapeDimensionA": 0,
-            "shapeDimensionB": 0,
-            "shapeOffsetX": 0,
-            "shapeOffsetY": 0,
-            "density": 1,
-            "friction": 0.3,
-            "restitution": 0.1,
-            "linearDamping": 0.1,
-            "angularDamping": 0.1,
-            "gravityScale": 1,
-            "layers": 1,
-            "masks": 1
-          }
+          "bullet": false,
+          "fixedRotation": false,
+          "shape": "Box",
+          "shapeDimensionA": 0,
+          "shapeDimensionB": 0,
+          "shapeOffsetX": 0,
+          "shapeOffsetY": 0,
+          "density": 1,
+          "friction": 0.3,
+          "restitution": 0.1,
+          "linearDamping": 0.1,
+          "angularDamping": 0.1,
+          "gravityScale": 1,
+          "layers": 1,
+          "masks": 1,
+          "bodyType": "Static"
         }
       ],
       "animations": [
@@ -329,6 +325,7 @@
     },
     {
       "name": "Drawer",
+      "tags": "",
       "type": "PrimitiveDrawing::Drawer",
       "variables": [],
       "behaviors": [],
@@ -345,15 +342,18 @@
         "g": 188,
         "r": 138
       },
-      "absoluteCoordinates": true
+      "absoluteCoordinates": true,
+      "clearBetweenFrames": true
     },
     {
       "name": "Button",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [
         {
           "name": "action",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -395,11 +395,13 @@
       "italic": false,
       "name": "ValueText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [
         {
           "name": "prop",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -418,11 +420,13 @@
       "italic": false,
       "name": "TitleText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [
         {
           "name": "prop",
+          "type": "string",
           "value": "none"
         }
       ],
@@ -441,6 +445,7 @@
       "italic": false,
       "name": "ButtonText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [],
@@ -456,6 +461,7 @@
     },
     {
       "name": "SceneButton",
+      "tags": "",
       "type": "Sprite",
       "updateIfNotVisible": false,
       "variables": [],
@@ -497,6 +503,7 @@
       "italic": false,
       "name": "SceneButtonText",
       "smoothed": true,
+      "tags": "",
       "type": "TextObject::Text",
       "underlined": false,
       "variables": [],
@@ -515,49 +522,61 @@
   "variables": [
     {
       "name": "Scenes",
+      "type": "structure",
       "children": [
         {
           "name": "0",
+          "type": "string",
           "value": "DistanceJoint"
         },
         {
           "name": "1",
+          "type": "string",
           "value": "RevoluteJoint"
         },
         {
           "name": "10",
+          "type": "string",
           "value": "MotorJoint"
         },
         {
           "name": "2",
+          "type": "string",
           "value": "PrismaticJoint"
         },
         {
           "name": "3",
+          "type": "string",
           "value": "PulleyJoint"
         },
         {
           "name": "4",
+          "type": "string",
           "value": "GearJoint"
         },
         {
           "name": "5",
+          "type": "string",
           "value": "MouseJoint"
         },
         {
           "name": "6",
+          "type": "string",
           "value": "WheelJoint"
         },
         {
           "name": "7",
+          "type": "string",
           "value": "WeldJoint"
         },
         {
           "name": "8",
+          "type": "string",
           "value": "RopeJoint"
         },
         {
           "name": "9",
+          "type": "string",
           "value": "FrictionJoint"
         }
       ]
@@ -585,6 +604,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -612,6 +632,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "6bae23be-2025-47d7-b61b-c319292fbd56",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -627,6 +648,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "c87bc784-9b95-43b6-8200-4324790127a3",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -642,6 +664,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "dc0e9ca7-f7d4-4084-92e6-5cbc52b1c37d",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -657,6 +680,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "4b7f5bd5-ea99-4cd3-98d7-060e733dfdd9",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -672,6 +696,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "83e65617-224a-4124-bf20-d688113e9d1c",
           "width": 0,
           "x": 123,
           "y": 433,
@@ -687,6 +712,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "20095e02-9fef-4678-b08c-ae7317122188",
           "width": 0,
           "x": 367,
           "y": 121,
@@ -702,6 +728,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "ca40af9b-389b-43d5-a2e2-6a3c3a9dc96f",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -717,6 +744,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "1097961b-604a-494c-bc29-249cb6803b77",
           "width": 0,
           "x": 668,
           "y": 251,
@@ -726,6 +754,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -737,6 +766,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "f0868cae-8844-496d-a159-d5284bd843c0",
           "width": 0,
           "x": 587,
           "y": 248,
@@ -746,6 +776,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -757,6 +788,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "1848e705-3768-47cd-8a00-46fad3ab4ce7",
           "width": 0,
           "x": 529,
           "y": 251,
@@ -766,6 +798,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -777,6 +810,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "2e3516d6-6d3f-4202-b79a-249d4a6a9c4b",
           "width": 0,
           "x": 586,
           "y": 218,
@@ -786,6 +820,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -797,6 +832,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "61431d3d-792f-48cf-be60-ef31518548c7",
           "width": 0,
           "x": 667,
           "y": 104,
@@ -806,6 +842,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_length"
             }
           ]
@@ -817,6 +854,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "0a516471-d11c-4a15-8cc7-f8e4805b3975",
           "width": 0,
           "x": 586,
           "y": 101,
@@ -826,6 +864,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length"
             }
           ]
@@ -837,6 +876,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a2a7c5ea-78b1-48b0-8c47-89525f2434a2",
           "width": 0,
           "x": 528,
           "y": 104,
@@ -846,6 +886,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_length"
             }
           ]
@@ -857,6 +898,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "e9a165ed-d321-4b55-bf25-255a1e0defe0",
           "width": 0,
           "x": 585,
           "y": 72,
@@ -866,6 +908,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length"
             }
           ]
@@ -877,6 +920,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "35d0bb09-8742-4f5c-8c1c-6ddb1ca141ef",
           "width": 0,
           "x": 667,
           "y": 179,
@@ -886,6 +930,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -897,6 +942,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "bbe3b14e-85f4-45f9-82be-9dd167821355",
           "width": 0,
           "x": 586,
           "y": 176,
@@ -906,6 +952,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -917,6 +964,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "6db5e28b-10e8-4aed-b538-c20c0b0c5551",
           "width": 0,
           "x": 528,
           "y": 179,
@@ -926,6 +974,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -937,6 +986,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "5f2da828-321b-4cc7-a844-2cac4c7cb049",
           "width": 0,
           "x": 585,
           "y": 146,
@@ -946,6 +996,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -978,11 +1029,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Centre)",
-                "Box.PointY(Centre)",
+                "Box.PointX(\"Centre\")",
+                "Box.PointY(\"Centre\")",
                 "Circle",
-                "Circle.PointX(Centre)",
-                "Circle.PointY(Centre)",
+                "Circle.PointX(\"Centre\")",
+                "Circle.PointY(\"Centre\")",
                 "",
                 "",
                 "",
@@ -1585,10 +1636,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -1619,6 +1670,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -1640,12 +1696,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -1670,6 +1724,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -1697,6 +1752,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "849e9b9b-9fee-4b71-a914-0b2a458469b0",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -1712,6 +1768,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "f3bfcc43-9c3b-42e7-ba74-5cc25cfeb7fa",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -1727,6 +1784,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "b19466c5-6fff-4ac2-85c9-3c7d63b92936",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -1742,6 +1800,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "474f5fc6-2c53-4177-beec-545faaa93f28",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -1757,6 +1816,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "84fabe14-565e-454d-b8ff-154dbf6679ae",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -1772,6 +1832,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "70243c01-d836-4969-8ad2-7ca8d1a102de",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -1787,6 +1848,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "e8c519d1-f875-47e3-9309-1905836f359b",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -1802,6 +1864,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "cc2d2776-71c0-4896-8bf6-24db6e530434",
           "width": 0,
           "x": 713,
           "y": 448,
@@ -1811,6 +1874,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_torque"
             }
           ]
@@ -1822,6 +1886,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "792c446a-f207-4b32-8343-0ff23f329dd2",
           "width": 0,
           "x": 632,
           "y": 445,
@@ -1831,6 +1896,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -1842,6 +1908,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "ae199c35-e4ac-47d3-9f97-a1f4fcc14355",
           "width": 0,
           "x": 574,
           "y": 448,
@@ -1851,6 +1918,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_torque"
             }
           ]
@@ -1862,6 +1930,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "cc34f295-f9ae-4abf-952b-aa2f926bdece",
           "width": 0,
           "x": 573,
           "y": 413,
@@ -1871,6 +1940,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -1882,6 +1952,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "836b8a19-eaec-41a6-a1f5-73ce540c465c",
           "width": 0,
           "x": 714,
           "y": 282,
@@ -1891,6 +1962,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -1902,6 +1974,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "243e1fa3-3eac-44e1-b4d4-b80327fe7c07",
           "width": 0,
           "x": 458,
           "y": 59,
@@ -1911,6 +1984,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -1922,6 +1996,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "ac2733a7-e70a-4d16-afa4-056a9df5eee3",
           "width": 0,
           "x": 575,
           "y": 282,
@@ -1931,6 +2006,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -1942,6 +2018,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "afaf6dd5-cd23-4235-b539-3cd01ceb8df9",
           "width": 0,
           "x": 417,
           "y": 35,
@@ -1951,6 +2028,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -1962,6 +2040,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "0ec7fc0e-519b-4a65-b15f-d701004d4176",
           "width": 0,
           "x": 714,
           "y": 364,
@@ -1971,6 +2050,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -1982,6 +2062,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "f437a2c7-e0c1-49a5-83e3-498d1ade9ea1",
           "width": 0,
           "x": 460,
           "y": 277,
@@ -1991,6 +2072,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -2002,6 +2084,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "4c6b224a-cb1e-4687-8ad2-1716c34dd620",
           "width": 0,
           "x": 575,
           "y": 364,
@@ -2011,6 +2094,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -2022,6 +2106,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "f22ea819-883a-4c27-938c-af08e706f253",
           "width": 0,
           "x": 421,
           "y": 247,
@@ -2031,6 +2116,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -2042,6 +2128,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "796bbef6-ec82-4f6e-8b77-9b0a2df085ea",
           "width": 0,
           "x": 633,
           "y": 279,
@@ -2051,6 +2138,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -2062,6 +2150,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "41a77bd0-753c-435c-b085-16a2bf7d9b71",
           "width": 0,
           "x": 623,
           "y": 250,
@@ -2071,6 +2160,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -2082,6 +2172,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "5488424b-bc08-4e15-95d8-623d04b53a59",
           "width": 0,
           "x": 633,
           "y": 361,
@@ -2091,6 +2182,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -2102,6 +2194,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "e76cb280-2bad-40cb-954a-3ca5d6ca11c5",
           "width": 0,
           "x": 596,
           "y": 330,
@@ -2111,6 +2204,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -2122,6 +2216,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "6003d8c5-afd3-49f9-be05-8e451975a0f5",
           "width": 0,
           "x": 713,
           "y": 204,
@@ -2131,6 +2226,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_angle"
             }
           ]
@@ -2142,6 +2238,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "e28acc1a-9850-40bc-9d19-59d437cd6c08",
           "width": 0,
           "x": 632,
           "y": 201,
@@ -2151,6 +2248,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_angle"
             }
           ]
@@ -2162,6 +2260,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "2e6ee9a7-cb2e-4dc3-a6a1-cebfd9ef6d88",
           "width": 0,
           "x": 574,
           "y": 204,
@@ -2171,6 +2270,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_angle"
             }
           ]
@@ -2182,6 +2282,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "09da3914-b2f7-4fa9-9d8c-b7ccb510abac",
           "width": 0,
           "x": 607,
           "y": 171,
@@ -2191,6 +2292,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_angle"
             }
           ]
@@ -2202,6 +2304,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "9166f8b4-76b8-4a48-b908-1e1068776e05",
           "width": 0,
           "x": 712,
           "y": 57,
@@ -2211,6 +2314,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_limits"
             }
           ]
@@ -2222,6 +2326,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "9214eec3-fbd8-48b0-9a37-ae005c6fd6fe",
           "width": 0,
           "x": 573,
           "y": 57,
@@ -2231,6 +2336,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_limits"
             }
           ]
@@ -2242,6 +2348,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "353cfa0e-ba9c-4b53-b946-e4448a1d9187",
           "width": 0,
           "x": 712,
           "y": 132,
@@ -2251,6 +2358,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_min_angle"
             }
           ]
@@ -2262,6 +2370,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "e7b3cecc-5b21-4dba-9771-930719fbaa47",
           "width": 0,
           "x": 573,
           "y": 132,
@@ -2271,6 +2380,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_min_angle"
             }
           ]
@@ -2282,6 +2392,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "7a8722d2-a447-464f-81c0-3bdc67c2e9cf",
           "width": 0,
           "x": 631,
           "y": 54,
@@ -2291,6 +2402,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -2302,6 +2414,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "9410e8db-4c84-4f7e-ae7d-50baa3862ecc",
           "width": 0,
           "x": 622,
           "y": 25,
@@ -2311,6 +2424,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -2322,6 +2436,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "061eab45-7d3d-4ce2-a504-e59d853e915b",
           "width": 0,
           "x": 631,
           "y": 129,
@@ -2331,6 +2446,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_angle"
             }
           ]
@@ -2342,6 +2458,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "22a9741b-a90b-4b49-a2c3-6df42772f876",
           "width": 0,
           "x": 607,
           "y": 98,
@@ -2351,6 +2468,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_angle"
             }
           ]
@@ -2362,6 +2480,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "2e4b3aff-79d3-463d-a322-300c74cbda44",
           "width": 0,
           "x": 458,
           "y": 203,
@@ -2371,6 +2490,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -2382,6 +2502,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "6b408cae-756e-4b06-bfc9-956bad9360e8",
           "width": 0,
           "x": 457,
           "y": 173,
@@ -2391,6 +2512,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -2402,6 +2524,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "2168b138-a902-4a23-bb69-6a2a8cd4c863",
           "width": 0,
           "x": 458,
           "y": 128,
@@ -2411,6 +2534,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "angle"
             }
           ]
@@ -2422,6 +2546,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "cf824929-8a39-4e75-a5f4-8139f9a4ceed",
           "width": 0,
           "x": 457,
           "y": 99,
@@ -2431,6 +2556,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "angle"
             }
           ]
@@ -2463,11 +2589,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Anchor)",
-                "Box.PointY(Anchor)",
+                "Box.PointX(\"Anchor\")",
+                "Box.PointY(\"Anchor\")",
                 "Circle",
-                "Circle.PointX(Anchor)",
-                "Circle.PointY(Anchor)",
+                "Circle.PointX(\"Anchor\")",
+                "Circle.PointY(\"Anchor\")",
                 "no",
                 "",
                 "",
@@ -3777,10 +3903,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
-                    "Circle.PointX(Anchor)",
-                    "Circle.PointY(Anchor)",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
+                    "Circle.PointX(\"Anchor\")",
+                    "Circle.PointY(\"Anchor\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -3825,10 +3951,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
-                    "Circle.PointX(Anchor) + 40*cos(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMinAngle(Variable(joint))))",
-                    "Circle.PointY(Anchor) + 40*sin(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMinAngle(Variable(joint))))",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
+                    "Circle.PointX(\"Anchor\") + 40*cos(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMinAngle(Variable(joint))))",
+                    "Circle.PointY(\"Anchor\") + 40*sin(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMinAngle(Variable(joint))))",
                     "1"
                   ],
                   "subInstructions": []
@@ -3851,10 +3977,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
-                    "Circle.PointX(Anchor) + 40*cos(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMaxAngle(Variable(joint))))",
-                    "Circle.PointY(Anchor) + 40*sin(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMaxAngle(Variable(joint))))",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
+                    "Circle.PointX(\"Anchor\") + 40*cos(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMaxAngle(Variable(joint))))",
+                    "Circle.PointY(\"Anchor\") + 40*sin(ToRad(Box.Angle() + Box.Physics2Behavior::RevoluteJointMaxAngle(Variable(joint))))",
                     "1"
                   ],
                   "subInstructions": []
@@ -3885,6 +4011,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -3906,12 +4037,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -3936,6 +4065,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -3963,6 +4093,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "d6d1ee66-de73-4470-ae4b-5c5d70a3da66",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -3978,6 +4109,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "574e5a25-0c05-4501-8e24-7862fc60e24e",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -3993,6 +4125,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "208932f9-5b6f-46fd-b639-7e23cb9bef38",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -4008,6 +4141,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "1191b5ac-5283-4ac3-a75f-bb11afaa45bf",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -4023,6 +4157,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "4dbaed9e-15ed-4755-9fc6-51149f9202f3",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -4038,6 +4173,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "5f3dd2e6-1b42-461d-b464-29a0d423701c",
           "width": 0,
           "x": 413,
           "y": 420,
@@ -4053,6 +4189,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "7e3f3020-b881-447a-bb3e-71ee3f294ac0",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -4068,6 +4205,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "b381db03-b357-4b99-a7f3-e0490a41fd48",
           "width": 0,
           "x": 713,
           "y": 448,
@@ -4077,6 +4215,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_force"
             }
           ]
@@ -4088,6 +4227,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "ae2b3922-3737-4d62-b6f6-2f1730a4fb9f",
           "width": 0,
           "x": 632,
           "y": 445,
@@ -4097,6 +4237,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_force"
             }
           ]
@@ -4108,6 +4249,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "9a202f07-1789-425a-9003-7483932a3e25",
           "width": 0,
           "x": 574,
           "y": 448,
@@ -4117,6 +4259,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_force"
             }
           ]
@@ -4128,6 +4271,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "4ba84913-fec7-4494-a901-013a557b773f",
           "width": 0,
           "x": 573,
           "y": 413,
@@ -4137,6 +4281,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_force"
             }
           ]
@@ -4148,6 +4293,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "3d941622-99fb-4f27-bcdf-cb68454f5f43",
           "width": 0,
           "x": 714,
           "y": 282,
@@ -4157,6 +4303,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -4168,6 +4315,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "89f02545-c372-4ee2-a3ed-efc798b003c3",
           "width": 0,
           "x": 457,
           "y": 58,
@@ -4177,6 +4325,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -4188,6 +4337,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a4e897fb-092a-41da-88e7-9547c3b0969a",
           "width": 0,
           "x": 575,
           "y": 282,
@@ -4197,6 +4347,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -4208,6 +4359,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "1d48b5c7-9f65-4d5f-9660-416e8bb19fa9",
           "width": 0,
           "x": 416,
           "y": 34,
@@ -4217,6 +4369,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -4228,6 +4381,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "02ca0f18-a01c-4ede-a2d5-1960a125b14d",
           "width": 0,
           "x": 714,
           "y": 364,
@@ -4237,6 +4391,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -4248,6 +4403,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "97bf5f27-ffa7-4488-a0eb-630f8dd6f0ab",
           "width": 0,
           "x": 466,
           "y": 347,
@@ -4257,6 +4413,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_force"
             }
           ]
@@ -4268,6 +4425,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "d9eaf8d2-6a4e-49ec-bb33-12df2c78f3ec",
           "width": 0,
           "x": 575,
           "y": 364,
@@ -4277,6 +4435,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -4288,6 +4447,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "2dfb19e6-2759-49f5-ab0a-bcdd7b4196ee",
           "width": 0,
           "x": 427,
           "y": 317,
@@ -4297,6 +4457,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_force"
             }
           ]
@@ -4308,6 +4469,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "30330d73-1f8b-4594-af7e-faa6bdf2ef46",
           "width": 0,
           "x": 633,
           "y": 279,
@@ -4317,6 +4479,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -4328,6 +4491,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "29da2e3f-ce2e-4f75-8ce2-cf960642e1d5",
           "width": 0,
           "x": 623,
           "y": 250,
@@ -4337,6 +4501,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -4348,6 +4513,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "5de022b4-2c44-4d7e-8290-43ee13c06e0a",
           "width": 0,
           "x": 633,
           "y": 361,
@@ -4357,6 +4523,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -4368,6 +4535,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "bee7d0fe-e87b-4e0c-ad4f-7fb7254a2b86",
           "width": 0,
           "x": 596,
           "y": 330,
@@ -4377,6 +4545,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -4388,6 +4557,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "3d5ddb6a-2f08-4878-917a-a11e8d992792",
           "width": 0,
           "x": 713,
           "y": 204,
@@ -4397,6 +4567,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_translation"
             }
           ]
@@ -4408,6 +4579,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "6c7706e5-b67a-4f01-8c8f-378b77e5d018",
           "width": 0,
           "x": 632,
           "y": 201,
@@ -4417,6 +4589,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_translation"
             }
           ]
@@ -4428,6 +4601,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "baa878d9-e151-40f4-97b6-c5b1fa595e97",
           "width": 0,
           "x": 574,
           "y": 204,
@@ -4437,6 +4611,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_translation"
             }
           ]
@@ -4448,6 +4623,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "52d2d4b3-5c01-48ff-a802-f40b4f2ec654",
           "width": 0,
           "x": 607,
           "y": 171,
@@ -4457,6 +4633,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_translation"
             }
           ]
@@ -4468,6 +4645,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "c758513b-5f1f-4823-81e6-8c9ddf05bc52",
           "width": 0,
           "x": 712,
           "y": 57,
@@ -4477,6 +4655,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_limits"
             }
           ]
@@ -4488,6 +4667,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "e58f2fb1-930b-4016-865c-8a6eed20a922",
           "width": 0,
           "x": 573,
           "y": 57,
@@ -4497,6 +4677,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_limits"
             }
           ]
@@ -4508,6 +4689,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "0da3072b-3552-4673-ace0-9d78e48b121b",
           "width": 0,
           "x": 712,
           "y": 132,
@@ -4517,6 +4699,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_min_translation"
             }
           ]
@@ -4528,6 +4711,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a3fc4142-c1dd-44eb-8ea9-f343e6804633",
           "width": 0,
           "x": 573,
           "y": 132,
@@ -4537,6 +4721,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_min_translation"
             }
           ]
@@ -4548,6 +4733,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "c2f166e4-8ee6-49ea-8f2e-c29336df6490",
           "width": 0,
           "x": 631,
           "y": 54,
@@ -4557,6 +4743,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -4568,6 +4755,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "9de8f4dc-7c81-490c-8ed2-b811186ed67b",
           "width": 0,
           "x": 622,
           "y": 25,
@@ -4577,6 +4765,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "limits"
             }
           ]
@@ -4588,6 +4777,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "eb2c6716-fc2a-4d40-9423-21c5d8bcf927",
           "width": 0,
           "x": 631,
           "y": 129,
@@ -4597,6 +4787,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_translation"
             }
           ]
@@ -4608,6 +4799,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "795ed21a-0d2e-402a-bfd4-533a8db57c35",
           "width": 0,
           "x": 607,
           "y": 98,
@@ -4617,6 +4809,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "min_translation"
             }
           ]
@@ -4628,6 +4821,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "3cee8d5a-d5bd-4b0d-bd52-ed547a97c1eb",
           "width": 0,
           "x": 464,
           "y": 273,
@@ -4637,6 +4831,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -4648,6 +4843,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "2ee15452-4ee4-47ea-95cd-29ca49d0725d",
           "width": 0,
           "x": 463,
           "y": 243,
@@ -4657,6 +4853,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -4668,6 +4865,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "9a4a34c9-d8af-4b6b-88c7-afe15720076d",
           "width": 0,
           "x": 464,
           "y": 198,
@@ -4677,6 +4875,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -4688,6 +4887,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "857cdb2d-ddf9-49fe-acbc-e14adcad0393",
           "width": 0,
           "x": 463,
           "y": 169,
@@ -4697,6 +4897,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -4708,6 +4909,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "d3cc1fe7-3285-4ac0-b02d-3307e61d4610",
           "width": 0,
           "x": 464,
           "y": 129,
@@ -4717,6 +4919,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -4728,6 +4931,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "c2bdadfd-775a-4ddb-9d4e-ff387f62a397",
           "width": 0,
           "x": 423,
           "y": 105,
@@ -4737,6 +4941,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -4769,11 +4974,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Centre)",
-                "Box.PointY(Centre)",
+                "Box.PointX(\"Centre\")",
+                "Box.PointY(\"Centre\")",
                 "Circle",
-                "Circle.PointX(Centre)",
-                "Circle.PointY(Centre)",
+                "Circle.PointX(\"Centre\")",
+                "Circle.PointY(\"Centre\")",
                 "45",
                 "",
                 "no",
@@ -6154,10 +6359,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -6202,10 +6407,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre) + Box.Physics2Behavior::PrismaticJointMinTranslation(Variable(joint))*cos(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
-                    "Box.PointY(Centre) + Box.Physics2Behavior::PrismaticJointMinTranslation(Variable(joint))*sin(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
-                    "Box.PointX(Centre) + Box.Physics2Behavior::PrismaticJointMaxTranslation(Variable(joint))*cos(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
-                    "Box.PointY(Centre) + Box.Physics2Behavior::PrismaticJointMaxTranslation(Variable(joint))*sin(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
+                    "Box.PointX(\"Centre\") + Box.Physics2Behavior::PrismaticJointMinTranslation(Variable(joint))*cos(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
+                    "Box.PointY(\"Centre\") + Box.Physics2Behavior::PrismaticJointMinTranslation(Variable(joint))*sin(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
+                    "Box.PointX(\"Centre\") + Box.Physics2Behavior::PrismaticJointMaxTranslation(Variable(joint))*cos(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
+                    "Box.PointY(\"Centre\") + Box.Physics2Behavior::PrismaticJointMaxTranslation(Variable(joint))*sin(ToRad(Box.Physics2Behavior::PrismaticJointAxisAngle(Variable(joint))))",
                     "1"
                   ],
                   "subInstructions": []
@@ -6236,6 +6441,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -6257,12 +6467,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -6287,6 +6495,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -6314,6 +6523,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "c285f8e5-4933-4a87-a961-d8ab32a7b08a",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -6329,6 +6539,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "7e791c5e-fe0f-4210-be95-7d45049d750c",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -6344,6 +6555,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "b7aa0e31-178e-485b-9210-c395c87c2808",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -6359,6 +6571,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "a6990ab0-d603-46eb-80d2-c2a99e7ae6d4",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -6374,6 +6587,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "851335e3-ff9c-499d-a30b-0566b8df7f39",
           "width": 0,
           "x": 114,
           "y": 308,
@@ -6389,6 +6603,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "a228b970-111b-4b71-8def-8cd707294667",
           "width": 0,
           "x": 491,
           "y": 443,
@@ -6404,6 +6619,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "7872616f-92be-4334-b482-af3c6a27b7eb",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -6419,6 +6635,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "29244067-b49b-4504-9c24-ae1706965644",
           "width": 0,
           "x": 636,
           "y": 67,
@@ -6428,6 +6645,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_a"
             }
           ]
@@ -6439,6 +6657,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "24f6a040-a3b4-4b70-9401-2e780e91da06",
           "width": 0,
           "x": 635,
           "y": 41,
@@ -6448,6 +6667,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_a"
             }
           ]
@@ -6459,6 +6679,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "2ef40727-4843-4fc5-8c2c-b9450a8d8738",
           "width": 0,
           "x": 666,
           "y": 358,
@@ -6468,6 +6689,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -6479,6 +6701,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "29dbfe2c-41fa-4c93-9f27-aa6e7e2020e6",
           "width": 0,
           "x": 650,
           "y": 328,
@@ -6488,6 +6711,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -6499,6 +6723,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "4c181984-c0e2-48c4-83ab-b8e6f152d03a",
           "width": 0,
           "x": 653,
           "y": 282,
@@ -6508,6 +6733,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_b"
             }
           ]
@@ -6519,6 +6745,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "6417c97c-0970-4468-8488-e5ed327cf91e",
           "width": 0,
           "x": 639,
           "y": 254,
@@ -6528,6 +6755,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_b"
             }
           ]
@@ -6539,6 +6767,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "a7f98ae4-e6b5-453c-b7c7-9cd293be0fbe",
           "width": 0,
           "x": 654,
           "y": 205,
@@ -6548,6 +6777,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_a"
             }
           ]
@@ -6559,6 +6789,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "b80f9926-517f-4d0b-9941-4dcb6dc0005e",
           "width": 0,
           "x": 640,
           "y": 178,
@@ -6568,6 +6799,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "length_a"
             }
           ]
@@ -6579,6 +6811,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "b8480e96-ea80-46ea-911a-dd12031bbeef",
           "width": 0,
           "x": 637,
           "y": 138,
@@ -6588,6 +6821,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_b"
             }
           ]
@@ -6599,6 +6833,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "cc5b0334-60f7-44f0-91bb-e79522b14b5f",
           "width": 0,
           "x": 637,
           "y": 112,
@@ -6608,6 +6843,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ground_b"
             }
           ]
@@ -6640,15 +6876,15 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Anchor)",
-                "Box.PointY(Anchor)",
+                "Box.PointX(\"Anchor\")",
+                "Box.PointY(\"Anchor\")",
                 "Circle",
-                "Circle.PointX(Anchor)",
-                "Circle.PointY(Anchor)",
-                "Box.PointX(Centre)",
-                "Box.PointY(Centre) - 200",
-                "Circle.PointX(Centre)",
-                "Circle.PointY(Centre) - 300",
+                "Circle.PointX(\"Anchor\")",
+                "Circle.PointY(\"Anchor\")",
+                "Box.PointX(\"Centre\")",
+                "Box.PointY(\"Centre\") - 200",
+                "Circle.PointX(\"Centre\")",
+                "Circle.PointY(\"Centre\") - 300",
                 "",
                 "",
                 "",
@@ -7049,8 +7285,8 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
                     "Box.Physics2Behavior::PulleyJointFirstGroundAnchorX(Variable(joint))",
                     "Box.Physics2Behavior::PulleyJointFirstGroundAnchorY(Variable(joint))",
                     "1"
@@ -7081,8 +7317,8 @@
                     "Drawer",
                     "Box.Physics2Behavior::PulleyJointSecondGroundAnchorX(Variable(joint))",
                     "Box.Physics2Behavior::PulleyJointSecondGroundAnchorY(Variable(joint))",
-                    "Circle.PointX(Anchor)",
-                    "Circle.PointY(Anchor)",
+                    "Circle.PointX(\"Anchor\")",
+                    "Circle.PointY(\"Anchor\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -7113,6 +7349,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -7134,12 +7375,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -7164,6 +7403,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -7191,6 +7431,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "25273513-f40b-45f3-8465-2bb4675604d2",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -7206,6 +7447,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "1ccf11a3-5333-4e3f-9238-f1efa80b485a",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -7221,6 +7463,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "8202b880-93ff-4e41-950a-b1211627346d",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -7230,6 +7473,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "bottom"
             }
           ]
@@ -7241,6 +7485,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "1004b8d1-cea5-4df7-9969-1c308d757795",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -7256,6 +7501,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "49163c75-c70e-4db2-909e-925a25f26699",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -7271,6 +7517,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "e5a7c86c-614e-492b-a5b9-312b5097a7bc",
           "width": 0,
           "x": 413,
           "y": 420,
@@ -7286,6 +7533,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "5206fa01-889e-44a6-b2cf-5556024a02a5",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -7301,6 +7549,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "88f25ed6-ff5b-4ea7-a3db-e1efd9488021",
           "width": 0,
           "x": 727,
           "y": 200,
@@ -7310,6 +7559,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_ratio"
             }
           ]
@@ -7321,6 +7571,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "5b0ebf79-dd9e-416e-ba28-ae1494e71c07",
           "width": 0,
           "x": 646,
           "y": 197,
@@ -7330,6 +7581,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -7341,6 +7593,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "0b8e4d42-f162-4f95-9011-4959237406ce",
           "width": 0,
           "x": 588,
           "y": 200,
@@ -7350,6 +7603,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_ratio"
             }
           ]
@@ -7361,6 +7615,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "15a06dd7-42af-4e9c-82e8-8b72ac4192bc",
           "width": 0,
           "x": 635,
           "y": 167,
@@ -7370,6 +7625,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ratio"
             }
           ]
@@ -7381,6 +7637,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "d5754698-f8ce-4cf1-8dd3-92eaef4be7dd",
           "width": 0,
           "x": 635,
           "y": 58,
@@ -7390,6 +7647,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "first_joint"
             }
           ]
@@ -7401,6 +7659,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "60e8423e-15e9-4b3c-b72f-30de53581601",
           "width": 0,
           "x": 606,
           "y": 36,
@@ -7410,6 +7669,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "first_joint"
             }
           ]
@@ -7421,6 +7681,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "5be2f2c1-b46f-4361-ba88-c4b4171580c3",
           "width": 0,
           "x": 642,
           "y": 129,
@@ -7430,6 +7691,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "second_joint"
             }
           ]
@@ -7441,6 +7703,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "d3a3a893-ad88-4e42-9233-371c5e381690",
           "width": 0,
           "x": 609,
           "y": 106,
@@ -7450,6 +7713,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "second_joint"
             }
           ]
@@ -7495,11 +7759,11 @@
               "parameters": [
                 "Wall",
                 "Physics2Behavior",
-                "Box.PointX(Centre)",
-                "Wall.PointY(Centre)",
+                "Box.PointX(\"Centre\")",
+                "Wall.PointY(\"Centre\")",
                 "Box",
-                "Box.PointX(Centre)",
-                "Box.PointY(Centre)",
+                "Box.PointX(\"Centre\")",
+                "Box.PointY(\"Centre\")",
                 "90",
                 "",
                 "no",
@@ -7521,8 +7785,8 @@
               "parameters": [
                 "Circle",
                 "Physics2Behavior",
-                "Circle.PointX(Centre)",
-                "Circle.PointY(Centre)",
+                "Circle.PointX(\"Centre\")",
+                "Circle.PointY(\"Centre\")",
                 "no",
                 "",
                 "",
@@ -7923,10 +8187,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Box.PointX(Centre)",
-                    "Wall.PointY(Centre)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Box.PointX(\"Centre\")",
+                    "Wall.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -7938,8 +8202,8 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -7951,10 +8215,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -7985,6 +8249,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -8006,12 +8275,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -8036,6 +8303,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -8063,6 +8331,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "bf52bbdd-c94e-4aa6-9bba-d51a35409696",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -8078,6 +8347,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "cd77deea-7e71-444b-8cc8-5d32a699ed70",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -8093,6 +8363,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "8d786965-edb4-4bf2-81ba-2913fe4d647c",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -8108,6 +8379,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "e1c44477-ad98-431e-881d-b5a311598cde",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -8123,6 +8395,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "0c234c78-5065-4910-a507-451d37af0ae6",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -8138,6 +8411,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "d9ef7ce0-554b-4d6b-9971-6b7e3bc45523",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -8153,6 +8427,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "ee9ec07f-3d1c-4f96-973f-c95abbc8ad72",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -8168,6 +8443,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "3309415c-75d5-469f-8753-ad1136deeec1",
           "width": 0,
           "x": 673,
           "y": 295,
@@ -8177,6 +8453,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -8188,6 +8465,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "a13b1041-a24c-4976-be92-63b459cde2a5",
           "width": 0,
           "x": 592,
           "y": 292,
@@ -8197,6 +8475,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -8208,6 +8487,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "e12c3a25-2e09-4722-a820-1bcdc4cea31a",
           "width": 0,
           "x": 534,
           "y": 295,
@@ -8217,6 +8497,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -8228,6 +8509,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "11021929-5b96-40ef-acc2-70a5e8525911",
           "width": 0,
           "x": 591,
           "y": 262,
@@ -8237,6 +8519,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -8248,6 +8531,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a9692a8d-801c-434c-ae84-13e532a4cd0f",
           "width": 0,
           "x": 672,
           "y": 148,
@@ -8257,6 +8541,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -8268,6 +8553,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "0cbafc41-6365-4eeb-a319-22a744fc5303",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -8277,6 +8563,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "target"
             }
           ]
@@ -8288,6 +8575,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "5e036580-580e-4db5-b22b-45e995ce588a",
           "width": 0,
           "x": 533,
           "y": 148,
@@ -8297,6 +8585,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -8308,6 +8597,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "64cc4410-2a9d-4691-84c9-d2d40b507dcd",
           "width": 0,
           "x": 588,
           "y": 46,
@@ -8317,6 +8607,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "target"
             }
           ]
@@ -8328,6 +8619,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "35dc1fbb-8f61-4a77-8d26-c10024023837",
           "width": 0,
           "x": 672,
           "y": 223,
@@ -8337,6 +8629,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -8348,6 +8641,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "8ecc34f6-cda4-4e50-950c-078bd2de9fa4",
           "width": 0,
           "x": 591,
           "y": 220,
@@ -8357,6 +8651,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -8368,6 +8663,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "3227fc94-ffe2-4bf9-bbfc-00c6982bb23c",
           "width": 0,
           "x": 533,
           "y": 223,
@@ -8377,6 +8673,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -8388,6 +8685,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "680e9862-9dab-4c6c-a508-5602cf032246",
           "width": 0,
           "x": 590,
           "y": 190,
@@ -8397,6 +8695,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -8408,6 +8707,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "2de8be35-e606-4633-8bc9-e687fcc1aac9",
           "width": 0,
           "x": 591,
           "y": 145,
@@ -8417,6 +8717,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -8428,6 +8729,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "ac6162f3-07f0-4fc1-a7e4-a046c7ec4963",
           "width": 0,
           "x": 578,
           "y": 116,
@@ -8437,6 +8739,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -9039,6 +9342,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -9060,12 +9368,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -9090,6 +9396,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -9117,6 +9424,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "566cf8f0-ac4c-42f2-b262-6b8ba071a455",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -9132,6 +9440,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "2b5d80e1-b23e-4917-a9b6-8d6b79744ae5",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -9147,6 +9456,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "0212689e-912a-4b36-bbc7-26a447f4c957",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -9162,6 +9472,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "6cc72ffc-8ba2-40f6-9eb2-de942e2af198",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -9177,6 +9488,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "3dd5fecf-d690-494e-ae84-145d6c7848fd",
           "width": 78,
           "x": 121,
           "y": 123,
@@ -9192,6 +9504,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "dfd9adf1-515e-4da7-9ab1-4af762df0265",
           "width": 0,
           "x": 209,
           "y": 451,
@@ -9201,6 +9514,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "front"
             }
           ]
@@ -9212,6 +9526,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "10a073df-61df-4ae7-80d6-247c5b25dfe3",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -9227,6 +9542,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "3d7608d8-bc9d-4a88-9854-04a999cec936",
           "width": 0,
           "x": 710,
           "y": 351,
@@ -9236,6 +9552,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -9247,6 +9564,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "8e675131-260e-4fb2-bcb0-c05cfbb0ce5c",
           "width": 0,
           "x": 629,
           "y": 348,
@@ -9256,6 +9574,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -9267,6 +9586,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "bd678502-959a-46e9-a6a5-90924d84508d",
           "width": 0,
           "x": 571,
           "y": 351,
@@ -9276,6 +9596,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -9287,6 +9608,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "66ee8562-561b-40d9-a02c-0a358afe2805",
           "width": 0,
           "x": 611,
           "y": 319,
@@ -9296,6 +9618,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -9307,6 +9630,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "c96aa352-8a06-4c05-a9ff-a4b155b46f0e",
           "width": 0,
           "x": 706,
           "y": 61,
@@ -9316,6 +9640,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "enable_motor"
             }
           ]
@@ -9327,6 +9652,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "f2f97e43-6b42-4d5f-afb3-715e998e0f6b",
           "width": 0,
           "x": 457,
           "y": 58,
@@ -9336,6 +9662,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -9347,6 +9674,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "92b78997-60c6-41da-aca0-431c51cce02c",
           "width": 0,
           "x": 567,
           "y": 61,
@@ -9356,6 +9684,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "disable_motor"
             }
           ]
@@ -9367,6 +9696,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "6ea8c07e-fe5b-46fd-8bf3-396deece938b",
           "width": 0,
           "x": 416,
           "y": 34,
@@ -9376,6 +9706,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "axis_angle"
             }
           ]
@@ -9387,6 +9718,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "cace951e-d15c-433b-8069-5f4b68c8619d",
           "width": 0,
           "x": 711,
           "y": 280,
@@ -9396,6 +9728,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -9407,6 +9740,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "48290d5f-e539-4155-a953-9dbaa8f0ba89",
           "width": 0,
           "x": 460,
           "y": 280,
@@ -9416,6 +9750,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -9427,6 +9762,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "b3acaadd-7910-49cb-a5a0-961dad2408d2",
           "width": 0,
           "x": 572,
           "y": 280,
@@ -9436,6 +9772,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -9447,6 +9784,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "a8620b95-de6a-4eff-8797-73109e0b6e88",
           "width": 0,
           "x": 421,
           "y": 250,
@@ -9456,6 +9794,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_torque"
             }
           ]
@@ -9467,6 +9806,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "e7925b75-d30e-4bcd-976e-41f733996695",
           "width": 0,
           "x": 625,
           "y": 58,
@@ -9476,6 +9816,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -9487,6 +9828,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "7e97ab21-4c19-43f6-ae6b-1454c7cae779",
           "width": 0,
           "x": 615,
           "y": 29,
@@ -9496,6 +9838,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor"
             }
           ]
@@ -9507,6 +9850,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "c2b9b26a-58cb-46af-a286-100658872c9f",
           "width": 0,
           "x": 630,
           "y": 277,
@@ -9516,6 +9860,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -9527,6 +9872,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "d7834458-e03c-415e-8e5c-ef48d62f5e80",
           "width": 0,
           "x": 600,
           "y": 246,
@@ -9536,6 +9882,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -9547,6 +9894,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "eb0f9939-d4a8-43d9-a6a8-421dbe6dc7c7",
           "width": 0,
           "x": 458,
           "y": 206,
@@ -9556,6 +9904,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -9567,6 +9916,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "676aae00-7253-4c49-9432-02cae0b650a6",
           "width": 0,
           "x": 457,
           "y": 176,
@@ -9576,6 +9926,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "speed"
             }
           ]
@@ -9587,6 +9938,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "e999149d-e6d8-4544-83ff-54ed9c6c115b",
           "width": 0,
           "x": 458,
           "y": 131,
@@ -9596,6 +9948,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -9607,6 +9960,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "0fe259dd-2e73-424f-bc1c-400a6abd0649",
           "width": 0,
           "x": 457,
           "y": 102,
@@ -9616,6 +9970,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "translation"
             }
           ]
@@ -9627,6 +9982,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "6a133696-0e79-4a4e-b6cf-721370feffb7",
           "width": 0,
           "x": 106,
           "y": 450,
@@ -9636,6 +9992,7 @@
           "initialVariables": [
             {
               "name": "position",
+              "type": "string",
               "value": "back"
             }
           ]
@@ -9647,6 +10004,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "388b1b3d-9aa3-4f88-abea-efb9867a6d05",
           "width": 0,
           "x": 711,
           "y": 209,
@@ -9656,6 +10014,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_motor_torque"
             }
           ]
@@ -9667,6 +10026,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "e200c2cc-840d-4159-83fb-37549093cb77",
           "width": 0,
           "x": 630,
           "y": 206,
@@ -9676,6 +10036,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -9687,6 +10048,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "aa5a5f81-84a8-4f22-87c7-edfd49481179",
           "width": 0,
           "x": 572,
           "y": 209,
@@ -9696,6 +10058,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_motor_torque"
             }
           ]
@@ -9707,6 +10070,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "5bd56e14-00ea-4ef5-af8a-5f7d330fd1d0",
           "width": 0,
           "x": 571,
           "y": 174,
@@ -9716,6 +10080,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_motor_torque"
             }
           ]
@@ -9727,6 +10092,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "0bb8ba69-2ceb-4410-8b6f-1bb567192a10",
           "width": 0,
           "x": 708,
           "y": 136,
@@ -9736,6 +10102,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_motor_speed"
             }
           ]
@@ -9747,6 +10114,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "dcc456ec-a965-4cb6-8cbd-b44afd14fc5b",
           "width": 0,
           "x": 569,
           "y": 136,
@@ -9756,6 +10124,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_motor_speed"
             }
           ]
@@ -9767,6 +10136,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "40d1acce-81a0-4b87-bcd3-231a2b991fe1",
           "width": 0,
           "x": 627,
           "y": 133,
@@ -9776,6 +10146,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -9787,6 +10158,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "42a86cd6-be8c-4289-b3c8-5583302dc886",
           "width": 0,
           "x": 590,
           "y": 102,
@@ -9796,6 +10168,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "motor_speed"
             }
           ]
@@ -9858,11 +10231,11 @@
                   "parameters": [
                     "Box",
                     "Physics2Behavior",
-                    "Box.PointX(Centre) + 1/3*Box.Width()",
-                    "Box.PointY(Centre) + 0.75*Box.Height()",
+                    "Box.PointX(\"Centre\") + 1/3*Box.Width()",
+                    "Box.PointY(\"Centre\") + 0.75*Box.Height()",
                     "Circle",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "70",
                     "",
                     "",
@@ -9905,11 +10278,11 @@
                   "parameters": [
                     "Box",
                     "Physics2Behavior",
-                    "Box.PointX(Centre) - 1/3*Box.Width()",
-                    "Box.PointY(Centre) + 1*Box.Height()",
+                    "Box.PointX(\"Centre\") - 1/3*Box.Width()",
+                    "Box.PointY(\"Centre\") + 1*Box.Height()",
                     "Circle",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "105",
                     "",
                     "",
@@ -11036,10 +11409,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre) + 1/3*Box.Width()*cos(ToRad(Box.Angle())) - 1*Box.Height()*sin(ToRad(Box.Angle()))",
-                    "Box.PointY(Centre) + 1*Box.Height()*cos(ToRad(Box.Angle())) + 1/3*Box.Width()*sin(ToRad(Box.Angle()))",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Box.PointX(\"Centre\") + 1/3*Box.Width()*cos(ToRad(Box.Angle())) - 1*Box.Height()*sin(ToRad(Box.Angle()))",
+                    "Box.PointY(\"Centre\") + 1*Box.Height()*cos(ToRad(Box.Angle())) + 1/3*Box.Width()*sin(ToRad(Box.Angle()))",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -11074,10 +11447,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre) - 1/3*Box.Width()*cos(ToRad(Box.Angle())) - 1*Box.Height()*sin(ToRad(Box.Angle()))",
-                    "Box.PointY(Centre) + 1*Box.Height()*cos(ToRad(Box.Angle())) - 1/3*Box.Width()*sin(ToRad(Box.Angle()))",
-                    "Circle.PointX(Centre)",
-                    "Circle.PointY(Centre)",
+                    "Box.PointX(\"Centre\") - 1/3*Box.Width()*cos(ToRad(Box.Angle())) - 1*Box.Height()*sin(ToRad(Box.Angle()))",
+                    "Box.PointY(\"Centre\") + 1*Box.Height()*cos(ToRad(Box.Angle())) - 1/3*Box.Width()*sin(ToRad(Box.Angle()))",
+                    "Circle.PointX(\"Centre\")",
+                    "Circle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -11108,6 +11481,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -11129,12 +11507,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -11159,6 +11535,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -11186,6 +11563,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "2dd21cc2-6225-446b-8468-5a18e8ef1e35",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -11201,6 +11579,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "5e13bf21-a447-4ea4-aed6-3afda4777cfb",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -11216,6 +11595,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "8bad9989-8c31-403d-ab4b-a5d9fd9948e0",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -11231,6 +11611,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "8fc10ad9-bc5d-490e-8272-8a24614662ac",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -11246,6 +11627,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "40ca8aae-3dff-44d4-9231-db7c6fb289cc",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -11261,6 +11643,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "fba1ce9d-041b-4ea1-a877-930b11c1f9de",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -11276,6 +11659,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "fa041046-b288-4219-9bd0-ce010cdb6306",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -11291,6 +11675,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "c794f10e-6dff-48a1-8b37-fc2e3d63c1aa",
           "width": 0,
           "x": 668,
           "y": 251,
@@ -11300,6 +11685,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_damping"
             }
           ]
@@ -11311,6 +11697,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "27bed8ce-0936-457b-8dc6-5372cc5e69f7",
           "width": 0,
           "x": 587,
           "y": 248,
@@ -11320,6 +11707,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -11331,6 +11719,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "f2a996de-f943-4e43-8e9f-34c8c21dd744",
           "width": 0,
           "x": 529,
           "y": 251,
@@ -11340,6 +11729,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_damping"
             }
           ]
@@ -11351,6 +11741,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "f4c453b9-2864-4939-ac1d-c4e4b8ee5972",
           "width": 0,
           "x": 586,
           "y": 218,
@@ -11360,6 +11751,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "damping"
             }
           ]
@@ -11371,6 +11763,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "32729638-9377-442a-917b-c360dafb5724",
           "width": 0,
           "x": 586,
           "y": 101,
@@ -11380,6 +11773,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -11391,6 +11785,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "05b670fa-0b5b-4719-976c-c568924f9531",
           "width": 0,
           "x": 585,
           "y": 72,
@@ -11400,6 +11795,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "ref_angle"
             }
           ]
@@ -11411,6 +11807,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "5b6e6252-33db-4d7a-abc4-37aeaaf47d91",
           "width": 0,
           "x": 667,
           "y": 179,
@@ -11420,6 +11817,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_frequency"
             }
           ]
@@ -11431,6 +11829,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "8d5b5ba1-0845-4d35-aa30-31b167af980c",
           "width": 0,
           "x": 586,
           "y": 176,
@@ -11440,6 +11839,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -11451,6 +11851,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "cd607b32-804b-4428-9141-7b39243612a2",
           "width": 0,
           "x": 528,
           "y": 179,
@@ -11460,6 +11861,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_frequency"
             }
           ]
@@ -11471,6 +11873,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "dbcf0529-2223-4165-b957-bae136eb0bc1",
           "width": 0,
           "x": 585,
           "y": 146,
@@ -11480,6 +11883,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "frequency"
             }
           ]
@@ -11512,11 +11916,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Anchor)",
-                "Box.PointY(Anchor)",
+                "Box.PointX(\"Anchor\")",
+                "Box.PointY(\"Anchor\")",
                 "Circle",
-                "Circle.PointX(Anchor)",
-                "Circle.PointY(Anchor)",
+                "Circle.PointX(\"Anchor\")",
+                "Circle.PointY(\"Anchor\")",
                 "",
                 "",
                 "",
@@ -11959,10 +12363,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
-                    "Circle.PointX(Anchor)",
-                    "Circle.PointY(Anchor)",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
+                    "Circle.PointX(\"Anchor\")",
+                    "Circle.PointY(\"Anchor\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -11974,8 +12378,8 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -12006,6 +12410,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -12027,12 +12436,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -12057,6 +12464,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -12084,6 +12492,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "6864aee3-5d63-49d3-b18b-1b0e8d2f94ed",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -12099,6 +12508,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "086d5e72-207b-48ad-b1f2-415f36e20aa2",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -12114,6 +12524,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "a475252b-7597-4cec-856c-19de570ae476",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -12129,6 +12540,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "6fea1e2e-58d5-43e3-8548-9ba642678bb8",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -12144,6 +12556,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "404657b1-9376-4090-b898-3bfa5de200f9",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -12159,6 +12572,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "46562520-6dfc-4c0c-9a11-42205ebff99d",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -12174,6 +12588,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "312a076c-dd31-49be-8ef5-63990387ccee",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -12189,6 +12604,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "bac5736e-0a5a-416e-8279-cfa351a0bb6e",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -12198,6 +12614,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_length"
             }
           ]
@@ -12209,6 +12626,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "9007c583-c50a-4d0a-b27c-94aefb340078",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -12218,6 +12636,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_length"
             }
           ]
@@ -12229,6 +12648,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "491fd26e-9416-426d-bd97-a2bed5c1e4e6",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -12238,6 +12658,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_length"
             }
           ]
@@ -12249,6 +12670,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "0f3a8e25-2168-4f08-9988-4557c0ace865",
           "width": 0,
           "x": 588,
           "y": 45,
@@ -12258,6 +12680,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_length"
             }
           ]
@@ -12290,11 +12713,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Anchor)",
-                "Box.PointY(Anchor)",
+                "Box.PointX(\"Anchor\")",
+                "Box.PointY(\"Anchor\")",
                 "Circle",
-                "Circle.PointX(Anchor)",
-                "Circle.PointY(Anchor)",
+                "Circle.PointX(\"Anchor\")",
+                "Circle.PointY(\"Anchor\")",
                 "",
                 "no",
                 "joint"
@@ -12521,10 +12944,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Anchor)",
-                    "Box.PointY(Anchor)",
-                    "Circle.PointX(Anchor)",
-                    "Circle.PointY(Anchor)",
+                    "Box.PointX(\"Anchor\")",
+                    "Box.PointY(\"Anchor\")",
+                    "Circle.PointX(\"Anchor\")",
+                    "Circle.PointY(\"Anchor\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -12555,6 +12978,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -12576,12 +13004,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -12606,6 +13032,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -12633,6 +13060,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "aee3095a-aed9-4269-84a2-daca687f10cf",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -12648,6 +13076,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "8e6aef0d-4c0b-4503-92e1-2c0058eab7f5",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -12663,6 +13092,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "3c540eae-d330-4b5b-87af-63a8c4a3973f",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -12678,6 +13108,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "a4c00e51-0612-48c7-9cc2-c06a0387462b",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -12693,6 +13124,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "e54fc49a-e8b7-4824-be71-58034f67ee4f",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -12708,6 +13140,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "f935e459-31e6-404e-9515-d746ecdb717e",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -12723,6 +13156,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "a4cb4c5e-db38-4b3f-b02c-1292fed9dc7f",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -12738,6 +13172,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a0a73bf3-abd0-402c-b89d-f9e665f38001",
           "width": 0,
           "x": 670,
           "y": 162,
@@ -12747,6 +13182,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_torque"
             }
           ]
@@ -12758,6 +13194,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "68074af1-07be-4aef-90cf-0eb6f614a17a",
           "width": 0,
           "x": 589,
           "y": 159,
@@ -12767,6 +13204,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -12778,6 +13216,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "65f0ba46-b125-41e4-878c-86d3f17d557c",
           "width": 0,
           "x": 531,
           "y": 162,
@@ -12787,6 +13226,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_torque"
             }
           ]
@@ -12798,6 +13238,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "a7df22a9-fb2e-49c6-a089-8bd22d1950a8",
           "width": 0,
           "x": 588,
           "y": 129,
@@ -12807,6 +13248,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -12818,6 +13260,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "5beae774-5297-4c6d-a750-1b9f19ec3ce1",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -12827,6 +13270,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -12838,6 +13282,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "ecd337cd-df55-43de-a446-71cb0a194462",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -12847,6 +13292,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -12858,6 +13304,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "2ca50105-a930-4553-978f-72e9cd15b296",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -12867,6 +13314,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -12878,6 +13326,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "5b15060c-fc8e-4cb4-b57b-9bb55fad00b6",
           "width": 0,
           "x": 588,
           "y": 45,
@@ -12887,6 +13336,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -12930,11 +13380,11 @@
               "parameters": [
                 "Box",
                 "Physics2Behavior",
-                "Box.PointX(Centre)",
-                "Box.PointY(Centre)",
+                "Box.PointX(\"Centre\")",
+                "Box.PointY(\"Centre\")",
                 "Circle",
-                "Circle.PointX(Anchor)",
-                "Circle.PointY(Anchor)",
+                "Circle.PointX(\"Anchor\")",
+                "Circle.PointY(\"Anchor\")",
                 "1",
                 "0.05",
                 "no",
@@ -13319,10 +13769,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Circle.PointX(Anchor)",
-                    "Circle.PointY(Anchor)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Circle.PointX(\"Anchor\")",
+                    "Circle.PointY(\"Anchor\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -13353,6 +13803,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -13374,12 +13829,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     },
@@ -13404,6 +13857,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -13431,6 +13885,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "5dee2a8b-61d9-4027-9bae-d4cb85f69b8f",
           "width": 10,
           "x": 790,
           "y": 0,
@@ -13446,6 +13901,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "be4a2cdd-d7b8-45e5-8e3a-b449cb2bd192",
           "width": 800,
           "x": 0,
           "y": 0,
@@ -13461,6 +13917,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "87c71c07-2833-4564-92b8-6e2005c1bee0",
           "width": 800,
           "x": 0,
           "y": 530,
@@ -13476,6 +13933,7 @@
           "layer": "",
           "locked": false,
           "name": "Wall",
+          "persistentUuid": "95cef973-7679-4020-9807-54e7a91517e4",
           "width": 10,
           "x": 0,
           "y": 0,
@@ -13491,6 +13949,7 @@
           "layer": "",
           "locked": false,
           "name": "Box",
+          "persistentUuid": "f26ff960-7efb-432b-94b8-502c199bdb2a",
           "width": 0,
           "x": 121,
           "y": 123,
@@ -13506,6 +13965,7 @@
           "layer": "",
           "locked": false,
           "name": "Circle",
+          "persistentUuid": "e668a48c-4a4a-4b12-a094-d8f8693e9125",
           "width": 0,
           "x": 445,
           "y": 346,
@@ -13521,6 +13981,7 @@
           "layer": "",
           "locked": false,
           "name": "Drawer",
+          "persistentUuid": "989d1f13-6937-4697-9e96-f9a32b86733b",
           "width": 0,
           "x": 744,
           "y": 14,
@@ -13536,6 +13997,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "5e94d1a3-1eba-4565-9583-109ff168260a",
           "width": 0,
           "x": 669,
           "y": 427,
@@ -13545,6 +14007,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_correction"
             }
           ]
@@ -13556,6 +14019,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "63e38e0b-d871-47a0-becc-6d381b609002",
           "width": 0,
           "x": 588,
           "y": 424,
@@ -13565,6 +14029,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "correction"
             }
           ]
@@ -13576,6 +14041,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "b2c51fea-9771-4846-b198-b446b5b59e86",
           "width": 0,
           "x": 530,
           "y": 427,
@@ -13585,6 +14051,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_correction"
             }
           ]
@@ -13596,6 +14063,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "9c6819cf-0185-4db2-acc0-2869b4302c53",
           "width": 0,
           "x": 575,
           "y": 393,
@@ -13605,6 +14073,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "correction"
             }
           ]
@@ -13616,6 +14085,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "d7d4f060-b9a1-47fe-ab92-b4834deace25",
           "width": 0,
           "x": 670,
           "y": 78,
@@ -13625,6 +14095,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_x"
             }
           ]
@@ -13636,6 +14107,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "df69fa75-49f7-409b-8c16-68929963908f",
           "width": 0,
           "x": 589,
           "y": 75,
@@ -13645,6 +14117,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_x"
             }
           ]
@@ -13656,6 +14129,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "96e3dcf2-c880-4e84-977f-154bb8cf471e",
           "width": 0,
           "x": 531,
           "y": 78,
@@ -13665,6 +14139,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_x"
             }
           ]
@@ -13676,6 +14151,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "3bce588d-d483-4c00-b917-70a0c61245f5",
           "width": 0,
           "x": 579,
           "y": 45,
@@ -13685,6 +14161,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_x"
             }
           ]
@@ -13696,6 +14173,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "b65072f7-579f-42bd-b819-68a5d7d059aa",
           "width": 0,
           "x": 670,
           "y": 148,
@@ -13705,6 +14183,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_y"
             }
           ]
@@ -13716,6 +14195,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "42019030-9167-4f16-ac12-a982076f11c4",
           "width": 0,
           "x": 589,
           "y": 145,
@@ -13725,6 +14205,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_y"
             }
           ]
@@ -13736,6 +14217,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "9b7b1336-4d05-400a-81e0-e9052fd3fab8",
           "width": 0,
           "x": 531,
           "y": 148,
@@ -13745,6 +14227,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_y"
             }
           ]
@@ -13756,6 +14239,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "8fdc7d5c-c839-4f6c-a676-a2217ba87ca4",
           "width": 0,
           "x": 581,
           "y": 115,
@@ -13765,6 +14249,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_y"
             }
           ]
@@ -13776,6 +14261,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "23bb5eae-3e99-48a1-94ff-3385300eb8a8",
           "width": 0,
           "x": 668,
           "y": 220,
@@ -13785,6 +14271,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_offset_angle"
             }
           ]
@@ -13796,6 +14283,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "f2aa4afe-0f52-4483-8318-3e48f6cf56bb",
           "width": 0,
           "x": 587,
           "y": 217,
@@ -13805,6 +14293,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_angle"
             }
           ]
@@ -13816,6 +14305,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "94aa4b75-2bbe-43f1-a141-9bc1946b7614",
           "width": 0,
           "x": 529,
           "y": 220,
@@ -13825,6 +14315,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_offset_angle"
             }
           ]
@@ -13836,6 +14327,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "e138847f-8c5e-4e44-b795-4e96d60bbf05",
           "width": 0,
           "x": 574,
           "y": 186,
@@ -13845,6 +14337,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "offset_angle"
             }
           ]
@@ -13856,6 +14349,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "97f12d3a-c8f1-4d42-9a3a-277426cdcb53",
           "width": 0,
           "x": 669,
           "y": 292,
@@ -13865,6 +14359,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_force"
             }
           ]
@@ -13876,6 +14371,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "0748d8ee-628a-466e-a2e5-9c3aa5cf96ed",
           "width": 0,
           "x": 588,
           "y": 289,
@@ -13885,6 +14381,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -13896,6 +14393,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "1d103a81-622b-4560-aba2-0a0fc52a4d2f",
           "width": 0,
           "x": 530,
           "y": 292,
@@ -13905,6 +14403,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_force"
             }
           ]
@@ -13916,6 +14415,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "cdaa99ff-f074-4c71-9075-1845b00c2076",
           "width": 0,
           "x": 575,
           "y": 258,
@@ -13925,6 +14425,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_force"
             }
           ]
@@ -13936,6 +14437,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "a7ad1cf0-2637-4389-a66c-eec844f6fdeb",
           "width": 0,
           "x": 669,
           "y": 360,
@@ -13945,6 +14447,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "more_max_torque"
             }
           ]
@@ -13956,6 +14459,7 @@
           "layer": "",
           "locked": false,
           "name": "ValueText",
+          "persistentUuid": "6787aa2a-ebd9-4cb2-8fad-a78aa0e1fb80",
           "width": 0,
           "x": 588,
           "y": 357,
@@ -13965,6 +14469,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -13976,6 +14481,7 @@
           "layer": "",
           "locked": false,
           "name": "Button",
+          "persistentUuid": "c0ff39ef-9fd0-4933-ae4b-c2616ae76f6a",
           "width": 0,
           "x": 530,
           "y": 360,
@@ -13985,6 +14491,7 @@
           "initialVariables": [
             {
               "name": "action",
+              "type": "string",
               "value": "less_max_torque"
             }
           ]
@@ -13996,6 +14503,7 @@
           "layer": "",
           "locked": false,
           "name": "TitleText",
+          "persistentUuid": "ba580ea0-6382-47a3-bbed-6ae141f2e9f5",
           "width": 0,
           "x": 575,
           "y": 326,
@@ -14005,6 +14513,7 @@
           "initialVariables": [
             {
               "name": "prop",
+              "type": "string",
               "value": "max_torque"
             }
           ]
@@ -14989,10 +15498,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
-                    "Box.PointX(Centre) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle()))",
-                    "Box.PointY(Centre) + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle()))",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
+                    "Box.PointX(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle()))",
+                    "Box.PointY(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle()))",
                     "1"
                   ],
                   "subInstructions": []
@@ -15004,10 +15513,10 @@
                   },
                   "parameters": [
                     "Drawer",
-                    "Box.PointX(Centre) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle()))",
-                    "Box.PointY(Centre) + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle()))",
-                    "Box.PointX(Centre) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle())) + 30*cos(ToRad(Box.Angle() + Box.Physics2Behavior::MotorJointAngularOffset(Variable(joint))))",
-                    "Box.PointY(Centre) + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle())) + 30*sin(ToRad(Box.Angle() + Box.Physics2Behavior::MotorJointAngularOffset(Variable(joint))))",
+                    "Box.PointX(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle()))",
+                    "Box.PointY(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle()))",
+                    "Box.PointX(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*cos(ToRad(Box.Angle())) - Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*sin(ToRad(Box.Angle())) + 30*cos(ToRad(Box.Angle() + Box.Physics2Behavior::MotorJointAngularOffset(Variable(joint))))",
+                    "Box.PointY(\"Centre\") + Box.Physics2Behavior::MotorJointOffsetY(Variable(joint))*cos(ToRad(Box.Angle())) + Box.Physics2Behavior::MotorJointOffsetX(Variable(joint))*sin(ToRad(Box.Angle())) + 30*sin(ToRad(Box.Angle() + Box.Physics2Behavior::MotorJointAngularOffset(Variable(joint))))",
                     "1"
                   ],
                   "subInstructions": []
@@ -15038,6 +15547,11 @@
       ],
       "layers": [
         {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
           "name": "",
           "visibility": true,
           "cameras": [
@@ -15059,12 +15573,10 @@
         {
           "name": "Physics2Behavior",
           "type": "Physics2::Physics2Behavior",
-          "content": {
-            "gravityX": 0,
-            "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
-          }
+          "gravityX": 0,
+          "gravityY": 9.8,
+          "scaleX": 100,
+          "scaleY": 100
         }
       ]
     }
@@ -15606,9 +16118,9 @@
               "parameters": [
                 "SceneButtonText",
                 "=",
-                "SceneButton.PointX(Centre) - SceneButtonText.Width()/2",
+                "SceneButton.PointX(\"Centre\") - SceneButtonText.Width()/2",
                 "=",
-                "SceneButton.PointY(Centre) - SceneButtonText.Height()/2"
+                "SceneButton.PointY(\"Centre\") - SceneButtonText.Height()/2"
               ],
               "subInstructions": []
             }
@@ -15812,9 +16324,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Button.PointX(Centre) - ButtonText.Width()/2",
+                    "Button.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Button.PointY(Centre) - ButtonText.Height()/2"
+                    "Button.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }

@@ -1,8 +1,11 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
+import ResourcesLoader from '../../ResourcesLoader';
 import Checkbox from '../../UI/Checkbox';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { useLongTouch } from '../../Utils/UseLongTouch';
+import CheckeredBackground from '../CheckeredBackground';
 
 const SPRITE_SIZE = 100;
 export const thumbnailContainerStyle = {
@@ -14,16 +17,14 @@ export const thumbnailContainerStyle = {
   alignItems: 'center',
   lineHeight: SPRITE_SIZE + 'px',
   textAlign: 'center',
-  border: '#AAAAAA 1px solid',
-  borderColor: '#AAAAAA',
 };
 
 const styles = {
   spriteThumbnail: {
     ...thumbnailContainerStyle,
-    background: 'url("res/transparentback.png") repeat',
   },
   spriteThumbnailImage: {
+    position: 'relative',
     maxWidth: SPRITE_SIZE,
     maxHeight: SPRITE_SIZE,
     verticalAlign: 'middle',
@@ -39,17 +40,21 @@ const styles = {
   },
 };
 
-const ImageThumbnail = ({
-  project,
-  resourceName,
-  resourcesLoader,
-  style,
-  selectable,
-  selected,
-  onSelect,
-  onContextMenu,
-  muiTheme,
-}) => {
+type Props = {|
+  project: gdProject,
+  resourceName: string,
+  resourcesLoader: typeof ResourcesLoader,
+  style?: any,
+  selectable?: boolean,
+  selected?: boolean,
+  onSelect?: (checked: boolean) => void,
+  onContextMenu?: (x: number, y: number) => void,
+|};
+
+const ImageThumbnail = (props: Props) => {
+  const { onContextMenu, resourcesLoader, resourceName, project } = props;
+  const theme = React.useContext(GDevelopThemeContext);
+
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
@@ -60,40 +65,41 @@ const ImageThumbnail = ({
     )
   );
 
+  const { selectedBorderColor } = theme.imageThumbnail;
+  const normalBorderColor = theme.imagePreview.borderColor;
+  const borderColor = props.selected ? selectedBorderColor : normalBorderColor;
+
+  const containerStyle = {
+    ...styles.spriteThumbnail,
+    border: `1px solid ${borderColor}`,
+    ...props.style,
+  };
+
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <div
-          title={resourceName}
-          style={{
-            ...styles.spriteThumbnail,
-            borderColor: selected
-              ? muiTheme.imageThumbnail.selectedBorderColor
-              : undefined,
-            ...style,
-          }}
-          onContextMenu={e => {
-            e.stopPropagation();
-            if (onContextMenu) onContextMenu(e.clientX, e.clientY);
-          }}
-          {...longTouchForContextMenuProps}
-        >
-          <CorsAwareImage
-            style={styles.spriteThumbnailImage}
-            alt={resourceName}
-            src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+    <div
+      title={resourceName}
+      style={containerStyle}
+      onContextMenu={e => {
+        e.stopPropagation();
+        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
+      }}
+      {...longTouchForContextMenuProps}
+    >
+      <CheckeredBackground />
+      <CorsAwareImage
+        style={styles.spriteThumbnailImage}
+        alt={resourceName}
+        src={resourcesLoader.getResourceFullUrl(project, resourceName, {})}
+      />
+      {props.selectable && (
+        <div style={styles.checkboxContainer}>
+          <Checkbox
+            checked={!!props.selected}
+            onCheck={(e, check) => props.onSelect && props.onSelect(check)}
           />
-          {selectable && (
-            <div style={styles.checkboxContainer}>
-              <Checkbox
-                checked={selected}
-                onCheck={(e, check) => onSelect(check)}
-              />
-            </div>
-          )}
         </div>
       )}
-    </ThemeConsumer>
+    </div>
   );
 };
 

@@ -471,6 +471,8 @@
         "kind": "audio",
         "metadata": "",
         "name": "life lost sound.wav",
+        "preloadAsMusic": false,
+        "preloadAsSound": false,
         "userAdded": true
       },
       {
@@ -510,6 +512,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 70,
         "snap": true,
         "windowMask": true,
@@ -554,18 +557,22 @@
       "variables": [
         {
           "name": "Score",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "CheckpointX",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "CheckpointY",
+          "type": "string",
           "value": "0"
         },
         {
           "name": "PlayerJustDead",
+          "type": "string",
           "value": ""
         }
       ],
@@ -2731,6 +2738,7 @@
           "variables": [
             {
               "name": "GoingLeft",
+              "type": "string",
               "value": "0"
             }
           ],
@@ -5582,6 +5590,7 @@
         "parallax",
         "tiled"
       ],
+      "dependencies": [],
       "eventsFunctions": [],
       "eventsBasedBehaviors": [
         {
@@ -5595,6 +5604,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {
@@ -5700,6 +5710,7 @@
               "fullName": "",
               "functionType": "Action",
               "name": "doStepPostEvents",
+              "private": false,
               "sentence": "",
               "events": [
                 {

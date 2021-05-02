@@ -8,9 +8,7 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcesLoader: typeof ResourcesLoader,
-  children?: any,
   style?: Object,
-  onSize?: (number, number) => void,
   selectable?: boolean,
   selected?: boolean,
   onSelect?: boolean => void,
@@ -62,9 +60,7 @@ export default class ResourceThumbnail extends React.Component<Props, State> {
             project={this.props.project}
             resourceName={this.props.resourceName}
             resourcesLoader={this.props.resourcesLoader}
-            children={this.props.children}
             style={this.props.style}
-            onSize={this.props.onSize}
             selectable={this.props.selectable}
             selected={this.props.selected}
             onSelect={this.props.onSelect}

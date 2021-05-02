@@ -114,7 +114,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Put a platform.
       platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
-      runtimeScene.renderAndStep(1000 / 60);
     });
 
     it('can fall when in the air', function () {
@@ -164,6 +163,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         );
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       }
+    });
+
+    it('must not move down when on the floor at startup', function () {
+      object.setPosition(0, platform.getY() - object.getHeight());
+
+      runtimeScene.renderAndStep(1000 / 60);
+      // Check the platformer object is not falling
+      // to verify that the platform AABB is up to date
+      expect(object.getY()).to.be.below(-29.99); // -30 = -10 (platform y) + -20 (object height)
     });
 
     it('must not move when put on a platform while falling', function () {
@@ -1106,8 +1114,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.above(-30);
     });
 
-    // This test doesn't pass because the platform AABB are not always updated
-    // before the platformer object moves.
+    // This test doesn't pass because the object falls at 1rst frame.
     it.skip('follows a platform that is slightly overlapping its top', function () {
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);

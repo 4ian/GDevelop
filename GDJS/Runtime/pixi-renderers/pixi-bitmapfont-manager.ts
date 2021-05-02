@@ -6,10 +6,11 @@
 namespace gdjs {
   const defaultBitmapFontKey = 'GDJS-DEFAULT-BITMAP-FONT';
 
-  // TODO: We implemented a cache to lazily unload unused `BitmapFont`s, but this
-  // is set to 0 because we don't even unload (`uninstall`) `BitmapFont`s, as this
-  // would destroy the texture that can be used by other objects or other fonts.
-  const uninstallCacheSize = 0;
+  // When a font is unused, we put it in a cache of unused fonts. It's unloaded
+  // from memory only when the cache is full and the font is at the last position
+  // in the cache.
+  // Set this to 0 to unload from memory ("uninstall") as soon as a font is unused.
+  const uninstallCacheSize = 5;
 
   /**
    * We patch the installed font to use a name that is unique for each font data and texture,
@@ -172,20 +173,11 @@ namespace gdjs {
           // Remove the first font (i.e: the oldest one)
           const oldestUnloadedPixiBitmapFontName = this._pixiBitmapFontsToUninstall.shift() as string;
 
-          // TODO: We don't uninstall fonts (which is a memory leak!) because uninstall calls
-          // `destroy` on the BitmapFont, which destroys the atlas texture *including* its base texture.
-          //
-          // This will crash if there is any other object using this base texture (like a Sprite).
-          //
-          // This will also put the texture in a non valid state (which is a problem as PixiImageManager expects
-          // textures to be all already loaded). You can see the problem by deleting all the BitmapText object using
-          // a texture and creating a new one.
-          //
           PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
           console.log(
-            'Should uninstall BitmapFont ' +
+            'Uninstalled BitmapFont "' +
               oldestUnloadedPixiBitmapFontName +
-              'from memory - but not doing it.'
+              '" from memory.'
           );
         }
       }

@@ -561,16 +561,11 @@ module.exports = {
       bitmapFontUsageCount[bitmapFontInstallKey]--;
 
       if (bitmapFontUsageCount[bitmapFontInstallKey] === 0) {
-        // TODO: We don't uninstall fonts (which is a memory leak!) because uninstall calls
-        // `destroy` on the BitmapFont, which destroys the atlas texture *including* its base texture.
-        //
-        // This will crash if there is any other object using this base texture (like a Sprite).
-
-        // PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
+        PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
         console.info(
-          'Should uninstall BitmapFont ' +
+          'Uninstalled BitmapFont "' +
             bitmapFontInstallKey +
-            ' - but not doing it.'
+            '" from memory.'
         );
       }
     };

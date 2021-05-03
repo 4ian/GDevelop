@@ -4,12 +4,9 @@ var path = optionalRequire('path');
 var os = optionalRequire('os');
 const gd /* TODO: add flow in this file */ = global.gd;
 
-/**
- * Gives access to the local filesystem, but returns paths
- * that are using "/" as a path separator, even on Windows
- * (so that in exported games, paths are slashs, which is
- * supported everywhere).
- */
+/*
+Try to get the uid of the user. If it cannot it return nothing;
+*/
 function getUsername(): string {
   try {
     return os.userInfo().uid;
@@ -17,6 +14,12 @@ function getUsername(): string {
     return '';
   }
 }
+/**
+ * Gives access to the local filesystem, but returns paths
+ * that are using "/" as a path separator, even on Windows
+ * (so that in exported games, paths are slashs, which is
+ * supported everywhere).
+ */
 export default {
   mkDir: function(path) {
     try {

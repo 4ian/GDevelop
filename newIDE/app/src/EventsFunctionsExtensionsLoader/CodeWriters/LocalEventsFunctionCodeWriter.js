@@ -8,10 +8,7 @@ import slugs from 'slugs';
 const os = optionalRequire('os');
 const fs = optionalRequire('fs');
 
-/**
- * Create the EventsFunctionCodeWriter that writes generated code for events functions
- * to local files.
- */
+//try to get UID of the user. If it cannot ; return blank.
 function getUsername(): string {
   try {
     return os.userInfo().uid;
@@ -19,6 +16,10 @@ function getUsername(): string {
     return '';
   }
 }
+/**
+ * Create the EventsFunctionCodeWriter that writes generated code for events functions
+ * to local files.
+ */
 export const makeLocalEventsFunctionCodeWriter = ({
   onWriteFile,
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {

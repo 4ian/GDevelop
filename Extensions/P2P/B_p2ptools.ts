@@ -370,8 +370,9 @@ namespace gdjs {
       export const useDefaultBrokerServer = loadPeerJS;
 
       /**
-       * Overrides the default peer ID. Must be called before connecting to a
-       * broker.
+       * Overrides the default peer ID. Must be called before connecting to a broker.
+       * Overriding the ID may have unwanted consequences. Do not use this feature
+       * unless you really know what you are doing.
        * @param id The peer ID to use when connecting to a broker.
        */
       export const overrideId = (id: string) => {

@@ -427,19 +427,13 @@ namespace gdjs {
         easing: easingValue,
         step: function step(state) {
           if(scaleFromCenterOfObject) {
-            const oldX = that.owner.getX();
-            const oldW = that.owner.getWidth();
+            const oldX = that.owner.getCenterXInScene();
+            const oldY = that.owner.getCenterYInScene();
             // @ts-ignore - objects are duck typed
             that.owner.setScaleX(state.scaleX);
-            const newX = oldX - (that.owner.getWidth() - oldW) / 2;
-            that.owner.setX(newX);
-
-            const oldY = that.owner.getY();
-            const oldH = that.owner.getHeight();
             // @ts-ignore - objects are duck typed
             that.owner.setScaleY(state.scaleY);
-            const newY = oldY - (that.owner.getHeight() - oldH) / 2;
-            that.owner.setY(newY);
+            that.owner.setCenterPositionInScene(oldX, oldY);
           } else {
             // @ts-ignore - objects are duck typed
             that.owner.setScaleX(state.scaleX);
@@ -499,12 +493,10 @@ namespace gdjs {
         easing: easingValue,
         step: function step(state) {
           if(scaleFromCenterOfObject) {
-            const oldX = that.owner.getX();
-            const oldW = that.owner.getWidth();
+            const oldX = that.owner.getCenterXInScene();
             // @ts-ignore - objects are duck typed
             that.owner.setScaleX(state.scaleX);
-            const newX = oldX - (that.owner.getWidth() - oldW) / 2;
-            that.owner.setX(newX);
+            that.owner.setCenterXInScene(oldX);
           } else {
             // @ts-ignore - objects are duck typed
             that.owner.setScaleX(state.scaleX);
@@ -562,12 +554,10 @@ namespace gdjs {
         easing: easingValue,
         step: function step(state) {
           if(scaleFromCenterOfObject) {
-            const oldY = that.owner.getY();
-            const oldH = that.owner.getHeight();
+            const oldY = that.owner.getCenterYInScene();
             // @ts-ignore - objects are duck typed
             that.owner.setScaleY(state.scaleY);
-            const newY = oldY - (that.owner.getHeight() - oldH) / 2;
-            that.owner.setY(newY);
+            that.owner.setCenterYInScene(oldY);
           } else {
             // @ts-ignore - objects are duck typed
             that.owner.setScaleY(state.scaleY);

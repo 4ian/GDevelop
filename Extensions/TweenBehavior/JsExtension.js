@@ -524,8 +524,53 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .addParameter(
+        'yesorno',
+        _('Use HSL instead of RGB to create tween colors'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectColorTween');
+
+    behavior
+      .addAction(
+        'AddObjectColorHSLTween',
+        _('Add object HSL color tween'),
+        _(
+          'Add a tween animation for the object\'s color as HSL. H: any number, S and L: 0-100. Use -1 for S and L to use original color\'s S/L value(s).'
+        ),
+        _(
+          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_) S: _PARAM5_ L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
+        ),
+        _('Color'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false) 
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false) 
+      .addParameter('string', _('Tween Identifier'), '', false) 
+      .addParameter('expression', _('To Hue'), '', false) 
+      .addParameter('yesorno', _('Animate Hue'), '', false)
+      .setDefaultValue('yes')
+      .addParameter('expression', _('To Saturation (-1 to ignore)'), '', false) 
+      .setDefaultValue('-1')
+      .addParameter('expression', _('To Lightness (-1 to ignore)'), '', false) 
+      .setDefaultValue('-1')
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false) 
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration'), '', false) 
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectColorHSLTween');
+
 
     behavior
       .addCondition(

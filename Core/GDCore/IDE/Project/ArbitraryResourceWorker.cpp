@@ -80,7 +80,7 @@ void ArbitraryResourceWorker::ExposeResource(gd::Resource& resource) {
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker() {}
 
-void LaunchResourceWorkerOnEvents(gd::Project& project,
+void LaunchResourceWorkerOnEvents(const gd::Project& project,
                                   gd::EventsList& events,
                                   gd::ArbitraryResourceWorker& worker) {
   // Get all extensions used

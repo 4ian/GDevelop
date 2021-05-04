@@ -1867,6 +1867,10 @@ interface WholeProjectRefactorer {
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
 };
 
+interface UsedExtensionsFinder {
+  [Value] SetString STATIC_ScanProject([Ref] Project project);
+};
+
 interface ExtensionAndBehaviorMetadata {
   [Const, Ref] PlatformExtension GetExtension();
   [Const, Ref] BehaviorMetadata GetMetadata();

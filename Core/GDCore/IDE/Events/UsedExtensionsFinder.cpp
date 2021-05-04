@@ -22,7 +22,7 @@ std::set<gd::String> UsedExtensionsFinder::ScanProject(gd::Project& project) {
 
 void UsedExtensionsFinder::DoVisitObject(gd::Object& object) {
   usedExtensions.insert(gd::MetadataProvider::GetExtensionAndObjectMetadata(
-                            projectPtr->GetCurrentPlatform(), object.GetType())
+                            project.GetCurrentPlatform(), object.GetType())
                             .GetExtension()
                             .GetName());
 };
@@ -32,7 +32,7 @@ void UsedExtensionsFinder::DoVisitObject(gd::Object& object) {
 void UsedExtensionsFinder::DoVisitBehavior(gd::BehaviorContent& behavior) {
   usedExtensions.insert(
       gd::MetadataProvider::GetExtensionAndBehaviorMetadata(
-          projectPtr->GetCurrentPlatform(), behavior.GetTypeName())
+          project.GetCurrentPlatform(), behavior.GetTypeName())
           .GetExtension()
           .GetName());
 };
@@ -42,19 +42,26 @@ void UsedExtensionsFinder::DoVisitBehavior(gd::BehaviorContent& behavior) {
 bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
                                               bool isCondition) {
   auto metadata =
-      isCondition
-          ? gd::MetadataProvider::GetExtensionAndConditionMetadata(
-                projectPtr->GetCurrentPlatform(), instruction.GetType())
-          : gd::MetadataProvider::GetExtensionAndActionMetadata(
-                projectPtr->GetCurrentPlatform(), instruction.GetType());
+      isCondition ? gd::MetadataProvider::GetExtensionAndConditionMetadata(
+                        project.GetCurrentPlatform(), instruction.GetType())
+                  : gd::MetadataProvider::GetExtensionAndActionMetadata(
+                        project.GetCurrentPlatform(), instruction.GetType());
   usedExtensions.insert(metadata.GetExtension().GetName());
 
+  size_t i = 0;
   for (auto expression : instruction.GetParameters()) {
-    gd::ExpressionParser2 parser(projectPtr->GetCurrentPlatform(),
-                                 GetGlobalObjectsContainer(),
-                                 GetObjectsContainer());
-    parser.ParseExpression("unknown", expression.GetPlainString())
-        ->Visit(*this);
+    const gd::String& parameterType =
+        metadata.GetMetadata().GetParameter(i++).GetType();
+
+    if (gd::ParameterMetadata::IsExpression("string", parameterType) ||
+        gd::ParameterMetadata::IsExpression("number", parameterType)) {
+      gd::ExpressionParser2 parser(project.GetCurrentPlatform(),
+                                   GetGlobalObjectsContainer(),
+                                   GetObjectsContainer());
+      parser.ParseExpression(parameterType, expression.GetPlainString())
+          ->Visit(*this);
+    } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
+      usedExtensions.insert("BuiltinVariables");
   }
   return false;
 }
@@ -106,11 +113,10 @@ void UsedExtensionsFinder::OnVisitVariableBracketAccessorNode(
 // Add extensions bound to Objects/Behaviors/Functions
 void UsedExtensionsFinder::OnVisitIdentifierNode(IdentifierNode& node) {
   if (gd::ParameterMetadata::IsObject(node.type)) {
-    usedExtensions.insert(
-        gd::MetadataProvider::GetExtensionAndObjectMetadata(
-            projectPtr->GetCurrentPlatform(), node.identifierName)
-            .GetExtension()
-            .GetName());
+    usedExtensions.insert(gd::MetadataProvider::GetExtensionAndObjectMetadata(
+                              project.GetCurrentPlatform(), node.identifierName)
+                              .GetExtension()
+                              .GetName());
   }
 };
 
@@ -121,11 +127,11 @@ void UsedExtensionsFinder::OnVisitFunctionCallNode(FunctionCallNode& node) {
 
   // Try to find a free number expression
   metadata = gd::MetadataProvider::GetExtensionAndExpressionMetadata(
-      projectPtr->GetCurrentPlatform(), node.functionName);
+      project.GetCurrentPlatform(), node.functionName);
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata.GetMetadata())) {
     // Try to find a free str expression
     metadata = gd::MetadataProvider::GetExtensionAndStrExpressionMetadata(
-        projectPtr->GetCurrentPlatform(), node.functionName);
+        project.GetCurrentPlatform(), node.functionName);
     // No valid expression found, return.
     if (gd::MetadataProvider::IsBadExpressionMetadata(metadata.GetMetadata()))
       return;

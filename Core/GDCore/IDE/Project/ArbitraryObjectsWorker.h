@@ -55,7 +55,7 @@ class GD_CORE_API ArbitraryObjectsWorker {
   /**
    * Called to do some work on a behavior.
    */
-  virtual void DoVisitBehavior(gd::BehaviorContent& instruction);
+  virtual void DoVisitBehavior(gd::BehaviorContent& instruction){};
 };
 
 }  // namespace gd

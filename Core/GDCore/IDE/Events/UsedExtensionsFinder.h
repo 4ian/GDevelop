@@ -29,32 +29,34 @@ class GD_CORE_API UsedExtensionsFinder
   static std::set<gd::String> ScanProject(gd::Project& project);
 
  private:
-  UsedExtensionsFinder(gd::Project& _project) { projectPtr = &_project; };
-  gd::Project* projectPtr;
+  UsedExtensionsFinder(gd::Project& project_) : project(project_){};
+  gd::Project& project;
   std::set<gd::String> usedExtensions;
 
   // Object Visitor
-  void DoVisitObject(gd::Object& object);
+  void DoVisitObject(gd::Object& object) override;
 
   // Behavior Visitor
-  void DoVisitBehavior(gd::BehaviorContent& behavior);
+  void DoVisitBehavior(gd::BehaviorContent& behavior) override;
 
   // Instructions Visitor
-  bool DoVisitInstruction(gd::Instruction& instruction, bool isCondition);
+  bool DoVisitInstruction(gd::Instruction& instruction,
+                          bool isCondition) override;
 
   // Expression Visitor
-  void OnVisitSubExpressionNode(SubExpressionNode& node);
-  void OnVisitOperatorNode(OperatorNode& node);
-  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node);
-  void OnVisitNumberNode(NumberNode& node);
-  void OnVisitTextNode(TextNode& node);
-  void OnVisitVariableNode(VariableNode& node);
-  void OnVisitVariableAccessorNode(VariableAccessorNode& node);
-  void OnVisitVariableBracketAccessorNode(VariableBracketAccessorNode& node);
-  void OnVisitIdentifierNode(IdentifierNode& node);
-  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node);
-  void OnVisitFunctionCallNode(FunctionCallNode& node);
-  void OnVisitEmptyNode(EmptyNode& node);
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override;
+  void OnVisitOperatorNode(OperatorNode& node) override;
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override;
+  void OnVisitNumberNode(NumberNode& node) override;
+  void OnVisitTextNode(TextNode& node) override;
+  void OnVisitVariableNode(VariableNode& node) override;
+  void OnVisitVariableAccessorNode(VariableAccessorNode& node) override;
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override;
+  void OnVisitIdentifierNode(IdentifierNode& node) override;
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override;
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override;
+  void OnVisitEmptyNode(EmptyNode& node) override;
 };
 
 };  // namespace gd

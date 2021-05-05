@@ -1,5 +1,5 @@
 import optionalRequire from '../../Utils/OptionalRequire.js';
-import getUID from '../../Utils/GetUserUID.js';
+import getUID from '../../Utils/LocalUserInfo.js';
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
 var os = optionalRequire('os');

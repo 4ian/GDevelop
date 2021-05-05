@@ -381,6 +381,7 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleTween(
       identifier: string,
@@ -388,7 +389,8 @@ namespace gdjs {
       toScaleY: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean, 
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -424,10 +426,20 @@ namespace gdjs {
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
+          if(scaleFromCenterOfObject) {
+            const oldX = that.owner.getCenterXInScene();
+            const oldY = that.owner.getCenterYInScene();
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleX(state.scaleX);
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleY(state.scaleY);
+            that.owner.setCenterPositionInScene(oldX, oldY);
+          } else {
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleX(state.scaleX);
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleY(state.scaleY);
+          }
         },
       });
       this._addTween(
@@ -446,13 +458,15 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleXTween(
       identifier: string,
       toScaleX: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -478,8 +492,15 @@ namespace gdjs {
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
+          if(scaleFromCenterOfObject) {
+            const oldX = that.owner.getCenterXInScene();
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleX(state.scaleX);
+            that.owner.setCenterXInScene(oldX);
+          } else {
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleX(state.scaleX);
+          }
         },
       });
       this._addTween(
@@ -498,13 +519,15 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleYTween(
       identifier: string,
       toScaleY: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -530,8 +553,15 @@ namespace gdjs {
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
+          if(scaleFromCenterOfObject) {
+            const oldY = that.owner.getCenterYInScene();
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleY(state.scaleY);
+            that.owner.setCenterYInScene(oldY);
+          } else {
+            // @ts-ignore - objects are duck typed
+            that.owner.setScaleY(state.scaleY);
+          }
         },
       });
       this._addTween(

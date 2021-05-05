@@ -171,6 +171,25 @@ module.exports = {
 
     extension
       .addAction(
+        'OverrideID',
+        _('Override the client ID'),
+        _(
+          'Overrides the client ID of the current game instance with a specified ID. ' +
+            'Must be called BEFORE connecting to a broker.'
+        ),
+        _('Override the client ID with _PARAM0_'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('ID'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.overrideId');
+
+    extension
+      .addAction(
         'SendToAll',
         _('Trigger event on all connected clients'),
         _('Triggers an event on all connected clients'),

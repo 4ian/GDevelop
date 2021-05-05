@@ -411,11 +411,9 @@ namespace gdjs {
       //Keyboard
       document.onkeydown = function (e) {
         manager.onKeyPressed(e.keyCode, e.location);
-        e.preventDefault();
       };
       document.onkeyup = function (e) {
         manager.onKeyReleased(e.keyCode, e.location);
-        e.preventDefault();
       };
 
       //Mouse

@@ -86,6 +86,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Read the wiki page for more info about the dataloss mode.`,
     };
   }
+  if (type === 'P2P::OverrideID') {
+    return {
+      kind: 'warning',
+      message: t`Overriding the ID may have unwanted consequences. Do not use this feature unless you really know what you are doing.`,
+    };
+  }
   if (type.indexOf('P2P::') === 0) {
     return {
       kind: 'warning',

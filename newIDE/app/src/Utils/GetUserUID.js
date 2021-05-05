@@ -1,10 +1,14 @@
-const getUID = () => var os = optionalRequire('os');
-function getUID(): string {
-  try {
-    return os.userInfo().uid;
-  } catch (e) {
-    return '';
-  }
+// @flow
+import optionalRequire from './OptionalRequire.js';
+var os = optionalRequire('os');
+
+const getUID = () => {
+    try {
+        return os.userInfo().uid;
+    } catch (e) {
+        return '';
+    }
 };
-export getUID ;
+
+export default getUID;
 

@@ -6,6 +6,7 @@ import {
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import getUID from '../../Utils/GetUserUID.js';
 import slugs from 'slugs';
+var path = optionalRequire('path');
 const os = optionalRequire('os');
 const fs = optionalRequire('fs');
 
@@ -18,7 +19,9 @@ export const makeLocalEventsFunctionCodeWriter = ({
 }: EventsFunctionCodeWriterCallbacks): EventsFunctionCodeWriter => {
   // The generated code for extensions will be stored in a temporary directory
 
-  const outputDir = path.join(os.tmpdir() + `/GDGeneratedEventsFunctions-` + getUID());
+  const outputDir = path.join(
+    os.tmpdir() + `/GDGeneratedEventsFunctions-` + getUID()
+  );
   fs.mkdir(outputDir, err => {
     if (err && err.code !== 'EEXIST') {
       console.error(

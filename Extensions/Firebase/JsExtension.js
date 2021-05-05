@@ -1296,7 +1296,6 @@ module.exports = {
         '',
         true
       )
-
       .setFunctionName('gdjs.evtTools.firebaseTools.firestore.executeQuery');
 
     extension
@@ -1435,7 +1434,6 @@ module.exports = {
       .addIncludeFile(
         'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
       )
-
       .setFunctionName('firebase.firestore().disableNetwork');
 
     extension

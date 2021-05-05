@@ -4,7 +4,7 @@ import {
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
 import optionalRequire from '../../Utils/OptionalRequire.js';
-import getUID from '../../Utils/GetUserUID.js';
+import getUID from '../../Utils/LocalUserInfo.js';
 import slugs from 'slugs';
 const path = optionalRequire('path');
 const os = optionalRequire('os');

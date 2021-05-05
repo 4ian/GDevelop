@@ -8,14 +8,6 @@ import slugs from 'slugs';
 const os = optionalRequire('os');
 const fs = optionalRequire('fs');
 
-//try to get UID of the user. If it cannot ; return blank.
-function getUsername(): string {
-  try {
-    return os.userInfo().uid;
-  } catch (e) {
-    return '';
-  }
-}
 /**
  * Create the EventsFunctionCodeWriter that writes generated code for events functions
  * to local files.

@@ -4,16 +4,6 @@ var path = optionalRequire('path');
 var os = optionalRequire('os');
 const gd /* TODO: add flow in this file */ = global.gd;
 
-/*
-Try to get the uid of the user. If it cannot it return nothing;
-*/
-function getUsername(): string {
-  try {
-    return os.userInfo().uid;
-  } catch (e) {
-    return '';
-  }
-}
 /**
  * Gives access to the local filesystem, but returns paths
  * that are using "/" as a path separator, even on Windows

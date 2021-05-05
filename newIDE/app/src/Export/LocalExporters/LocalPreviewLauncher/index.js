@@ -13,7 +13,6 @@ import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
 import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
-const os = optionalRequire('os');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
@@ -150,8 +149,9 @@ export default class LocalPreviewLauncher extends React.Component<
         new gd.AbstractFileSystemJS(),
         localFileSystem
       );
-      const outputDir = path.join(fileSystem.getTempDir(), `preview`);
+      const outputDir = path.join(fileSystem.getTempDir(), 'preview');
       const exporter = new gd.Exporter(fileSystem, gdjsRoot);
+
       return {
         outputDir,
         exporter,

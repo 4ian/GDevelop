@@ -1,4 +1,5 @@
 import optionalRequire from '../../Utils/OptionalRequire.js';
+import getUID from '../../Utils/GetUserUID.js'
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
 var os = optionalRequire('os');
@@ -31,7 +32,7 @@ export default {
     }
   },
   getTempDir: function() {
-    return path.join(os.tmpdir(), `GDTMP-${getUsername()}`);
+    return path.join(os.tmpdir(), `GDTMP-${getUID()}`);
   },
   fileNameFrom: function(fullPath) {
     if (this._isExternalUrl(fullPath)) return fullPath;

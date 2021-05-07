@@ -123,7 +123,7 @@ export const installResource = (
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
-  newResource.setSmooth(project.getScaleMode());
+  newResource.setSmooth(project.getScaleMode() !== 'nearest');
   newResource.setOrigin(resourceOriginName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();

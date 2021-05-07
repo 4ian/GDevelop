@@ -55,6 +55,22 @@ namespace gdjs {
   };
 
   /**
+   * Convert a string hex color value to an array [r, g, b], where each component is in the range [0, 255].
+   *
+   * @param {string} hex Color hexadecimal
+   */
+  export const hexToRGBColor = function (
+    hexString: string
+  ): [number, number, number] {
+    var hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return [
+      (hexNumber >> 16) & 0xff,
+      (hexNumber >> 8) & 0xff,
+      hexNumber & 0xff,
+    ];
+  };
+
+  /**
    * Convert a rgb color value to a hex value.
    * @param r Red
    * @param g Green

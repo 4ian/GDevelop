@@ -123,6 +123,12 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/SpatialSound/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
+  {
+    name: 'BitmapText',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BitmapText/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

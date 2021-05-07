@@ -85,6 +85,7 @@ declare class libGDevelop {
   ImageResource: Class<gdImageResource>;
   AudioResource: Class<gdAudioResource>;
   FontResource: Class<gdFontResource>;
+  BitmapFontResource: Class<gdBitmapFontResource>;
   VideoResource: Class<gdVideoResource>;
   JsonResource: Class<gdJsonResource>;
   InitialInstance: Class<gdInitialInstance>;

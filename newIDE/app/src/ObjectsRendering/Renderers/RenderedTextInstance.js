@@ -27,17 +27,19 @@ function RenderedTextInstance(
     pixiResourcesLoader
   );
 
+  const style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 20,
+    align: 'left',
+    padding: 5,
+  });
+
   //Setup the PIXI object:
-  const textObject = gd.asTextObject(this._associatedObject);
-  this._pixiObject = new PIXI.Text(' ', { align: 'left' });
+  this._pixiObject = new PIXI.Text('', style);
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
   this._pixiContainer.addChild(this._pixiObject);
   this._styleFontDirty = true;
-  this._fontFamily = this._pixiResourcesLoader.getFontFamily(
-    this._project,
-    textObject.getFontName()
-  );
   this.update();
 }
 RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
@@ -90,7 +92,7 @@ RenderedTextInstance.prototype.update = function() {
 
   if (this._styleFontDirty) {
     this._pixiObject.style.fontFamily = this._fontFamily || 'Arial';
-    this._pixiObject.style.fontSize = Math.max(1, this._characterSize) + 'px';
+    this._pixiObject.style.fontSize = Math.max(1, this._characterSize);
     this._pixiObject.style.fontStyle = this._isItalic ? 'italic' : 'normal';
     this._pixiObject.style.fontWeight = this._isBold ? 'bold' : 'normal';
     this._pixiObject.style.wordWrap = this._wrapping;

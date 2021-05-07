@@ -38,12 +38,15 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };
   std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
   std::set<gd::String>& GetAllAudios() { return GetAll("audio"); };
+  std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
     return resourceType == "image"
                ? allImages
                : (resourceType == "audio"
                       ? allAudios
-                      : (resourceType == "font") ? allFonts : emptyResources);
+                      : (resourceType == "font")
+                            ? allFonts
+                            : (resourceType == "bitmapFont") ? allBitmapFonts : emptyResources);
   };
 
   virtual void ExposeFile(gd::String& resource) override{
@@ -58,11 +61,15 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual void ExposeFont(gd::String& fontResourceName) override {
     allFonts.insert(fontResourceName);
   };
+  virtual void ExposeBitmapFont(gd::String& bitmapFontResourceName) override {
+    allBitmapFonts.insert(bitmapFontResourceName);
+  };
 
  protected:
   std::set<gd::String> allImages;
   std::set<gd::String> allAudios;
   std::set<gd::String> allFonts;
+  std::set<gd::String> allBitmapFonts;
   std::set<gd::String> emptyResources;
 };
 

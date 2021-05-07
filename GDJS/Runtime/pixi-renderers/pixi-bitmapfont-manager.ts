@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   const defaultBitmapFontKey = 'GDJS-DEFAULT-BITMAP-FONT';
 
   // When a font is unused, we put it in a cache of unused fonts. It's unloaded

@@ -3,11 +3,14 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
+#include "GDCpp/Runtime/RuntimeScene.h"
+
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCpp/Extensions/CppPlatform.h"
@@ -25,7 +28,6 @@
 #include "GDCpp/Runtime/RuntimeGame.h"
 #include "GDCpp/Runtime/RuntimeLayer.h"
 #include "GDCpp/Runtime/RuntimeObjectHelpers.h"
-#include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/SoundManager.h"
 #include "GDCpp/Runtime/profile.h"
 #if !defined(ANDROID)  // TODO: OpenGL
@@ -60,9 +62,7 @@ RuntimeScene::RuntimeScene(sf::RenderWindow* renderWindow_, RuntimeGame* game_)
 }
 
 RuntimeScene::~RuntimeScene() {
-  for (std::size_t i = 0; i < game->GetUsedExtensions().size(); ++i) {
-    std::shared_ptr<gd::PlatformExtension> gdExtension =
-        CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+  for (auto gdExtension : CppPlatform::Get().GetAllPlatformExtensions()) {
     std::shared_ptr<ExtensionBase> extension =
         std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
     if (extension != std::shared_ptr<ExtensionBase>())
@@ -454,9 +454,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances(
 
   std::cout << ".";
   // Extensions specific initialization
-  for (std::size_t i = 0; i < game->GetUsedExtensions().size(); ++i) {
-    std::shared_ptr<gd::PlatformExtension> gdExtension =
-        CppPlatform::Get().GetExtension(game->GetUsedExtensions()[i]);
+  for (auto gdExtension : CppPlatform::Get().GetAllPlatformExtensions()) {
     std::shared_ptr<ExtensionBase> extension =
         std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
     if (extension != std::shared_ptr<ExtensionBase>()) {

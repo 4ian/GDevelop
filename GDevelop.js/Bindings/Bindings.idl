@@ -350,7 +350,6 @@ interface Project {
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
-    [Const, Ref] VectorString GetUsedExtensions();
     [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
@@ -1871,6 +1870,10 @@ interface WholeProjectRefactorer {
     void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
+};
+
+interface UsedExtensionsFinder {
+  [Value] SetString STATIC_ScanProject([Ref] Project project);
 };
 
 interface ExtensionAndBehaviorMetadata {

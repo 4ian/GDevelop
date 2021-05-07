@@ -102,9 +102,19 @@ describe('libGD.js', function () {
     });
 
     it('should have a list of extensions', function () {
-      expect(typeof project.getUsedExtensions().size()).toBe('number');
-      project.getUsedExtensions().clear();
-      expect(project.getUsedExtensions().size()).toBe(0);
+      expect(
+        gd.UsedExtensionsFinder.scanProject(project)
+          .toNewVectorString()
+          .toJSArray()
+      ).toEqual([]);
+
+      project.insertNewObject(project, 'Sprite', 'MyObject', 0);
+
+      expect(
+        gd.UsedExtensionsFinder.scanProject(project)
+          .toNewVectorString()
+          .toJSArray()
+      ).toEqual(['Sprite']);
     });
 
     it('handles events functions extensions', function () {
@@ -790,7 +800,9 @@ describe('libGD.js', function () {
 
       var child1 = parentVariable.getChild('Child1');
       var child2 = parentVariable.getChild('Child2');
-      var grandChild1 = parentVariable.getChild('Child1').getChild('GrandChild');
+      var grandChild1 = parentVariable
+        .getChild('Child1')
+        .getChild('GrandChild');
       var grandChild2 = parentVariable.getChild('Child2').getAtIndex(0);
 
       expect(parentVariable.contains(grandChild1, true)).toBe(true);

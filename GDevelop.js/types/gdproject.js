@@ -35,7 +35,6 @@ declare class gdProject extends gdObjectsContainer {
   getUseDeprecatedZeroAsDefaultZOrder(): boolean;
   setLastCompilationDirectory(path: string): void;
   getLastCompilationDirectory(): string;
-  getUsedExtensions(): gdVectorString;
   getExtensionProperties(): gdExtensionProperties;
   addPlatform(platform: gdPlatform): void;
   getCurrentPlatform(): gdPlatform;

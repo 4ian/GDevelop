@@ -51,7 +51,8 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
   size_t i = 0;
   for (auto expression : instruction.GetParameters()) {
     const gd::String& parameterType =
-        metadata.GetMetadata().GetParameter(i++).GetType();
+        metadata.GetMetadata().GetParameter(i).GetType();
+    i++;
 
     if (gd::ParameterMetadata::IsExpression("string", parameterType) ||
         gd::ParameterMetadata::IsExpression("number", parameterType)) {

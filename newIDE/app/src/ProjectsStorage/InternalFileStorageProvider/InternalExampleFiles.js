@@ -120,21 +120,22 @@ import exampleFile115 from '../../fixtures/spatial-sound/spatial-sound.json';
 import exampleFile116 from '../../fixtures/splash-screen/splash-screen.json';
 import exampleFile117 from '../../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import exampleFile118 from '../../fixtures/tabbed-menu-with-layers/tabbed-menu-with-layers.json';
-import exampleFile119 from '../../fixtures/take-screenshot/take-screenshot.json';
-import exampleFile120 from '../../fixtures/tetris-demo/tetris-demo.json';
-import exampleFile121 from '../../fixtures/text-entry-object/text-entry-object.json';
-import exampleFile122 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
-import exampleFile123 from '../../fixtures/text-to-speech/text-to-speech.json';
-import exampleFile124 from '../../fixtures/tilemaps-made-with-tiled-editor/tilemaps-made-with-tiled-editor.json';
-import exampleFile125 from '../../fixtures/titan-souls-demo/titan-souls-demo.json';
-import exampleFile126 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
-import exampleFile127 from '../../fixtures/tween-animations/tween-animations.json';
-import exampleFile128 from '../../fixtures/tween-test/tween-test.json';
-import exampleFile129 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
-import exampleFile130 from '../../fixtures/unlock-items/unlock-items.json';
-import exampleFile131 from '../../fixtures/video-player/video-player.json';
-import exampleFile132 from '../../fixtures/z-depth/z-depth.json';
-import exampleFile133 from '../../fixtures/zombie-laser/zombie-laser.json';
+import exampleFile119 from '../../fixtures/tactical-game-grid-movement/tactical-game-grid-movement.json';
+import exampleFile120 from '../../fixtures/take-screenshot/take-screenshot.json';
+import exampleFile121 from '../../fixtures/tetris-demo/tetris-demo.json';
+import exampleFile122 from '../../fixtures/text-entry-object/text-entry-object.json';
+import exampleFile123 from '../../fixtures/text-fade-in-out/text-fade-in-out.json';
+import exampleFile124 from '../../fixtures/text-to-speech/text-to-speech.json';
+import exampleFile125 from '../../fixtures/tilemaps-made-with-tiled-editor/tilemaps-made-with-tiled-editor.json';
+import exampleFile126 from '../../fixtures/titan-souls-demo/titan-souls-demo.json';
+import exampleFile127 from '../../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import exampleFile128 from '../../fixtures/tween-animations/tween-animations.json';
+import exampleFile129 from '../../fixtures/tween-test/tween-test.json';
+import exampleFile130 from '../../fixtures/type-on-text-effect/type-on-text-effect.json';
+import exampleFile131 from '../../fixtures/unlock-items/unlock-items.json';
+import exampleFile132 from '../../fixtures/video-player/video-player.json';
+import exampleFile133 from '../../fixtures/z-depth/z-depth.json';
+import exampleFile134 from '../../fixtures/zombie-laser/zombie-laser.json';
 
 // prettier-ignore
 export default {
@@ -257,19 +258,20 @@ export default {
   'example://splash-screen': exampleFile116,
   'example://sprite-fade-in-out': exampleFile117,
   'example://tabbed-menu-with-layers': exampleFile118,
-  'example://take-screenshot': exampleFile119,
-  'example://tetris-demo': exampleFile120,
-  'example://text-entry-object': exampleFile121,
-  'example://text-fade-in-out': exampleFile122,
-  'example://text-to-speech': exampleFile123,
-  'example://tilemaps-made-with-tiled-editor': exampleFile124,
-  'example://titan-souls-demo': exampleFile125,
-  'example://toggle-music-play-sound': exampleFile126,
-  'example://tween-animations': exampleFile127,
-  'example://tween-test': exampleFile128,
-  'example://type-on-text-effect': exampleFile129,
-  'example://unlock-items': exampleFile130,
-  'example://video-player': exampleFile131,
-  'example://z-depth': exampleFile132,
-  'example://zombie-laser': exampleFile133,
+  'example://tactical-game-grid-movement': exampleFile119,
+  'example://take-screenshot': exampleFile120,
+  'example://tetris-demo': exampleFile121,
+  'example://text-entry-object': exampleFile122,
+  'example://text-fade-in-out': exampleFile123,
+  'example://text-to-speech': exampleFile124,
+  'example://tilemaps-made-with-tiled-editor': exampleFile125,
+  'example://titan-souls-demo': exampleFile126,
+  'example://toggle-music-play-sound': exampleFile127,
+  'example://tween-animations': exampleFile128,
+  'example://tween-test': exampleFile129,
+  'example://type-on-text-effect': exampleFile130,
+  'example://unlock-items': exampleFile131,
+  'example://video-player': exampleFile132,
+  'example://z-depth': exampleFile133,
+  'example://zombie-laser': exampleFile134,
 };

@@ -4472,6 +4472,43 @@ module.exports = {
       }
     ]
   },
+  "tactical-game-grid-movement": {
+    "description": "Shows how to move units on an hexagonal grid, like done in some tactical games.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "take-screenshot": {
     "description": "Show how to save a screenshot of the game on the disk (on Windows/macOS/Linux only).",
     "usedExtensions": [

@@ -2426,6 +2426,51 @@ module.exports = {
       }
     ]
   },
+  "menu-with-tweens": {
+    "description": "Shows how to use the tween behavior to animate a game main menu.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tweening",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "move-camera-to-position": {
     "description": "This shows how to move the camera to the position of an object on a map.",
     "usedExtensions": [

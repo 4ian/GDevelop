@@ -418,6 +418,55 @@ module.exports = {
       }
     ]
   },
+  "bim-bam": {
+    "description": "A Bust-a-Move clone to show how to make a match 3 game.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      }
+    ]
+  },
   "board-walk-with-raycast": {
     "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
     "usedExtensions": [

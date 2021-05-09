@@ -381,6 +381,7 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleTween(
       identifier: string,
@@ -388,7 +389,8 @@ namespace gdjs {
       toScaleY: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -413,6 +415,25 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
+      let stepFunction;
+      if (scaleFromCenterOfObject) {
+        stepFunction = function step(state) {
+          const oldX = that.owner.getCenterXInScene();
+          const oldY = that.owner.getCenterYInScene();
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleX(state.scaleX);
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleY(state.scaleY);
+          that.owner.setCenterPositionInScene(oldX, oldY);
+        };
+      } else {
+        stepFunction = function step(state) {
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleX(state.scaleX);
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleY(state.scaleY);
+        };
+      }
       newTweenable.setConfig({
         from: {
           // @ts-ignore - objects are duck typed
@@ -423,12 +444,7 @@ namespace gdjs {
         to: { scaleX: toScaleX, scaleY: toScaleY },
         duration: durationValue,
         easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-        },
+        step: stepFunction,
       });
       this._addTween(
         identifier,
@@ -446,13 +462,15 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleXTween(
       identifier: string,
       toScaleX: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -471,16 +489,27 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
+      let stepFunction;
+      if (scaleFromCenterOfObject) {
+        stepFunction = function step(state) {
+          const oldX = that.owner.getCenterXInScene();
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleX(state.scaleX);
+          that.owner.setCenterXInScene(oldX);
+        };
+      } else {
+        stepFunction = function step(state) {
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleX(state.scaleX);
+        };
+      }
       newTweenable.setConfig({
         // @ts-ignore - objects are duck typed
         from: { scaleX: this.owner.getScaleX() },
         to: { scaleX: toScaleX },
         duration: durationValue,
         easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleX(state.scaleX);
-        },
+        step: stepFunction,
       });
       this._addTween(
         identifier,
@@ -498,13 +527,15 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param scaleFromCenterOfObject Scale the transform from the center of the object (or point that is called center), not the top-left origin
      */
     addObjectScaleYTween(
       identifier: string,
       toScaleY: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      scaleFromCenterOfObject: boolean
     ) {
       const that = this;
       if (!this._isActive) {
@@ -523,16 +554,27 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
+      let stepFunction;
+      if (scaleFromCenterOfObject) {
+        stepFunction = function step(state) {
+          const oldY = that.owner.getCenterYInScene();
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleY(state.scaleY);
+          that.owner.setCenterYInScene(oldY);
+        };
+      } else {
+        stepFunction = function step(state) {
+          // @ts-ignore - objects are duck typed
+          that.owner.setScaleY(state.scaleY);
+        };
+      }
       newTweenable.setConfig({
         // @ts-ignore - objects are duck typed
         from: { scaleY: this.owner.getScaleY() },
         to: { scaleY: toScaleY },
         duration: durationValue,
         easing: easingValue,
-        step: function step(state) {
-          // @ts-ignore - objects are duck typed
-          that.owner.setScaleY(state.scaleY);
-        },
+        step: stepFunction,
       });
       this._addTween(
         identifier,

@@ -489,7 +489,7 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
-      let stepFunction: { (state: any): void; (state: any): void };
+      let stepFunction;
       if (scaleFromCenterOfObject) {
         stepFunction = function step(state) {
           const oldX = that.owner.getCenterXInScene();
@@ -554,7 +554,7 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
-      let stepFunction: { (state: any): void; (state: any): void };
+      let stepFunction;
       if (scaleFromCenterOfObject) {
         stepFunction = function step(state) {
           const oldY = that.owner.getCenterYInScene();

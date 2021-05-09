@@ -183,7 +183,7 @@ export type PreferencesValues = {|
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
   isMenuBarHiddenInPreview: boolean,
-  backdropClickBehavior: string,
+  backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
 |};
 
 /**
@@ -265,7 +265,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    backdropClickBehavior: 'cancel',
+    backdropClickBehavior: 'nothing',
   },
   setLanguage: () => {},
   setThemeName: () => {},

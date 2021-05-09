@@ -506,7 +506,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setBackdropClickBehavior(backdropClickBehavior: string) {
+  _setBackdropClickBehavior(
+    backdropClickBehavior: 'nothing' | 'apply' | 'cancel'
+  ) {
     this.setState(
       state => ({
         values: { ...state.values, backdropClickBehavior },

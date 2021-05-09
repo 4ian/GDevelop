@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
+      const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
       if (parameterName === 'blur') {
         dropShadowFilter.blur = value;
       } else if (parameterName === 'quality') {
@@ -20,7 +20,7 @@ namespace gdjs {
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
-      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
+      const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
       if (parameterName === 'color') {
         dropShadowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(
           value
@@ -28,7 +28,7 @@ namespace gdjs {
       }
     },
     updateBooleanParameter: function (filter, parameterName, value) {
-      const dropShadowFilter = filter as PIXI.filters.DropShadowFilter;
+      const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
       if (parameterName === 'shadowOnly') {
         dropShadowFilter.shadowOnly = value;
       }

@@ -1,5 +1,7 @@
 //A simple PIXI filter doing some color changes
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   const DummyPixiFilter = function () {
     var vertexShader = null;
     var fragmentShader = [

@@ -6,8 +6,10 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ArbitraryResourceWorker.h"
+
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -55,6 +57,21 @@ void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
   ExposeFile(fontName);
 };
 
+void ArbitraryResourceWorker::ExposeBitmapFont(gd::String& bitmapFontName) {
+  for (auto resources : GetResources()) {
+    if (!resources) continue;
+
+    if (resources->HasResource(bitmapFontName) &&
+        resources->GetResource(bitmapFontName).GetKind() == "bitmapFont") {
+      // Nothing to do, the font is a reference to a resource that
+      // is already exposed.
+      return;
+    }
+  }
+
+  ExposeFile(bitmapFontName);
+};
+
 void ArbitraryResourceWorker::ExposeResources(
     gd::ResourcesManager* resourcesManager) {
   if (!resourcesManager) return;
@@ -82,15 +99,8 @@ void LaunchResourceWorkerOnEvents(const gd::Project& project,
                                   gd::EventsList& events,
                                   gd::ArbitraryResourceWorker& worker) {
   // Get all extensions used
-  std::vector<std::shared_ptr<gd::PlatformExtension> > allGameExtensions;
-  std::vector<gd::String> usedExtensions = project.GetUsedExtensions();
-  for (std::size_t i = 0; i < usedExtensions.size(); ++i) {
-    std::shared_ptr<gd::PlatformExtension> extension =
-        project.GetCurrentPlatform().GetExtension(usedExtensions[i]);
-
-    if (extension != std::shared_ptr<gd::PlatformExtension>())
-      allGameExtensions.push_back(extension);
-  }
+  auto allGameExtensions =
+      project.GetCurrentPlatform().GetAllPlatformExtensions();
 
   for (std::size_t j = 0; j < events.size(); j++) {
     vector<gd::InstructionsList*> allActionsVectors =

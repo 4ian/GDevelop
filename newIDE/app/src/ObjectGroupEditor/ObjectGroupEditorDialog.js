@@ -32,6 +32,7 @@ const ObjectGroupEditorDialog = ({
 
   return (
     <Dialog
+      onApply={onApply}
       key={group.ptr}
       actions={[
         <FlatButton

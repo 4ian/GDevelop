@@ -327,7 +327,7 @@ module.exports = {
           'Add a tween animation for the object scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
+          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -347,6 +347,8 @@ module.exports = {
         '',
         false
       )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleTween');
@@ -359,7 +361,7 @@ module.exports = {
           'Add a tween animation for the object X-scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -379,6 +381,8 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleXTween');
 
@@ -390,7 +394,7 @@ module.exports = {
           'Add a tween animation for the object Y-scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -409,6 +413,8 @@ module.exports = {
         '',
         false
       )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleYTween');

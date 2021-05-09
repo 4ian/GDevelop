@@ -10,16 +10,18 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import CheckeredBackground from '../../ResourcesList/CheckeredBackground';
 
 const paddingSize = 10;
 const styles = {
-  previewBackground: {
-    background: 'url("res/transparentback.png") repeat',
+  previewContainer: {
     display: 'flex',
+    position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
   },
   previewImage: {
+    position: 'relative',
     objectFit: 'contain',
     verticalAlign: 'middle',
     pointerEvents: 'none',
@@ -72,7 +74,8 @@ const ImageCard = ({
   return (
     <ButtonBase onClick={onChoose} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>
-        <div style={{ ...styles.previewBackground, width: size, height: size }}>
+        <div style={{ ...styles.previewContainer, width: size, height: size }}>
+          <CheckeredBackground />
           <CorsAwareImage
             key={resource.url}
             style={{

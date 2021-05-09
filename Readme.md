@@ -36,7 +36,7 @@ Status of the tests and builds: [![Build status](https://circleci.com/gh/4ian/GD
 
 ### Community
 
--   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/rjdYHvj).
+-   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/gdevelop).
 -   [GDevelop homepage](https://gdevelop-app.com)
 -   [GDevelop wiki (documentation)](http://wiki.compilgames.net/doku.php/gdevelop5/start)
 -   Help translate GDevelop in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).

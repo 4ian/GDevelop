@@ -30,7 +30,7 @@ export const getDeprecatedBehaviorsInformation = (): {
 export const getExperimentalObjects = (): {
   [string]: boolean,
 } => ({
-  'SkeletonObject::Skeleton': true,
+  'BitmapText::BitmapTextObject': true,
   'TileMap::TileMap': true,
 });
 
@@ -51,14 +51,18 @@ export const getExtraObjectsInformation = (): {
       message: t`Video format supported can vary according to devices and browsers. For maximum compatibility, use H.264/mp4 file format (and AAC for audio).`,
     },
   ],
-  'SkeletonObject::Skeleton': [
+  'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not actively maintained. It might have bugs or incomplete support in GDevelop. A maintainer is searched to improve the object implementation and solve any issue. Your help is welcome!`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
     },
     {
       kind: 'info',
-      message: t`Only use this object if you can contribute back to the source code or are able to remove/replace it from your game in a future version.`,
+      message: t`For a pixel type font, you must disable the Smooth checkbox related to your texture in the game resources to disable anti-aliasing.`,
+    },
+    {
+      kind: 'info',
+      message: t`The font size is stored directly inside the font. If you want to change it, export again your font using an external editor like bmFont. Click on the help button to learn more.`,
     },
   ],
   'TileMap::TileMap': [
@@ -79,6 +83,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   Physics2, you can't mix the behaviors).`,
     };
   }
+  if (type === 'BitmapText::Scale') {
+    return {
+      kind: 'info',
+      message: t`A scale under 1 on a Bitmap text object can downgrade the quality text, prefer to remake a bitmap font smaller in the external bmFont editor.`,
+    };
+  }
   if (type === 'TextObject::Size') {
     return {
       kind: 'warning',
@@ -95,6 +105,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`Read the wiki page for more info about the dataloss mode.`,
+    };
+  }
+  if (type === 'P2P::OverrideID') {
+    return {
+      kind: 'warning',
+      message: t`Overriding the ID may have unwanted consequences. Do not use this feature unless you really know what you are doing.`,
     };
   }
   if (type.indexOf('P2P::') === 0) {

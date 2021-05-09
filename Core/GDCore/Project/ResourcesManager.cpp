@@ -80,6 +80,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<VideoResource>();
   else if (kind == "json")
     return std::make_shared<JsonResource>();
+  else if (kind == "bitmapFont")
+    return std::make_shared<BitmapFontResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -652,6 +654,26 @@ bool JsonResource::UpdateProperty(const gd::String& name,
   return true;
 }
 
+#endif
+
+void BitmapFontResource::SetFile(const gd::String& newFile) {
+  file = newFile;
+
+  // Convert all backslash to slashs.
+  while (file.find('\\') != gd::String::npos)
+    file.replace(file.find('\\'), 1, "/");
+}
+
+void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+#if defined(GD_IDE_ONLY)
+void BitmapFontResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute("file", GetFile());
+}
 #endif
 
 #if defined(GD_IDE_ONLY)

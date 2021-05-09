@@ -1,15 +1,23 @@
 // @flow
 import * as React from 'react';
+import CheckeredBackground from '../CheckeredBackground';
 
 const styles = {
   previewContainer: {
+    position: 'relative',
     display: 'flex',
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     height: 200,
-    border: '#AAAAAA 1px solid',
-    background: 'url("res/transparentback.png") repeat',
+  },
+  iconContainer: {
+    display: 'flex',
+    flex: 1,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   icon: { width: 60, height: 60 },
 };
@@ -23,6 +31,7 @@ type Props = {|
  */
 export default ({ renderIcon }: Props) => (
   <div style={styles.previewContainer}>
-    {renderIcon({ style: styles.icon })}
+    <CheckeredBackground />
+    <div style={styles.iconContainer}>{renderIcon({ style: styles.icon })}</div>
   </div>
 );

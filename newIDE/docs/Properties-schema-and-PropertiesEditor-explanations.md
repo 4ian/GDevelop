@@ -16,46 +16,58 @@ That's why object and behaviors can have "properties". A property is defined by 
 * You can use them when declaring **an object or behavior** in JavaScript (in `JsExtension.js`). For example, in the case of a Video Object:
 
     ```js
-    videoObject.getProperties = function(objectContent) {
-        var objectProperties = new gd.MapStringPropertyDescriptor();
-        objectProperties
-            .getOrCreate('opacity')
-            .setValue(objectContent.opacity.toString())
-            .setType("number")
-            .setLabel(_("Video opacity (0-255)"));
-        objectProperties
-            .getOrCreate('looped')
-            .setValue(objectContent.loop ? "true" : "false")
-            .setType("boolean")
-            .setLabel(_("Loop the video"));
-        objectProperties
-            .getOrCreate('videoResource')
-            .setValue(objectContent.videoResource)
-            .setType("resource")
-            .addExtraInfo("video")
-            .setLabel(_("Video resource"));
+    videoObject.getProperties = function (objectContent) {
+      var objectProperties = new gd.MapStringPropertyDescriptor();
 
-        return objectProperties;
+      objectProperties
+        .getOrCreate('Opacity')
+        .setValue(objectContent.opacity.toString())
+        .setType('number')
+        .setLabel(_('Video opacity (0-255)'));
+      objectProperties
+        .getOrCreate('Looped')
+        .setValue(objectContent.loop ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Loop the video'));
+      objectProperties
+        .getOrCreate('Volume')
+        .setValue(objectContent.volume.toString())
+        .setType('number')
+        .setLabel(_('Video volume (0-100)'));
+      objectProperties
+        .getOrCreate('videoResource')
+        .setValue(objectContent.videoResource)
+        .setType('resource')
+        .addExtraInfo('video')
+        .setLabel(_('Video resource'));
+
+      return objectProperties;
     };
     ```
 
-* Their usage is mostly the same in C++. For example, in the case of a Skeleton Object:
+* Their usage is mostly the same in C++. For example, in the case of a Video Object:
 
     ```c++
-    std::map<gd::String, gd::PropertyDescriptor> SkeletonObject::GetProperties() const {
+    std::map<gd::String, gd::PropertyDescriptor> videoObject::GetProperties() const {
     std::map<gd::String, gd::PropertyDescriptor> properties;
-    properties[_("Skeletal data filename")]
-        .SetValue(skeletalDataFilename)
+    properties[_("Opacity")]
+        .SetValue(opacity)
+        .SetType("number")
+        .setLabel(_("Video opacity (0-255)"));
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties[_("Looped")]
+        .SetValue(looped ? 'true': 'false')
+        .SetType("boolean")
+        .setLabel(_("Loop the video"));
+    properties[_("Volume")]
+        .SetValue(volume)
+        .SetType("number")
+        .setLabel(_("Video volume (0-100)"));
+    properties[_("Video resource")]
+        .SetValue(videoDataFilename)
         .SetType("resource")
-        .AddExtraInfo("json");
-    properties[_("Main armature name")].SetValue(rootArmatureName);
-    properties[_("Texture data filename")]
-        .SetValue(textureDataFilename)
-        .SetType("resource")
-        .AddExtraInfo("json");
-    properties[_("Texture")].SetValue(textureName)
-        .SetType("resource")
-        .AddExtraInfo("image");
+        .AddExtraInfo("video")
+        .SetLabel(_('Video resource'));
 
     return properties;
     }

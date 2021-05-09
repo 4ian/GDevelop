@@ -13,20 +13,25 @@ import ZoomOutMap from '@material-ui/icons/ZoomOutMap';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import CheckeredBackground from '../CheckeredBackground';
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
 
 const styles = {
+  contentContainer: {
+    position: 'relative',
+    height: '100%',
+    overflow: 'hidden',
+  },
   imagePreviewContainer: {
     position: 'relative',
-    display: 'inline-block',
     width: '100%',
-    border: '#AAAAAA 1px solid',
-    overflow: 'scroll',
-    height: 200,
-    background: 'url("res/transparentback.png") repeat',
+    height: '100%',
+    boxSizing: 'border-box',
+    overflow: 'auto',
 
     // The container contains the image and the "overlay" that can display
     // points or polygons that can be drag'n'dropped. `touch-action` must
@@ -39,9 +44,6 @@ const styles = {
     pointerEvents: 'none',
     margin: MARGIN,
   },
-  box: {
-    border: '1px solid black',
-  },
 };
 
 type Props = {|
@@ -49,9 +51,12 @@ type Props = {|
   resourceName: string,
   resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
+  fixedHeight?: number,
   renderOverlay?: ({|
     imageWidth: number,
     imageHeight: number,
+    offsetTop: number,
+    offsetLeft: number,
     imageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
@@ -65,48 +70,57 @@ type State = {|
   imageZoomFactor: number,
 |};
 
+const loadStateFrom = (newProps: {
+  project: gdProject,
+  resourceName: string,
+  resourcesLoader: typeof ResourcesLoader,
+}) => {
+  return {
+    errored: false,
+    imageSource: newProps.resourcesLoader.getResourceFullUrl(
+      newProps.project,
+      newProps.resourceName,
+      {}
+    ),
+  };
+};
+
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-export default class ImagePreview extends React.Component<Props, State> {
-  state = {
+const ImagePreview = (props: Props) => {
+  const [state, setState] = React.useState<State>({
     errored: false,
     imageWidth: null,
     imageHeight: null,
     imageZoomFactor: 1,
-    ...this._loadFrom(this.props),
+    ...loadStateFrom(props),
+  });
+
+  React.useEffect(
+    () => {
+      setState(state => ({
+        ...state,
+        ...loadStateFrom({
+          resourceName: props.resourceName,
+          project: props.project,
+          resourcesLoader: props.resourcesLoader,
+        }),
+      }));
+    },
+    [
+      props.resourceName,
+      props.project,
+      props.resourcesLoader,
+      props.resourcePath,
+    ]
+  );
+
+  const handleImageError = () => {
+    setState(state => ({ ...state, errored: true }));
   };
 
-  componentWillReceiveProps(newProps: Props) {
-    if (
-      newProps.resourceName !== this.props.resourceName ||
-      newProps.project !== this.props.project ||
-      newProps.resourcesLoader !== this.props.resourcesLoader ||
-      newProps.resourcePath !== this.props.resourcePath
-    ) {
-      this.setState(this._loadFrom(newProps));
-    }
-  }
-
-  _loadFrom(props: Props): {| errored: boolean, imageSource: ?string |} {
-    const { project, resourceName, resourcesLoader } = props;
-    return {
-      errored: false,
-      imageSource: resourcesLoader.getResourceFullUrl(
-        project,
-        resourceName,
-        {}
-      ),
-    };
-  }
-
-  _handleImageError = () => {
-    this.setState({
-      errored: true,
-    });
-  };
-
-  _handleImageLoaded = (e: any) => {
+  const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
     const imageWidth = imgElement
@@ -115,19 +129,17 @@ export default class ImagePreview extends React.Component<Props, State> {
     const imageHeight = imgElement
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
-    this.setState({
-      imageWidth,
-      imageHeight,
-    });
-    if (this.props.onSize) this.props.onSize(imageWidth, imageHeight);
+    setState(state => ({ ...state, imageWidth, imageHeight }));
+    if (props.onSize) props.onSize(imageWidth, imageHeight);
   };
 
-  _zoomBy = (imageZoomFactorDelta: number) => {
-    this._zoomTo(this.state.imageZoomFactor + imageZoomFactorDelta);
+  const zoomBy = (imageZoomFactorDelta: number) => {
+    zoomTo(state.imageZoomFactor + imageZoomFactorDelta);
   };
 
-  _zoomTo = (imageZoomFactor: number) => {
-    this.setState(state => ({
+  const zoomTo = (imageZoomFactor: number) => {
+    setState(state => ({
+      ...state,
       imageZoomFactor: Math.min(
         MAX_ZOOM_FACTOR,
         Math.max(MIN_ZOOM_FACTOR, imageZoomFactor)
@@ -135,81 +147,105 @@ export default class ImagePreview extends React.Component<Props, State> {
     }));
   };
 
-  render() {
-    return (
-      <Measure bounds>
-        {({ contentRect, measureRef }) => {
-          const containerWidth = contentRect.bounds.width;
-          const { resourceName, renderOverlay } = this.props;
-          const {
-            imageHeight,
-            imageWidth,
-            imageSource,
-            imageZoomFactor,
-          } = this.state;
+  const theme = React.useContext(GDevelopThemeContext);
+  const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
+  const previewBorderColor = theme.imagePreview.borderColor || '#aaa';
 
-          const imageLoaded =
-            !!imageWidth && !!imageHeight && !this.state.errored;
+  return (
+    <Measure bounds>
+      {({ contentRect, measureRef }) => {
+        const containerWidth = contentRect.bounds.width;
+        const containerHeight = contentRect.bounds.height;
+        const { resourceName, renderOverlay, fixedHeight } = props;
+        const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 
-          const imagePositionTop = 0;
-          const imagePositionLeft = Math.max(
-            0,
-            containerWidth / 2 -
-              ((imageWidth || 0) * imageZoomFactor) / 2 -
-              MARGIN
-          );
+        const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
 
-          const imageStyle = {
-            ...styles.spriteThumbnailImage,
-            top: imagePositionTop,
-            left: imagePositionLeft,
-            width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-            height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          };
+        // Centre-align the image and overlays
+        const imagePositionTop = Math.max(
+          0,
+          containerHeight / 2 -
+            ((imageHeight || 0) * imageZoomFactor) / 2 -
+            MARGIN
+        );
+        const imagePositionLeft = Math.max(
+          0,
+          containerWidth / 2 -
+            ((imageWidth || 0) * imageZoomFactor) / 2 -
+            MARGIN
+        );
 
-          const overlayStyle = {
-            position: 'absolute',
-            top: imagePositionTop + MARGIN,
-            left: imagePositionLeft + MARGIN,
-            width: imageWidth ? imageWidth * imageZoomFactor : undefined,
-            height: imageHeight ? imageHeight * imageZoomFactor : undefined,
-            visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          };
+        const imageStyle = {
+          ...styles.spriteThumbnailImage,
+          top: imagePositionTop || 0,
+          left: imagePositionLeft || 0,
+          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
+          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+        };
 
-          return (
-            <Column expand noMargin>
-              <MiniToolbar>
-                <IconButton
-                  onClick={() => this._zoomBy(+0.2)}
-                  tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
-                >
-                  <ZoomIn />
-                </IconButton>
-                <IconButton
-                  onClick={() => this._zoomBy(-0.2)}
-                  tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
-                >
-                  <ZoomOut />
-                </IconButton>
-                <IconButton
-                  onClick={() => this._zoomTo(1)}
-                  tooltip={t`Restore original size`}
-                >
-                  <ZoomOutMap />
-                </IconButton>
-              </MiniToolbar>
+        const frameStyle = {
+          position: 'absolute',
+          top: imagePositionTop + MARGIN || 0,
+          left: imagePositionLeft + MARGIN || 0,
+          width: imageWidth ? imageWidth * imageZoomFactor : undefined,
+          height: imageHeight ? imageHeight * imageZoomFactor : undefined,
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          border: `1px solid ${frameBorderColor}`,
+        };
+
+        const overlayStyle = {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+        };
+
+        return (
+          <Column expand noMargin useFullHeight>
+            <MiniToolbar>
+              <IconButton
+                onClick={() => zoomBy(+0.2)}
+                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
+              >
+                <ZoomIn />
+              </IconButton>
+              <IconButton
+                onClick={() => zoomBy(-0.2)}
+                tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
+              >
+                <ZoomOut />
+              </IconButton>
+              <IconButton
+                onClick={() => zoomTo(1)}
+                tooltip={t`Restore original size`}
+              >
+                <ZoomOutMap />
+              </IconButton>
+            </MiniToolbar>
+            <div
+              style={{
+                ...styles.contentContainer,
+                height: fixedHeight || '100%',
+              }}
+            >
+              <CheckeredBackground />
               <div
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */
                 }
-                style={styles.imagePreviewContainer}
+                style={{
+                  ...styles.imagePreviewContainer,
+                  border: `1px solid ${previewBorderColor}`,
+                }}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
                   //TODO: Use KeyboardShortcuts
                   if (event.metaKey || event.ctrlKey) {
-                    this._zoomBy(-deltaY / 500);
+                    zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();
                   } else {
@@ -217,39 +253,41 @@ export default class ImagePreview extends React.Component<Props, State> {
                   }
                 }}
               >
-                {!!this.state.errored && (
+                {!!state.errored && (
                   <PlaceholderMessage>
                     <Text>
                       <Trans>Unable to load the image</Trans>
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!this.state.errored && (
+                {!state.errored && (
                   <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
                     src={imageSource}
-                    onError={this._handleImageError}
-                    onLoad={this._handleImageLoaded}
+                    onError={handleImageError}
+                    onLoad={handleImageLoaded}
                   />
                 )}
-                {imageLoaded && renderOverlay && (
-                  <div style={{ ...overlayStyle, ...styles.box }} />
-                )}
+                {imageLoaded && renderOverlay && <div style={frameStyle} />}
                 {imageLoaded && renderOverlay && (
                   <div style={overlayStyle}>
                     {renderOverlay({
                       imageWidth: imageWidth || 0,
                       imageHeight: imageHeight || 0,
+                      offsetTop: imagePositionTop + MARGIN,
+                      offsetLeft: imagePositionLeft + MARGIN,
                       imageZoomFactor,
                     })}
                   </div>
                 )}
               </div>
-            </Column>
-          );
-        }}
-      </Measure>
-    );
-  }
-}
+            </div>
+          </Column>
+        );
+      }}
+    </Measure>
+  );
+};
+
+export default ImagePreview;

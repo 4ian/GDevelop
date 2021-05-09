@@ -156,6 +156,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": false,
@@ -385,7 +386,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "If mouse or touch os NOT on the button, change the animation to 0",
+          "comment": "If mouse or touch is NOT on the button, change the animation to 0",
           "comment2": ""
         },
         {
@@ -615,6 +616,7 @@
         "gridOffsetX": 0,
         "gridOffsetY": 0,
         "gridR": 158,
+        "gridType": "rectangular",
         "gridWidth": 32,
         "snap": true,
         "windowMask": true,

@@ -1,4 +1,5 @@
 declare namespace PIXI.filters {
+  import PIXI = GlobalPIXIModule.PIXI;
   export class ConvolutionFilter extends PIXI.Filter {
     constructor(matrix: number[], width: number, height: number);
     height: number;

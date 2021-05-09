@@ -27,11 +27,13 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   setCustomWidthAndHeight(customWidth, customHeight) {
     this._customWidth = customWidth;
     this._customHeight = customHeight;
+    this.hitBoxesDirty = true;
   }
 
   setCustomCenter(customCenterX, customCenterY) {
     this._customCenterX = customCenterX;
     this._customCenterY = customCenterY;
+    this.hitBoxesDirty = true;
   }
 
   getRendererObject() {

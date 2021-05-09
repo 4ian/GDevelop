@@ -41,23 +41,22 @@
 #undef CopyFile  // Disable an annoying macro
 
 namespace {
-  double GetTimeNow() {
-    #if defined(EMSCRIPTEN)
-    double currentTime = emscripten_get_now();
-    return currentTime;
-    #else
-    return 0;
-    #endif
-  }
-  double GetTimeSpent(double previousTime) {
-    return GetTimeNow() - previousTime;
-  }
-  double LogTimeSpent(const gd::String & name, double previousTime) {
-    gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) + "ms");
-    std::cout << std::endl;
-    return GetTimeNow();
-  }
+double GetTimeNow() {
+#if defined(EMSCRIPTEN)
+  double currentTime = emscripten_get_now();
+  return currentTime;
+#else
+  return 0;
+#endif
 }
+double GetTimeSpent(double previousTime) { return GetTimeNow() - previousTime; }
+double LogTimeSpent(const gd::String &name, double previousTime) {
+  gd::LogStatus(name + " took " + gd::String::From(GetTimeSpent(previousTime)) +
+                "ms");
+  std::cout << std::endl;
+  return GetTimeNow();
+}
+}  // namespace
 
 namespace gdjs {
 
@@ -300,9 +299,11 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
     const auto &dependency = dependencyAndExtension.GetDependency();
 
     gd::String plugin;
-    plugin += "<plugin name=\"" + dependency.GetExportName();
+    plugin += "<plugin name=\"" +
+              gd::Serializer::ToEscapedXMLString(dependency.GetExportName());
     if (dependency.GetVersion() != "") {
-      plugin += "\" spec=\"" + dependency.GetVersion();
+      plugin += "\" spec=\"" +
+                gd::Serializer::ToEscapedXMLString(dependency.GetVersion());
     }
     plugin += "\">\n";
 
@@ -312,11 +313,14 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
     // For Cordova, all settings are considered a plugin variable.
     for (auto &extraSetting : extraSettingValues) {
-      plugin += "\t\t<variable name=\"" + extraSetting.first + "\" value=\"" +
-                extraSetting.second + "\" />\n";
+      plugin += "    <variable name=\"" +
+                gd::Serializer::ToEscapedXMLString(extraSetting.first) +
+                "\" value=\"" +
+                gd::Serializer::ToEscapedXMLString(extraSetting.second) +
+                "\" />\n";
     }
 
-    plugin += "\t</plugin>";
+    plugin += "</plugin>";
 
     plugins += plugin;
   }
@@ -640,6 +644,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
     InsertUnique(includesFiles,
@@ -656,6 +661,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (cocosRenderers) {
     InsertUnique(includesFiles, "cocos-renderers/cocos-director-manager.js");
     InsertUnique(includesFiles, "cocos-renderers/cocos-image-manager.js");
+    InsertUnique(includesFiles, "cocos-renderers/cocos-bitmapfont-manager.js");
     InsertUnique(includesFiles, "cocos-renderers/cocos-tools.js");
     InsertUnique(includesFiles, "cocos-renderers/layer-cocos-renderer.js");
     InsertUnique(includesFiles,

@@ -639,6 +639,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
     );
 
+    // Unselect instances of the deleted object because these instances
+    // will be deleted by gd.WholeProjectRefactorer (and after that, they will
+    // be invalid references, as pointing to deleted objects).
+    this.instancesSelection.unselectInstancesOfObject(object.getName());
+
     if (global) {
       gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
@@ -655,7 +660,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
+
     done(true);
+
+    // We modified the selection, so force an update of editors dealing with it.
+    this.forceUpdatePropertiesEditor();
+    this.updateToolbar();
   };
 
   _canObjectOrGroupUseNewName = (newName: string) => {
@@ -751,6 +761,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
+
     done(true);
   };
 
@@ -915,7 +926,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       objectResourceNames,
       () => {},
       () => {
-        if (this.editor) this.editor.resetRenderersFor(object.getName());
+        if (this.editor)
+          this.editor.resetInstanceRenderersFor(object.getName());
       }
     );
   };

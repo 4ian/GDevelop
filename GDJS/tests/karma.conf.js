@@ -1,8 +1,5 @@
-module.exports = function(config) {
-  const testFiles = [
-    '../../Extensions/**/tests/**.spec.js',
-    './tests/**/*.js',
-  ];
+module.exports = function (config) {
+  const testFiles = ['../../Extensions/**/tests/**.spec.js', './tests/**/*.js'];
 
   const benchmarkFiles = [
     './benchmarks/init.js',
@@ -13,6 +10,12 @@ module.exports = function(config) {
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
+    client: {
+      mocha: {
+        reporter: 'html',
+        timeout: 5000, // Give a bit more time for CIs (the default 2s can be too low sometimes)
+      },
+    },
     files: [
       'node_modules/expect.js/index.js',
 
@@ -28,6 +31,7 @@ module.exports = function(config) {
       '../Runtime-dist/fontfaceobserver-font-manager/fontfaceobserver.js',
       '../Runtime-dist/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       '../Runtime-dist/jsonmanager.js',
+      '../Runtime-dist/timemanager.js',
       '../Runtime-dist/timemanager.js',
       '../Runtime-dist/runtimeobject.js',
       '../Runtime-dist/runtimescene.js',
@@ -68,6 +72,10 @@ module.exports = function(config) {
       '../Runtime-dist/Extensions/Lighting/lightobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       '../Runtime-dist/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
+      '../Runtime-dist/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
+      '../Runtime-dist/Extensions/Firebase/A_firebasejs/*.js',
+      '../Runtime-dist/Extensions/Firebase/B_firebasetools/*.js',
 
       // Test extensions:
       './tests/Extensions/**.js',
@@ -76,10 +84,16 @@ module.exports = function(config) {
       './tests-utils/init.pixiruntimegamewithassets.js',
 
       // Assets
-      {pattern: './tests-utils/assets/*.jpg', watched: false, included: false, served: true, nocache: false},
+      {
+        pattern: './tests-utils/assets/*.jpg',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
 
       ...testFiles,
-      ...(config.enableBenchmarks ? benchmarkFiles : [])
-    ]
+      ...(config.enableBenchmarks ? benchmarkFiles : []),
+    ],
   });
 };

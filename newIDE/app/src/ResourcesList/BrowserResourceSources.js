@@ -185,4 +185,25 @@ export default [
       }
     },
   },
+  {
+    name: 'publicBitmapFontUrlChooser',
+    displayName: 'Choose a bitmap font from library',
+    kind: 'bitmapFont',
+    component: class BitmapFontResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urlsAreImages={false}
+            createNewResource={() => new gd.BitmapFontResource()}
+            title={<Trans>Choose a bitmap font from the library</Trans>}
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
 ];

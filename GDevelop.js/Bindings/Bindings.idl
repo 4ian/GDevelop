@@ -350,7 +350,6 @@ interface Project {
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
-    [Const, Ref] VectorString GetUsedExtensions();
     [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
@@ -803,6 +802,11 @@ interface FontResource {
     void FontResource();
 };
 FontResource implements Resource;
+
+interface BitmapFontResource {
+    void BitmapFontResource();
+};
+BitmapFontResource implements Resource;
 
 interface VideoResource {
     void VideoResource();
@@ -1868,6 +1872,10 @@ interface WholeProjectRefactorer {
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
 };
 
+interface UsedExtensionsFinder {
+  [Value] SetString STATIC_ScanProject([Ref] Project project);
+};
+
 interface ExtensionAndBehaviorMetadata {
   [Const, Ref] PlatformExtension GetExtension();
   [Const, Ref] BehaviorMetadata GetMetadata();
@@ -2242,6 +2250,7 @@ interface ResourcesInUseHelper {
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();
+    [Ref] SetString GetAllBitmapFonts();
     [Ref] SetString GetAll([Const] DOMString resourceType);
 };
 ResourcesInUseHelper implements ArbitraryResourceWorker;
@@ -2492,37 +2501,6 @@ interface TextEntryObject {
     void TextEntryObject([Const] DOMString name);
 };
 TextEntryObject implements gdObject;
-
-interface SkeletonObject {
-    void SkeletonObject([Const] DOMString name);
-
-    //Inherited from gdObject:
-    void SetName([Const] DOMString name);
-    [Const, Ref] DOMString GetName();
-    void SetType([Const] DOMString type);
-    [Const, Ref] DOMString GetType();
-    void SetTags([Const] DOMString tags);
-    [Const, Ref] DOMString GetTags();
-
-    [Value] MapStringPropertyDescriptor GetProperties();
-    boolean UpdateProperty([Const] DOMString name, [Const] DOMString value);
-
-    [Value] MapStringPropertyDescriptor GetInitialInstanceProperties([Const, Ref] InitialInstance instance, [Ref] Project project, [Ref] Layout scene);
-    boolean UpdateInitialInstanceProperty([Ref] InitialInstance instance, [Const] DOMString name, [Const] DOMString value, [Ref] Project project, [Ref] Layout scene);
-
-    void ExposeResources([Ref] ArbitraryResourceWorker worker);
-
-    [Ref] VariablesContainer GetVariables();
-    [Value] VectorString GetAllBehaviorNames();
-    boolean HasBehaviorNamed([Const] DOMString name);
-    BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
-    [Ref] BehaviorContent GetBehavior([Const] DOMString name);
-    void RemoveBehavior([Const] DOMString name);
-    boolean RenameBehavior([Const] DOMString oldBame, [Const] DOMString name);
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
-};
 
 enum ParticleEmitterObject_RendererType {
   "ParticleEmitterObject::Point",

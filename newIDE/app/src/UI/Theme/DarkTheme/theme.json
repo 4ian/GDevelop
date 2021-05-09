@@ -149,6 +149,17 @@
       "white": {
         "value": "#fff"
       }
+    },
+    "image-preview": {
+      "background-filter": {
+        "value": "invert(1) invert(20%) sepia(56%) saturate(0%) hue-rotate(214deg) brightness(58%) contrast(91%)"
+      },
+      "border-color": {
+        "value": "#434343"
+      },
+      "frame-border-color": {
+        "value": "#dddddd"
+      }
     }
   },
   "input": {

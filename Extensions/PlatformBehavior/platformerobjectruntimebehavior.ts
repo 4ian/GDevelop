@@ -188,7 +188,7 @@ namespace gdjs {
       this._requestedDeltaX += this._updateSpeed(timeDelta);
 
       //0.2) Track changes in object size
-      this._state.beforeUpdatingObstacles();
+      this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
 
       //0.3) Update list of platforms around/related to the object
@@ -205,9 +205,9 @@ namespace gdjs {
 
       //Ensure the object is not stuck
       if (this._separateFromPlatforms(this._potentialCollidingObjects, true)) {
+        //After being unstuck, the object must be able to jump again.
         this._canJump = true;
       }
-      //After being unstuck, the object must be able to jump again.
 
       const oldX = object.getX();
       this._moveX();
@@ -258,7 +258,7 @@ namespace gdjs {
         this._currentSpeed -=
           this._deceleration * timeDelta * (wasPositive ? 1.0 : -1.0);
 
-        //Set the speed to 0 if the speed was top low.
+        //Set the speed to 0 if the speed was too low.
         if (wasPositive && this._currentSpeed < 0) {
           this._currentSpeed = 0;
         }
@@ -633,7 +633,10 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param exceptTheseOnes The platforms to be excluded from the test
      */
-    private _isCollidingWithExcluding(candidates, exceptTheseOnes) {
+    private _isCollidingWithExcluding(
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      exceptTheseOnes: gdjs.PlatformRuntimeBehavior[]
+    ) {
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
         if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) {
@@ -1137,7 +1140,7 @@ namespace gdjs {
      * Called before the obstacle search.
      * The object position may need adjustments to handle external changes.
      */
-    beforeUpdatingObstacles(): void;
+    beforeUpdatingObstacles(timeDelta: float): void;
     /**
      * Check if transitions to other states are needed and apply them before moving horizontally.
      */
@@ -1190,7 +1193,7 @@ namespace gdjs {
       this._floorLastY = this._floorPlatform!.owner.getY();
     }
 
-    beforeUpdatingObstacles() {
+    beforeUpdatingObstacles(timeDelta: float) {
       const object = this._behavior.owner;
       //Stick the object to the floor if its height has changed.
       if (this._oldHeight !== object.getHeight()) {
@@ -1363,7 +1366,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -1429,7 +1432,7 @@ namespace gdjs {
       this._currentJumpSpeed = 0;
     }
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 
@@ -1509,7 +1512,7 @@ namespace gdjs {
       this._grabbedPlatform = null;
     }
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {
       const behavior = this._behavior;
@@ -1575,7 +1578,7 @@ namespace gdjs {
 
     leave() {}
 
-    beforeUpdatingObstacles() {}
+    beforeUpdatingObstacles(timeDelta: float) {}
 
     checkTransitionBeforeX() {}
 

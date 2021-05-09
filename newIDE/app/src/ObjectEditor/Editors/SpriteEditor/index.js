@@ -111,7 +111,7 @@ class Animation extends React.Component<AnimationProps, void> {
         <MiniToolbar>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
-          <Column expand margin>
+          <Column expand>
             <SemiControlledTextField
               commitOnBlur
               margin="none"
@@ -444,7 +444,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           extraBottomTools={
             <ResponsiveLineStackLayout noMargin>
               <RaisedButton
-                label={<Trans>Edit hitboxes</Trans>}
+                label={<Trans>Edit collision masks</Trans>}
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
@@ -475,6 +475,9 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
             ]}
             cannotBeDismissed={true}
             noMargin
+            maxWidth="lg"
+            flexBody
+            fullHeight
             onRequestClose={() => this.openPointsEditor(false)}
             open={this.state.pointsEditorOpen}
           >
@@ -501,6 +504,9 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               />,
             ]}
             noMargin
+            maxWidth="lg"
+            flexBody
+            fullHeight
             cannotBeDismissed={true}
             onRequestClose={() => this.openCollisionMasksEditor(false)}
             open={this.state.collisionMasksEditorOpen}

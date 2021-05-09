@@ -50,11 +50,8 @@ RenderedInstance.prototype.getInstance = function() {
  * the scene. The PIXI object should probably be removed from the container: This is what
  * the default implementation of the method does.
  */
-RenderedInstance.prototype.instanceRemovedFromScene = function() {
-  if (
-    this._pixiObject !== null &&
-    this._pixiContainer.children.indexOf(this._pixiObject) !== -1
-  )
+RenderedInstance.prototype.onRemovedFromScene = function() {
+  if (this._pixiObject !== null)
     this._pixiContainer.removeChild(this._pixiObject);
 };
 

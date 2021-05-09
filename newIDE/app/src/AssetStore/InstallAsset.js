@@ -63,7 +63,7 @@ export const sanitizeObjectName = (objectName: string) => {
  * if it was already added.
  */
 export const installResource = (
-  resourcesManager: gdResourcesManager,
+  project: gdProject,
   serializedResource: any,
   resourceNewNames: { [string]: string }
 ) => {
@@ -74,6 +74,8 @@ export const installResource = (
     // bother adding it again.
     return;
   }
+
+  const resourcesManager: gdResourcesManager = project.getResourcesManager();
 
   // Check if the resource that must be installed is already present. Use the "origin"
   // of the resource (if present), otherwise for compatibility we use the URL.
@@ -121,6 +123,7 @@ export const installResource = (
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
+  newResource.setSmooth(project.getScaleMode() !== 'nearest');
   newResource.setOrigin(resourceOriginName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();
@@ -177,11 +180,7 @@ export const addAssetToProject = async ({
 
     // Add resources used by the object
     objectAsset.resources.forEach(serializedResource => {
-      installResource(
-        project.getResourcesManager(),
-        serializedResource,
-        resourceNewNames
-      );
+      installResource(project, serializedResource, resourceNewNames);
     });
 
     // TODO: Check how multiple objects are handled

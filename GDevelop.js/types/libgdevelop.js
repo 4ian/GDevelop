@@ -85,6 +85,7 @@ declare class libGDevelop {
   ImageResource: Class<gdImageResource>;
   AudioResource: Class<gdAudioResource>;
   FontResource: Class<gdFontResource>;
+  BitmapFontResource: Class<gdBitmapFontResource>;
   VideoResource: Class<gdVideoResource>;
   JsonResource: Class<gdJsonResource>;
   InitialInstance: Class<gdInitialInstance>;
@@ -133,6 +134,7 @@ declare class libGDevelop {
   VectorEventsSearchResult: Class<gdVectorEventsSearchResult>;
   EventsRefactorer: Class<gdEventsRefactorer>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
+  UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;
   ExtensionAndObjectMetadata: Class<gdExtensionAndObjectMetadata>;
   ExtensionAndEffectMetadata: Class<gdExtensionAndEffectMetadata>;
@@ -188,7 +190,6 @@ declare class libGDevelop {
   PanelSpriteObject: Class<gdPanelSpriteObject>;
   ShapePainterObject: Class<gdShapePainterObject>;
   TextEntryObject: Class<gdTextEntryObject>;
-  SkeletonObject: Class<gdSkeletonObject>;
   ParticleEmitterObject_RendererType: Class<ParticleEmitterObject_RendererType>;
   ParticleEmitterObject: Class<gdParticleEmitterObject>;
   LayoutCodeGenerator: Class<gdLayoutCodeGenerator>;

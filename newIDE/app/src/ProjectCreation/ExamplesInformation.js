@@ -418,6 +418,55 @@ module.exports = {
       }
     ]
   },
+  "bim-bam": {
+    "description": "A Bust-a-Move clone to show how to make a match 3 game.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      }
+    ]
+  },
   "board-walk-with-raycast": {
     "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
     "usedExtensions": [
@@ -1112,6 +1161,51 @@ module.exports = {
       }
     ]
   },
+  "dialogue-tree-simple-demo": {
+    "description": "Shows how to set up a dialogue with a character, like in a RPG game, including multiple choices.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Dialogue Tree (Experimental)",
+        "name": "DialogueTree"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "dialogue-tree-with-yarn": {
     "description": "A platformer showing a simple interactive story with dialogues like in RPG games, using the Yarn dialogue tree extension.\n",
     "usedExtensions": [
@@ -1778,6 +1872,59 @@ module.exports = {
       }
     ]
   },
+  "goose-bomberman": {
+    "description": "A bomberman-like game where each player controls a goose. Includes a title screen where you can choose the map and between 2 to 4 players, and bonuses.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "health-bar": {
     "description": "The platform example game adapted to add a health bar to the player, that is decreased when the player touches an enemy.",
     "usedExtensions": [
@@ -2328,6 +2475,51 @@ module.exports = {
       }
     ]
   },
+  "menu-with-tweens": {
+    "description": "Shows how to use the tween behavior to animate a game main menu.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tweening",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "move-camera-to-position": {
     "description": "This shows how to move the camera to the position of an object on a map.",
     "usedExtensions": [
@@ -2771,6 +2963,10 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "BBCode Text Object",
+        "name": "BBText"
       }
     ]
   },
@@ -4325,6 +4521,43 @@ module.exports = {
       }
     ]
   },
+  "tactical-game-grid-movement": {
+    "description": "Shows how to move units on an hexagonal grid, like done in some tactical games.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      }
+    ]
+  },
   "take-screenshot": {
     "description": "Show how to save a screenshot of the game on the disk (on Windows/macOS/Linux only).",
     "usedExtensions": [
@@ -4516,6 +4749,59 @@ module.exports = {
       {
         "fullName": "",
         "name": ""
+      }
+    ]
+  },
+  "titan-souls-demo": {
+    "description": "A demo of a top down game where you have to beat a boss that has multiple attacks.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

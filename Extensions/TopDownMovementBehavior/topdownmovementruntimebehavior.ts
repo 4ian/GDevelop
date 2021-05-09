@@ -29,10 +29,16 @@ namespace gdjs {
     private _xVelocity: float = 0;
     private _yVelocity: float = 0;
     private _angularSpeed: float = 0;
+
+    // Inputs
     private _leftKey: boolean = false;
     private _rightKey: boolean = false;
     private _upKey: boolean = false;
     private _downKey: boolean = false;
+    private _leftKeyPressedDuration: integer = -1;
+    private _rightKeyPressedDuration: integer = -1;
+    private _upKeyPressedDuration: integer = -1;
+    private _downKeyPressedDuration: integer = -1;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
 
@@ -235,54 +241,81 @@ namespace gdjs {
       this._upKey |=
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
+
       let direction = -1;
       if (!this._allowDiagonals) {
+        const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+
+        if (!this._leftKey) {
+          this._leftKeyPressedDuration = 0;
+        } else {
+          this._leftKeyPressedDuration += elapsedTime;
+        }
+        if (!this._rightKey) {
+          this._rightKeyPressedDuration = 0;
+        } else {
+          this._rightKeyPressedDuration += elapsedTime;
+        }
+        if (!this._downKey) {
+          this._downKeyPressedDuration = 0;
+        } else {
+          this._downKeyPressedDuration += elapsedTime;
+        }
+        if (!this._upKey) {
+          this._upKeyPressedDuration = 0;
+        } else {
+          this._upKeyPressedDuration += elapsedTime;
+        }
+
         if (this._upKey && !this._downKey) {
           direction = 6;
-        } else {
-          if (!this._upKey && this._downKey) {
-            direction = 2;
-          }
+        } else if (!this._upKey && this._downKey) {
+          direction = 2;
         }
-        if (!this._upKey && !this._downKey) {
-          if (this._leftKey && !this._rightKey) {
-            direction = 4;
-          } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 0;
-            }
-          }
+        // when 2 keys are pressed for diagonals the most recently pressed win
+        if (
+          this._leftKey &&
+          !this._rightKey &&
+          (this._upKey === this._downKey ||
+            (this._upKey &&
+              this._leftKeyPressedDuration < this._upKeyPressedDuration) ||
+            (this._downKey &&
+              this._leftKeyPressedDuration < this._downKeyPressedDuration))
+        ) {
+          direction = 4;
+        } else if (
+          this._rightKey &&
+          !this._leftKey &&
+          (this._upKey === this._downKey ||
+            (this._upKey &&
+              this._rightKeyPressedDuration < this._upKeyPressedDuration) ||
+            (this._downKey &&
+              this._rightKeyPressedDuration < this._downKeyPressedDuration))
+        ) {
+          direction = 0;
         }
       } else {
         if (this._upKey && !this._downKey) {
           if (this._leftKey && !this._rightKey) {
             direction = 5;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 7;
           } else {
-            if (!this._leftKey && this._rightKey) {
-              direction = 7;
-            } else {
-              direction = 6;
-            }
+            direction = 6;
+          }
+        } else if (!this._upKey && this._downKey) {
+          if (this._leftKey && !this._rightKey) {
+            direction = 3;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 1;
+          } else {
+            direction = 2;
           }
         } else {
-          if (!this._upKey && this._downKey) {
-            if (this._leftKey && !this._rightKey) {
-              direction = 3;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 1;
-              } else {
-                direction = 2;
-              }
-            }
-          } else {
-            if (this._leftKey && !this._rightKey) {
-              direction = 4;
-            } else {
-              if (!this._leftKey && this._rightKey) {
-                direction = 0;
-              }
-            }
+          if (this._leftKey && !this._rightKey) {
+            direction = 4;
+          } else if (!this._leftKey && this._rightKey) {
+            direction = 0;
           }
         }
       }
@@ -301,6 +334,9 @@ namespace gdjs {
         this._yVelocity +=
           this._acceleration * timeDelta * Math.sin(directionInRad);
       } else if (this._stickForce !== 0) {
+        if (!this._allowDiagonals) {
+          this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
+        }
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;

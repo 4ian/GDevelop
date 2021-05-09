@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 const marginsSize = 4;
 
 /**
@@ -6,7 +7,14 @@ const marginsSize = 4;
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Line = props => (
+export const Line = (props: {|
+  children?: React.Node,
+  noMargin?: boolean,
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  overflow?: string,
+|}) => (
   <div
     style={{
       display: 'flex',
@@ -27,7 +35,15 @@ export const Line = props => (
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Column = props => (
+export const Column = (props: {|
+  children?: React.Node,
+  noMargin?: boolean,
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  useFullHeight?: boolean,
+  noOverflowParent?: boolean,
+|}) => (
   <div
     style={{
       display: 'flex',
@@ -41,6 +57,11 @@ export const Column = props => (
       // all the height (if set to flex: 1) and to *not* grow
       // larger than the parent.
       minHeight: props.useFullHeight ? '0' : undefined,
+      // In some cases, if some flex children cannot contract to
+      // within `Column`, it is possible for Column to overflow
+      // outside its parent. Setting min-width to 0 avoids this.
+      // See: https://stackoverflow.com/a/36247448/6199068
+      minWidth: props.noOverflowParent ? 0 : undefined,
     }}
   >
     {props.children}
@@ -52,7 +73,7 @@ export const Column = props => (
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = props => (
+export const Spacer = () => (
   <span
     style={{
       width: marginsSize,

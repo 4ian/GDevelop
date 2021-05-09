@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const glowFilter = filter as PIXI.filters.GlowFilter;
+      const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter;
       if (parameterName === 'innerStrength') {
         glowFilter.innerStrength = value;
       } else if (parameterName === 'outerStrength') {
@@ -17,7 +17,7 @@ namespace gdjs {
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
-      const glowFilter = filter as PIXI.filters.GlowFilter;
+      const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter;
       if (parameterName === 'color') {
         glowFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }

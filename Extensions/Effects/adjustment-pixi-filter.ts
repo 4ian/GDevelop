@@ -6,7 +6,7 @@ namespace gdjs {
     },
     update: function (filter, layer) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const adjustmentFilter = filter as PIXI.filters.AdjustmentFilter;
+      const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
       if (parameterName === 'gamma') {
         adjustmentFilter.gamma = value;
       } else if (parameterName === 'saturation') {

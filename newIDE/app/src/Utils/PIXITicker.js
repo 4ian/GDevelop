@@ -10,6 +10,7 @@ import * as PIXI from 'pixi.js-legacy';
 export const stopPIXITicker = () => {
   const ticker = PIXI.Ticker && PIXI.Ticker.shared;
   if (ticker) ticker.stop();
+  // TODO: same for the PIXI.Ticker.system
 };
 
 /**
@@ -22,5 +23,6 @@ export const startPIXITicker = () => {
   setTimeout(() => {
     const ticker = PIXI.Ticker && PIXI.Ticker.shared;
     if (ticker) ticker.start();
+    // TODO: same for the PIXI.Ticker.system
   }, 50);
 };

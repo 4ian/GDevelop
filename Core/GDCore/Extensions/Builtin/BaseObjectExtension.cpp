@@ -6,6 +6,7 @@
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 
 using namespace std;
 namespace gd {
@@ -26,7 +27,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
 #if defined(GD_IDE_ONLY)
   obj.AddCondition("PosX",
-                   _("Compare X position of an object"),
+                   _("X position"),
                    _("Compare the X position of the object."),
                    _("the X position"),
                    _("Position"),
@@ -38,7 +39,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddAction("MettreX",
-                _("X position of an object"),
+                _("X position"),
                 _("Change the X position of an object."),
                 _("the X position"),
                 _("Position"),
@@ -50,7 +51,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddCondition("PosY",
-                   _("Compare Y position of an object"),
+                   _("Y position"),
                    _("Compare the Y position of an object."),
                    _("the Y position"),
                    _("Position"),
@@ -62,7 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddAction("MettreY",
-                _("Y position of an object"),
+                _("Y position"),
                 _("Change the Y position of an object."),
                 _("the Y position"),
                 _("Position"),
@@ -74,7 +75,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddAction("MettreXY",
-                _("Position of an object"),
+                _("Position"),
                 _("Change the position of an object."),
                 _("Change the position of _PARAM0_: _PARAM1_ _PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
@@ -89,8 +90,41 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
+  obj.AddAction("SetCenter",
+                _("Center position"),
+                _("Change the position of an object, using its center."),
+                _("Change the position of the center of _PARAM0_: _PARAM1_ _PARAM2_ (x "
+                  "axis), _PARAM3_ _PARAM4_ (y axis)"),
+                _("Position/Center"),
+                "res/actions/position24.png",
+                "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("X position"))
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Y position"))
+      .MarkAsSimple();
+
+  obj.AddExpressionAndConditionAndAction("number", "CenterX",
+          _("Center X position"),
+          _("the X position of the center"),
+          _("the X position of the center"),
+          _("Position/Center"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndConditionAndAction("number", "CenterY",
+          _("Center Y position"),
+          _("the Y position of the center"),
+          _("the Y position of the center"),
+          _("Position/Center"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
   obj.AddAction("MettreAutourPos",
-                _("Put an object around a position"),
+                _("Put around a position"),
                 _("Position the center of the given object around a position, "
                   "using the specified angle "
                   "and distance."),
@@ -202,7 +236,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceVersPos",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
-         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
+         _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
            "pixels"),
          _("Movement"),
          "res/actions/force24.png",
@@ -248,7 +282,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("Delete",
-                _("Delete an object"),
+                _("Delete the object"),
                 _("Delete the specified object."),
                 _("Delete _PARAM0_"),
                 _("Objects"),
@@ -383,7 +417,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("Montre",
                 _("Show"),
-                _("Show the specified object"),
+                _("Show the specified object."),
                 _("Show _PARAM0_"),
                 _("Visibility"),
                 "res/actions/visibilite24.png",
@@ -406,10 +440,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("Plan",
-                   _("Compare Z order"),
+                   _("Z-order"),
                    _("Compare the Z-order of the specified object."),
-                   _("the z Order"),
-                   _("Z order"),
+                   _("the Z-order"),
+                   _("Z-order"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
@@ -418,7 +452,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("Layer",
-                   _("Compare layer"),
+                   _("Current layer"),
                    _("Check if the object is on the specified layer."),
                    _("_PARAM0_ is on layer _PARAM1_"),
                    _("Layer"),
@@ -430,7 +464,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddCondition("Visible",
-                   _("Visibility of an object"),
+                   _("Visibility"),
                    _("Check if an object is visible."),
                    _("_PARAM0_ is visible (not marked as hidden)"),
                    _("Visibility"),
@@ -636,7 +670,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceVers",
          _("Add a force to move toward an object"),
          _("Add a force to an object to make it move toward another."),
-         _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
+         _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
          _("Movement"),
          "res/actions/forceVers24.png",
          "res/actions/forceVers.png")
@@ -668,7 +702,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("MettreAutour",
-                _("Put an object around another"),
+                _("Put the object around another"),
                 _("Position an object around another, with the specified angle "
                   "and distance. The center of the objects are used for "
                   "positioning them."),
@@ -711,7 +745,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object 2 (won't move)"));
 
   obj.AddAction("SeparateFromObjects",
-                _("Separate two objects"),
+                _("Separate objects"),
                 _("Move an object away from another using their collision "
                   "masks.\nBe sure to call this action on a reasonable number "
                   "of objects\nto avoid slowing down the game."),
@@ -914,15 +948,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetHidden();
 
   obj.AddExpression("ZOrder",
-                    _("Z order"),
-                    _("Z order of an object"),
+                    _("Z-order"),
+                    _("Z-order of an object"),
                     _("Visibility"),
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Plan",
-                    _("Z order"),
-                    _("Z order of an object"),
+                    _("Z-order"),
+                    _("Z-order of an object"),
                     _("Visibility"),
                     "res/actions/planicon.png")
       .AddParameter("object", _("Object"))
@@ -998,17 +1032,41 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Angle between two objects"),
                     _("Compute the angle between two objects. If you need the "
                       "angle to an arbitrary position, use AngleToPosition."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
+
+   obj.AddExpression("XFromAngleAndDistance",
+                    _("X position from angle and distance"),
+                    _("Compute the X position when given an angle and distance "
+                      "relative to the starting object. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
+
+   obj.AddExpression("YFromAngleAndDistance",
+                    _("Y position from angle and distance"),
+                    _("Compute the Y position when given an angle and distance "
+                      "relative to the starting object. This is also known as "
+                      "getting the cartesian coordinates of a 2D vector, using "
+                      "its polar coordinates."),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Angle, in degrees"))
+      .AddParameter("expression", _("Distance"));
 
   obj.AddExpression("AngleToPosition",
                     _("Angle between an object and a position"),
                     _("Compute the angle between the object center and a "
                       "\"target\" position. If you need the angle between two "
                       "objects, use AngleToObject."),
-                    _("Position"),
+                    _("Angle"),
                     "res/actions/position.png")
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))

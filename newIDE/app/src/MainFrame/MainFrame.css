@@ -48,12 +48,6 @@ html {
   padding-left: env(safe-area-inset-left);
 }
 
-/* Force a Material UI dialog/modal to use the full height, even on large screens. */
-.full-height-modal > .MuiDialog-container > .MuiPaper-root {
-  /* This follows the material-ui dialog `min-height`. */
-  min-height: calc(100% - 64px);
-}
-
 /* Disable selections and web-ish cursors */
 :not(input):not(textarea):not(canvas):not(code),
 :not(input):not(textarea):not(canvas):not(code)::after,

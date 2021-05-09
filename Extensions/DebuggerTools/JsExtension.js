@@ -20,39 +20,75 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-    createExtension: function(_/*: (string) => string */, gd/*: libGDevelop */) {
-      const extension = new gd.PlatformExtension();
-      extension.setExtensionInformation(
-        'DebuggerTools',
-        _('Debugger Tools'),
-        _(
-          'Allow to interact with the editor debugger from the game.'
-        ),
-        'Arthur Pacaud (arthuro555)',
-        'MIT'
-      );
+  createExtension: function (
+    _ /*: (string) => string */,
+    gd /*: libGDevelop */
+  ) {
+    const extension = new gd.PlatformExtension();
+    extension.setExtensionInformation(
+      'DebuggerTools',
+      _('Debugger Tools'),
+      _('Allow to interact with the editor debugger from the game.'),
+      'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
+      'MIT'
+    );
 
-      extension
+    extension
       .addAction(
         'Pause',
         _('Pause game execution'),
         _(
           'This pauses the game, useful for inspecting the game state through the debugger. ' +
-          'Note that events will be still executed until the end before the game is paused.'
+            'Note that events will be still executed until the end before the game is paused.'
         ),
         _('Pause game execution'),
         _('Debugger Tools'),
         'res/actions/bug32.png',
         'res/actions/bug32.png'
       )
-      .addCodeOnlyParameter("currentScene", "")
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.pause');
 
-      return extension;
-    },
-    runExtensionSanityTests: function(gd /*: libGDevelop */, extension /*: gdPlatformExtension*/) {
-        return [];
-    },
-}
+    extension
+      .addAction(
+        'EnableDebugDraw',
+        _('Draw collisions hitboxes and points'),
+        _(
+          'This activates the display of rectangles and information on screen showing the objects bounding boxes (blue), the hitboxes (red) and some points of objects.'
+        ),
+        _(
+          'Enable debugging view of bounding boxes/collision masks: _PARAM1_ (include invisible objects: _PARAM2_, point names: _PARAM3_, custom points: _PARAM4_)'
+        ),
+        _('Debugger Tools'),
+        'res/actions/planicon24.png',
+        'res/actions/planicon.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('yesorno', _('Enable debug draw'), '', true)
+      .setDefaultValue('yes')
+      .addParameter(
+        'yesorno',
+        _('Show collisions for hidden objects'),
+        '',
+        true
+      )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Show points names'), '', true)
+      .setDefaultValue('yes')
+      .addParameter('yesorno', _('Show custom points'), '', true)
+      .setDefaultValue('yes')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.enableDebugDraw');
+
+    return extension;
+  },
+  runExtensionSanityTests: function (
+    gd /*: libGDevelop */,
+    extension /*: gdPlatformExtension*/
+  ) {
+    return [];
+  },
+};

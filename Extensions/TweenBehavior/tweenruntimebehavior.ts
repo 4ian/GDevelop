@@ -389,7 +389,7 @@ namespace gdjs {
       toScaleY: number,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean, 
+      destroyObjectWhenFinished: boolean,
       scaleFromCenterOfObject: boolean
     ) {
       const that = this;
@@ -416,7 +416,7 @@ namespace gdjs {
         this._runtimeScene
       );
       let stepFunction;
-      if(scaleFromCenterOfObject) {
+      if (scaleFromCenterOfObject) {
         stepFunction = function step(state) {
           const oldX = that.owner.getCenterXInScene();
           const oldY = that.owner.getCenterYInScene();
@@ -425,14 +425,14 @@ namespace gdjs {
           // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
           that.owner.setCenterPositionInScene(oldX, oldY);
-        }
+        };
       } else {
         stepFunction = function step(state) {
           // @ts-ignore - objects are duck typed
           that.owner.setScaleX(state.scaleX);
           // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
-        }
+        };
       }
       newTweenable.setConfig({
         from: {
@@ -489,19 +489,19 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
-      let stepFunction: { (state: any): void; (state: any): void; };
-      if(scaleFromCenterOfObject) {
+      let stepFunction: { (state: any): void; (state: any): void };
+      if (scaleFromCenterOfObject) {
         stepFunction = function step(state) {
           const oldX = that.owner.getCenterXInScene();
           // @ts-ignore - objects are duck typed
           that.owner.setScaleX(state.scaleX);
           that.owner.setCenterXInScene(oldX);
-        }
+        };
       } else {
         stepFunction = function step(state) {
           // @ts-ignore - objects are duck typed
           that.owner.setScaleX(state.scaleX);
-        }
+        };
       }
       newTweenable.setConfig({
         // @ts-ignore - objects are duck typed
@@ -554,19 +554,19 @@ namespace gdjs {
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
-      let stepFunction: { (state: any): void; (state: any): void; };
-      if(scaleFromCenterOfObject) {
+      let stepFunction: { (state: any): void; (state: any): void };
+      if (scaleFromCenterOfObject) {
         stepFunction = function step(state) {
           const oldY = that.owner.getCenterYInScene();
           // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
           that.owner.setCenterYInScene(oldY);
-        }
+        };
       } else {
         stepFunction = function step(state) {
           // @ts-ignore - objects are duck typed
           that.owner.setScaleY(state.scaleY);
-        }
+        };
       }
       newTweenable.setConfig({
         // @ts-ignore - objects are duck typed

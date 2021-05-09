@@ -467,6 +467,15 @@ module.exports = {
       }
     ]
   },
+  "bitmap-text": {
+    "description": "A few examples of Bitmap Text usage and their features (wrapping, tint color...).\n",
+    "usedExtensions": [
+      {
+        "fullName": "Bitmap Text Object",
+        "name": "BitmapText"
+      }
+    ]
+  },
   "board-walk-with-raycast": {
     "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
     "usedExtensions": [

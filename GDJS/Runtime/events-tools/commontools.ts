@@ -231,11 +231,7 @@ namespace gdjs {
        * @param max The  maximum value.
        * @returns The new value.
        */
-      export const clamp = function (
-        x: float,
-        min: number,
-        max: float
-      ): number {
+      export const clamp = function (x: float, min: float, max: float): float {
         return Math.min(Math.max(x, min), max);
       };
 

@@ -50,6 +50,11 @@ const PointsEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
+
+  // Note: these two booleans are set to false to avoid erasing points of other
+  // animations/frames (and they will be updated by updateSamePointsToggles). In
+  // theory, they should be set to the appropriate value at their initialization,
+  // for consistency of the state.
   const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
     false
   );

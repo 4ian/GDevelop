@@ -159,10 +159,10 @@ namespace gdjs {
         debugDraw.line.color = 0x778ee8;
         debugDraw.fill.color = 0x778ee8;
         debugDraw.drawRect(
-          aabb.min[0] - cameraCoords[0],
-          aabb.min[1] - cameraCoords[1],
-          aabb.max[0] - aabb.min[0],
-          aabb.max[1] - aabb.min[1]
+          (aabb.min[0] - cameraCoords[0]) * layer.getCameraZoom(),
+          (aabb.min[1] - cameraCoords[1]) * layer.getCameraZoom(),
+          (aabb.max[0] - aabb.min[0]) * layer.getCameraZoom(),
+          (aabb.max[1] - aabb.min[1]) * layer.getCameraZoom()
         );
       }
 
@@ -201,8 +201,8 @@ namespace gdjs {
           // as this is for debug draw.
           const polygon: float[] = [];
           hitboxes[j].vertices.forEach((point) => {
-            polygon.push(point[0] - cameraCoords[0]);
-            polygon.push(point[1] - cameraCoords[1]);
+            polygon.push((point[0] - cameraCoords[0]) * layer.getCameraZoom());
+            polygon.push((point[1] - cameraCoords[1]) * layer.getCameraZoom());
           });
           debugDraw.fill.alpha = 0;
           debugDraw.line.alpha = 0.5;
@@ -215,9 +215,11 @@ namespace gdjs {
 
         // Draw Center point
         const centerPointX =
-          object.getDrawableX() + object.getCenterX() - cameraCoords[0];
+          (object.getDrawableX() + object.getCenterX() - cameraCoords[0]) *
+          layer.getCameraZoom();
         const centerPointY =
-          object.getDrawableY() + object.getCenterY() - cameraCoords[1];
+          (object.getDrawableY() + object.getCenterY() - cameraCoords[1]) *
+          layer.getCameraZoom();
         renderObjectPoint(
           renderedObjectPoints.points,
           'Center',
@@ -242,8 +244,8 @@ namespace gdjs {
           renderedObjectPoints.points,
           'Origin',
           0xff0000,
-          originPoint[0],
-          originPoint[1]
+          originPoint[0] * layer.getCameraZoom(),
+          originPoint[1] * layer.getCameraZoom()
         );
 
         // Draw custom point
@@ -259,8 +261,8 @@ namespace gdjs {
               renderedObjectPoints.points,
               customPointName,
               0x0000ff,
-              customPoint[0],
-              customPoint[1]
+              customPoint[0] * layer.getCameraZoom(),
+              customPoint[1] * layer.getCameraZoom()
             );
           }
         }

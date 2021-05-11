@@ -149,21 +149,30 @@ namespace gdjs {
         ) {
           continue;
         }
-        const cameraCoords = layersCameraCoordinates[object.getLayer()];
+
         const rendererObject = object.getRendererObject();
-        if (!cameraCoords || !rendererObject) {
+        if (!rendererObject) {
           continue;
         }
         const aabb = object.getAABB();
         debugDraw.fill.alpha = 0.2;
         debugDraw.line.color = 0x778ee8;
         debugDraw.fill.color = 0x778ee8;
-        debugDraw.drawRect(
-          (aabb.min[0] - cameraCoords[0]) * layer.getCameraZoom(),
-          (aabb.min[1] - cameraCoords[1]) * layer.getCameraZoom(),
-          (aabb.max[0] - aabb.min[0]) * layer.getCameraZoom(),
-          (aabb.max[1] - aabb.min[1]) * layer.getCameraZoom()
-        );
+
+        const vertices = [
+          layer.convertInverseCoords(aabb.min[0], aabb.min[1]),
+          layer.convertInverseCoords(aabb.max[0], aabb.min[1]),
+          layer.convertInverseCoords(aabb.max[0], aabb.max[1]),
+          layer.convertInverseCoords(aabb.min[0], aabb.max[1]),
+        ];
+
+        const polygon: float[] = [];
+        for (let v = 0; v < vertices.length; v++) {
+          polygon.push(vertices[v][0]);
+          polygon.push(vertices[v][1]);
+        }
+
+        debugDraw.drawPolygon(polygon);
       }
 
       // Draw hitboxes and points
@@ -177,9 +186,9 @@ namespace gdjs {
         ) {
           continue;
         }
-        const cameraCoords = layersCameraCoordinates[object.getLayer()];
+
         const rendererObject = object.getRendererObject();
-        if (!cameraCoords || !rendererObject) {
+        if (!rendererObject) {
           continue;
         }
 
@@ -201,8 +210,10 @@ namespace gdjs {
           // as this is for debug draw.
           const polygon: float[] = [];
           hitboxes[j].vertices.forEach((point) => {
-            polygon.push((point[0] - cameraCoords[0]) * layer.getCameraZoom());
-            polygon.push((point[1] - cameraCoords[1]) * layer.getCameraZoom());
+            point = layer.convertInverseCoords(point[0], point[1]);
+
+            polygon.push(point[0]);
+            polygon.push(point[1]);
           });
           debugDraw.fill.alpha = 0;
           debugDraw.line.alpha = 0.5;
@@ -214,38 +225,39 @@ namespace gdjs {
         debugDraw.fill.alpha = 0.3;
 
         // Draw Center point
-        const centerPointX =
-          (object.getDrawableX() + object.getCenterX() - cameraCoords[0]) *
-          layer.getCameraZoom();
-        const centerPointY =
-          (object.getDrawableY() + object.getCenterY() - cameraCoords[1]) *
-          layer.getCameraZoom();
-        renderObjectPoint(
-          renderedObjectPoints.points,
-          'Center',
-          0xffff00,
+        const centerPointX = object.getDrawableX() + object.getCenterX();
+        const centerPointY = object.getDrawableY() + object.getCenterY();
+        const centerPoint = layer.convertInverseCoords(
           centerPointX,
           centerPointY
         );
 
+        renderObjectPoint(
+          renderedObjectPoints.points,
+          'Center',
+          0xffff00,
+          centerPoint[0],
+          centerPoint[1]
+        );
+
         // Draw Origin point
-        let originPoint = [
-          object.getDrawableX() - cameraCoords[0],
-          object.getDrawableY() - cameraCoords[1],
-        ];
+        let originPoint = [object.getDrawableX(), object.getDrawableY()];
         if (object instanceof gdjs.SpriteRuntimeObject) {
           // For Sprite objects get the position of the origin point.
           originPoint = object.getPointPosition('origin');
-          originPoint[0] -= cameraCoords[0];
-          originPoint[1] -= cameraCoords[1];
         }
+
+        originPoint = layer.convertInverseCoords(
+          originPoint[0],
+          originPoint[1]
+        );
 
         renderObjectPoint(
           renderedObjectPoints.points,
           'Origin',
           0xff0000,
-          originPoint[0] * layer.getCameraZoom(),
-          originPoint[1] * layer.getCameraZoom()
+          originPoint[0],
+          originPoint[1]
         );
 
         // Draw custom point
@@ -253,16 +265,19 @@ namespace gdjs {
           if (!object._animationFrame) continue;
 
           for (const customPointName in object._animationFrame.points.items) {
-            const customPoint = object.getPointPosition(customPointName);
-            customPoint[0] -= cameraCoords[0];
-            customPoint[1] -= cameraCoords[1];
+            let customPoint = object.getPointPosition(customPointName);
+
+            customPoint = layer.convertInverseCoords(
+              customPoint[0],
+              customPoint[1]
+            );
 
             renderObjectPoint(
               renderedObjectPoints.points,
               customPointName,
               0x0000ff,
-              customPoint[0] * layer.getCameraZoom(),
-              customPoint[1] * layer.getCameraZoom()
+              customPoint[0],
+              customPoint[1]
             );
           }
         }

@@ -51,9 +51,9 @@ const PointsEditor = (props: Props) => {
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
   const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
-    true
+    false
   );
-  const [samePointsForSprites, setSamePointsForSprites] = React.useState(true);
+  const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
   const spriteObject = gd.asSpriteObject(props.object);

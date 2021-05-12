@@ -64,8 +64,8 @@ const buildSW = () => {
         // 'external/monaco-editor-min/vs/editor/editor.main.css',
       ],
 
-      // Increase the limit to 6mb:
-      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+      // Increase the limit to 10mb:
+      maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
     })
     .then(({ count, size, warnings }) => {
       // Optionally, log any warnings and details.

@@ -159,18 +159,23 @@ namespace gdjs {
         debugDraw.line.color = 0x778ee8;
         debugDraw.fill.color = 0x778ee8;
 
-        const vertices = [
-          layer.convertInverseCoords(aabb.min[0], aabb.min[1]),
-          layer.convertInverseCoords(aabb.max[0], aabb.min[1]),
-          layer.convertInverseCoords(aabb.max[0], aabb.max[1]),
-          layer.convertInverseCoords(aabb.min[0], aabb.max[1]),
-        ];
-
         const polygon: float[] = [];
-        for (let v = 0; v < vertices.length; v++) {
-          polygon.push(vertices[v][0]);
-          polygon.push(vertices[v][1]);
-        }
+        polygon.push.apply(
+          polygon,
+          layer.convertInverseCoords(aabb.min[0], aabb.min[1])
+        );
+        polygon.push.apply(
+          polygon,
+          layer.convertInverseCoords(aabb.max[0], aabb.min[1])
+        );
+        polygon.push.apply(
+          polygon,
+          layer.convertInverseCoords(aabb.max[0], aabb.max[1])
+        );
+        polygon.push.apply(
+          polygon,
+          layer.convertInverseCoords(aabb.min[0], aabb.max[1])
+        );
 
         debugDraw.drawPolygon(polygon);
       }

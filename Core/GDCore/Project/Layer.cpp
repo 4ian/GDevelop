@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/Layer.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Effect.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -13,7 +14,11 @@ namespace gd {
 Camera Layer::badCamera;
 Effect Layer::badEffect;
 
-Layer::Layer() : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}
+Layer::Layer()
+    : isVisible(true),
+      isLightingLayer(false),
+      followBaseLayerCamera(false),
+      effectsContainer(std::make_unique<EffectsContainer>()) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -51,12 +56,13 @@ void Layer::SerializeTo(SerializerElement& element) const {
     cameraElement.SetAttribute("viewportBottom", GetCamera(c).GetViewportY2());
   }
 
-  SerializerElement& effectsElement = element.AddChild("effects");
-  effectsElement.ConsiderAsArrayOf("effect");
-  for (std::size_t i = 0; i < GetEffectsCount(); ++i) {
-    SerializerElement& effectElement = effectsElement.AddChild("effect");
-    GetEffect(i).SerializeTo(effectElement);
-  }
+  // TODO: Serialize EffectsContainer
+  // SerializerElement& effectsElement = element.AddChild("effects");
+  // effectsElement.ConsiderAsArrayOf("effect");
+  // for (std::size_t i = 0; i < GetEffectsCount(); ++i) {
+  //   SerializerElement& effectElement = effectsElement.AddChild("effect");
+  //   GetEffect(i).SerializeTo(effectElement);
+  // }
 }
 #endif
 
@@ -67,8 +73,9 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   SetName(element.GetStringAttribute("name", "", "Name"));
   SetVisibility(element.GetBoolAttribute("visibility", true, "Visibility"));
   SetLightingLayer(element.GetBoolAttribute("isLightingLayer", false));
-  SetFollowBaseLayerCamera(element.GetBoolAttribute("followBaseLayerCamera", false));
-  SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200), 
+  SetFollowBaseLayerCamera(
+      element.GetBoolAttribute("followBaseLayerCamera", false));
+  SetAmbientLightColor(element.GetIntAttribute("ambientLightColorR", 200),
                        element.GetIntAttribute("ambientLightColorG", 200),
                        element.GetIntAttribute("ambientLightColorB", 200));
 
@@ -122,100 +129,58 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
     }
   }
 
-  effects.clear();
-  SerializerElement& effectsElement = element.GetChild("effects");
-  effectsElement.ConsiderAsArrayOf("effect");
-  for (std::size_t i = 0; i < effectsElement.GetChildrenCount(); ++i) {
-    const SerializerElement& effectElement = effectsElement.GetChild(i);
+  // TODO: Unserialize EffectsContainer
+  // effects.clear();
+  // SerializerElement& effectsElement = element.GetChild("effects");
+  // effectsElement.ConsiderAsArrayOf("effect");
+  // for (std::size_t i = 0; i < effectsElement.GetChildrenCount(); ++i) {
+  //   const SerializerElement& effectElement = effectsElement.GetChild(i);
 
-    auto effect = std::make_shared<Effect>();
-    effect->UnserializeFrom(effectElement);
-    effects.push_back(effect);
-  }
+  //   auto effect = std::make_shared<Effect>();
+  //   effect->UnserializeFrom(effectElement);
+  //   effects.push_back(effect);
+  // }
 }
 
 gd::Effect& Layer::GetEffect(const gd::String& name) {
-  auto effect = find_if(effects.begin(),
-                        effects.end(),
-                        [&name](std::shared_ptr<gd::Effect>& effect) {
-                          return effect->GetName() == name;
-                        });
-
-  if (effect != effects.end()) return **effect;
-
-  return badEffect;
+  return effectsContainer->GetEffect(name);
 }
 const gd::Effect& Layer::GetEffect(const gd::String& name) const {
-  auto effect = find_if(effects.begin(),
-                        effects.end(),
-                        [&name](const std::shared_ptr<gd::Effect>& effect) {
-                          return effect->GetName() == name;
-                        });
-
-  if (effect != effects.end()) return **effect;
-
-  return badEffect;
+  return effectsContainer->GetEffect(name);
 }
-gd::Effect& Layer::GetEffect(std::size_t index) { return *effects[index]; }
+gd::Effect& Layer::GetEffect(std::size_t index) {
+  return effectsContainer->GetEffect(index);
+}
 const gd::Effect& Layer::GetEffect(std::size_t index) const {
-  return *effects[index];
+  return effectsContainer->GetEffect(index);
 }
-std::size_t Layer::GetEffectsCount() const { return effects.size(); }
+std::size_t Layer::GetEffectsCount() const {
+  return effectsContainer->GetEffectsCount();
+}
 
 bool Layer::HasEffectNamed(const gd::String& name) const {
-  return (find_if(effects.begin(),
-                  effects.end(),
-                  [&name](const std::shared_ptr<gd::Effect>& effect) {
-                    return effect->GetName() == name;
-                  }) != effects.end());
+  return effectsContainer->HasEffectNamed(name);
 }
 std::size_t Layer::GetEffectPosition(const gd::String& name) const {
-  for (std::size_t i = 0; i < effects.size(); ++i) {
-    if (effects[i]->GetName() == name) return i;
-  }
-  return gd::String::npos;
+  return effectsContainer->GetEffectPosition(name);
 }
 
 gd::Effect& Layer::InsertNewEffect(const gd::String& name,
                                    std::size_t position) {
-  auto newEffect = std::make_shared<Effect>();
-  newEffect->SetName(name);
-
-  if (position < effects.size())
-    effects.insert(effects.begin() + position, newEffect);
-  else
-    effects.push_back(newEffect);
-
-  return *newEffect;
+  return effectsContainer->InsertNewEffect(name, position);
 }
 
 void Layer::InsertEffect(const gd::Effect& effect, std::size_t position) {
-  auto newEffect = std::make_shared<gd::Effect>(effect);
-  if (position < effects.size())
-    effects.insert(effects.begin() + position, newEffect);
-  else
-    effects.push_back(newEffect);
+  effectsContainer->InsertEffect(effect, position);
 }
 
 void Layer::RemoveEffect(const gd::String& name) {
-  auto effect = find_if(effects.begin(),
-                        effects.end(),
-                        [&name](const std::shared_ptr<gd::Effect>& effect) {
-                          return effect->GetName() == name;
-                        });
-  if (effect == effects.end()) return;
-
-  effects.erase(effect);
+  effectsContainer->RemoveEffect(name);
 }
 
 void Layer::SwapEffects(std::size_t firstEffectIndex,
                         std::size_t secondEffectIndex) {
-  if (firstEffectIndex >= effects.size() || secondEffectIndex >= effects.size())
-    return;
-
-  auto temp = effects[firstEffectIndex];
-  effects[firstEffectIndex] = effects[secondEffectIndex];
-  effects[secondEffectIndex] = temp;
+  effectsContainer->SwapEffects(firstEffectIndex, secondEffectIndex);
 }
 
 Camera::Camera()

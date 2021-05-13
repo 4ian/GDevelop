@@ -7,7 +7,10 @@
 #define GDCORE_LAYER_H
 #include <memory>
 #include <vector>
+
+#include "EffectsContainer.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class Effect;
 }
@@ -16,6 +19,9 @@ class Camera;
 }
 namespace gd {
 class SerializerElement;
+}
+namespace gd {
+class EffectsContainer;
 }
 
 namespace gd {
@@ -54,7 +60,9 @@ class GD_CORE_API Layer {
   /**
    * \brief Set if the layer is a lightining layer or not.
    */
-  void SetLightingLayer(bool isLightingLayer_) { isLightingLayer = isLightingLayer_; }
+  void SetLightingLayer(bool isLightingLayer_) {
+    isLightingLayer = isLightingLayer_;
+  }
 
   /**
    * \brief Return true if the layer is a lighting layer.
@@ -64,7 +72,9 @@ class GD_CORE_API Layer {
   /**
    * \brief Set if the layer automatically follows the base layer or not.
    */
-  void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) { followBaseLayerCamera = followBaseLayerCamera_; }
+  void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) {
+    followBaseLayerCamera = followBaseLayerCamera_;
+  }
 
   /**
    * \brief Return true if the layer follows the base layer.
@@ -219,16 +229,18 @@ class GD_CORE_API Layer {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  gd::String name;                  ///< The name of the layer
-  bool isVisible;                   ///< True if the layer is visible
-  bool isLightingLayer;             ///< True if the layer is used to display lights and renders an ambient light.
-  bool followBaseLayerCamera;           ///< True if the layer automatically follows the base layer
-  unsigned int ambientLightColorR;     ///< Ambient light color Red component
-  unsigned int ambientLightColorG;     ///< Ambient light color Green component
-  unsigned int ambientLightColorB;     ///< Ambient light color Blue component
+  gd::String name;       ///< The name of the layer
+  bool isVisible;        ///< True if the layer is visible
+  bool isLightingLayer;  ///< True if the layer is used to display lights and
+                         ///< renders an ambient light.
+  bool followBaseLayerCamera;  ///< True if the layer automatically follows the
+                               ///< base layer
+  unsigned int ambientLightColorR;  ///< Ambient light color Red component
+  unsigned int ambientLightColorG;  ///< Ambient light color Green component
+  unsigned int ambientLightColorB;  ///< Ambient light color Blue component
   std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
-  std::vector<std::shared_ptr<gd::Effect>>
-      effects;  ///< The effects applied to the layer.
+  std::unique_ptr<gd::EffectsContainer>
+      effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;
   static gd::Effect badEffect;

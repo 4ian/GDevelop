@@ -25,7 +25,7 @@ EffectsContainer& EffectsContainer::operator=(const EffectsContainer& rhs) {
 void EffectsContainer::Init(const EffectsContainer& other) {
   effects.clear();
   for (auto& it : other.effects) {
-    effects.push_back(it);
+    effects.push_back(std::make_shared<Effect>(*it));
   }
 }
 

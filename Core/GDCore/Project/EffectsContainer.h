@@ -32,7 +32,6 @@ class GD_CORE_API EffectsContainer {
   virtual ~EffectsContainer(){};
 
   EffectsContainer& operator=(const EffectsContainer& rhs);
-  void Init(const EffectsContainer& other);
   /**
    * \brief Return true if the effect called "name" exists.
    */
@@ -109,8 +108,8 @@ class GD_CORE_API EffectsContainer {
 
  private:
   std::vector<std::shared_ptr<gd::Effect>> effects;
-
   static Effect badEffect;
+  void Init(const EffectsContainer& other);
 };
 }  // namespace gd
 

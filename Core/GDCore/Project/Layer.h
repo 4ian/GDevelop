@@ -242,7 +242,6 @@ class GD_CORE_API Layer {
   gd::EffectsContainer effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;
-  static gd::Effect badEffect;
 };
 
 /**

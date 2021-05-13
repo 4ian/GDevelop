@@ -12,7 +12,6 @@
 namespace gd {
 
 Camera Layer::badCamera;
-Effect Layer::badEffect;
 
 Layer::Layer()
     : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}

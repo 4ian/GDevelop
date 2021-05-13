@@ -12,7 +12,10 @@
 
 namespace gd {
 class Effect;
-}  // namespace gd
+}
+namespace gd {
+class SerializerElement;
+}
 
 namespace gd {
 
@@ -25,7 +28,11 @@ namespace gd {
 class GD_CORE_API EffectsContainer {
  public:
   EffectsContainer();
+  EffectsContainer(const EffectsContainer& other);
   virtual ~EffectsContainer(){};
+
+  EffectsContainer& operator=(const EffectsContainer& rhs);
+  void Init(const EffectsContainer& other);
   /**
    * \brief Return true if the effect called "name" exists.
    */
@@ -87,6 +94,18 @@ class GD_CORE_API EffectsContainer {
    * Swap the position of two effects.
    */
   void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);
+
+#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Serialize effects container
+   */
+  void SerializeTo(SerializerElement& element) const;
+#endif
+
+  /**
+   * \brief Unserialize the effects container.
+   */
+  void UnserializeFrom(const SerializerElement& element);
 
  private:
   std::vector<std::shared_ptr<gd::Effect>>

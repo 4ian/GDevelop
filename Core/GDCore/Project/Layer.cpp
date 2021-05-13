@@ -15,10 +15,7 @@ Camera Layer::badCamera;
 Effect Layer::badEffect;
 
 Layer::Layer()
-    : isVisible(true),
-      isLightingLayer(false),
-      followBaseLayerCamera(false),
-      effectsContainer(std::make_unique<EffectsContainer>()) {}
+    : isVisible(true), isLightingLayer(false), followBaseLayerCamera(false) {}
 
 /**
  * Change cameras count, automatically adding/removing them.
@@ -56,13 +53,8 @@ void Layer::SerializeTo(SerializerElement& element) const {
     cameraElement.SetAttribute("viewportBottom", GetCamera(c).GetViewportY2());
   }
 
-  // TODO: Serialize EffectsContainer
-  // SerializerElement& effectsElement = element.AddChild("effects");
-  // effectsElement.ConsiderAsArrayOf("effect");
-  // for (std::size_t i = 0; i < GetEffectsCount(); ++i) {
-  //   SerializerElement& effectElement = effectsElement.AddChild("effect");
-  //   GetEffect(i).SerializeTo(effectElement);
-  // }
+  SerializerElement& effectsElement = element.AddChild("effects");
+  effectsContainer.SerializeTo(effectsElement);
 }
 #endif
 
@@ -129,58 +121,49 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
     }
   }
 
-  // TODO: Unserialize EffectsContainer
-  // effects.clear();
-  // SerializerElement& effectsElement = element.GetChild("effects");
-  // effectsElement.ConsiderAsArrayOf("effect");
-  // for (std::size_t i = 0; i < effectsElement.GetChildrenCount(); ++i) {
-  //   const SerializerElement& effectElement = effectsElement.GetChild(i);
-
-  //   auto effect = std::make_shared<Effect>();
-  //   effect->UnserializeFrom(effectElement);
-  //   effects.push_back(effect);
-  // }
+  const SerializerElement& effectsElement = element.GetChild("effects");
+  effectsContainer.UnserializeFrom(effectsElement);
 }
 
 gd::Effect& Layer::GetEffect(const gd::String& name) {
-  return effectsContainer->GetEffect(name);
+  return effectsContainer.GetEffect(name);
 }
 const gd::Effect& Layer::GetEffect(const gd::String& name) const {
-  return effectsContainer->GetEffect(name);
+  return effectsContainer.GetEffect(name);
 }
 gd::Effect& Layer::GetEffect(std::size_t index) {
-  return effectsContainer->GetEffect(index);
+  return effectsContainer.GetEffect(index);
 }
 const gd::Effect& Layer::GetEffect(std::size_t index) const {
-  return effectsContainer->GetEffect(index);
+  return effectsContainer.GetEffect(index);
 }
 std::size_t Layer::GetEffectsCount() const {
-  return effectsContainer->GetEffectsCount();
+  return effectsContainer.GetEffectsCount();
 }
 
 bool Layer::HasEffectNamed(const gd::String& name) const {
-  return effectsContainer->HasEffectNamed(name);
+  return effectsContainer.HasEffectNamed(name);
 }
 std::size_t Layer::GetEffectPosition(const gd::String& name) const {
-  return effectsContainer->GetEffectPosition(name);
+  return effectsContainer.GetEffectPosition(name);
 }
 
 gd::Effect& Layer::InsertNewEffect(const gd::String& name,
                                    std::size_t position) {
-  return effectsContainer->InsertNewEffect(name, position);
+  return effectsContainer.InsertNewEffect(name, position);
 }
 
 void Layer::InsertEffect(const gd::Effect& effect, std::size_t position) {
-  effectsContainer->InsertEffect(effect, position);
+  effectsContainer.InsertEffect(effect, position);
 }
 
 void Layer::RemoveEffect(const gd::String& name) {
-  effectsContainer->RemoveEffect(name);
+  effectsContainer.RemoveEffect(name);
 }
 
 void Layer::SwapEffects(std::size_t firstEffectIndex,
                         std::size_t secondEffectIndex) {
-  effectsContainer->SwapEffects(firstEffectIndex, secondEffectIndex);
+  effectsContainer.SwapEffects(firstEffectIndex, secondEffectIndex);
 }
 
 Camera::Camera()

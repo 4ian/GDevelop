@@ -239,8 +239,7 @@ class GD_CORE_API Layer {
   unsigned int ambientLightColorG;  ///< Ambient light color Green component
   unsigned int ambientLightColorB;  ///< Ambient light color Blue component
   std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
-  std::unique_ptr<gd::EffectsContainer>
-      effectsContainer;  ///< The effects applied to the layer.
+  gd::EffectsContainer effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;
   static gd::Effect badEffect;

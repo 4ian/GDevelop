@@ -29,65 +29,6 @@
       "showGDevelopSplash": true
     },
     "extensionProperties": [],
-    "extensions": [
-      {
-        "name": "BuiltinObject"
-      },
-      {
-        "name": "BuiltinAudio"
-      },
-      {
-        "name": "BuiltinVariables"
-      },
-      {
-        "name": "BuiltinTime"
-      },
-      {
-        "name": "BuiltinMouse"
-      },
-      {
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "name": "BuiltinJoystick"
-      },
-      {
-        "name": "BuiltinCamera"
-      },
-      {
-        "name": "BuiltinWindow"
-      },
-      {
-        "name": "BuiltinFile"
-      },
-      {
-        "name": "BuiltinNetwork"
-      },
-      {
-        "name": "BuiltinScene"
-      },
-      {
-        "name": "BuiltinAdvanced"
-      },
-      {
-        "name": "Sprite"
-      },
-      {
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "name": "BuiltinCommonConversions"
-      },
-      {
-        "name": "BuiltinStringInstructions"
-      },
-      {
-        "name": "BuiltinMathematicalTools"
-      },
-      {
-        "name": "BuiltinExternalLayouts"
-      }
-    ],
     "platforms": [
       {
         "name": "GDevelop JS platform"
@@ -3857,200 +3798,20 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() - 16",
-                "LinkBubble.Y() + 32"
-              ],
-              "subInstructions": []
-            }
-          ],
+          "conditions": [],
           "actions": [
             {
               "type": {
                 "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
+                "value": "LinkTools::LinkHexagonalNeighbors"
               },
               "parameters": [
                 "",
+                "LinkBubble",
                 "BoardBubble",
-                "LinkBubble"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() + 16",
-                "LinkBubble.Y() + 32"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "BoardBubble",
-                "LinkBubble"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() - 16",
-                "LinkBubble.Y() - 32"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "BoardBubble",
-                "LinkBubble"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() + 16",
-                "LinkBubble.Y() - 32"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "BoardBubble",
-                "LinkBubble"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() - 32",
-                "LinkBubble.Y()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "BoardBubble",
-                "LinkBubble"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "CollisionPoint"
-              },
-              "parameters": [
-                "BoardBubble",
-                "LinkBubble.X() + 32",
-                "LinkBubble.Y()"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "LinkedObjects::LinkObjects"
-              },
-              "parameters": [
-                "",
-                "BoardBubble",
-                "LinkBubble"
+                "32",
+                "32",
+                ""
               ],
               "subInstructions": []
             }
@@ -5838,25 +5599,1177 @@
     },
     {
       "author": "D8H",
-      "description": "Link helper functions\n* \"Can reach through links\" condition",
+      "description": "This provides:\n* \"Can reach through links\" conditions, useful to check if an object is linked to another through one or more other linked objects.\n* a path finding movement behavior that uses objects links (instead of obstacles for the other behavior)\n\nFor instance, it can be helpful for grid-based games like:\n* Match-3 (see BimBam example)\n* Tactical (see Tactical example)\n* City builders (see City Builder example)\n* Point and click (bypass obstacles with a predetermined polygonal chain)",
       "extensionNamespace": "",
-      "fullName": "Link Tools",
-      "helpPath": "",
+      "fullName": "Linked Objects Tools",
+      "helpPath": "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/extensions/linked-objects-tools",
       "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWdyYXBoLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTkuNSAxN0MxOS4zNiAxNyAxOS4yNCAxNyAxOS4xMSAxNy4wNEwxNy41IDEzLjhDMTcuOTUgMTMuMzUgMTguMjUgMTIuNzEgMTguMjUgMTJDMTguMjUgMTAuNjIgMTcuMTMgOS41IDE1Ljc1IDkuNUMxNS42MSA5LjUgMTUuNSA5LjUgMTUuMzUgOS41NEwxMy43NCA2LjNDMTQuMjEgNS44NCAxNC41IDUuMjEgMTQuNSA0LjVDMTQuNSAzLjEyIDEzLjM4IDIgMTIgMlM5LjUgMy4xMiA5LjUgNC41QzkuNSA1LjIgOS43OSA1Ljg0IDEwLjI2IDYuMjlMOC42NSA5LjU0QzguNSA5LjUgOC4zOSA5LjUgOC4yNSA5LjVDNi44NyA5LjUgNS43NSAxMC42MiA1Ljc1IDEyQzUuNzUgMTIuNzEgNi4wNCAxMy4zNCA2LjUgMTMuNzlMNC44OSAxNy4wNEM0Ljc2IDE3IDQuNjQgMTcgNC41IDE3QzMuMTIgMTcgMiAxOC4xMiAyIDE5LjVDMiAyMC44OCAzLjEyIDIyIDQuNSAyMlM3IDIwLjg4IDcgMTkuNUM3IDE4LjggNi43MSAxOC4xNiA2LjI0IDE3LjcxTDcuODYgMTQuNDZDOCAxNC41IDguMTIgMTQuNSA4LjI1IDE0LjVDOC4zOCAxNC41IDguNSAxNC41IDguNjMgMTQuNDZMMTAuMjYgMTcuNzFDOS43OSAxOC4xNiA5LjUgMTguOCA5LjUgMTkuNUM5LjUgMjAuODggMTAuNjIgMjIgMTIgMjJTMTQuNSAyMC44OCAxNC41IDE5LjVDMTQuNSAxOC4xMiAxMy4zOCAxNyAxMiAxN0MxMS44NyAxNyAxMS43NCAxNyAxMS42MSAxNy4wNEwxMCAxMy44QzEwLjQ1IDEzLjM1IDEwLjc1IDEyLjcxIDEwLjc1IDEyQzEwLjc1IDExLjMgMTAuNDYgMTAuNjcgMTAgMTAuMjFMMTEuNjEgNi45NkMxMS43NCA3IDExLjg3IDcgMTIgN0MxMi4xMyA3IDEyLjI2IDcgMTIuMzkgNi45NkwxNCAxMC4yMUMxMy41NCAxMC42NiAxMy4yNSAxMS4zIDEzLjI1IDEyQzEzLjI1IDEzLjM4IDE0LjM3IDE0LjUgMTUuNzUgMTQuNUMxNS44OCAxNC41IDE2IDE0LjUgMTYuMTMgMTQuNDZMMTcuNzYgMTcuNzFDMTcuMjkgMTguMTYgMTcgMTguOCAxNyAxOS41QzE3IDIwLjg4IDE4LjEyIDIyIDE5LjUgMjJTMjIgMjAuODggMjIgMTkuNUMyMiAxOC4xMiAyMC44OCAxNyAxOS41IDE3TTQuNSAyMC41QzMuOTUgMjAuNSAzLjUgMjAuMDUgMy41IDE5LjVTMy45NSAxOC41IDQuNSAxOC41IDUuNSAxOC45NSA1LjUgMTkuNSA1LjA1IDIwLjUgNC41IDIwLjVNMTMgMTkuNUMxMyAyMC4wNSAxMi41NSAyMC41IDEyIDIwLjVTMTEgMjAuMDUgMTEgMTkuNSAxMS40NSAxOC41IDEyIDE4LjUgMTMgMTguOTUgMTMgMTkuNU03LjI1IDEyQzcuMjUgMTEuNDUgNy43IDExIDguMjUgMTFTOS4yNSAxMS40NSA5LjI1IDEyIDguOCAxMyA4LjI1IDEzIDcuMjUgMTIuNTUgNy4yNSAxMk0xMSA0LjVDMTEgMy45NSAxMS40NSAzLjUgMTIgMy41UzEzIDMuOTUgMTMgNC41IDEyLjU1IDUuNSAxMiA1LjUgMTEgNS4wNSAxMSA0LjVNMTQuNzUgMTJDMTQuNzUgMTEuNDUgMTUuMiAxMSAxNS43NSAxMVMxNi43NSAxMS40NSAxNi43NSAxMiAxNi4zIDEzIDE1Ljc1IDEzIDE0Ljc1IDEyLjU1IDE0Ljc1IDEyTTE5LjUgMjAuNUMxOC45NSAyMC41IDE4LjUgMjAuMDUgMTguNSAxOS41UzE4Ljk1IDE4LjUgMTkuNSAxOC41IDIwLjUgMTguOTUgMjAuNSAxOS41IDIwLjA1IDIwLjUgMTkuNSAyMC41WiIgLz48L3N2Zz4=",
       "name": "LinkTools",
       "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/graph-outline.svg",
-      "shortDescription": "Link helper functions to use links as a graph",
-      "version": "1.0.0",
+      "shortDescription": "Conditions to use Linked Objects as a graph and a path finding movement behavior",
+      "version": "1.2.0",
       "tags": [
         "link",
         "graph",
         "path",
-        "aggregate",
-        "aggregation",
-        "match"
+        "match",
+        "tactical",
+        "city",
+        "movement"
       ],
       "dependencies": [],
       "eventsFunctions": [
+        {
+          "description": "Link to neighbors on a rectangular grid",
+          "fullName": "Link to neighbors on a rectangular grid",
+          "functionType": "Action",
+          "name": "LinkRectangularNeighbors",
+          "private": false,
+          "sentence": "Link _PARAM1_ and its neighbors _PARAM2_  on a rectangular grid with cell dimensions: _PARAM3_; _PARAM4_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\")",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X()",
+                        "Object.Y() + GetArgumentAsNumber(\"CellHeight\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\")",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X()",
+                        "Object.Y() - GetArgumentAsNumber(\"CellHeight\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"AllowsDiagonals\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() + GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y() + GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() - GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y() + GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() - GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y() - GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() + GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y() - GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Neighbor",
+              "longDescription": "The 2 objects can't be the same.",
+              "name": "Neighbor",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell width",
+              "longDescription": "",
+              "name": "CellWidth",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell height",
+              "longDescription": "",
+              "name": "CellHeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Allows diagonals",
+              "longDescription": "",
+              "name": "AllowsDiagonals",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Link to neighbors on a hexagonal grid",
+          "fullName": "Link to neighbors on a hexagonal grid",
+          "functionType": "Action",
+          "name": "LinkHexagonalNeighbors",
+          "private": false,
+          "sentence": "Link _PARAM1_ and its neighbors _PARAM2_  on a hexagonal grid with cell dimensions: _PARAM3_; _PARAM4_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\")",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() + GetArgumentAsNumber(\"CellHeight\") * 3/4"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() + GetArgumentAsNumber(\"CellHeight\") * 3/4"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\")",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() - GetArgumentAsNumber(\"CellHeight\") * 3/4"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() - GetArgumentAsNumber(\"CellHeight\") * 3/4"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Neighbor",
+              "longDescription": "The 2 objects can't be the same.",
+              "name": "Neighbor",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell width",
+              "longDescription": "",
+              "name": "CellWidth",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell height",
+              "longDescription": "",
+              "name": "CellHeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Link to neighbors on an isometric grid",
+          "fullName": "Link to neighbors on an isometric grid",
+          "functionType": "Action",
+          "name": "LinkIsometricRectangularNeighbors",
+          "private": false,
+          "sentence": "Link _PARAM1_ and its neighbors _PARAM2_  on an isometric grid with cell dimensions: _PARAM3_; _PARAM4_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Object",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() + GetArgumentAsNumber(\"CellHeight\") / 2"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() + GetArgumentAsNumber(\"CellHeight\") / 2"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() - GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() - GetArgumentAsNumber(\"CellHeight\") / 2"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionPoint"
+                      },
+                      "parameters": [
+                        "Neighbor",
+                        "Object.X() + GetArgumentAsNumber(\"CellWidth\") / 2",
+                        "Object.Y() - GetArgumentAsNumber(\"CellHeight\") / 2"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkedObjects::LinkObjects"
+                      },
+                      "parameters": [
+                        "",
+                        "Object",
+                        "Neighbor"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "GetArgumentAsBoolean"
+                      },
+                      "parameters": [
+                        "\"AllowsDiagonals\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() + GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X()",
+                            "Object.Y() + GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X() - GetArgumentAsNumber(\"CellWidth\")",
+                            "Object.Y()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CollisionPoint"
+                          },
+                          "parameters": [
+                            "Neighbor",
+                            "Object.X()",
+                            "Object.Y() - GetArgumentAsNumber(\"CellHeight\")"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "Object",
+                            "Neighbor"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Neighbor",
+              "longDescription": "The 2 objects can't be the same.",
+              "name": "Neighbor",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell width",
+              "longDescription": "",
+              "name": "CellWidth",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cell height",
+              "longDescription": "",
+              "name": "CellHeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Allows diagonals",
+              "longDescription": "",
+              "name": "AllowsDiagonals",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Can reach through a given cost sum",
+          "fullName": "Can reach with links limited by cost",
+          "functionType": "Condition",
+          "name": "CanReachWithMaxWeight",
+          "private": false,
+          "sentence": "Take into account all \"_PARAM1_\" that can reach _PARAM2_ with initial value from the variable _PARAM3_ through at most a cost of: _PARAM4_ according to cost class: _PARAM5_ and at most _PARAM6_ links depth",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "\n/**\n * Insert a node in an array sorted by farest 1st\n * @param {gdjs.RuntimeObject[]} objects\n * @param {gdjs.RuntimeObject} object\n */\nconst insertOpenNode = function (objects, object)\n{\n    let leftIndex = 0;\n    let rightIndex = objects.length;\n    while (leftIndex < rightIndex)\n    {\n        const medianIndex = Math.floor((leftIndex + rightIndex) / 2)\n        if (objects[medianIndex].linktoolsWeightSum < object.linktoolsWeightSum\n         || objects[medianIndex].linktoolsWeightSum === object.linktoolsWeightSum\n         && objects[medianIndex].linktoolsDepth < object.linktoolsDepth)\n            rightIndex = medianIndex;\n        else\n            leftIndex = medianIndex + 1;\n    }\n    objects.splice(rightIndex, 0, object);\n};\n\nlet pickedSomething = false;\nconst pickedObjects = eventsFunctionContext.getObjects(\"PickedObject\");\nconst targetObjects = eventsFunctionContext.getObjects(\"TargetObject\");\n/** @type {string} */\nconst initialLengthVariableName = eventsFunctionContext.getArgument(\"InitialLengthVariable\");\n/** @type {number} */\nconst maxWeight = eventsFunctionContext.getArgument(\"MaxWeight\");\n/** @type {string} */\nconst costClass = eventsFunctionContext.getArgument(\"CostClass\");\nconst skipFirstCost = eventsFunctionContext.getArgument(\"SkipFirstWeight\") === true;\n/** @type {number} */\nconst maxDepth = eventsFunctionContext.getArgument(\"MaxDepth\");\n\n/** @type {gdjs.LinksManager} */\nconst manager = gdjs.LinksManager.getManager(runtimeScene);\nfor (const targetObject of targetObjects)\n{\n    targetObject.linktoolsDepth = 0;\n    if (initialLengthVariableName === \"\")\n    {\n        targetObject.linktoolsWeightSum = 0;\n    }\n    else\n    {\n        targetObject.linktoolsWeightSum = targetObject.getVariableNumber(targetObject.getVariables().get(initialLengthVariableName));\n    }\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\n// mark every instance that can be reached through links\n// openObjects is the new discovered instances where links must be checked\nlet openObjects;\nopenObjects = targetObjects.slice();\nif (initialLengthVariableName !== \"\")\n{\n    // nearest last because pop is o(1)\n    openObjects.sort\n    (\n        function (a, b)\n        {\n            return b.linktoolsWeightSum - a.linktoolsWeightSum;\n        }\n    );\n}\nwhile (openObjects.length !== 0)\n{\n    const object = openObjects.pop();\n    const linktoolsWeightSum = object.linktoolsWeightSum;\n    /** @type {Array<gdjs.RuntimeObject>} */\n    const linkedObjects = manager.getObjectsLinkedWith(object);\n    for (const linkedObject of linkedObjects)\n    {\n        // don't check one instance twice\n        // and it must be in the set given by the caller\n        if (!linkedObject.pick && pickedObjects.includes(linkedObject) && object.linktoolsDepth < maxDepth)\n        {\n            let newWeightSum = 0;\n            if (costClass.length === 0)\n            {\n                newWeightSum = linktoolsWeightSum + 1;\n            }\n            else\n            {\n                const costVariable = linkedObject.getVariables().get(\"linktools_Cost\");\n                if (costVariable.hasChild(costClass))\n                {\n                    const cost = linkedObject.getVariableNumber(costVariable.getChild(costClass));\n                    newWeightSum = linktoolsWeightSum + cost;\n                }\n                else {\n                    newWeightSum = maxWeight + 1;\n                }\n            }\n            if (newWeightSum <= maxWeight)\n            {\n                if (object.linktoolsDepth === 0 && skipFirstCost)\n                {\n                    linkedObject.linktoolsWeightSum = linktoolsWeightSum;\n                }\n                else\n                {\n                    linkedObject.linktoolsWeightSum = newWeightSum;\n                }\n                linkedObject.pick = true;\n                pickedSomething = true;\n                linkedObject.linktoolsDepth = object.linktoolsDepth + 1;\n                insertOpenNode(openObjects, linkedObject);\n            }\n        }\n    }\n}\n// filter the instances to only keep the one marked with the pick attribute\nconst pickedObjectsLists = eventsFunctionContext.getObjectsLists(\"PickedObject\");\n/** @type {Array<String>} */\nconst objectNames = [];\npickedObjectsLists.keys(objectNames);\nfor (const objectName of objectNames)\n{\n    const pickedObjectsList = pickedObjectsLists.get(objectName);\n    gdjs.evtTools.object.filterPickedObjectsList(pickedObjectsList);\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\neventsFunctionContext.returnValue = pickedSomething;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Pick these objects...",
+              "longDescription": "",
+              "name": "PickedObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "if they can reach this object.",
+              "longDescription": "",
+              "name": "TargetObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Initial length variable",
+              "longDescription": "Start to 0 if left empty",
+              "name": "InitialLengthVariable",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Maximum cost",
+              "longDescription": "",
+              "name": "MaxWeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cost class",
+              "longDescription": "Leave empty to make everything crossable with cost = 1. It looks in the variable children of linktools_Cost. No child means not crossable, the cost must be positive.",
+              "name": "CostClass",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Maximum depth",
+              "longDescription": "",
+              "name": "MaxDepth",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Ignore first node cost",
+              "longDescription": "",
+              "name": "SkipFirstWeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "yesorno"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Can reach through a given number of links",
+          "fullName": "Can reach with links limited by length",
+          "functionType": "Condition",
+          "name": "CanReachWithMaxLength",
+          "private": false,
+          "sentence": "Take into account all \"_PARAM1_\" that can reach _PARAM2_ through at most _PARAM3_ links according to cost class: _PARAM4_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "let pickedSomething = false;\nconst pickedObjects = eventsFunctionContext.getObjects(\"PickedObject\");\nconst targetObjects = eventsFunctionContext.getObjects(\"TargetObject\");\n/** @type {number} */\nconst maxLinkLength = eventsFunctionContext.getArgument(\"MaxLinkLength\");\n/** @type {string} */\nconst costClass = eventsFunctionContext.getArgument(\"CostClass\");\n/** @type {gdjs.LinksManager} */\nconst manager = gdjs.LinksManager.getManager(runtimeScene);\nfor (const targetObject of targetObjects)\n{\n    targetObject.linktoolsWeightSum = 0;\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\n// mark every instance that can be reached through links\n// openObjects is the new discovered instances where links must be checked\nlet openObjects = [];\nlet swapOpenObjects = [];\nlet nextOpenObjects = targetObjects.slice();\nwhile (nextOpenObjects.length !== 0)\n{\n    swapOpenObjects = openObjects;\n    openObjects = nextOpenObjects;\n    nextOpenObjects = swapOpenObjects;\n    nextOpenObjects.length = 0;\n    while (openObjects.length !== 0)\n    {\n        const object = openObjects.pop();\n        /** @type {number} */\n        const linktoolsWeightSum = object.linktoolsWeightSum;\n        /** @type {Array<gdjs.RuntimeObject>} */\n        const linkedObjects = manager.getObjectsLinkedWith(object);\n        //console.log(\"linktoolsWeightSum: \" + linktoolsWeightSum);\n        //console.log(\"linkedObjects: \" + linkedObjects.length);\n        for (const linkedObject of linkedObjects)\n        {\n            // don't check one instance twice\n            // and it must be in the set given by the caller\n            if (!linkedObject.pick && pickedObjects.includes(linkedObject))\n            {\n                if (costClass === \"\")\n                {\n                    if (linktoolsWeightSum + 1 <= maxLinkLength)\n                    {\n                        linkedObject.pick = true;\n                        pickedSomething = true;\n                        linkedObject.linktoolsWeightSum = linktoolsWeightSum + 1;\n                        nextOpenObjects.push(linkedObject);\n                    }\n                }\n                else\n                {\n                    const costVariable = linkedObject.getVariables().get(\"linktools_Cost\");\n                    if (costVariable.hasChild(costClass))\n                    {\n                        const cost = linkedObject.getVariableNumber(costVariable.getChild(costClass));\n                        if (cost === 0)\n                        {\n                            linkedObject.pick = true;\n                            pickedSomething = true;\n                            linkedObject.linktoolsWeightSum = linktoolsWeightSum;\n                            openObjects.push(linkedObject);\n                        }\n                        else\n                        {\n                            if (linktoolsWeightSum + 1 <= maxLinkLength)\n                            {\n                                linkedObject.pick = true;\n                                pickedSomething = true;\n                                linkedObject.linktoolsWeightSum = linktoolsWeightSum + 1;\n                                nextOpenObjects.push(linkedObject);\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n}\n// filter the instances to only keep the one marked with the pick attribute\nconst pickedObjectsLists = eventsFunctionContext.getObjectsLists(\"PickedObject\");\n/** @type {Array<String>} */\nconst objectNames = [];\npickedObjectsLists.keys(objectNames);\nfor (const objectName of objectNames)\n{\n    const pickedObjectsList = pickedObjectsLists.get(objectName);\n    gdjs.evtTools.object.filterPickedObjectsList(pickedObjectsList);\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\neventsFunctionContext.returnValue = pickedSomething;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Pick these objects...",
+              "longDescription": "",
+              "name": "PickedObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "if they can reach this object.",
+              "longDescription": "",
+              "name": "TargetObject",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Maximum link length",
+              "longDescription": "",
+              "name": "MaxLinkLength",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Cost class",
+              "longDescription": "Leave empty to make everything crossable with cost = 1. It looks in the variable children of linktools_Cost. No child means not crossable, the cost can be 0 or 1.",
+              "name": "CostClass",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
         {
           "description": "Can reach through links",
           "fullName": "Can reach",
@@ -5869,7 +6782,7 @@
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "let pickedSomething = false;\nconst pickedObjects = eventsFunctionContext.getObjects(\"PickedObject\");\nconst targetObjects = eventsFunctionContext.getObjects(\"TargetObject\");\n/** @type {gdjs.LinksManager} */\nconst manager = gdjs.LinksManager.getManager(runtimeScene);\nfor (const pickedObject of pickedObjects) {\n    pickedObject.pick = false;\n}\n// mark every instance that can be reached through links\n// openObjects is the new discovered instances where links must be checked\nconst openObjects = targetObjects.slice();\nwhile (openObjects.length != 0) {\n    const object = openObjects.pop();\n    /** @type {Array<gdjs.RuntimeObject>} */\n    const linkedObjects = manager.getObjectsLinkedWith(object);\n    for (const linkedObject of linkedObjects) {\n        // don't check one instance twice\n        // and it must be in the set given by the caller\n        if (!linkedObject.pick && pickedObjects.includes(linkedObject)) {\n            linkedObject.pick = true;\n            pickedSomething = true;\n            openObjects.push(linkedObject);\n        }\n    }\n}\n// filter the instances to only keep the one marked with the pick attribute\nconst pickedObjectsLists = eventsFunctionContext.getObjectsLists(\"PickedObject\");\n/** @type {Array<String>} */\nconst objectNames = [];\npickedObjectsLists.keys(objectNames);\nfor (const objectName of objectNames) {\n    const pickedObjectsList = pickedObjectsLists.get(objectName);\n    gdjs.evtTools.object.filterPickedObjectsList(pickedObjectsList);\n}\nfor (const pickedObject of pickedObjects) {\n    pickedObject.pick = false;\n}\neventsFunctionContext.returnValue = pickedSomething;",
+              "inlineCode": "let pickedSomething = false;\nconst pickedObjects = eventsFunctionContext.getObjects(\"PickedObject\");\nconst targetObjects = eventsFunctionContext.getObjects(\"TargetObject\");\nconsole.log(\"pickedObjects: \" + pickedObjects.length);\n/** @type {gdjs.LinksManager} */\nconst manager = gdjs.LinksManager.getManager(runtimeScene);\nfor (const targetObject of targetObjects)\n{\n    targetObject.linktoolsWeightSum = 0;\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\n// mark every instance that can be reached through links\n// openObjects is the new discovered instances where links must be checked\nlet openObjects = [];\nlet swapOpenObjects = [];\nlet nextOpenObjects = targetObjects.slice();\nlet linkLength = 0;\nwhile (nextOpenObjects.length !== 0)\n{\n    swapOpenObjects = openObjects;\n    openObjects = nextOpenObjects;\n    nextOpenObjects = swapOpenObjects;\n    nextOpenObjects.length = 0;\n    while (openObjects.length != 0)\n    {\n        const object = openObjects.pop();\n        /** @type {Array<gdjs.RuntimeObject>} */\n        const linkedObjects = manager.getObjectsLinkedWith(object);\n        for (const linkedObject of linkedObjects)\n        {\n            // don't check one instance twice\n            // and it must be in the set given by the caller\n            if (!linkedObject.pick && pickedObjects.includes(linkedObject))\n            {\n                linkedObject.pick = true;\n                pickedSomething = true;\n                linkedObject.linktoolsWeightSum = linkLength + 1;\n                nextOpenObjects.push(linkedObject);\n            }\n        }\n    }\n    linkLength++;\n}\n// filter the instances to only keep the one marked with the pick attribute\nconst pickedObjectsLists = eventsFunctionContext.getObjectsLists(\"PickedObject\");\n/** @type {Array<String>} */\nconst objectNames = [];\npickedObjectsLists.keys(objectNames);\nfor (const objectName of objectNames)\n{\n    const pickedObjectsList = pickedObjectsLists.get(objectName);\n    gdjs.evtTools.object.filterPickedObjectsList(pickedObjectsList);\n}\nfor (const pickedObject of pickedObjects)\n{\n    pickedObject.pick = false;\n}\neventsFunctionContext.returnValue = pickedSomething;",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": true
@@ -5898,9 +6811,1622 @@
             }
           ],
           "objectGroups": []
+        },
+        {
+          "description": "Cost sum",
+          "fullName": "Cost sum",
+          "functionType": "Expression",
+          "name": "CostSum",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = objects[0].linktoolsWeightSum;",
+              "parameterObjects": "Object",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            }
+          ],
+          "objectGroups": []
         }
       ],
-      "eventsBasedBehaviors": []
+      "eventsBasedBehaviors": [
+        {
+          "description": "The object will move from one object instance to another according to how they are linked to one another to reach a targeted object.",
+          "fullName": "Link path finding",
+          "name": "LinkPathFinding",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Move the object along the path",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyisOnPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertySpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "+",
+                        "Object.Behavior::PropertyAcceleration() * TimeDelta()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::PropertySpeed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            ">",
+                            "Object.Behavior::PropertySpeedMax()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::SetPropertySpeed"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "=",
+                            "Object.Behavior::PropertySpeedMax()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "Object.SqDistanceToPosition(Object.Behavior::PropertyNextNodeX(), Object.Behavior::PropertyNextNodeY())",
+                            ">",
+                            "Object.Behavior::PropertySpeed() * TimeDelta()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "AddForceVersPos"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object.Behavior::PropertyNextNodeX()",
+                            "Object.Behavior::PropertyNextNodeY()",
+                            "Object.Behavior::PropertySpeed()",
+                            ""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::SetPropertyIsAtNode"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "no"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "Object.SqDistanceToPosition(Object.Behavior::PropertyNextNodeX(), Object.Behavior::PropertyNextNodeY())",
+                            "<=",
+                            "Object.Behavior::PropertySpeed() * TimeDelta()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "Object",
+                            "=",
+                            "Object.Behavior::PropertyNextNodeX()",
+                            "=",
+                            "Object.Behavior::PropertyNextNodeY()"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::SetPropertyIsAtNode"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "yes"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::SetNextNode"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior",
+                            "Object.Behavior::PropertyNextNodeIndex() + 1",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkTools::LinkPathFinding::PropertyRotate"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Behavior"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Angle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "!=",
+                            "Object.Behavior::PropertyNextNodeAngle()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "RotateTowardAngle"
+                          },
+                          "parameters": [
+                            "Object",
+                            "Object.Behavior::PropertyNextNodeAngle()",
+                            "Object.Behavior::PropertyRotationSpeed()",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Move the object to a position",
+              "fullName": "Move to a position",
+              "functionType": "Action",
+              "name": "MoveTo",
+              "private": false,
+              "sentence": "Move _PARAM0_ to _PARAM3_ passing by _PARAM2_ using cost class _PARAM4_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Search the path and set the result in the path variable.\nThis variable is use by doStepPreEvent to move the object along the path.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "\n/**\n * Insert a node in an array sorted by farest 1st\n * @param {gdjs.RuntimeObject[]} objects\n * @param {gdjs.RuntimeObject} object\n */\nconst insertOpenNode = function (objects, object)\n{\n    let leftIndex = 0;\n    let rightIndex = objects.length;\n    while (leftIndex < rightIndex)\n    {\n        const medianIndex = Math.floor((leftIndex + rightIndex) / 2)\n        if (objects[medianIndex].linktoolsWeightSum < object.linktoolsWeightSum)\n            rightIndex = medianIndex;\n        else\n            leftIndex = medianIndex + 1;\n    }\n    objects.splice(rightIndex, 0, object);\n};\n\nconst pickedObjects = eventsFunctionContext.getObjects(\"CrossableObject\");\nconst targetObjects = eventsFunctionContext.getObjects(\"DestinationObject\");\nconst costClass = eventsFunctionContext.getArgument(\"CostClass\").toString();\n\nfor (const object of objects)\n{\n    let pickedSomething = false;\n    /** @type {gdjs.LinksManager} */\n    const manager = gdjs.LinksManager.getManager(runtimeScene);\n    for (const pickedObject of pickedObjects)\n    {\n        pickedObject.pick = false;\n    }\n    // mark every instance that can be reached through links\n    // openObjects is the new discovered instances where links must be checked\n    let openObjects = targetObjects.slice();\n    for (const openObject of openObjects)\n    {\n        openObject.linktoolsWeightSum = 0;\n        openObject.linktoolsPreviousNode = null;\n    }\n    let objectFound = false;\n    while (openObjects.length !== 0 && !objectFound)\n    {\n        const openObject = openObjects.pop();\n        const linktoolsWeightSum = openObject.linktoolsWeightSum;\n        /** @type {Array<gdjs.RuntimeObject>} */\n        const linkedObjects = manager.getObjectsLinkedWith(openObject);\n        for (const linkedObject of linkedObjects)\n        {\n            objectFound = linkedObject === object;\n            // don't check one instance twice\n            // and it must be in the set given by the caller\n            if ((!linkedObject.pick && pickedObjects.includes(linkedObject)) || objectFound)\n            {\n                let isCrossable = objectFound;\n                if (!objectFound)\n                {\n                    let newWeightSum = 0;\n                    if (costClass.length === 0)\n                    {\n                        isCrossable = true;\n                        newWeightSum = linktoolsWeightSum + 1;\n                    }\n                    else\n                    {\n                        const costVariable = linkedObject.getVariables().get(\"linktools_Cost\");\n                        isCrossable = costVariable.hasChild(costClass);\n                        if (isCrossable)\n                        {\n                            const cost = linkedObject.getVariableNumber(costVariable.getChild(costClass));\n                            newWeightSum = linktoolsWeightSum + cost;\n                        }\n                    }\n                    if (isCrossable)\n                    {\n                        linkedObject.pick = true;\n                        linkedObject.linktoolsWeightSum = newWeightSum;\n                        insertOpenNode(openObjects, linkedObject);\n                    }\n                }\n                if (isCrossable)\n                {\n                    linkedObject.linktoolsPreviousNode = openObject;\n                    pickedSomething = true;\n                }\n            }\n        }\n    }\n    \n    const variables = object.getVariables();\n    let pathVariable;\n    if (variables.has(\"__linktools_Path\"))\n    {\n        pathVariable = variables.get(\"__linktools_Path\");\n    }\n    else\n    {\n        pathVariable = new gdjs.Variable({type: \"structure\"})\n        variables.add(\"__linktools_Path\", pathVariable);\n    }\n    pathVariable.clearChildren();\n    if (objectFound)\n    {\n        // build the path in the path variable\n        let pathObject = object;\n        let index = 0;\n        while (pathObject.linktoolsPreviousNode !== null)\n        {\n            const previousX = pathObject.getX();\n            const previousY = pathObject.getY();\n            pathObject = pathObject.linktoolsPreviousNode;\n            if (pathObject.getX() !== previousX\n             || pathObject.getY() !== previousY)\n            {\n                const positionVariable = new gdjs.Variable({type: \"structure\"});\n                positionVariable.addChild(\"x\", new gdjs.Variable({value: pathObject.getX(), type: \"number\"}));\n                positionVariable.addChild(\"y\", new gdjs.Variable({value: pathObject.getY(), type: \"number\"}));\n                pathVariable.addChild(index, positionVariable);\n\n                index++;\n            }\n        }\n    }\n    for (const pickedObject of pickedObjects)\n    {\n        pickedObject.pick = false;\n    }\n    eventsFunctionContext.returnValue = objectFound;\n}",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ObjectVariableChildExists"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__linktools_Path",
+                        "\"0\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyisOnPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertySpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetNextNode"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "0",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Crossable objects",
+                  "longDescription": "",
+                  "name": "CrossableObject",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Destination objects",
+                  "longDescription": "",
+                  "name": "DestinationObject",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Cost class",
+                  "longDescription": "",
+                  "name": "CostClass",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "string"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object position is the on a path node",
+              "fullName": "Is at a node",
+              "functionType": "Condition",
+              "name": "HasReachedNode",
+              "private": false,
+              "sentence": "_PARAM0_  is at a node",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyIsAtNode"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Forget the path",
+              "fullName": "Forget the path",
+              "functionType": "Action",
+              "name": "ForgetPath",
+              "private": false,
+              "sentence": "_PARAM0_ forgets the path",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyisOnPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyIsAtNode"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ObjectVariableClearChildren"
+                      },
+                      "parameters": [
+                        "Object",
+                        "__linktools_Path"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Set next node index",
+              "fullName": "Set next node index",
+              "functionType": "Action",
+              "name": "SetNextNode",
+              "private": true,
+              "sentence": "Set next node index of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyNextNodeIndex"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "GetArgumentAsNumber(\"Index\")"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "No more nodes",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyNextNodeIndex"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.VariableChildCount(__linktools_Path) "
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyisOnPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertySpeed"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Update the next target",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyNextNodeIndex"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "<",
+                        "Object.VariableChildCount(__linktools_Path) "
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyNextNodeX"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Variable(__linktools_Path[Object.Behavior::PropertyNextNodeIndex()][\"x\"])"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyNextNodeY"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.Variable(__linktools_Path[Object.Behavior::PropertyNextNodeIndex()][\"y\"])"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::SetPropertyNextNodeAngle"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "mod(AngleBetweenPositions(Object.X(), Object.Y(), Object.Behavior::PropertyNextNodeX(), Object.Behavior::PropertyNextNodeY()) + Object.Behavior::PropertyAngleOffset(), 360)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Node index",
+                  "longDescription": "",
+                  "name": "Index",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the object is moving",
+              "fullName": "Is moving",
+              "functionType": "Condition",
+              "name": "IsMoving",
+              "private": false,
+              "sentence": "_PARAM0_ is moving",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyisOnPath"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if a path has been found.",
+              "fullName": "Path found",
+              "functionType": "Condition",
+              "name": "PathFound",
+              "private": false,
+              "sentence": "A path has been found for _PARAM0_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "Object.VariableChildCount(__linktools_Path)",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Check if the destination was reached.",
+              "fullName": "Destination reached",
+              "functionType": "Condition",
+              "name": "HasReachedDestination",
+              "private": false,
+              "sentence": "_PARAM0_ reached its destination",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::HasReachedNode"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        ""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LinkTools::LinkPathFinding::PropertyNextNodeIndex"
+                      },
+                      "parameters": [
+                        "Object",
+                        "Behavior",
+                        "=",
+                        "Object.VariableChildCount(__linktools_Path)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnBoolean"
+                      },
+                      "parameters": [
+                        "True"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Speed of the object on the path",
+              "fullName": "Speed",
+              "functionType": "Expression",
+              "name": "Speed",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertySpeed()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Get the number of waypoints on the path",
+              "fullName": "Node count",
+              "functionType": "Expression",
+              "name": "NodeCount",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.VariableChildCount(__linktools_Path)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Waypoint X position",
+              "fullName": "Node X",
+              "functionType": "Expression",
+              "name": "NodeX",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(__linktools_Path[GetArgumentAsNumber(\"NodeIndex\")][\"x\"])"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Waypoint index",
+                  "longDescription": "",
+                  "name": "NodeIndex",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Waypoint X position",
+              "fullName": "Node Y",
+              "functionType": "Expression",
+              "name": "NodeY",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(__linktools_Path[GetArgumentAsNumber(\"NodeIndex\")][\"y\"])"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Waypoint index",
+                  "longDescription": "",
+                  "name": "NodeIndex",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Next waypoint index",
+              "fullName": "Next node index",
+              "functionType": "Expression",
+              "name": "NextNodeIndex",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyNextNodeIndex()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Next waypoint X position",
+              "fullName": "Next node X",
+              "functionType": "Expression",
+              "name": "NextNodeX",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyNextNodeX()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Next waypoint Y position",
+              "fullName": "Next node Y",
+              "functionType": "Expression",
+              "name": "NextNodeY",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Behavior::PropertyNextNodeY()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Destination X position",
+              "fullName": "Destination X",
+              "functionType": "Expression",
+              "name": "DestinationX",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(__linktools_Path[Object.VariableChildCount(__linktools_Path) - 1][\"x\"])"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Destination Y position",
+              "fullName": "Destination Y",
+              "functionType": "Expression",
+              "name": "DestinationY",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "Object.Variable(__linktools_Path[Object.VariableChildCount(__linktools_Path) - 1][\"y\"])"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "LinkTools::LinkPathFinding",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "400",
+              "type": "Number",
+              "label": "Acceleration",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Acceleration"
+            },
+            {
+              "value": "200",
+              "type": "Number",
+              "label": "Maximum Speed",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "SpeedMax"
+            },
+            {
+              "value": "true",
+              "type": "Boolean",
+              "label": "Rotate object",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Rotate"
+            },
+            {
+              "value": "180",
+              "type": "Number",
+              "label": "Rotation speed",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "RotationSpeed"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Angle offset",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AngleOffset"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "Is following a path",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "isOnPath"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Next node index",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NextNodeIndex"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Next node X",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NextNodeX"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Next node Y",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NextNodeY"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Speed",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "Speed"
+            },
+            {
+              "value": "",
+              "type": "Boolean",
+              "label": "Is at a node",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "IsAtNode"
+            },
+            {
+              "value": "",
+              "type": "Number",
+              "label": "Next node angle",
+              "description": "",
+              "extraInformation": [],
+              "hidden": true,
+              "name": "NextNodeAngle"
+            }
+          ]
+        }
+      ]
     },
     {
       "author": "D8H",

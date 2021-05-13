@@ -20,9 +20,9 @@ class SerializerElement;
 namespace gd {
 
 /**
- * \brief Contains the effect applied to other entities (ie, Layer or Object)
+ * \brief Contains effects applied to an entity on screen (i.e: a Layer or an
+ * Object).
  *
- * \see gd::EffectsContainer
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API EffectsContainer {
@@ -76,7 +76,7 @@ class GD_CORE_API EffectsContainer {
   /**
    * \brief Add a copy of the specified effect in the effects list.
    *
-   * \note No pointer or reference must be kept on the layer passed as
+   * \note No pointer or reference must be kept on the effect passed as
    * parameter.
    *
    * \param theEffect The effect that must be copied and inserted
@@ -108,8 +108,7 @@ class GD_CORE_API EffectsContainer {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  std::vector<std::shared_ptr<gd::Effect>>
-      effects;  ///< The effects contained by the container.
+  std::vector<std::shared_ptr<gd::Effect>> effects;
 
   static Effect badEffect;
 };

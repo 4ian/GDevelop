@@ -74,6 +74,7 @@ declare class libGDevelop {
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
+  EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
   NamedPropertyDescriptor: Class<gdNamedPropertyDescriptor>;

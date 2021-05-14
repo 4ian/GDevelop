@@ -124,49 +124,8 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   effectsContainer.UnserializeFrom(effectsElement);
 }
 
-gd::EffectsContainer& Layer::GetEffectsContainer() {
+const gd::EffectsContainer& Layer::GetEffects() const {
   return effectsContainer;
-}
-
-gd::Effect& Layer::GetEffect(const gd::String& name) {
-  return effectsContainer.GetEffect(name);
-}
-const gd::Effect& Layer::GetEffect(const gd::String& name) const {
-  return effectsContainer.GetEffect(name);
-}
-gd::Effect& Layer::GetEffect(std::size_t index) {
-  return effectsContainer.GetEffect(index);
-}
-const gd::Effect& Layer::GetEffect(std::size_t index) const {
-  return effectsContainer.GetEffect(index);
-}
-std::size_t Layer::GetEffectsCount() const {
-  return effectsContainer.GetEffectsCount();
-}
-
-bool Layer::HasEffectNamed(const gd::String& name) const {
-  return effectsContainer.HasEffectNamed(name);
-}
-std::size_t Layer::GetEffectPosition(const gd::String& name) const {
-  return effectsContainer.GetEffectPosition(name);
-}
-
-gd::Effect& Layer::InsertNewEffect(const gd::String& name,
-                                   std::size_t position) {
-  return effectsContainer.InsertNewEffect(name, position);
-}
-
-void Layer::InsertEffect(const gd::Effect& effect, std::size_t position) {
-  effectsContainer.InsertEffect(effect, position);
-}
-
-void Layer::RemoveEffect(const gd::String& name) {
-  effectsContainer.RemoveEffect(name);
-}
-
-void Layer::SwapEffects(std::size_t firstEffectIndex,
-                        std::size_t secondEffectIndex) {
-  effectsContainer.SwapEffects(firstEffectIndex, secondEffectIndex);
 }
 
 Camera::Camera()

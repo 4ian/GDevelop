@@ -687,16 +687,7 @@ interface Layer {
     unsigned long GetAmbientLightColorGreen();
     unsigned long GetAmbientLightColorBlue();
 
-    [Ref] EffectsContainer GetEffectsContainer();
-    boolean HasEffectNamed([Const] DOMString name);
-    [Ref] Effect GetEffect([Const] DOMString name);
-    [Ref] Effect GetEffectAt(unsigned long index);
-    unsigned long GetEffectPosition([Const] DOMString name);
-    unsigned long GetEffectsCount();
-    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
-    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
-    void RemoveEffect([Const] DOMString name);
-    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+    [Const, Ref] EffectsContainer GetEffects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

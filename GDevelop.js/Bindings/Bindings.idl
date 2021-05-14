@@ -687,6 +687,7 @@ interface Layer {
     unsigned long GetAmbientLightColorGreen();
     unsigned long GetAmbientLightColorBlue();
 
+    [Ref] EffectsContainer GetEffectsContainer();
     boolean HasEffectNamed([Const] DOMString name);
     [Ref] Effect GetEffect([Const] DOMString name);
     [Ref] Effect GetEffectAt(unsigned long index);

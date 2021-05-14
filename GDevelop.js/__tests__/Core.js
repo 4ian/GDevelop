@@ -201,6 +201,9 @@ describe('libGD.js', function () {
       expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
       expect(layer.getEffectsCount()).toBe(0);
 
+      expect(layer.getEffectsContainer().hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(layer.getEffectsContainer().getEffectsCount()).toBe(0);
+
       layer.insertNewEffect('MyEffect', 0);
       expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
       expect(layer.hasEffectNamed('MyEffect')).toBe(true);
@@ -210,11 +213,16 @@ describe('libGD.js', function () {
       const effect2 = new gd.Effect();
       effect2.setName('MyEffect2');
 
-      layer.insertEffect(effect2, 1);
+      layer.getEffectsContainer().insertEffect(effect2, 1);
       expect(layer.hasEffectNamed('MyEffect2')).toBe(true);
       expect(layer.getEffectsCount()).toBe(2);
       expect(layer.getEffectPosition('MyEffect')).toBe(0);
-      expect(layer.getEffectPosition('MyEffect2')).toBe(1);
+
+      expect(layer.getEffectsContainer().hasEffectNamed('MyEffect2')).toBe(true);
+      expect(layer.getEffectsContainer().getEffectsCount()).toBe(2);
+      expect(layer.getEffectsContainer().getEffectPosition('MyEffect')).toBe(0);
+
+      expect(layer.getEffectsContainer().getEffectPosition('MyEffect2')).toBe(1);
 
       layer.swapEffects(0, 1);
       expect(layer.getEffectPosition('MyEffect2')).toBe(0);

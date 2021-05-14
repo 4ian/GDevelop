@@ -153,6 +153,11 @@ class GD_CORE_API Layer {
   /** \name Effects
    */
   ///@{
+  
+  /**
+   * \brief Return the effects container.
+   */
+  EffectsContainer& GetEffectsContainer();
   /**
    * \brief Return true if the effect called "name" exists.
    */

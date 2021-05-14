@@ -94,12 +94,10 @@ class GD_CORE_API EffectsContainer {
    */
   void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);
 
-#if defined(GD_IDE_ONLY)
   /**
-   * \brief Serialize effects container
+   * \brief Serialize the effects container.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the effects container.

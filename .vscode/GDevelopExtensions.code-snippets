@@ -104,7 +104,7 @@
   },
   "Add parameter": {
     "scope": "javascript",
-    "description": "Define an parameter in a GDevelop extension definition.",
+    "description": "Define a parameter in a GDevelop extension definition.",
     "prefix": "gdparam",
     "body": [
       ".addParameter('${1|string,expression,object,behavior,yesorno,stringWithSelector,scenevar,globalvar,objectvar,objectList,objectListWithoutPicking,color,key,sceneName,file,layer,relationalOperator,operator,trueorfalse,musicfile,soundfile,police,mouse,passwordjoyaxis,camera,objectPtr,forceMultiplier|}', '${2:Parameter description}', '${3:Optional parameter data}', /*parameterIsOptional=*/${4|false,true|})"
@@ -112,7 +112,7 @@
   },
   "Add code only parameter": {
     "scope": "javascript",
-    "description": "Define an parameter in a GDevelop extension definition.",
+    "description": "Define a parameter in a GDevelop extension definition.",
     "prefix": "gdcoparam",
     "body": [
       ".addCodeOnlyParameter('${1|inlineCode,currentScene,objectsContext,eventsFunctionContext,conditionInverted|}', '${2:Inline code (for inlineCode parameter)}')"
@@ -120,7 +120,7 @@
   },
   "Add include": {
     "scope": "javascript",
-    "description": "Define an include in a GDevelop extension definition.",
+    "description": "Define an include file in a GDevelop extension definition.",
     "prefix": "gdincl",
     "body": [
       ".addIncludeFile('Extensions/${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}/${1:include}.js')"

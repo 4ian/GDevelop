@@ -1,0 +1,129 @@
+{
+  "Define extension": {
+    "scope": "javascript",
+    "description": "Adds the boilerplate code of a GDevelop extension definition.",
+    "prefix": "gdext",
+    "body": [
+      "// @flow",
+      "/**",
+      " * This is a declaration of an extension for GDevelop 5.",
+      " *",
+      " * ℹ️ Changes in this file are watched and automatically imported if the editor",
+      " * is running. You can also manually run `node import-GDJS-Runtime.js` (in newIDE/app/scripts).",
+      " *",
+      " * The file must be named \"JsExtension.js\", otherwise GDevelop won't load it.",
+      " * ⚠️ If you make a change and the extension is not loaded, open the developer console",
+      " * and search for any errors.",
+      " *",
+      " * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md",
+      " */",
+      "",
+      "/*::",
+      "// Import types to allow Flow to do static type checking on this file.",
+      "// Extensions declaration are typed using Flow (like the editor), but the files",
+      "// for the game engine are checked with TypeScript annotations.",
+      "import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'",
+      "*/",
+      "",
+      "module.exports = {",
+      "\tcreateExtension: function (",
+      "\t\t/*: (string) => string */,",
+      "\t\tgd /*: libGDevelop */",
+      "\t) {",
+      "\t\tconst extension = new gd.PlatformExtension();",
+      "\t\textension",
+      "\t\t\t.setExtensionInformation(",
+      "\t\t\t\t'${1:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}}',",
+      "\t\t\t\t_('${2:Extension Name}'),",
+      "\t\t\t\t_(",
+      "\t\t\t\t\t'${3:Extension description}'",
+      "\t\t\t\t),",
+      "\t\t\t\t'${4:Extension author}',",
+      "\t\t\t\t'MIT'",
+      "\t\t\t);",
+      "",
+      "\t\t$0",
+      "",
+      "\t\treturn extension;",
+      "\t},",
+      "\trunExtensionSanityTests: function (",
+      "\t\tgd /*: libGDevelop */,",
+      "\t\textension /*: gdPlatformExtension*/",
+      "\t) {",
+      "\t\treturn [];",
+      "\t},",
+      "};",
+      ""
+    ]
+  },
+  "Define instruction": {
+    "scope": "javascript",
+    "description": "Define an instruction in a GDevelop extension definition.",
+    "prefix": "gdinstr",
+    "body": [
+      "extension",
+      "\t.add${1|Condition,Action|}(",
+      "\t\t'${2:InstructionInternalName}',",
+      "\t\t_('${3:Instruction full name}'),",
+      "\t\t_(",
+      "\t\t\t'${4:Instruction description}'",
+      "\t\t),",
+      "\t\t_('${5:Event sheet sentence}'),",
+      "\t\t_('${6:Events group}'),",
+      "\t\t'JsPlatform/Extensions/${8:icon}.png',",
+      "\t\t'JsPlatform/Extensions/${8:icon}.png'",
+      "\t)",
+      "\t.getCodeExtraInformation()",
+      "\t.setIncludeFile('Extensions/${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}/${9:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}tools}.js')",
+      "\t.setFunctionName('gdjs.${7:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}.}');",
+      "",
+      "$0"
+    ]
+  },
+  "Define expression": {
+    "scope": "javascript",
+    "description": "Define an expression in a GDevelop extension definition.",
+    "prefix": "gdexp",
+    "body": [
+      "extension",
+      "\t.add${1|Expression,StrExpression|}(",
+      "\t\t'${2:ExpressionsInternalName}',",
+      "\t\t_('${3:Expression full name}'),",
+      "\t\t_(",
+      "\t\t\t'${4:Expression description}'",
+      "\t\t),",
+      "\t\t_('${5:Events group}'),",
+      "\t\t'JsPlatform/Extensions/${7:icon}.png'",
+      "\t)",
+      "\t.getCodeExtraInformation()",
+      "\t.setIncludeFile('Extensions/${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}/${8:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}tools}.js')",
+      "\t.setFunctionName('gdjs.${6:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}.}');",
+      "",
+      "$0"
+    ]
+  },
+  "Add parameter": {
+    "scope": "javascript",
+    "description": "Define a parameter in a GDevelop extension definition.",
+    "prefix": "gdparam",
+    "body": [
+      ".addParameter('${1|string,expression,object,behavior,yesorno,stringWithSelector,scenevar,globalvar,objectvar,objectList,objectListWithoutPicking,color,key,sceneName,file,layer,relationalOperator,operator,trueorfalse,musicfile,soundfile,police,mouse,passwordjoyaxis,camera,objectPtr,forceMultiplier|}', '${2:Parameter description}', '${3:Optional parameter data}', /*parameterIsOptional=*/${4|false,true|})"
+    ]
+  },
+  "Add code only parameter": {
+    "scope": "javascript",
+    "description": "Define a parameter in a GDevelop extension definition.",
+    "prefix": "gdcoparam",
+    "body": [
+      ".addCodeOnlyParameter('${1|inlineCode,currentScene,objectsContext,eventsFunctionContext,conditionInverted|}', '${2:Inline code (for inlineCode parameter)}')"
+    ]
+  },
+  "Add include": {
+    "scope": "javascript",
+    "description": "Define an include file in a GDevelop extension definition.",
+    "prefix": "gdincl",
+    "body": [
+      ".addIncludeFile('Extensions/${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}/${1:include}.js')"
+    ]
+  }
+}

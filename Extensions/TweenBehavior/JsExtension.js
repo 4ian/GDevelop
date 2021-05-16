@@ -505,9 +505,12 @@ module.exports = {
       .setDefaultValue('no')
       .addParameter(
         'yesorno',
-        _('Use HSL instead of RGB to create tween colors'),
+        _('Tween on the Hue/Saturation/Lightness (HSL)'),
         '',
         false
+      )
+      .setParameterLongDescription(
+        _('Useful to have a more natural change between colors.')
       )
       .setDefaultValue('no')
       .getCodeExtraInformation()
@@ -518,10 +521,10 @@ module.exports = {
         'AddObjectColorHSLTween',
         _('Add object HSL color tween'),
         _(
-          "Add a tween animation for the object's color as HSL. H: any number, S and L: 0-100. Use -1 for S and L to use original color's S/L value(s)."
+          'Add a tween animation for the object color using Hue/Saturation/Lightness. Hue can be any number, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
         ),
         _(
-          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_) S: _PARAM5_ L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
+          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_), S: _PARAM5_, L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
         ),
         _('Color'),
         'JsPlatform/Extensions/tween_behavior24.png',

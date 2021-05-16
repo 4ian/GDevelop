@@ -4,20 +4,16 @@ namespace gdjs {
     export type Tweenable = any;
   }
 
-  function rgbToHsl(col: number[]): number[] {
-    col[0] /= 255;
-    col[1] /= 255;
-    col[2] /= 255;
-    let v = Math.max(col[0], col[1], col[2]),
-      c = v - Math.min(col[0], col[1], col[2]),
+  function rgbToHsl(r: number, g: number, b: number): number[] {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    let v = Math.max(r, g, b),
+      c = v - Math.min(r, g, b),
       f = 1 - Math.abs(v + v - c - 1);
     let h =
       c &&
-      (v === col[0]
-        ? (col[1] - col[2]) / c
-        : v === col[1]
-        ? 2 + (col[2] - col[0]) / c
-        : 4 + (col[0] - col[1]) / c);
+      (v === r ? (g - b) / c : v === g ? 2 + (b - r) / c : 4 + (r - g) / c);
     return [
       Math.round(60 * (h < 0 ? h + 6 : h)),
       Math.round((f ? c / f : 0) * 100),
@@ -25,13 +21,13 @@ namespace gdjs {
     ];
   }
 
-  function hslToRgb(hsl: number[]): number[] {
-    let h = (hsl[0] %= 360);
+  function hslToRgb(h: number, s: number, l: number): number[] {
+    h = h %= 360;
     if (h < 0) {
       h += 360;
     }
-    const s = hsl[1] / 100;
-    const l = hsl[2] / 100;
+    s = s / 100;
+    l = l / 100;
     const a = s * Math.min(l, 1 - l);
     const f = (n = 0, k = (n + h / 30) % 12) =>
       l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
@@ -652,8 +648,6 @@ namespace gdjs {
     ) {
       const that = this;
 
-      let fromColorAsHSL: number[] = [],
-        toColorAsHSL: number[] = [];
       if (!this._isActive) {
         return;
       }
@@ -675,11 +669,8 @@ namespace gdjs {
         this.removeTween(identifier);
       }
       // @ts-ignore - objects are duck typed
-      let fromColor: any[] = this.owner.getColor().split(';');
-      if (useHSLColorTransition) {
-        fromColorAsHSL = rgbToHsl(fromColor);
-      }
-      let toColor: any[] = toColorStr.split(';');
+      const fromColor: string[] = this.owner.getColor().split(';');
+      const toColor: string[] = toColorStr.split(';');
       if (toColor.length !== 3) {
         return;
       }
@@ -689,7 +680,16 @@ namespace gdjs {
       );
 
       if (useHSLColorTransition) {
-        toColorAsHSL = rgbToHsl(toColor);
+        const fromColorAsHSL = rgbToHsl(
+          parseFloat(fromColor[0]),
+          parseFloat(fromColor[1]),
+          parseFloat(fromColor[2])
+        );
+        const toColorAsHSL = rgbToHsl(
+          parseFloat(toColor[0]),
+          parseFloat(toColor[1]),
+          parseFloat(toColor[2])
+        );
 
         newTweenable.setConfig({
           from: {
@@ -705,11 +705,11 @@ namespace gdjs {
           duration: durationValue,
           easing: easingValue,
           step: function step(state) {
-            const rgbFromHslColor = hslToRgb([
+            const rgbFromHslColor = hslToRgb(
               state.hue,
               state.saturation,
-              state.lightness,
-            ]);
+              state.lightness
+            );
             // @ts-ignore - objects are duck typed
             that.owner.setColor(
               Math.floor(rgbFromHslColor[0]) +
@@ -758,7 +758,6 @@ namespace gdjs {
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
      */
-
     addObjectColorHSLTween(
       identifier: string,
       toHue: number,
@@ -771,8 +770,6 @@ namespace gdjs {
     ) {
       const that = this;
 
-      let fromColorAsHSL: number[] = [],
-        toColorAsHSL: number[] = [];
       if (!this._isActive) {
         return;
       }
@@ -789,8 +786,13 @@ namespace gdjs {
       }
 
       // @ts-ignore - objects are duck typed
-      let fromColor: number[] = this.owner.getColor().split(';');
-      fromColorAsHSL = rgbToHsl(fromColor);
+      const fromColor: string[] = this.owner.getColor().split(';');
+      if (fromColor.length < 3) return;
+      const fromColorAsHSL = rgbToHsl(
+        parseFloat(fromColor[0]),
+        parseFloat(fromColor[1]),
+        parseFloat(fromColor[2])
+      );
 
       const toH = animateHue ? toHue : fromColorAsHSL[0];
       const toS =
@@ -801,8 +803,6 @@ namespace gdjs {
         -1 === toLightness
           ? fromColorAsHSL[2]
           : Math.min(Math.max(toLightness, 0), 100);
-
-      toColorAsHSL = [toH, toS, toL];
 
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
@@ -815,18 +815,18 @@ namespace gdjs {
           lightness: fromColorAsHSL[2],
         },
         to: {
-          hue: toColorAsHSL[0],
-          saturation: toColorAsHSL[1],
-          lightness: toColorAsHSL[2],
+          hue: toH,
+          saturation: toS,
+          lightness: toL,
         },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
-          const rgbFromHslColor = hslToRgb([
+          const rgbFromHslColor = hslToRgb(
             state.hue,
             state.saturation,
-            state.lightness,
-          ]);
+            state.lightness
+          );
           // @ts-ignore - objects are duck typed
           that.owner.setColor(
             Math.floor(rgbFromHslColor[0]) +

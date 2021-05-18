@@ -17,6 +17,8 @@ namespace gdjs {
         dropShadowFilter.distance = value;
       } else if (parameterName === 'rotation') {
         dropShadowFilter.rotation = value;
+      } else if (parameterName === 'padding') {
+        dropShadowFilter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {

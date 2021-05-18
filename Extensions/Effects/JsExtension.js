@@ -839,6 +839,12 @@ module.exports = {
       .setValue('1')
       .setLabel(_('Color of the outline'))
       .setType('color');
+    outlineProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const pixelateEffect = extension
       .addEffect('Pixelate')

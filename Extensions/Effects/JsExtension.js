@@ -130,7 +130,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const asciiEffect = extension
       .addEffect('Ascii')
@@ -423,7 +423,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const displacementEffect = extension
       .addEffect('Displacement')
@@ -528,7 +528,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const glitchEffect = extension
       .addEffect('Glitch')
@@ -703,7 +703,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const kawaseBlurEffect = extension
       .addEffect('KawaseBlur')
@@ -739,7 +739,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const lightNightEffect = extension
       .addEffect('LightNight')
@@ -874,7 +874,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const pixelateEffect = extension
       .addEffect('Pixelate')
@@ -932,7 +932,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     const reflectionEffect = extension
       .addEffect('Reflection')
@@ -1103,7 +1103,7 @@ module.exports = {
       .setValue('20')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
     twistProperties
       .getOrCreate('offsetX')
       .setValue('0.5')
@@ -1147,7 +1147,7 @@ module.exports = {
       .setValue('0')
       .setLabel(_('Padding'))
       .setType('number')
-      .setDescription(_('Padding for filter area'));
+      .setDescription(_('Padding for the visual effect area'));
 
     return extension;
   },

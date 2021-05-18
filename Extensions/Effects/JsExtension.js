@@ -125,6 +125,12 @@ module.exports = {
       .setValue('7')
       .setLabel(_('Quality (between 0 and 20)'))
       .setType('number');
+    advancedBloomProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const asciiEffect = extension
       .addEffect('Ascii')
@@ -412,6 +418,12 @@ module.exports = {
       .setLabel(_('Noise Frequency'))
       .setType('number')
       .setDescription('Number of updates per second (0: no updates)');
+    crtProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const displacementEffect = extension
       .addEffect('Displacement')
@@ -511,6 +523,12 @@ module.exports = {
       .setValue('false')
       .setLabel(_('Shadow only (shows only the shadow when enabled)'))
       .setType('boolean');
+    dropShadowProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const glitchEffect = extension
       .addEffect('Glitch')
@@ -680,6 +698,12 @@ module.exports = {
       .setValue('100')
       .setLabel(_('Center Y (between -1000 and 100)'))
       .setType('number');
+    godrayProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const kawaseBlurEffect = extension
       .addEffect('KawaseBlur')
@@ -710,6 +734,12 @@ module.exports = {
       .setValue('3')
       .setLabel(_('Quality (between 1 and 20)'))
       .setType('number');
+    kawaseBlurProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const lightNightEffect = extension
       .addEffect('LightNight')
@@ -897,6 +927,12 @@ module.exports = {
       .setValue('0.5')
       .setLabel(_('Center Y (between 0 and 1, 0.5 is image middle)'))
       .setType('number');
+    radialBlurProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     const reflectionEffect = extension
       .addEffect('Reflection')
@@ -1106,6 +1142,12 @@ module.exports = {
       .setValue('0.3')
       .setLabel(_('strength (between 0 and 5)'))
       .setType('number');
+    zoomBlurProperties
+      .getOrCreate('padding')
+      .setValue('0')
+      .setLabel(_('Padding'))
+      .setType('number')
+      .setDescription(_('Padding for filter area'));
 
     return extension;
   },

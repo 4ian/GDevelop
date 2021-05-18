@@ -33,6 +33,8 @@ namespace gdjs {
       } else if (parameterName === 'centerY') {
         // @ts-ignore - extra properties are stored on the filter.
         radialBlurFilter._centerY = value;
+      } else if (parameterName === 'padding') {
+        radialBlurFilter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

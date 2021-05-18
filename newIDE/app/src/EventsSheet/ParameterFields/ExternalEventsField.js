@@ -5,65 +5,49 @@ import {
   enumerateExternalEvents,
 } from '../../ProjectManager/EnumerateProjectItems';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete, {
-  type DataSource,
-} from '../../UI/SemiControlledAutoComplete';
+import GenericExpressionField from './GenericExpressionField';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
-const getList = (project: ?gdProject): DataSource => {
+const getList = (project: ?gdProject): Array<ExpressionAutocompletion> => {
   if (!project) {
     return [];
   }
 
   const externalEvents = enumerateExternalEvents(project).map(
     externalEvents => ({
-      text: externalEvents.getName(),
-      value: externalEvents.getName(),
+      kind: 'Text',
+      completion: `"${externalEvents.getName()}"`,
     })
   );
   const layouts = enumerateLayouts(project).map(layout => ({
-    text: layout.getName(),
-    value: layout.getName(),
+    kind: 'Text',
+    completion: `"${layout.getName()}"`,
   }));
-  return [...externalEvents, { type: 'separator' }, ...layouts];
+
+  return externalEvents.concat(layouts);
 };
 
 export default class ExternalEventsField extends React.Component<
   ParameterFieldProps,
   {||}
 > {
-  _field: ?any;
+  _field: ?GenericExpressionField;
 
   focus() {
     if (this._field) this._field.focus();
   }
 
   render() {
-    const {
-      value,
-      onChange,
-      onRequestClose,
-      isInline,
-      project,
-      parameterMetadata,
-    } = this.props;
-
     return (
-      <SemiControlledAutoComplete
-        margin={this.props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
+      <GenericExpressionField
+        expressionType="string"
+        additionalAutocompletions={expression =>
+          getList(this.props.project).filter(
+            ({ completion }) => completion.indexOf(expression) === 0
+          )
         }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
-        fullWidth
-        id="external-events-field"
-        value={value}
-        onChange={onChange}
-        onRequestClose={onRequestClose}
-        dataSource={getList(project)}
-        openOnFocus={!isInline}
         ref={field => (this._field = field)}
+        {...this.props}
       />
     );
   }

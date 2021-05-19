@@ -15,6 +15,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
+  allVariableNames: ?Array<String>,
   onOpenDialog: ?() => void,
 };
 
@@ -33,12 +34,27 @@ export default class VariableField extends Component<Props, {||}> {
       onOpenDialog,
       parameterMetadata,
       variablesContainer,
+      allVariableNames,
       onRequestClose,
     } = this.props;
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+
+    let variableNames = enumerateVariables(variablesContainer)
+      .map(({ name, isValidName }) =>
+        isValidName
+          ? name
+          : // Hide invalid variable names - they would not
+            // be parsed correctly anyway.
+            null
+      )
+      .filter(Boolean);
+    if (allVariableNames) {
+      Array.prototype.push.apply(variableNames, allVariableNames);
+      variableNames = [...new Set(variableNames)];
+    }
 
     return (
       <TextFieldWithButtonLayout
@@ -55,18 +71,10 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={enumerateVariables(variablesContainer)
-              .map(({ name, isValidName }) =>
-                isValidName
-                  ? {
-                      text: name,
-                      value: name,
-                    }
-                  : // Hide invalid variable names - they would not
-                    // be parsed correctly anyway.
-                    null
-              )
-              .filter(Boolean)}
+            dataSource={variableNames.map(name => ({
+              text: name,
+              value: name,
+            }))}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

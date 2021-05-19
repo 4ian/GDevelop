@@ -57,10 +57,20 @@ export default class ObjectVariableField extends React.Component<
       variablesContainer = object.getVariables();
     }
 
+    const allVariableNames = gd.EventsVariablesFinder.findAllObjectVariables(
+      project.getCurrentPlatform(),
+      project,
+      layout,
+      object
+    )
+      .toNewVectorString()
+      .toJSArray();
+
     return (
       <React.Fragment>
         <VariableField
           variablesContainer={variablesContainer}
+          allVariableNames={allVariableNames}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -77,14 +87,7 @@ export default class ObjectVariableField extends React.Component<
             title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
-            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
-              project.getCurrentPlatform(),
-              project,
-              layout,
-              object
-            )
-              .toNewVectorString()
-              .toJSArray()}
+            allVariableNames={allVariableNames}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });

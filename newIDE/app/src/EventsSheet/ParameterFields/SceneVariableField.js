@@ -6,6 +6,8 @@ import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 
+const gd: libGDevelop = global.gd;
+
 type State = {|
   editorOpen: boolean,
 |};
@@ -25,7 +27,7 @@ export default class SceneVariableField extends React.Component<
 
   render() {
     const { scope } = this.props;
-    const { layout } = scope;
+    const { project, layout } = scope;
 
     return (
       <React.Fragment>
@@ -63,6 +65,13 @@ export default class SceneVariableField extends React.Component<
                 the current score of the player.
               </Trans>
             }
+            allVariableNames={gd.EventsVariablesFinder.findAllLayoutVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
       </React.Fragment>

@@ -47,6 +47,8 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
+const gd: libGDevelop = global.gd;
+
 const styles = {
   listContainer: {
     flex: 1,
@@ -652,6 +654,14 @@ export default class ObjectsList extends React.Component<Props, State> {
               </Trans>
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout,
+              this.state.variablesEditedObject
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
         {tagEditedObject && (

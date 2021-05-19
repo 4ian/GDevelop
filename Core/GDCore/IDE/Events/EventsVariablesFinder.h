@@ -29,6 +29,9 @@ namespace gd {
  */
 class EventsVariablesFinder {
  public:
+  EventsVariablesFinder(){};
+  virtual ~EventsVariablesFinder(){};
+
   /**
    * Construct a list containing the name of all global variables used in the
    * project.
@@ -114,9 +117,6 @@ class EventsVariablesFinder {
       const gd::EventsList& events,
       const gd::String& parameterType,
       const gd::String& objectName = "");
-
-  EventsVariablesFinder(){};
-  virtual ~EventsVariablesFinder(){};
 };
 
 }  // namespace gd

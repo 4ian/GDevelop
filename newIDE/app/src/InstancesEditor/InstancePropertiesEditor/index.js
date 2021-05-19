@@ -19,6 +19,8 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   project: gdProject,
   layout: gdLayout,
@@ -179,6 +181,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 object ? object.getVariables() : null
               }
               variablesContainer={instance.getVariables()}
+              allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
+                project.getCurrentPlatform(),
+                project,
+                layout,
+                object
+              )
+                .toNewVectorString()
+                .toJSArray()}
               ref={this._instanceVariablesList}
             />
           </Column>

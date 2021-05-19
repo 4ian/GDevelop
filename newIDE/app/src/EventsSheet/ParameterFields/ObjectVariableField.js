@@ -7,6 +7,8 @@ import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
 
+const gd: libGDevelop = global.gd;
+
 type State = {|
   editorOpen: boolean,
 |};
@@ -43,14 +45,16 @@ export default class ObjectVariableField extends React.Component<
       parameterIndex,
     });
 
+    const { layout } = scope;
+    let object = null;
     let variablesContainer = null;
     if (objectName) {
-      const { layout } = scope;
       if (layout && layout.hasObjectNamed(objectName)) {
-        variablesContainer = layout.getObject(objectName).getVariables();
+        object = layout.getObject(objectName);
       } else if (project && project.hasObjectNamed(objectName)) {
-        variablesContainer = project.getObject(objectName).getVariables();
+        object = project.getObject(objectName);
       }
+      variablesContainer = object.getVariables();
     }
 
     return (
@@ -73,6 +77,14 @@ export default class ObjectVariableField extends React.Component<
             title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
+            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout,
+              object
+            )
+              .toNewVectorString()
+              .toJSArray()}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });

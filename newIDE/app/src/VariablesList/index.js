@@ -40,19 +40,34 @@ type Props = {|
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
+  allVariableNames?: Array<string>,
 |};
 type State = {|
   nameErrors: { [string]: string },
   selectedVariables: { [number]: ?VariableAndName },
   mode: 'select' | 'move',
+  undefinedVariableNames: Set<string>,
 |};
 
 export default class VariablesList extends React.Component<Props, State> {
+  _getUndefinedVariableNames = () => {
+    return new Set(
+      this.props.allVariableNames
+        ? this.props.allVariableNames.filter(
+            variableName => !this.props.variablesContainer.has(variableName)
+          )
+        : []
+    );
+  };
+
   state = {
     nameErrors: {},
     selectedVariables: getInitialSelection(),
     mode: 'select',
+    undefinedVariableNames: this._getUndefinedVariableNames(),
   };
+
+  allVariableNamesSet = new Set(this.props.allVariableNames);
 
   _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
     this.setState({
@@ -133,9 +148,13 @@ export default class VariablesList extends React.Component<Props, State> {
 
     // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
     // that's why it's important to only delete ancestor variables.
-    ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
-      variablesContainer.removeRecursively(variable)
-    );
+    ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) => {
+      variablesContainer.removeRecursively(variable);
+
+      if (this.allVariableNamesSet.has(name)) {
+        this.state.undefinedVariableNames.add(name);
+      }
+    });
     this.clearSelection();
   };
 
@@ -280,13 +299,16 @@ export default class VariablesList extends React.Component<Props, State> {
           variable.castTo(newType);
           this.forceUpdate();
         }}
-        onBlur={event => {
-          const text = event.target.value;
+        onChangeName={text => {
           if (name === text) return;
 
           let success = true;
           if (!parentVariable) {
             success = variablesContainer.rename(name, text);
+            if (this.allVariableNamesSet.has(name)) {
+              this.state.undefinedVariableNames.add(name);
+            }
+            this.state.undefinedVariableNames.delete(text);
           } else {
             success = parentVariable.renameChild(name, text);
           }
@@ -301,6 +323,10 @@ export default class VariablesList extends React.Component<Props, State> {
         onRemove={() => {
           if (!parentVariable) {
             variablesContainer.remove(name);
+
+            if (this.allVariableNamesSet.has(name)) {
+              this.state.undefinedVariableNames.add(name);
+            }
           } else {
             if (parentVariable.getType() === gd.Variable.Structure)
               parentVariable.removeChild(name);
@@ -338,6 +364,7 @@ export default class VariablesList extends React.Component<Props, State> {
         onSelect={select =>
           this._selectVariable({ name, ptr: variable.ptr, variable }, select)
         }
+        undefinedVariableNames={this.state.undefinedVariableNames}
       />
     );
   }

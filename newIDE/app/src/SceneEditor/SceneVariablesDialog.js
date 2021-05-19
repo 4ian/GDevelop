@@ -4,8 +4,11 @@ import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   open: boolean,
+  project: gdProject,
   layout: gdLayout,
   onApply: () => void,
   onClose: () => void,
@@ -33,6 +36,13 @@ export default (props: Props) => {
         </Trans>
       }
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+      allVariableNames={gd.EventsVariablesFinder.findAllLayoutVariables(
+        props.project.getCurrentPlatform(),
+        props.project,
+        props.layout
+      )
+        .toNewVectorString()
+        .toJSArray()}
     />
   );
 };

@@ -52,6 +52,8 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
+const gd: libGDevelop = global.gd;
+
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
@@ -1148,6 +1150,12 @@ export default class ProjectManager extends React.Component<Props, State> {
               </Trans>
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            allVariableNames={gd.EventsVariablesFinder.findAllGlobalVariables(
+              project.getCurrentPlatform(),
+              project
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
         {this.state.projectPropertiesDialogOpen && (
@@ -1185,6 +1193,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         {!!this.state.editedVariablesLayout && (
           <SceneVariablesDialog
             open
+            project={project}
             layout={this.state.editedVariablesLayout}
             onClose={() => this._onOpenLayoutVariables(null)}
             onApply={() => {

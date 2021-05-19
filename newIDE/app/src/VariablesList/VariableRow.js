@@ -6,6 +6,7 @@ import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import Checkbox from '../UI/Checkbox';
 import AddCircle from '@material-ui/icons/AddCircle';
 import BuildIcon from '@material-ui/icons/Build';
@@ -35,9 +36,9 @@ type Props = {|
   errorText?: ?string,
   commitVariableValueOnBlur: boolean,
   onChangeType: (type: string) => void,
-  onBlur: () => void,
   onRemove: () => void,
   onAddChild: () => void,
+  onChangeName: string => void,
   onChangeValue: string => void,
   onResetToDefaultValue: () => void,
   children?: React.Node,
@@ -47,6 +48,7 @@ type Props = {|
   onSelect: boolean => void,
   origin: VariableOrigin,
   arrayElement: boolean,
+  undefinedVariableNames: Set<string>,
 |};
 
 const VariableRow = ({
@@ -55,10 +57,10 @@ const VariableRow = ({
   depth,
   errorText,
   onChangeType,
-  onBlur,
   commitVariableValueOnBlur,
   onRemove,
   onAddChild,
+  onChangeName,
   onChangeValue,
   onResetToDefaultValue,
   children,
@@ -68,6 +70,7 @@ const VariableRow = ({
   onSelect,
   origin,
   arrayElement,
+  undefinedVariableNames,
 }: Props) => {
   const type = variable.getType();
   const isCollection = !gd.Variable.isPrimitive(type);
@@ -90,17 +93,24 @@ const VariableRow = ({
       {arrayElement ? (
         <Text noMargin>{name}</Text>
       ) : (
-        <TextField
+        <SemiControlledAutoComplete
           margin="none"
-          style={{
-            fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
-          }}
           fullWidth
           name={key + 'name'}
           defaultValue={name}
           errorText={errorText}
-          onBlur={onBlur}
           disabled={origin === 'parent'}
+          value={name}
+          onChange={onChangeName}
+          dataSource={
+            undefinedVariableNames
+              ? [...undefinedVariableNames].map(name => ({
+                  text: name,
+                  value: name,
+                }))
+              : []
+          }
+          openOnFocus={true}
         />
       )}
     </TreeTableCell>,

@@ -6,6 +6,8 @@ import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 
+const gd: libGDevelop = global.gd;
+
 type State = {|
   editorOpen: boolean,
 |};
@@ -56,6 +58,12 @@ export default class GlobalVariableField extends React.Component<
                 scenes during the game.
               </Trans>
             }
+            allVariableNames={gd.EventsVariablesFinder.findAllGlobalVariables(
+              project.getCurrentPlatform(),
+              project
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
       </React.Fragment>

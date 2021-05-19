@@ -71,6 +71,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -1309,6 +1310,14 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout,
+              this.state.variablesEditedObject
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1329,6 +1338,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             title={<Trans>Object Variables</Trans>}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
+              project.getCurrentPlatform(),
+              project,
+              layout,
+              this.state.variablesEditedObject
+            )
+              .toNewVectorString()
+              .toJSArray()}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (
@@ -1370,6 +1387,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         {!!this.state.layoutVariablesDialogOpen && (
           <SceneVariablesDialog
             open
+            project={project}
             layout={layout}
             onApply={() => this.editLayoutVariables(false)}
             onClose={() => this.editLayoutVariables(false)}

@@ -282,7 +282,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
                 toggled={values.isAlwaysOnTopInPreview}
                 labelPosition="right"
-                label={<Trans>Always display the preview window on top of others</Trans>}
+                label={
+                  <Trans>
+                    Always display the preview window on top of others
+                  </Trans>
+                }
               />
             </Line>
           )}

@@ -74,6 +74,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     getIsMenuBarHiddenInPreview: this._getIsMenuBarHiddenInPreview.bind(this),
     setIsMenuBarHiddenInPreview: this._setIsMenuBarHiddenInPreview.bind(this),
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
+    getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
+    setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
   };
 
   componentDidMount() {
@@ -512,6 +514,22 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     this.setState(
       state => ({
         values: { ...state.values, backdropClickBehavior },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getIsAlwaysOnTopInPreview() {
+    return this.state.values.isAlwaysOnTopInPreview;
+  }
+
+  _setIsAlwaysOnTopInPreview(enabled: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          isAlwaysOnTopInPreview: enabled,
+        },
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );

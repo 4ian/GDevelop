@@ -1218,6 +1218,7 @@ const MainFrame = (props: Props) => {
             projectDataOnlyExport: !!projectDataOnlyExport,
             getIsMenuBarHiddenInPreview:
               preferences.getIsMenuBarHiddenInPreview,
+            getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
           })
         )
         .catch(error => {
@@ -1237,6 +1238,7 @@ const MainFrame = (props: Props) => {
       previewState,
       state.editorTabs,
       preferences.getIsMenuBarHiddenInPreview,
+      preferences.getIsAlwaysOnTopInPreview,
     ]
   );
 

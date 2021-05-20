@@ -4502,7 +4502,7 @@ storiesOf('EffectsList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      effectsContainer={testProject.layerWithEffects}
+      effectsContainer={testProject.layerWithEffects.getEffects()}
       onEffectsUpdated={action('effects updated')}
     />
   ))
@@ -4515,7 +4515,7 @@ storiesOf('EffectsList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      effectsContainer={testProject.layerWithEffectWithoutEffectType}
+      effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
       onEffectsUpdated={action('effects updated')}
     />
   ))
@@ -4528,7 +4528,7 @@ storiesOf('EffectsList', module)
         return Promise.reject();
       }}
       resourceSources={[]}
-      effectsContainer={testProject.layerWithoutEffects}
+      effectsContainer={testProject.layerWithoutEffects.getEffects()}
       onEffectsUpdated={action('effects updated')}
     />
   ));

@@ -497,10 +497,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   effect3.setStringParameter('image', 'my-image');
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
-  layerWithEffectWithoutEffectType.getEffects().insertNewEffect(
-    'MyEffectWithoutEffectType',
-    0
-  );
+  layerWithEffectWithoutEffectType
+    .getEffects()
+    .insertNewEffect('MyEffectWithoutEffectType', 0);
 
   const layerWithoutEffects = new gd.Layer();
 

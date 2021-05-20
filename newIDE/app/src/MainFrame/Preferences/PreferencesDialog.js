@@ -12,6 +12,7 @@ import { Column, Line, Spacer } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
+import optionalRequire from '../../Utils/OptionalRequire';
 import PreferencesContext, { allAlertMessages } from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
@@ -19,6 +20,7 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
+const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
@@ -47,6 +49,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setShortcutForCommand,
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
+    setIsAlwaysOnTopInPreview,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -273,6 +276,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
           </Line>
+          {electron && (
+            <Line>
+              <Toggle
+                onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
+                toggled={values.isAlwaysOnTopInPreview}
+                labelPosition="right"
+                label={<Trans>Preview window is always on top</Trans>}
+              />
+            </Line>
+          )}
           {Window.isDev() && (
             <Line>
               <Toggle

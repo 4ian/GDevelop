@@ -22,7 +22,7 @@ type Props = {
 
 export default class VariableField extends Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
-  _variableNames: ?Array<[string, string]> = null;
+  _variableNames: ?Array<{ text: string, value: string }> = null;
 
   static contextType = PreferencesContext;
 
@@ -65,9 +65,9 @@ export default class VariableField extends Component<Props, {||}> {
         tempVariableNames = [...new Set(tempVariableNames)];
       }
       this._variableNames = tempVariableNames.map(name => ({
-              text: name,
-              value: name,
-            }));
+        text: name,
+        value: name,
+      }));
     }
 
     return (

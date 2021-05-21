@@ -95,8 +95,6 @@ const VariableRow = ({
         <SemiControlledAutoComplete
           margin="none"
           fullWidth
-          name={key + 'name'}
-          defaultValue={name}
           errorText={errorText}
           disabled={origin === 'parent'}
           value={name}

@@ -1311,14 +1311,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onComputeAllVariableNames={() =>
-              gd.EventsVariablesFinder.findAllObjectVariables(
-                project.getCurrentPlatform(),
-                project,
-                layout,
-                this.state.variablesEditedObject
-              )
-                .toNewVectorString()
-                .toJSArray()
+              this.state.variablesEditedObject
+                ? gd.EventsVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    this.state.variablesEditedObject
+                  )
+                    .toNewVectorString()
+                    .toJSArray()
+                : []
             }
           />
         )}
@@ -1341,14 +1343,16 @@ export default class SceneEditor extends React.Component<Props, State> {
             title={<Trans>Object Variables</Trans>}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onComputeAllVariableNames={() =>
-              gd.EventsVariablesFinder.findAllObjectVariables(
-                project.getCurrentPlatform(),
-                project,
-                layout,
-                this.state.variablesEditedObject
-              )
-                .toNewVectorString()
-                .toJSArray()
+              this.state.variablesEditedObject
+                ? gd.EventsVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    this.state.variablesEditedObject
+                  )
+                    .toNewVectorString()
+                    .toJSArray()
+                : []
             }
           />
         )}

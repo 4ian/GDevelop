@@ -182,14 +182,16 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
               }
               variablesContainer={instance.getVariables()}
               onComputeAllVariableNames={() =>
-                gd.EventsVariablesFinder.findAllObjectVariables(
-                  project.getCurrentPlatform(),
-                  project,
-                  layout,
-                  object
-                )
-                  .toNewVectorString()
-                  .toJSArray()
+                object
+                  ? gd.EventsVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                      .toNewVectorString()
+                      .toJSArray()
+                  : []
               }
               ref={this._instanceVariablesList}
             />

@@ -29,13 +29,13 @@ export default class GlobalVariableField extends React.Component<
     const { project, scope } = this.props;
 
     const onComputeAllVariableNames = () =>
-      (project) ?
-      gd.EventsVariablesFinder.findAllGlobalVariables(
-        project.getCurrentPlatform(),
-        project
-      )
-        .toNewVectorString()
-        .toJSArray()
+      project
+        ? gd.EventsVariablesFinder.findAllGlobalVariables(
+            project.getCurrentPlatform(),
+            project
+          )
+            .toNewVectorString()
+            .toJSArray()
         : [];
 
     return (

@@ -59,16 +59,16 @@ export default class ObjectVariableField extends React.Component<
     }
 
     const onComputeAllVariableNames = () =>
-      (project && layout && object) ?
-        gd.EventsVariablesFinder.findAllObjectVariables(
-          project.getCurrentPlatform(),
-          project,
-          layout,
-          object
-        )
-          .toNewVectorString()
-          .toJSArray()
-      : [];
+      project && layout && object
+        ? gd.EventsVariablesFinder.findAllObjectVariables(
+            project.getCurrentPlatform(),
+            project,
+            layout,
+            object
+          )
+            .toNewVectorString()
+            .toJSArray()
+        : [];
 
     return (
       <React.Fragment>

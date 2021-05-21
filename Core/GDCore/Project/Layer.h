@@ -7,7 +7,10 @@
 #define GDCORE_LAYER_H
 #include <memory>
 #include <vector>
+
+#include "EffectsContainer.h"
 #include "GDCore/String.h"
+
 namespace gd {
 class Effect;
 }
@@ -16,6 +19,9 @@ class Camera;
 }
 namespace gd {
 class SerializerElement;
+}
+namespace gd {
+class EffectsContainer;
 }
 
 namespace gd {
@@ -54,7 +60,9 @@ class GD_CORE_API Layer {
   /**
    * \brief Set if the layer is a lightining layer or not.
    */
-  void SetLightingLayer(bool isLightingLayer_) { isLightingLayer = isLightingLayer_; }
+  void SetLightingLayer(bool isLightingLayer_) {
+    isLightingLayer = isLightingLayer_;
+  }
 
   /**
    * \brief Return true if the layer is a lighting layer.
@@ -64,7 +72,9 @@ class GD_CORE_API Layer {
   /**
    * \brief Set if the layer automatically follows the base layer or not.
    */
-  void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) { followBaseLayerCamera = followBaseLayerCamera_; }
+  void SetFollowBaseLayerCamera(bool followBaseLayerCamera_) {
+    followBaseLayerCamera = followBaseLayerCamera_;
+  }
 
   /**
    * \brief Return true if the layer follows the base layer.
@@ -144,66 +154,14 @@ class GD_CORE_API Layer {
    */
   ///@{
   /**
-   * \brief Return true if the effect called "name" exists.
+   * \brief Return the effects container.
    */
-  bool HasEffectNamed(const gd::String& name) const;
+  EffectsContainer& GetEffects();
 
   /**
-   * \brief Return a reference to the effect called "name".
+   * \brief Return a const reference to the effects container.
    */
-  Effect& GetEffect(const gd::String& name);
-
-  /**
-   * \brief Return a reference to the effect called "name".
-   */
-  const Effect& GetEffect(const gd::String& name) const;
-
-  /**
-   * Return a reference to the effect at position "index" in the effects list
-   */
-  Effect& GetEffect(std::size_t index);
-
-  /**
-   * Return a reference to the effect at position "index" in the effects list
-   */
-  const Effect& GetEffect(std::size_t index) const;
-
-  /**
-   * Return the position of the effect called "name" in the effects list
-   */
-  std::size_t GetEffectPosition(const gd::String& name) const;
-
-  /**
-   * Return the number of effecst.
-   */
-  std::size_t GetEffectsCount() const;
-
-  /**
-   * Add a new effect at the specified position in the effects list.
-   */
-  gd::Effect& InsertNewEffect(const gd::String& name, std::size_t position);
-
-  /**
-   * \brief Add a copy of the specified effect in the effects list.
-   *
-   * \note No pointer or reference must be kept on the layer passed as
-   * parameter.
-   *
-   * \param theEffect The effect that must be copied and inserted
-   * into the effects list
-   * \param position Insertion position.
-   */
-  void InsertEffect(const Effect& theEffect, std::size_t position);
-
-  /**
-   * Remove the specified effect.
-   */
-  void RemoveEffect(const gd::String& name);
-
-  /**
-   * Swap the position of two effects.
-   */
-  void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);
+  const EffectsContainer& GetEffects() const;
   ///@}
 
 #if defined(GD_IDE_ONLY)
@@ -219,19 +177,19 @@ class GD_CORE_API Layer {
   void UnserializeFrom(const SerializerElement& element);
 
  private:
-  gd::String name;                  ///< The name of the layer
-  bool isVisible;                   ///< True if the layer is visible
-  bool isLightingLayer;             ///< True if the layer is used to display lights and renders an ambient light.
-  bool followBaseLayerCamera;           ///< True if the layer automatically follows the base layer
-  unsigned int ambientLightColorR;     ///< Ambient light color Red component
-  unsigned int ambientLightColorG;     ///< Ambient light color Green component
-  unsigned int ambientLightColorB;     ///< Ambient light color Blue component
+  gd::String name;       ///< The name of the layer
+  bool isVisible;        ///< True if the layer is visible
+  bool isLightingLayer;  ///< True if the layer is used to display lights and
+                         ///< renders an ambient light.
+  bool followBaseLayerCamera;  ///< True if the layer automatically follows the
+                               ///< base layer
+  unsigned int ambientLightColorR;  ///< Ambient light color Red component
+  unsigned int ambientLightColorG;  ///< Ambient light color Green component
+  unsigned int ambientLightColorB;  ///< Ambient light color Blue component
   std::vector<gd::Camera> cameras;  ///< The camera displayed by the layer
-  std::vector<std::shared_ptr<gd::Effect>>
-      effects;  ///< The effects applied to the layer.
+  gd::EffectsContainer effectsContainer;  ///< The effects applied to the layer.
 
   static gd::Camera badCamera;
-  static gd::Effect badEffect;
 };
 
 /**

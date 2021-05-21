@@ -483,9 +483,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Create a layer with some effects
   const layerWithEffects = new gd.Layer();
 
-  const effect1 = layerWithEffects.insertNewEffect('MyEffect1', 0);
-  const effect2 = layerWithEffects.insertNewEffect('MyEffect2', 1);
-  const effect3 = layerWithEffects.insertNewEffect('MyEffect3', 1);
+  const effect1 = layerWithEffects.getEffects().insertNewEffect('MyEffect1', 0);
+  const effect2 = layerWithEffects.getEffects().insertNewEffect('MyEffect2', 1);
+  const effect3 = layerWithEffects.getEffects().insertNewEffect('MyEffect3', 1);
 
   effect1.setEffectType('FakeSepia');
   effect1.setDoubleParameter('opacity', 0.6);
@@ -497,10 +497,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   effect3.setStringParameter('image', 'my-image');
 
   const layerWithEffectWithoutEffectType = new gd.Layer();
-  layerWithEffectWithoutEffectType.insertNewEffect(
-    'MyEffectWithoutEffectType',
-    0
-  );
+  layerWithEffectWithoutEffectType
+    .getEffects()
+    .insertNewEffect('MyEffectWithoutEffectType', 0);
 
   const layerWithoutEffects = new gd.Layer();
 

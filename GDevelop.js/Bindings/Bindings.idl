@@ -654,6 +654,23 @@ interface Effect {
   void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface EffectsContainer {
+  void EffectsContainer();
+  
+  boolean HasEffectNamed([Const] DOMString name);
+  [Ref] Effect GetEffect([Const] DOMString name);
+  [Ref] Effect GetEffectAt(unsigned long index);
+  unsigned long GetEffectPosition([Const] DOMString name);
+  unsigned long GetEffectsCount();
+  [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
+  void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
+  void RemoveEffect([Const] DOMString name);
+  void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+  void SerializeTo([Ref] SerializerElement element);
+  void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Layer {
     void Layer();
     void SetName([Const] DOMString name);
@@ -670,15 +687,7 @@ interface Layer {
     unsigned long GetAmbientLightColorGreen();
     unsigned long GetAmbientLightColorBlue();
 
-    boolean HasEffectNamed([Const] DOMString name);
-    [Ref] Effect GetEffect([Const] DOMString name);
-    [Ref] Effect GetEffectAt(unsigned long index);
-    unsigned long GetEffectPosition([Const] DOMString name);
-    unsigned long GetEffectsCount();
-    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
-    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
-    void RemoveEffect([Const] DOMString name);
-    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+    [Ref] EffectsContainer GetEffects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

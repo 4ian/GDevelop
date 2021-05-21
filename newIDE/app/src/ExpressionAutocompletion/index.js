@@ -36,6 +36,10 @@ export type ExpressionAutocompletion =
     |}
   | {|
       ...BaseExpressionAutocompletion,
+      kind: 'Text',
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
       object?: gdObject,
       kind: 'Object',
     |}

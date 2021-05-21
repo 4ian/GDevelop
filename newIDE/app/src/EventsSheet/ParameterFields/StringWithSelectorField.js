@@ -1,15 +1,21 @@
 // @flow
 import React, { Component } from 'react';
+import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
-const getChoices = (parameterMetadata: ?gdParameterMetadata) => {
+const getChoices = (
+  parameterMetadata: ?gdParameterMetadata
+): Array<ExpressionAutocompletion> => {
   if (!parameterMetadata) {
     return [];
   }
 
   try {
-    return JSON.parse(parameterMetadata.getExtraInfo());
+    return JSON.parse(parameterMetadata.getExtraInfo()).map(choice => ({
+      kind: 'Text',
+      completion: `"${choice}"`,
+    }));
   } catch (exception) {
     console.error(
       'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',
@@ -24,33 +30,23 @@ export default class StringWithSelectorField extends Component<
   ParameterFieldProps,
   {||}
 > {
-  _field: ?any;
+  _field: ?GenericExpressionField;
 
   focus() {
     if (this._field) this._field.focus();
   }
 
   render() {
-    const { value, onChange, isInline, parameterMetadata } = this.props;
-
     return (
-      <SemiControlledAutoComplete
-        margin={this.props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
+      <GenericExpressionField
+        expressionType="string"
+        getAdditionalAutocompletions={expression =>
+          getChoices(this.props.parameterMetadata).filter(
+            ({ completion }) => completion.indexOf(expression) === 0
+          )
         }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
-        fullWidth
-        value={value}
-        onChange={onChange}
-        dataSource={getChoices(parameterMetadata).map(choice => ({
-          text: '"' + choice + '"',
-          value: '"' + choice + '"',
-        }))}
-        openOnFocus={!isInline}
         ref={field => (this._field = field)}
+        {...this.props}
       />
     );
   }

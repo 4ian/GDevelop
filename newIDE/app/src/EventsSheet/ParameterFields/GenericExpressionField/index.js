@@ -92,6 +92,9 @@ type State = {|
 
 type Props = {|
   expressionType: 'number' | 'string',
+  getAdditionalAutocompletions?: (
+    currentExpression: string
+  ) => Array<ExpressionAutocompletion>,
   renderExtraButton?: ({|
     style: Object,
   |}) => React.Node,
@@ -312,6 +315,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       objectsContainer,
       expressionType,
       scope,
+      getAdditionalAutocompletions,
     } = this.props;
     if (!project) return null;
 
@@ -346,6 +350,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       },
       completionDescriptions
     );
+    const allNewAutocompletions = getAdditionalAutocompletions
+      ? getAdditionalAutocompletions(expression).concat(newAutocompletions)
+      : newAutocompletions;
 
     parser.delete();
 
@@ -354,7 +361,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       errorHighlights,
       autocompletions: setNewAutocompletions(
         state.autocompletions,
-        newAutocompletions
+        allNewAutocompletions
       ),
     }));
   };

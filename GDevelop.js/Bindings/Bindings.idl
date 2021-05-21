@@ -687,7 +687,7 @@ interface Layer {
     unsigned long GetAmbientLightColorGreen();
     unsigned long GetAmbientLightColorBlue();
 
-    [Const, Ref] EffectsContainer GetEffects();
+    [Ref] EffectsContainer GetEffects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

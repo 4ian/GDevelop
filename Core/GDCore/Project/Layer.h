@@ -156,6 +156,11 @@ class GD_CORE_API Layer {
   /**
    * \brief Return the effects container.
    */
+  EffectsContainer& GetEffects();
+
+  /**
+   * \brief Return a const reference to the effects container.
+   */
   const EffectsContainer& GetEffects() const;
   ///@}
 

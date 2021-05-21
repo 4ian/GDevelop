@@ -124,6 +124,10 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
   effectsContainer.UnserializeFrom(effectsElement);
 }
 
+gd::EffectsContainer& Layer::GetEffects() {
+  return effectsContainer;
+}
+
 const gd::EffectsContainer& Layer::GetEffects() const {
   return effectsContainer;
 }

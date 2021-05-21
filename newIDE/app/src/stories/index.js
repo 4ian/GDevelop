@@ -39,7 +39,7 @@ import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
-import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
+import ExternalEventsAutoComplete from '../EventsSheet/EventsTree/Renderers/LinkEvent/ExternalEventsAutoComplete';
 import LayerField from '../EventsSheet/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
@@ -2001,32 +2001,23 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
-  .add('ExternalEventsField', () => (
+  .add('ExternalEventsAutoComplete', () => (
     <ValueStateHolder
       initialValue={'Test'}
       render={(value, onChange) => (
-        <ExternalEventsField
+        <ExternalEventsAutoComplete
           project={testProject.project}
-          scope={{}}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
           value={value}
           onChange={onChange}
         />
       )}
     />
   ))
-  .add('ExternalEventsField (without project)', () => (
+  .add('ExternalEventsAutoComplete (without project)', () => (
     <ValueStateHolder
       initialValue={'Test'}
       render={(value, onChange) => (
-        <ExternalEventsField
-          scope={{}}
-          value={value}
-          onChange={onChange}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-        />
+        <ExternalEventsAutoComplete value={value} onChange={onChange} />
       )}
     />
   ))

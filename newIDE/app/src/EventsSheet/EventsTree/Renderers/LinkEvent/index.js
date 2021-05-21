@@ -6,7 +6,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import OpenInNew from '@material-ui/icons/OpenInNew';
-import IconButton from '../../../UI/IconButton';
+import IconButton from '../../../../UI/IconButton';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -14,12 +14,12 @@ import {
   selectableArea,
   linkContainer,
   disabledText,
-} from '../ClassNames';
-import InlinePopover from '../../InlinePopover';
-import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
-import { showWarningBox } from '../../../UI/Messages/MessageBox';
-import { type EventRendererProps } from './EventRenderer';
-import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+} from '../../ClassNames';
+import InlinePopover from '../../../InlinePopover';
+import ExternalEventsAutoComplete from './ExternalEventsAutoComplete';
+import { showWarningBox } from '../../../../UI/Messages/MessageBox';
+import { type EventRendererProps } from '../EventRenderer';
+import { shouldActivate } from '../../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -38,7 +38,7 @@ const styles = {
 };
 
 export default class LinkEvent extends React.Component<EventRendererProps, *> {
-  _externalEventsField: ?ExternalEventsField = null;
+  _externalEventsAutoComplete: ?ExternalEventsAutoComplete = null;
 
   state = {
     editing: false,
@@ -61,7 +61,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
           () => {
             // Give a bit of time for the popover to mount itself
             setTimeout(() => {
-              if (this._externalEventsField) this._externalEventsField.focus();
+              if (this._externalEventsAutoComplete)
+                this._externalEventsAutoComplete.focus();
             }, 10);
           }
         ),
@@ -150,11 +151,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               anchorEl={this.state.anchorEl}
               onRequestClose={this.endEditing}
             >
-              <ExternalEventsField
+              <ExternalEventsAutoComplete
                 project={this.props.project}
-                scope={this.props.scope}
-                globalObjectsContainer={this.props.globalObjectsContainer}
-                objectsContainer={this.props.objectsContainer}
                 value={target}
                 onChange={text => {
                   linkEvent.setTarget(text);
@@ -162,8 +160,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 }}
                 isInline
                 onRequestClose={this.endEditing}
-                ref={externalEventsField =>
-                  (this._externalEventsField = externalEventsField)
+                ref={externalEventsAutoComplete =>
+                  (this._externalEventsAutoComplete = externalEventsAutoComplete)
                 }
               />
             </InlinePopover>

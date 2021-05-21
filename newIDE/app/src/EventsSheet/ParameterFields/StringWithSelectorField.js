@@ -40,7 +40,7 @@ export default class StringWithSelectorField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        additionalAutocompletions={expression =>
+        getAdditionalAutocompletions={expression =>
           getChoices(this.props.parameterMetadata).filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

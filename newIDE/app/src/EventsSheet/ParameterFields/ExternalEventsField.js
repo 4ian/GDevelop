@@ -41,7 +41,7 @@ export default class ExternalEventsField extends React.Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        additionalAutocompletions={expression =>
+        getAdditionalAutocompletions={expression =>
           getList(this.props.project).filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

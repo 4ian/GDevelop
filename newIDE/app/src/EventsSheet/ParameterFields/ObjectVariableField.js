@@ -51,21 +51,24 @@ export default class ObjectVariableField extends React.Component<
     if (objectName) {
       if (layout && layout.hasObjectNamed(objectName)) {
         object = layout.getObject(objectName);
+        variablesContainer = object.getVariables();
       } else if (project && project.hasObjectNamed(objectName)) {
         object = project.getObject(objectName);
+        variablesContainer = object.getVariables();
       }
-      variablesContainer = object.getVariables();
     }
 
     const onComputeAllVariableNames = () =>
-      gd.EventsVariablesFinder.findAllObjectVariables(
-        project.getCurrentPlatform(),
-        project,
-        layout,
-        object
-      )
-        .toNewVectorString()
-        .toJSArray();
+      (project && layout && object) ?
+        gd.EventsVariablesFinder.findAllObjectVariables(
+          project.getCurrentPlatform(),
+          project,
+          layout,
+          object
+        )
+          .toNewVectorString()
+          .toJSArray()
+      : [];
 
     return (
       <React.Fragment>

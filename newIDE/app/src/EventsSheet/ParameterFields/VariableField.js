@@ -16,7 +16,7 @@ import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  onComputeAllVariableNames: () => Array<String>,
+  onComputeAllVariableNames: () => Array<string>,
   onOpenDialog: ?() => void,
 };
 
@@ -47,7 +47,7 @@ export default class VariableField extends Component<Props, {||}> {
       : undefined;
 
     if (this._variableNames === null) {
-      this._variableNames = enumerateVariables(variablesContainer)
+      let tempVariableNames = enumerateVariables(variablesContainer)
         .map(({ name, isValidName }) =>
           isValidName
             ? name
@@ -59,11 +59,15 @@ export default class VariableField extends Component<Props, {||}> {
       const preferences = this.context;
       if (preferences.values.useUndefinedVariablesInAutocompletion) {
         Array.prototype.push.apply(
-          this._variableNames,
+          tempVariableNames,
           onComputeAllVariableNames()
         );
-        this._variableNames = [...new Set(this._variableNames)];
+        tempVariableNames = [...new Set(tempVariableNames)];
       }
+      this._variableNames = tempVariableNames.map(name => ({
+              text: name,
+              value: name,
+            }));
     }
 
     return (
@@ -81,10 +85,7 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={this._variableNames.map(name => ({
-              text: name,
-              value: name,
-            }))}
+            dataSource={this._variableNames}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

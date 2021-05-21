@@ -3619,6 +3619,7 @@ storiesOf('VariablesList', module)
     <SerializedObjectDisplay object={testProject.testLayout}>
       <VariablesList
         variablesContainer={testProject.testLayout.getVariables()}
+        onComputeAllVariableNames={() => []}
       />
     </SerializedObjectDisplay>
   ));

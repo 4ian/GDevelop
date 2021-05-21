@@ -30,13 +30,15 @@ export default class SceneVariableField extends React.Component<
     const { layout } = scope;
 
     const onComputeAllVariableNames = () =>
+      (project && layout) ?
       gd.EventsVariablesFinder.findAllLayoutVariables(
         project.getCurrentPlatform(),
         project,
         layout
       )
         .toNewVectorString()
-        .toJSArray();
+        .toJSArray()
+        : [];
 
     return (
       <React.Fragment>

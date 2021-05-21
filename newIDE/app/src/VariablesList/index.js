@@ -35,12 +35,12 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
+  onComputeAllVariableNames: () => Array<string>,
   inheritedVariablesContainer?: ?gdVariablesContainer,
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
-  onComputeAllVariableNames: () => Array<string>,
 |};
 type State = {|
   nameErrors: { [string]: string },

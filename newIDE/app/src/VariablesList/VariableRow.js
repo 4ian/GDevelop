@@ -11,7 +11,6 @@ import Checkbox from '../UI/Checkbox';
 import AddCircle from '@material-ui/icons/AddCircle';
 import BuildIcon from '@material-ui/icons/Build';
 import SubdirectoryArrowRight from '@material-ui/icons/SubdirectoryArrowRight';
-import TextField from '../UI/TextField';
 import IconButton from '../UI/IconButton';
 import Replay from '@material-ui/icons/Replay';
 import styles from './styles';

@@ -11,6 +11,7 @@ import SemiControlledAutoComplete, {
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {
   ...ParameterFieldProps,
@@ -22,6 +23,8 @@ type Props = {
 export default class VariableField extends Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
   _variableNames: ?Array<[string, string]> = null;
+
+  static contextType = PreferencesContext;
 
   focus() {
     if (this._field) this._field.focus();
@@ -53,11 +56,14 @@ export default class VariableField extends Component<Props, {||}> {
               null
         )
         .filter(Boolean);
-      Array.prototype.push.apply(
-        this._variableNames,
-        onComputeAllVariableNames()
-      );
-      this._variableNames = [...new Set(this._variableNames)];
+      const preferences = this.context;
+      if (preferences.values.useUndefinedVariablesInAutocompletion) {
+        Array.prototype.push.apply(
+          this._variableNames,
+          onComputeAllVariableNames()
+        );
+        this._variableNames = [...new Set(this._variableNames)];
+      }
     }
 
     return (

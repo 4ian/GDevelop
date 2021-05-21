@@ -49,6 +49,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
       this
     ),
+    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
+      this
+    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -126,6 +129,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           useNewInstructionEditorDialog,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setUseUndefinedVariablesInAutocompletion(
+    useUndefinedVariablesInAutocompletion: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          useUndefinedVariablesInAutocompletion,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

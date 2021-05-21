@@ -40,6 +40,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
     setUseNewInstructionEditorDialog,
+    setUseUndefinedVariablesInAutocompletion,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -243,6 +244,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               toggled={values.useNewInstructionEditorDialog}
               labelPosition="right"
               label={<Trans>Use the new action/condition editor</Trans>}
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) =>
+                setUseUndefinedVariablesInAutocompletion(check)
+              }
+              toggled={values.useUndefinedVariablesInAutocompletion}
+              labelPosition="right"
+              label={<Trans>Use undefined variables in autocompletion</Trans>}
             />
           </Line>
           <Text size="title">

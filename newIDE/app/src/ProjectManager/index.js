@@ -1150,12 +1150,14 @@ export default class ProjectManager extends React.Component<Props, State> {
               </Trans>
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            allVariableNames={gd.EventsVariablesFinder.findAllGlobalVariables(
-              project.getCurrentPlatform(),
-              project
-            )
-              .toNewVectorString()
-              .toJSArray()}
+            onComputeAllVariableNames={() =>
+              gd.EventsVariablesFinder.findAllGlobalVariables(
+                project.getCurrentPlatform(),
+                project
+              )
+                .toNewVectorString()
+                .toJSArray()
+            }
           />
         )}
         {this.state.projectPropertiesDialogOpen && (

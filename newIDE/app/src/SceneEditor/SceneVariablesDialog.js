@@ -36,13 +36,15 @@ export default (props: Props) => {
         </Trans>
       }
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
-      allVariableNames={gd.EventsVariablesFinder.findAllLayoutVariables(
-        props.project.getCurrentPlatform(),
-        props.project,
-        props.layout
-      )
-        .toNewVectorString()
-        .toJSArray()}
+      onComputeAllVariableNames={() =>
+        gd.EventsVariablesFinder.findAllLayoutVariables(
+          props.project.getCurrentPlatform(),
+          props.project,
+          props.layout
+        )
+          .toNewVectorString()
+          .toJSArray()
+      }
     />
   );
 };

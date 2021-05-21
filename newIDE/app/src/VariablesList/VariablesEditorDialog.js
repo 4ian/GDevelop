@@ -20,7 +20,7 @@ type Props = {|
   emptyExplanationSecondMessage?: React.Node,
   variablesContainer: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
-  allVariableNames?: Array<string>,
+  onComputeAllVariableNames: () => Array<string>,
 |};
 
 const VariablesEditorDialog = ({
@@ -33,7 +33,7 @@ const VariablesEditorDialog = ({
   emptyExplanationSecondMessage,
   variablesContainer,
   hotReloadPreviewButtonProps,
-  allVariableNames,
+  onComputeAllVariableNames,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
@@ -94,7 +94,7 @@ const VariablesEditorDialog = ({
         onSizeUpdated={
           forceUpdate /*Force update to ensure dialog is properly positioned*/
         }
-        allVariableNames={allVariableNames}
+        onComputeAllVariableNames={onComputeAllVariableNames}
       />
     </Dialog>
   );

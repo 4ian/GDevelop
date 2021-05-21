@@ -28,18 +28,19 @@ export default class GlobalVariableField extends React.Component<
   render() {
     const { project, scope } = this.props;
 
-    const allVariableNames = gd.EventsVariablesFinder.findAllGlobalVariables(
-      project.getCurrentPlatform(),
-      project
-    )
-      .toNewVectorString()
-      .toJSArray();
+    const onComputeAllVariableNames = () =>
+      gd.EventsVariablesFinder.findAllGlobalVariables(
+        project.getCurrentPlatform(),
+        project
+      )
+        .toNewVectorString()
+        .toJSArray();
 
     return (
       <React.Fragment>
         <VariableField
           variablesContainer={project ? project.getVariables() : null}
-          allVariableNames={allVariableNames}
+          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -66,7 +67,7 @@ export default class GlobalVariableField extends React.Component<
                 scenes during the game.
               </Trans>
             }
-            allVariableNames={allVariableNames}
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
       </React.Fragment>

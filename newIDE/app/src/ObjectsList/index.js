@@ -654,14 +654,16 @@ export default class ObjectsList extends React.Component<Props, State> {
               </Trans>
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            allVariableNames={gd.EventsVariablesFinder.findAllObjectVariables(
-              project.getCurrentPlatform(),
-              project,
-              layout,
-              this.state.variablesEditedObject
-            )
-              .toNewVectorString()
-              .toJSArray()}
+            onComputeAllVariableNames={() =>
+              gd.EventsVariablesFinder.findAllObjectVariables(
+                project.getCurrentPlatform(),
+                project,
+                layout,
+                this.state.variablesEditedObject
+              )
+                .toNewVectorString()
+                .toJSArray()
+            }
           />
         )}
         {tagEditedObject && (

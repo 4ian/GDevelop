@@ -40,7 +40,7 @@ type Props = {|
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
-  allVariableNames?: Array<string>,
+  onComputeAllVariableNames: () => Array<string>,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -52,11 +52,11 @@ type State = {|
 export default class VariablesList extends React.Component<Props, State> {
   _getUndefinedVariableNames = () => {
     return new Set(
-      this.props.allVariableNames
-        ? this.props.allVariableNames.filter(
-            variableName => !this.props.variablesContainer.has(variableName)
-          )
-        : []
+      this.props
+        .onComputeAllVariableNames()
+        .filter(
+          variableName => !this.props.variablesContainer.has(variableName)
+        )
     );
   };
 

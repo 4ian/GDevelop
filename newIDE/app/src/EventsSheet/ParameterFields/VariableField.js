@@ -15,12 +15,13 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  allVariableNames: ?Array<String>,
+  onComputeAllVariableNames: () => Array<String>,
   onOpenDialog: ?() => void,
 };
 
 export default class VariableField extends Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
+  _variableNames: ?Array<[string, string]> = null;
 
   focus() {
     if (this._field) this._field.focus();
@@ -34,7 +35,7 @@ export default class VariableField extends Component<Props, {||}> {
       onOpenDialog,
       parameterMetadata,
       variablesContainer,
-      allVariableNames,
+      onComputeAllVariableNames,
       onRequestClose,
     } = this.props;
 
@@ -42,18 +43,21 @@ export default class VariableField extends Component<Props, {||}> {
       ? parameterMetadata.getDescription()
       : undefined;
 
-    let variableNames = enumerateVariables(variablesContainer)
-      .map(({ name, isValidName }) =>
-        isValidName
-          ? name
-          : // Hide invalid variable names - they would not
-            // be parsed correctly anyway.
-            null
-      )
-      .filter(Boolean);
-    if (allVariableNames) {
-      Array.prototype.push.apply(variableNames, allVariableNames);
-      variableNames = [...new Set(variableNames)];
+    if (this._variableNames === null) {
+      this._variableNames = enumerateVariables(variablesContainer)
+        .map(({ name, isValidName }) =>
+          isValidName
+            ? name
+            : // Hide invalid variable names - they would not
+              // be parsed correctly anyway.
+              null
+        )
+        .filter(Boolean);
+      Array.prototype.push.apply(
+        this._variableNames,
+        onComputeAllVariableNames()
+      );
+      this._variableNames = [...new Set(this._variableNames)];
     }
 
     return (
@@ -71,7 +75,7 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={variableNames.map(name => ({
+            dataSource={this._variableNames.map(name => ({
               text: name,
               value: name,
             }))}

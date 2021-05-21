@@ -29,19 +29,20 @@ export default class SceneVariableField extends React.Component<
     const { project, scope } = this.props;
     const { layout } = scope;
 
-    const allVariableNames = gd.EventsVariablesFinder.findAllLayoutVariables(
-      project.getCurrentPlatform(),
-      project,
-      layout
-    )
-      .toNewVectorString()
-      .toJSArray();
+    const onComputeAllVariableNames = () =>
+      gd.EventsVariablesFinder.findAllLayoutVariables(
+        project.getCurrentPlatform(),
+        project,
+        layout
+      )
+        .toNewVectorString()
+        .toJSArray();
 
     return (
       <React.Fragment>
         <VariableField
           variablesContainer={layout ? layout.getVariables() : null}
-          allVariableNames={allVariableNames}
+          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -74,7 +75,7 @@ export default class SceneVariableField extends React.Component<
                 the current score of the player.
               </Trans>
             }
-            allVariableNames={allVariableNames}
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
       </React.Fragment>

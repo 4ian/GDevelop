@@ -313,20 +313,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   void ResetProjectUuid();
 
-  /**
-   * Return a reference to the vector containing the names of extensions used by
-   * the project.
-   */
-  const std::vector<gd::String>& GetUsedExtensions() const {
-    return extensionsUsed;
-  };
-
-  /**
-   * Return a reference to the vector containing the names of extensions used by
-   * the project.
-   */
-  std::vector<gd::String>& GetUsedExtensions() { return extensionsUsed; };
-
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Get the properties set by extensions.
@@ -1002,7 +988,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::shared_ptr<gd::ImageManager>
       imageManager;  ///< Image manager is accessed thanks to a (smart) ptr as
                      ///< it can be shared with GD C++ Platform projects.
-  std::vector<gd::String> extensionsUsed;  ///< List of extensions used
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;

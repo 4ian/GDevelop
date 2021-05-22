@@ -418,6 +418,64 @@ module.exports = {
       }
     ]
   },
+  "bim-bam": {
+    "description": "A Bust-a-Move clone to show how to make a match 3 game.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "External layouts",
+        "name": "BuiltinExternalLayouts"
+      }
+    ]
+  },
+  "bitmap-text": {
+    "description": "A few examples of Bitmap Text usage and their features (wrapping, tint color...).\n",
+    "usedExtensions": [
+      {
+        "fullName": "Bitmap Text Object",
+        "name": "BitmapText"
+      }
+    ]
+  },
   "board-walk-with-raycast": {
     "description": "Example showing how to walk on a tile-based arbitrary board using the Raycast condition.\n",
     "usedExtensions": [
@@ -2426,6 +2484,51 @@ module.exports = {
       }
     ]
   },
+  "menu-with-tweens": {
+    "description": "Shows how to use the tween behavior to animate a game main menu.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tweening",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      }
+    ]
+  },
   "move-camera-to-position": {
     "description": "This shows how to move the camera to the position of an object on a map.",
     "usedExtensions": [
@@ -4424,6 +4527,43 @@ module.exports = {
       {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      }
+    ]
+  },
+  "tactical-game-grid-movement": {
+    "description": "Shows how to move units on an hexagonal grid, like done in some tactical games.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse and touch",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Features for all objects",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      },
+      {
+        "fullName": "Builtin events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },

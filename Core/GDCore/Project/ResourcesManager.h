@@ -375,6 +375,34 @@ class GD_CORE_API JsonResource : public Resource {
 };
 
 /**
+ * \brief Describe a bitmap font file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API BitmapFontResource : public Resource {
+ public:
+  BitmapFontResource() : Resource() { SetKind("bitmapFont"); };
+  virtual ~BitmapFontResource(){};
+  virtual BitmapFontResource* Clone() const override {
+    return new BitmapFontResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+#if defined(GD_IDE_ONLY)
+  virtual bool UseFile() override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+#endif
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource

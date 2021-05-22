@@ -118,7 +118,7 @@ export default class InstancesRenderer {
     }
 
     this._updatePixiObjectsZOrder();
-    this._cleanRenderers();
+    this._cleanUnusedLayerRenderers();
   }
 
   _updatePixiObjectsZOrder() {
@@ -134,11 +134,11 @@ export default class InstancesRenderer {
    * the next render.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetRenderersFor(objectName) {
+  resetInstanceRenderersFor(objectName) {
     for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         const layerRenderer = this.layersRenderers[i];
-        layerRenderer.resetRenderersFor(objectName);
+        layerRenderer.resetInstanceRenderersFor(objectName);
       }
     }
   }
@@ -146,7 +146,7 @@ export default class InstancesRenderer {
   /**
    * Clean up rendered layers that are not existing anymore
    */
-  _cleanRenderers() {
+  _cleanUnusedLayerRenderers() {
     for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         const layerRenderer = this.layersRenderers[i];
@@ -160,10 +160,14 @@ export default class InstancesRenderer {
   }
 
   delete() {
+    // Destroy the layers first.
     for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         this.layersRenderers[i].delete();
       }
     }
+
+    // Finish by the pixi container.
+    this.pixiContainer.destroy();
   }
 }

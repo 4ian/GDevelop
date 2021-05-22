@@ -3,11 +3,10 @@ import * as React from 'react';
 import {
   enumerateLayouts,
   enumerateExternalEvents,
-} from '../../ProjectManager/EnumerateProjectItems';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
+} from '../../../../ProjectManager/EnumerateProjectItems';
 import SemiControlledAutoComplete, {
   type DataSource,
-} from '../../UI/SemiControlledAutoComplete';
+} from '../../../../UI/SemiControlledAutoComplete';
 
 const getList = (project: ?gdProject): DataSource => {
   if (!project) {
@@ -27,8 +26,16 @@ const getList = (project: ?gdProject): DataSource => {
   return [...externalEvents, { type: 'separator' }, ...layouts];
 };
 
-export default class ExternalEventsField extends React.Component<
-  ParameterFieldProps,
+type Props = {|
+  onChange: string => void,
+  value: string,
+  project?: gdProject,
+  isInline?: boolean,
+  onRequestClose?: () => void,
+|};
+
+export default class ExternalEventsAutoComplete extends React.Component<
+  Props,
   {||}
 > {
   _field: ?any;
@@ -38,24 +45,11 @@ export default class ExternalEventsField extends React.Component<
   }
 
   render() {
-    const {
-      value,
-      onChange,
-      onRequestClose,
-      isInline,
-      project,
-      parameterMetadata,
-    } = this.props;
+    const { value, onChange, onRequestClose, isInline, project } = this.props;
 
     return (
       <SemiControlledAutoComplete
         margin={this.props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
-        }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
         fullWidth
         id="external-events-field"
         value={value}

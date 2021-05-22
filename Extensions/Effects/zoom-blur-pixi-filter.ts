@@ -31,6 +31,8 @@ namespace gdjs {
           0,
           20
         );
+      } else if (parameterName === 'padding') {
+        zoomBlurFilter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

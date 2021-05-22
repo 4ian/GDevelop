@@ -75,13 +75,11 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/IDE",
                 "${workspaceRoot}/GDCpp",
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
                 "${workspaceRoot}/ExtLibs/SFML/include",
-                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
                 "${workspaceRoot}"
             ],
             "defines": [
@@ -95,7 +93,6 @@
             "intelliSenseMode": "msvc-x64",
             "browse": {
                 "path": [
-                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
                     "${workspaceRoot}"
                 ],
                 "limitSymbolsToIncludedHeaders": true,

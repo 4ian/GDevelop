@@ -17,6 +17,8 @@ namespace gdjs {
         advancedBloomFilter.blur = value;
       } else if (parameterName === 'quality') {
         advancedBloomFilter.quality = value;
+      } else if (parameterName === 'padding') {
+        advancedBloomFilter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

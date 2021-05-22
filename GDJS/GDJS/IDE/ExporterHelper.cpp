@@ -644,6 +644,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
     InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
     InsertUnique(includesFiles,
@@ -660,6 +661,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   if (cocosRenderers) {
     InsertUnique(includesFiles, "cocos-renderers/cocos-director-manager.js");
     InsertUnique(includesFiles, "cocos-renderers/cocos-image-manager.js");
+    InsertUnique(includesFiles, "cocos-renderers/cocos-bitmapfont-manager.js");
     InsertUnique(includesFiles, "cocos-renderers/cocos-tools.js");
     InsertUnique(includesFiles, "cocos-renderers/layer-cocos-renderer.js");
     InsertUnique(includesFiles,

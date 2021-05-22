@@ -186,6 +186,8 @@ void ObjectJsImplementation::ExposeResources(
         // Not supported in gd::ArbitraryResourceWorker
       } else if (resourceType == "json") {
         // Not supported in gd::ArbitraryResourceWorker
+      } else if (resourceType == "bitmapFont") {
+        worker.ExposeBitmapFont(newPropertyValue);
       }
 
       if (newPropertyValue != oldPropertyValue) {

@@ -327,7 +327,7 @@ module.exports = {
           'Add a tween animation for the object scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
+          'Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ (from center: _PARAM8_) with easing _PARAM5_ over _PARAM6_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -347,6 +347,8 @@ module.exports = {
         '',
         false
       )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleTween');
@@ -359,7 +361,7 @@ module.exports = {
           'Add a tween animation for the object X-scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the X-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -379,6 +381,8 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleXTween');
 
@@ -390,7 +394,7 @@ module.exports = {
           'Add a tween animation for the object Y-scale (Note: the scale can never be less than 0).'
         ),
         _(
-          'Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
+          'Tween the Y-scale of _PARAM0_ to _PARAM3_ (from center: _PARAM7_) with easing _PARAM4_ over _PARAM5_ms as _PARAM2_'
         ),
         _('Scale'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -409,6 +413,8 @@ module.exports = {
         '',
         false
       )
+      .setDefaultValue('no')
+      .addParameter('yesorno', _('Scale from center of object'), '', false)
       .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectScaleYTween');
@@ -503,8 +509,55 @@ module.exports = {
         false
       )
       .setDefaultValue('no')
+      .addParameter(
+        'yesorno',
+        _('Tween on the Hue/Saturation/Lightness (HSL)'),
+        '',
+        false
+      )
+      .setParameterLongDescription(
+        _('Useful to have a more natural change between colors.')
+      )
+      .setDefaultValue('no')
       .getCodeExtraInformation()
       .setFunctionName('addObjectColorTween');
+
+    behavior
+      .addAction(
+        'AddObjectColorHSLTween',
+        _('Add object HSL color tween'),
+        _(
+          'Add a tween animation for the object color using Hue/Saturation/Lightness. Hue can be any number, Saturation and Lightness are between 0 and 100. Use -1 for Saturation and Lightness to let them unchanged.'
+        ),
+        _(
+          'Tween the color of _PARAM0_ using HSL to H: _PARAM3_ (_PARAM4_), S: _PARAM5_, L: _PARAM6_ with easing _PARAM7_ over _PARAM8_ms as _PARAM2_'
+        ),
+        _('Color'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('expression', _('To Hue'), '', false)
+      .addParameter('yesorno', _('Animate Hue'), '', false)
+      .setDefaultValue('yes')
+      .addParameter('expression', _('To Saturation (-1 to ignore)'), '', false)
+      .setDefaultValue('-1')
+      .addParameter('expression', _('To Lightness (-1 to ignore)'), '', false)
+      .setDefaultValue('-1')
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('Duration'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Destroy this object when tween finishes'),
+        '',
+        false
+      )
+      .setDefaultValue('no')
+      .getCodeExtraInformation()
+      .setFunctionName('addObjectColorHSLTween');
 
     behavior
       .addCondition(

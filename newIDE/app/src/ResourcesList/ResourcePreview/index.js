@@ -80,6 +80,7 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
           />
         );
       case 'font':
+      case 'bitmapFont':
         return (
           <GenericIconPreview
             renderIcon={props => <FontDownload {...props} />}

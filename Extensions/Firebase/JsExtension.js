@@ -1296,6 +1296,15 @@ module.exports = {
         '',
         true
       )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
       .setFunctionName('gdjs.evtTools.firebaseTools.firestore.executeQuery');
 
     extension

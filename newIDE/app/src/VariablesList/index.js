@@ -55,8 +55,8 @@ export default class VariablesList extends React.Component<Props, State> {
     mode: 'select',
   };
 
-  _allVariableNamesSet: Set<string> = null;
-  _undefinedVariableNames: Set<string> = null;
+  _allVariableNamesSet: ?Set<string> = null;
+  _undefinedVariableNames: ?Set<string> = null;
 
   _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
     this.setState({
@@ -140,8 +140,8 @@ export default class VariablesList extends React.Component<Props, State> {
     ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) => {
       variablesContainer.removeRecursively(variable);
 
-      if (this._allVariableNamesSet.has(name)) {
-        this._undefinedVariableNames.add(name);
+      if (this._allVariableNamesSet && this._allVariableNamesSet.has(name)) {
+        this._undefinedVariableNames && this._undefinedVariableNames.add(name);
       }
     });
     this.clearSelection();
@@ -294,10 +294,15 @@ export default class VariablesList extends React.Component<Props, State> {
           let success = true;
           if (!parentVariable) {
             success = variablesContainer.rename(name, text);
-            if (this._allVariableNamesSet.has(name)) {
-              this._undefinedVariableNames.add(name);
+            if (
+              this._allVariableNamesSet &&
+              this._allVariableNamesSet.has(name)
+            ) {
+              this._undefinedVariableNames &&
+                this._undefinedVariableNames.add(name);
             }
-            this._undefinedVariableNames.delete(text);
+            this._undefinedVariableNames &&
+              this._undefinedVariableNames.delete(text);
           } else {
             success = parentVariable.renameChild(name, text);
           }
@@ -313,8 +318,12 @@ export default class VariablesList extends React.Component<Props, State> {
           if (!parentVariable) {
             variablesContainer.remove(name);
 
-            if (this._allVariableNamesSet.has(name)) {
-              this._undefinedVariableNames.add(name);
+            if (
+              this._allVariableNamesSet &&
+              this._allVariableNamesSet.has(name)
+            ) {
+              this._undefinedVariableNames &&
+                this._undefinedVariableNames.add(name);
             }
           } else {
             if (parentVariable.getType() === gd.Variable.Structure)

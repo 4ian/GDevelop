@@ -1310,18 +1310,19 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() =>
-              this.state.variablesEditedObject
+            onComputeAllVariableNames={() => {
+              const variablesEditedObject = this.state.variablesEditedObject;
+              return variablesEditedObject
                 ? gd.EventsVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),
                     project,
                     layout,
-                    this.state.variablesEditedObject
+                    variablesEditedObject
                   )
                     .toNewVectorString()
                     .toJSArray()
-                : []
-            }
+                : [];
+            }}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1342,18 +1343,19 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             title={<Trans>Object Variables</Trans>}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() =>
-              this.state.variablesEditedObject
+            onComputeAllVariableNames={() => {
+              const variablesEditedObject = this.state.variablesEditedObject;
+              return variablesEditedObject
                 ? gd.EventsVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),
                     project,
                     layout,
-                    this.state.variablesEditedObject
+                    variablesEditedObject
                   )
                     .toNewVectorString()
                     .toJSArray()
-                : []
-            }
+                : [];
+            }}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (

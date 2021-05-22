@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
+  type DataSource,
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
@@ -22,7 +23,7 @@ type Props = {
 
 export default class VariableField extends Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
-  _variableNames: ?Array<{ text: string, value: string }> = null;
+  _variableNames: DataSource = [];
 
   static contextType = PreferencesContext;
 

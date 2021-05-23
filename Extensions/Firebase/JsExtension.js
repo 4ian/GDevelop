@@ -1238,24 +1238,33 @@ module.exports = {
         'FirestoreQuerySkipSome',
         _('Skip some documents'),
         _(
-          'Removes documents before or after a documents in a query. Can only be used after an order filter.'
+          'Removes documents before or after a certain value on the field ordered by in a query. Can only be used after an order filter.'
         ),
         _(
-          'Skip documents (before: _PARAM2_) document _PARAM1_ in query _PARAM0_ (include the document: _PARAM3_)'
+          'Skip documents with fields (before: _PARAM2_) value _PARAM1_ in query _PARAM0_ (include documents at that value: _PARAM3_)'
         ),
         _('Firebase/Cloud Firestore/Queries/Filters'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Query name'), '', false)
-      .addParameter('string', _('The document'), '', false)
+      .addParameter(
+        'expression',
+        _('The value of the field ordered by to skip after'),
+        '',
+        false
+      )
       .addParameter('yesorno', _('Skip documents before?'), '', false)
       .setParameterLongDescription(
-        'If yes, the documents before the document will be kept, else the documents after it will be kept by the query.'
+        'If yes, the documents with a bigger field value will be kept, else the documents with a smaller field value be kept by the query.'
       )
-      .addParameter('yesorno', _('Include self?'), '', false)
-      .setParameterLongDescription(
-        'If yes, the document will not be skipped by the query.'
+      .addParameter(
+        'yesorno',
+        _(
+          'Include documents which field value equals the value to skip after?'
+        ),
+        '',
+        false
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')

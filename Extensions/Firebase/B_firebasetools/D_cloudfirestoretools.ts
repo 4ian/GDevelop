@@ -79,7 +79,7 @@ namespace gdjs {
             // Exclude unsupported "batch" operations (as they require an array as value to check)
             'in' | 'array-contains-any' | 'not-in'
           >,
-          value: string
+          value: string | number
         ) => {
           if (queries.has(queryID))
             queries.set(
@@ -136,16 +136,17 @@ namespace gdjs {
         };
 
         /**
-         * Makes a query skip documents after or before a certain document.
+         * Makes a query skip documents after or before a certain 
+         * value of a field the query was ordered with.
          *
          * @param queryID - The query to add the filter to.
-         * @param docPath - The document.
+         * @param value - The value of the field ordered by.
          * @param before - If set to true, all documents before the document are skipped, else all documents after it are skipped.
          * @param includeSelf - If set to true, doesn't skip the document.
          */
         export const querySkipSome = (
           queryID: string,
-          docPath: string,
+          value: number,
           before: boolean,
           includeSelf: boolean
         ) => {
@@ -160,7 +161,7 @@ namespace gdjs {
                   : includeSelf
                   ? 'startAt'
                   : 'startAfter'
-              ](firebase.firestore().doc(docPath))
+              ](value)
             );
         };
 

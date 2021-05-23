@@ -127,8 +127,8 @@ export class SubscriptionCheckDialog extends React.Component<
             <Star style={styles.icon} />
             <Text style={styles.iconText}>
               <Trans>
-                Get a subscription to gain more automatic exports and remove the
-                GDevelop splashscreen and this message asking you to get a
+                Get a subscription to gain more one-click exports, remove the
+                GDevelop splashscreen, this message asking you to get a
                 subscription.
               </Trans>
             </Text>

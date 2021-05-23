@@ -47,7 +47,7 @@ type Props = {|
   onSelect: boolean => void,
   origin: VariableOrigin,
   arrayElement: boolean,
-  undefinedVariableNames: Set<string>,
+  undefinedVariableNames: Array<string>,
 |};
 
 const VariableRow = ({
@@ -101,7 +101,7 @@ const VariableRow = ({
           onChange={onChangeName}
           dataSource={
             undefinedVariableNames
-              ? [...undefinedVariableNames].map(name => ({
+              ? undefinedVariableNames.map(name => ({
                   text: name,
                   value: name,
                 }))

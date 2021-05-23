@@ -23,7 +23,7 @@ type Props = {
 
 export default class VariableField extends Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
-  _variableNames: DataSource = [];
+  _variableNames: ?DataSource = null;
 
   static contextType = PreferencesContext;
 
@@ -47,7 +47,7 @@ export default class VariableField extends Component<Props, {||}> {
       ? parameterMetadata.getDescription()
       : undefined;
 
-    if (this._variableNames === null) {
+      if (this._variableNames === null) {
       let tempVariableNames = enumerateVariables(variablesContainer)
         .map(({ name, isValidName }) =>
           isValidName
@@ -59,12 +59,14 @@ export default class VariableField extends Component<Props, {||}> {
         .filter(Boolean);
       const preferences = this.context;
       if (preferences.values.useUndefinedVariablesInAutocompletion) {
+        console.log("useUndefinedVariablesInAutocompletion");
         Array.prototype.push.apply(
           tempVariableNames,
           onComputeAllVariableNames()
         );
         tempVariableNames = [...new Set(tempVariableNames)];
       }
+      console.log("tempVariableNames: " + tempVariableNames.length);
       this._variableNames = tempVariableNames.map(name => ({
         text: name,
         value: name,
@@ -86,7 +88,7 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={this._variableNames}
+            dataSource={this._variableNames ? this._variableNames : []}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

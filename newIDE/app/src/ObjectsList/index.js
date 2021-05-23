@@ -46,8 +46,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-
-const gd: libGDevelop = global.gd;
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 const styles = {
   listContainer: {
@@ -657,14 +656,12 @@ export default class ObjectsList extends React.Component<Props, State> {
             onComputeAllVariableNames={() => {
               const variablesEditedObject = this.state.variablesEditedObject;
               return layout && variablesEditedObject
-                ? gd.EventsVariablesFinder.findAllObjectVariables(
+                ? EventsRootVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),
                     project,
                     layout,
                     variablesEditedObject
                   )
-                    .toNewVectorString()
-                    .toJSArray()
                 : [];
             }}
           />

@@ -47,7 +47,7 @@ export default class VariableField extends Component<Props, {||}> {
       ? parameterMetadata.getDescription()
       : undefined;
 
-      if (this._variableNames === null) {
+    if (this._variableNames === null) {
       let tempVariableNames = enumerateVariables(variablesContainer)
         .map(({ name, isValidName }) =>
           isValidName
@@ -59,14 +59,14 @@ export default class VariableField extends Component<Props, {||}> {
         .filter(Boolean);
       const preferences = this.context;
       if (preferences.values.useUndefinedVariablesInAutocompletion) {
-        console.log("useUndefinedVariablesInAutocompletion");
+        console.log('useUndefinedVariablesInAutocompletion');
         Array.prototype.push.apply(
           tempVariableNames,
           onComputeAllVariableNames()
         );
         tempVariableNames = [...new Set(tempVariableNames)];
       }
-      console.log("tempVariableNames: " + tempVariableNames.length);
+      console.log('tempVariableNames: ' + tempVariableNames.length);
       this._variableNames = tempVariableNames.map(name => ({
         text: name,
         value: name,

@@ -3,8 +3,7 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-
-const gd: libGDevelop = global.gd;
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   open: boolean,
@@ -37,13 +36,11 @@ export default (props: Props) => {
       }
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
       onComputeAllVariableNames={() =>
-        gd.EventsVariablesFinder.findAllLayoutVariables(
+        EventsRootVariablesFinder.findAllLayoutVariables(
           props.project.getCurrentPlatform(),
           props.project,
           props.layout
         )
-          .toNewVectorString()
-          .toJSArray()
       }
     />
   );

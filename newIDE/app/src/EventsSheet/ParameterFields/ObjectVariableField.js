@@ -6,8 +6,7 @@ import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
-
-const gd: libGDevelop = global.gd;
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 type State = {|
   editorOpen: boolean,
@@ -60,14 +59,12 @@ export default class ObjectVariableField extends React.Component<
 
     const onComputeAllVariableNames = () =>
       project && layout && object
-        ? gd.EventsVariablesFinder.findAllObjectVariables(
+        ? EventsRootVariablesFinder.findAllObjectVariables(
             project.getCurrentPlatform(),
             project,
             layout,
             object
           )
-            .toNewVectorString()
-            .toJSArray()
         : [];
 
     return (

@@ -71,6 +71,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 const gd: libGDevelop = global.gd;
 
@@ -1311,23 +1312,26 @@ export default class SceneEditor extends React.Component<Props, State> {
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onComputeAllVariableNames={() => {
-              const variablesEditedInstance = this.state.variablesEditedInstance;
+              const variablesEditedInstance = this.state
+                .variablesEditedInstance;
               if (variablesEditedInstance) {
-              const variablesEditedObject = getObjectByName(project, layout, variablesEditedInstance.getObjectName());
-              console.log("Instance variablesEditedObject: " + variablesEditedObject);
-              return variablesEditedObject
-                ? gd.EventsVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                    .toNewVectorString()
-                    .toJSArray()
-                : [];
-            }
-          }
-          }
+                const variablesEditedObject = getObjectByName(
+                  project,
+                  layout,
+                  variablesEditedInstance.getObjectName()
+                );
+                return variablesEditedObject
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      variablesEditedObject
+                    )
+                  : [];
+              } else {
+                return [];
+              }
+            }}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1350,16 +1354,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onComputeAllVariableNames={() => {
               const variablesEditedObject = this.state.variablesEditedObject;
-              console.log("Object variablesEditedObject: " + variablesEditedObject);
               return variablesEditedObject
-                ? gd.EventsVariablesFinder.findAllObjectVariables(
+                ? EventsRootVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),
                     project,
                     layout,
                     variablesEditedObject
                   )
-                    .toNewVectorString()
-                    .toJSArray()
                 : [];
             }}
           />

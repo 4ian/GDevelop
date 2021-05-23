@@ -5,8 +5,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-
-const gd: libGDevelop = global.gd;
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 type State = {|
   editorOpen: boolean,
@@ -31,13 +30,11 @@ export default class SceneVariableField extends React.Component<
 
     const onComputeAllVariableNames = () =>
       project && layout
-        ? gd.EventsVariablesFinder.findAllLayoutVariables(
+        ? EventsRootVariablesFinder.findAllLayoutVariables(
             project.getCurrentPlatform(),
             project,
             layout
           )
-            .toNewVectorString()
-            .toJSArray()
         : [];
 
     return (

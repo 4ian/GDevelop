@@ -18,8 +18,7 @@ import OpenInNew from '@material-ui/icons/OpenInNew';
 import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
-
-const gd: libGDevelop = global.gd;
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   project: gdProject,
@@ -183,14 +182,12 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
               variablesContainer={instance.getVariables()}
               onComputeAllVariableNames={() =>
                 object
-                  ? gd.EventsVariablesFinder.findAllObjectVariables(
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
                       project.getCurrentPlatform(),
                       project,
                       layout,
                       object
                     )
-                      .toNewVectorString()
-                      .toJSArray()
                   : []
               }
               ref={this._instanceVariablesList}

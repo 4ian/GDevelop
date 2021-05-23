@@ -342,11 +342,11 @@ export default class VariablesList extends React.Component<Props, State> {
         }
         undefinedVariableNames={
           // autocompletion is not handled for child variables.
-          depth === 0 ?
-          this._allVariableNames.filter(
-            variableName => !this.props.variablesContainer.has(variableName)
-          )
-          : []
+          depth === 0 && this._allVariableNames
+            ? this._allVariableNames.filter(
+                variableName => !this.props.variablesContainer.has(variableName)
+              )
+            : []
         }
       />
     );

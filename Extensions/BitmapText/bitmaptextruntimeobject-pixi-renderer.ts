@@ -149,9 +149,8 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._object.y + this._pixiObject.height / 2;
+      this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
+      this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
     }
 
     updateAngle(): void {
@@ -167,7 +166,7 @@ namespace gdjs {
     }
 
     getHeight(): float {
-      return this._pixiObject.height;
+      return this._pixiObject.textHeight;
     }
   }
   export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectPixiRenderer;

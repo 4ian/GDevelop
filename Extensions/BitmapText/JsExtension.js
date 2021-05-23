@@ -684,9 +684,9 @@ module.exports = {
       }
 
       this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
+        this._instance.getX() + this._pixiObject.textWidth / 2;
       this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
+        this._instance.getY() + this._pixiObject.textHeight / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );

@@ -13,6 +13,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -26,11 +27,12 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/IDE/ExporterHelper.h"
-#undef CopyFile  // Disable an annoying macro
+
+#undef CopyFile // Disable an annoying macro
 
 namespace gdjs {
 
-Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
+Exporter::Exporter(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_) {
   SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp");
 }
@@ -38,20 +40,21 @@ Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
 Exporter::~Exporter() {}
 
 bool Exporter::ExportProjectForPixiPreview(
-    const PreviewExportOptions& options) {
+    const PreviewExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   return helper.ExportProjectForPixiPreview(options);
 }
 
 bool Exporter::ExportWholePixiProject(
-    gd::Project& project,
-    gd::String exportDir,
-    std::map<gd::String, bool>& exportOptions) {
+    gd::Project &project, gd::String exportDir,
+    std::map<gd::String, bool> &exportOptions) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   gd::Project exportedProject = project;
 
-  auto exportProject = [this, &exportedProject, &exportOptions, &helper](
-                           gd::String exportDir) {
+  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(project);
+
+  auto exportProject = [this, &exportedProject, &exportOptions,
+                        &helper](gd::String exportDir) {
     bool exportForCordova = exportOptions["exportForCordova"];
     bool exportForFacebookInstantGames =
         exportOptions["exportForFacebookInstantGames"];
@@ -86,16 +89,16 @@ bool Exporter::ExportWholePixiProject(
     helper.ExportEffectIncludes(exportedProject, includesFiles);
 
     // Export events
-    if (!helper.ExportEventsCode(
-            exportedProject, codeOutputDir, includesFiles, false)) {
+    if (!helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles,
+                                 false)) {
       gd::LogError(_("Error during exporting! Unable to export events:\n") +
                    lastError);
       return false;
     }
 
     // Export source files
-    if (!helper.ExportExternalSourceFiles(
-            exportedProject, codeOutputDir, includesFiles)) {
+    if (!helper.ExportExternalSourceFiles(exportedProject, codeOutputDir,
+                                          includesFiles)) {
       gd::LogError(
           _("Error during exporting! Unable to export source files:\n") +
           lastError);
@@ -108,8 +111,8 @@ bool Exporter::ExportWholePixiProject(
 
     //...and export it
     gd::SerializerElement noRuntimeGameOptions;
-    helper.ExportProjectData(
-        fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
+    helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                             noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
     // Copy all dependencies and the index (or metadata) file.
@@ -122,12 +125,9 @@ bool Exporter::ExportWholePixiProject(
     else if (exportForFacebookInstantGames)
       source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
-    if (!helper.ExportPixiIndexFile(exportedProject,
-                                    source,
-                                    exportDir,
+    if (!helper.ExportPixiIndexFile(exportedProject, source, exportDir,
                                     includesFiles,
-                                    /*nonRuntimeScriptsCacheBurst=*/0,
-                                    "")) {
+                                    /*nonRuntimeScriptsCacheBurst=*/0, "")) {
       gd::LogError(_("Error during export:\n") + lastError);
       return false;
     }
@@ -139,33 +139,38 @@ bool Exporter::ExportWholePixiProject(
     fs.MkDir(exportDir);
     fs.MkDir(exportDir + "/www");
 
-    if (!exportProject(exportDir + "/www")) return false;
+    if (!exportProject(exportDir + "/www"))
+      return false;
 
-    if (!helper.ExportCordovaFiles(exportedProject, exportDir)) return false;
+    if (!helper.ExportCordovaFiles(exportedProject, exportDir, usedExtensions))
+      return false;
   } else if (exportOptions["exportForElectron"]) {
     fs.MkDir(exportDir);
 
-    if (!exportProject(exportDir + "/app")) return false;
+    if (!exportProject(exportDir + "/app"))
+      return false;
 
-    if (!helper.ExportElectronFiles(exportedProject, exportDir)) return false;
+    if (!helper.ExportElectronFiles(exportedProject, exportDir, usedExtensions))
+      return false;
   } else if (exportOptions["exportForFacebookInstantGames"]) {
-    if (!exportProject(exportDir)) return false;
+    if (!exportProject(exportDir))
+      return false;
 
     if (!helper.ExportFacebookInstantGamesFiles(exportedProject, exportDir))
       return false;
   } else {
-    if (!exportProject(exportDir)) return false;
+    if (!exportProject(exportDir))
+      return false;
   }
 
   return true;
 }
 
-bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
-                                         bool debugMode,
+bool Exporter::ExportWholeCocos2dProject(gd::Project &project, bool debugMode,
                                          gd::String exportDir) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
 
-  wxProgressDialog* progressDialogPtr = NULL;
+  wxProgressDialog *progressDialogPtr = NULL;
 
   // Prepare the export directory
   fs.MkDir(exportDir);
@@ -195,16 +200,16 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   helper.ExportEffectIncludes(exportedProject, includesFiles);
 
   // Export events
-  if (!helper.ExportEventsCode(
-          exportedProject, codeOutputDir, includesFiles, false)) {
+  if (!helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles,
+                               false)) {
     gd::LogError(_("Error during exporting! Unable to export events:\n") +
                  lastError);
     return false;
   }
 
   // Export source files
-  if (!helper.ExportExternalSourceFiles(
-          exportedProject, codeOutputDir, includesFiles)) {
+  if (!helper.ExportExternalSourceFiles(exportedProject, codeOutputDir,
+                                        includesFiles)) {
     gd::LogError(_("Error during exporting! Unable to export source files:\n") +
                  lastError);
     return false;
@@ -216,16 +221,16 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   //...and export it
   gd::SerializerElement noRuntimeGameOptions;
-  helper.ExportProjectData(
-      fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
+  helper.ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
+                           noRuntimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
   helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
 
-  if (!helper.ExportCocos2dFiles(
-          project, exportDir, debugMode, includesFiles)) {
+  if (!helper.ExportCocos2dFiles(project, exportDir, debugMode,
+                                 includesFiles)) {
     gd::LogError(_("Error during export:\n") + lastError);
     return false;
   }
@@ -233,4 +238,4 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   return true;
 }
 
-}  // namespace gdjs
+} // namespace gdjs

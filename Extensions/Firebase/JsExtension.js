@@ -1049,6 +1049,27 @@ module.exports = {
     /* ====== CLOUD FIRESTORE ====== */
 
     extension
+      .addStrExpression(
+        'ServerTimestamp',
+        _('Get server timestamp'),
+        _(
+          'Set a field to the timstamp on the server when the request arrives there'
+        ),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.getServerTimestamp');
+
+    extension
       .addAction(
         'FirestoreStartQuery',
         _('Start a query'),

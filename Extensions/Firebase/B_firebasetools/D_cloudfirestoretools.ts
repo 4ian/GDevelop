@@ -136,7 +136,7 @@ namespace gdjs {
         };
 
         /**
-         * Makes a query skip documents after or before a certain 
+         * Makes a query skip documents after or before a certain
          * value of a field the query was ordered with.
          *
          * @param queryID - The query to add the filter to.
@@ -248,8 +248,10 @@ namespace gdjs {
             .collection(collectionName)
             .doc(variableName)
             .set(
-              JSON.parse(
-                gdjs.evtTools.network.variableStructureToJSON(variable)
+              replaceTimstampsInObject(
+                JSON.parse(
+                  gdjs.evtTools.network.variableStructureToJSON(variable)
+                )
               )
             )
             .then(() => {
@@ -283,7 +285,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(documentName)
-            .set({ [field]: value }, { merge: merge })
+            .set({ [field]: replaceTimstampInString(value) }, { merge: merge })
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -312,8 +314,10 @@ namespace gdjs {
             .collection(collectionName)
             .doc(variableName)
             .update(
-              JSON.parse(
-                gdjs.evtTools.network.variableStructureToJSON(variable)
+              replaceTimstampsInObject(
+                JSON.parse(
+                  gdjs.evtTools.network.variableStructureToJSON(variable)
+                )
               )
             )
             .then(() => {
@@ -345,7 +349,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(documentName)
-            .update({ [field]: value })
+            .update({ [field]: replaceTimstampInString(value) })
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -581,6 +585,28 @@ namespace gdjs {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString(error.message);
             });
+        };
+
+        /**
+         * Returns a special string replaced by a firebase serverTimestamp field value.
+         */
+        export const getServerTimestamp = () =>
+          '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]';
+
+        const replaceTimstampInString = (str: any) => {
+          if (str === '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]')
+            return firebase.firestore.FieldValue.serverTimestamp();
+          else return str;
+        };
+
+        const replaceTimstampsInObject = (object: object): object => {
+          for (const i in object) {
+            const item = object[i];
+            if (typeof item === 'object') replaceTimstampsInObject(item);
+            else if (item === '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]')
+              object[i] = firebase.firestore.FieldValue.serverTimestamp();
+          }
+          return object;
         };
       }
     }

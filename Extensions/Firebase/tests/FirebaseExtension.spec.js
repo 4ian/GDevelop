@@ -394,6 +394,27 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           ).getValue()
         ).to.not.be.ok();
       });
+
+      it('should be able to use server timestamps', async () => {
+        await promisifyCallbackVariables((callback) => {
+          gdjs.evtTools.firebaseTools.firestore.writeField(
+            namespace,
+            'field',
+            'timestamp',
+            gdjs.evtTools.firebaseTools.firestore.getServerTimestamp(),
+            callback
+          );
+        });
+
+        expect(
+          (
+            await firebase
+              .firestore()
+              .doc(namespace + '/field')
+              .get()
+          ).get('timestamp', { serverTimestamps: 'estimate' })
+        ).to.be.an(firebase.firestore.Timestamp);
+      });
     });
 
     describe('Firestore Queries', async () => {

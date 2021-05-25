@@ -56,7 +56,7 @@ export default class ParameterColorField extends Component<ParameterFieldProps> 
           expressioNode: gdExpressionNode
         ) => {
           if (expression.trim().startsWith('"\\"')) {
-            return 'A color is a text in the format R;G;B, like 100;200;300. You need to surround the text with quotes, but the text itself should not contain a quote inside.';
+            return 'A color is a text in the format R;G;B, like 100;200;180 (numbers going from 0 to 255). You need to surround the text with quotes, but the text itself should not contain a quote inside.';
           }
 
           return null;

@@ -162,11 +162,11 @@ namespace gdjs {
     }
 
     getWidth(): float {
-      return this._pixiObject.textWidth;
+      return this._pixiObject.textWidth * this.getScale();
     }
 
     getHeight(): float {
-      return this._pixiObject.textHeight;
+      return this._pixiObject.textHeight * this.getScale();
     }
   }
   export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectPixiRenderer;

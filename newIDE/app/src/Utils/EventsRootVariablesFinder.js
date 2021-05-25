@@ -1,7 +1,7 @@
 const gd: libGDevelop = global.gd;
 
 const isRootVariableName = fullName =>
-  !fullName.includes('.') && !fullName.includes('[');
+  !fullName.includes('.') && !fullName.includes('[') && fullName.length > 0;
 
 export default class EventsRootVariablesFinder {
   static findAllGlobalVariables(

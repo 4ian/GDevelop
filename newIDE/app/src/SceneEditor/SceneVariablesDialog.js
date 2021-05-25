@@ -3,9 +3,11 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 type Props = {|
   open: boolean,
+  project: gdProject,
   layout: gdLayout,
   onApply: () => void,
   onClose: () => void,
@@ -33,6 +35,13 @@ export default (props: Props) => {
         </Trans>
       }
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
+      onComputeAllVariableNames={() =>
+        EventsRootVariablesFinder.findAllLayoutVariables(
+          props.project.getCurrentPlatform(),
+          props.project,
+          props.layout
+        )
+      }
     />
   );
 };

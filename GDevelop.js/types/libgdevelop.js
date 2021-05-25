@@ -48,6 +48,7 @@ declare class libGDevelop {
   MapExtensionProperties: Class<gdMapExtensionProperties>;
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
+  EventsVariablesFinder: Class<gdEventsVariablesFinder>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;
   JsPlatform: Class<gdJsPlatform>;

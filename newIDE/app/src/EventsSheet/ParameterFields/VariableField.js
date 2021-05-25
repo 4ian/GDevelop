@@ -8,18 +8,63 @@ import classNames from 'classnames';
 import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
+  type DataSource,
 } from '../../UI/SemiControlledAutoComplete';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import uniq from 'lodash/uniq';
 
 type Props = {
   ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
+  onComputeAllVariableNames: () => Array<string>,
   onOpenDialog: ?() => void,
 };
 
-export default class VariableField extends Component<Props, {||}> {
+type State = {|
+  autocompletionVariableNames: DataSource,
+|};
+
+export default class VariableField extends Component<Props, State> {
   _field: ?SemiControlledAutoCompleteInterface;
+
+  static contextType = PreferencesContext;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      autocompletionVariableNames: [],
+    };
+  }
+
+  componentDidMount() {
+    const definedVariableNames = enumerateVariables(
+      this.props.variablesContainer
+    )
+      .map(({ name, isValidName }) =>
+        isValidName
+          ? name
+          : // Hide invalid variable names - they would not
+            // be parsed correctly anyway.
+            null
+      )
+      .filter(Boolean);
+    const preferences = this.context;
+    const autocompletionVariableNames = preferences.values
+      .useUndefinedVariablesInAutocompletion
+      ? uniq([
+          ...definedVariableNames,
+          ...this.props.onComputeAllVariableNames(),
+        ])
+      : definedVariableNames;
+    this.setState({
+      autocompletionVariableNames: autocompletionVariableNames.map(name => ({
+        text: name,
+        value: name,
+      })),
+    });
+  }
 
   focus() {
     if (this._field) this._field.focus();
@@ -32,7 +77,6 @@ export default class VariableField extends Component<Props, {||}> {
       isInline,
       onOpenDialog,
       parameterMetadata,
-      variablesContainer,
       onRequestClose,
     } = this.props;
 
@@ -55,18 +99,7 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={enumerateVariables(variablesContainer)
-              .map(({ name, isValidName }) =>
-                isValidName
-                  ? {
-                      text: name,
-                      value: name,
-                    }
-                  : // Hide invalid variable names - they would not
-                    // be parsed correctly anyway.
-                    null
-              )
-              .filter(Boolean)}
+            dataSource={this.state.autocompletionVariableNames}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

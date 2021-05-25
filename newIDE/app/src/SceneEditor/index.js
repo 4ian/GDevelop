@@ -71,6 +71,8 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -1309,6 +1311,26 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onComputeAllVariableNames={() => {
+              const variablesEditedInstance = this.state
+                .variablesEditedInstance;
+              if (!variablesEditedInstance) {
+                return [];
+              }
+              const variablesEditedObject = getObjectByName(
+                project,
+                layout,
+                variablesEditedInstance.getObjectName()
+              );
+              return variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1329,6 +1351,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             title={<Trans>Object Variables</Trans>}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onComputeAllVariableNames={() => {
+              const variablesEditedObject = this.state.variablesEditedObject;
+              return variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (
@@ -1370,6 +1403,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         {!!this.state.layoutVariablesDialogOpen && (
           <SceneVariablesDialog
             open
+            project={project}
             layout={layout}
             onApply={() => this.editLayoutVariables(false)}
             onClose={() => this.editLayoutVariables(false)}

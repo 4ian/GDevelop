@@ -46,6 +46,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 const styles = {
   listContainer: {
@@ -652,6 +653,17 @@ export default class ObjectsList extends React.Component<Props, State> {
               </Trans>
             }
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onComputeAllVariableNames={() => {
+              const variablesEditedObject = this.state.variablesEditedObject;
+              return layout && variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
           />
         )}
         {tagEditedObject && (

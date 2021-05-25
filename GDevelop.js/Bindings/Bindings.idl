@@ -120,6 +120,16 @@ interface ProjectHelper {
     [Const, Value] DOMString STATIC_SanityCheckObjectInitialInstanceProperty(gdObject obj, [Const] DOMString propertyName, [Const] DOMString newValue);
 };
 
+interface EventsVariablesFinder {
+    void EventsVariablesFinder();
+
+    [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
+    [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
+    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
+    
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();

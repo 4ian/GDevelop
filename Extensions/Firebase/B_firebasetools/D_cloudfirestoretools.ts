@@ -57,10 +57,7 @@ namespace gdjs {
           sourceQueryID: string
         ) => {
           if (queries.has(sourceQueryID))
-            queries.set(
-              queryID,
-              queries.get(sourceQueryID) as firebase.firestore.Query
-            );
+            queries.set(queryID, queries.get(sourceQueryID)!);
         };
 
         /**
@@ -82,14 +79,7 @@ namespace gdjs {
           value: string | number
         ) => {
           if (queries.has(queryID))
-            queries.set(
-              queryID,
-              (queries.get(queryID) as firebase.firestore.Query).where(
-                field,
-                op,
-                value
-              )
-            );
+            queries.set(queryID, queries.get(queryID)!.where(field, op, value));
         };
 
         /**
@@ -107,10 +97,7 @@ namespace gdjs {
           if (queries.has(queryID))
             queries.set(
               queryID,
-              (queries.get(queryID) as firebase.firestore.Query).orderBy(
-                field,
-                direction
-              )
+              queries.get(queryID)!.orderBy(field, direction)
             );
         };
 
@@ -118,20 +105,18 @@ namespace gdjs {
          * Limits the amount of documents returned by the query.
          *
          * @param queryID - The query to add the filter to.
-         * @param ammount - The amount of documents to limit to
+         * @param amount - The amount of documents to limit to
          * @param last - If true, limits to the last documents instead of the first documents.
          */
         export const queryLimit = (
           queryID: string,
-          ammount: integer,
+          amount: integer,
           last: boolean
         ) => {
           if (queries.has(queryID))
             queries.set(
               queryID,
-              (queries.get(queryID) as firebase.firestore.Query)[
-                last ? 'limitToLast' : 'limit'
-              ](ammount)
+              queries.get(queryID)![last ? 'limitToLast' : 'limit'](amount)
             );
         };
 
@@ -153,15 +138,17 @@ namespace gdjs {
           if (queries.has(queryID))
             queries.set(
               queryID,
-              (queries.get(queryID) as firebase.firestore.Query)[
-                before
-                  ? includeSelf
-                    ? 'endAt'
-                    : 'endBefore'
-                  : includeSelf
-                  ? 'startAt'
-                  : 'startAfter'
-              ](value)
+              queries
+                .get(queryID)!
+                [
+                  before
+                    ? includeSelf
+                      ? 'endAt'
+                      : 'endBefore'
+                    : includeSelf
+                    ? 'startAt'
+                    : 'startAfter'
+                ](value)
             );
         };
 
@@ -178,7 +165,8 @@ namespace gdjs {
           callbackStatusVariable?: gdjs.Variable
         ) => {
           if (!queries.has(queryID)) return;
-          (queries.get(queryID) as firebase.firestore.Query)
+          queries
+            .get(queryID)!
             .get()
             .then((snapshot) => {
               if (typeof callbackStatusVariable !== 'undefined')
@@ -212,7 +200,7 @@ namespace gdjs {
           callbackStatusVariable?: gdjs.Variable
         ) => {
           if (!queries.has(queryID)) return;
-          (queries.get(queryID) as firebase.firestore.Query).onSnapshot(
+          queries.get(queryID)!.onSnapshot(
             (snapshot) => {
               if (typeof callbackStatusVariable !== 'undefined')
                 callbackStatusVariable.setString('ok');
@@ -248,7 +236,7 @@ namespace gdjs {
             .collection(collectionName)
             .doc(variableName)
             .set(
-              replaceTimstampsInObject(
+              replaceTimestampsInObject(
                 JSON.parse(
                   gdjs.evtTools.network.variableStructureToJSON(variable)
                 )
@@ -285,7 +273,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(documentName)
-            .set({ [field]: replaceTimstampInString(value) }, { merge: merge })
+            .set({ [field]: replaceTimestampInString(value) }, { merge: merge })
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -314,7 +302,7 @@ namespace gdjs {
             .collection(collectionName)
             .doc(variableName)
             .update(
-              replaceTimstampsInObject(
+              replaceTimestampsInObject(
                 JSON.parse(
                   gdjs.evtTools.network.variableStructureToJSON(variable)
                 )
@@ -349,7 +337,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(documentName)
-            .update({ [field]: replaceTimstampInString(value) })
+            .update({ [field]: replaceTimestampInString(value) })
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -593,16 +581,16 @@ namespace gdjs {
         export const getServerTimestamp = () =>
           '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]';
 
-        const replaceTimstampInString = (str: any) => {
+        const replaceTimestampInString = (str: any) => {
           if (str === '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]')
             return firebase.firestore.FieldValue.serverTimestamp();
           else return str;
         };
 
-        const replaceTimstampsInObject = (object: object): object => {
+        const replaceTimestampsInObject = (object: object): object => {
           for (const i in object) {
             const item = object[i];
-            if (typeof item === 'object') replaceTimstampsInObject(item);
+            if (typeof item === 'object') replaceTimestampsInObject(item);
             else if (item === '[{__FIREBASE_SERVERSIDE_TIMESTAMP}]')
               object[i] = firebase.firestore.FieldValue.serverTimestamp();
           }

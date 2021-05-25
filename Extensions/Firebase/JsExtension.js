@@ -1225,7 +1225,7 @@ module.exports = {
     extension
       .addAction(
         'FirestoreQueryLimit',
-        _('Limit ammount of documents'),
+        _('Limit amount of documents'),
         _(
           'Limits the amount of documents returned by the query. Can only be used after an order filter.'
         ),
@@ -1237,7 +1237,7 @@ module.exports = {
         'JsPlatform/Extensions/firebase.png'
       )
       .addParameter('string', _('Query name'), '', false)
-      .addParameter('expression', _('Ammount to limit by'), '', false)
+      .addParameter('expression', _('Amount to limit by'), '', false)
       .addParameter('yesorno', _('Begin from the end'), '', false)
       .setDefaultValue('false')
       .setParameterLongDescription(
@@ -1318,7 +1318,7 @@ module.exports = {
         true
       )
       .setParameterLongDescription(
-        'See the shape of the returned data on [the wiki page]().'
+        'See the shape of the returned data on [the wiki page](http://wiki.compilgames.net/doku.php/gdevelop5/all-features/firebase/firestore#the_query_result).'
       )
       .addParameter(
         'scenevar',

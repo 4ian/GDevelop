@@ -24,7 +24,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
     return (
       <GenericExpressionField
         expressionType="string"
-        getAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={expression =>
           layerNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

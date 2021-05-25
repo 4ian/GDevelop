@@ -13,6 +13,7 @@ import SemiControlledAutoComplete, {
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import uniq from 'lodash/uniq';
 
 type Props = {
   ...ParameterFieldProps,
@@ -21,11 +22,49 @@ type Props = {
   onOpenDialog: ?() => void,
 };
 
-export default class VariableField extends Component<Props, {||}> {
+type State = {|
+  autocompletionVariableNames: DataSource,
+|};
+
+export default class VariableField extends Component<Props, State> {
   _field: ?SemiControlledAutoCompleteInterface;
-  _variableNames: ?DataSource = null;
 
   static contextType = PreferencesContext;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      autocompletionVariableNames: [],
+    };
+  }
+
+  componentDidMount() {
+    const definedVariableNames = enumerateVariables(
+      this.props.variablesContainer
+    )
+      .map(({ name, isValidName }) =>
+        isValidName
+          ? name
+          : // Hide invalid variable names - they would not
+            // be parsed correctly anyway.
+            null
+      )
+      .filter(Boolean);
+    const preferences = this.context;
+    const autocompletionVariableNames = preferences.values
+      .useUndefinedVariablesInAutocompletion
+      ? uniq([
+          ...definedVariableNames,
+          ...this.props.onComputeAllVariableNames(),
+        ])
+      : definedVariableNames;
+    this.setState({
+      autocompletionVariableNames: autocompletionVariableNames.map(name => ({
+        text: name,
+        value: name,
+      })),
+    });
+  }
 
   focus() {
     if (this._field) this._field.focus();
@@ -38,40 +77,12 @@ export default class VariableField extends Component<Props, {||}> {
       isInline,
       onOpenDialog,
       parameterMetadata,
-      variablesContainer,
-      onComputeAllVariableNames,
       onRequestClose,
     } = this.props;
 
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
-
-    if (this._variableNames === null) {
-      let tempVariableNames = enumerateVariables(variablesContainer)
-        .map(({ name, isValidName }) =>
-          isValidName
-            ? name
-            : // Hide invalid variable names - they would not
-              // be parsed correctly anyway.
-              null
-        )
-        .filter(Boolean);
-      const preferences = this.context;
-      if (preferences.values.useUndefinedVariablesInAutocompletion) {
-        console.log('useUndefinedVariablesInAutocompletion');
-        Array.prototype.push.apply(
-          tempVariableNames,
-          onComputeAllVariableNames()
-        );
-        tempVariableNames = [...new Set(tempVariableNames)];
-      }
-      console.log('tempVariableNames: ' + tempVariableNames.length);
-      this._variableNames = tempVariableNames.map(name => ({
-        text: name,
-        value: name,
-      }));
-    }
 
     return (
       <TextFieldWithButtonLayout
@@ -88,7 +99,7 @@ export default class VariableField extends Component<Props, {||}> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
-            dataSource={this._variableNames ? this._variableNames : []}
+            dataSource={this.state.autocompletionVariableNames}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}
           />

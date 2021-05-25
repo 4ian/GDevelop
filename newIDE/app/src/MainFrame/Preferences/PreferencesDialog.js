@@ -253,7 +253,12 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               }
               toggled={values.useUndefinedVariablesInAutocompletion}
               labelPosition="right"
-              label={<Trans>Show undefined variables in autocompletion</Trans>}
+              label={
+                <Trans>
+                  Suggest names of variables used in events but not declared in
+                  the list of variables
+                </Trans>
+              }
             />
           </Line>
           <Text size="title">

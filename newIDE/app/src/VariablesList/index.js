@@ -46,6 +46,7 @@ type State = {|
   nameErrors: { [string]: string },
   selectedVariables: { [number]: ?VariableAndName },
   mode: 'select' | 'move',
+  allVariableNames: string[],
 |};
 
 export default class VariablesList extends React.Component<Props, State> {
@@ -53,9 +54,12 @@ export default class VariablesList extends React.Component<Props, State> {
     nameErrors: {},
     selectedVariables: getInitialSelection(),
     mode: 'select',
+    allVariableNames: [],
   };
 
-  _allVariableNames: ?Array<string> = null;
+  componentDidMount() {
+    this.setState({ allVariableNames: this.props.onComputeAllVariableNames() });
+  }
 
   _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
     this.setState({
@@ -136,9 +140,9 @@ export default class VariablesList extends React.Component<Props, State> {
 
     // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
     // that's why it's important to only delete ancestor variables.
-    ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) => {
-      variablesContainer.removeRecursively(variable);
-    });
+    ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) =>
+      variablesContainer.removeRecursively(variable)
+    );
     this.clearSelection();
   };
 
@@ -342,8 +346,8 @@ export default class VariablesList extends React.Component<Props, State> {
         }
         undefinedVariableNames={
           // autocompletion is not handled for child variables.
-          depth === 0 && this._allVariableNames
-            ? this._allVariableNames.filter(
+          depth === 0
+            ? this.state.allVariableNames.filter(
                 variableName => !this.props.variablesContainer.has(variableName)
               )
             : []
@@ -376,10 +380,6 @@ export default class VariablesList extends React.Component<Props, State> {
   render() {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
-
-    if (this._allVariableNames === null) {
-      this._allVariableNames = this.props.onComputeAllVariableNames();
-    }
 
     // Display inherited variables, if any
     const containerInheritedVariablesTree = inheritedVariablesContainer

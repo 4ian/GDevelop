@@ -94,6 +94,9 @@ const VariableRow = ({
       ) : (
         <SemiControlledAutoComplete
           margin="none"
+          style={{
+            fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
+          }}
           fullWidth
           errorText={errorText}
           disabled={origin === 'parent'}

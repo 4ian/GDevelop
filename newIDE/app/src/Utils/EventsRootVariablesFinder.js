@@ -1,5 +1,8 @@
 const gd: libGDevelop = global.gd;
 
+const isRootVariableName = fullName =>
+  !fullName.includes('.') && !fullName.includes('[');
+
 export default class EventsRootVariablesFinder {
   static findAllGlobalVariables(
     platform: gdPlatform,
@@ -10,7 +13,7 @@ export default class EventsRootVariablesFinder {
         .toNewVectorString()
         .toJSArray()
         // Remove child references
-        .filter(name => !name.includes('.') && !name.includes('['))
+        .filter(isRootVariableName)
     );
   }
 
@@ -26,7 +29,7 @@ export default class EventsRootVariablesFinder {
     )
       .toNewVectorString()
       .toJSArray()
-      .filter(name => !name.includes('.') && !name.includes('['));
+      .filter(isRootVariableName);
   }
 
   static findAllObjectVariables(
@@ -43,6 +46,6 @@ export default class EventsRootVariablesFinder {
     )
       .toNewVectorString()
       .toJSArray()
-      .filter(name => !name.includes('.') && !name.includes('['));
+      .filter(isRootVariableName);
   }
 }

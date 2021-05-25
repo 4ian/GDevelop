@@ -299,14 +299,14 @@ namespace gdjs {
      * Get the width of the object.
      */
     getWidth(): float {
-      return this._renderer.getWidth() * this.getScale();
+      return this._renderer.getWidth();
     }
 
     /**
      * Get the height of the object.
      */
     getHeight(): float {
-      return this._renderer.getHeight() * this.getScale();
+      return this._renderer.getHeight();
     }
   }
   gdjs.registerObject(

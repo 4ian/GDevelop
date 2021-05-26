@@ -243,7 +243,7 @@ export default function NewInstructionEditorDialog({
     <ResponsiveWindowMeasurer>
       {windowWidth => (
         <Dialog
-          onApply={onSubmit}
+          onApply={instructionType && onSubmit}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}

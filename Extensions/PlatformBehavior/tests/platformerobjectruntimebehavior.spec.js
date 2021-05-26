@@ -191,67 +191,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
     });
 
-    it('can grab, and release, a platform', function () {
-      //Put the object near the right ledge of the platform.
-      object.setPosition(
-        platform.getX() + platform.getWidth() + 2,
-        platform.getY() - 10
-      );
-
-      for (let i = 0; i < 35; ++i) {
-        object.getBehavior('auto1').simulateLeftKey();
-        runtimeScene.renderAndStep(1000 / 60);
-      }
-
-      //Check that the object grabbed the platform
-      expect(object.getX()).to.be.within(
-        platform.getX() + platform.getWidth() + 0,
-        platform.getX() + platform.getWidth() + 1
-      );
-      expect(object.getY()).to.be(platform.getY());
-
-      object.getBehavior('auto1').simulateReleaseKey();
-      for (let i = 0; i < 10; ++i) {
-        runtimeScene.renderAndStep(1000 / 60);
-        expect(object.getBehavior('auto1').isFalling()).to.be(true);
-        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
-          true
-        );
-      }
-
-      //Check that the object is falling
-      expect(object.getY()).to.be(3.75);
-    });
-
-    it('can grab a platform and jump', function () {
-      //Put the object near the right ledge of the platform.
-      object.setPosition(
-        platform.getX() + platform.getWidth() + 2,
-        platform.getY() - 10
-      );
-
-      for (let i = 0; i < 35; ++i) {
-        object.getBehavior('auto1').simulateLeftKey();
-        runtimeScene.renderAndStep(1000 / 60);
-      }
-
-      //Check that the object grabbed the platform
-      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
-      expect(object.getX()).to.be.within(
-        platform.getX() + platform.getWidth() + 0,
-        platform.getX() + platform.getWidth() + 1
-      );
-      expect(object.getY()).to.be(platform.getY());
-
-      object.getBehavior('auto1').simulateJumpKey();
-      //Check that the object is jumping
-      for (let i = 0; i < 10; ++i) {
-        runtimeScene.renderAndStep(1000 / 60);
-        expect(object.getBehavior('auto1').isJumping()).to.be(true);
-      }
-      expect(object.getY()).to.be.below(platform.getY());
-    });
-
     it('can track object height changes', function () {
       //Put the object near the right ledge of the platform.
       object.setPosition(
@@ -334,6 +273,170 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+  });
+
+  describe('(grab platforms)', function () {
+    let runtimeScene;
+    let object;
+
+    beforeEach(function () {
+      runtimeScene = makeTestRuntimeScene();
+
+      // Put a platformer object in the air.
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 900,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 1500,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+          },
+        ],
+      });
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      object.setPosition(0, -100);
+    });
+
+    it('can grab, and release, a platform', function () {
+      // Put a platform.
+      const platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      //Put the object near the right ledge of the platform.
+      object.setPosition(
+        platform.getX() + platform.getWidth() + 2,
+        platform.getY() - 10
+      );
+
+      for (let i = 0; i < 35; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check that the object grabbed the platform
+      expect(object.getX()).to.be.within(
+        platform.getX() + platform.getWidth() + 0,
+        platform.getX() + platform.getWidth() + 1
+      );
+      expect(object.getY()).to.be(platform.getY());
+
+      object.getBehavior('auto1').simulateReleaseKey();
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+      }
+
+      //Check that the object is falling
+      expect(object.getY()).to.be(3.75);
+    });
+
+    [true, false].forEach((addTopPlatformFirst) => {
+      it('can grab every platform when colliding 2', function () {
+        // The 2 platforms will be simultaneously in collision
+        // with the object when it grabs one.
+        let upperPlatform, lowerPlatform;
+        if (addTopPlatformFirst) {
+          upperPlatform = addPlatformObject(runtimeScene);
+          upperPlatform.setPosition(0, -10);
+          upperPlatform.setCustomWidthAndHeight(60, 10);
+
+          lowerPlatform = addPlatformObject(runtimeScene);
+          lowerPlatform.setPosition(0, 0);
+          lowerPlatform.setCustomWidthAndHeight(60, 10);
+        } else {
+          lowerPlatform = addPlatformObject(runtimeScene);
+          lowerPlatform.setPosition(0, 0);
+          lowerPlatform.setCustomWidthAndHeight(60, 10);
+
+          upperPlatform = addPlatformObject(runtimeScene);
+          upperPlatform.setPosition(0, -10);
+          upperPlatform.setCustomWidthAndHeight(60, 10);
+        }
+
+        // Put the object near the right ledge of the platform.
+        object.setPosition(
+          upperPlatform.getX() + upperPlatform.getWidth() + 2,
+          upperPlatform.getY() - 10
+        );
+        runtimeScene.renderAndStep(1000 / 60);
+
+        for (let i = 0; i < 35; ++i) {
+          object.getBehavior('auto1').simulateLeftKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Check that the object grabbed the upper platform
+        expect(object.getX()).to.be.within(
+          upperPlatform.getX() + upperPlatform.getWidth() + 0,
+          upperPlatform.getX() + upperPlatform.getWidth() + 1
+        );
+        expect(object.getY()).to.be(upperPlatform.getY());
+        expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+
+        // Release upper platform
+        object.getBehavior('auto1').simulateReleaseKey();
+        for (let i = 0; i < 35; ++i) {
+          object.getBehavior('auto1').simulateLeftKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Check that the object grabbed the lower platform
+        expect(object.getX()).to.be.within(
+          lowerPlatform.getX() + lowerPlatform.getWidth() + 0,
+          lowerPlatform.getX() + lowerPlatform.getWidth() + 1
+        );
+        expect(object.getY()).to.be(lowerPlatform.getY());
+        expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+      });
+    });
+
+    it('can grab a platform and jump', function () {
+      // Put a platform.
+      platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      //Put the object near the right ledge of the platform.
+      object.setPosition(
+        platform.getX() + platform.getWidth() + 2,
+        platform.getY() - 10
+      );
+
+      for (let i = 0; i < 35; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check that the object grabbed the platform
+      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+      expect(object.getX()).to.be.within(
+        platform.getX() + platform.getWidth() + 0,
+        platform.getX() + platform.getWidth() + 1
+      );
+      expect(object.getY()).to.be(platform.getY());
+
+      object.getBehavior('auto1').simulateJumpKey();
+      //Check that the object is jumping
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      }
+      expect(object.getY()).to.be.below(platform.getY());
     });
   });
 

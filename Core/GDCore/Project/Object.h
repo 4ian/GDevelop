@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
@@ -20,6 +21,7 @@ class Layout;
 class ArbitraryResourceWorker;
 class InitialInstance;
 class SerializerElement;
+class EffectsContainer;
 }  // namespace gd
 
 namespace gd {
@@ -146,8 +148,7 @@ class GD_CORE_API Object {
    *
    * \return false if the new value cannot be set
    */
-  virtual bool UpdateProperty(const gd::String& name,
-                              const gd::String& value) {
+  virtual bool UpdateProperty(const gd::String& name, const gd::String& value) {
     return false;
   };
   ///@}
@@ -270,6 +271,24 @@ class GD_CORE_API Object {
    * object variables
    */
   gd::VariablesContainer& GetVariables() { return objectVariables; }
+  ///@}
+
+  /**
+   * \name Effects management
+   * Member functions related to effects management.
+   */
+  ///@{
+  /**
+   * \brief Provide access to the gd::EffectsContainer member containing the
+   * effects.
+   */
+  const gd::EffectsContainer& GetEffects() const { return effectsContainer; }
+
+  /**
+   * \brief Provide access to the gd::EffectsContainer member containing the
+   * effects.
+   */
+  gd::EffectsContainer& GetEffects() { return effectsContainer; }
 ///@}
 
 /** \name Serialization
@@ -301,7 +320,9 @@ class GD_CORE_API Object {
                   ///< object.
   gd::VariablesContainer
       objectVariables;  ///< List of the variables of the object
-  gd::String tags; ///< Comma-separated list of tags
+  gd::String tags;      ///< Comma-separated list of tags
+  gd::EffectsContainer
+      effectsContainer;  ///< The effects container for the object.
 
   /**
    * \brief Derived objects can redefine this method to load custom attributes.

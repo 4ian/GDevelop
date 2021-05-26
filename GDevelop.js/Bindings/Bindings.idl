@@ -515,6 +515,7 @@ interface gdObject {
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
 
     [Ref] VariablesContainer GetVariables();
+    [Ref] EffectsContainer GetEffects();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
     BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);

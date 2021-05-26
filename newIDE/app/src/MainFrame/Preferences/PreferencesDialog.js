@@ -284,27 +284,29 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               }
             />
           </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
-              toggled={values.isMenuBarHiddenInPreview}
-              labelPosition="right"
-              label={<Trans>Hide the menu bar in the preview window</Trans>}
-            />
-          </Line>
           {electron && (
-            <Line>
-              <Toggle
-                onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
-                toggled={values.isAlwaysOnTopInPreview}
-                labelPosition="right"
-                label={
-                  <Trans>
-                    Always display the preview window on top of others
-                  </Trans>
-                }
-              />
-            </Line>
+            <>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
+                  toggled={values.isMenuBarHiddenInPreview}
+                  labelPosition="right"
+                  label={<Trans>Hide the menu bar in the preview window</Trans>}
+                />
+              </Line>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
+                  toggled={values.isAlwaysOnTopInPreview}
+                  labelPosition="right"
+                  label={
+                    <Trans>
+                      Always display the preview window on top of others
+                    </Trans>
+                  }
+                />
+              </Line>
+            </>
           )}
           {Window.isDev() && (
             <Line>

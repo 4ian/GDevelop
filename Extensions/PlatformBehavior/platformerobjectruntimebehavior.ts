@@ -427,33 +427,29 @@ namespace gdjs {
 
     _checkGrabPlatform() {
       const object = this.owner;
-      let tryGrabbingPlatform = false;
-      object.setX(
-        object.getX() +
-          (this._requestedDeltaX > 0
-            ? this._xGrabTolerance
-            : -this._xGrabTolerance)
-      );
-      let collidingPlatform = this._getCollidingPlatform();
-      if (collidingPlatform !== null && this._canGrab(collidingPlatform)) {
-        tryGrabbingPlatform = true;
-      }
-      object.setX(
-        object.getX() +
-          (this._requestedDeltaX > 0
-            ? -this._xGrabTolerance
-            : this._xGrabTolerance)
-      );
+      let oldX = object.getX();
+      let oldY = object.getY();
 
-      //Check if we can grab the collided platform
-      if (tryGrabbingPlatform) {
-        let oldY = object.getY();
+      let tryGrabbingPlatform = false;
+      for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
+        const platform = this._potentialCollidingObjects[i];
+
+        object.setX(
+          object.getX() +
+            (this._requestedDeltaX > 0
+              ? this._xGrabTolerance
+              : -this._xGrabTolerance)
+        );
+        tryGrabbingPlatform =
+          this._isColliding(platform) && this._canGrab(platform);
+        object.setX(oldX);
+
+        //Check if we can grab the collided platform
+        if (!tryGrabbingPlatform) {
+          continue;
+        }
         object.setY(
-          // @ts-ignore - collidingPlatform is guaranteed to be not null.
-          collidingPlatform.owner.getY() +
-            // @ts-ignore - collidingPlatform is guaranteed to be not null.
-            collidingPlatform.getYGrabOffset() -
-            this._yGrabOffset
+          platform.owner.getY() + platform.getYGrabOffset() - this._yGrabOffset
         );
         if (
           !this._isCollidingWith(
@@ -463,11 +459,11 @@ namespace gdjs {
             true
           )
         ) {
-          this._setGrabbingPlatform(collidingPlatform!);
+          this._setGrabbingPlatform(platform);
           this._requestedDeltaY = 0;
-        } else {
-          object.setY(oldY);
+          return;
         }
+        object.setY(oldY);
       }
     }
 
@@ -554,6 +550,38 @@ namespace gdjs {
     }
 
     /**
+     * Separate the object from all platforms passed in parameter.
+     * @param candidates The platform to be tested for collision
+     * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     */
+    private _separateFromPlatforms(
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      excludeJumpThrus: boolean
+    ) {
+      excludeJumpThrus = !!excludeJumpThrus;
+      const objects = gdjs.staticArray(
+        PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms
+      );
+      objects.length = 0;
+      for (let i = 0; i < candidates.length; ++i) {
+        const platform = candidates[i];
+        if (
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
+        ) {
+          continue;
+        }
+        if (
+          excludeJumpThrus &&
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
+        ) {
+          continue;
+        }
+        objects.push(platform.owner);
+      }
+      return this.owner.separateFromObjects(objects, this._ignoreTouchingEdges);
+    }
+
+    /**
      * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
      * Ladders are *always* excluded from the test.
      * @param candidates The platform to be tested for collision
@@ -593,38 +621,6 @@ namespace gdjs {
         }
       }
       return false;
-    }
-
-    /**
-     * Separate the object from all platforms passed in parameter.
-     * @param candidates The platform to be tested for collision
-     * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
-     */
-    private _separateFromPlatforms(
-      candidates: gdjs.PlatformRuntimeBehavior[],
-      excludeJumpThrus: boolean
-    ) {
-      excludeJumpThrus = !!excludeJumpThrus;
-      const objects = gdjs.staticArray(
-        PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms
-      );
-      objects.length = 0;
-      for (let i = 0; i < candidates.length; ++i) {
-        const platform = candidates[i];
-        if (
-          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
-        ) {
-          continue;
-        }
-        if (
-          excludeJumpThrus &&
-          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
-        ) {
-          continue;
-        }
-        objects.push(platform.owner);
-      }
-      return this.owner.separateFromObjects(objects, this._ignoreTouchingEdges);
     }
 
     /**
@@ -683,6 +679,23 @@ namespace gdjs {
 
       //Nothing is being colliding with the behavior object.
       return null;
+    }
+
+    /**
+     * Return true if the platform is colliding with the behavior owner object.
+     * Overlapped jump thru and ladders are excluded.
+     * @param platform The platform to be tested for collision
+     */
+    private _isColliding(platform: gdjs.PlatformRuntimeBehavior): boolean {
+      return (
+        platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER &&
+        !this._isIn(this._overlappedJumpThru, platform.owner.id) &&
+        gdjs.RuntimeObject.collisionTest(
+          this.owner,
+          platform.owner,
+          this._ignoreTouchingEdges
+        )
+      );
     }
 
     /**

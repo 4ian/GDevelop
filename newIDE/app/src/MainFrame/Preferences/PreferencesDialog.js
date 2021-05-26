@@ -284,6 +284,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               }
             />
           </Line>
+          {electron && (
           <Line>
             <Toggle
               onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
@@ -292,7 +293,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               label={<Trans>Hide the menu bar in the preview window</Trans>}
             />
           </Line>
-          {electron && (
             <Line>
               <Toggle
                 onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}

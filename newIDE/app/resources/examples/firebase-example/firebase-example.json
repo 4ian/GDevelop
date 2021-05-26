@@ -36,65 +36,6 @@
         "value": "{\n    \"apiKey\": \"AIzaSyCbFhG_bCyAvnxlmVSgIgn7Em0XOYE9YXA\",\n    \"authDomain\": \"tutorial-gdevelop.firebaseapp.com\",\n    \"databaseURL\": \"https://tutorial-gdevelop.firebaseio.com\",\n    \"projectId\": \"tutorial-gdevelop\",\n    \"storageBucket\": \"tutorial-gdevelop.appspot.com\",\n    \"messagingSenderId\": \"386980638073\",\n    \"appId\": \"1:386980638073:web:b00afc0ecb3ed7ca4f53a8\",\n    \"measurementId\": \"G-R0KBN0HPQ8\"\n  }"
       }
     ],
-    "extensions": [
-      {
-        "name": "BuiltinObject"
-      },
-      {
-        "name": "BuiltinAudio"
-      },
-      {
-        "name": "BuiltinVariables"
-      },
-      {
-        "name": "BuiltinTime"
-      },
-      {
-        "name": "BuiltinMouse"
-      },
-      {
-        "name": "BuiltinKeyboard"
-      },
-      {
-        "name": "BuiltinJoystick"
-      },
-      {
-        "name": "BuiltinCamera"
-      },
-      {
-        "name": "BuiltinWindow"
-      },
-      {
-        "name": "BuiltinFile"
-      },
-      {
-        "name": "BuiltinNetwork"
-      },
-      {
-        "name": "BuiltinScene"
-      },
-      {
-        "name": "BuiltinAdvanced"
-      },
-      {
-        "name": "Sprite"
-      },
-      {
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "name": "BuiltinCommonConversions"
-      },
-      {
-        "name": "BuiltinStringInstructions"
-      },
-      {
-        "name": "BuiltinMathematicalTools"
-      },
-      {
-        "name": "BuiltinExternalLayouts"
-      }
-    ],
     "platforms": [
       {
         "name": "GDevelop JS platform"
@@ -5995,6 +5936,22 @@
       "objectsGroups": [],
       "variables": [
         {
+          "name": "messageOffset",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "name": "messages",
+          "type": "structure",
+          "children": [
+            {
+              "name": "docs",
+              "type": "array",
+              "children": []
+            }
+          ]
+        },
+        {
           "name": "message",
           "type": "structure",
           "children": [
@@ -6016,88 +5973,19 @@
           ]
         },
         {
-          "name": "sendMessageStatus",
-          "type": "string",
-          "value": ""
-        },
-        {
-          "name": "listMessageStatus",
-          "type": "string",
-          "value": ""
-        },
-        {
-          "name": "messagesList",
-          "type": "string",
-          "value": ""
-        },
-        {
-          "name": "refreshMessages",
-          "type": "string",
-          "value": "1"
-        },
-        {
-          "name": "reloadMessages",
+          "name": "previousOffset",
           "type": "string",
           "value": "0"
         },
         {
-          "name": "messageOffset",
+          "name": "listMessageStatus",
           "type": "string",
-          "value": ""
+          "value": "IDLE"
         },
         {
-          "name": "messages",
-          "type": "structure",
-          "children": [
-            {
-              "name": "1",
-              "type": "structure",
-              "children": [
-                {
-                  "name": "content",
-                  "type": "string",
-                  "value": "Loading..."
-                },
-                {
-                  "name": "date",
-                  "type": "string",
-                  "value": " "
-                }
-              ]
-            },
-            {
-              "name": "2",
-              "type": "structure",
-              "children": [
-                {
-                  "name": "content",
-                  "type": "string",
-                  "value": "Loading..."
-                },
-                {
-                  "name": "date",
-                  "type": "string",
-                  "value": " "
-                }
-              ]
-            },
-            {
-              "name": "3",
-              "type": "structure",
-              "children": [
-                {
-                  "name": "content",
-                  "type": "string",
-                  "value": "Loading..."
-                },
-                {
-                  "name": "date",
-                  "type": "string",
-                  "value": " "
-                }
-              ]
-            }
-          ]
+          "name": "sendMessageStatus",
+          "type": "string",
+          "value": "IDLE"
         }
       ],
       "instances": [
@@ -6333,7 +6221,7 @@
           "height": 0,
           "layer": "",
           "locked": false,
-          "name": "loadingText",
+          "name": "loadError",
           "persistentUuid": "ebcc4fe4-e6e3-4730-8835-d1e409c88503",
           "width": 0,
           "x": 114,
@@ -6361,7 +6249,7 @@
             {
               "name": "id",
               "type": "string",
-              "value": "1"
+              "value": "0"
             }
           ]
         },
@@ -6383,7 +6271,7 @@
             {
               "name": "id",
               "type": "string",
-              "value": "3"
+              "value": "2"
             }
           ]
         },
@@ -6405,7 +6293,7 @@
             {
               "name": "id",
               "type": "string",
-              "value": "2"
+              "value": "1"
             }
           ]
         },
@@ -6504,8 +6392,30 @@
           "name": "postDate",
           "persistentUuid": "8ad3e3a6-183d-4819-b607-72f548446bd4",
           "width": 0,
-          "x": 495,
-          "y": 141,
+          "x": 360,
+          "y": 140,
+          "zOrder": 18,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "id",
+              "type": "string",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "postDate",
+          "persistentUuid": "ac9c053e-f938-449f-9f03-61a9b8205193",
+          "width": 0,
+          "x": 360,
+          "y": 313,
           "zOrder": 18,
           "numberProperties": [],
           "stringProperties": [],
@@ -6524,31 +6434,9 @@
           "layer": "",
           "locked": false,
           "name": "postDate",
-          "persistentUuid": "ac9c053e-f938-449f-9f03-61a9b8205193",
-          "width": 0,
-          "x": 495,
-          "y": 313,
-          "zOrder": 18,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": [
-            {
-              "name": "id",
-              "type": "string",
-              "value": "2"
-            }
-          ]
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "postDate",
           "persistentUuid": "091419ff-3980-4889-a3a0-78e693ee3fc2",
           "width": 0,
-          "x": 495,
+          "x": 360,
           "y": 483,
           "zOrder": 18,
           "numberProperties": [],
@@ -6557,7 +6445,7 @@
             {
               "name": "id",
               "type": "string",
-              "value": "3"
+              "value": "2"
             }
           ]
         }
@@ -6706,6 +6594,25 @@
           ]
         },
         {
+          "bold": true,
+          "italic": false,
+          "name": "post",
+          "smoothed": true,
+          "tags": "write-message",
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Post!",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
           "name": "textBoxEntry",
           "tags": "write-message",
           "type": "TextEntryObject::TextEntry",
@@ -6835,92 +6742,22 @@
           }
         },
         {
-          "name": "messagebox",
-          "tags": "display-tweets",
-          "type": "Sprite",
-          "updateIfNotVisible": false,
-          "variables": [
-            {
-              "name": "id",
-              "type": "string",
-              "value": ""
-            }
-          ],
-          "behaviors": [],
-          "animations": [
-            {
-              "name": "",
-              "useMultipleDirections": false,
-              "directions": [
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 0.08,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "Assets\\text_field.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 0,
-                        "y": 0
-                      },
-                      "customCollisionMask": []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
           "bold": false,
           "italic": true,
-          "name": "loadingText",
+          "name": "loadError",
           "smoothed": true,
           "tags": "display-tweets",
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "Loading...",
+          "string": "",
           "font": "",
           "characterSize": 32,
           "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
-          }
-        },
-        {
-          "bold": false,
-          "italic": false,
-          "name": "messageBoxText",
-          "smoothed": true,
-          "tags": "display-tweets",
-          "type": "TextObject::Text",
-          "underlined": false,
-          "variables": [
-            {
-              "name": "id",
-              "type": "string",
-              "value": "0"
-            }
-          ],
-          "behaviors": [],
-          "string": "Message",
-          "font": "",
-          "characterSize": 20,
-          "color": {
-            "b": 0,
-            "g": 0,
-            "r": 0
+            "b": 27,
+            "g": 2,
+            "r": 208
           }
         },
         {
@@ -7021,18 +6858,69 @@
           }
         },
         {
-          "bold": true,
+          "name": "messagebox",
+          "tags": "display-tweets",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "id",
+              "type": "string",
+              "value": ""
+            }
+          ],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\text_field.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "bold": false,
           "italic": false,
-          "name": "post",
+          "name": "messageBoxText",
           "smoothed": true,
-          "tags": "write-message",
+          "tags": "display-tweets",
           "type": "TextObject::Text",
           "underlined": false,
-          "variables": [],
+          "variables": [
+            {
+              "name": "id",
+              "type": "string",
+              "value": "0"
+            }
+          ],
           "behaviors": [],
-          "string": "Post!",
+          "string": "Message",
           "font": "",
-          "characterSize": 30,
+          "characterSize": 20,
           "color": {
             "b": 0,
             "g": 0,
@@ -7093,6 +6981,41 @@
                 "no"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Firebase::FirestoreStartQuery"
+              },
+              "parameters": [
+                "\"GetMessages\"",
+                "\"messages\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Firebase::FirestoreQueryOrderBy"
+              },
+              "parameters": [
+                "\"GetMessages\"",
+                "\"date\"",
+                "\"asc\""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Firebase::FirestoreWatchQuery"
+              },
+              "parameters": [
+                "\"GetMessages\"",
+                "messages",
+                "listMessageStatus"
+              ],
+              "subInstructions": []
             }
           ],
           "events": []
@@ -7137,7 +7060,7 @@
                   "parameters": [
                     "textBoxEntry",
                     "=",
-                    "Sanitizer::removeNewLines(Sanitizer::trim(textBoxEntry.String(), 280))"
+                    "InputValidation::RemoveNewLines(SubStr(textBoxEntry.String(), 0, 280))"
                   ],
                   "subInstructions": []
                 },
@@ -7168,12 +7091,12 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "",
+              "comment": "Click handlers",
               "comment2": ""
             },
             {
               "disabled": false,
-              "folded": true,
+              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
                 {
@@ -7282,7 +7205,7 @@
                       "parameters": [
                         "message.date",
                         "=",
-                        "ToString(Time(\"hour\"))+\":\"+ToString(Time(\"min\"))+\"h\""
+                        "Firebase::ServerTimestamp()"
                       ],
                       "subInstructions": []
                     },
@@ -7408,18 +7331,6 @@
                       "parameters": [
                         "textBoxEntry",
                         "yes"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "refreshMessages",
-                        "=",
-                        "1"
                       ],
                       "subInstructions": []
                     }
@@ -7631,6 +7542,18 @@
                         "0"
                       ],
                       "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "messageOffset",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
                     }
                   ],
                   "actions": [
@@ -7642,18 +7565,6 @@
                       "parameters": [
                         "messageOffset",
                         "-",
-                        "1"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "reloadMessages",
-                        "=",
                         "1"
                       ],
                       "subInstructions": []
@@ -7690,6 +7601,18 @@
                         "0"
                       ],
                       "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "messageOffset",
+                        "<",
+                        "Variable(messages.size) - 3"
+                      ],
+                      "subInstructions": []
                     }
                   ],
                   "actions": [
@@ -7701,18 +7624,6 @@
                       "parameters": [
                         "messageOffset",
                         "+",
-                        "1"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "reloadMessages",
-                        "=",
                         "1"
                       ],
                       "subInstructions": []
@@ -7832,8 +7743,32 @@
                   },
                   "parameters": [
                     "sendMessageStatus",
-                    "=",
-                    "\"error\""
+                    "!=",
+                    "\"IDLE\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "sendMessageStatus",
+                    "!=",
+                    "\"ok\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "sendMessageStatus",
+                    "!=",
+                    "\"pending\""
                   ],
                   "subInstructions": []
                 },
@@ -7855,7 +7790,19 @@
                   "parameters": [
                     "sendStatus",
                     "=",
-                    "\"An error occured...\""
+                    "\"An error occured: \" + VariableString(sendMessageStatus)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "sendMessageStatus",
+                    "=",
+                    "\"IDLE\""
                   ],
                   "subInstructions": []
                 }
@@ -7874,52 +7821,11 @@
                   },
                   "parameters": [
                     "listMessageStatus",
-                    "=",
-                    "\"pending\""
+                    "!=",
+                    "\"IDLE\""
                   ],
                   "subInstructions": []
                 },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "loadingText",
-                    "=",
-                    "\"Loading...\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Montre"
-                  },
-                  "parameters": [
-                    "loadingText",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
                 {
                   "type": {
                     "inverted": false,
@@ -7927,7 +7833,7 @@
                   },
                   "parameters": [
                     "listMessageStatus",
-                    "=",
+                    "!=",
                     "\"ok\""
                   ],
                   "subInstructions": []
@@ -7945,400 +7851,15 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "Cache"
-                  },
-                  "parameters": [
-                    "loadingText"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarSceneTxt"
-                  },
-                  "parameters": [
-                    "listMessageStatus",
-                    "=",
-                    "\"error\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
                     "value": "TextObject::String"
                   },
                   "parameters": [
-                    "loadingText",
+                    "loadError",
                     "=",
-                    "\"An error occured...\""
+                    "\"An error occured: \" + VariableString(listMessageStatus)"
                   ],
                   "subInstructions": []
                 },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Montre"
-                  },
-                  "parameters": [
-                    "loadingText",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.1.error",
-                    "=",
-                    "\"error\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.1.content",
-                    "=",
-                    "\"An error occured...\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.2.error",
-                    "=",
-                    "\"error\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.2.content",
-                    "=",
-                    "\"An error occured...\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.3.error",
-                    "=",
-                    "\"error\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "BuiltinCommonInstructions::Once"
-                  },
-                  "parameters": [],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarSceneTxt"
-                  },
-                  "parameters": [
-                    "messages.3.content",
-                    "=",
-                    "\"An error occured...\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "disabled": false,
-          "folded": true,
-          "name": "Reload Messages",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Regularly reload messages",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Timer"
-                  },
-                  "parameters": [
-                    "",
-                    "10",
-                    "\"reload\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "refreshMessages",
-                    "=",
-                    "1"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ResetTimer"
-                  },
-                  "parameters": [
-                    "",
-                    "\"reload\""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            }
-          ],
-          "parameters": []
-        },
-        {
-          "colorB": 228,
-          "colorG": 176,
-          "colorR": 74,
-          "creationTime": 0,
-          "disabled": false,
-          "folded": true,
-          "name": "Fetch messages",
-          "source": "",
-          "type": "BuiltinCommonInstructions::Group",
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Verify if message offset in bounds",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarScene"
-                  },
-                  "parameters": [
-                    "messageOffset",
-                    "<",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "messageOffset",
-                    "=",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarScene"
-                  },
-                  "parameters": [
-                    "messageOffset",
-                    ">",
-                    "VariableChildCount(messagesList) - 3"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "messageOffset",
-                    "=",
-                    "VariableChildCount(messagesList) - 4"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Download the list of messages",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarScene"
-                  },
-                  "parameters": [
-                    "refreshMessages",
-                    "=",
-                    "1"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
                 {
                   "type": {
                     "inverted": false,
@@ -8347,37 +7868,27 @@
                   "parameters": [
                     "listMessageStatus",
                     "=",
-                    "\"pending\""
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Firebase::FirestoreListDocuments"
-                  },
-                  "parameters": [
-                    "\"messages\"",
-                    "messagesList",
-                    "listMessageStatus"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarScene"
-                  },
-                  "parameters": [
-                    "refreshMessages",
-                    "=",
-                    "0"
+                    "\"IDLE\""
                   ],
                   "subInstructions": []
                 }
               ],
               "events": []
-            },
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Show messages",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
             {
               "disabled": false,
               "folded": false,
@@ -8390,7 +7901,7 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Download a message",
+              "comment": "If the messages have been updated, or the offset has been changed, update the text in the objects",
               "comment2": ""
             },
             {
@@ -8408,43 +7919,26 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "VarScene"
+                        "value": "VarSceneTxt"
                       },
                       "parameters": [
-                        "reloadMessages",
+                        "listMessageStatus",
                         "=",
-                        "1"
+                        "\"ok\""
                       ],
                       "subInstructions": []
                     },
                     {
                       "type": {
                         "inverted": false,
-                        "value": "BuiltinCommonInstructions::And"
+                        "value": "VarScene"
                       },
-                      "parameters": [],
-                      "subInstructions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "VarSceneTxt"
-                          },
-                          "parameters": [
-                            "listMessageStatus",
-                            "=",
-                            "\"ok\""
-                          ],
-                          "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": [],
-                          "subInstructions": []
-                        }
-                      ]
+                      "parameters": [
+                        "previousOffset",
+                        "!=",
+                        "Variable(messageOffset)"
+                      ],
+                      "subInstructions": []
                     }
                   ]
                 }
@@ -8453,39 +7947,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "Firebase::FirestoreGetDocument"
+                    "value": "ModVarSceneTxt"
                   },
                   "parameters": [
-                    "\"messages\"",
-                    "VariableString(messagesList[ToString(Variable(messageOffset))])",
-                    "messages.1",
-                    "messages.1.error"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Firebase::FirestoreGetDocument"
-                  },
-                  "parameters": [
-                    "\"messages\"",
-                    "VariableString(messagesList[ToString(Variable(messageOffset) + 1)])",
-                    "messages.2",
-                    "messages.2.error"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "Firebase::FirestoreGetDocument"
-                  },
-                  "parameters": [
-                    "\"messages\"",
-                    "VariableString(messagesList[ToString(Variable(messageOffset) + 2)])",
-                    "messages.3",
-                    "messages.3.error"
+                    "listMessageStatus",
+                    "=",
+                    "\"IDLE\""
                   ],
                   "subInstructions": []
                 },
@@ -8495,209 +7962,63 @@
                     "value": "ModVarScene"
                   },
                   "parameters": [
-                    "reloadMessages",
+                    "previousOffset",
                     "=",
-                    "0"
+                    "Variable(messageOffset)"
                   ],
                   "subInstructions": []
                 }
               ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "Display downloaded messages",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
+              "events": [
                 {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "id",
-                    "=",
-                    "1"
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "messageBoxText",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "postDate",
+                        "id",
+                        "=",
+                        "messageBoxText.Variable(id)"
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "id",
-                    "=",
-                    "1"
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "messageBoxText",
+                        "=",
+                        "VariableString(messages.docs[messageBoxText.Variable(id) + Variable(messageOffset)].data.content)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "postDate",
+                        "=",
+                        "TimeFormatter::SecondsToFormattedString(Variable(messages.docs[messageBoxText.Variable(id) + Variable(messageOffset)].data.date.seconds))"
+                      ],
+                      "subInstructions": []
+                    }
                   ],
-                  "subInstructions": []
+                  "events": []
                 }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "=",
-                    "VariableString(messages.1.content)"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "=",
-                    "VariableString(messages.1.date)"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "id",
-                    "=",
-                    "2"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "id",
-                    "=",
-                    "2"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "=",
-                    "VariableString(messages.2.content)"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "=",
-                    "VariableString(messages.2.date)"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "id",
-                    "=",
-                    "3"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "VarObjet"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "id",
-                    "=",
-                    "3"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "messageBoxText",
-                    "=",
-                    "VariableString(messages.3.content)"
-                  ],
-                  "subInstructions": []
-                },
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "TextObject::String"
-                  },
-                  "parameters": [
-                    "postDate",
-                    "=",
-                    "VariableString(messages.3.date)"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
+              ]
             }
           ],
           "parameters": []
@@ -8727,59 +8048,869 @@
           "effects": []
         }
       ],
-      "behaviorsSharedData": []
+      "behaviorsSharedData": [
+        {
+          "name": "FlexContainer",
+          "type": "FlexBox::FlexContainer"
+        },
+        {
+          "name": "FlexItem",
+          "type": "FlexBox::FlexItem"
+        }
+      ]
     }
   ],
   "externalEvents": [],
   "eventsFunctionsExtensions": [
     {
       "author": "Arthur Pacaud (arthuro555)",
-      "description": "Have multiple expressions that remove unwanted characters from a string (non-alphanumerical characters, new Lines...)",
+      "description": "A behavior to position objects using the CSS Flexible Box layout. Find more information at https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
       "extensionNamespace": "",
-      "fullName": "Sanitizer",
+      "fullName": "Flexbox",
       "helpPath": "",
-      "iconUrl": "",
-      "name": "Sanitizer",
-      "previewIconUrl": "",
-      "shortDescription": "Removes unwanted text from strings",
-      "version": "1.0.0",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXBhZ2UtbGF5b3V0LWJvZHkiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNiwySDE4QTIsMiAwIDAsMSAyMCw0VjIwQTIsMiAwIDAsMSAxOCwyMkg2QTIsMiAwIDAsMSA0LDIwVjRBMiwyIDAgMCwxIDYsMk02LDhWMTZIMThWOEg2WiIgLz48L3N2Zz4=",
+      "name": "FlexBox",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/page-layout-body.svg",
+      "shortDescription": "Allows using flexbox for positioning objects",
+      "version": "0.0.1",
       "tags": [
-        "sanitization",
-        "string",
-        "string manipulation"
+        "flexbox",
+        "layout",
+        "css",
+        "items",
+        "container",
+        "html",
+        "DOM apis"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "A container for flex items",
+          "fullName": "Flex container",
+          "name": "FlexContainer",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Hack: onCreated doesn't has object properties set, use this trigger once to make it like onCreated but after object properties are set.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::JsCode",
+                      "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\n// Create an HTML element for letting the Browser calculate the CSS.\nbehavior.element = Object.assign(document.createElement(\"div\"), {\n    id: objects[0].getName() + \"-\" + objects[0].getUniqueId(),\n});\n\nconst directionMap = {\n    right: \"row\",\n    left: \"row-reverse\",\n    down: \"column\",\n    up: \"column-reverse\",\n}\n\n// Set default styles\nObject.assign(behavior.element.style, {\n    top: 0,\n    left: 0,\n    display: \"flex\",\n    position: \"absolute\",\n    \"flex-direction\": directionMap[behavior._getDirection()],\n    \"flex-wrap\": behavior._getWrap(),\n    \"justify-content\": behavior._getJustifyContent(),\n    \"align-items\": behavior._getAlignItems(),\n    \"align-content\": behavior._getAlignContent(),\n});\n\n// Small hack to trick the browser into calculating \n// styles without actually putting the element in the DOM \n// (which would pollute the game website and falsify the \n// positional data as other elements would mess with the \n// objects position).\ndocument.body.appendChild(Object.assign(document.createElement(\"iframe\"), { style: \"position: absolute; width:0; height:0; border:0;\" })).contentDocument.body.appendChild(behavior.element);\n\n// Expose a \"global interface\" to allow LayoutItems to interact with the container.\n(gdjs.layoutContainers || (gdjs.layoutContainers = {}))[behavior._getID()] =\n    {\n        addChild: behavior.element.appendChild.bind(behavior.element),\n    };\n",
+                      "parameterObjects": "Object",
+                      "useStrict": true,
+                      "eventsSheetExpanded": true
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "// Update the CSS of the HTML element.\nconst behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nObject.assign(behavior.element.style, {\n    width: objects[0].getWidth() + 15 + \"px\",\n    height: objects[0].getHeight() + 3 + \"px\",\n    \"margin-left\": objects[0].getX() + 15 + \"px\",\n    \"margin-top\": objects[0].getY() + 3 + \"px\",\n});\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the flexbox direction property",
+              "fullName": "Set flex direction",
+              "functionType": "Action",
+              "name": "SetFlexDirection",
+              "private": false,
+              "sentence": "Set flexbox direction of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const directionMap = {\n    right: \"row\",\n    left: \"row-reverse\",\n    down: \"column\",\n    up: \"column-reverse\",\n};\n\nconst behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"flex-direction\"] = directionMap[eventsFunctionContext.getArgument(\"direction\")];\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Flex direction",
+                  "longDescription": "",
+                  "name": "direction",
+                  "optional": false,
+                  "supplementaryInformation": "[\"right\",\"left\",\"down\",\"right\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the flexbox wrap property",
+              "fullName": "Set flex wrap",
+              "functionType": "Action",
+              "name": "SetFlexWrap",
+              "private": false,
+              "sentence": "Set flexbox wrap of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"flex-wrap\"] = eventsFunctionContext.getArgument(\"wrap\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Flex wrap",
+                  "longDescription": "",
+                  "name": "wrap",
+                  "optional": false,
+                  "supplementaryInformation": "[\"nowrap\",\"wrap\",\"wrap-reverse\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the alignement method for items on the X axis",
+              "fullName": "Set alignement on the X axis",
+              "functionType": "Action",
+              "name": "SetXAlign",
+              "private": false,
+              "sentence": "Set flexbox X alignement of items of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"justify-content\"] = eventsFunctionContext.getArgument(\"alignement\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Alignement method",
+                  "longDescription": "",
+                  "name": "alignement",
+                  "optional": false,
+                  "supplementaryInformation": "[\"flex-start\",\"flex-end\",\"center\",\"space-between\",\"space-around\",\"space-evenly\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the alignement method for items on the Y axis",
+              "fullName": "Set alignement on the Y axis",
+              "functionType": "Action",
+              "name": "SetYAlign",
+              "private": false,
+              "sentence": "Set flexbox Y alignement of items of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"align-items\"] = eventsFunctionContext.getArgument(\"alignement\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Alignement method",
+                  "longDescription": "",
+                  "name": "alignement",
+                  "optional": false,
+                  "supplementaryInformation": "[\"stretch\",\"flex-start\",\"flex-end\",\"center\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the alignement method for the lines/rows of objects in the box",
+              "fullName": "Set alignement of the lines",
+              "functionType": "Action",
+              "name": "SetLineAlign",
+              "private": false,
+              "sentence": "Set flexbox alignement of lines of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"align-items\"] = eventsFunctionContext.getArgument(\"alignement\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexContainer",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Alignement method",
+                  "longDescription": "",
+                  "name": "alignement",
+                  "optional": false,
+                  "supplementaryInformation": "[\"stretch\",\"flex-start\",\"flex-end\",\"center\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "Default",
+              "type": "String",
+              "label": "ID",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ID"
+            },
+            {
+              "value": "right",
+              "type": "String",
+              "label": "The direction of the items (right, left, up or down)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Direction"
+            },
+            {
+              "value": "nowrap",
+              "type": "String",
+              "label": "Allow adding lines to fit everything inside the Flexbox (nowrap, wrap or wrap-reverse)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Wrap"
+            },
+            {
+              "value": "flex-start",
+              "type": "String",
+              "label": "The alignement of the items on the X axis (flex-start, flex-end, center, space-between, space-around or space-evenly)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "JustifyContent"
+            },
+            {
+              "value": "stretch",
+              "type": "String",
+              "label": "The alignement of the items on the Y axis (stretch, flex-start, flex-end or center)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AlignItems"
+            },
+            {
+              "value": "normal",
+              "type": "String",
+              "label": "The alignement of the lines (normal, flex-start, flex-end, center, space-between, space-around, space-evenly or stretch)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AlignContent"
+            }
+          ]
+        },
+        {
+          "description": "An item in a flex container",
+          "fullName": "Flex Item",
+          "name": "FlexItem",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Hack: onCreated doesn't has object properties set, use this trigger once to make it like onCreated but after object properties are set.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::JsCode",
+                      "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\n// Create an HTML element for letting the Browser calculate the CSS.\nbehavior.element = Object.assign(document.createElement(\"div\"), {\n    id: objects[0].getName() + \"-\" + objects[0].getUniqueId(),\n});\n\n// Set default styles\nObject.assign(behavior.element.style, {\n    \"flex-grow\": behavior._getGrowth(),\n    \"flex-shrink\": behavior._getShrink(),\n    order: behavior._getOrder(),\n    width: objects[0].getWidth() + \"px\",\n    height: objects[0].getHeight() + \"px\",\n});\n\nif (behavior._getAlignSelf().length > 1)\n    behavior.element.style[\"align-self\"] = behavior._getAlignSelf();\n\n(gdjs.layoutContainers || (gdjs.layoutContainers = {}))[behavior._getContainerID()].addChild(behavior.element);\n",
+                      "parameterObjects": "Object",
+                      "useStrict": true,
+                      "eventsSheetExpanded": false
+                    }
+                  ]
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPostEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nconst pos = behavior.element.getBoundingClientRect();\nif (behavior.h !== objects[0].getHeight())\n    behavior.element.style.heigth = objects[0].getHeight() + \"px\";\nif (behavior.w !== objects[0].getWidth())\n    behavior.element.style.width = objects[0].getWidth() + \"px\";\nobjects[0].setX(pos.x);\nobjects[0].setY(pos.y);\nobjects[0].setWidth(pos.width);\nobjects[0].setHeight(pos.height);\nbehavior.w = pos.width;\nbehavior.h = pos.height;\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the shrink for this object",
+              "fullName": "Set shrink of the object",
+              "functionType": "Action",
+              "name": "SetShrink",
+              "private": false,
+              "sentence": "Set flex shrink of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"flex-shrink\"] = eventsFunctionContext.getArgument(\"shrink\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Shrink",
+                  "longDescription": "",
+                  "name": "shrink",
+                  "optional": false,
+                  "supplementaryInformation": "[\"auto\",\"flex-start\",\"flex-end\",\"center\",\"stretch\"]",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the growth for this object",
+              "fullName": "Set growth of the object",
+              "functionType": "Action",
+              "name": "SetGrowth",
+              "private": false,
+              "sentence": "Set flex growth of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"flex-grow\"] = eventsFunctionContext.getArgument(\"growth\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Growth",
+                  "longDescription": "",
+                  "name": "growth",
+                  "optional": false,
+                  "supplementaryInformation": "[\"auto\",\"flex-start\",\"flex-end\",\"center\",\"stretch\"]",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the order for this object",
+              "fullName": "Set order of the object",
+              "functionType": "Action",
+              "name": "SetOrder",
+              "private": false,
+              "sentence": "Set flex order of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style.order = eventsFunctionContext.getArgument(\"order\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Order",
+                  "longDescription": "",
+                  "name": "order",
+                  "optional": false,
+                  "supplementaryInformation": "[\"auto\",\"flex-start\",\"flex-end\",\"center\",\"stretch\"]",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "Sets the alignement method for this object",
+              "fullName": "Set alignement of the object",
+              "functionType": "Action",
+              "name": "SetAlign",
+              "private": false,
+              "sentence": "Set flex alignement of _PARAM0_ to _PARAM2_",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "const behavior = objects[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nbehavior.element.style[\"align-self\"] = eventsFunctionContext.getArgument(\"alignement\");\n",
+                  "parameterObjects": "Object",
+                  "useStrict": true,
+                  "eventsSheetExpanded": false
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "FlexBox::FlexItem",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Alignement method",
+                  "longDescription": "",
+                  "name": "alignement",
+                  "optional": false,
+                  "supplementaryInformation": "[\"auto\",\"flex-start\",\"flex-end\",\"center\",\"stretch\"]",
+                  "type": "stringWithSelector"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "Default",
+              "type": "String",
+              "label": "The ID of the container",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "ContainerID"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Ability to grow (flex-grow)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Growth"
+            },
+            {
+              "value": "1",
+              "type": "Number",
+              "label": "Ability to shrink (flex-shrink)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Shrink"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "The order of the object in the container",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "Order"
+            },
+            {
+              "value": "",
+              "type": "String",
+              "label": "Override the alignement for that object (auto, flex-start, flex-end, center, stretch)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "AlignSelf"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "author": "@Bouh",
+      "description": "Expressions to transform time in seconds to format like HH:MM:SS. Ideal to display timers on screen.",
+      "extensionNamespace": "",
+      "fullName": "Time formatting",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWNsb2NrLWRpZ2l0YWwiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMiw2QTIsMiAwIDAsMCAwLDhWMTZBMiwyIDAgMCwwIDIsMThIMjJBMiwyIDAgMCwwIDI0LDE2VjhBMiwyIDAgMCwwIDIyLDZNMiw4SDIyVjE2SDJNMyw5VjEwLjVINi4yNUwzLDE1SDQuNzVMOCwxMC41VjlNOS4yNSw5VjEwLjVIMTAuNzVWOU0xMiw5VjEwLjVIMTMuNVYxNUgxNVY5TTE3LDlBMSwxIDAgMCwwIDE2LDEwVjE0QTEsMSAwIDAsMCAxNywxNUgyMEExLDEgMCAwLDAgMjEsMTRWMTBBMSwxIDAgMCwwIDIwLDlNMTcuNSwxMC41SDE5LjVWMTMuNUgxNy41TTkuMjUsMTMuNVYxNUgxMC43NVYxMy41IiAvPjwvc3ZnPg==",
+      "name": "TimeFormatter",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/clock-digital.svg",
+      "shortDescription": "Expressions to transform time in seconds to format like HH:MM:SS. Ideal to display timers on screen.",
+      "version": "0.0.1",
+      "tags": [
+        "time",
+        "timer",
+        "format",
+        "hours",
+        "minutes",
+        "seconds"
       ],
       "dependencies": [],
       "eventsFunctions": [
         {
-          "description": "Removes every non-alphanumerical characters of a string.",
-          "fullName": "Sanitize Text",
+          "description": "Format time in seconds to an ISO string",
+          "fullName": "Format time in seconds to an ISO string",
           "functionType": "StringExpression",
-          "name": "sanitize",
+          "name": "SecondsToFormattedString",
           "private": false,
-          "sentence": "",
+          "sentence": "Format time _PARAM1_ to HH:MM:SS in _PARAM2_",
           "events": [
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\W/g, '');",
+              "inlineCode": "//custom function in custom fonction ~~Woow~~\r\nvar format_time = function (time_second) {\r\n    date = new Date(null);\r\n    date.setSeconds(time_second);\r\n    return date.toLocaleDateString() + \" \" + date.toLocaleTimeString();\r\n}\r\n\r\neventsFunctionContext.returnValue = format_time(eventsFunctionContext.getArgument(\"TimeInSeconds\"));",
               "parameterObjects": "",
-              "useStrict": true,
+              "useStrict": false,
               "eventsSheetExpanded": false
             }
           ],
@@ -8787,66 +8918,9 @@
             {
               "codeOnly": false,
               "defaultValue": "",
-              "description": "The text to sanitize",
+              "description": "Time, in seconds",
               "longDescription": "",
-              "name": "text",
-              "optional": false,
-              "supplementaryInformation": "",
-              "type": "string"
-            }
-          ],
-          "objectGroups": []
-        },
-        {
-          "description": "Cuts a string to be sure it doesn't exxceeds a maximum size",
-          "fullName": "Trim a string",
-          "functionType": "StringExpression",
-          "name": "trim",
-          "private": false,
-          "sentence": "",
-          "events": [
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "",
-              "comment2": ""
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(0, eventsFunctionContext.getArgument(\"size\"));",
-              "parameterObjects": "",
-              "useStrict": true,
-              "eventsSheetExpanded": false
-            }
-          ],
-          "parameters": [
-            {
-              "codeOnly": false,
-              "defaultValue": "",
-              "description": "The string to trim",
-              "longDescription": "",
-              "name": "text",
-              "optional": false,
-              "supplementaryInformation": "",
-              "type": "string"
-            },
-            {
-              "codeOnly": false,
-              "defaultValue": "",
-              "description": "The size to limit the string to",
-              "longDescription": "",
-              "name": "size",
+              "name": "TimeInSeconds",
               "optional": false,
               "supplementaryInformation": "",
               "type": "expression"
@@ -8855,33 +8929,72 @@
           "objectGroups": []
         },
         {
-          "description": "Replaces every new line character with a space",
-          "fullName": "Remove new lines",
+          "description": "Format time in seconds to HH:MM:SS",
+          "fullName": "Format time in seconds to HH:MM:SS",
           "functionType": "StringExpression",
-          "name": "removeNewLines",
+          "name": "SecondsToHHMMSS",
           "private": false,
-          "sentence": "",
+          "sentence": "Format time _PARAM1_ to HH:MM:SS in _PARAM2_",
           "events": [
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "",
-              "comment2": ""
-            },
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "//custom function in custom fonction ~~Woow~~\r\nvar format_time = function (time_second) {\r\n    date = new Date(null);\r\n    date.setSeconds(time_second);\r\n    if (time_second >= 3600) {\r\n        return date.toISOString().substr(11, 8); // MM:SS\r\n    } else {\r\n        return date.toISOString().substr(14, 5); // HH:MM:SS\r\n    }\r\n}\r\n\r\neventsFunctionContext.returnValue = format_time(eventsFunctionContext.getArgument(\"TimeInSeconds\"));",
+              "parameterObjects": "",
+              "useStrict": false,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Time, in seconds",
+              "longDescription": "",
+              "name": "TimeInSeconds",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    },
+    {
+      "author": "@arthuro555 and @Add00",
+      "description": "",
+      "extensionNamespace": "",
+      "fullName": "Input Validation",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQo8L3N0eWxlPg0KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI2LDNIOUM3LjMsMyw2LDQuMyw2LDZ2MGMwLDEuNywxLjMsMywzLDNoMTd2MTAiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xOCwyOUg5Yy0xLjcsMC0zLTEuMy0zLTN2MFY2Ii8+DQo8bGluZSBjbGFzcz0ic3QwIiB4MT0iMjYiIHkxPSI2IiB4Mj0iOSIgeTI9IjYiLz4NCjxsaW5lIGNsYXNzPSJzdDAiIHgxPSIxMCIgeTE9IjkiIHgyPSIxMCIgeTI9IjI5Ii8+DQo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjUuNSwxOC41YzEuOSwxLjksMS45LDUuMSwwLDdjLTAuNSwwLjUtMSwwLjgtMS42LDEuMWMtMS44LDAuNy0zLjksMC40LTUuNC0xLjFjLTEuOS0xLjktMS45LTUuMSwwLTcNCglTMjMuNiwxNi42LDI1LjUsMTguNXoiLz4NCjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yNi41LDI0bDMuOSwzLjZjMC44LDAuOCwwLjgsMiwwLDIuOGwwLDBjLTAuOCwwLjgtMiwwLjgtMi44LDBsLTMuNS0zLjUiLz4NCjwvc3ZnPg0K",
+      "name": "InputValidation",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Education and Learning/Education and Learning_education_book_library_search.svg",
+      "shortDescription": "Provides conditions to check if a string is a valid phone number, url, email, number, contains only letters. Also provides expressions to manipulate strings (count number of lines, remove new lines, remove non alphanumerical characters).",
+      "version": "1.0.0",
+      "tags": [
+        "sanitization",
+        "string",
+        "string manipulation",
+        "input validation"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Check if the string is a valid phone number.",
+          "fullName": "Check if a string is a valid phone number",
+          "functionType": "Condition",
+          "name": "IsValidPhoneNumber",
+          "private": false,
+          "sentence": "_PARAM1_ is a valid phone number",
+          "events": [
             {
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\r?\\n|\\r/g, '');",
+              "inlineCode": "const phone = eventsFunctionContext.getArgument(\"phone\");\nconst n = /[0-9 -()+]+$/;\n\neventsFunctionContext.returnValue = n.test(phone);",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -8891,7 +9004,167 @@
             {
               "codeOnly": false,
               "defaultValue": "",
-              "description": "The text to remove new lines from",
+              "description": "Phone number",
+              "longDescription": "",
+              "name": "phone",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the string is a valid URL.",
+          "fullName": "Check if a string is a valid URL",
+          "functionType": "Condition",
+          "name": "IsValidUrl",
+          "private": false,
+          "sentence": "_PARAM1_ is a valid URL",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const url = eventsFunctionContext.getArgument(\"url\");\nconst n = /^(?:(?:https?|ftp):\\/\\/)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]-*)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))(?::\\d{2,5})?(?:\\/\\S*)?$/;\n\neventsFunctionContext.returnValue = n.test(url);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "URL",
+              "longDescription": "",
+              "name": "url",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the string is a valid email.",
+          "fullName": "Check if a string is a valid email",
+          "functionType": "Condition",
+          "name": "IsValidEmail",
+          "private": false,
+          "sentence": "_PARAM1_ is a valid email",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const email = eventsFunctionContext.getArgument(\"email\");\nconst n = /(([^<>()[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))/;\n\neventsFunctionContext.returnValue = n.test(email);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Email",
+              "longDescription": "",
+              "name": "email",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the string represents a number (potentially with a minus sign and potentially with a decimal point).",
+          "fullName": "Check if a string represents a number",
+          "functionType": "Condition",
+          "name": "IsValidNumber",
+          "private": false,
+          "sentence": "_PARAM1_ represents a number",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const num = eventsFunctionContext.getArgument(\"num\");\nconst n = /^-?\\d+\\.?\\d*$/;\n\neventsFunctionContext.returnValue = n.test(num);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Number",
+              "longDescription": "",
+              "name": "num",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Check if the string has only latin alphabet letters.",
+          "fullName": "Check if a string has only latin alphabet letters",
+          "functionType": "Condition",
+          "name": "IsOnlyLetters",
+          "private": false,
+          "sentence": "_PARAM1_ has only latin alphabet letters ",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const lrt = eventsFunctionContext.getArgument(\"lrt\");\nconst n = /^[a-zA-Z\\s]*$/;\n\neventsFunctionContext.returnValue = n.test(lrt);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Letters",
+              "longDescription": "",
+              "name": "lrt",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Returns the string without the first line.",
+          "fullName": "Remove the first line",
+          "functionType": "StringExpression",
+          "name": "RemoveFirstLine",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(eventsFunctionContext.getArgument(\"text\").indexOf(\"\\n\") + 1);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "String to remove the first line from",
               "longDescription": "",
               "name": "text",
               "optional": false,
@@ -8902,10 +9175,10 @@
           "objectGroups": []
         },
         {
-          "description": "Count the nmber of lines in a string",
-          "fullName": "Count Lines",
+          "description": "Count the number of lines in a string",
+          "fullName": "Count lines",
           "functionType": "Expression",
-          "name": "countNewLines",
+          "name": "CountNewLines",
           "private": false,
           "sentence": "",
           "events": [
@@ -8916,7 +9189,7 @@
               "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").split(/\\r\\n|\\r|\\n/).length;",
               "parameterObjects": "",
               "useStrict": true,
-              "eventsSheetExpanded": false
+              "eventsSheetExpanded": true
             }
           ],
           "parameters": [
@@ -8934,33 +9207,117 @@
           "objectGroups": []
         },
         {
-          "description": "",
-          "fullName": "",
+          "description": "Replaces every new line character with a space",
+          "fullName": "Replace new lines by a space",
           "functionType": "StringExpression",
-          "name": "removeFirstLine",
+          "name": "RemoveNewLines",
           "private": false,
           "sentence": "",
           "events": [
             {
               "disabled": false,
               "folded": false,
-              "type": "BuiltinCommonInstructions::Comment",
-              "color": {
-                "b": 109,
-                "g": 230,
-                "r": 255,
-                "textB": 0,
-                "textG": 0,
-                "textR": 0
-              },
-              "comment": "",
-              "comment2": ""
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__Sanitizer_tmpStr",
+                    "=",
+                    "GetArgumentAsString(\"text\")"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             },
             {
               "disabled": false,
               "folded": false,
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Egal"
+                  },
+                  "parameters": [
+                    "StrFind(VariableString(__Sanitizer_tmpStr), NewLine())",
+                    "!=",
+                    "-1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "__Sanitizer_tmpStr",
+                    "=",
+                    "SubStr(VariableString(__Sanitizer_tmpStr), 0, StrFind(VariableString(__Sanitizer_tmpStr), NewLine())) + SubStr(VariableString(__Sanitizer_tmpStr), StrFind(VariableString(__Sanitizer_tmpStr), NewLine())+1, StrLength(VariableString(__Sanitizer_tmpStr)))"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnString"
+                  },
+                  "parameters": [
+                    "VariableString(__Sanitizer_tmpStr)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "The text to remove new lines from",
+              "longDescription": "",
+              "name": "text",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "string"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Remove any non-numerical and non A-Z characters.",
+          "fullName": "Remove any non-numerical and non A-Z characters",
+          "functionType": "StringExpression",
+          "name": "ToAlphanumerical",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
               "type": "BuiltinCommonInstructions::JsCode",
-              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").substring(eventsFunctionContext.getArgument(\"text\").indexOf(\"\\n\") + 1);",
+              "inlineCode": "eventsFunctionContext.returnValue = eventsFunctionContext.getArgument(\"text\").replace(/\\W/g, '');",
               "parameterObjects": "",
               "useStrict": true,
               "eventsSheetExpanded": false
@@ -8970,7 +9327,7 @@
             {
               "codeOnly": false,
               "defaultValue": "",
-              "description": "String to remove the first line from",
+              "description": "The text to sanitize",
               "longDescription": "",
               "name": "text",
               "optional": false,

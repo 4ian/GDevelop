@@ -219,6 +219,37 @@ namespace gdjs {
         };
 
         /**
+         * Adds a variable in a collection as document with a unique name.
+         * @param collectionName - The collection where to store the variable.
+         * @param variable - The variable to write.
+         * @param [callbackStateVariable] - The variable where to store the result.
+         */
+        export const addDocument = (
+          collectionName: string,
+          variable: gdjs.Variable,
+          callbackStateVariable?: gdjs.Variable
+        ) => {
+          firebase
+            .firestore()
+            .collection(collectionName)
+            .add(
+              replaceTimestampsInObject(
+                JSON.parse(
+                  gdjs.evtTools.network.variableStructureToJSON(variable)
+                )
+              )
+            )
+            .then(() => {
+              if (typeof callbackStateVariable !== 'undefined')
+                callbackStateVariable.setString('ok');
+            })
+            .catch((error) => {
+              if (typeof callbackStateVariable !== 'undefined')
+                callbackStateVariable.setString(error.message);
+            });
+        };
+
+        /**
          * Writes a variable in a collection as document.
          * @param collectionName - The collection where to store the variable.
          * @param variableName - The name under wich the variable will be saved (document name).

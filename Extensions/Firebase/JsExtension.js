@@ -1067,7 +1067,9 @@ module.exports = {
       .addIncludeFile(
         'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
       )
-      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.getServerTimestamp');
+      .setFunctionName(
+        'gdjs.evtTools.firebaseTools.firestore.getServerTimestamp'
+      );
 
     extension
       .addAction(
@@ -1506,6 +1508,37 @@ module.exports = {
         'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
       )
       .setFunctionName('gdjs.evtTools.firebaseTools.firestore.writeDocument');
+
+    extension
+      .addAction(
+        'FirestoreAddDocument',
+        _('Add a document to firestore'),
+        _('Adds a document (variable) to cloud firestore with a unique name.'),
+        _(
+          'Add _PARAM1_ to firestore collection _PARAM0_ (store result state in _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore/Documents'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Collection'), '', false)
+      .addParameter('scenevar', _('Variable to write'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.addDocument');
 
     extension
       .addAction(

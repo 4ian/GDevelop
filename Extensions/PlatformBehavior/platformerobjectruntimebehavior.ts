@@ -427,29 +427,32 @@ namespace gdjs {
 
     _checkGrabPlatform() {
       const object = this.owner;
+
       let oldX = object.getX();
-      let oldY = object.getY();
-
-      let tryGrabbingPlatform = false;
-      for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
-        const platform = this._potentialCollidingObjects[i];
-
-        object.setX(
-          object.getX() +
-            (this._requestedDeltaX > 0
-              ? this._xGrabTolerance
-              : -this._xGrabTolerance)
-        );
-        tryGrabbingPlatform =
-          this._isColliding(platform) && this._canGrab(platform);
-        object.setX(oldX);
-
-        //Check if we can grab the collided platform
-        if (!tryGrabbingPlatform) {
-          continue;
+      object.setX(
+        object.getX() +
+          (this._requestedDeltaX > 0
+            ? this._xGrabTolerance
+            : -this._xGrabTolerance)
+      );
+      const collidingPlatforms: PlatformRuntimeBehavior[] = gdjs.staticArray(
+        PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
+      );
+      collidingPlatforms.length = 0;
+      for (const platform of this._potentialCollidingObjects) {
+        if (this._isColliding(platform) && this._canGrab(platform)) {
+          collidingPlatforms.push(platform);
         }
+      }
+      object.setX(oldX);
+
+      //Check if we can grab the collided platform
+      let oldY = object.getY();
+      for (const collidingPlatform of collidingPlatforms) {
         object.setY(
-          platform.owner.getY() + platform.getYGrabOffset() - this._yGrabOffset
+          collidingPlatform.owner.getY() +
+            collidingPlatform.getYGrabOffset() -
+            this._yGrabOffset
         );
         if (
           !this._isCollidingWith(
@@ -459,12 +462,14 @@ namespace gdjs {
             true
           )
         ) {
-          this._setGrabbingPlatform(platform);
+          this._setGrabbingPlatform(collidingPlatform);
           this._requestedDeltaY = 0;
+          collidingPlatforms.length = 0;
           return;
         }
         object.setY(oldY);
       }
+      collidingPlatforms.length = 0;
     }
 
     private _checkTransitionOnFloorOrFalling() {

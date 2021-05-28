@@ -290,7 +290,7 @@ namespace gdjs {
         //Colliding: Try to push out from the solid.
         //Note that jump thru are never obstacle on X axis.
         while (
-          this._isCollidingWith(
+          this._isCollidingWithOneOf(
             this._potentialCollidingObjects,
             floorPlatformId,
             /*excludeJumpthrus=*/
@@ -312,7 +312,7 @@ namespace gdjs {
           if (this._state === this._onFloor) {
             object.setY(object.getY() - 1);
             if (
-              !this._isCollidingWith(
+              !this._isCollidingWithOneOf(
                 this._potentialCollidingObjects,
                 floorPlatformId,
                 /*excludeJumpthrus=*/
@@ -348,7 +348,7 @@ namespace gdjs {
         //Stop when colliding with an obstacle.
         while (
           (this._requestedDeltaY < 0 &&
-            this._isCollidingWith(
+            this._isCollidingWithOneOf(
               this._potentialCollidingObjects,
               null,
               /*excludeJumpThrus=*/
@@ -356,7 +356,7 @@ namespace gdjs {
             )) ||
           //Jumpthru = obstacle <=> Never when going up
           (this._requestedDeltaY > 0 &&
-            this._isCollidingWithExcluding(
+            this._isCollidingWithOneOfExcluding(
               this._potentialCollidingObjects,
               this._overlappedJumpThru
             ))
@@ -427,48 +427,49 @@ namespace gdjs {
 
     _checkGrabPlatform() {
       const object = this.owner;
-      let tryGrabbingPlatform = false;
+
+      let oldX = object.getX();
       object.setX(
         object.getX() +
           (this._requestedDeltaX > 0
             ? this._xGrabTolerance
             : -this._xGrabTolerance)
       );
-      let collidingPlatform = this._getCollidingPlatform();
-      if (collidingPlatform !== null && this._canGrab(collidingPlatform)) {
-        tryGrabbingPlatform = true;
-      }
-      object.setX(
-        object.getX() +
-          (this._requestedDeltaX > 0
-            ? -this._xGrabTolerance
-            : this._xGrabTolerance)
+      const collidingPlatforms: PlatformRuntimeBehavior[] = gdjs.staticArray(
+        PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
       );
+      collidingPlatforms.length = 0;
+      for (const platform of this._potentialCollidingObjects) {
+        if (this._isCollidingWith(platform) && this._canGrab(platform)) {
+          collidingPlatforms.push(platform);
+        }
+      }
+      object.setX(oldX);
 
       //Check if we can grab the collided platform
-      if (tryGrabbingPlatform) {
-        let oldY = object.getY();
+      let oldY = object.getY();
+      for (const collidingPlatform of collidingPlatforms) {
         object.setY(
-          // @ts-ignore - collidingPlatform is guaranteed to be not null.
           collidingPlatform.owner.getY() +
-            // @ts-ignore - collidingPlatform is guaranteed to be not null.
             collidingPlatform.getYGrabOffset() -
             this._yGrabOffset
         );
         if (
-          !this._isCollidingWith(
+          !this._isCollidingWithOneOf(
             this._potentialCollidingObjects,
             null,
             /*excludeJumpthrus=*/
             true
           )
         ) {
-          this._setGrabbingPlatform(collidingPlatform!);
+          this._setGrabbingPlatform(collidingPlatform);
           this._requestedDeltaY = 0;
-        } else {
-          object.setY(oldY);
+          collidingPlatforms.length = 0;
+          return;
         }
+        object.setY(oldY);
       }
+      collidingPlatforms.length = 0;
     }
 
     private _checkTransitionOnFloorOrFalling() {
@@ -554,48 +555,6 @@ namespace gdjs {
     }
 
     /**
-     * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
-     * Ladders are *always* excluded from the test.
-     * @param candidates The platform to be tested for collision
-     * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
-     * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
-     */
-    _isCollidingWith(
-      candidates: gdjs.PlatformRuntimeBehavior[],
-      exceptThisOne?: number | null,
-      excludeJumpThrus?: boolean
-    ) {
-      excludeJumpThrus = !!excludeJumpThrus;
-      for (let i = 0; i < candidates.length; ++i) {
-        const platform = candidates[i];
-        if (platform.owner.id === exceptThisOne) {
-          continue;
-        }
-        if (
-          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
-        ) {
-          continue;
-        }
-        if (
-          excludeJumpThrus &&
-          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
-        ) {
-          continue;
-        }
-        if (
-          gdjs.RuntimeObject.collisionTest(
-            this.owner,
-            platform.owner,
-            this._ignoreTouchingEdges
-          )
-        ) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
      * Separate the object from all platforms passed in parameter.
      * @param candidates The platform to be tested for collision
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
@@ -631,9 +590,51 @@ namespace gdjs {
      * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
      * Ladders are *always* excluded from the test.
      * @param candidates The platform to be tested for collision
+     * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
+     * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     */
+    _isCollidingWithOneOf(
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      exceptThisOne?: number | null,
+      excludeJumpThrus?: boolean
+    ) {
+      excludeJumpThrus = !!excludeJumpThrus;
+      for (let i = 0; i < candidates.length; ++i) {
+        const platform = candidates[i];
+        if (platform.owner.id === exceptThisOne) {
+          continue;
+        }
+        if (
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
+        ) {
+          continue;
+        }
+        if (
+          excludeJumpThrus &&
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
+        ) {
+          continue;
+        }
+        if (
+          gdjs.RuntimeObject.collisionTest(
+            this.owner,
+            platform.owner,
+            this._ignoreTouchingEdges
+          )
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
+     * Ladders are *always* excluded from the test.
+     * @param candidates The platform to be tested for collision
      * @param exceptTheseOnes The platforms to be excluded from the test
      */
-    private _isCollidingWithExcluding(
+    private _isCollidingWithOneOfExcluding(
       candidates: gdjs.PlatformRuntimeBehavior[],
       exceptTheseOnes: gdjs.PlatformRuntimeBehavior[]
     ) {
@@ -683,6 +684,23 @@ namespace gdjs {
 
       //Nothing is being colliding with the behavior object.
       return null;
+    }
+
+    /**
+     * Return true if the platform is colliding with the behavior owner object.
+     * Overlapped jump thru and ladders are excluded.
+     * @param platform The platform to be tested for collision
+     */
+    private _isCollidingWith(platform: gdjs.PlatformRuntimeBehavior): boolean {
+      return (
+        platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER &&
+        !this._isIn(this._overlappedJumpThru, platform.owner.id) &&
+        gdjs.RuntimeObject.collisionTest(
+          this.owner,
+          platform.owner,
+          this._ignoreTouchingEdges
+        )
+      );
     }
 
     /**
@@ -1317,7 +1335,7 @@ namespace gdjs {
         let step = 0;
         let noMoreOnFloor = false;
         while (
-          !behavior._isCollidingWith(behavior._potentialCollidingObjects)
+          !behavior._isCollidingWithOneOf(behavior._potentialCollidingObjects)
         ) {
           if (
             step >

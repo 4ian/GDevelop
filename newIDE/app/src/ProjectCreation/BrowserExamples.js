@@ -1,31 +1,42 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
-import { Column } from '../UI/Grid';
-import ExamplesList from './ExamplesList';
-import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
-import ExamplesInformation from './ExamplesInformation';
+import { ExampleStore } from '../AssetStore/ExampleStore';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import { getExample } from '../Utils/GDevelopServices/Asset';
 
-// To add a new example, add it first in resources/examples (at which point you can see it
-// in the desktop version), then run these scripts:
-// * scripts/update-examples-information-from-resources-examples.js (update metadata)
-// * scripts/update-fixtures-from-resources-examples.js (update web-app examples)
-// and upload the examples to `gdevelop-resources` s3.
-const exampleNames: Array<string> = Object.keys(ExamplesInformation);
+type Props = {|
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
+|};
 
-export default class BrowserExamples extends Component {
-  render() {
-    return (
-      <Column noMargin>
-        <ExamplesList
-          exampleNames={exampleNames}
-          onCreateFromExample={exampleName => {
-            sendNewGameCreated(exampleName);
-            this.props.onOpen(InternalFileStorageProvider, {
-              fileIdentifier: `example://${exampleName}`,
-            });
-          }}
-        />
-      </Column>
-    );
-  }
+export default function BrowserExamples(props: Props) {
+  const [isOpening, setIsOpening] = React.useState(false);
+
+  return (
+    <ExampleStore
+      isOpening={isOpening}
+      onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+        try {
+          setIsOpening(true);
+          const example = getExample(exampleShortHeader);
+          props.onOpen(UrlStorageProvider, {
+            fileIdentifier: example.projectFileUrl,
+          });
+          sendNewGameCreated(example.projectFileUrl);
+        } catch (error) {
+          showErrorBox({
+            message: 'TODO',
+            rawError: error,
+            errorId: 'browser-example-load-error',
+          });
+        } finally {
+          setIsOpening(false);
+        }
+      }}
+    />
+  );
 }

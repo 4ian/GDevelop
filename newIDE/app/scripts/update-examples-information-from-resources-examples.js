@@ -80,8 +80,7 @@ initializeGDevelopJs().then(gd => {
   };
 
   const computeUsedExtensions = project => {
-    // TODO: gd.WholeProjectRefactorer.exposeProjectEvents should be used to browse events
-    // so that events functions are also browsed.
+    // TODO: replace by UsedExtensionsFinder
     const layoutExtensions = _.flatten(
       mapFor(0, project.getLayoutsCount(), i => {
         const layout = project.getLayoutAt(i);

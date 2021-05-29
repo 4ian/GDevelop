@@ -47,6 +47,7 @@ export const create = (authentification: Authentification) => {
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
+            // Add Url provider
             InternalFileStorageProvider,
             GoogleDriveStorageProvider,
             DropboxStorageProvider,

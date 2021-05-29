@@ -47,7 +47,9 @@ export const create = (authentification: Authentification) => {
       {({ i18n }) => (
         <ProjectStorageProviders
           appArguments={appArguments}
-          storageProviders={[LocalFileStorageProvider]}
+          storageProviders={
+            // Add Url provider
+            [LocalFileStorageProvider]}
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({

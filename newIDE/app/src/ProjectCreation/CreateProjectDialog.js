@@ -55,11 +55,6 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
 
   _showExamples = () => this._onChangeTab('examples');
 
-  _onExamplesLoaded = () => {
-    // Force an update to ensure dialog is properly positioned.
-    this.forceUpdate();
-  };
-
   render() {
     const { open, onClose, onOpen, onCreate } = this.props;
     if (!open) return null;
@@ -124,9 +119,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             <ScrollView>
               <ExamplesComponent
                 onOpen={onOpen}
-                onCreate={onCreate}
                 onChangeOutputPath={outputPath => this.setState({ outputPath })}
-                onExamplesLoaded={this._onExamplesLoaded}
                 outputPath={this.state.outputPath}
               />
             </ScrollView>

@@ -1,27 +1,22 @@
 // @flow
-import { t, Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import React, { Component } from 'react';
+import * as React from 'react';
+import { ExampleStore } from '../AssetStore/ExampleStore';
+import { getExample } from '../Utils/GDevelopServices/Asset';
 import Divider from '@material-ui/core/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
-import Text from '../UI/Text';
-import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import ExamplesList from './ExamplesList';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import { writeAndCheckFile } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
+import axios from 'axios';
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
-
-// To add a new example, add it first in resources/examples (at which point you can see it
-// in the desktop version), then run these scripts:
-// * scripts/update-examples-information-from-resources-examples.js (update metadata)
-// * scripts/update-fixtures-from-resources-examples.js (update web-app examples)
-// and upload the examples to `gdevelop-resources` s3.
 
 type Props = {|
   onOpen: (
@@ -29,12 +24,7 @@ type Props = {|
     fileMetadata: FileMetadata
   ) => void,
   onChangeOutputPath: (outputPath: string) => void,
-  onExamplesLoaded: () => void,
   outputPath: string,
-|};
-
-type State = {|
-  exampleNames: ?Array<string>,
 |};
 
 export const showGameFileCreationError = (
@@ -51,83 +41,70 @@ export const showGameFileCreationError = (
   });
 };
 
-export default class LocalExamples extends Component<Props, State> {
-  state = {
-    exampleNames: null,
-  };
+export default function LocalExamples({
+  outputPath,
+  onChangeOutputPath,
+  onOpen,
+}: Props) {
+  const [isOpening, setIsOpening] = React.useState(false);
 
-  componentDidMount() {
-    findExamples(examplesPath => {
-      fs.readdir(examplesPath, (error, exampleNames) => {
-        if (error) {
-          console.error('Unable to read examples:', error);
-          return;
-        }
-
-        this.setState(
-          {
-            exampleNames: exampleNames.filter(name => name !== '.DS_Store'),
-          },
-          () => this.props.onExamplesLoaded()
-        );
-      });
-    });
-  }
-
-  createFromExample = (i18n: I18nType, exampleName: string) => {
-    const { outputPath } = this.props;
-    if (!fs || !outputPath) return;
-
-    findExamples(examplesPath => {
-      try {
-        fs.mkdirsSync(outputPath);
-        fs.copySync(path.join(examplesPath, exampleName), outputPath);
-      } catch (error) {
-        showGameFileCreationError(i18n, outputPath, error);
-        return;
-      }
-
-      this.props.onOpen(LocalFileStorageProvider, {
-        fileIdentifier: path.join(outputPath, exampleName + '.json'),
-      });
-      sendNewGameCreated(exampleName);
-    });
-  };
-
-  render() {
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <Column noMargin>
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.props.outputPath}
-                  onChange={this.props.onChangeOutputPath}
-                  type="create-game"
-                />
-              </Column>
-            </Line>
-            <Divider />
-            <Line>
-              <Column>
-                <Text>
-                  <Trans>Choose or search for an example to open:</Trans>
-                </Text>
-              </Column>
-            </Line>
-            <Line>
-              <ExamplesList
-                exampleNames={this.state.exampleNames}
-                onCreateFromExample={exampleName =>
-                  this.createFromExample(i18n, exampleName)
-                }
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Column noMargin>
+          <Line expand>
+            <Column expand>
+              <LocalFolderPicker
+                fullWidth
+                value={outputPath}
+                onChange={onChangeOutputPath}
+                type="create-game"
               />
-            </Line>
-          </Column>
-        )}
-      </I18n>
-    );
-  }
+            </Column>
+          </Line>
+          <Divider />
+          <ExampleStore
+            isOpening={isOpening}
+            onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+              if (!fs || !outputPath) return;
+              try {
+                setIsOpening(true);
+                const example = await getExample(exampleShortHeader);
+
+                // Prepare the folder for the example.
+                fs.mkdirsSync(outputPath);
+
+                // Download the project file and save it.
+                const response = await axios.get(example.projectFileUrl, {
+                  responseType: 'text',
+                  // Required to properly get the response as text, and not as JSON:
+                  transformResponse: [data => data],
+                });
+                const projectFileContent = response.data;
+                const localFilePath = path.join(outputPath, 'game.json');
+
+                await writeAndCheckFile(projectFileContent, localFilePath);
+
+                // Open the project file. Note that resources that are URLs will be downloaded
+                // thanks the the LocalResourceFetcher.
+                onOpen(LocalFileStorageProvider, {
+                  fileIdentifier: localFilePath,
+                });
+
+                sendNewGameCreated(example.projectFileUrl);
+              } catch (error) {
+                showErrorBox({
+                  message: 'TODO',
+                  rawError: error,
+                  errorId: 'local-example-load-error',
+                });
+              } finally {
+                setIsOpening(false);
+              }
+            }}
+          />
+        </Column>
+      )}
+    </I18n>
+  );
 }

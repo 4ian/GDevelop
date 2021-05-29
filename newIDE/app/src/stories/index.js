@@ -221,6 +221,8 @@ import { AssetCard } from '../AssetStore/AssetCard';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import { ExampleStore } from '../AssetStore/ExampleStore';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
@@ -2706,26 +2708,30 @@ storiesOf('AboutDialog', module)
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <CreateProjectDialog
-      open
-      examplesComponent={Placeholder}
-      startersComponent={Placeholder}
-      onClose={action('onClose')}
-      onCreate={action('onCreate')}
-      onOpen={action('onOpen')}
-      initialTab="starters"
-    />
+    <ExampleStoreStateProvider>
+      <CreateProjectDialog
+        open
+        examplesComponent={Placeholder}
+        startersComponent={Placeholder}
+        onClose={action('onClose')}
+        onCreate={action('onCreate')}
+        onOpen={action('onOpen')}
+        initialTab="starters"
+      />
+    </ExampleStoreStateProvider>
   ))
   .add('Games showcase as initial tab', () => (
-    <CreateProjectDialog
-      open
-      examplesComponent={Placeholder}
-      startersComponent={Placeholder}
-      onClose={action('onClose')}
-      onCreate={action('onCreate')}
-      onOpen={action('onOpen')}
-      initialTab="games-showcase"
-    />
+    <ExampleStoreStateProvider>
+      <CreateProjectDialog
+        open
+        examplesComponent={Placeholder}
+        startersComponent={Placeholder}
+        onClose={action('onClose')}
+        onCreate={action('onCreate')}
+        onOpen={action('onOpen')}
+        initialTab="games-showcase"
+      />
+    </ExampleStoreStateProvider>
   ));
 
 storiesOf('OpenFromStorageProviderDialog', module)
@@ -4663,6 +4669,20 @@ storiesOf('AssetStore', module)
           objectsContainer={testProject.testLayout}
         />
       </AssetStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ExampleStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExampleStoreStateProvider>
+        <ExampleStore
+          onOpen={action('onOpen')}
+          project={testProject.project}
+          isOpening={false}
+        />
+      </ExampleStoreStateProvider>
     </FixedHeightFlexContainer>
   ));
 

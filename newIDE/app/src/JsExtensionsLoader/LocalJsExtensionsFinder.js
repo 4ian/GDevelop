@@ -21,8 +21,8 @@ const checkIfPathHasJsExtensionModule = extensionFolderPath => {
   });
 };
 
-const findJsExtensionModules = ({ filterExamples }) => {
-  return findGDJS().then(({ gdjsRoot }) => {
+const findJsExtensionModules = ({ filterExamples, onFindGDJS }) => {
+  return (onFindGDJS ? onFindGDJS() : findGDJS()).then(({ gdjsRoot }) => {
     const extensionsRoot = path.join(gdjsRoot, 'Runtime', 'Extensions');
     console.info(
       `Searching for JS extensions (file called JsExtension.js) in ${extensionsRoot}...`

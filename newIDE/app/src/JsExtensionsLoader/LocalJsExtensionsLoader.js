@@ -15,6 +15,7 @@ type MakeExtensionsLoaderArguments = {|
   objectsEditorService: typeof ObjectsEditorService,
   objectsRenderingService: typeof ObjectsRenderingService,
   filterExamples: boolean,
+  onFindGDJS?: ?() => Promise<{gdjsRoot: string}>
 |};
 */
 
@@ -29,11 +30,12 @@ module.exports = function makeExtensionsLoader(
     objectsEditorService,
     objectsRenderingService,
     filterExamples,
+    onFindGDJS,
   } /*: MakeExtensionsLoaderArguments*/
 ) /*: JsExtensionsLoader*/ {
   return {
     loadAllExtensions: (_ /*: TranslationFunction */) => {
-      return findJsExtensionModules({ filterExamples }).then(
+      return findJsExtensionModules({ filterExamples, onFindGDJS }).then(
         extensionModulePaths => {
           return Promise.all(
             extensionModulePaths.map(extensionModulePath => {

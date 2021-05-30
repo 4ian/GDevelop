@@ -219,6 +219,12 @@ namespace gdjs {
      * @param opacity The new opacity of the object (0-255).
      */
     setOpacity(opacity: float): void {
+      if (opacity < 0) {
+        opacity = 0;
+      }
+      if (opacity > 255) {
+        opacity = 255;
+      }
       this._opacity = opacity;
       this._renderer.updateOpacity();
     }

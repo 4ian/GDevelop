@@ -21,21 +21,23 @@ type GamesShowcaseState = {|
   filtersState: FiltersState,
 |};
 
-export const GamesShowcaseContext = React.createContext<GamesShowcaseState>({
-  filters: null,
-  searchResults: null,
-  fetchShowcasedGamesAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const GamesShowcaseContext: React$Context<GamesShowcaseState> = React.createContext<GamesShowcaseState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchShowcasedGamesAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type GamesShowcaseStateProviderProps = {|
   children: React.Node,
@@ -55,7 +57,7 @@ const getShowcasedGameSearchTerms = (showcasedGame: ShowcasedGame) => {
 
 export const GamesShowcaseStateProvider = ({
   children,
-}: GamesShowcaseStateProviderProps) => {
+}: GamesShowcaseStateProviderProps): React.Node => {
   const [showcasedGamesByName, setShowcasedGamesByName] = React.useState<?{
     [string]: ShowcasedGame,
   }>(null);

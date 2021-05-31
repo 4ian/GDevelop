@@ -40,7 +40,7 @@ export const ExtensionListItem = ({
   extensionShortHeader,
   onChoose,
   onHeightComputed,
-}: Props) => {
+}: Props): React.Node => {
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );

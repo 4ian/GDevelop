@@ -32,7 +32,7 @@ export default function PreviewButtons({
   hasPreviewsRunning,
   previewState,
   setPreviewOverride,
-}: PreviewButtonsProps) {
+}: PreviewButtonsProps): React.Node {
   const previewIcon = (
     <ToolbarIcon
       onClick={onHotReloadPreview}

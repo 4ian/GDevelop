@@ -30,7 +30,7 @@ const styles = {
  * next to each other on a big screen (with proper sizing for the conditions column),
  * and stacked on a small one.
  */
-const ConditionsActionsColumns = (props: Props) => {
+const ConditionsActionsColumns = (props: Props): React.Element<'div'> => {
   if (props.windowWidth === 'small') {
     return (
       <div style={styles.oneColumnContainer} className={props.className}>

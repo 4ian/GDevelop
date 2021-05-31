@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -167,7 +168,7 @@ type Props = {|
 |};
 
 export default class SpritesList extends Component<Props, void> {
-  onSortEnd = ({
+  onSortEnd: ({ newIndex: number, oldIndex: number, ... }) => void = ({
     oldIndex,
     newIndex,
   }: {
@@ -178,7 +179,7 @@ export default class SpritesList extends Component<Props, void> {
     this.forceUpdate();
   };
 
-  onAddSprite = () => {
+  onAddSprite: () => void = () => {
     const {
       resourceSources,
       onChooseResource,
@@ -218,7 +219,9 @@ export default class SpritesList extends Component<Props, void> {
     });
   };
 
-  editWith = (externalEditor: ResourceExternalEditor) => {
+  editWith: (externalEditor: ResourceExternalEditor) => void = (
+    externalEditor: ResourceExternalEditor
+  ) => {
     const {
       project,
       direction,
@@ -309,7 +312,7 @@ export default class SpritesList extends Component<Props, void> {
     });
   };
 
-  render() {
+  render(): Element<'div'> {
     return (
       <div>
         <MiniToolbar justifyContent="flex-end" smallest>

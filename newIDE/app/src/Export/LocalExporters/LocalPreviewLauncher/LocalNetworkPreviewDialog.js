@@ -19,7 +19,7 @@ type Props = {|
 |};
 
 export default class LocalNetworkDialog extends React.Component<Props, {}> {
-  render() {
+  render(): null | React.Node {
     const {
       url,
       open,

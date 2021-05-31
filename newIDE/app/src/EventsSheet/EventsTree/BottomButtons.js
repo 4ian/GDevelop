@@ -25,7 +25,7 @@ const makeMenuTemplateBuilderForEvents = (
     };
   });
 
-export default function BottomButtons({ onAddEvent }: Props) {
+export default function BottomButtons({ onAddEvent }: Props): React.Node {
   return (
     <Column>
       <Line justifyContent="space-between">

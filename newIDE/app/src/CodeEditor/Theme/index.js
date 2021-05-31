@@ -41,4 +41,4 @@ const themes: Array<CodeEditorTheme> = [
   OneDark,
 ];
 
-export const getAllThemes = () => themes;
+export const getAllThemes = (): Array<CodeEditorTheme> => themes;

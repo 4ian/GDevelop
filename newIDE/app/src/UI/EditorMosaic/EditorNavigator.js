@@ -30,7 +30,7 @@ export type EditorNavigatorInterface = {|
 // Flow types might have to be changed/removed if upgrading Flow
 // (see example at https://github.com/wgao19/flow-notes/blob/master/react/react-memo.md)
 
-export default React.forwardRef<Props, EditorNavigatorInterface>(
+export default (React.forwardRef<Props, EditorNavigatorInterface>(
   (
     { initialEditorName, editors, transitions, onEditorChanged }: Props,
     ref
@@ -97,4 +97,4 @@ export default React.forwardRef<Props, EditorNavigatorInterface>(
       </Column>
     );
   }
-);
+): React$AbstractComponent<Props, EditorNavigatorInterface>);

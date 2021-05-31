@@ -33,7 +33,7 @@ type State = {|
   draggedPointKind: ?PointKind,
 |};
 
-const PointsPreview = (props: Props) => {
+const PointsPreview = (props: Props): React.Element<'div'> => {
   const frameRef = React.useRef<React.ElementRef<'div'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedPoint: null,

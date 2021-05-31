@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -92,7 +93,7 @@ export default class LocalStarters extends Component<Props, State> {
         );
   }
 
-  render() {
+  render(): Node {
     return (
       <I18n>
         {({ i18n }) => (

@@ -38,7 +38,7 @@ const styles = {
 
 type State = {|
   loadingMessage: string,
-  App: ?Element<*>,
+  App: ?any,
 |};
 
 class Bootstrapper extends Component<{}, State> {

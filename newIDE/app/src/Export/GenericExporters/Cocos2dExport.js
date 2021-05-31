@@ -5,7 +5,7 @@ import Text from '../../UI/Text';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Column noMargin>
     <Text>
       <Trans>
@@ -29,7 +29,7 @@ export const DoneFooter = ({
   renderGameButton,
 }: {|
   renderGameButton: () => React.Node,
-|}) => (
+|}): React.Node => (
   <Column noMargin>
     <Text>
       <Trans>

@@ -25,7 +25,7 @@ type Props = {|
 |};
 
 export default class Profiler extends React.Component<Props, void> {
-  render() {
+  render(): React.Node {
     const { onStart, onStop, profilerOutput, profilingInProgress } = this.props;
 
     return (

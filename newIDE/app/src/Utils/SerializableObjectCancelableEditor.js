@@ -17,7 +17,7 @@ export const useSerializableObjectCancelableEditor = ({
   serializableObject,
   useProjectToUnserialize,
   onCancel,
-}: Props) => {
+}: Props): (() => void) => {
   const serializedElementRef = React.useRef(null);
   React.useEffect(
     () => {

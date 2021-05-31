@@ -1,4 +1,5 @@
 // @flow
+import type { Node as $IMPORTED_TYPE$_Node, Element } from 'React';
 import React, { Component, type Node } from 'react';
 import findIndex from 'lodash/findIndex';
 import {
@@ -246,7 +247,13 @@ type SortableTreeNode = {
  * can be drag'n'dropped and events rows are virtualized.
  */
 export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
-  static defaultProps = {
+  static defaultProps: {|
+    selection: {|
+      selectedEvents: { [number]: EventContext },
+      selectedInstructions: { [number]: InstructionContext },
+      selectedInstructionsLists: { [number]: InstructionsListContext },
+    |},
+  |} = {
     selection: getInitialSelection(),
   };
   _list: ?any;
@@ -307,7 +314,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.forceEventsUpdate();
   }
 
-  _getEventRow(searchedEvent: gdBaseEvent) {
+  _getEventRow(searchedEvent: gdBaseEvent): number {
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
@@ -389,7 +396,12 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     };
   };
 
-  _onMoveNode = ({
+  _onMoveNode: ({
+    node: SortableTreeNode,
+    path: Array<any>,
+    treeData: any,
+    ...
+  }) => void = ({
     treeData,
     path,
     node,
@@ -432,11 +444,19 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.props.onEventMoved();
   };
 
-  _canDrag = ({ node }: { node: ?SortableTreeNode }) => {
+  _canDrag: ({ node: ?SortableTreeNode, ... }) => boolean = ({
+    node,
+  }: {
+    node: ?SortableTreeNode,
+  }) => {
     return !!node && !!node.event;
   };
 
-  _canDrop = ({ nextParent }: { nextParent: ?SortableTreeNode }) => {
+  _canDrop: ({ nextParent: ?SortableTreeNode, ... }) => boolean = ({
+    nextParent,
+  }: {
+    nextParent: ?SortableTreeNode,
+  }) => {
     if (nextParent) {
       if (nextParent.event) {
         return nextParent.event.canHaveSubEvents();
@@ -448,7 +468,9 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     return true;
   };
 
-  _canNodeHaveChildren = (node: ?SortableTreeNode) => {
+  _canNodeHaveChildren: (node: ?SortableTreeNode) => boolean = (
+    node: ?SortableTreeNode
+  ) => {
     if (node && node.event) {
       return node.event.canHaveSubEvents();
     }
@@ -456,7 +478,11 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     return false;
   };
 
-  _onVisibilityToggle = ({ node }: { node: SortableTreeNode }) => {
+  _onVisibilityToggle: ({ node: SortableTreeNode, ... }) => void = ({
+    node,
+  }: {
+    node: SortableTreeNode,
+  }) => {
     const { event } = node;
     if (!event) return;
 
@@ -464,7 +490,9 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.forceEventsUpdate();
   };
 
-  _renderObjectThumbnail = (objectName: string) => {
+  _renderObjectThumbnail: (
+    objectName: string
+  ) => null | $IMPORTED_TYPE$_Node = (objectName: string) => {
     const { project, scope, showObjectThumbnails } = this.props;
     if (!showObjectThumbnails) return null;
 
@@ -482,7 +510,14 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
-  _renderEvent = ({ node }: { node: SortableTreeNode }) => {
+  _renderEvent: ({
+    node: SortableTreeNode,
+    ...
+  }) => null | $IMPORTED_TYPE$_Node = ({
+    node,
+  }: {
+    node: SortableTreeNode,
+  }) => {
     const { event, depth, disabled } = node;
     if (!event) return null;
 
@@ -533,7 +568,11 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
-  _isNodeHighlighted = ({
+  _isNodeHighlighted: ({
+    node: SortableTreeNode,
+    searchQuery: ?Array<gdBaseEvent>,
+    ...
+  }) => void | gdBaseEvent | boolean = ({
     node,
     searchQuery,
   }: {
@@ -550,7 +589,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
-  render() {
+  render(): Element<'div'> {
     // react-sortable-tree does the rendering by transforming treeData
     // into a flat array, the result being memoized. This hack forces
     // a re-rendering of events, by discarding the memoized flat array

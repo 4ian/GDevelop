@@ -113,7 +113,7 @@ function applyPropertiesToProject(
   return displayProjectErrorsBox(t, getErrors(t, project));
 }
 
-function ProjectPropertiesDialog(props: Props) {
+function ProjectPropertiesDialog(props: Props): React.Node {
   const { project } = props;
 
   const subscriptionChecker = React.useRef<?SubscriptionChecker>(null);

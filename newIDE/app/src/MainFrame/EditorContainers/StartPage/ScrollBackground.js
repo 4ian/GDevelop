@@ -14,7 +14,7 @@ type Props = {|
   children: React.Node,
 |};
 
-const ScrollBackground = ({ children }: Props) => (
+const ScrollBackground = ({ children }: Props): React.Node => (
   <ThemeConsumer>
     {muiTheme => (
       <div

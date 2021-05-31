@@ -25,7 +25,11 @@ type Props = {|
 /**
  * Display information about latest releases.
  */
-const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
+const ChangelogRenderer = ({
+  releases,
+  error,
+  currentReleaseName,
+}: Props): React.Node => {
   const openReleaseNote = () =>
     Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
 

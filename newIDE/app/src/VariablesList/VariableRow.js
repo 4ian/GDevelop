@@ -70,7 +70,7 @@ const VariableRow = ({
   origin,
   arrayElement,
   undefinedVariableNames,
-}: Props) => {
+}: Props): React.Node => {
   const type = variable.getType();
   const isCollection = !gd.Variable.isPrimitive(type);
 

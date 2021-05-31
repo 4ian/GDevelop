@@ -63,7 +63,7 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
   Props,
   State
 > {
-  render() {
+  render(): React.Node {
     const actions = [
       <FlatButton
         label={<Trans>Cancel</Trans>}

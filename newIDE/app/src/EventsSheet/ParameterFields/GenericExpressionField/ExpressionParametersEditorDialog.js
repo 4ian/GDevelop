@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 import React, { Component } from 'react';
@@ -42,13 +43,13 @@ export default class ExpressionParametersEditorDialog extends Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     parameterValues: Array(
       this.props.expressionMetadata.getParametersCount()
     ).fill(''),
   };
 
-  render() {
+  render(): Node {
     const {
       project,
       scope,

@@ -93,7 +93,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     }
   }
 
-  _generateFromFile = () => {
+  _generateFromFile: () => void = () => {
     const { project, resourceSources, onChooseResource } = this.props;
 
     const sources = resourceSources.filter(source => source.kind === 'image');
@@ -193,7 +193,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     });
   };
 
-  onApply = () => {
+  onApply: () => void = () => {
     const { project } = this.props;
     const {
       desktopIconResourceNames,
@@ -220,7 +220,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     this.props.onApply();
   };
 
-  render() {
+  render(): React.Node {
     const actions = [
       <FlatButton
         key="cancel"

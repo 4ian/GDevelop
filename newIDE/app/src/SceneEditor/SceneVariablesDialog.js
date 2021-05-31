@@ -14,7 +14,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-export default (props: Props) => {
+export default (props: Props): React.Node => {
   return (
     <VariablesEditorDialog
       open={props.open}

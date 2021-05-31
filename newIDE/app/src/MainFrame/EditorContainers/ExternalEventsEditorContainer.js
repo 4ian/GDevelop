@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
@@ -29,7 +30,7 @@ export class ExternalEventsEditorContainer extends React.Component<
 > {
   editor: ?EventsSheet;
 
-  state = {
+  state: State = {
     layoutChooserOpen: false,
   };
 
@@ -160,4 +161,4 @@ export class ExternalEventsEditorContainer extends React.Component<
 
 export const renderExternalEventsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalEventsEditorContainer {...props} />;
+): Node => <ExternalEventsEditorContainer {...props} />;

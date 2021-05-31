@@ -12,7 +12,7 @@ export default ({
 }: {
   children: React.Node,
   isLoading: ?boolean,
-}) => (
+}): React.Element<'span'> => (
   <span>
     {children}
     {isLoading && <CircularProgress size={20} style={styles.progress} />}

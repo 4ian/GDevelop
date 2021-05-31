@@ -46,10 +46,10 @@ export default class LocalPreviewLauncher extends React.Component<
   Props,
   State
 > {
-  canDoNetworkPreview = () => true;
-  canDoHotReload = () => true;
+  canDoNetworkPreview: () => boolean = () => true;
+  canDoHotReload: () => boolean = () => true;
 
-  state = {
+  state: State = {
     networkPreviewDialogOpen: false,
     networkPreviewHost: null,
     networkPreviewPort: null,
@@ -64,7 +64,7 @@ export default class LocalPreviewLauncher extends React.Component<
   _networkPreviewSubscriptionChecker: ?SubscriptionChecker = null;
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
-  _openPreviewBrowserWindow = () => {
+  _openPreviewBrowserWindow: () => void = () => {
     if (
       !BrowserWindow ||
       !this.state.previewBrowserWindowConfig ||
@@ -85,7 +85,11 @@ export default class LocalPreviewLauncher extends React.Component<
     if (this.state.devToolsOpen) win.openDevTools();
   };
 
-  _openPreviewWindow = (
+  _openPreviewWindow: (
+    project: gdProject,
+    gamePath: string,
+    options: PreviewOptions
+  ) => void = (
     project: gdProject,
     gamePath: string,
     options: PreviewOptions
@@ -145,7 +149,7 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter: () => Promise<any> = (): Promise<any> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -163,7 +167,9 @@ export default class LocalPreviewLauncher extends React.Component<
     });
   };
 
-  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any> = (
+    previewOptions: PreviewOptions
+  ): Promise<any> => {
     const { project, layout, externalLayout } = previewOptions;
 
     // Start the debugger server for previews. Even if not used,
@@ -256,7 +262,7 @@ export default class LocalPreviewLauncher extends React.Component<
     return this._networkPreviewSubscriptionChecker.checkHasSubscription();
   };
 
-  render() {
+  render(): React.Node {
     const {
       networkPreviewDialogOpen,
       networkPreviewHost,

@@ -23,7 +23,7 @@ type Props = {|
   isAutomatic?: Boolean,
 |};
 
-const PointRow = (props: Props) => (
+const PointRow = (props: Props): React.Node => (
   <ThemeConsumer>
     {muiTheme => (
       <TableRow

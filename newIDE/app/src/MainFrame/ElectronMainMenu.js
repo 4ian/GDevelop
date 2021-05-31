@@ -330,7 +330,7 @@ const buildAndSendMenuTemplate = (
 /**
  * Create and update the editor main menu using Electron APIs.
  */
-const ElectronMainMenu = (props: MainMenuProps) => {
+const ElectronMainMenu = (props: MainMenuProps): null => {
   const { i18n, project, recentProjectFiles, onOpenRecentFile } = props;
   const shortcutMap = useShortcutMap();
   const language = i18n.language;

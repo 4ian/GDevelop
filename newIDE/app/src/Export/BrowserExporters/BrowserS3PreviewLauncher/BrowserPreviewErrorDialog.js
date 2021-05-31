@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import React, { Component } from 'react';
@@ -13,7 +14,7 @@ type Props = {|
 |};
 
 export default class BrowserPreviewErrorDialog extends Component<Props> {
-  render() {
+  render(): Node {
     const { error, onClose } = this.props;
 
     return (

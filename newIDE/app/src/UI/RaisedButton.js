@@ -30,7 +30,7 @@ type Props = {|
  * A raised button based on Material-UI button.
  */
 export default class RaisedButton extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     const { label, primary, icon, ...otherProps } = this.props;
 
     // In theory, focus ripple is only shown after a keyboard interaction

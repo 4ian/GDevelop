@@ -16,7 +16,7 @@ type Props = {|
   onEditExtensionOptions: () => void,
 |};
 
-export default (props: Props) => {
+export default (props: Props): React.Node => {
   const eventsFunctionsCount = props.eventsFunctionsExtension.getEventsFunctionsCount();
   const eventsBasedBehaviorsCount = props.eventsFunctionsExtension
     .getEventsBasedBehaviors()

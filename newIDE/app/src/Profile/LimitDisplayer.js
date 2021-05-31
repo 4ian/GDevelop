@@ -14,7 +14,11 @@ type Props = {|
   onChangeSubscription: Function,
 |};
 
-export default ({ subscription, limit, onChangeSubscription }: Props) => {
+export default ({
+  subscription,
+  limit,
+  onChangeSubscription,
+}: Props): React.Node => {
   if (!limit) return <PlaceholderLoader />;
   const hasSubscription = subscription && !!subscription.planId;
   const noSubscription = subscription && !subscription.planId;

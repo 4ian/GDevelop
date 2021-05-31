@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { type UserProfile } from '../../Profile/UserProfileContext';
 import BuildsList from './BuildsList';
@@ -20,10 +21,10 @@ type State = {|
 |};
 
 export default class Builds extends Component<Props, State> {
-  state = {
+  state: State = {
     builds: null,
   };
-  buildsWatcher = new BuildsWatcher();
+  buildsWatcher: BuildsWatcher = new BuildsWatcher();
 
   componentDidMount() {
     this._refreshBuilds();
@@ -33,7 +34,7 @@ export default class Builds extends Component<Props, State> {
     this.buildsWatcher.stop();
   }
 
-  _startBuildsWatcher = () => {
+  _startBuildsWatcher: () => void = () => {
     if (!this.state.builds) return;
 
     this.buildsWatcher.start({
@@ -53,7 +54,7 @@ export default class Builds extends Component<Props, State> {
     });
   };
 
-  _refreshBuilds = () => {
+  _refreshBuilds: () => void = () => {
     const { getAuthorizationHeader, profile } = this.props.userProfile;
     if (!profile) return;
 
@@ -75,12 +76,15 @@ export default class Builds extends Component<Props, State> {
     );
   };
 
-  _download = (build: Build, key: BuildArtifactKeyName) => {
+  _download: (build: Build, key: BuildArtifactKeyName) => void = (
+    build: Build,
+    key: BuildArtifactKeyName
+  ) => {
     const url = getBuildArtifactUrl(build, key);
     if (url) Window.openExternalURL(url);
   };
 
-  render() {
+  render(): Node {
     return (
       <BuildsList
         builds={this.state.builds}

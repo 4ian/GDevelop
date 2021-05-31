@@ -94,7 +94,7 @@ const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
 export const isCompatibleWithExtension = (
   ideVersion: string,
   extensionShortHeader: ExtensionShortHeader
-) =>
+): any | boolean =>
   extensionShortHeader.gdevelopVersion
     ? semverSatisfies(ideVersion, extensionShortHeader.gdevelopVersion, {
         includePrerelease: true,

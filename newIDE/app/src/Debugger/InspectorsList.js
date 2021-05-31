@@ -69,7 +69,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     });
   }
 
-  render() {
+  render(): null | React.Node {
     return this.props.gameData ? (
       <List style={styles.list}>
         {this._renderInspectorList(

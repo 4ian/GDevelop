@@ -84,7 +84,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
   Props,
   {||}
 > {
-  _addProperty = () => {
+  _addProperty: () => void = () => {
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
 
@@ -95,7 +95,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     this.props.onPropertiesUpdated();
   };
 
-  _removeProperty = (name: string) => {
+  _removeProperty: (name: string) => void = (name: string) => {
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
 
@@ -104,7 +104,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     this.props.onPropertiesUpdated();
   };
 
-  _moveProperty = (oldIndex: number, newIndex: number) => {
+  _moveProperty: (oldIndex: number, newIndex: number) => void = (
+    oldIndex: number,
+    newIndex: number
+  ) => {
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
 
@@ -113,7 +116,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     this.props.onPropertiesUpdated();
   };
 
-  render() {
+  render(): React.Node {
     const { eventsBasedBehavior } = this.props;
 
     const properties = eventsBasedBehavior.getPropertyDescriptors();

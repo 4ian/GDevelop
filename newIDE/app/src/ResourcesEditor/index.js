@@ -59,15 +59,15 @@ const initialMosaicEditorNodes = {
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {| setToolbar: () => void |} = {
     setToolbar: () => {},
   };
 
   editorMosaic: ?EditorMosaic = null;
   _propertiesEditor: ?ResourcePropertiesEditor = null;
   _resourcesList: ?ResourcesList = null;
-  resourcesLoader = ResourcesLoader;
-  state = {
+  resourcesLoader: typeof ResourcesLoader = ResourcesLoader;
+  state: State = {
     showPropertiesInfoBar: false,
     selectedResource: null,
   };
@@ -85,7 +85,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   }
 
-  deleteResource = (resource: ?gdResource) => {
+  deleteResource: (resource: ?gdResource) => void = (resource: ?gdResource) => {
     const { project, onDeleteResource } = this.props;
     if (!resource) return;
 
@@ -112,7 +112,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
-  _removeUnusedResources = (resourceKind: ResourceKind) => {
+  _removeUnusedResources: (resourceKind: ResourceKind) => void = (
+    resourceKind: ResourceKind
+  ) => {
     const { project } = this.props;
     const selectedResourceName = this.state.selectedResource
       ? this.state.selectedResource.getName()
@@ -144,7 +146,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     }
   };
 
-  _removeAllResourcesWithInvalidPath = () => {
+  _removeAllResourcesWithInvalidPath: () => void = () => {
     const { project } = this.props;
     const selectedResourceName = this.state.selectedResource
       ? this.state.selectedResource.getName()
@@ -176,12 +178,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     }
   };
 
-  openProjectFolder = () => {
+  openProjectFolder: () => void = () => {
     const project = this.props.project;
     if (shell) shell.openItem(path.dirname(project.getProjectFile()));
   };
 
-  openProperties = () => {
+  openProperties: () => void = () => {
     if (!this.editorMosaic) return;
     if (!this.editorMosaic.openEditor('properties', 'start', 66, 'column')) {
       this.setState({
@@ -190,7 +192,9 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     }
   };
 
-  _onResourceSelected = (selectedResource: ?gdResource) => {
+  _onResourceSelected: (selectedResource: ?gdResource) => void = (
+    selectedResource: ?gdResource
+  ) => {
     this.setState(
       {
         selectedResource,
@@ -202,7 +206,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const {
       project,
       onRenameResource,

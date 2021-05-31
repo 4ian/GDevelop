@@ -107,7 +107,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
   Props,
   State
 > {
-  render() {
+  render(): React.Node {
     const {
       eventsFunction,
       freezeEventsFunctionType,

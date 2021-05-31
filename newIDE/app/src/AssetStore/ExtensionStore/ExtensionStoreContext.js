@@ -21,21 +21,23 @@ type ExtensionStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
-  filters: null,
-  searchResults: null,
-  fetchExtensionsAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const ExtensionStoreContext: React$Context<ExtensionStoreState> = React.createContext<ExtensionStoreState>(
+  {
+    filters: null,
+    searchResults: null,
+    fetchExtensionsAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
@@ -53,7 +55,7 @@ const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
 
 export const ExtensionStoreStateProvider = ({
   children,
-}: ExtensionStoreStateProviderProps) => {
+}: ExtensionStoreStateProviderProps): React.Node => {
   const [
     extensionShortHeadersByName,
     setExtensionShortHeadersByName,

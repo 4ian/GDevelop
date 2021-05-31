@@ -57,7 +57,7 @@ export default ({
   errored,
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
-}: Props) => (
+}: Props): React.Node => (
   <Stepper
     activeStep={
       exportStep === 'export' || exportStep === 'resources-download'

@@ -67,7 +67,17 @@ export default class EventsBasedBehaviorsList extends React.Component<
   Props,
   State
 > {
-  static defaultProps = {
+  static defaultProps: {|
+    onDeleteEventsBasedBehavior: (
+      eventsBasedBehavior: gdEventsBasedBehavior,
+      cb: (boolean) => void
+    ) => void,
+    onRenameEventsBasedBehavior: (
+      eventsBasedBehavior: gdEventsBasedBehavior,
+      newName: string,
+      cb: (boolean) => void
+    ) => void,
+  |} = {
     onDeleteEventsBasedBehavior: (
       eventsBasedBehavior: gdEventsBasedBehavior,
       cb: boolean => void
@@ -85,7 +95,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
     searchText: '',
   };
 
-  _deleteEventsBasedBehavior = (
+  _deleteEventsBasedBehavior: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    {| askForConfirmation: boolean |}
+  ) => void = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     { askForConfirmation }: {| askForConfirmation: boolean |}
   ) => {
@@ -106,7 +119,9 @@ export default class EventsBasedBehaviorsList extends React.Component<
     });
   };
 
-  _editName = (renamedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+  _editName: (renamedEventsBasedBehavior: ?gdEventsBasedBehavior) => void = (
+    renamedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => {
     this.setState(
       {
         renamedEventsBasedBehavior,
@@ -117,7 +132,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
   };
 
-  _rename = (eventsBasedBehavior: gdEventsBasedBehavior, newName: string) => {
+  _rename: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    newName: string
+  ) => void = (eventsBasedBehavior: gdEventsBasedBehavior, newName: string) => {
     const { eventsBasedBehaviorsList } = this.props;
     this.setState({
       renamedEventsBasedBehavior: null,
@@ -144,9 +162,9 @@ export default class EventsBasedBehaviorsList extends React.Component<
     );
   };
 
-  _moveSelectionTo = (
+  _moveSelectionTo: (
     destinationEventsBasedBehavior: gdEventsBasedBehavior
-  ) => {
+  ) => void = (destinationEventsBasedBehavior: gdEventsBasedBehavior) => {
     const {
       eventsBasedBehaviorsList,
       selectedEventsBasedBehavior,
@@ -161,26 +179,30 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.forceUpdateList();
   };
 
-  forceUpdateList = () => {
+  forceUpdateList: () => void = () => {
     this._onEventsBasedBehaviorModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _copyEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+  _copyEventsBasedBehavior: (
+    eventsBasedBehavior: gdEventsBasedBehavior
+  ) => void = (eventsBasedBehavior: gdEventsBasedBehavior) => {
     Clipboard.set(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND, {
       eventsBasedBehavior: serializeToJSObject(eventsBasedBehavior),
       name: eventsBasedBehavior.getName(),
     });
   };
 
-  _cutEventsBasedBehavior = (eventsBasedBehavior: gdEventsBasedBehavior) => {
+  _cutEventsBasedBehavior: (
+    eventsBasedBehavior: gdEventsBasedBehavior
+  ) => void = (eventsBasedBehavior: gdEventsBasedBehavior) => {
     this._copyEventsBasedBehavior(eventsBasedBehavior);
     this._deleteEventsBasedBehavior(eventsBasedBehavior, {
       askForConfirmation: false,
     });
   };
 
-  _pasteEventsBasedBehavior = (index: number) => {
+  _pasteEventsBasedBehavior: (index: number) => void = (index: number) => {
     if (!Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(
@@ -215,7 +237,16 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this._onEventsBasedBehaviorModified();
   };
 
-  _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (
+  _renderEventsBasedBehaviorMenuTemplate: (
+    i18n: I18nType
+  ) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    index: number
+  ) => Array<
+    | {| click: () => void, enabled: boolean, label: any | string |}
+    | {| click: () => void, label: any | string |}
+    | {| type: string |}
+  > = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     index: number
   ) => {
@@ -257,7 +288,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     ];
   };
 
-  _addNewEventsBasedBehavior = () => {
+  _addNewEventsBasedBehavior: () => void = () => {
     const { eventsBasedBehaviorsList } = this.props;
 
     const name = newNameGenerator('MyBehavior', name =>
@@ -276,7 +307,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.forceUpdate();
   }
 
-  render() {
+  render(): React.Node {
     const {
       project,
       eventsBasedBehaviorsList,

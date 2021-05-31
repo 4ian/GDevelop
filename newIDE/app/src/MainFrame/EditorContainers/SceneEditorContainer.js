@@ -104,4 +104,4 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
 export const renderSceneEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <SceneEditorContainer {...props} />;
+): React.Node => <SceneEditorContainer {...props} />;

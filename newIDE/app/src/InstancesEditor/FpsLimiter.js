@@ -16,7 +16,7 @@ export default class FpsLimiter {
     this._forceUpdate = false;
   }
 
-  shouldUpdate() {
+  shouldUpdate(): boolean {
     const now = Date.now();
     const delta = now - this._lastFrameTime;
 

@@ -90,7 +90,9 @@ export const hasAutoSave = (
   return Promise.resolve(false);
 };
 
-export const onGetAutoSave = (fileMetadata: FileMetadata) => {
+export const onGetAutoSave = (
+  fileMetadata: FileMetadata
+): Promise<{| fileIdentifier: string |}> => {
   return Promise.resolve({
     ...fileMetadata,
     fileIdentifier: fileMetadata.fileIdentifier + '.autosave',

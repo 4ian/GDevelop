@@ -14,7 +14,7 @@ export const Line = (props: {|
   justifyContent?: string,
   expand?: boolean,
   overflow?: string,
-|}) => (
+|}): React.Element<'div'> => (
   <div
     style={{
       display: 'flex',
@@ -43,7 +43,7 @@ export const Column = (props: {|
   expand?: boolean,
   useFullHeight?: boolean,
   noOverflowParent?: boolean,
-|}) => (
+|}): React.Element<'div'> => (
   <div
     style={{
       display: 'flex',
@@ -73,7 +73,7 @@ export const Column = (props: {|
  * Check `Layout` first to see if there is already a layout made
  * specifically for your components (like `TextFieldWithButton`).
  */
-export const Spacer = () => (
+export const Spacer = (): React.Element<'span'> => (
   <span
     style={{
       width: marginsSize,

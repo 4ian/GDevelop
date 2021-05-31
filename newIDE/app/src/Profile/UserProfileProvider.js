@@ -38,7 +38,7 @@ type State = {|
 |};
 
 export default class UserProfileProvider extends React.Component<Props, State> {
-  state = {
+  state: State = {
     userProfile: initialUserProfile,
     loginDialogOpen: false,
     createAccountDialogOpen: false,
@@ -68,7 +68,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     });
   }
 
-  _fetchUserProfile = () => {
+  _fetchUserProfile: () => void = () => {
     const { authentification } = this.props;
 
     authentification.getUserProfile((err, profile: ?Profile) => {
@@ -137,12 +137,12 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     });
   };
 
-  _doLogout = () => {
+  _doLogout: () => void = () => {
     if (this.props.authentification) this.props.authentification.logout();
     this._resetUserProfile();
   };
 
-  _doLogin = (form: LoginForm) => {
+  _doLogin: (form: LoginForm) => void = (form: LoginForm) => {
     const { authentification } = this.props;
     if (!authentification) return;
 
@@ -161,7 +161,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     );
   };
 
-  _doCreateAccount = (form: LoginForm) => {
+  _doCreateAccount: (form: LoginForm) => void = (form: LoginForm) => {
     const { authentification } = this.props;
     if (!authentification) return;
 
@@ -181,7 +181,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     );
   };
 
-  _doForgotPassword = (form: LoginForm) => {
+  _doForgotPassword: (form: LoginForm) => void = (form: LoginForm) => {
     const { authentification } = this.props;
     if (!authentification) return;
 
@@ -202,27 +202,29 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     );
   };
 
-  openResetPassword = (open: boolean = true) => {
+  openResetPassword: (open?: boolean) => void = (open: boolean = true) => {
     this.setState({
       resetPasswordDialogOpen: open,
     });
   };
 
-  openLoginDialog = (open: boolean = true) => {
+  openLoginDialog: (open?: boolean) => void = (open: boolean = true) => {
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
     });
   };
 
-  openCreateAccountDialog = (open: boolean = true) => {
+  openCreateAccountDialog: (open?: boolean) => void = (
+    open: boolean = true
+  ) => {
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
     });
   };
 
-  render() {
+  render(): React.Node {
     return (
       <React.Fragment>
         <UserProfileContext.Provider value={this.state.userProfile}>

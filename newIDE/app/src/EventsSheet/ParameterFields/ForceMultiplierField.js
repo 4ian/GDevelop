@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
@@ -18,8 +19,10 @@ export default class ForceMultiplierField extends Component<
   ParameterFieldProps,
   State
 > {
-  _instantButton = React.createRef<RaisedButton>();
-  state = {
+  _instantButton: {|
+    current: null | RaisedButton,
+  |} = React.createRef<RaisedButton>();
+  state: State = {
     showDeprecatedNumericValue:
       this.props.value !== '' &&
       this.props.value !== '1' &&
@@ -30,7 +33,7 @@ export default class ForceMultiplierField extends Component<
     focusButton(this._instantButton);
   }
 
-  render() {
+  render(): Node {
     const { showDeprecatedNumericValue } = this.state;
     return (
       <Column expand noMargin>
@@ -100,7 +103,7 @@ export default class ForceMultiplierField extends Component<
 
 export const renderInlineForceMultiplier = ({
   value,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): Node | string => {
   if (value === '1') return <Trans>{`a permanent`}</Trans>;
   else if (value === '0' || value === '') return <Trans>{`an instant`}</Trans>;
 

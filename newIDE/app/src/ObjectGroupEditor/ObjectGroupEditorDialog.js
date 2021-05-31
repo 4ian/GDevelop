@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -23,7 +24,7 @@ const ObjectGroupEditorDialog = ({
   onCancel,
   globalObjectsContainer,
   objectsContainer,
-}: Props) => {
+}: Props): Node => {
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
     serializableObject: group,

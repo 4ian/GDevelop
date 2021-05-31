@@ -44,7 +44,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     const { value, onChange, onRequestClose, isInline, project } = this.props;
 
     return (

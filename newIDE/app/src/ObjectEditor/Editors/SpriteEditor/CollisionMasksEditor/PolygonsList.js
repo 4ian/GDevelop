@@ -197,7 +197,7 @@ type PolygonsListProps = {|
   spriteHeight: number,
 |};
 
-const PolygonsList = (props: PolygonsListProps) => {
+const PolygonsList = (props: PolygonsListProps): React.Node => {
   return (
     <React.Fragment>
       <Column expand>

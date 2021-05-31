@@ -50,14 +50,14 @@ export default class SelectedInstances {
   toCanvasCoordinates: (x: number, y: number) => [number, number];
   _screenType: ScreenType;
 
-  pixiContainer = new PIXI.Container();
-  rectanglesContainer = new PIXI.Container();
-  selectedRectangles = [];
-  resizeButton = new PIXI.Graphics();
-  resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
-  rightResizeButton = new PIXI.Graphics();
-  bottomResizeButton = new PIXI.Graphics();
-  rotateButton = new PIXI.Graphics();
+  pixiContainer: any = new PIXI.Container();
+  rectanglesContainer: any = new PIXI.Container();
+  selectedRectangles: Array<any> = [];
+  resizeButton: any = new PIXI.Graphics();
+  resizeIcon: any = PIXI.Sprite.from('res/actions/direction.png');
+  rightResizeButton: any = new PIXI.Graphics();
+  bottomResizeButton: any = new PIXI.Graphics();
+  rotateButton: any = new PIXI.Graphics();
 
   constructor({
     instancesSelection,
@@ -141,7 +141,7 @@ export default class SelectedInstances {
     this.pixiContainer.addChild(objectButton);
   }
 
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this.pixiContainer;
   }
 

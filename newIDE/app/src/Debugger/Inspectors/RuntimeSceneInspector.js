@@ -97,11 +97,11 @@ export default class RuntimeSceneInspector extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     newObjectName: '',
   };
 
-  render() {
+  render(): null | React.Node {
     const { runtimeScene, onCall } = this.props;
     if (!runtimeScene) return null;
 

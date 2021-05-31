@@ -10,7 +10,7 @@ type Props = {|
   onRetry?: () => void | Promise<void>,
 |};
 
-const PlaceholderError = ({ onRetry, children }: Props) => (
+const PlaceholderError = ({ onRetry, children }: Props): React.Node => (
   <Column expand alignItems="center">
     <EmptyMessage>{children}</EmptyMessage>
     <Line>

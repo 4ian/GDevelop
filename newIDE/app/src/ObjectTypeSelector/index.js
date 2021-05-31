@@ -23,11 +23,11 @@ type State = {|
 |};
 
 export default class ObjectTypeSelector extends React.Component<Props, State> {
-  state = {
+  state: State = {
     objectMetadata: enumerateObjectTypes(this.props.project),
   };
 
-  render() {
+  render(): React.Node {
     const {
       disabled,
       value,

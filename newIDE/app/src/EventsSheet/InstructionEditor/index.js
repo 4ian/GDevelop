@@ -46,7 +46,7 @@ type State = {||};
 export default class InstructionEditor extends React.Component<Props, State> {
   _instructionParametersEditor: ?InstructionParametersEditor;
 
-  chooseType = (type: string) => {
+  chooseType: (type: string) => void = (type: string) => {
     const { instruction } = this.props;
     instruction.setType(type);
     this.forceUpdate(() => {
@@ -56,7 +56,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
     });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const {
       instruction,
       isCondition,

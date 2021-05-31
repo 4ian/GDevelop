@@ -26,16 +26,19 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   Props,
   State
 > {
-  canDoNetworkPreview = () => false;
-  canDoHotReload = () => false;
+  canDoNetworkPreview: () => boolean = () => false;
+  canDoHotReload: () => boolean = () => false;
 
-  state = {
+  state: State = {
     showPreviewLinkDialog: false,
     url: null,
     error: null,
   };
 
-  _openPreviewWindow = (project: gdProject, url: string): any => {
+  _openPreviewWindow: (project: gdProject, url: string) => any = (
+    project: gdProject,
+    url: string
+  ): any => {
     const windowObjectReference = window.open(url, `_blank`);
     return {
       url,
@@ -43,7 +46,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     };
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter: () => Promise<any> = (): Promise<any> => {
     return findGDJS('preview').then(({ gdjsRoot, filesContent }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -70,7 +73,9 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     });
   };
 
-  launchPreview = (previewOptions: PreviewOptions): Promise<any> => {
+  launchPreview: (previewOptions: PreviewOptions) => Promise<any> = (
+    previewOptions: PreviewOptions
+  ): Promise<any> => {
     const { project, layout, externalLayout } = previewOptions;
     this.setState({
       error: null,
@@ -116,12 +121,12 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       });
   };
 
-  getPreviewDebuggerServer() {
+  getPreviewDebuggerServer(): null {
     // Debugger server is not supported in the web-app.
     return null;
   }
 
-  render() {
+  render(): null | React.Node {
     const { showPreviewLinkDialog, url, error } = this.state;
 
     if (error) {

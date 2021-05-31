@@ -39,7 +39,7 @@ type Props = {|
  * all sprites of an animation, or between all sprites of all animations of the object.
  */
 export default class SpriteSelector extends React.Component<Props, void> {
-  render() {
+  render(): React.Node {
     const {
       spriteObject,
       animationIndex,

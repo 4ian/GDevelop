@@ -10,7 +10,7 @@ type Props = {|
   children: ?React.Node,
 |};
 
-const BackgroundText = (props: Props) => (
+const BackgroundText = (props: Props): React.Node => (
   <ThemeConsumer>
     {muiTheme => (
       <Typography

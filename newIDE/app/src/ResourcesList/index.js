@@ -64,7 +64,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     resourcesWithErrors: {},
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to resources list is made outside
@@ -87,18 +87,22 @@ export default class ResourcesList extends React.Component<Props, State> {
     return false;
   }
 
-  _deleteResource = (resource: gdResource) => {
+  _deleteResource: (resource: gdResource) => void = (resource: gdResource) => {
     this.props.onDeleteResource(resource);
   };
 
-  _locateResourceFile = (resource: gdResource) => {
+  _locateResourceFile: (resource: gdResource) => void = (
+    resource: gdResource
+  ) => {
     const resourceFolderPath = path.dirname(
       getLocalResourceFullPath(this.props.project, resource.getName())
     );
     electron.shell.openItem(resourceFolderPath);
   };
 
-  _openResourceFile = (resource: gdResource) => {
+  _openResourceFile: (resource: gdResource) => void = (
+    resource: gdResource
+  ) => {
     const resourceFilePath = getLocalResourceFullPath(
       this.props.project,
       resource.getName()
@@ -106,7 +110,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     electron.shell.openItem(resourceFilePath);
   };
 
-  _copyResourceFilePath = (resource: gdResource) => {
+  _copyResourceFilePath: (resource: gdResource) => void = (
+    resource: gdResource
+  ) => {
     const resourceFilePath = getLocalResourceFullPath(
       this.props.project,
       resource.getName()
@@ -114,10 +120,10 @@ export default class ResourcesList extends React.Component<Props, State> {
     electron.clipboard.writeText(resourceFilePath);
   };
 
-  _scanForNewResources = (
+  _scanForNewResources: (
     extensions: string,
     createResource: () => gdResource
-  ) => {
+  ) => void = (extensions: string, createResource: () => gdResource) => {
     const glob = lazyRequireGlob();
     if (!glob) return;
 
@@ -144,7 +150,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _editName = (resource: ?gdResource) => {
+  _editName: (resource: ?gdResource) => void = (resource: ?gdResource) => {
     this.setState(
       {
         renamedResource: resource,
@@ -155,7 +161,10 @@ export default class ResourcesList extends React.Component<Props, State> {
     );
   };
 
-  _rename = (resource: gdResource, newName: string) => {
+  _rename: (resource: gdResource, newName: string) => void = (
+    resource: gdResource,
+    newName: string
+  ) => {
     const { project } = this.props;
     this.setState({
       renamedResource: null,
@@ -182,7 +191,9 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _moveSelectionTo = (destinationResource: gdResource) => {
+  _moveSelectionTo: (destinationResource: gdResource) => void = (
+    destinationResource: gdResource
+  ) => {
     const { project, selectedResource } = this.props;
     if (!selectedResource) return;
 
@@ -194,15 +205,21 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
-  forceUpdateList = () => {
+  forceUpdateList: () => void = () => {
     this.forceUpdate();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderResourceMenuTemplate = (i18n: I18nType) => (
+  _renderResourceMenuTemplate: (
+    i18n: I18nType
+  ) => (
     resource: gdResource,
     _index: number
-  ) => {
+  ) => Array<
+    | {| click: () => void, enabled: boolean, label: any | string |}
+    | {| click: () => void, label: any | string |}
+    | {| type: string |}
+  > = (i18n: I18nType) => (resource: gdResource, _index: number) => {
     return [
       {
         label: i18n._(t`Rename`),
@@ -303,7 +320,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     ];
   };
 
-  checkMissingPaths = () => {
+  checkMissingPaths: () => void = () => {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
@@ -322,7 +339,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.checkMissingPaths();
   }
 
-  render() {
+  render(): React.Node {
     const { project, selectedResource, onSelectResource } = this.props;
     const { searchText } = this.state;
 

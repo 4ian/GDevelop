@@ -36,14 +36,14 @@ export default class ExpressionParametersEditor extends React.Component<
 > {
   static getNonCodeOnlyParametersCount(
     expressionMetadata: gdExpressionMetadata
-  ) {
+  ): number {
     return mapFor(0, expressionMetadata.getParametersCount(), i => {
       const parameterMetadata = expressionMetadata.getParameter(i);
       return !parameterMetadata.isCodeOnly();
     }).filter(isVisible => isVisible).length;
   }
 
-  render() {
+  render(): null | React.Element<'div'> {
     const {
       expressionMetadata,
       parameterValues,

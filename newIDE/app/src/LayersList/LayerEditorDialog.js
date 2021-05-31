@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -41,7 +42,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-const LayerEditorDialog = (props: Props) => {
+const LayerEditorDialog = (props: Props): Node => {
   const {
     initialTab,
     layer,

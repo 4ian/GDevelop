@@ -87,10 +87,14 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
   State
 > {
-  state = { searchText: '', selectedObjectTags: [] };
-  _searchBar = React.createRef<SearchBar>();
-  _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItemRefType>();
+  state: State = { searchText: '', selectedObjectTags: [] };
+  _searchBar: {| current: null | SearchBar |} = React.createRef<SearchBar>();
+  _scrollView: {|
+    current: null | ScrollViewInterface,
+  |} = React.createRef<ScrollViewInterface>();
+  _selectedItem: {|
+    current: null | ListItemRefType,
+  |} = React.createRef<ListItemRefType>();
 
   // Free instructions, to be displayed in a tab next to the objects.
   freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -100,7 +104,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.freeInstructionsInfo
   );
-  initialInstructionTypePath = findInTree(
+  initialInstructionTypePath: ?Array<string> = findInTree(
     this.freeInstructionsInfoTree,
     this.props.chosenInstructionType
   );
@@ -125,7 +129,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     }
   }
 
-  _getAllObjectTags = (): Array<string> => {
+  _getAllObjectTags: () => Array<string> = (): Array<string> => {
     const { globalObjectsContainer, objectsContainer } = this.props;
 
     const tagsSet: Set<string> = new Set();
@@ -139,7 +143,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     return Array.from(tagsSet);
   };
 
-  _buildObjectTagsMenuTemplate = (i18n: I18nType): Array<any> => {
+  _buildObjectTagsMenuTemplate: (i18n: I18nType) => Array<any> = (
+    i18n: I18nType
+  ): Array<any> => {
     const { selectedObjectTags } = this.state;
 
     return buildTagsMenuTemplate({
@@ -152,7 +158,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     });
   };
 
-  render() {
+  render(): React.Node {
     const {
       style,
       globalObjectsContainer,

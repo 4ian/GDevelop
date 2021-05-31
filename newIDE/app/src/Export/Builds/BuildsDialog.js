@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -16,12 +17,12 @@ type Props = {|
 type State = {||};
 
 export default class BuildsDialog extends Component<Props, State> {
-  _onBuildsUpdated = () => {
+  _onBuildsUpdated: () => void = () => {
     // Force the Dialog repositioning
     this.forceUpdate();
   };
 
-  render() {
+  render(): null | Node {
     const { open, onClose, userProfile } = this.props;
     if (!open) return null;
 

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React from 'react';
 import { TableRow, TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
@@ -16,7 +17,7 @@ type Props = {|
   onChangeVerticeY: (value: number) => void,
 |};
 
-const VerticeRow = (props: Props) => (
+const VerticeRow = (props: Props): Node => (
   <ThemeConsumer>
     {muiTheme => (
       <TableRow

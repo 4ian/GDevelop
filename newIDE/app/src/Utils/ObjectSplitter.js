@@ -181,14 +181,16 @@ export const unsplit = (
 /**
  * A helper that can be used to split according to a list of hardcoded paths
  */
-export const splitPaths = (paths: Set<string>) => {
+export const splitPaths = (paths: Set<string>): ((path: string) => boolean) => {
   return (path: string) => paths.has(path);
 };
 
 /**
  * A helper that can be used to get the name of items in array using an hardcoded property name.
  */
-export const getNameFromProperty = (propertyName: string) => {
+export const getNameFromProperty = (
+  propertyName: string
+): ((object: any) => string) => {
   return (object: Object): string => {
     const property = object[propertyName];
     if (typeof property !== 'string') {
@@ -202,7 +204,9 @@ export const getNameFromProperty = (propertyName: string) => {
 /**
  * A helper that can be used to get the name of items in array using an hardcoded property name.
  */
-export const getSlugifiedUniqueNameFromProperty = (propertyName: string) => {
+export const getSlugifiedUniqueNameFromProperty = (
+  propertyName: string
+): ((object: any, currentReference: string) => string) => {
   const existingNamesForReference = {};
 
   return (object: Object, currentReference: string): string => {

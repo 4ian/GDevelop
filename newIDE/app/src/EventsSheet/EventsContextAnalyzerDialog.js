@@ -57,7 +57,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
   Props,
   {}
 > {
-  render() {
+  render(): React.Node {
     const { onClose, eventsContextResult } = this.props;
     const actions = [
       <FlatButton

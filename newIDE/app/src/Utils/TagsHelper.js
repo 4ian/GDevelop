@@ -80,7 +80,7 @@ export const getStringFromTags = (tags: Tags): string => {
   return tags.join(', ');
 };
 
-export const hasStringAllTags = (tagsString: string, tags: Tags) => {
+export const hasStringAllTags = (tagsString: string, tags: Tags): boolean => {
   for (const tag of tags) {
     if (tagsString.indexOf(tag) === -1) return false;
   }

@@ -43,11 +43,13 @@ export default class Authentification {
     });
   }
 
-  onUserChange = (cb: () => void) => {
+  onUserChange: (cb: () => void) => void = (cb: () => void) => {
     this._onUserChangeCb = cb;
   };
 
-  createAccount = (form: LoginForm): Promise<void> => {
+  createAccount: (form: LoginForm) => Promise<void> = (
+    form: LoginForm
+  ): Promise<void> => {
     return firebase
       .auth()
       .createUserWithEmailAndPassword(form.email, form.password)
@@ -60,7 +62,9 @@ export default class Authentification {
       });
   };
 
-  login = (form: LoginForm): Promise<void> => {
+  login: (form: LoginForm) => Promise<void> = (
+    form: LoginForm
+  ): Promise<void> => {
     return firebase
       .auth()
       .signInWithEmailAndPassword(form.email, form.password)
@@ -73,21 +77,25 @@ export default class Authentification {
       });
   };
 
-  forgotPassword = (form: LoginForm): Promise<void> => {
+  forgotPassword: (form: LoginForm) => Promise<void> = (
+    form: LoginForm
+  ): Promise<void> => {
     return firebase.auth().sendPasswordResetEmail(form.email);
   };
 
-  getUserProfile = (cb: (any, ?Profile) => void) => {
+  getUserProfile: (cb: (any, ?Profile) => void) => void = (
+    cb: (any, ?Profile) => void
+  ) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
 
     cb(null, this.user);
   };
 
-  getUserProfileSync = (): ?Profile => {
+  getUserProfileSync: () => ?Profile = (): ?Profile => {
     return this.user;
   };
 
-  logout = () => {
+  logout: () => void = () => {
     firebase
       .auth()
       .signOut()
@@ -99,14 +107,14 @@ export default class Authentification {
       });
   };
 
-  getAuthorizationHeader = (): Promise<string> => {
+  getAuthorizationHeader: () => Promise<string> = (): Promise<string> => {
     if (!this.user)
       return Promise.reject(new Error('User is not authenticated'));
 
     return this.user.getIdToken().then(token => `Bearer ${token}`);
   };
 
-  isAuthenticated = (): boolean => {
+  isAuthenticated: () => boolean = (): boolean => {
     return !!this.user;
   };
 }

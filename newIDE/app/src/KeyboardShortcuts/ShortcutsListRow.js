@@ -27,7 +27,7 @@ type Props = {|
   onResetShortcut: () => void,
 |};
 
-const ShortcutsListRow = (props: Props) => {
+const ShortcutsListRow = (props: Props): React.Node => {
   return (
     <ListItem>
       <ListItemText

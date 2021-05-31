@@ -27,7 +27,7 @@ const shouldNeverBeCalled = () => {
  * A raised button based on Material-UI button, that has a menu displayed
  * when the the dropdown arrow is clicked.
  */
-const RaisedButtonWithSplitMenu = (props: Props) => {
+const RaisedButtonWithSplitMenu = (props: Props): React.Node => {
   const { buildMenuTemplate, onClick, label, primary, icon, disabled } = props;
 
   // In theory, focus ripple is only shown after a keyboard interaction

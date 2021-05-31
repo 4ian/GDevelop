@@ -103,12 +103,12 @@ const getStyles = (props: Props, state: State) => {
  * Customized to add optional tags button.
  */
 export default class SearchBar extends React.PureComponent<Props, State> {
-  state = {
+  state: State = {
     focus: false,
     value: this.props.value,
     active: false,
   };
-  _textField = React.createRef<TextField>();
+  _textField: {| current: null | TextField |} = React.createRef<TextField>();
 
   componentWillReceiveProps(nextProps: Props) {
     if (this.props.value !== nextProps.value) {
@@ -116,46 +116,50 @@ export default class SearchBar extends React.PureComponent<Props, State> {
     }
   }
 
-  focus = () => {
+  focus: () => void = () => {
     if (this._textField.current) {
       this._textField.current.focus();
     }
   };
 
-  blur = () => {
+  blur: () => void = () => {
     if (this._textField.current) {
       this._textField.current.blur();
     }
   };
 
-  handleFocus = () => {
+  handleFocus: () => void = () => {
     this.setState({ focus: true });
   };
 
-  handleBlur = () => {
+  handleBlur: () => void = () => {
     this.setState({ focus: false });
     if (this.state.value.trim().length === 0) {
       this.setState({ value: '' });
     }
   };
 
-  handleInput = (e: {| target: {| value: string |} |}) => {
+  handleInput: (e: {| target: {| value: string |} |}) => void = (e: {|
+    target: {| value: string |},
+  |}) => {
     this.setState({ value: e.target.value });
     this.props.onChange && this.props.onChange(e.target.value);
   };
 
-  handleCancel = () => {
+  handleCancel: () => void = () => {
     this.setState({ active: false, value: '' });
     this.props.onChange && this.props.onChange('');
   };
 
-  handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+  handleKeyPressed: (event: SyntheticKeyboardEvent<>) => void = (
+    event: SyntheticKeyboardEvent<>
+  ) => {
     if (shouldValidate(event)) {
       this.props.onRequestSearch(this.state.value);
     }
   };
 
-  render() {
+  render(): React.Node {
     const styles = getStyles(this.props, this.state);
     const { value } = this.state;
     const { disabled, style, buildTagsMenuTemplate, helpPagePath } = this.props;
@@ -232,7 +236,7 @@ export default class SearchBar extends React.PureComponent<Props, State> {
   }
 }
 
-export const useShouldAutofocusSearchbar = () => {
+export const useShouldAutofocusSearchbar = (): boolean => {
   // Note: this is not a React hook but is named as one to encourage
   // components to use it as such, so that it could be reworked
   // at some point to use a context (verify in this case all usages).

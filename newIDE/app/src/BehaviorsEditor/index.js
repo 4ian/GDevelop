@@ -54,7 +54,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
-const BehaviorsEditor = (props: Props) => {
+const BehaviorsEditor = (props: Props): React.Node => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );

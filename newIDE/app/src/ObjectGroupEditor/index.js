@@ -21,11 +21,11 @@ type State = {|
 |};
 
 export default class ObjectGroupEditor extends React.Component<Props, State> {
-  state = {
+  state: State = {
     newObjectName: '',
   };
 
-  removeObject = (objectName: string) => {
+  removeObject: (objectName: string) => void = (objectName: string) => {
     const { group, onSizeUpdated } = this.props;
 
     group.removeObject(objectName);
@@ -34,7 +34,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
     if (onSizeUpdated) onSizeUpdated();
   };
 
-  addObject = (objectName: string) => {
+  addObject: (objectName: string) => void = (objectName: string) => {
     const { group, onSizeUpdated } = this.props;
 
     group.addObject(objectName);
@@ -44,7 +44,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
     if (onSizeUpdated) onSizeUpdated();
   };
 
-  _renderExplanation() {
+  _renderExplanation(): React.Node {
     const { group, globalObjectsContainer, objectsContainer } = this.props;
 
     let type = undefined;
@@ -75,7 +75,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
     return <EmptyMessage>{message}</EmptyMessage>;
   }
 
-  render() {
+  render(): React.Element<'div'> {
     const {
       project,
       group,

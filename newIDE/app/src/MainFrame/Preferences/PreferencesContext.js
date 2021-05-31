@@ -246,14 +246,13 @@ export const initialPreferences = {
   values: {
     language: 'en',
     autoDownloadUpdates: true,
-    themeName:
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'Nord'
-        : 'GDevelop default',
+    themeName: ((typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'Nord'
+      : 'GDevelop default'): string),
     codeEditorThemeName: 'vs-dark',
-    hiddenAlertMessages: {},
-    hiddenTutorialHints: {},
+    hiddenAlertMessages: ({}: { ... }),
+    hiddenTutorialHints: ({}: { ... }),
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
@@ -263,12 +262,12 @@ export const initialPreferences = {
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
-    projectLastUsedPaths: {},
-    defaultEditorMosaicNodes: {},
-    recentProjectFiles: [],
+    projectLastUsedPaths: ({}: { ... }),
+    defaultEditorMosaicNodes: ({}: { ... }),
+    recentProjectFiles: ([]: Array<FileMetadataAndStorageProviderName>),
     autoOpenMostRecentProject: true,
     hasProjectOpened: false,
-    userShortcutMap: {},
+    userShortcutMap: ({}: { ... }),
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: true,
@@ -282,7 +281,7 @@ export const initialPreferences = {
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
   showTutorialHint: (identifier: string, show: boolean) => {},
-  verifyIfIsNewVersion: () => false,
+  verifyIfIsNewVersion: (): boolean => false,
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
@@ -290,35 +289,37 @@ export const initialPreferences = {
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
-  getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
+  getLastUsedPath: (project: gdProject, kind: ResourceKind): string => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},
-  getDefaultEditorMosaicNode: (name: EditorMosaicName) => null,
+  getDefaultEditorMosaicNode: (name: EditorMosaicName): null => null,
   setDefaultEditorMosaicNode: (
     name: EditorMosaicName,
     node: ?EditorMosaicNode
   ) => {},
-  getRecentProjectFiles: () => [],
+  getRecentProjectFiles: (): Array<FileMetadataAndStorageProviderName> => [],
   insertRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => {},
   removeRecentProjectFile: (
     fileMetadata: FileMetadataAndStorageProviderName
   ) => {},
-  getAutoOpenMostRecentProject: () => true,
+  getAutoOpenMostRecentProject: (): boolean => true,
   setAutoOpenMostRecentProject: () => {},
-  hadProjectOpenedDuringLastSession: () => false,
+  hadProjectOpenedDuringLastSession: (): boolean => false,
   setHasProjectOpened: () => {},
   resetShortcutsToDefault: () => {},
   setShortcutForCommand: (commandName: CommandName, shortcut: string) => {},
-  getNewObjectDialogDefaultTab: () => 'asset-store',
+  getNewObjectDialogDefaultTab: (): 'asset-store' => 'asset-store',
   setNewObjectDialogDefaultTab: () => {},
-  getIsMenuBarHiddenInPreview: () => true,
+  getIsMenuBarHiddenInPreview: (): boolean => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
-  getIsAlwaysOnTopInPreview: () => true,
+  getIsAlwaysOnTopInPreview: (): boolean => true,
   setIsAlwaysOnTopInPreview: () => {},
 };
 
-const PreferencesContext = React.createContext<Preferences>(initialPreferences);
+const PreferencesContext: React$Context<Preferences> = React.createContext<Preferences>(
+  initialPreferences
+);
 
 export default PreferencesContext;

@@ -22,7 +22,7 @@ type Props = {|
 /**
  * A text field based on Material-UI text field.
  */
-export default (props: Props) => {
+export default (props: Props): React.Node => {
   const { onCheck } = props;
   const checkbox = (
     <Checkbox

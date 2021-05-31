@@ -33,7 +33,7 @@ export const AssetStore = ({
   objectsContainer,
   events,
   onOpenDetails,
-}: Props) => {
+}: Props): React.Node => {
   const {
     filters,
     searchResults,

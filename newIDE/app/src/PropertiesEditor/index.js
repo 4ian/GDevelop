@@ -191,7 +191,9 @@ const getFieldLabel = (instances: Instances, field: ValueField): any => {
 };
 
 export default class PropertiesEditor extends React.Component<Props, {||}> {
-  _onInstancesModified = (instances: Instances) => {
+  _onInstancesModified: (instances: Instances) => void = (
+    instances: Instances
+  ) => {
     // This properties editor is dealing with fields that are
     // responsible to update their state (see field.setValue).
 
@@ -202,7 +204,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     else this.forceUpdate();
   };
 
-  _getFieldDescription = (instances: Instances, field: ValueField): ?string => {
+  _getFieldDescription: (instances: Instances, field: ValueField) => ?string = (
+    instances: Instances,
+    field: ValueField
+  ): ?string => {
     const { renderExtraDescriptionText } = this.props;
     if (!instances[0]) {
       console.log(
@@ -222,7 +227,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return descriptions.join('\n') || undefined;
   };
 
-  _renderInputField = (field: ValueField) => {
+  _renderInputField: (field: ValueField) => null | React.Node = (
+    field: ValueField
+  ) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
@@ -368,7 +375,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderSelectField = (field: ValueField) => {
+  _renderSelectField: (field: ValueField) => void | React.Node = (
+    field: ValueField
+  ) => {
     if (!field.getChoices || !field.getValue) return;
 
     const children = field
@@ -428,7 +437,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderButton = (field: ValueField) => {
+  _renderButton: (field: ValueField) => React.Node = (field: ValueField) => {
     //TODO: multi selection handling
     return (
       <FlatButton
@@ -443,7 +452,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     );
   };
 
-  _renderResourceField = (field: ResourceField) => {
+  _renderResourceField: (field: ResourceField) => void | React.Node = (
+    field: ResourceField
+  ) => {
     if (!this.props.project) {
       console.error(
         'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, etc...)'
@@ -480,7 +491,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     );
   };
 
-  render() {
+  render(): React.Node {
     const { mode } = this.props;
 
     const renderContainer =

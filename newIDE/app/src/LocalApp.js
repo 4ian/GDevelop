@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import type {Node} from "React";import React from 'react';
 import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
@@ -29,7 +29,7 @@ import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalRes
 
 const gd: libGDevelop = global.gd;
 
-export const create = (authentification: Authentification) => {
+export const create = (authentification: Authentification): Node => {
   Window.setUpContextMenu();
 
   const appArguments = Window.getArguments();

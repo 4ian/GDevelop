@@ -41,7 +41,7 @@ export default {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
-  getThumbnail: function(project: gdProject, object: gdObject) {
+  getThumbnail: function(project: gdProject, object: gdObject): any {
     var objectType = object.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -62,7 +62,7 @@ export default {
     instance: gdInitialInstance,
     associatedObject: gdObject,
     pixiContainer: any
-  ) {
+  ): any {
     var objectType = associatedObject.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return new this.renderers[objectType](

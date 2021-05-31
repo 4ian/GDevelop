@@ -68,7 +68,7 @@ type Props = {|
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-export default ({ build, onDownload }: Props) => {
+export default ({ build, onDownload }: Props): React.Node => {
   const config = buildTypesConfig[build.type];
   const secondsSinceLastUpdate = Math.abs(
     differenceInSeconds(build.updatedAt, Date.now())

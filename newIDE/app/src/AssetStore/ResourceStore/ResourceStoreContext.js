@@ -26,23 +26,25 @@ type ResourceStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const ResourceStoreContext = React.createContext<ResourceStoreState>({
-  filters: null,
-  authors: null,
-  licenses: null,
-  searchResults: null,
-  fetchResourcesAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const ResourceStoreContext: React$Context<ResourceStoreState> = React.createContext<ResourceStoreState>(
+  {
+    filters: null,
+    authors: null,
+    licenses: null,
+    searchResults: null,
+    fetchResourcesAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type ResourceStoreStateProviderProps = {|
   children: React.Node,
@@ -54,7 +56,7 @@ const getResourceSearchTerms = (resource: Resource) => {
 
 export const ResourceStoreStateProvider = ({
   children,
-}: ResourceStoreStateProviderProps) => {
+}: ResourceStoreStateProviderProps): React.Node => {
   const [resourcesByUrl, setResourcesByUrl] = React.useState<?{
     [string]: Resource,
   }>(null);

@@ -20,12 +20,12 @@ type Props = {|
  * Load information about latest releases and display them.
  */
 export default class Changelog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     releases: null,
     error: null,
   };
 
-  _onUpdated = () => {
+  _onUpdated: () => void = () => {
     if (this.props.onUpdated) this.props.onUpdated();
   };
 
@@ -50,7 +50,7 @@ export default class Changelog extends React.Component<Props, State> {
       );
   }
 
-  render() {
+  render(): React.Node {
     const { releases, error } = this.state;
     return (
       <ChangelogRenderer

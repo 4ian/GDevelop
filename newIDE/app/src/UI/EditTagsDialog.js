@@ -23,10 +23,10 @@ type State = {|
  * enter to validate, esc to dismiss dialog).
  */
 export default class EditTagsDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     tagsString: this.props.tagsString,
   };
-  _tagsField = React.createRef<TextField>();
+  _tagsField: {| current: null | TextField |} = React.createRef<TextField>();
 
   componentDidMount() {
     setTimeout(() => {
@@ -36,7 +36,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
     }, 10);
   }
 
-  render() {
+  render(): React.Node {
     const { onCancel, onEdit } = this.props;
     const { tagsString } = this.state;
 

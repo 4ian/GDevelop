@@ -38,7 +38,7 @@ export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
   _options: Object;
-  _zOrderFinder = new gd.HighestZOrderFinder();
+  _zOrderFinder: gdHighestZOrderFinder = new gd.HighestZOrderFinder();
 
   constructor({ instances, options }: Props) {
     this._instances = instances;
@@ -54,7 +54,10 @@ export default class InstancesAdder {
    * Immediately create new instance at the specified position
    * (specified in scene coordinates).
    */
-  addInstances = (
+  addInstances: (
+    pos: [number, number],
+    objectNames: Array<string>
+  ) => Array<gdInitialInstance> = (
     pos: [number, number],
     objectNames: Array<string>
   ): Array<gdInitialInstance> => {
@@ -79,10 +82,10 @@ export default class InstancesAdder {
    * Create temporary instances at the specified position
    * (specified in scene coordinates).
    */
-  createOrUpdateTemporaryInstancesFromObjectNames = (
+  createOrUpdateTemporaryInstancesFromObjectNames: (
     pos: [number, number],
     objectNames: Array<string>
-  ) => {
+  ) => void = (pos: [number, number], objectNames: Array<string>) => {
     if (!objectNames.length) return;
 
     if (!this._temporaryInstances.length) {
@@ -92,10 +95,10 @@ export default class InstancesAdder {
     }
   };
 
-  _createTemporaryInstancesFromObjectNames = (
+  _createTemporaryInstancesFromObjectNames: (
     pos: [number, number],
     objectNames: Array<string>
-  ) => {
+  ) => void = (pos: [number, number], objectNames: Array<string>) => {
     this.deleteTemporaryInstances();
 
     this._instances.iterateOverInstances(this._zOrderFinder);
@@ -117,7 +120,9 @@ export default class InstancesAdder {
    * Update the temporary instances  positions
    * (specified in scene coordinates). Useful when dragging these instances.
    */
-  updateTemporaryInstancePositions = (
+  updateTemporaryInstancePositions: (
+    pos: [number, number]
+  ) => Array<gdInitialInstance> = (
     pos: [number, number]
   ): Array<gdInitialInstance> => {
     const newPos = roundPositionsToGrid(pos, this._options);

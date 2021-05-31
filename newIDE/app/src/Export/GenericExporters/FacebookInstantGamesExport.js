@@ -7,7 +7,7 @@ import FlatButton from '../../UI/FlatButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Text>
     <Trans>
       Prepare your game for Facebook Instant Games so that it can be play on
@@ -21,7 +21,7 @@ export const DoneFooter = ({
   renderGameButton,
 }: {|
   renderGameButton: () => React.Node,
-|}) => {
+|}): React.Node => {
   const openLearnMore = () => {
     Window.openExternalURL(
       getHelpLink('/publishing/publishing-to-facebook-instant-games')

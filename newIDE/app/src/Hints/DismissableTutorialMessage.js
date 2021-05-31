@@ -18,7 +18,9 @@ type Props = {|
  * Show a link to a tutorial that can be permanently hidden. Hidden tutorials
  * will be stored in preferences.
  */
-const DismissableTutorialMessage = ({ tutorialHint }: Props) => {
+const DismissableTutorialMessage = ({
+  tutorialHint,
+}: Props): null | React.Node => {
   const preferences = React.useContext(PreferencesContext);
   const { values, showTutorialHint } = preferences;
 

@@ -14,7 +14,7 @@ type Props = {|
  * This considers a window to be "small" if *both* the width and height
  * are small.
  */
-export const ResponsiveWindowMeasurer = ({ children }: Props) => {
+export const ResponsiveWindowMeasurer = ({ children }: Props): React.Node => {
   useOnResize(useForceUpdate());
   const width = useResponsiveWindowWidth();
 

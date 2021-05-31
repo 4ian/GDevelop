@@ -30,9 +30,12 @@ export const initialUserProfile = {
   onLogin: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {},
-  getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
+  getAuthorizationHeader: (): Promise<string> =>
+    Promise.reject(new Error('Unimplemented')),
 };
 
-const UserProfileContext = React.createContext<UserProfile>(initialUserProfile);
+const UserProfileContext: React$Context<UserProfile> = React.createContext<UserProfile>(
+  initialUserProfile
+);
 
 export default UserProfileContext;

@@ -129,7 +129,7 @@ const LinkButton = ({
 export const ShowcasedGameListItem = ({
   showcasedGame,
   onHeightComputed,
-}: Props) => {
+}: Props): React.Element<'div'> => {
   // Report the height of the item once it's known.
   const [isLoaded, setIsLoaded] = React.useState(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);

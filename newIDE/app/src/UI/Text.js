@@ -43,7 +43,7 @@ export default ({
   noShrink,
   noMargin,
   displayInlineAsSpan,
-}: Props) => (
+}: Props): React.Node => (
   <Typography
     variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
     component={displayInlineAsSpan ? 'span' : undefined}

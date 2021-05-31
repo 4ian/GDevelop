@@ -41,7 +41,7 @@ export const declareExtension = (
 export const declareExtensionDependencies = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension
-) =>
+): Array<void> =>
   mapVector<gdDependencyMetadata, void>(
     eventsFunctionsExtension.getAllDependencies(),
     dependency => extension.addDependency().copyFrom(dependency)
@@ -177,7 +177,9 @@ export const declareBehaviorMetadata = (
  * Check if the name of the function is the name of a lifecycle function (for events-based behaviors),
  * that will be called automatically by the game engine.
  */
-export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
+export const isBehaviorLifecycleEventsFunction = (
+  functionName: string
+): boolean => {
   return (
     [
       'onCreated',
@@ -197,7 +199,9 @@ export const isBehaviorLifecycleEventsFunction = (functionName: string) => {
  * Check if the name of the function is the name of a lifecycle function (for events-based extensions),
  * that will be called automatically by the game engine.
  */
-export const isExtensionLifecycleEventsFunction = (functionName: string) => {
+export const isExtensionLifecycleEventsFunction = (
+  functionName: string
+): boolean => {
   return gd.EventsFunctionsExtension.isExtensionLifecycleEventsFunction(
     functionName
   );

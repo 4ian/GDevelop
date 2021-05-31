@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import React from 'react';
 import { type Tags, removeTag } from '../Utils/TagsHelper';
 import Chip from '@material-ui/core/Chip';
@@ -21,7 +22,7 @@ type Props = {|
   onChange?: Tags => void,
 |};
 
-export default ({ tags, onChange }: Props) => {
+export default ({ tags, onChange }: Props): null | Element<'div'> => {
   if (!tags.length) return null;
 
   return (

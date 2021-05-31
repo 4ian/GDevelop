@@ -17,7 +17,7 @@ const tryPath = (
     else onNoAccess();
   });
 
-export const findExamples = (cb: (?string) => void) => {
+export const findExamples = (cb: (?string) => void): void | string => {
   if (!process || !fs) return '';
 
   const appPath = app ? app.getAppPath() : process.cwd();

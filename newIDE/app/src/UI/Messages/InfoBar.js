@@ -16,7 +16,7 @@ type Props = {|
 |};
 
 export default class InfoBar extends React.PureComponent<Props> {
-  render() {
+  render(): React.Node {
     const { identifier } = this.props;
 
     return (

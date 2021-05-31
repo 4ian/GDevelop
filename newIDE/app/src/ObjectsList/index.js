@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -120,7 +121,7 @@ type Props = {|
 export default class ObjectsList extends React.Component<Props, State> {
   sortableList: ?SortableVirtualizedItemList<ObjectWithContext>;
   _displayedObjectWithContextsList: ObjectWithContextList = [];
-  state = {
+  state: State = {
     newObjectDialogOpen: false,
     renamedObjectWithContext: null,
     variablesEditedObject: null,
@@ -128,7 +129,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     tagEditedObject: null,
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to objects list is made outside
@@ -161,7 +162,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     return false;
   }
 
-  addObject = (objectType: string) => {
+  addObject: (objectType: string) => void = (objectType: string) => {
     const {
       project,
       objectsContainer,
@@ -198,18 +199,20 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
   };
 
-  _onObjectAddedFromAsset = (object: gdObject) => {
+  _onObjectAddedFromAsset: (object: gdObject) => void = (object: gdObject) => {
     const { onObjectCreated } = this.props;
 
     object.setTags(getStringFromTags(this.props.selectedObjectTags));
     onObjectCreated(object);
   };
 
-  onAddNewObject = () => {
+  onAddNewObject: () => void = () => {
     this.setState({ newObjectDialogOpen: true });
   };
 
-  _deleteObject = (objectWithContext: ObjectWithContext) => {
+  _deleteObject: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
@@ -236,7 +239,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     });
   };
 
-  _copyObject = (objectWithContext: ObjectWithContext) => {
+  _copyObject: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     const { object } = objectWithContext;
     Clipboard.set(CLIPBOARD_KIND, {
       type: object.getType(),
@@ -245,21 +250,29 @@ export default class ObjectsList extends React.Component<Props, State> {
     });
   };
 
-  _cutObject = (objectWithContext: ObjectWithContext) => {
+  _cutObject: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     this._copyObject(objectWithContext);
     this._deleteObject(objectWithContext);
   };
 
-  _duplicateObject = (objectWithContext: ObjectWithContext) => {
+  _duplicateObject: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     this._copyObject(objectWithContext);
     this._pasteAndRename(objectWithContext);
   };
 
-  _pasteAndRename = (objectWithContext: ObjectWithContext) => {
+  _pasteAndRename: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     this._editName(this._paste(objectWithContext));
   };
 
-  _paste = (objectWithContext: ObjectWithContext): ?ObjectWithContext => {
+  _paste: (objectWithContext: ObjectWithContext) => ?ObjectWithContext = (
+    objectWithContext: ObjectWithContext
+  ): ?ObjectWithContext => {
     if (!Clipboard.has(CLIPBOARD_KIND)) return null;
 
     const { object: pasteObject, global } = objectWithContext;
@@ -309,7 +322,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     return { object: newObject, global };
   };
 
-  _editName = (objectWithContext: ?ObjectWithContext) => {
+  _editName: (objectWithContext: ?ObjectWithContext) => void = (
+    objectWithContext: ?ObjectWithContext
+  ) => {
     this.setState(
       {
         renamedObjectWithContext: objectWithContext,
@@ -320,13 +335,16 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
   };
 
-  _editVariables = (object: ?gdObject) => {
+  _editVariables: (object: ?gdObject) => void = (object: ?gdObject) => {
     this.setState({
       variablesEditedObject: object,
     });
   };
 
-  _rename = (objectWithContext: ObjectWithContext, newName: string) => {
+  _rename: (objectWithContext: ObjectWithContext, newName: string) => void = (
+    objectWithContext: ObjectWithContext,
+    newName: string
+  ) => {
     const { object } = objectWithContext;
     this.setState({
       renamedObjectWithContext: null,
@@ -344,7 +362,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     }
   };
 
-  _canMoveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
+  _canMoveSelectionTo: (
+    destinationObjectWithContext: ObjectWithContext
+  ) => boolean = (destinationObjectWithContext: ObjectWithContext) => {
     // Check if at least one element in the selection can be moved.
     const selectedObjects = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
@@ -361,7 +381,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
   };
 
-  _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
+  _moveSelectionTo: (
+    destinationObjectWithContext: ObjectWithContext
+  ) => void = (destinationObjectWithContext: ObjectWithContext) => {
     const { project, objectsContainer } = this.props;
 
     const container: gdObjectsContainer = destinationObjectWithContext.global
@@ -393,7 +415,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     this._onObjectModified(true);
   };
 
-  _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
+  _setAsGlobalObject: (objectWithContext: ObjectWithContext) => void = (
+    objectWithContext: ObjectWithContext
+  ) => {
     const { object } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
@@ -424,18 +448,23 @@ export default class ObjectsList extends React.Component<Props, State> {
     this._onObjectModified(true);
   };
 
-  forceUpdateList = () => {
+  forceUpdateList: () => void = () => {
     this.forceUpdate();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _openEditTagDialog = (tagEditedObject: ?gdObject) => {
+  _openEditTagDialog: (tagEditedObject: ?gdObject) => void = (
+    tagEditedObject: ?gdObject
+  ) => {
     this.setState({
       tagEditedObject,
     });
   };
 
-  _changeObjectTags = (object: gdObject, tags: Tags) => {
+  _changeObjectTags: (object: gdObject, tags: Tags) => void = (
+    object: gdObject,
+    tags: Tags
+  ) => {
     object.setTags(getStringFromTags(tags));
 
     // Force update the list as it's possible that user removed a tag
@@ -443,16 +472,29 @@ export default class ObjectsList extends React.Component<Props, State> {
     this._onObjectModified(true);
   };
 
-  _selectObject = (objectWithContext: ?ObjectWithContext) => {
+  _selectObject: (objectWithContext: ?ObjectWithContext) => void = (
+    objectWithContext: ?ObjectWithContext
+  ) => {
     this.props.onObjectSelected(
       objectWithContext ? objectWithContext.object.getName() : ''
     );
   };
 
-  _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
-    this.props.getThumbnail(this.props.project, objectWithContext.object);
+  _getObjectThumbnail: (objectWithContext: ObjectWithContext) => string = (
+    objectWithContext: ObjectWithContext
+  ) => this.props.getThumbnail(this.props.project, objectWithContext.object);
 
-  _renderObjectMenuTemplate = (i18n: I18nType) => (
+  _renderObjectMenuTemplate: (
+    i18n: I18nType
+  ) => (
+    objectWithContext: ObjectWithContext,
+    index: number
+  ) => Array<
+    | {| click: () => void, label: any | string |}
+    | {| click: () => ?ObjectWithContext, enabled: boolean, label: string |}
+    | {| label: any | string, submenu: Array<any> |}
+    | {| type: string |}
+  > = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     index: number
   ) => {
@@ -518,7 +560,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     ];
   };
 
-  _onObjectModified = (shouldForceUpdateList: boolean) => {
+  _onObjectModified: (shouldForceUpdateList: boolean) => void = (
+    shouldForceUpdateList: boolean
+  ) => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
 
@@ -526,7 +570,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     else this.forceUpdate();
   };
 
-  render() {
+  render(): Node {
     const {
       project,
       layout,

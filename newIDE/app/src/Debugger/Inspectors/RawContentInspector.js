@@ -15,7 +15,7 @@ type Props = {|
  * A very simple inspector that display the raw information given by the gameData
  * object.
  */
-export default ({ gameData, onEdit }: Props) => (
+export default ({ gameData, onEdit }: Props): React.Node => (
   <React.Fragment>
     <EmptyMessage>
       <Trans>

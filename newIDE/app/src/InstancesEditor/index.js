@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import gesture from 'pixi-simple-gesture';
 import DeprecatedKeyboardShortcuts from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
@@ -69,11 +70,11 @@ type Props = {|
 |};
 
 export default class InstancesEditor extends Component<Props> {
-  lastContextMenuX = 0;
-  lastContextMenuY = 0;
-  lastCursorX = 0;
-  lastCursorY = 0;
-  fpsLimiter = new FpsLimiter(28);
+  lastContextMenuX: any | number = 0;
+  lastContextMenuY: any | number = 0;
+  lastCursorX: number = 0;
+  lastCursorY: number = 0;
+  fpsLimiter: FpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
   pixiRenderer: any;
   keyboardShortcuts: DeprecatedKeyboardShortcuts;
@@ -96,8 +97,8 @@ export default class InstancesEditor extends Component<Props> {
   viewPosition: ViewPosition;
   longTouchHandler: LongTouchHandler;
   grid: Grid;
-  _unmounted = false;
-  _renderingPaused = false;
+  _unmounted: boolean = false;
+  _renderingPaused: boolean = false;
   nextFrame: AnimationFrameID;
   contextMenuLongTouchTimeoutID: TimeoutID;
 
@@ -475,11 +476,11 @@ export default class InstancesEditor extends Component<Props> {
     }
   }
 
-  getZoomFactor = () => {
+  getZoomFactor: () => any = () => {
     return this.props.options.zoomFactor;
   };
 
-  setZoomFactor = (zoomFactor: number) => {
+  setZoomFactor: (zoomFactor: number) => void = (zoomFactor: number) => {
     this.props.onChangeOptions({
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });
@@ -489,19 +490,25 @@ export default class InstancesEditor extends Component<Props> {
    * Immediately add instances for the specified objects at the given
    * position (in scene coordinates).
    */
-  addInstances = (
+  addInstances: (
+    pos: [number, number],
+    objectNames: Array<string>
+  ) => Array<gdInitialInstance> = (
     pos /*: [number, number] */,
     objectNames /*: Array<string> */
   ): Array<gdInitialInstance> => {
     return this._instancesAdder.addInstances(pos, objectNames);
   };
 
-  _onMouseMove = (x: number, y: number) => {
+  _onMouseMove: (x: number, y: number) => void = (x: number, y: number) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
   };
 
-  _onBackgroundClicked = (x: number, y: number) => {
+  _onBackgroundClicked: (x: number, y: number) => void = (
+    x: number,
+    y: number
+  ) => {
     this.lastCursorX = x;
     this.lastCursorY = y;
     this.pixiRenderer.view.focus();
@@ -524,7 +531,12 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _onPanMove = (deltaX: number, deltaY: number, x: number, y: number) => {
+  _onPanMove: (deltaX: number, deltaY: number, x: number, y: number) => void = (
+    deltaX: number,
+    deltaY: number,
+    x: number,
+    y: number
+  ) => {
     if (this.keyboardShortcuts.shouldMoveView()) {
       const sceneDeltaX = deltaX / this.getZoomFactor();
       const sceneDeltaY = deltaY / this.getZoomFactor();
@@ -539,7 +551,7 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _getLayersVisibility = () => {
+  _getLayersVisibility: () => { ... } = () => {
     const { layout } = this.props;
     const layersVisibility = {};
     for (let i = 0; i < layout.getLayersCount(); i++) {
@@ -550,7 +562,7 @@ export default class InstancesEditor extends Component<Props> {
     return layersVisibility;
   };
 
-  _onPanEnd = () => {
+  _onPanEnd: () => void = () => {
     // When a pan is ended, this can be that either the user was making
     // a selection, or that the user was moving the view.
     if (this.selectionRectangle.hasStartedSelectionRectangle()) {
@@ -566,19 +578,27 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _onInstanceClicked = (instance: gdInitialInstance) => {
+  _onInstanceClicked: (instance: gdInitialInstance) => void = (
+    instance: gdInitialInstance
+  ) => {
     this.pixiRenderer.view.focus();
   };
 
-  _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
+  _onInstanceDoubleClicked: (instance: gdInitialInstance) => void = (
+    instance: gdInitialInstance
+  ) => {
     this.props.onInstanceDoubleClicked(instance);
   };
 
-  _onOverInstance = (instance: gdInitialInstance) => {
+  _onOverInstance: (instance: gdInitialInstance) => void = (
+    instance: gdInitialInstance
+  ) => {
     this.highlightedInstance.setInstance(instance);
   };
 
-  _onDownInstance = (instance: gdInitialInstance) => {
+  _onDownInstance: (instance: gdInitialInstance) => void = (
+    instance: gdInitialInstance
+  ) => {
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
       // it's just the beginning of the user panning the view.
@@ -608,16 +628,18 @@ export default class InstancesEditor extends Component<Props> {
     }
   };
 
-  _onOutInstance = (instance: gdInitialInstance) => {
+  _onOutInstance: (instance: gdInitialInstance) => void = (
+    instance: gdInitialInstance
+  ) => {
     if (instance === this.highlightedInstance.getInstance())
       this.highlightedInstance.setInstance(null);
   };
 
-  _onMoveInstance = (
+  _onMoveInstance: (
     instance: gdInitialInstance,
     deltaX: number,
     deltaY: number
-  ) => {
+  ) => void = (instance: gdInitialInstance, deltaX: number, deltaY: number) => {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -647,14 +669,17 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  _onMoveInstanceEnd = () => {
+  _onMoveInstanceEnd: () => void = () => {
     this.instancesMover.endMove();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX: number | null, deltaY: number | null) => {
+  _onResize: (deltaX: number | null, deltaY: number | null) => void = (
+    deltaX: number | null,
+    deltaY: number | null
+  ) => {
     const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
     const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
 
@@ -671,14 +696,17 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  _onResizeEnd = () => {
+  _onResizeEnd: () => void = () => {
     this.instancesResizer.endResize();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesResized(selectedInstances);
   };
 
-  _onRotate = (deltaX: number, deltaY: number) => {
+  _onRotate: (deltaX: number, deltaY: number) => void = (
+    deltaX: number,
+    deltaY: number
+  ) => {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
@@ -691,18 +719,18 @@ export default class InstancesEditor extends Component<Props> {
     );
   };
 
-  _onRotateEnd = () => {
+  _onRotateEnd: () => void = () => {
     this.instancesRotator.endRotate();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesRotated(selectedInstances);
   };
 
-  clearHighlightedInstance = () => {
+  clearHighlightedInstance: () => void = () => {
     this.highlightedInstance.setInstance(null);
   };
 
-  moveSelection = (x: number, y: number) => {
+  moveSelection: (x: number, y: number) => void = (x: number, y: number) => {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     selectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
@@ -730,25 +758,25 @@ export default class InstancesEditor extends Component<Props> {
     }
   }
 
-  getLastContextMenuSceneCoordinates = () => {
+  getLastContextMenuSceneCoordinates: () => [number, number] = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastContextMenuX,
       this.lastContextMenuY
     );
   };
 
-  getLastCursorSceneCoordinates = () => {
+  getLastCursorSceneCoordinates: () => [number, number] = () => {
     return this.viewPosition.toSceneCoordinates(
       this.lastCursorX,
       this.lastCursorY
     );
   };
 
-  getViewPosition = () /*: ?ViewPosition */ => {
+  getViewPosition: () => ?ViewPosition = () /*: ?ViewPosition */ => {
     return this.viewPosition;
   };
 
-  _renderScene = () => {
+  _renderScene: () => void = () => {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
     if (this._renderingPaused) return;
@@ -771,21 +799,21 @@ export default class InstancesEditor extends Component<Props> {
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };
 
-  pauseSceneRendering = () => {
+  pauseSceneRendering: () => void = () => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
 
     stopPIXITicker();
   };
 
-  restartSceneRendering = () => {
+  restartSceneRendering: () => void = () => {
     this._renderingPaused = false;
     this._renderScene();
 
     startPIXITicker();
   };
 
-  render() {
+  render(): null | Node {
     if (!this.props.project) return null;
 
     return (

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
 import { ToolbarGroup } from '../UI/Toolbar';
@@ -15,7 +16,7 @@ type Props = {|
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
-  render() {
+  render(): Node {
     const { canDelete } = this.props;
 
     return (

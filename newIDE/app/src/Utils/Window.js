@@ -108,19 +108,19 @@ export default class Window {
     }
   }
 
-  static onFocus(cb: () => void) {
+  static onFocus(cb: () => void): any | void {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('focus', cb);
   }
 
-  static onBlur(cb: () => void) {
+  static onBlur(cb: () => void): any | void {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('blur', cb);
   }
 
-  static onClose(cb: () => void) {
+  static onClose(cb: () => void): any | void {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('close', cb);
@@ -171,7 +171,7 @@ export default class Window {
   static showConfirmDialog(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
-  ) {
+  ): boolean {
     if (!dialog || !electron) {
       // eslint-disable-next-line
       return confirm(message);
@@ -232,7 +232,7 @@ export default class Window {
     window.open(url, '_blank');
   }
 
-  static hasMainMenu() {
+  static hasMainMenu(): any {
     return !!electron;
   }
 

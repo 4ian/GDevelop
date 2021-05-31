@@ -15,7 +15,7 @@ export default class ViewPosition {
   _width: number;
   _height: number;
   options: any;
-  _pixiContainer = new PIXI.Container();
+  _pixiContainer: any = new PIXI.Container();
 
   constructor({ initialViewX, initialViewY, width, height, options }: Props) {
     this.viewX = initialViewX;
@@ -33,11 +33,11 @@ export default class ViewPosition {
     this._height = height;
   }
 
-  getWidth() {
+  getWidth(): number {
     return this._width;
   }
 
-  getHeight() {
+  getHeight(): number {
     return this._height;
   }
 
@@ -45,7 +45,10 @@ export default class ViewPosition {
    * Convert a point from the canvas coordinates (for example, the mouse position) to the
    * "world" coordinates.
    */
-  toSceneCoordinates = (x: number, y: number): [number, number] => {
+  toSceneCoordinates: (x: number, y: number) => [number, number] = (
+    x: number,
+    y: number
+  ): [number, number] => {
     x -= this._width / 2;
     y -= this._height / 2;
     x /= Math.abs(this.options.zoomFactor);
@@ -67,7 +70,10 @@ export default class ViewPosition {
    * Convert a point from the "world" coordinates (for example, an object position) to the
    * canvas coordinates.
    */
-  toCanvasCoordinates = (x: number, y: number): [number, number] => {
+  toCanvasCoordinates: (x: number, y: number) => [number, number] = (
+    x: number,
+    y: number
+  ): [number, number] => {
     x -= this.viewX;
     y -= this.viewY;
 
@@ -101,15 +107,15 @@ export default class ViewPosition {
     this.viewY = instance.getY();
   }
 
-  getViewX() {
+  getViewX(): number {
     return this.viewX;
   }
 
-  getViewY() {
+  getViewY(): number {
     return this.viewY;
   }
 
-  getPixiContainer() {
+  getPixiContainer(): any {
     return this._pixiContainer;
   }
 

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
@@ -45,7 +46,7 @@ export default ({
   width,
   isLightingLayer,
   onEdit,
-}: Props) => (
+}: Props): Node => (
   <I18n>
     {({ i18n }) => (
       <TreeTableRow>

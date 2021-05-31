@@ -37,13 +37,15 @@ export default class ObjectGroupsListWithObjectGroupEditor extends React.Compone
   Props,
   State
 > {
-  state = {
+  state: State = {
     editedGroup: null,
   };
 
-  editGroup = (editedGroup: ?gdObjectGroup) => this.setState({ editedGroup });
+  editGroup: (editedGroup: ?gdObjectGroup) => void = (
+    editedGroup: ?gdObjectGroup
+  ) => this.setState({ editedGroup });
 
-  render() {
+  render(): React.Node {
     const {
       project,
       objectsContainer,

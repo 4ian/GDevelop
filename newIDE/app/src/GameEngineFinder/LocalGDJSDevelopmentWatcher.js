@@ -75,7 +75,7 @@ const genericWatcherErrorMessage =
  * Set up some watchers for GDJS and Extensions sources.
  * Stop the watchers when the component is unmounted or `shouldWatch` prop is false.
  */
-export const LocalGDJSDevelopmentWatcher = () => {
+export const LocalGDJSDevelopmentWatcher = (): null => {
   const preferences = React.useContext(PreferencesContext);
   const shouldWatch = preferences.values.useGDJSDevelopmentWatcher;
 

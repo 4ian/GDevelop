@@ -135,7 +135,11 @@ type Props = {|
   onChoose: () => void,
 |};
 
-export const ResourceCard = ({ resource, onChoose, size }: Props) => {
+export const ResourceCard = ({
+  resource,
+  onChoose,
+  size,
+}: Props): null | React.Node => {
   const resourceKind = resource.type;
 
   switch (resourceKind) {

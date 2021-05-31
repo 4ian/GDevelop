@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
@@ -112,7 +113,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     const {
       value,
       onChange,
@@ -157,7 +158,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
 export const renderInlineKey = ({
   value,
   InvalidParameterValue,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): Node | string => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

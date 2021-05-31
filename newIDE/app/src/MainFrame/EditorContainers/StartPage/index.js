@@ -250,7 +250,7 @@ export class StartPage extends React.Component<Props, {||}> {
 
 export const renderStartPageContainer = (
   props: RenderEditorContainerPropsWithRef
-) => (
+): React.Node => (
   <StartPage
     ref={props.ref}
     project={props.project}

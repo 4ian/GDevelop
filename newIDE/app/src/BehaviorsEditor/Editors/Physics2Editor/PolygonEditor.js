@@ -29,7 +29,7 @@ type Props = {|
 |};
 
 export default class PolygonEditor extends React.Component<Props> {
-  _isPolygonConvex(vertices: Array<Vertex>) {
+  _isPolygonConvex(vertices: Array<Vertex>): boolean {
     // Get edges
     let edges = [];
     let v1 = null;
@@ -80,7 +80,7 @@ export default class PolygonEditor extends React.Component<Props> {
     return true;
   }
 
-  render() {
+  render(): React.Node {
     const {
       vertices,
       onChangeVertexX,

@@ -38,7 +38,7 @@ export default class ObjectField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     return (
       <ObjectSelector
         margin={this.props.isInline ? 'none' : 'dense'}
@@ -74,7 +74,7 @@ export const renderInlineObjectWithThumbnail = ({
   parameterMetadata,
   renderObjectThumbnail,
   MissingParameterValue,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): React.Element<'span'> | React.Node => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

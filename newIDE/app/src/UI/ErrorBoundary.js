@@ -38,7 +38,7 @@ export const ErrorFallbackComponent = ({
 }: {
   componentStack: string,
   error: Error,
-}) => (
+}): React.Node => (
   <PlaceholderMessage>
     <Line>
       <BugReport fontSize="large" />
@@ -98,7 +98,7 @@ type Props = {|
   children: React.Node,
 |};
 
-const ErrorBoundary = (props: Props) => (
+const ErrorBoundary = (props: Props): React.Node => (
   <ReactErrorBoundary
     FallbackComponent={ErrorFallbackComponent}
     onError={errorHandler}

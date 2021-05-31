@@ -59,7 +59,7 @@ export const getLastObjectParameterValue = ({
 export const getLastObjectParameterObjectType = (
   parameters: gdVectorParameterMetadata,
   parameterIndex: number
-) => {
+): string => {
   const objectParameterIndex = gd.ParameterMetadataTools.getObjectParameterIndexFor(
     parameters,
     parameterIndex

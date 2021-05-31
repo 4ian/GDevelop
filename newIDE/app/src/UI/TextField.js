@@ -140,7 +140,7 @@ type Props = {|
 export const computeTextFieldStyleProps = (props: {
   margin?: 'none' | 'dense',
   floatingLabelText?: React.Node,
-}) => {
+}): {| hiddenLabel: boolean, margin: string, variant: string |} => {
   return {
     // Use "filled" variant by default, unless `margin` is "none" (see 1. and 2.)
     variant: props.margin === 'none' ? 'standard' : 'filled',
@@ -157,7 +157,9 @@ export const computeTextFieldStyleProps = (props: {
  * A text field based on Material-UI text field.
  */
 export default class TextField extends React.Component<Props, {||}> {
-  _input = React.createRef<HTMLInputElement>();
+  _input: {|
+    current: null | HTMLInputElement,
+  |} = React.createRef<HTMLInputElement>();
 
   focus() {
     if (this._input.current) {
@@ -179,7 +181,7 @@ export default class TextField extends React.Component<Props, {||}> {
     return null;
   }
 
-  render() {
+  render(): React.Node {
     const { props } = this;
     const onChange = props.onChange || undefined;
 

@@ -153,11 +153,11 @@ export default class EventsFunctionParametersEditor extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     longDescriptionShownIndexes: {},
   };
 
-  _addParameter = () => {
+  _addParameter: () => void = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
 
@@ -169,7 +169,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     this.props.onParametersUpdated();
   };
 
-  _removeParameter = (index: number) => {
+  _removeParameter: (index: number) => void = (index: number) => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
 
@@ -178,7 +178,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     this.props.onParametersUpdated();
   };
 
-  _addLongDescription = (index: number) => {
+  _addLongDescription: (index: number) => void = (index: number) => {
     // Show the long description field
     this.setState(state => ({
       longDescriptionShownIndexes: {
@@ -188,7 +188,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }));
   };
 
-  _removeLongDescription = (index: number) => {
+  _removeLongDescription: (index: number) => void = (index: number) => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
     const parameter = parameters.at(index);
@@ -203,7 +203,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }));
   };
 
-  _moveParameters = (oldIndex: number, newIndex: number) => {
+  _moveParameters: (oldIndex: number, newIndex: number) => void = (
+    oldIndex: number,
+    newIndex: number
+  ) => {
     const { eventsFunction, eventsBasedBehavior } = this.props;
     const parameters = eventsFunction.getParameters();
 
@@ -237,7 +240,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
     }
   };
 
-  render() {
+  render(): React.Node {
     const {
       project,
       eventsFunction,

@@ -88,7 +88,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     const {
       value,
       onChange,

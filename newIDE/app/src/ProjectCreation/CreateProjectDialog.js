@@ -40,12 +40,14 @@ type Props = {|
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     currentTab: this.props.initialTab,
     outputPath: '',
   };
 
-  _onChangeTab = (
+  _onChangeTab: (
+    newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
+  ) => void = (
     newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
   ) => {
     this.setState({
@@ -53,14 +55,14 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
     });
   };
 
-  _showExamples = () => this._onChangeTab('examples');
+  _showExamples: () => void = () => this._onChangeTab('examples');
 
-  _onExamplesLoaded = () => {
+  _onExamplesLoaded: () => void = () => {
     // Force an update to ensure dialog is properly positioned.
     this.forceUpdate();
   };
 
-  render() {
+  render(): null | React.Node {
     const { open, onClose, onOpen, onCreate } = this.props;
     if (!open) return null;
 

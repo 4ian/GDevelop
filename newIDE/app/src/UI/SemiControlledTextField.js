@@ -60,7 +60,7 @@ export default class SemiControlledTextField extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     focused: false,
     text: null,
   };
@@ -87,7 +87,7 @@ export default class SemiControlledTextField extends React.Component<
     if (this._field) return this._field.getInputNode();
   }
 
-  render() {
+  render(): React.Node {
     const {
       value,
       onChange,

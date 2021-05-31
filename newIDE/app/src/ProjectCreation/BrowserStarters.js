@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { List, ListItem } from '../UI/List';
@@ -26,7 +27,7 @@ type Props = {|
 |};
 
 export default class BrowserStarters extends Component<Props> {
-  render() {
+  render(): Node {
     return (
       <Column noMargin>
         <Line>

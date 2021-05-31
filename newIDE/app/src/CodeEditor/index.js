@@ -34,12 +34,12 @@ let monacoCompletionsInitialized = false;
 let monacoThemesInitialized = false;
 
 export class CodeEditor extends React.Component<Props, State> {
-  state = {
+  state: State = {
     MonacoEditor: null,
     error: null,
   };
 
-  setupEditorThemes = (monaco: any) => {
+  setupEditorThemes: (monaco: any) => void = (monaco: any) => {
     if (!monacoThemesInitialized) {
       monacoThemesInitialized = true;
 
@@ -55,7 +55,10 @@ export class CodeEditor extends React.Component<Props, State> {
     }
   };
 
-  setupEditorCompletions = (editor: any, monaco: any) => {
+  setupEditorCompletions: (editor: any, monaco: any) => void = (
+    editor: any,
+    monaco: any
+  ) => {
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
 
@@ -104,14 +107,16 @@ export class CodeEditor extends React.Component<Props, State> {
       .catch(this.handleLoadError);
   }
 
-  _handleContextMenu = (event: SyntheticEvent<>) => {
+  _handleContextMenu: (event: SyntheticEvent<>) => void = (
+    event: SyntheticEvent<>
+  ) => {
     // Prevent right click to bubble up and trigger the context menu
     // of the event.
     event.preventDefault();
     event.stopPropagation();
   };
 
-  render() {
+  render(): React.Element<'div'> | React.Node {
     const { MonacoEditor, error } = this.state;
     if (error) {
       return (

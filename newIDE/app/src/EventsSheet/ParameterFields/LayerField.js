@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
@@ -12,7 +13,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     const { layout } = this.props.scope;
     const layerNames: Array<ExpressionAutocompletion> = layout
       ? mapFor(0, layout.getLayersCount(), i => {

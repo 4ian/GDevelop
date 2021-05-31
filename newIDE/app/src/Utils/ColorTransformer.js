@@ -7,7 +7,7 @@ export type RGBColor = {|
   a?: number,
 |};
 
-export const rgbColorToHexNumber = (rgbColor: RGBColor) => {
+export const rgbColorToHexNumber = (rgbColor: RGBColor): number => {
   const { r, g, b } = rgbColor;
   return rgbToHexNumber(r, g, b);
 };
@@ -16,18 +16,20 @@ export const rgbColorToHexNumber = (rgbColor: RGBColor) => {
  * Convert a rgb color value to a string hex value.
  * @note No "#" or "0x" are added.
  */
-export const rgbToHex = (r: number, g: number, b: number) =>
+export const rgbToHex = (r: number, g: number, b: number): string =>
   '' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 /**
  * Convert a rgb color value to a hex value.
  */
-export const rgbToHexNumber = (r: number, g: number, b: number) =>
+export const rgbToHexNumber = (r: number, g: number, b: number): number =>
   (r << 16) + (g << 8) + b;
 
 /**
  * Convert a hex color value to an rgb object value.
  */
-export const hexToRGBColor = (hex: string) => {
+export const hexToRGBColor = (
+  hex: string
+): {| a: number, b: number, g: number, r: number |} => {
   const hexNumber = parseInt(hex.replace('#', ''), 16);
   return {
     r: (hexNumber >> 16) & 0xff,

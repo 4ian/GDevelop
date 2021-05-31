@@ -35,7 +35,7 @@ const AlertMessage = ({
   onHide,
   renderRightButton,
   renderLeftIcon,
-}: Props) => {
+}: Props): React.Node => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (

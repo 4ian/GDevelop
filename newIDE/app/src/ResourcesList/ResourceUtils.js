@@ -41,7 +41,7 @@ export const createOrUpdateResource = (
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
-) => {
+): string => {
   let resourcePath = ResourcesLoader.getResourceFullUrl(
     project,
     resourceName,
@@ -61,7 +61,7 @@ export const getLocalResourceFullPath = (
 export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
-) => {
+): boolean => {
   const projectPath = path.dirname(project.getProjectFile());
   return resourcePath.includes(projectPath);
 };
@@ -119,7 +119,7 @@ export const copyAllToProjectFolder = (
 export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
-) => {
+): string => {
   if (!fs) return '';
   const resourcePath = path.normalize(
     getLocalResourceFullPath(project, resourceName)

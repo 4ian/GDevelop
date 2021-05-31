@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
@@ -15,7 +16,7 @@ export default class SceneNameField extends Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     const layoutNames: Array<ExpressionAutocompletion> = this.props.project
       ? enumerateLayouts(this.props.project).map(layout => ({
           kind: 'Text',

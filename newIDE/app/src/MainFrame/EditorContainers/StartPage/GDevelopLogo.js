@@ -8,7 +8,7 @@ const styles = {
   },
 };
 
-const GDevelopLogo = () => (
+const GDevelopLogo = (): React.Node => (
   <ThemeConsumer>
     {muiTheme => <img src={muiTheme.logo.src} alt="" style={styles.logo} />}
   </ThemeConsumer>

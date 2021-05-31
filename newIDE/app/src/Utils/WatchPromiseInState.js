@@ -5,7 +5,7 @@ export const watchPromiseInState = (
   component: React.Component<*, *>,
   stateField: string,
   fn: () => Promise<any>
-) => {
+): Promise<mixed> => {
   component.setState({
     [stateField]: true,
   });

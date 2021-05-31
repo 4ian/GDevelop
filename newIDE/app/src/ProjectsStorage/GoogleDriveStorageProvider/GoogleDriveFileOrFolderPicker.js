@@ -27,7 +27,7 @@ const styles = {
   },
 };
 
-export default (props: Props) => {
+export default (props: Props): React.Element<'div'> => {
   return (
     <div
       style={{

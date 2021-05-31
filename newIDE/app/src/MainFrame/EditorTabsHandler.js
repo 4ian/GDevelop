@@ -115,7 +115,7 @@ export const changeCurrentTab = (
 export const closeTabsExceptIf = (
   state: EditorTabsState,
   keepPredicate: (editorTab: EditorTab) => boolean
-) => {
+): EditorTabsState => {
   const currentEditorTab = getCurrentTab(state);
   const remainingEditors = state.editors.filter(keepPredicate);
   return changeCurrentTab(
@@ -165,7 +165,7 @@ export const getCurrentTab = (state: EditorTabsState): EditorTab => {
 export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
-) => {
+): EditorTabsState => {
   return closeTabsExceptIf(state, editorTab => {
     const editorProject =
       editorTab.editorRef && editorTab.editorRef.getProject();
@@ -203,7 +203,10 @@ export const notifyPreviewWillStart = (state: EditorTabsState) => {
   });
 };
 
-export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
+export const closeLayoutTabs = (
+  state: EditorTabsState,
+  layout: gdLayout
+): EditorTabsState => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -224,7 +227,7 @@ export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
 export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
-) => {
+): EditorTabsState => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
 
@@ -242,7 +245,7 @@ export const closeExternalLayoutTabs = (
 export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
-) => {
+): EditorTabsState => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof ExternalEventsEditorContainer) {
@@ -259,7 +262,7 @@ export const closeExternalEventsTabs = (
 export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
-) => {
+): EditorTabsState => {
   return closeTabsExceptIf(state, editorTab => {
     const editor = editorTab.editorRef;
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {

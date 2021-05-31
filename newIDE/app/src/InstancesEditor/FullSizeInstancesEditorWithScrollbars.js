@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import Slider from '@material-ui/core/Slider';
 import ViewPosition from './ViewPosition';
@@ -65,7 +66,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     }
   }
 
-  _handleXChange = (e: any, value: number) => {
+  _handleXChange: (e: any, value: number) => void = (e: any, value: number) => {
     const { xMin, xMax } = this.state;
     const xValue = xMin + ((xMax - xMin) * value) / 100;
     this.setState(
@@ -80,7 +81,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     );
   };
 
-  _handleYChange = (e: any, value: number) => {
+  _handleYChange: (e: any, value: number) => void = (e: any, value: number) => {
     const { yMin, yMax } = this.state;
     // Substract the value from 100 as the slider is 180deg rotated. Not perfect though
     // as it breaks when using the keyboard arrow keys (when focusing the slider).
@@ -97,7 +98,13 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     );
   };
 
-  _setAndAdjust = ({ xValue, yValue }: { xValue: number, yValue: number }) => {
+  _setAndAdjust: ({ xValue: number, yValue: number, ... }) => void = ({
+    xValue,
+    yValue,
+  }: {
+    xValue: number,
+    yValue: number,
+  }) => {
     const xMax = Math.max(Math.abs(xValue) + 100, this.state.xMax);
     const yMax = Math.max(Math.abs(yValue) + 100, this.state.yMax);
 
@@ -111,7 +118,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     });
   };
 
-  _handleViewPositionChange = throttle(
+  _handleViewPositionChange: (viewPosition: ?ViewPosition) => void = throttle(
     (viewPosition: ?ViewPosition) => {
       if (!viewPosition) return;
 
@@ -124,7 +131,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
     { leading: false, trailing: true }
   );
 
-  render() {
+  render(): Node {
     const { wrappedEditorRef, ...otherProps } = this.props;
 
     return (

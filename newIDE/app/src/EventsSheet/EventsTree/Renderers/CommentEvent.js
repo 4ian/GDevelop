@@ -51,14 +51,14 @@ export default class CommentEvent extends React.Component<
   EventRendererProps,
   State
 > {
-  state = {
+  state: State = {
     editing: false,
   };
 
   _selectable: ?HTMLSpanElement;
   _textField: ?TextField;
 
-  edit = () => {
+  edit: () => void = () => {
     this.setState(
       {
         editing: true,
@@ -69,7 +69,7 @@ export default class CommentEvent extends React.Component<
     );
   };
 
-  onEvent = (e: any, text: string) => {
+  onEvent: (e: any, text: string) => void = (e: any, text: string) => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     commentEvent.setComment(text);
 
@@ -77,7 +77,7 @@ export default class CommentEvent extends React.Component<
     this.forceUpdate();
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     if (!this._textField) return;
 
     this.setState(
@@ -88,7 +88,7 @@ export default class CommentEvent extends React.Component<
     );
   };
 
-  _getCommentHTML = () => {
+  _getCommentHTML: () => string = () => {
     const commentEvent = gd.asCommentEvent(this.props.event);
     return commentEvent
       .getComment()
@@ -98,7 +98,7 @@ export default class CommentEvent extends React.Component<
       .replace(/\n/g, '<br>');
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const commentEvent = gd.asCommentEvent(this.props.event);
 
     const backgroundColor = rgbToHex(

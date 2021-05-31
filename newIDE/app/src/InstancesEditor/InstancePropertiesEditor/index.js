@@ -122,7 +122,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     },
   ];
 
-  _renderEmpty() {
+  _renderEmpty(): React.Node {
     return (
       <EmptyMessage>
         <Trans>
@@ -132,7 +132,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     );
   }
 
-  _renderInstancesProperties() {
+  _renderInstancesProperties(): React.Node {
     const { project, layout, instances } = this.props;
     const instance = instances[0];
     const associatedObjectName = instance.getObjectName();
@@ -198,7 +198,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     );
   }
 
-  render() {
+  render(): React.Node {
     const { instances } = this.props;
 
     return (

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
@@ -49,7 +50,7 @@ const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
 };
 
 export default class ExtensionInstallDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     extensionHeader: null,
     error: null,
   };
@@ -58,7 +59,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
     this._loadExtensionheader();
   }
 
-  _loadExtensionheader = () => {
+  _loadExtensionheader: () => void = () => {
     this.setState({
       error: null,
     });
@@ -76,7 +77,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
     );
   };
 
-  render() {
+  render(): Node {
     const {
       isInstalling,
       extensionShortHeader,

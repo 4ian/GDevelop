@@ -16,7 +16,7 @@ export default class BehaviorField extends React.Component<
   ParameterFieldProps,
   State
 > {
-  state = { errorText: null };
+  state: State = { errorText: null };
   _description: ?string;
   _longDescription: ?string;
   _behaviorTypeAllowed: ?string;
@@ -83,7 +83,7 @@ export default class BehaviorField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  _getError = (value?: string) => {
+  _getError: (value?: string) => null | string = (value?: string) => {
     if (!value && !this.props.value) return null;
 
     const isValidChoice =
@@ -95,11 +95,11 @@ export default class BehaviorField extends React.Component<
     return null;
   };
 
-  _doValidation = (value?: string) => {
+  _doValidation: (value?: string) => void = (value?: string) => {
     this.setState({ errorText: this._getError(value) });
   };
 
-  _forceChooseBehavior = () => {
+  _forceChooseBehavior: () => void = () => {
     // This is a bit hacky:
     // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {
@@ -117,7 +117,7 @@ export default class BehaviorField extends React.Component<
     this._forceChooseBehavior();
   }
 
-  render() {
+  render(): React.Node {
     this._updateBehaviorsList();
 
     const noBehaviorErrorText =

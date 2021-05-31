@@ -77,7 +77,7 @@ export default function NewInstructionEditorMenu({
   onSubmit,
   canPasteInstructions,
   onPasteInstructions,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
   const [
     newInstructionEditorState,

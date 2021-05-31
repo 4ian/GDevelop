@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -39,7 +40,10 @@ type TitleAndMessage = {|
 |};
 
 export default class LocalFolderPicker extends PureComponent<Props, {||}> {
-  _onChooseFolder = ({ title, message }: TitleAndMessage) => {
+  _onChooseFolder: TitleAndMessage => void = ({
+    title,
+    message,
+  }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -56,7 +60,9 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
       });
   };
 
-  _getTitleAndMessage = (i18n: I18nType): TitleAndMessage => {
+  _getTitleAndMessage: (i18n: I18nType) => TitleAndMessage = (
+    i18n: I18nType
+  ): TitleAndMessage => {
     const { type } = this.props;
     if (type === 'export') {
       return {
@@ -76,7 +82,7 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
     };
   };
 
-  render() {
+  render(): Node {
     return (
       <I18n>
         {({ i18n }) => {

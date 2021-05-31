@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -50,7 +51,7 @@ type State = {|
 |};
 
 export default class DirectionTools extends Component<Props, State> {
-  state = {
+  state: State = {
     timeBetweenFrames: formatTime(this.props.direction.getTimeBetweenFrames()),
     timeError: false,
     previewOpen: false,
@@ -65,7 +66,7 @@ export default class DirectionTools extends Component<Props, State> {
     });
   }
 
-  saveTimeBetweenFrames = () => {
+  saveTimeBetweenFrames: () => void = () => {
     const { direction } = this.props;
 
     const newTime = Math.max(parseFloat(this.state.timeBetweenFrames), 0.00001);
@@ -80,14 +81,14 @@ export default class DirectionTools extends Component<Props, State> {
     });
   };
 
-  setLooping = (check: boolean) => {
+  setLooping: (check: boolean) => void = (check: boolean) => {
     const { direction } = this.props;
 
     direction.setLoop(!!check);
     this.forceUpdate();
   };
 
-  openPreview = (open: boolean) => {
+  openPreview: (open: boolean) => void = (open: boolean) => {
     this.setState({
       previewOpen: open,
     });
@@ -96,7 +97,7 @@ export default class DirectionTools extends Component<Props, State> {
     }
   };
 
-  render() {
+  render(): Element<'div'> {
     const {
       direction,
       resourcesLoader,

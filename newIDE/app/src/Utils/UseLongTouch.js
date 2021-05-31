@@ -33,7 +33,13 @@ const moveTolerance = 10; // px
  * A long press is characterized by starting a touch and staying pressed, without
  * moving too far from the initial position (to avoid being confused with a drag/scroll).
  */
-export const useLongTouch = (callback: (e: CallbackEvent) => void) => {
+export const useLongTouch = (
+  callback: (e: CallbackEvent) => void
+): {|
+  onTouchEnd: () => void,
+  onTouchMove: (event: TouchEvent) => void,
+  onTouchStart: (event: TouchEvent) => void,
+|} => {
   const timeout = React.useRef<?TimeoutID>(null);
   const currentTouchCallbackEvent = React.useRef<CallbackEvent>({
     clientX: 0,

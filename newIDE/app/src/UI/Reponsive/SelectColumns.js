@@ -7,7 +7,7 @@ type Props<TColumnName> = {|
   getColumns: () => Array<TColumnName>,
 |};
 
-export const SelectColumns = (props: Props<string>) => {
+export const SelectColumns = (props: Props<string>): React.Node => {
   const columns = props.getColumns();
   return (
     <Line noMargin expand>

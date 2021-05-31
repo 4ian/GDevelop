@@ -36,7 +36,7 @@ export const ExtensionStore = ({
   project,
   onInstall,
   showOnlyWithBehaviors,
-}: Props) => {
+}: Props): React.Node => {
   const [
     selectedExtensionShortHeader,
     setSelectedExtensionShortHeader,

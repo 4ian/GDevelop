@@ -33,7 +33,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
   State
 > {
   editor: ?SceneEditor;
-  state = {
+  state: State = {
     layoutChooserOpen: false,
   };
 
@@ -200,4 +200,4 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
 export const renderExternalLayoutEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalLayoutEditorContainer {...props} />;
+): React.Node => <ExternalLayoutEditorContainer {...props} />;

@@ -67,7 +67,7 @@ const BitGroupEditor = (props: {|
   );
 };
 
-const Physics2Editor = (props: Props) => {
+const Physics2Editor = (props: Props): React.Node => {
   const { current: resourcesLoader } = React.useRef(ResourcesLoader);
   const [image, setImage] = React.useState('');
   const { behavior, behaviorContent } = props;

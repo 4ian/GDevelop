@@ -50,7 +50,7 @@ export default class ResourceThumbnail extends React.Component<Props, State> {
     };
   }
 
-  render() {
+  render(): null | React.Node {
     const { resourceKind } = this.state;
 
     switch (resourceKind) {

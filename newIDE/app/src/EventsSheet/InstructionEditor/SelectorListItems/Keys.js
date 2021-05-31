@@ -9,23 +9,27 @@ import { type EnumeratedInstructionOrExpressionMetadata } from '../../../Instruc
 // (object, group, instruction) to allow them to be living
 // in the same list (in search results) and be selected.
 
-export const getObjectGroupListItemKey = (groupWithContext: GroupWithContext) =>
+export const getObjectGroupListItemKey = (
+  groupWithContext: GroupWithContext
+): string =>
   `object-group-key-${groupWithContext.group.getName()}-${
     groupWithContext.global ? '-global' : ''
   }`;
-export const getObjectListItemKey = (objectWithContext: ObjectWithContext) =>
+export const getObjectListItemKey = (
+  objectWithContext: ObjectWithContext
+): string =>
   `object-key-${objectWithContext.object.getName()}-${
     objectWithContext.global ? '-global' : ''
   }`;
 export const getObjectOrObjectGroupListItemValue = (
   objectOrObjectGroupName: string
-) => `object-or-object-group-value-${objectOrObjectGroupName}`;
+): string => `object-or-object-group-value-${objectOrObjectGroupName}`;
 
 export const getInstructionListItemKey = (
   instruction: EnumeratedInstructionOrExpressionMetadata
-) => `instruction-key-${instruction.fullGroupName}-${instruction.type}`;
-export const getInstructionListItemValue = (instructionType: string) =>
+): string => `instruction-key-${instruction.fullGroupName}-${instruction.type}`;
+export const getInstructionListItemValue = (instructionType: string): string =>
   `instruction-value-${instructionType}`;
 
-export const getSubheaderListItemKey = (subheader: string) =>
+export const getSubheaderListItemKey = (subheader: string): string =>
   `subheader-key-${subheader}`;

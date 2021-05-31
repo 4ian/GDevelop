@@ -48,7 +48,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
     }
   }
 
-  render() {
+  render(): React.Node {
     const {
       item,
       itemName,

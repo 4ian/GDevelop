@@ -12,7 +12,7 @@ export default class TiledSpriteEditor extends React.Component<
   EditorProps,
   void
 > {
-  render() {
+  render(): React.Node {
     const {
       object,
       project,

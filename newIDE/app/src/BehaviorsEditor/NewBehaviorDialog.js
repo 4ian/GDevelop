@@ -77,7 +77,7 @@ export default function NewBehaviorDialog({
   onClose,
   onChoose,
   objectType,
-}: Props) {
+}: Props): null | React.Node {
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [currentTab, setCurrentTab] = React.useState('installed');

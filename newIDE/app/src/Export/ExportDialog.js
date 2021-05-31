@@ -57,31 +57,35 @@ type State = {|
 |};
 
 export default class ExportDialog extends React.Component<Props, State> {
-  state = {
+  state: State = {
     chosenExporterKey: '',
     showExperimental: false,
     buildsDialogOpen: false,
   };
 
-  chooseExporter = (key: string) => {
+  chooseExporter: (key: string) => void = (key: string) => {
     this.setState({
       chosenExporterKey: key,
     });
   };
 
-  _showExperimental = (show: boolean = true) => {
+  _showExperimental: (show?: boolean) => void = (show: boolean = true) => {
     this.setState({
       showExperimental: show,
     });
   };
 
-  _openBuildsDialog = (open: boolean = true) => {
+  _openBuildsDialog: (open?: boolean) => void = (open: boolean = true) => {
     this.setState({
       buildsDialogOpen: open,
     });
   };
 
-  _renderExporterListItem = (
+  _renderExporterListItem: (
+    exporter: Exporter,
+    index: number,
+    forceDisable: boolean
+  ) => React.Node = (
     exporter: Exporter,
     index: number,
     forceDisable: boolean
@@ -102,7 +106,7 @@ export default class ExportDialog extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  render(): null | React.Node {
     const {
       project,
       onClose,

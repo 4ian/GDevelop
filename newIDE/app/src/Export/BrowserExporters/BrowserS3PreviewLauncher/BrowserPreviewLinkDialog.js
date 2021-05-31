@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
@@ -17,7 +18,7 @@ type Props = {|
 |};
 
 export default class BrowserPreviewLinkDialog extends Component<Props> {
-  _makeOnOpen = (i18n: I18nType) => () => {
+  _makeOnOpen: (i18n: I18nType) => () => void = (i18n: I18nType) => () => {
     const windowObjectReference = window.open(this.props.url, '_blank');
     if (!windowObjectReference) {
       showErrorBox({
@@ -31,7 +32,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
     this.props.onClose();
   };
 
-  render() {
+  render(): null | Node {
     const { url } = this.props;
     if (!url) return null;
 

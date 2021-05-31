@@ -18,7 +18,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 type Props = { usages: ?Usages };
 
-export default ({ usages }: Props) => (
+export default ({ usages }: Props): React.Node => (
   <Column noMargin>
     <Line>
       {!usages ? (

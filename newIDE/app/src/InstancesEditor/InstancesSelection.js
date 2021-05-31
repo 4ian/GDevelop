@@ -7,15 +7,15 @@ const gd: libGDevelop = global.gd;
 export default class InstancesSelection {
   selection: Array<gdInitialInstance> = [];
 
-  hasSelectedInstances() {
+  hasSelectedInstances(): boolean {
     return !!this.getSelectedInstances().length;
   }
 
-  getSelectedInstances() {
+  getSelectedInstances(): Array<gdInitialInstance> {
     return this.selection;
   }
 
-  isInstanceSelected(instance: gdInitialInstance) {
+  isInstanceSelected(instance: gdInitialInstance): boolean {
     for (var i = 0; i < this.selection.length; i++) {
       if (gd.compare(this.selection[i], instance)) return true;
     }

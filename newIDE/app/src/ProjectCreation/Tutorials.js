@@ -42,7 +42,7 @@ const TutorialListItem = ({
   );
 };
 
-export default function Tutorials() {
+export default function Tutorials(): React.Node {
   const allTutorials = getAllTutorialHints();
   const featuredForGettingStartedTutorials = allTutorials.filter(
     tutorialHint => {

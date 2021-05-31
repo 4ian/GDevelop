@@ -35,7 +35,11 @@ export type SelectionState = {
   selectedEvents: { [number]: EventContext },
 };
 
-export const getInitialSelection = () => {
+export const getInitialSelection = (): {|
+  selectedEvents: { [number]: EventContext },
+  selectedInstructions: { [number]: InstructionContext },
+  selectedInstructionsLists: { [number]: InstructionsListContext },
+|} => {
   return {
     selectedInstructions: {},
     selectedEvents: {},

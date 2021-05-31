@@ -13,7 +13,7 @@ export type HotReloadPreviewButtonProps = {|
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
   hasPreviewsRunning,
-}: HotReloadPreviewButtonProps) {
+}: HotReloadPreviewButtonProps): React.Node {
   return (
     <FlatButton
       icon={hasPreviewsRunning ? <OfflineBoltIcon /> : <PlayCircleFilledIcon />}

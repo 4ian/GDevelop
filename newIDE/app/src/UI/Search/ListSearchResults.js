@@ -32,7 +32,7 @@ export const ListSearchResults = <SearchItem>({
   renderSearchItem,
   error,
   onRetry,
-}: Props<SearchItem>) => {
+}: Props<SearchItem>): React.Node => {
   const grid = React.useRef<?Grid>(null);
 
   // Height of each item is initially unknown. When rendered, the items

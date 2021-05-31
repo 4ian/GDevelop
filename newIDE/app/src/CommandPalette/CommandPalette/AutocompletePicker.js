@@ -39,7 +39,7 @@ type Props<T> = {|
 
 const AutocompletePicker = (
   props: Props<NamedCommand> | Props<CommandOption>
-) => {
+): React.Node => {
   const [open, setOpen] = React.useState(true);
   const shortcutMap = useShortcutMap();
   const classes = useStyles();

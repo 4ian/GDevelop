@@ -13,7 +13,7 @@ export default class PanelSpriteEditor extends React.Component<
   EditorProps,
   void
 > {
-  render() {
+  render(): React.Node {
     const { object } = this.props;
     const shapePainterObject = gd.asShapePainterObject(object);
 

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
@@ -24,13 +25,15 @@ export default class TrueFalseField extends Component<
   ParameterFieldProps,
   void
 > {
-  _trueButton = React.createRef<RaisedButton>();
+  _trueButton: {|
+    current: null | RaisedButton,
+  |} = React.createRef<RaisedButton>();
 
   focus() {
     focusButton(this._trueButton);
   }
 
-  render() {
+  render(): Node {
     const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -67,7 +70,7 @@ export default class TrueFalseField extends Component<
 export const renderInlineTrueFalse = ({
   value,
   parameterMetadata,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'True') {
     return <Trans>true</Trans>;
   } else {

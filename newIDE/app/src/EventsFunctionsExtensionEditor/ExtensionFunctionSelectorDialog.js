@@ -60,7 +60,7 @@ export default function BehaviorMethodSelectorDialog({
   eventsFunctionsExtension,
   onChoose,
   onCancel,
-}: Props) {
+}: Props): React.Node {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
   return (

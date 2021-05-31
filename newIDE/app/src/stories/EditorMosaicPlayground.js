@@ -21,7 +21,7 @@ type Props = {|
   }) => React.Node,
 |};
 
-export default ({ renderButtons, renderEditorMosaic }: Props) => {
+export default ({ renderButtons, renderEditorMosaic }: Props): React.Node => {
   // $FlowFixMe
   const editorRef = React.useRef((null: ?EditorMosaic | ?EditorNavigator));
   const openEditor = (

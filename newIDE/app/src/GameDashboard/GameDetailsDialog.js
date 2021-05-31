@@ -67,7 +67,7 @@ export const GameDetailsDialog = ({
   onClose,
   onGameUpdated,
   onGameDeleted,
-}: Props) => {
+}: Props): React.Node => {
   const { getAuthorizationHeader, profile } = React.useContext(
     UserProfileContext
   );

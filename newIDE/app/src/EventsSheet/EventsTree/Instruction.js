@@ -93,7 +93,7 @@ type Props = {|
   windowWidth: WidthType,
 |};
 
-const Instruction = (props: Props) => {
+const Instruction = (props: Props): React.Node => {
   const {
     instruction,
     isCondition,

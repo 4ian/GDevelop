@@ -24,7 +24,7 @@ const OpenFromStorageProviderDialog = ({
   storageProviders,
   onChooseProvider,
   onCreateNewProject,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <I18n>
       {({ i18n }) => (

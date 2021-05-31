@@ -21,7 +21,7 @@ const shouldNeverBeCalled = () => {
 /**
  * A raised button based on Material-UI button, that has a menu displayed when clicked.
  */
-const RaisedButtonWithMenu = (props: Props) => {
+const RaisedButtonWithMenu = (props: Props): React.Node => {
   const { buildMenuTemplate, ...otherProps } = props;
 
   return (

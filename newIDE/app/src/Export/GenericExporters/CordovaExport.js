@@ -4,7 +4,7 @@ import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Text>
     <Trans>
       This will export your game as a Cordova project. Cordova is a technology
@@ -17,7 +17,7 @@ export const DoneFooter = ({
   renderGameButton,
 }: {|
   renderGameButton: () => React.Node,
-|}) => (
+|}): React.Node => (
   <Column noMargin>
     <Text>
       <Trans>

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -29,16 +30,16 @@ type State = {|
 |};
 
 export default class ProfileDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     currentTab: this.props.initialTab,
   };
 
-  _onChangeTab = (newTab: string) =>
+  _onChangeTab: (newTab: string) => void = (newTab: string) =>
     this.setState({
       currentTab: newTab,
     });
 
-  render() {
+  render(): Node {
     const { open, onClose } = this.props;
     const actions = [
       <FlatButton

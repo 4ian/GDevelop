@@ -109,7 +109,7 @@ export default class InstructionParametersEditor extends React.Component<
   State
 > {
   _firstVisibleField: ?any = {};
-  state = {
+  state: State = {
     isDirty: false,
   };
 
@@ -144,7 +144,7 @@ export default class InstructionParametersEditor extends React.Component<
   _getVisibleParametersCount(
     instructionMetadata: ?gdInstructionMetadata,
     objectName: ?string
-  ) {
+  ): number {
     if (!instructionMetadata) return 0;
 
     const objectParameterIndex = objectName
@@ -159,7 +159,7 @@ export default class InstructionParametersEditor extends React.Component<
     }).filter(isVisible => isVisible).length;
   }
 
-  _openExtension = (i18n: I18nType) => {
+  _openExtension: (i18n: I18nType) => null | void = (i18n: I18nType) => {
     if (this.state.isDirty) {
       const answer = Window.showConfirmDialog(
         i18n._(
@@ -186,7 +186,7 @@ export default class InstructionParametersEditor extends React.Component<
     this.props.openInstructionOrExpression(extension, instructionType);
   };
 
-  _renderEmpty() {
+  _renderEmpty(): React.Element<'div'> {
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
         <EmptyMessage>
@@ -204,7 +204,7 @@ export default class InstructionParametersEditor extends React.Component<
     );
   }
 
-  render() {
+  render(): React.Element<'div'> | React.Node {
     const {
       instruction,
       project,

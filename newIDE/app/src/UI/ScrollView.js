@@ -22,7 +22,7 @@ export type ScrollViewInterface = {|
   scrollToBottom: () => void,
 |};
 
-export default React.forwardRef<Props, ScrollViewInterface>(
+export default (React.forwardRef<Props, ScrollViewInterface>(
   ({ children, autoHideScrollbar, style }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
@@ -70,4 +70,4 @@ export default React.forwardRef<Props, ScrollViewInterface>(
       </div>
     );
   }
-);
+): React$AbstractComponent<Props, ScrollViewInterface>);

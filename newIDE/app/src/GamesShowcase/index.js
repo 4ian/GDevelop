@@ -25,7 +25,7 @@ const getShowcasedGameTitle = (showcasedGame: ShowcasedGame) =>
 
 type Props = {};
 
-export const GamesShowcase = (props: Props) => {
+export const GamesShowcase = (props: Props): React.Node => {
   const {
     filters,
     searchResults,

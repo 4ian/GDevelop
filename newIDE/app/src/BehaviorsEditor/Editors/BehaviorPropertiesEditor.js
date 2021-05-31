@@ -11,7 +11,7 @@ import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 type Props = BehaviorEditorProps;
 
 export default class BehaviorPropertiesEditor extends React.Component<Props> {
-  render() {
+  render(): React.Node {
     const { behavior, behaviorContent } = this.props;
     const properties = behavior.getProperties(behaviorContent.getContent());
 

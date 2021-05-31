@@ -69,7 +69,9 @@ export default class BrowserFileSystem {
   /**
    * Returns all the in memory text files with the specified path prefix.
    */
-  getAllTextFilesIn = (pathPrefix: string): Array<TextFileDescriptor> => {
+  getAllTextFilesIn: (pathPrefix: string) => Array<TextFileDescriptor> = (
+    pathPrefix: string
+  ): Array<TextFileDescriptor> => {
     return Object.keys(this._textFiles)
       .filter(filePath => filePath.indexOf(pathPrefix) === 0)
       .map(filePath => ({
@@ -81,7 +83,9 @@ export default class BrowserFileSystem {
   /**
    * Returns all the files that should be downloaded from a URL, with the specified path prefix.
    */
-  getAllUrlFilesIn = (pathPrefix: string): Array<UrlFileDescriptor> => {
+  getAllUrlFilesIn: (pathPrefix: string) => Array<UrlFileDescriptor> = (
+    pathPrefix: string
+  ): Array<UrlFileDescriptor> => {
     return Object.keys(this._filesToDownload)
       .filter(filePath => filePath.indexOf(pathPrefix) === 0)
       .map(filePath => ({
@@ -90,16 +94,16 @@ export default class BrowserFileSystem {
       }));
   };
 
-  mkDir = (path: string) => {
+  mkDir: (path: string) => boolean = (path: string) => {
     // "Directories" are assumed to exist.
     return true;
   };
-  dirExists = (path: string) => {
+  dirExists: (path: string) => boolean = (path: string) => {
     // TODO: To be changed to be EnsureDirExists.
     // "Directories" are assumed to exist.
     return true;
   };
-  clearDir = (path: string) => {
+  clearDir: (path: string) => boolean = (path: string) => {
     // Clear the files to be written in the specified directory.
     const filePaths = Object.keys(this._textFiles);
     filePaths.forEach(filePath => {
@@ -110,16 +114,19 @@ export default class BrowserFileSystem {
 
     return true;
   };
-  getTempDir = () => {
+  getTempDir: () => string = () => {
     return '/browser-file-system-tmp-dir';
   };
-  fileNameFrom = (fullpath: string) => {
+  fileNameFrom: (fullpath: string) => any = (fullpath: string) => {
     return pathPosix.basename(fullpath);
   };
-  dirNameFrom = (fullpath: string) => {
+  dirNameFrom: (fullpath: string) => any = (fullpath: string) => {
     return pathPosix.dirname(fullpath);
   };
-  makeAbsolute = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeAbsolute: (
+    filePathOrURL: string,
+    baseDirectoryOrURL: string
+  ) => any | string = (filePathOrURL: string, baseDirectoryOrURL: string) => {
     // URLs are always absolute
     if (isURL(filePathOrURL)) return filePathOrURL;
 
@@ -131,7 +138,10 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  makeRelative = (filePathOrURL: string, baseDirectoryOrURL: string) => {
+  makeRelative: (
+    filePathOrURL: string,
+    baseDirectoryOrURL: string
+  ) => any | string = (filePathOrURL: string, baseDirectoryOrURL: string) => {
     if (isURL(filePathOrURL)) {
       // Cutting the start if the URL is relative to the base URL
       if (filePathOrURL.indexOf(baseDirectoryOrURL) === 0) {
@@ -151,7 +161,7 @@ export default class BrowserFileSystem {
       pathPosix.normalize(filePathOrURL)
     );
   };
-  isAbsolute = (fullpath: string) => {
+  isAbsolute: (fullpath: string) => boolean = (fullpath: string) => {
     // URLs are always absolute
     if (isURL(fullpath)) return true;
 
@@ -159,7 +169,10 @@ export default class BrowserFileSystem {
     return fullpath.length > 0 && fullpath.charAt(0) === '/';
   };
 
-  copyFile = (source: string, dest: string) => {
+  copyFile: (source: string, dest: string) => boolean = (
+    source: string,
+    dest: string
+  ) => {
     // URLs are not copied, but marked as to be downloaded.
     if (isURL(source)) {
       if (isURL(dest)) {
@@ -184,19 +197,25 @@ export default class BrowserFileSystem {
     return false;
   };
 
-  writeToFile = (filePath: string, content: string) => {
+  writeToFile: (filePath: string, content: string) => boolean = (
+    filePath: string,
+    content: string
+  ) => {
     this._textFiles[pathPosix.normalize(filePath)] = content;
     return true;
   };
 
-  readFile = (file: string): string => {
+  readFile: (file: string) => string = (file: string): string => {
     if (this._textFiles[file]) return this._textFiles[file];
 
     console.error(`Unknown file ${file}, returning an empty string`);
     return '';
   };
 
-  readDir = (path: string, ext: string) => {
+  readDir: (path: string, ext: string) => gdVectorString = (
+    path: string,
+    ext: string
+  ) => {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
 
@@ -215,7 +234,7 @@ export default class BrowserFileSystem {
     return output;
   };
 
-  fileExists = (filePath: string) => {
+  fileExists: (filePath: string) => boolean = (filePath: string) => {
     if (isURL(filePath)) return true;
 
     const normalizedFilePath = pathPosix.normalize(filePath);

@@ -1,5 +1,6 @@
 // @flow
 
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -52,7 +53,7 @@ type Props = {|
  * of an export.
  */
 export default class ExportLauncher extends Component<Props, State> {
-  state = {
+  state: State = {
     exportStep: '',
     build: null,
     compressionOutput: null,
@@ -64,22 +65,24 @@ export default class ExportLauncher extends Component<Props, State> {
       this.props.project
     ),
   };
-  buildsWatcher = new BuildsWatcher();
+  buildsWatcher: BuildsWatcher = new BuildsWatcher();
 
   componentWillUnmount() {
     this.buildsWatcher.stop();
   }
 
-  _updateStepProgress = (
+  _updateStepProgress: (
     stepCurrentProgress: number,
     stepMaxProgress: number
-  ) =>
+  ) => void = (stepCurrentProgress: number, stepMaxProgress: number) =>
     this.setState({
       stepCurrentProgress,
       stepMaxProgress,
     });
 
-  _startBuildWatch = (userProfile: UserProfile) => {
+  _startBuildWatch: (userProfile: UserProfile) => void = (
+    userProfile: UserProfile
+  ) => {
     if (!this.state.build) return;
 
     this.buildsWatcher.start({
@@ -89,7 +92,9 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
-  launchWholeExport = (userProfile: UserProfile) => {
+  launchWholeExport: (userProfile: UserProfile) => void = (
+    userProfile: UserProfile
+  ) => {
     const t = str => str; //TODO;
     const { project, exportPipeline } = this.props;
     sendExportLaunched(exportPipeline.name);
@@ -202,24 +207,28 @@ export default class ExportLauncher extends Component<Props, State> {
       });
   };
 
-  _downloadBuild = (key: BuildArtifactKeyName) => {
+  _downloadBuild: (key: BuildArtifactKeyName) => void = (
+    key: BuildArtifactKeyName
+  ) => {
     const url = getBuildArtifactUrl(this.state.build, key);
     if (url) Window.openExternalURL(url);
   };
 
-  _closeDoneFooter = () =>
+  _closeDoneFooter: () => void = () =>
     this.setState({
       doneFooterOpen: false,
     });
 
-  _updateExportState = (updater: any => any) => {
+  _updateExportState: (updater: (any) => any) => void = (
+    updater: any => any
+  ) => {
     this.setState(prevState => ({
       ...prevState,
       exportState: updater(prevState.exportState),
     }));
   };
 
-  render() {
+  render(): null | Node {
     const {
       exportStep,
       compressionOutput,

@@ -26,7 +26,7 @@ export const BoxSearchResults = <SearchItem>({
   error,
   onRetry,
   baseSize,
-}: Props<SearchItem>) => {
+}: Props<SearchItem>): React.Node => {
   if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
     else {

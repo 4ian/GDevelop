@@ -22,7 +22,7 @@ type State = {|
 |};
 
 export default class HelpFinder extends React.PureComponent<Props, State> {
-  state = {
+  state: State = {
     searchText: '',
   };
 
@@ -32,18 +32,20 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
     }
   }
 
-  _handleSearchTextChange = (searchText: string) => {
+  _handleSearchTextChange: (searchText: string) => void = (
+    searchText: string
+  ) => {
     this.setState({
       searchText,
     });
     this._sendHelpSearch();
   };
 
-  _sendHelpSearch = debounce(() => {
+  _sendHelpSearch: () => void = debounce(() => {
     if (this.state.searchText) sendHelpSearch(this.state.searchText.trim());
   }, 2900);
 
-  render() {
+  render(): React.Node {
     const { open, onClose } = this.props;
 
     return (

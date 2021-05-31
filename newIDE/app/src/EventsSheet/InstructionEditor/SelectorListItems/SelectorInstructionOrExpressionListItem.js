@@ -17,7 +17,7 @@ export const renderInstructionOrExpressionListItem = ({
   iconSize,
   onClick,
   selectedValue,
-}: Props) => {
+}: Props): React.Node => {
   return (
     <ListItem
       key={getInstructionListItemKey(instructionOrExpressionMetadata)}

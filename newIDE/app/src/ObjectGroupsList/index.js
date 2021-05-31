@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -145,7 +146,14 @@ type Props = {|
 |};
 
 export default class GroupsListContainer extends React.Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|
+    onDeleteGroup: (groupWithContext: GroupWithContext, cb: any) => any,
+    onRenameGroup: (
+      groupWithContext: GroupWithContext,
+      newName: string,
+      cb: any
+    ) => any,
+  |} = {
     onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) =>
       cb(true),
     onRenameGroup: (
@@ -163,7 +171,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     searchText: '',
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to groups list is made outside
@@ -187,7 +195,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     return false;
   }
 
-  addGroup = () => {
+  addGroup: () => void = () => {
     const { globalObjectGroups, objectGroups } = this.props;
 
     const name = newNameGenerator(
@@ -203,7 +211,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     }
   };
 
-  _onDelete = (groupWithContext: GroupWithContext) => {
+  _onDelete: (groupWithContext: GroupWithContext) => void = (
+    groupWithContext: GroupWithContext
+  ) => {
     const { group, global } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
@@ -228,7 +238,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     });
   };
 
-  _onEditName = (groupWithContext: GroupWithContext) => {
+  _onEditName: (groupWithContext: GroupWithContext) => void = (
+    groupWithContext: GroupWithContext
+  ) => {
     this.setState(
       {
         renamedGroupWithScope: groupWithContext,
@@ -237,7 +249,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
   };
 
-  _onRename = (groupWithContext: GroupWithContext, newName: string) => {
+  _onRename: (groupWithContext: GroupWithContext, newName: string) => void = (
+    groupWithContext: GroupWithContext,
+    newName: string
+  ) => {
     const { group } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
@@ -268,7 +283,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     }
   };
 
-  _onMove = (oldIndex: number, newIndex: number) => {
+  _onMove: (oldIndex: number, newIndex: number) => void = (
+    oldIndex: number,
+    newIndex: number
+  ) => {
     const { globalObjectGroups, objectGroups } = this.props;
 
     const isInGroupsList = oldIndex < this.objectGroupsList.length;
@@ -296,7 +314,9 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _setAsGlobalGroup = (groupWithContext: GroupWithContext) => {
+  _setAsGlobalGroup: (groupWithContext: GroupWithContext) => void = (
+    groupWithContext: GroupWithContext
+  ) => {
     const { group } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
 
@@ -320,13 +340,13 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     this._onObjectGroupModified();
   };
 
-  _onObjectGroupModified = () => {
+  _onObjectGroupModified: () => void = () => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
-  render() {
+  render(): Node {
     const { globalObjectGroups, objectGroups } = this.props;
     const { searchText } = this.state;
 

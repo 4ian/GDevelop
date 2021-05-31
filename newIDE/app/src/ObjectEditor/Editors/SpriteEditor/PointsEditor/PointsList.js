@@ -166,7 +166,7 @@ type PointsListProps = {|
   onPointsUpdated: () => void,
 |};
 
-const PointsList = (props: PointsListProps) => {
+const PointsList = (props: PointsListProps): React.Node => {
   return (
     <Column expand>
       <Table>

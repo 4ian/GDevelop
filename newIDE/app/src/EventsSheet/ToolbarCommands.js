@@ -23,7 +23,7 @@ type Props = {|
   onOpenSettings?: ?() => void,
 |};
 
-const ToolbarCommands = (props: Props) => {
+const ToolbarCommands = (props: Props): null => {
   const { onAddEvent } = props;
 
   useCommand('ADD_STANDARD_EVENT', true, {

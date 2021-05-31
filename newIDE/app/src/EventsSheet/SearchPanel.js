@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
@@ -45,7 +46,7 @@ type State = {|
 
 export default class SearchPanel extends PureComponent<Props, State> {
   searchTextField: ?TextField;
-  state = {
+  state: State = {
     searchText: '',
     replaceText: '',
     matchCase: false,
@@ -56,17 +57,17 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchResultsDirty: false,
   };
 
-  focus = () => {
+  focus: () => void = () => {
     if (this.searchTextField) {
       this.searchTextField.focus();
     }
   };
 
-  markSearchResultsDirty = () => {
+  markSearchResultsDirty: () => void = () => {
     this.setState({ searchResultsDirty: true });
   };
 
-  launchSearch = () => {
+  launchSearch: () => void = () => {
     const {
       searchText,
       searchInSelection,
@@ -85,7 +86,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
-  launchReplace = () => {
+  launchReplace: () => void = () => {
     const {
       searchText,
       replaceText,
@@ -109,14 +110,14 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
-  launchSearchIfResultsDirty = () => {
+  launchSearchIfResultsDirty: () => void = () => {
     if (this.state.searchResultsDirty) {
       this.launchSearch();
       this.setState({ searchResultsDirty: false });
     }
   };
 
-  render() {
+  render(): Node {
     const {
       resultsCount,
       hasEventSelected,

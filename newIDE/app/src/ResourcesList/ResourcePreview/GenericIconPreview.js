@@ -29,7 +29,7 @@ type Props = {|
 /**
  * Display a generic container to display an icon.
  */
-export default ({ renderIcon }: Props) => (
+export default ({ renderIcon }: Props): React.Element<'div'> => (
   <div style={styles.previewContainer}>
     <CheckeredBackground />
     <div style={styles.iconContainer}>{renderIcon({ style: styles.icon })}</div>

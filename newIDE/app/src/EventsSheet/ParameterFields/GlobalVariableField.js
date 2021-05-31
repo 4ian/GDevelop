@@ -16,7 +16,7 @@ export default class GlobalVariableField extends React.Component<
   State
 > {
   _field: ?VariableField;
-  state = {
+  state: State = {
     editorOpen: false,
   };
 
@@ -24,7 +24,7 @@ export default class GlobalVariableField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     const { project, scope } = this.props;
 
     const onComputeAllVariableNames = () =>
@@ -76,7 +76,7 @@ export default class GlobalVariableField extends React.Component<
 
 export const renderInlineGlobalVariable = (
   props: ParameterInlineRendererProps
-) => {
+): React.Element<'span'> | React.Node => {
   return renderVariableWithIcon(
     props,
     'res/types/globalvar.png',

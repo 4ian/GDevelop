@@ -32,7 +32,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     currentTab: 'configuration',
   };
 
@@ -45,7 +45,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
     .toNewVectorString()
     .toJSArray();
 
-  _changeTab = (newTab: TabName) =>
+  _changeTab: (newTab: TabName) => void = (newTab: TabName) =>
     this.setState(
       {
         currentTab: newTab,
@@ -53,7 +53,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
       () => this.props.onTabChanged()
     );
 
-  render() {
+  render(): React.Node {
     const { currentTab } = this.state;
     const { eventsBasedBehavior, project } = this.props;
 

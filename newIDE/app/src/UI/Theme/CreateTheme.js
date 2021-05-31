@@ -7,7 +7,14 @@ export const closeableTabSizeOverrides = {
   closeButtonWidth: 24,
 };
 
-export function getRootClassNames(theme: string) {
+export function getRootClassNames(
+  theme: string
+): {|
+  eventsSheetRootClassName: string,
+  markdownRootClassName: string,
+  mosaicRootClassName: string,
+  tableRootClassName: string,
+|} {
   return {
     mosaicRootClassName: theme,
     eventsSheetRootClassName: theme,
@@ -22,7 +29,57 @@ export function getMuiOverrides(
   inputBorderBottomColor: string,
   appBarBackgroundColor: string,
   iconColor: string
-) {
+): {|
+  MuiAccordion: {|
+    root: {|
+      '&$expanded': {|
+        '&:before': {| opacity: number |},
+        '&:first-child': {| marginTop: number |},
+        margin: string,
+      |},
+      '&:before': {| display: string |},
+      '&:not(:last-child)': {| borderBottom: number |},
+      margin: string,
+    |},
+  |},
+  MuiAccordionDetails: {| root: {| padding: number |} |},
+  MuiAccordionSummary: {|
+    content: {| '&$expanded': {| margin: number |}, margin: number |},
+    expandIcon: {| padding: number |},
+    root: {| '&$expanded': {| minHeight: null |} |},
+  |},
+  MuiAppBar: {| colorPrimary: {| backgroundColor: string |} |},
+  MuiButton: {| root: {| borderRadius: number, fontWeight: number |} |},
+  MuiButtonBase: {| root: {| cursor: string |} |},
+  MuiCheckbox: {| root: {| marginBottom: number, marginTop: number |} |},
+  MuiDialogContent: {|
+    root: {| '&:first-child': {| paddingTop: number |}, padding: number |},
+  |},
+  MuiDialogTitle: {| root: {| padding: number |} |},
+  MuiFormControl: {|
+    marginDense: {| marginBottom: number, marginTop: number |},
+  |},
+  MuiIconButton: {| root: {| color: string |} |},
+  MuiInput: {|
+    input: {| padding: number, paddingBottom: number |},
+    underline: {| '&:before': {| borderBottom: string |} |},
+  |},
+  MuiListItem: {|
+    gutters: {| paddingRight: number |},
+    secondaryAction: {| paddingRight: number |},
+  |},
+  MuiListItemIcon: {| root: {| color: string |} |},
+  MuiListItemSecondaryAction: {| root: {| right: number |} |},
+  MuiTab: {|
+    root: {| minHeight: number, paddingBottom: number, paddingTop: number |},
+    textColorPrimary: {| color: string |},
+  |},
+  MuiTableCell: {|
+    sizeSmall: {| paddingBottom: number, paddingTop: number |},
+  |},
+  MuiTabs: {| root: {| backgroundColor: string, minHeight: number |} |},
+  MuiTypography: {| h6: {| fontWeight: number |} |},
+|} {
   return {
     MuiTypography: {
       h6: {
@@ -185,7 +242,10 @@ export function getMuiOverrides(
   };
 }
 
-export function getThemeMode(color: string, contrastText: string) {
+export function getThemeMode(
+  color: string,
+  contrastText: string
+): {| contrastText: string, dark: any, light: any, main: string |} {
   return {
     light: lighten(color, 0.05),
     main: color,

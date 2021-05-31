@@ -20,7 +20,7 @@ type Props = {|
   onPolygonsUpdated: () => void,
 |};
 
-const CollisionMasksPreview = (props: Props) => {
+const CollisionMasksPreview = (props: Props): React.Element<'div'> => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [draggedVertex, setDraggedVertex] = React.useState<gdVector2f | null>(
     null

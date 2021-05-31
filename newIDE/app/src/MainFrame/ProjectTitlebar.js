@@ -12,7 +12,7 @@ type Props = {|
 /**
  * Update the title bar according to the project and the current theme.
  */
-export default function ProjectTitlebar({ fileMetadata }: Props) {
+export default function ProjectTitlebar({ fileMetadata }: Props): null {
   const gdevelopTheme = React.useContext(ThemeContext);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;

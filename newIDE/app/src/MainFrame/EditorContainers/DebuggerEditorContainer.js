@@ -19,7 +19,7 @@ export class DebuggerEditorContainer extends React.Component<
 > {
   editor: ?Debugger;
   _subscriptionChecker: ?SubscriptionChecker;
-  state = {
+  state: State = {
     subscriptionChecked: false,
   };
 
@@ -98,4 +98,4 @@ export class DebuggerEditorContainer extends React.Component<
 
 export const renderDebuggerEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <DebuggerEditorContainer {...props} />;
+): React.Node => <DebuggerEditorContainer {...props} />;

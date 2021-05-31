@@ -6,7 +6,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export default (props: Props) => {
+export default (props: Props): React.Element<'div'> => {
   return (
     <div
       style={{

@@ -162,7 +162,7 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-export default (props: Props) => (
+export default (props: Props): React.Node => (
   <ReactJsonView
     collapsed={false}
     name={false}

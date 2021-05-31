@@ -52,7 +52,7 @@ type State = {|
  * This is only supported on Electron runtime for now.
  */
 export default class Debugger extends React.Component<Props, State> {
-  state = {
+  state: State = {
     debuggerServerState: this.props.previewDebuggerServer.getServerState(),
     debuggerServerError: null,
     debuggerIds: this.props.previewDebuggerServer.getExistingDebuggerIds(),
@@ -101,7 +101,7 @@ export default class Debugger extends React.Component<Props, State> {
     }
   }
 
-  _startServer = () => {
+  _startServer: () => void = () => {
     const { previewDebuggerServer } = this.props;
     const { unregisterDebuggerServerCallbacks } = this.state;
     if (
@@ -163,7 +163,10 @@ export default class Debugger extends React.Component<Props, State> {
     });
   };
 
-  _handleMessage = (id: DebuggerId, data: any) => {
+  _handleMessage: (id: DebuggerId, data: any) => void = (
+    id: DebuggerId,
+    data: any
+  ) => {
     if (data.command === 'dump') {
       this.setState({
         debuggerGameData: {
@@ -196,22 +199,26 @@ export default class Debugger extends React.Component<Props, State> {
     }
   };
 
-  _play = (id: DebuggerId) => {
+  _play: (id: DebuggerId) => void = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'play' });
   };
 
-  _pause = (id: DebuggerId) => {
+  _pause: (id: DebuggerId) => void = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'pause' });
   };
 
-  _refresh = (id: DebuggerId) => {
+  _refresh: (id: DebuggerId) => void = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'refresh' });
   };
 
-  _edit = (id: DebuggerId, path: Array<string>, newValue: any) => {
+  _edit: (id: DebuggerId, path: Array<string>, newValue: any) => boolean = (
+    id: DebuggerId,
+    path: Array<string>,
+    newValue: any
+  ) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'set',
@@ -223,7 +230,11 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
+  _call: (id: DebuggerId, path: Array<string>, args: Array<any>) => boolean = (
+    id: DebuggerId,
+    path: Array<string>,
+    args: Array<any>
+  ) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, {
       command: 'call',
@@ -235,22 +246,22 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
-  _startProfiler = (id: DebuggerId) => {
+  _startProfiler: (id: DebuggerId) => void = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'profiler.start' });
   };
 
-  _stopProfiler = (id: DebuggerId) => {
+  _stopProfiler: (id: DebuggerId) => void = (id: DebuggerId) => {
     const { previewDebuggerServer } = this.props;
     previewDebuggerServer.sendMessage(id, { command: 'profiler.stop' });
   };
 
-  _hasSelectedDebugger = () => {
+  _hasSelectedDebugger: () => boolean = () => {
     const { selectedId, debuggerIds } = this.state;
     return debuggerIds.indexOf(selectedId) !== -1;
   };
 
-  render() {
+  render(): React.Node {
     const {
       debuggerServerError,
       debuggerServerState,

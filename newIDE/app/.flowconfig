@@ -24,7 +24,3 @@
 
 [options]
 module.ignore_non_literal_requires=true
-suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
-suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
-# For node_modules/jss/src/Jss.js:
-suppress_comment=\\(.\\|\n\\)*\\$FlowIgnore

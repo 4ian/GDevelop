@@ -7405,10 +7405,10 @@ flow-annotation-check@1.8.0:
     glob "7.1.1"
     load-pkg "^3.0.1"
 
-flow-bin@0.120.1:
-  version "0.120.1"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.120.1.tgz#ab051d6df71829b70a26a2c90bb81f9d43797cae"
-  integrity sha512-KgE+d+rKzdXzhweYVJty1QIOOZTTbtnXZf+4SLnmArLvmdfeLreQOZpeLbtq5h79m7HhDzX/HkUkoyu/fmSC2A==
+flow-bin@0.131.0:
+  version "0.131.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.131.0.tgz#d4228b6070afdf3b2a76acdee77a7f3f8e8f5133"
+  integrity sha512-fZmoIBcDrtLhy/NNMxwJysSYzMr1ksRcAOMi3AHSoYXfcuQqTvhGJx+wqjlIOqIwz8RRYm8J4V4JrSJbIKP+Xg==
 
 flow-bin@^0.50.0:
   version "0.50.0"

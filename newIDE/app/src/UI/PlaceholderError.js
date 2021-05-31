@@ -7,7 +7,7 @@ import EmptyMessage from './EmptyMessage';
 
 type Props = {|
   children: React.Node,
-  onRetry?: () => void,
+  onRetry?: () => void | Promise<void>,
 |};
 
 const PlaceholderError = ({ onRetry, children }: Props) => (
@@ -18,7 +18,7 @@ const PlaceholderError = ({ onRetry, children }: Props) => (
         <RaisedButton
           primary
           label={<Trans>Retry</Trans>}
-          onClick={() => onRetry()}
+          onClick={() => { onRetry(); }}
         />
       )}
     </Line>

@@ -19,6 +19,8 @@ import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
+import RaisedButton from '../../UI/RaisedButton';
+import { ExampleIcon } from './ExampleIcon';
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
@@ -60,6 +62,7 @@ export function ExampleDialog({
     getIDEVersion(),
     exampleShortHeader
   );
+  const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
   return (
     <Dialog
@@ -72,7 +75,7 @@ export function ExampleDialog({
           disabled={isOpening}
         />,
         <LeftLoader isLoading={isOpening} key="open">
-          <FlatButton
+          <RaisedButton
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
@@ -101,11 +104,10 @@ export function ExampleDialog({
           </AlertMessage>
         )}
         <Line alignItems="center" noMargin>
-          {/* <ExtensionIcon
-              exampleShortHeader={exampleShortHeader}
-              size={40}
-            /> */}
-          <Column expand>
+          {hasIcon ? (
+            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+          ) : null}
+          <Column expand noMargin={!hasIcon}>
             <Text noMargin size="title">
               {exampleShortHeader.name}
             </Text>

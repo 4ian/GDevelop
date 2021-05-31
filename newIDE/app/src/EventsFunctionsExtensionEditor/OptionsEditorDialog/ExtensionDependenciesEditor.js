@@ -88,7 +88,7 @@ export const ExtensionDependenciesEditor = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              { // $FlowFixMe - unsure why Flow complains about TableRow.
+              {// $FlowFixMe - unsure why Flow complains about TableRow.
               mapVector<gdDependencyMetadata, TableRow>(
                 eventsFunctionsExtension.getAllDependencies(),
                 (dependency, index) => (

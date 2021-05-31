@@ -8,6 +8,7 @@ import { getExample } from '../Utils/GDevelopServices/Asset';
 import Divider from '@material-ui/core/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Asset';
 import { Column, Line } from '../UI/Grid';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -51,8 +52,8 @@ export default function LocalExamples({
   return (
     <I18n>
       {({ i18n }) => (
-        <Column noMargin>
-          <Line expand>
+        <Column noMargin expand useFullHeight>
+          <Line>
             <Column expand>
               <LocalFolderPicker
                 fullWidth

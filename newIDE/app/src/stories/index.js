@@ -105,6 +105,7 @@ import {
   gameRollingMetrics1,
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
+  exampleFromFutureVersion,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
@@ -223,6 +224,7 @@ import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/Resource
 import { ResourceStore } from '../AssetStore/ResourceStore';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExampleStore } from '../AssetStore/ExampleStore';
+import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
@@ -4677,13 +4679,19 @@ storiesOf('AssetStore/ExampleStore', module)
   .add('default', () => (
     <FixedHeightFlexContainer height={400}>
       <ExampleStoreStateProvider>
-        <ExampleStore
-          onOpen={action('onOpen')}
-          project={testProject.project}
-          isOpening={false}
-        />
+        <ExampleStore onOpen={action('onOpen')} isOpening={false} />
       </ExampleStoreStateProvider>
     </FixedHeightFlexContainer>
+  ));
+storiesOf('AssetStore/ExampleStore/ExampleDialog', module)
+  .addDecorator(muiDecorator)
+  .add('non existing example, from a future version', () => (
+    <ExampleDialog
+      exampleShortHeader={exampleFromFutureVersion}
+      onOpen={action('onOpen')}
+      isOpening={false}
+      onClose={action('onClose')}
+    />
   ));
 
 storiesOf('AssetStore/ResourceStore', module)

@@ -4,7 +4,11 @@ import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { ExampleStore } from '../AssetStore/ExampleStore';
 import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { getExample } from '../Utils/GDevelopServices/Asset';
+import {
+  getExample,
+  type ExampleShortHeader,
+} from '../Utils/GDevelopServices/Asset';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type Props = {|
   onOpen: (
@@ -22,7 +26,7 @@ export default function BrowserExamples(props: Props) {
       onOpen={async (exampleShortHeader: ExampleShortHeader) => {
         try {
           setIsOpening(true);
-          const example = getExample(exampleShortHeader);
+          const example = await getExample(exampleShortHeader);
           props.onOpen(UrlStorageProvider, {
             fileIdentifier: example.projectFileUrl,
           });

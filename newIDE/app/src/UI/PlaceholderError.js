@@ -18,7 +18,9 @@ const PlaceholderError = ({ onRetry, children }: Props) => (
         <RaisedButton
           primary
           label={<Trans>Retry</Trans>}
-          onClick={() => { onRetry(); }}
+          onClick={() => {
+            onRetry();
+          }}
         />
       )}
     </Line>

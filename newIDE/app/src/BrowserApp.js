@@ -21,7 +21,7 @@ import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService'
 import { makeBrowserS3EventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/BrowserS3EventsFunctionCodeWriter';
 import Providers from './MainFrame/Providers';
 import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
-import InternalFileStorageProvider from './ProjectsStorage/InternalFileStorageProvider';
+import UrlStorageProvider from './ProjectsStorage/UrlStorageProvider';
 import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProvider';
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
@@ -47,14 +47,13 @@ export const create = (authentification: Authentification) => {
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
-            // Add Url provider
-            InternalFileStorageProvider,
+            UrlStorageProvider,
             GoogleDriveStorageProvider,
             DropboxStorageProvider,
             OneDriveStorageProvider,
             DownloadFileStorageProvider,
           ]}
-          defaultStorageProvider={InternalFileStorageProvider}
+          defaultStorageProvider={UrlStorageProvider}
         >
           {({
             getStorageProviderOperations,

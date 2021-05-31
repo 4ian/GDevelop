@@ -176,8 +176,8 @@ export const listAllExamples = (): Promise<AllExamples> => {
 };
 
 export const getExample = (
-  exampleShortHeader: AssetShortHeader
-): Promise<Asset> => {
+  exampleShortHeader: ExampleShortHeader
+): Promise<Example> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/example/${exampleShortHeader.id}`)
     .then(response => response.data)

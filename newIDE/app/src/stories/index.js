@@ -3318,6 +3318,8 @@ storiesOf('TextEditor', module)
           action('Choose resource from source', source)
         }
         resourceExternalEditors={fakeResourceExternalEditors}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
       />
     </SerializedObjectDisplay>
   ));
@@ -3335,6 +3337,8 @@ storiesOf('TiledSpriteEditor', module)
           action('Choose resource from source', source)
         }
         resourceExternalEditors={fakeResourceExternalEditors}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
       />
     </SerializedObjectDisplay>
   ));
@@ -3352,6 +3356,8 @@ storiesOf('PanelSpriteEditor', module)
           action('Choose resource from source', source)
         }
         resourceExternalEditors={fakeResourceExternalEditors}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
       />
     </SerializedObjectDisplay>
   ));
@@ -3370,6 +3376,8 @@ storiesOf('SpriteEditor and related editors', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={fakeResourceExternalEditors}
+          onSizeUpdated={() => {}}
+          objectName="FakeObjectName"
         />
       </DragAndDropContextProvider>
     </SerializedObjectDisplay>
@@ -3409,6 +3417,13 @@ storiesOf('ShapePainterEditor', module)
       <ShapePainterEditor
         object={testProject.shapePainterObject}
         project={testProject.project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)
+        }
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onSizeUpdated={() => {}}
+        objectName="FakeObjectName"
       />
     </SerializedObjectDisplay>
   ));

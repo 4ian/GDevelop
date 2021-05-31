@@ -14,7 +14,7 @@ type Props = {|
   project: ?gdProject,
 |};
 
-export const GamesList = (props: Props) => {
+export const GamesList = (props: Props): null | React.Node => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
   const { authenticated, profile, getAuthorizationHeader } = React.useContext(

@@ -21,7 +21,10 @@ type Props = {|
   size: number,
 |};
 
-export const ExtensionIcon = ({ extensionShortHeader, size }: Props) => {
+export const ExtensionIcon = ({
+  extensionShortHeader,
+  size,
+}: Props): React.Element<'div'> => {
   return (
     <div style={styles.iconBackground}>
       <CorsAwareImage

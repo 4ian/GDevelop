@@ -21,7 +21,7 @@ export default class StandardEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  render() {
+  render(): React.Node {
     var standardEvent = gd.asStandardEvent(this.props.event);
 
     return (

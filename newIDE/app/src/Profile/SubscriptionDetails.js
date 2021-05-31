@@ -12,7 +12,7 @@ type Props = {
   onChangeSubscription: Function,
 };
 
-export default ({ subscription, onChangeSubscription }: Props) =>
+export default ({ subscription, onChangeSubscription }: Props): React.Node =>
   subscription && subscription.planId ? (
     <Column>
       <Line>

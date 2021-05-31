@@ -41,7 +41,7 @@ export default class InstructionEditorDialog extends React.Component<
   Props,
   State
 > {
-  render() {
+  render(): React.Node {
     const {
       isNewInstruction,
       onCancel,

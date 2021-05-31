@@ -81,5 +81,7 @@ function ListIcon(props: Props) {
   );
 }
 
-const ListIconMemo = React.memo<Props>(ListIcon);
+const ListIconMemo: React$AbstractComponent<Props, mixed> = React.memo<Props>(
+  ListIcon
+);
 export default ListIconMemo;

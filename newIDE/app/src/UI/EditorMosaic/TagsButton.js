@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 import IconButton from '../IconButton';
@@ -23,7 +24,7 @@ type Props = {|
 |};
 
 export default class TagsButton extends Component<Props, {||}> {
-  render() {
+  render(): Node {
     return (
       <ElementWithMenu
         element={

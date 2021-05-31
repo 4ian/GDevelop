@@ -97,7 +97,10 @@ export type ListItemRefType = any; // Should be a material-ui ListIten
  *
  * Also used outside of a List by virtualized lists.
  */
-export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
+export const ListItem: React$AbstractComponent<
+  ListItemProps,
+  ListItemRefType
+> = React.forwardRef<ListItemProps, ListItemRefType>(
   (props: ListItemProps, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
@@ -291,7 +294,7 @@ type ListProps = {|
  * List based on Material-UI List.
  */
 export class List extends React.Component<ListProps, {||}> {
-  render() {
+  render(): React.Node {
     return (
       <MUIList style={this.props.style} dense={useDenseLists}>
         {this.props.children}

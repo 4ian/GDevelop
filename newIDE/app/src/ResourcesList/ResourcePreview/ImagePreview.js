@@ -88,7 +88,7 @@ const loadStateFrom = (newProps: {
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-const ImagePreview = (props: Props) => {
+const ImagePreview = (props: Props): React.Node => {
   const [state, setState] = React.useState<State>({
     errored: false,
     imageWidth: null,

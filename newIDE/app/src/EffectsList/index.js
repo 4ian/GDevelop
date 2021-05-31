@@ -57,7 +57,7 @@ const getEnumeratedEffectMetadata = (
  *
  * All available effects are fetched from the project's platform.
  */
-export default function EffectsList(props: Props) {
+export default function EffectsList(props: Props): React.Node {
   const { effectsContainer, onEffectsUpdated } = props;
 
   const preferences = React.useContext(PreferencesContext);

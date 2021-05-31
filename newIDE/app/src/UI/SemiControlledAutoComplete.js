@@ -199,7 +199,7 @@ const getDefaultStylingProps = (
 const getOptionLabel = (option: Option, value: string): string =>
   option.value ? option.value : value;
 
-export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
+export default (React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
   function SemiControlledAutoComplete(props: Props, ref) {
     const input = React.useRef((null: ?HTMLInputElement));
     const [inputValue, setInputValue] = useState((null: string | null));
@@ -329,4 +329,4 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
       </I18n>
     );
   }
-);
+): React$AbstractComponent<Props, SemiControlledAutoCompleteInterface>);

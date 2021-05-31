@@ -68,7 +68,17 @@ type Props = {|
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
-  static defaultProps = {
+  static defaultProps: {|
+    onDeleteEventsFunction: (
+      eventsFunction: gdEventsFunction,
+      cb: (boolean) => void
+    ) => void,
+    onRenameEventsFunction: (
+      eventsFunction: gdEventsFunction,
+      newName: string,
+      cb: (boolean) => void
+    ) => void,
+  |} = {
     onDeleteEventsFunction: (
       eventsFunction: gdEventsFunction,
       cb: boolean => void
@@ -86,12 +96,17 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
-  _togglePrivate = (eventsFunction: gdEventsFunction) => {
+  _togglePrivate: (eventsFunction: gdEventsFunction) => void = (
+    eventsFunction: gdEventsFunction
+  ) => {
     eventsFunction.setPrivate(!eventsFunction.isPrivate());
     this.forceUpdate();
   };
 
-  _deleteEventsFunction = (
+  _deleteEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    {| askForConfirmation: boolean |}
+  ) => void = (
     eventsFunction: gdEventsFunction,
     { askForConfirmation }: {| askForConfirmation: boolean |}
   ) => {
@@ -112,7 +127,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     });
   };
 
-  _editName = (eventsFunction: ?gdEventsFunction) => {
+  _editName: (eventsFunction: ?gdEventsFunction) => void = (
+    eventsFunction: ?gdEventsFunction
+  ) => {
     this.setState(
       {
         renamedEventsFunction: eventsFunction,
@@ -123,7 +140,10 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
-  _rename = (eventsFunction: gdEventsFunction, newName: string) => {
+  _rename: (eventsFunction: gdEventsFunction, newName: string) => void = (
+    eventsFunction: gdEventsFunction,
+    newName: string
+  ) => {
     const { eventsFunctionsContainer } = this.props;
     this.setState({
       renamedEventsFunction: null,
@@ -145,7 +165,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     });
   };
 
-  _moveSelectionTo = (destinationEventsFunction: gdEventsFunction) => {
+  _moveSelectionTo: (destinationEventsFunction: gdEventsFunction) => void = (
+    destinationEventsFunction: gdEventsFunction
+  ) => {
     const { eventsFunctionsContainer, selectedEventsFunction } = this.props;
     if (!selectedEventsFunction) return;
 
@@ -161,24 +183,28 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.forceUpdateList();
   };
 
-  forceUpdateList = () => {
+  forceUpdateList: () => void = () => {
     this._onEventsFunctionModified();
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _copyEventsFunction: (eventsFunction: gdEventsFunction) => void = (
+    eventsFunction: gdEventsFunction
+  ) => {
     Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
       eventsFunction: serializeToJSObject(eventsFunction),
       name: eventsFunction.getName(),
     });
   };
 
-  _cutEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _cutEventsFunction: (eventsFunction: gdEventsFunction) => void = (
+    eventsFunction: gdEventsFunction
+  ) => {
     this._copyEventsFunction(eventsFunction);
     this._deleteEventsFunction(eventsFunction, { askForConfirmation: false });
   };
 
-  _pasteEventsFunction = (index: number) => {
+  _pasteEventsFunction: (index: number) => void = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EVENTS_FUNCTION_CLIPBOARD_KIND);
@@ -218,10 +244,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.forceUpdate();
   }
 
-  _renderEventsFunctionMenuTemplate = (i18n: I18nType) => (
+  _renderEventsFunctionMenuTemplate: (
+    i18n: I18nType
+  ) => (
     eventsFunction: gdEventsFunction,
     index: number
-  ) => {
+  ) => Array<
+    | {| click: () => void, enabled: boolean, label: any | string |}
+    | {| click: () => void, label: any | string |}
+    | {| type: string |}
+  > = (i18n: I18nType) => (eventsFunction: gdEventsFunction, index: number) => {
     return [
       {
         label: i18n._(t`Rename`),
@@ -260,7 +292,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     ];
   };
 
-  _addNewEventsFunction = () => {
+  _addNewEventsFunction: () => void = () => {
     const { eventsFunctionsContainer } = this.props;
 
     this.props.onAddEventsFunction(
@@ -286,7 +318,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  render(): React.Node {
     const {
       project,
       eventsFunctionsContainer,

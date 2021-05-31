@@ -15,7 +15,7 @@ type Props = {|
 type State = {||};
 
 export default class ChangelogDialog extends React.Component<Props, State> {
-  render() {
+  render(): null | React.Node {
     const { open, onClose } = this.props;
     if (!open) {
       // Don't render anything, to avoid in particular sending useless requests.

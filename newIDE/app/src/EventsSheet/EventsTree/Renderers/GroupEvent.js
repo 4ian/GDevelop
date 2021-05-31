@@ -34,12 +34,12 @@ const styles = {
 };
 
 export default class GroupEvent extends React.Component<EventRendererProps, *> {
-  state = {
+  state: {| editing: boolean |} = {
     editing: false,
   };
   _textField: ?TextField = null;
 
-  edit = () => {
+  edit: () => void = () => {
     this.setState(
       {
         editing: true,
@@ -50,13 +50,13 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
     );
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     this.setState({
       editing: false,
     });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     var groupEvent = gd.asGroupEvent(this.props.event);
 
     const r = groupEvent.getBackgroundColorR(),

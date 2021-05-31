@@ -45,7 +45,7 @@ type Props = {|
 /**
  * Display a markdown text
  */
-export const MarkdownText = (props: Props) => {
+export const MarkdownText = (props: Props): React.Node => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const markdownCustomRenderers = React.useMemo(
     () =>

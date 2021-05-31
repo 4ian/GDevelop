@@ -53,6 +53,7 @@ class ScopedCommandManager implements CommandManagerInterface {
   getAllNamedCommands = () => {
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const cmd = this._commands[commandName];
+      // $FlowFixMe
       return { ...cmd, name: commandName };
     });
   };
@@ -69,7 +70,7 @@ type Props = {|
   active: boolean,
 |};
 
-const CommandsContextScopedProvider = (props: Props) => {
+const CommandsContextScopedProvider = (props: Props): React.Node => {
   const centralManager = React.useContext(CommandsContext);
   const scopedManager = useRefInit(
     () => new ScopedCommandManager(centralManager)

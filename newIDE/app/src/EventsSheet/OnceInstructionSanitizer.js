@@ -3,7 +3,7 @@ const gd: libGDevelop = global.gd;
 
 export const ensureSingleOnceInstructions = (
   instructionsList: gdInstructionsList
-) => {
+): boolean => {
   let hasEndingOnceInstruction = false;
   let hasInvalidOnce = false;
   for (let i = instructionsList.size() - 1; i >= 0; --i) {

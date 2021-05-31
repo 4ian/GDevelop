@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../../../../UI/FlatButton';
@@ -47,7 +48,7 @@ type Props = {|
   project: gdProject,
 |};
 
-const CollisionMasksEditor = (props: Props) => {
+const CollisionMasksEditor = (props: Props): null | Element<'div'> => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);

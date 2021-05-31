@@ -13,7 +13,7 @@ const gd: libGDevelop = global.gd;
 export function serializeToJSObject(
   serializable: gdSerializable,
   methodName: string = 'serializeTo'
-) {
+): any {
   const serializedElement = new gd.SerializerElement();
   serializable[methodName](serializedElement);
 

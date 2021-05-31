@@ -25,7 +25,7 @@ export default function ExtensionsSearchDialog({
   project,
   onClose,
   onInstallExtension,
-}: Props) {
+}: Props): React.Node {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
     false

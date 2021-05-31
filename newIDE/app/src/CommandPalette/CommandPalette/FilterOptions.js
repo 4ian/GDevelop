@@ -8,7 +8,7 @@ import { fuzzyOrEmptyFilter } from '../../Utils/FuzzyOrEmptyFilter';
 const filterOptions = <T>(
   options: Array<T>,
   state: { getOptionLabel: T => string, inputValue: string }
-) => {
+): Array<T> => {
   const searchText = state.inputValue.toLowerCase();
   if (searchText === '') return options;
 

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t, Trans } from '@lingui/macro';
 import { type I18n } from '@lingui/core';
 
@@ -27,7 +28,7 @@ type Props = {|
   onClose: Function,
 |};
 
-const PreferencesDialog = ({ i18n, onClose }: Props) => {
+const PreferencesDialog = ({ i18n, onClose }: Props): Node => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
   const {
     values,

@@ -132,4 +132,4 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
 
 export const renderEventsFunctionsExtensionEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <EventsFunctionsExtensionEditorContainer {...props} />;
+): React.Node => <EventsFunctionsExtensionEditorContainer {...props} />;

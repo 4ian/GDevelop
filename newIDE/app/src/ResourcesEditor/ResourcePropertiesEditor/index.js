@@ -56,7 +56,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     },
   ];
 
-  _renderEmpty() {
+  _renderEmpty(): React.Node {
     return (
       <EmptyMessage>
         <Trans>
@@ -68,7 +68,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _chooseResourcePath = () => {
+  _chooseResourcePath: () => void = () => {
     const {
       resources,
       onResourcePathUpdated,
@@ -93,7 +93,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     });
   };
 
-  _renderResourcesProperties() {
+  _renderResourcesProperties(): React.Element<'div'> {
     const { resources } = this.props;
     //TODO: Multiple resources support
     const properties = resources[0].getProperties();
@@ -116,7 +116,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _renderPreview() {
+  _renderPreview(): void | React.Node {
     const { resources, project, resourcesLoader } = this.props;
     if (!resources || !resources.length) return;
 
@@ -130,7 +130,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  render() {
+  render(): React.Node {
     const { resources } = this.props;
 
     return (

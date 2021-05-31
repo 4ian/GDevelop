@@ -23,7 +23,7 @@ type State = {
 };
 
 export default class GDI18nProvider extends React.Component<Props, State> {
-  state = {
+  state: State = {
     language: 'en',
     catalogs: {},
     i18n: null,
@@ -39,7 +39,9 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     }
   }
 
-  _loadCatalog = (language: string): Promise<Catalogs> => {
+  _loadCatalog: (language: string) => Promise<Catalogs> = (
+    language: string
+  ): Promise<Catalogs> => {
     if (this.state.catalogs[language]) {
       return Promise.resolve(this.state.catalogs);
     }
@@ -76,7 +78,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     });
   }
 
-  render() {
+  render(): null | React.Node {
     // Use language from the state, as it is synchronized with the catalogs,
     // while the language from props is the "target language", and sometime
     // can be a language for which the catalog is not loaded yet (which would

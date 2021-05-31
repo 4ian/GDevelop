@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import EmptyMessage from '../../../../UI/EmptyMessage';
@@ -46,7 +47,7 @@ type Props = {|
   project: gdProject,
 |};
 
-const PointsEditor = (props: Props) => {
+const PointsEditor = (props: Props): null | Element<'div'> => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);

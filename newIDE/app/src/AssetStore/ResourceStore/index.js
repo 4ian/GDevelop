@@ -25,7 +25,10 @@ type Props = {
   resourceKind: string,
 };
 
-export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
+export const ResourceStore = ({
+  onChoose,
+  resourceKind,
+}: Props): React.Node => {
   const {
     filters,
     searchResults,

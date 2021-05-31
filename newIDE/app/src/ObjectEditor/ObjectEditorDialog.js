@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import React, { Component } from 'react';
@@ -179,7 +180,7 @@ type State = {|
 |};
 
 export default class ObjectEditorDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     editorComponent: null,
     castToObjectType: null,
     helpPagePath: null,
@@ -199,7 +200,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
     }
   }
 
-  _loadFrom(object: ?gdObject) {
+  _loadFrom(object: ?gdObject): void {
     if (!object) return;
 
     const editorConfiguration = ObjectsEditorService.getEditorConfiguration(
@@ -220,7 +221,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
     });
   }
 
-  render() {
+  render(): null | Node {
     const { object } = this.props;
     const { editorComponent, castToObjectType, helpPagePath } = this.state;
 

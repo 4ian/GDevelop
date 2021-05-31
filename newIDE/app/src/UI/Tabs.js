@@ -15,7 +15,7 @@ type TabsProps<TabName> = {|
  * Tabs based on Material-UI Tabs.
  */
 export class Tabs<TabName> extends React.Component<TabsProps<TabName>, {||}> {
-  render() {
+  render(): React.Node {
     return (
       <MUITabs
         variant="fullWidth"
@@ -41,7 +41,7 @@ type TabProps = {|
  * A Tab based on Material-UI Tab.
  */
 export class Tab extends React.Component<TabProps, {||}> {
-  render() {
+  render(): React.Node {
     return <MUITab {...this.props} />;
   }
 }

@@ -34,7 +34,7 @@ const VariablesEditorDialog = ({
   variablesContainer,
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
-}: Props) => {
+}: Props): React.Node => {
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,

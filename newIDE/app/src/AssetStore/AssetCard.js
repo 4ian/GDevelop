@@ -51,7 +51,11 @@ type Props = {|
   onOpenDetails: () => void,
 |};
 
-export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
+export const AssetCard = ({
+  assetShortHeader,
+  onOpenDetails,
+  size,
+}: Props): React.Node => {
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
       <div style={{ ...styles.cardContainer, width: size, height: size }}>

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
@@ -21,13 +22,15 @@ const styles = {
 };
 
 export default class YesNoField extends Component<ParameterFieldProps, void> {
-  _yesButton = React.createRef<RaisedButton>();
+  _yesButton: {|
+    current: null | RaisedButton,
+  |} = React.createRef<RaisedButton>();
 
   focus() {
     focusButton(this._yesButton);
   }
 
-  render() {
+  render(): Node {
     const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -64,7 +67,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
 export const renderInlineYesNo = ({
   value,
   parameterMetadata,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): Node => {
   if (getParameterValueOrDefault(value, parameterMetadata) === 'yes') {
     return <Trans>yes</Trans>;
   } else {

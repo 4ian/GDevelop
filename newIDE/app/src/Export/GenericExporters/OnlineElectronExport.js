@@ -21,7 +21,7 @@ type HeaderProps = {|
 export const SetupExportHeader = ({
   exportState,
   updateExportState,
-}: HeaderProps) => {
+}: HeaderProps): React.Node => {
   const setTarget = (targetName: TargetName, enable: boolean) => {
     updateExportState(prevExportState => {
       if (enable && prevExportState.targets.indexOf(targetName) === -1) {

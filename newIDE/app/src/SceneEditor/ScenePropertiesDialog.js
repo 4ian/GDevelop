@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -65,7 +66,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
     }
   }
 
-  _onApply = () => {
+  _onApply: () => void = () => {
     this.props.layout.setWindowDefaultTitle(this.state.windowTitle);
     this.props.layout.setStopSoundsOnStartup(
       this.state.shouldStopSoundsOnStartup
@@ -78,7 +79,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
     this.props.onApply();
   };
 
-  render() {
+  render(): Node {
     const { layout } = this.props;
     const actions = [
       // TODO: Add support for cancelling modifications made to BehaviorSharedData

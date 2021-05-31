@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import React, { Component } from 'react';
@@ -13,7 +14,7 @@ export default class OperatorField extends Component<ParameterFieldProps> {
     if (this._field && this._field.focus) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     const { parameterMetadata } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -46,7 +47,7 @@ export const renderInlineOperator = ({
   value,
   InvalidParameterValue,
   useAssignmentOperators,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): string | Node => {
   if (!value) {
     return (
       <InvalidParameterValue isEmpty>

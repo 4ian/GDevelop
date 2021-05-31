@@ -35,12 +35,12 @@ export default class ForEachEvent extends React.Component<
   *
 > {
   _objectField: ?ObjectField = null;
-  state = {
+  state: {| anchorEl: null, editing: boolean |} = {
     editing: false,
     anchorEl: null,
   };
 
-  edit = (domEvent: any) => {
+  edit: (domEvent: any) => void = (domEvent: any) => {
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -64,7 +64,7 @@ export default class ForEachEvent extends React.Component<
     );
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
     // $FlowFixMe
@@ -76,7 +76,7 @@ export default class ForEachEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     var forEachEvent = gd.asForEachEvent(this.props.event);
 
     const objectName = forEachEvent.getObjectToPick();

@@ -40,12 +40,12 @@ const styles = {
 export default class LinkEvent extends React.Component<EventRendererProps, *> {
   _externalEventsAutoComplete: ?ExternalEventsAutoComplete = null;
 
-  state = {
+  state: {| anchorEl: null, editing: boolean |} = {
     editing: false,
     anchorEl: null,
   };
 
-  edit = (domEvent: any) => {
+  edit: (domEvent: any) => void = (domEvent: any) => {
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -70,7 +70,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     );
   };
 
-  openTarget = (i18n: I18nType) => {
+  openTarget: (i18n: I18nType) => void = (i18n: I18nType) => {
     const { project, event, onOpenLayout, onOpenExternalEvents } = this.props;
     const linkEvent = gd.asLinkEvent(event);
     const target = linkEvent.getTarget();
@@ -88,7 +88,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     }
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
@@ -101,7 +101,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     });
   };
 
-  render() {
+  render(): React.Node {
     const linkEvent = gd.asLinkEvent(this.props.event);
     const target = linkEvent.getTarget();
 

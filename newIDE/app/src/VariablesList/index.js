@@ -50,7 +50,7 @@ type State = {|
 |};
 
 export default class VariablesList extends React.Component<Props, State> {
-  state = {
+  state: State = {
     nameErrors: {},
     selectedVariables: getInitialSelection(),
     mode: 'select',
@@ -61,7 +61,10 @@ export default class VariablesList extends React.Component<Props, State> {
     this.setState({ allVariableNames: this.props.onComputeAllVariableNames() });
   }
 
-  _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
+  _selectVariable: (
+    variableAndName: VariableAndName,
+    select: boolean
+  ) => void = (variableAndName: VariableAndName, select: boolean) => {
     this.setState({
       selectedVariables: addToSelection(
         this.state.selectedVariables,
@@ -71,7 +74,7 @@ export default class VariablesList extends React.Component<Props, State> {
     });
   };
 
-  copySelection = () => {
+  copySelection: () => void = () => {
     Clipboard.set(
       CLIPBOARD_KIND,
       getSelection(this.state.selectedVariables).map(({ name, variable }) => ({
@@ -81,7 +84,7 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   };
 
-  paste = () => {
+  paste: () => void = () => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
@@ -118,7 +121,7 @@ export default class VariablesList extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
-  deleteSelection = () => {
+  deleteSelection: () => void = () => {
     const { variablesContainer } = this.props;
     const selection: Array<VariableAndName> = getSelection(
       this.state.selectedVariables
@@ -146,13 +149,19 @@ export default class VariablesList extends React.Component<Props, State> {
     this.clearSelection();
   };
 
-  clearSelection = () => {
+  clearSelection: () => void = () => {
     this.setState({
       selectedVariables: getInitialSelection(),
     });
   };
 
-  _updateOrDefineVariable = (
+  _updateOrDefineVariable: (
+    name: string,
+    variable: gdVariable,
+    newValue: string,
+    index: number,
+    origin: ?VariableOrigin
+  ) => void = (
     name: string,
     variable: gdVariable,
     newValue: string,
@@ -233,7 +242,7 @@ export default class VariablesList extends React.Component<Props, State> {
     });
   }
 
-  _getVariableOrigin = (name: string) => {
+  _getVariableOrigin = (name: string): 'parent' | 'inherited' | '' => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
     if (!inheritedVariablesContainer || !inheritedVariablesContainer.has(name))
@@ -249,7 +258,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?VariableOrigin = null,
     arrayElement: ?boolean = false
-  ) {
+  ): React.Node {
     const { variablesContainer, commitVariableValueOnBlur } = this.props;
     const type = variable.getType();
     const isCollection = !gd.Variable.isPrimitive(variable.getType());
@@ -356,7 +365,7 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
-  _renderEmpty() {
+  _renderEmpty(): React.Element<'div'> | boolean {
     return (
       !!this.props.emptyExplanationMessage && (
         <div>
@@ -377,7 +386,7 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
-  render() {
+  render(): null | React.Node {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
 

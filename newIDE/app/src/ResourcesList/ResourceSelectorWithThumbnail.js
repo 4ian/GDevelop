@@ -39,7 +39,7 @@ const ResourceSelectorWithThumbnail = ({
   onChange,
   floatingLabelText,
   hintText,
-}: Props) => {
+}: Props): React.Element<'div'> => {
   return (
     <div style={styles.container}>
       <div style={styles.selectorContainer}>

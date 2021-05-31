@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t } from '@lingui/macro';
 import React, { PureComponent } from 'react';
 import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
@@ -24,11 +25,11 @@ type State = {|
 |};
 
 export class MainFrameToolbar extends PureComponent<Props, State> {
-  state = {
+  state: State = {
     editorToolbar: null,
   };
 
-  isDev = Window.isDev();
+  isDev: boolean = Window.isDev();
 
   setEditorToolbar(editorToolbar: any) {
     this.setState({
@@ -36,7 +37,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
     });
   }
 
-  render() {
+  render(): Node {
     return (
       <Toolbar>
         <ToolbarGroup firstChild>

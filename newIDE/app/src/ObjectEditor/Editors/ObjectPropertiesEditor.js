@@ -21,7 +21,7 @@ const gd: libGDevelop = global.gd;
 type Props = EditorProps;
 
 export default class ObjectPropertiesEditor extends React.Component<Props> {
-  render() {
+  render(): React.Node {
     const {
       object,
       project,

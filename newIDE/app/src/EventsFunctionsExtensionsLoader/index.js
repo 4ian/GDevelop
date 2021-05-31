@@ -431,7 +431,7 @@ export const unloadProjectEventsFunctionsExtension = (
  */
 export const isAnEventFunctionMetadata = (
   instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
-) => {
+): boolean => {
   const parametersCount = instructionOrExpression.getParametersCount();
   if (parametersCount <= 0) return false;
 
@@ -445,7 +445,9 @@ export const isAnEventFunctionMetadata = (
  * Get back the name a function from its type.
  * See also getFreeEventsFunctionType for the reverse operation.
  */
-export const getFunctionNameFromType = (type: string) => {
+export const getFunctionNameFromType = (
+  type: string
+): {| behaviorName: ?string, extensionName: string, name: string |} => {
   const parts = type.split('::');
   if (!parts.length)
     return {
@@ -468,7 +470,7 @@ export const getFunctionNameFromType = (type: string) => {
 export const getFreeEventsFunctionType = (
   extensionName: string,
   eventsFunction: gdEventsFunction
-) => {
+): string => {
   return extensionName + '::' + eventsFunction.getName();
 };
 
@@ -479,7 +481,7 @@ export const getFreeEventsFunctionType = (
  */
 export const getParametersIndexOffset = (
   isEventsBasedBehaviorMethod: boolean
-) => {
+): number => {
   return isEventsBasedBehaviorMethod
     ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
     : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/

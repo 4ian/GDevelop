@@ -52,10 +52,14 @@ export default class InstructionOrExpressionSelector<
     searchResults: [],
   };
   _searchBar: ?SearchBar;
-  _scrollView = React.createRef<ScrollViewInterface>();
-  _selectedItem = React.createRef<ListItemRefType>();
+  _scrollView: {|
+    current: null | ScrollViewInterface,
+  |} = React.createRef<ScrollViewInterface>();
+  _selectedItem: {|
+    current: null | ListItemRefType,
+  |} = React.createRef<ListItemRefType>();
 
-  initialInstructionTypePath = findInTree(
+  initialInstructionTypePath: ?Array<string> = findInTree(
     this.props.instructionsInfoTree,
     this.props.selectedType
   );
@@ -73,11 +77,11 @@ export default class InstructionOrExpressionSelector<
     }
   }
 
-  focus = () => {
+  focus: () => void = () => {
     if (this._searchBar) this._searchBar.focus();
   };
 
-  render() {
+  render(): React.Node {
     const {
       selectedType,
       iconSize,

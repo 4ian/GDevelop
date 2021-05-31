@@ -63,7 +63,7 @@ const initialMosaicEditorNodes = {
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
-  state = {
+  state: State = {
     selectedInspector: null,
     selectedInspectorFullPath: [],
     rawMode: false,

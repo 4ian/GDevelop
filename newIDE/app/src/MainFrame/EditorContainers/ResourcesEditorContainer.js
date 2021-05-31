@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React from 'react';
 import {
   type RenderEditorContainerProps,
@@ -51,4 +52,4 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
 
 export const renderResourcesEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ResourcesEditorContainer {...props} />;
+): Node => <ResourcesEditorContainer {...props} />;

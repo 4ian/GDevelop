@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
@@ -52,7 +53,7 @@ export const showGameFileCreationError = (
 };
 
 export default class LocalExamples extends Component<Props, State> {
-  state = {
+  state: State = {
     exampleNames: null,
   };
 
@@ -74,7 +75,10 @@ export default class LocalExamples extends Component<Props, State> {
     });
   }
 
-  createFromExample = (i18n: I18nType, exampleName: string) => {
+  createFromExample: (i18n: I18nType, exampleName: string) => void = (
+    i18n: I18nType,
+    exampleName: string
+  ) => {
     const { outputPath } = this.props;
     if (!fs || !outputPath) return;
 
@@ -94,7 +98,7 @@ export default class LocalExamples extends Component<Props, State> {
     });
   };
 
-  render() {
+  render(): Node {
     return (
       <I18n>
         {({ i18n }) => (

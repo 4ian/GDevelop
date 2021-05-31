@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
@@ -37,7 +38,7 @@ type Props = {|
 |};
 
 export default class LocalFilePicker extends PureComponent<Props, *> {
-  onChooseFolder = () => {
+  onChooseFolder: () => any | void = () => {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -53,7 +54,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
       });
   };
 
-  render() {
+  render(): Element<'div'> {
     return (
       <div
         style={{

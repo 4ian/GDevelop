@@ -96,7 +96,7 @@ export default function NewObjectDialog({
   onClose,
   onCreateNewObject,
   onObjectAddedFromAsset,
-}: Props) {
+}: Props): React.Node {
   const {
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,

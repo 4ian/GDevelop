@@ -48,7 +48,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
   );
   _includeFileHashs: { [string]: number } = {};
   _lastLoadPromise: ?Promise<void> = null;
-  state = {
+  state: State = {
     eventsFunctionsExtensionsError: null,
     loadProjectEventsFunctionsExtensions: this._loadProjectEventsFunctionsExtensions.bind(
       this
@@ -149,7 +149,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     return this._loadProjectEventsFunctionsExtensions(project);
   }
 
-  render() {
+  render(): React.Node {
     return (
       <EventsFunctionsExtensionsContext.Provider value={this.state}>
         {this.props.children}

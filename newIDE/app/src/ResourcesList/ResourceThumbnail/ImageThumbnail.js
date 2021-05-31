@@ -15,7 +15,7 @@ export const thumbnailContainerStyle = {
   height: SPRITE_SIZE,
   justifyContent: 'center',
   alignItems: 'center',
-  lineHeight: SPRITE_SIZE + 'px',
+  lineHeight: (SPRITE_SIZE + 'px': string),
   textAlign: 'center',
 };
 
@@ -51,7 +51,7 @@ type Props = {|
   onContextMenu?: (x: number, y: number) => void,
 |};
 
-const ImageThumbnail = (props: Props) => {
+const ImageThumbnail = (props: Props): React.Element<'div'> => {
   const { onContextMenu, resourcesLoader, resourceName, project } = props;
   const theme = React.useContext(GDevelopThemeContext);
 

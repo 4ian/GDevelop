@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
@@ -147,25 +148,25 @@ const contributors = [
 ];
 
 export default class AboutDialog extends PureComponent<Props, State> {
-  state = {
+  state: State = {
     currentTab: 'about',
   };
 
-  _openContributePage = () => {
+  _openContributePage: () => void = () => {
     Window.openExternalURL('https://gdevelop-app.com/contribute/');
   };
 
-  _openLink = (link: string) => {
+  _openLink: (link: string) => void = (link: string) => {
     if (!link) return;
 
     Window.openExternalURL(link);
   };
 
-  _changeTab = (currentTab: string) => {
+  _changeTab: (currentTab: string) => void = (currentTab: string) => {
     this.setState({ currentTab });
   };
 
-  render() {
+  render(): null | Node {
     const { open, onClose, updateStatus } = this.props;
     const { currentTab } = this.state;
     if (!open) return null;

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { useEffect, useRef } from 'react';
@@ -42,7 +43,7 @@ function useInterval(callback: () => void, delay: number | null) {
 export default function SubscriptionPendingDialog({
   onClose,
   userProfile,
-}: Props) {
+}: Props): Node {
   const hasPlan =
     !!userProfile &&
     !!userProfile.subscription &&

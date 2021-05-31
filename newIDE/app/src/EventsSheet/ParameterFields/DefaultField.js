@@ -14,7 +14,7 @@ export default class DefaultField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     const { parameterMetadata } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
@@ -41,7 +41,7 @@ export const renderInlineDefaultField = ({
   value,
   parameterMetadata,
   MissingParameterValue,
-}: ParameterInlineRendererProps) => {
+}: ParameterInlineRendererProps): React.Node | string => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

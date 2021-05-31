@@ -38,7 +38,7 @@ export default class LongTouchHandler {
     canvas.addEventListener('touchend', this._clear);
   }
 
-  _onTouchStart = (event: TouchEvent) => {
+  _onTouchStart: (event: TouchEvent) => void = (event: TouchEvent) => {
     // If more than one touch,
     // it's not a long press.
     if (event.touches.length !== 1) return;
@@ -59,7 +59,7 @@ export default class LongTouchHandler {
     }, delay);
   };
 
-  _onTouchMove = (event: TouchEvent) => {
+  _onTouchMove: (event: TouchEvent) => void = (event: TouchEvent) => {
     // If more than one touch,
     // it's not a long press anymore.
     if (event.touches.length !== 1) {
@@ -79,11 +79,11 @@ export default class LongTouchHandler {
     }
   };
 
-  _clear = () => {
+  _clear: () => void = () => {
     clearTimeout(this._longTouchTimeoutID);
   };
 
-  unmount = () => {
+  unmount: () => void = () => {
     this._canvas.removeEventListener('touchstart', this._onTouchStart);
     this._canvas.removeEventListener('touchmove', this._onTouchMove);
     this._canvas.removeEventListener('touchend', this._clear);

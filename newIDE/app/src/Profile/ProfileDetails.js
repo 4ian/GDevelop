@@ -13,7 +13,7 @@ type Props = {
   profile: ?Profile,
 };
 
-export default ({ profile }: Props) =>
+export default ({ profile }: Props): React.Node =>
   profile ? (
     <Column>
       <Line alignItems="center">

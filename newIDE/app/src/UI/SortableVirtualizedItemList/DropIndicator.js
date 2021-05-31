@@ -13,7 +13,11 @@ const styles = {
   },
 };
 
-export default function DropIndicator({ canDrop }: {| canDrop: boolean |}) {
+export default function DropIndicator({
+  canDrop,
+}: {|
+  canDrop: boolean,
+|}): React.Node {
   return (
     <ThemeConsumer>
       {gdevelopTheme => (

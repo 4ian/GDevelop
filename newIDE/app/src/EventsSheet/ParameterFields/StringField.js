@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
@@ -10,7 +11,7 @@ export default class StringField extends Component<ParameterFieldProps, void> {
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     return (
       <GenericExpressionField
         expressionType="string"

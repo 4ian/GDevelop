@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import InstructionOrExpressionSelector from './index';
 import {
@@ -33,7 +34,7 @@ export default class InstructionSelector extends Component<Props, {||}> {
   );
   instructionsInfoTree: InstructionTreeNode = createTree(this.instructionsInfo);
 
-  render() {
+  render(): Node {
     const { isCondition, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector

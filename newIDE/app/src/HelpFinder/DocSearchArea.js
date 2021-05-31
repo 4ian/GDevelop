@@ -60,17 +60,19 @@ const algoliaOptions = { hitsPerPage: 5 };
 
 export default class DocSearchArea extends React.Component<Props, State> {
   // $FlowFixMe
-  client = algoliasearch(appId, apiKey, algoliaOptions);
-  state = {
+  client: Client = algoliasearch(appId, apiKey, algoliaOptions);
+  state: State = {
     results: null,
     error: null,
   };
 
-  _handleSearchTextChange = (searchText: string) => {
+  _handleSearchTextChange: (searchText: string) => void = (
+    searchText: string
+  ) => {
     this.props.onChange(searchText);
   };
 
-  _launchSearchRequest = debounce(() => {
+  _launchSearchRequest: () => void = debounce(() => {
     if (this.props.value) {
       this.client
         // $FlowFixMe
@@ -106,7 +108,9 @@ export default class DocSearchArea extends React.Component<Props, State> {
     }
   }
 
-  _renderResult = (result: AlgoliaResult) => {
+  _renderResult: (result: AlgoliaResult) => React.Node = (
+    result: AlgoliaResult
+  ) => {
     const primaryText =
       result.hierarchy.lvl0 ||
       result.hierarchy.lvl1 ||
@@ -143,7 +147,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  render(): React.Element<'div'> {
     return (
       <div>
         <TextField

@@ -14,7 +14,7 @@ type Props = {
   onCreateAccount: () => void,
 };
 
-export default ({ message, onLogin, onCreateAccount }: Props) => (
+export default ({ message, onLogin, onCreateAccount }: Props): React.Node => (
   <Column noMargin>
     <Line>
       <Text>

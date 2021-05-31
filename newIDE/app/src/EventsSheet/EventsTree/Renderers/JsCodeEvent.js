@@ -68,7 +68,7 @@ export default class JsCodeEvent extends React.Component<
   State
 > {
   _objectField: ?ObjectField = null;
-  state = {
+  state: State = {
     editing: false,
     editingObject: false,
     anchorEl: null,
@@ -76,7 +76,7 @@ export default class JsCodeEvent extends React.Component<
 
   _input: ?any;
 
-  edit = () => {
+  edit: () => void = () => {
     this.setState(
       {
         editing: true,
@@ -92,7 +92,7 @@ export default class JsCodeEvent extends React.Component<
     );
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
 
     // $FlowFixMe
@@ -107,12 +107,12 @@ export default class JsCodeEvent extends React.Component<
     );
   };
 
-  onChange = (newValue: string) => {
+  onChange: (newValue: string) => void = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     jsCodeEvent.setInlineCode(newValue);
   };
 
-  editObject = (domEvent: any) => {
+  editObject: (domEvent: any) => void = (domEvent: any) => {
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -136,7 +136,7 @@ export default class JsCodeEvent extends React.Component<
     );
   };
 
-  endObjectEditing = () => {
+  endObjectEditing: () => void = () => {
     const { anchorEl } = this.state;
 
     // Put back the focus after closing the inline popover.
@@ -149,12 +149,12 @@ export default class JsCodeEvent extends React.Component<
     });
   };
 
-  toggleExpanded = () => {
+  toggleExpanded: () => void = () => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     jsCodeEvent.setEventsSheetExpanded(!jsCodeEvent.isEventsSheetExpanded());
   };
 
-  _getCodeEditorHeight = () => {
+  _getCodeEditorHeight: () => number = () => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
 
     // Always use the minimum height when collapsed.
@@ -167,7 +167,7 @@ export default class JsCodeEvent extends React.Component<
     return Math.max(MINIMUM_EDITOR_HEIGHT, heightToFillSheet);
   };
 
-  render() {
+  render(): React.Node {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
 

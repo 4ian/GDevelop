@@ -18,7 +18,7 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
   Props,
   {||}
 > {
-  render() {
+  render(): React.Node {
     const {
       onApply,
       eventsBasedBehavior,

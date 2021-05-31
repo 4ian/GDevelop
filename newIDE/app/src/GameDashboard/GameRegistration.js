@@ -32,7 +32,7 @@ export const GameRegistration = ({
   hideIfRegistered,
   hideLoader,
   onGameRegistered,
-}: Props) => {
+}: Props): null | React.Node => {
   const {
     authenticated,
     onLogin,

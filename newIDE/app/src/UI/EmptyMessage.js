@@ -20,7 +20,7 @@ type Props = {|
   children: ?React.Node,
 |};
 
-const EmptyMessage = (props: Props) => (
+const EmptyMessage = (props: Props): React.Node => (
   <ThemeConsumer>
     {muiTheme => (
       <div style={{ ...styles.containerStyle, ...props.style }}>

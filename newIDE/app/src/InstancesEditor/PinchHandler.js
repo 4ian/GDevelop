@@ -1,7 +1,7 @@
 // @flow
 import ViewPosition from './ViewPosition';
 
-export const shouldBeHandledByPinch = (event: ?TouchEvent) => {
+export const shouldBeHandledByPinch = (event: ?TouchEvent): boolean => {
   if (!event) return false;
 
   const { targetTouches } = event;
@@ -122,11 +122,15 @@ export default class PinchHandler {
     });
   }
 
-  _startPinch = () => {
+  _startPinch: () => void = () => {
     // Nothing to do
   };
 
-  _onPinchMove = (centerX: number, centerY: number, scale: number) => {
+  _onPinchMove: (centerX: number, centerY: number, scale: number) => void = (
+    centerX: number,
+    centerY: number,
+    scale: number
+  ) => {
     if (this._lastPinchCenterX === null || this._lastPinchCenterY === null) {
       this._lastPinchCenterX = centerX;
       this._lastPinchCenterY = centerY;
@@ -144,12 +148,12 @@ export default class PinchHandler {
     this._setZoomFactor(this._getZoomFactor() * scale);
   };
 
-  _endPinch = () => {
+  _endPinch: () => void = () => {
     this._lastPinchCenterX = null;
     this._lastPinchCenterY = null;
   };
 
-  unmount = () => {
+  unmount: () => void = () => {
     this._unregisterCanvasPinchDetector();
   };
 }

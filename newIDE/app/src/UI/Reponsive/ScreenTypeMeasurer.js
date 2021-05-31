@@ -23,7 +23,7 @@ type Props = {|
 /**
  * Check if the screen is a touchscreen or not.
  */
-export const ScreenTypeMeasurer = ({ children }: Props) => {
+export const ScreenTypeMeasurer = ({ children }: Props): React.Node => {
   if (typeof window === 'undefined') {
     return children('normal');
   }
@@ -32,7 +32,7 @@ export const ScreenTypeMeasurer = ({ children }: Props) => {
 };
 
 /** Return if the screen is a touchscreen or not. */
-export const useScreenType = () => {
+export const useScreenType = (): string => {
   // Note: this is not a React hook but is named as one to encourage
   // components to use it as such, so that it could be reworked
   // at some point to use a context (verify in this case all usages).

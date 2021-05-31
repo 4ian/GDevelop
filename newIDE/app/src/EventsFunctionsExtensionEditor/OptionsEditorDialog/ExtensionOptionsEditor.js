@@ -1,4 +1,5 @@
 //@flow
+import type { Node } from 'React';
 import React from 'react';
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
@@ -108,7 +109,7 @@ export const ExtensionOptionsEditor = ({
   eventsFunctionsExtension,
   onLoadChange,
   isLoading,
-}: Props) => {
+}: Props): Node => {
   const forceUpdate = useForceUpdate();
   const [resourceStoreOpen, setResourceStoreOpen] = React.useState(false);
   const isMounted = useIsMounted();

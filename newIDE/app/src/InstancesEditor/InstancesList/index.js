@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import {
@@ -41,13 +42,13 @@ const styles = {
 };
 
 export default class InstancesList extends Component<Props, State> {
-  state = {
+  state: State = {
     searchText: '',
   };
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
-  _searchBar = React.createRef<SearchBar>();
+  _searchBar: {| current: null | SearchBar |} = React.createRef<SearchBar>();
 
   componentDidMount() {
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
@@ -84,16 +85,28 @@ export default class InstancesList extends Component<Props, State> {
     if (this.instanceRowRenderer) this.instanceRowRenderer.delete();
   }
 
-  _onRowClick = ({ index }: { index: number }) => {
+  _onRowClick: ({ index: number, ... }) => void = ({
+    index,
+  }: {
+    index: number,
+  }) => {
     if (!this.renderedRows[index]) return;
     this.props.onSelectInstances([this.renderedRows[index].instance]);
   };
 
-  _rowGetter = ({ index }: { index: number }) => {
+  _rowGetter: ({ index: number, ... }) => RenderedRowInfo = ({
+    index,
+  }: {
+    index: number,
+  }) => {
     return this.renderedRows[index];
   };
 
-  _rowClassName = ({ index }: { index: number }) => {
+  _rowClassName: ({ index: number, ... }) => string = ({
+    index,
+  }: {
+    index: number,
+  }) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -105,13 +118,13 @@ export default class InstancesList extends Component<Props, State> {
     }
   };
 
-  _selectFirstInstance = () => {
+  _selectFirstInstance: () => void = () => {
     if (this.renderedRows.length) {
       this.props.onSelectInstances([this.renderedRows[0].instance]);
     }
   };
 
-  render() {
+  render(): null | Node {
     const { searchText } = this.state;
     const { instances } = this.props;
 

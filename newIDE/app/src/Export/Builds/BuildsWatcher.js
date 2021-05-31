@@ -9,7 +9,7 @@ const maxTimeBeforeIgnoring = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 export default class BuildsWatcher {
   runningWatchers: { [string]: boolean } = {};
-  nextWatcherId = 0;
+  nextWatcherId: number = 0;
   onBuildUpdated: ?(build: Build) => void;
   userProfile: ?UserProfile;
 
@@ -52,7 +52,10 @@ export default class BuildsWatcher {
     this.runningWatchers = {};
   }
 
-  _pollBuild = async (buildId: string, waitTime: number) => {
+  _pollBuild: (buildId: string, waitTime: number) => Promise<void> = async (
+    buildId: string,
+    waitTime: number
+  ) => {
     const watcherId = this.nextWatcherId.toString();
     this.nextWatcherId++;
 

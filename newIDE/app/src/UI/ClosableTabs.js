@@ -1,4 +1,5 @@
 // @flow
+import type { Node as $IMPORTED_TYPE$_Node, Element } from 'React';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { Component, useEffect, type Node, useRef } from 'react';
@@ -57,11 +58,11 @@ type TabContentContainerProps = {|
  * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
  */
 export class TabContentContainer extends Component<TabContentContainerProps> {
-  shouldComponentUpdate(nextProps: TabContentContainerProps) {
+  shouldComponentUpdate(nextProps: TabContentContainerProps): boolean {
     return this.props.active || nextProps.active;
   }
 
-  render() {
+  render(): Element<'div'> {
     const { children, active } = this.props;
     return (
       <div
@@ -82,7 +83,7 @@ type ClosableTabsProps = {|
 |};
 
 export class ClosableTabs extends Component<ClosableTabsProps> {
-  render() {
+  render(): $IMPORTED_TYPE$_Node {
     const { hideLabels, children } = this.props;
 
     return (
@@ -124,7 +125,7 @@ export function ClosableTab({
   closable,
   onClick,
   onActivated,
-}: ClosableTabProps) {
+}: ClosableTabProps): $IMPORTED_TYPE$_Node {
   useEffect(
     () => {
       if (active) {

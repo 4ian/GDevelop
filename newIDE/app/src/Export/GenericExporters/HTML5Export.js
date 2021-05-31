@@ -8,7 +8,7 @@ import FlatButton from '../../UI/FlatButton';
 import { Column, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Text>
     <Trans>This will export your game to a folder.</Trans>
     <Trans>
@@ -23,7 +23,7 @@ export const DoneFooter = ({
   renderGameButton,
 }: {|
   renderGameButton: () => React.Node,
-|}) => (
+|}): React.Node => (
   <Column noMargin>
     <Text>
       <Trans>

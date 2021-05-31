@@ -211,7 +211,7 @@ export type Props = {
   i18n: I18n,
 };
 
-const MainFrame = (props: Props) => {
+const MainFrame = (props: Props): React.Element<'div'> => {
   const [state, setState]: [
     State,
     ((State => State) | State) => Promise<State>,

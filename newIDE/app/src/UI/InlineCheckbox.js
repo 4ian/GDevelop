@@ -16,7 +16,7 @@ type Props = {|
  * A checkbox based on Material-UI Checkbox, but that can be displayed
  * without having it taking the full width of its container.
  */
-export default (props: Props) => {
+export default (props: Props): React.Node => {
   const { onCheck } = props;
   const checkbox = (
     <Checkbox

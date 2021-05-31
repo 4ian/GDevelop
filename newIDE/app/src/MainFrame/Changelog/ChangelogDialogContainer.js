@@ -38,7 +38,7 @@ class ChangelogDialogContainer extends React.Component<
  * The container showing the ChangelogDialog only if a a new version
  * of GDevelop is detected.
  */
-export default (props: {||}) => (
+export default (props: {||}): React.Node => (
   <PreferencesContext.Consumer>
     {({ values, verifyIfIsNewVersion }) => (
       <ChangelogDialogContainer

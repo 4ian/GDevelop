@@ -48,7 +48,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     eventsFunction: null,
     extensionName: '',
     createNewExtension: false,
@@ -91,7 +91,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     if (eventsFunction) eventsFunction.delete();
   }
 
-  render() {
+  render(): null | React.Node {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
     if (!eventsFunction) return null;

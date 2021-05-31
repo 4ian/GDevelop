@@ -31,7 +31,7 @@ export default class ForEachEvent extends React.Component<
   EventRendererProps,
   *
 > {
-  render() {
+  render(): React.Element<'div'> {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
     return (

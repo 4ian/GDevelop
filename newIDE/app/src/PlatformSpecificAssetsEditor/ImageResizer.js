@@ -2,7 +2,7 @@
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 const lazyRequireJimp = optionalLazyRequire('jimp');
 
-export const isResizeSupported = () => {
+export const isResizeSupported = (): any | boolean => {
   const Jimp = lazyRequireJimp();
   return !!Jimp;
 };

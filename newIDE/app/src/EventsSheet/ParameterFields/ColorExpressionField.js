@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
@@ -34,7 +35,7 @@ export default class ParameterColorField extends Component<ParameterFieldProps> 
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     return (
       <GenericExpressionField
         expressionType="string"

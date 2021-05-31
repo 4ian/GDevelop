@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 
-export const ExplanationHeader = () => (
+export const ExplanationHeader = (): React.Node => (
   <Text>
     <Trans>
       Packaging your game for Android will create an APK file that can be

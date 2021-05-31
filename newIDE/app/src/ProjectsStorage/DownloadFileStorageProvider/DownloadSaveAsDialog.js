@@ -16,7 +16,7 @@ type Props = {|
 |};
 
 export default class DownloadSaveAsDialog extends React.Component<Props> {
-  _download = () => {
+  _download: () => void = () => {
     let content = '';
     try {
       content = JSON.stringify(serializeToJSObject(this.props.project));
@@ -42,7 +42,7 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
     body.removeChild(downloadLink);
   };
 
-  render() {
+  render(): React.Node {
     const { onDone } = this.props;
 
     const actions = [

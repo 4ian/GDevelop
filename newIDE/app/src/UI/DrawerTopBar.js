@@ -29,7 +29,7 @@ const styles = {
   title: { fontSize: '15px', flexGrow: 1 },
 };
 
-export default (props: Props) => {
+export default (props: Props): React.Node => {
   return (
     <AppBar
       position="static"

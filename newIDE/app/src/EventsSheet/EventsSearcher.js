@@ -49,7 +49,7 @@ type Props = {|
  * to its children components, as well as methods to browse the results.
  */
 export default class EventsSearcher extends React.Component<Props, State> {
-  state = {
+  state: State = {
     eventsSearchResults: null, // The list of results
     searchFocusOffset: null,
   };
@@ -72,7 +72,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     });
   }
 
-  _doReplaceInEvents = ({
+  _doReplaceInEvents: ReplaceInEventsInputs => void = ({
     searchInSelection,
     searchText,
     replaceText,
@@ -105,7 +105,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     );
   };
 
-  _doSearchInEvents = (
+  _doSearchInEvents: (SearchInEventsInputs, cb: () => void) => void = (
     {
       searchInSelection,
       searchText,
@@ -151,7 +151,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     );
   };
 
-  _updateListOfResultEvents = () => {
+  _updateListOfResultEvents: () => void = () => {
     const { eventsSearchResults } = this.state;
     if (!eventsSearchResults) {
       this._resultEvents = null;
@@ -174,7 +174,9 @@ export default class EventsSearcher extends React.Component<Props, State> {
     this._resultEvents = uniqBy(resultEventsWithDuplicates, event => event.ptr);
   };
 
-  _goToSearchResults = (step: number): ?gdBaseEvent => {
+  _goToSearchResults: (step: number) => ?gdBaseEvent = (
+    step: number
+  ): ?gdBaseEvent => {
     this._updateListOfResultEvents();
     if (!this._resultEvents || this._resultEvents.length === 0) {
       this.setState({ searchFocusOffset: null });
@@ -198,15 +200,15 @@ export default class EventsSearcher extends React.Component<Props, State> {
     return event;
   };
 
-  _goToPreviousSearchResult = (): ?gdBaseEvent => {
+  _goToPreviousSearchResult: () => ?gdBaseEvent = (): ?gdBaseEvent => {
     return this._goToSearchResults(-1);
   };
 
-  _goToNextSearchResult = (): ?gdBaseEvent => {
+  _goToNextSearchResult: () => ?gdBaseEvent = (): ?gdBaseEvent => {
     return this._goToSearchResults(+1);
   };
 
-  render() {
+  render(): React.Node {
     return this.props.children({
       eventsSearchResultEvents: this._resultEvents,
       searchFocusOffset: this.state.searchFocusOffset,

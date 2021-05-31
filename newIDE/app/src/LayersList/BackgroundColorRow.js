@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import React from 'react';
@@ -12,7 +13,7 @@ type Props = {|
   onBackgroundColorChanged: () => void,
 |};
 
-export default ({ layout, onBackgroundColorChanged }: Props) => (
+export default ({ layout, onBackgroundColorChanged }: Props): Node => (
   <I18n>
     {({ i18n }) => (
       <TreeTableRow>

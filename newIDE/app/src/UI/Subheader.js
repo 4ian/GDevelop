@@ -11,7 +11,7 @@ const style = {
 };
 
 // A Subheader to be displayed in a List.
-export default ({ children }: Props) =>
+export default ({ children }: Props): null | React.Node =>
   children ? (
     <Typography variant={'overline'} style={style}>
       {children}

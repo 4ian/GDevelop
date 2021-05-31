@@ -59,7 +59,7 @@ export const TextFieldWithButtonLayout = ({
   noFloatingLabelText,
   renderTextField,
   renderButton,
-}: TextFieldWithButtonLayoutProps) => {
+}: TextFieldWithButtonLayoutProps): React.Element<'div'> => {
   return (
     <div style={textFieldWithButtonLayoutStyles.container}>
       {renderTextField()}
@@ -94,7 +94,7 @@ export const ResponsiveLineStackLayout = ({
   noMargin,
   noColumnMargin,
   children,
-}: ResponsiveLineStackLayoutProps) => {
+}: ResponsiveLineStackLayoutProps): React.Node => {
   const windowWidth = useResponsiveWindowWidth();
   let isFirstChild = true;
 
@@ -140,7 +140,7 @@ export const ColumnStackLayout = ({
   expand,
   noMargin,
   children,
-}: ColumnStackLayoutProps) => {
+}: ColumnStackLayoutProps): React.Node => {
   let isFirstChild = true;
   return (
     <Column

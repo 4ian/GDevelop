@@ -153,7 +153,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _fieldElement: ?Element = null;
   _inputElement: ?HTMLInputElement = null;
 
-  state = {
+  state: State = {
     popoverOpen: false,
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
@@ -174,31 +174,33 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = () => {
+  focus: () => void = () => {
     if (this._field) {
       this._field.focus();
       this._enqueueValidation();
     }
   };
 
-  _openExpressionPopover = () => {
+  _openExpressionPopover: () => void = () => {
     this.setState({
       popoverOpen: true,
     });
   };
 
-  _handleFocus = (event: { preventDefault: () => void }) => {
+  _handleFocus: (event: { preventDefault: () => void, ... }) => void = (event: {
+    preventDefault: () => void,
+  }) => {
     // This prevents ghost click.
     event.preventDefault();
   };
 
-  _handleRequestClose = () => {
+  _handleRequestClose: () => void = () => {
     this.setState({
       popoverOpen: false,
     });
   };
 
-  _handleChange = (value: string) => {
+  _handleChange: (value: string) => void = (value: string) => {
     this.setState(
       {
         validatedValue: value,
@@ -207,10 +209,14 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   };
 
-  _handleBlur = (event: { currentTarget: { value: string } }) => {
+  _handleBlur: (event: {
+    currentTarget: { value: string, ... },
+    ...
+  }) => void = (event: { currentTarget: { value: string } }) => {
     const value = event.currentTarget.value;
     if (this.props.onChange) this.props.onChange(value);
     this.setState({ validatedValue: value }, () => {
+      // $FlowFixMe
       this._enqueueValidation.cancel();
       this._doValidation();
       this.setState({
@@ -219,7 +225,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
-  _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
+  _handleExpressionChosen: (
+    expressionInfo: EnumeratedExpressionMetadata
+  ) => void = (expressionInfo: EnumeratedExpressionMetadata) => {
     this.setState({
       popoverOpen: false,
       parametersDialogOpen: true,
@@ -227,7 +235,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
-  insertExpression = (
+  insertExpression: (
+    expressionInfo: EnumeratedExpressionMetadata,
+    parameterValues: ParameterValues
+  ) => void = (
     expressionInfo: EnumeratedExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
@@ -267,9 +278,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     }, 5);
   };
 
-  _insertAutocompletion = (
+  _insertAutocompletion: (
     expressionAutocompletion: ExpressionAutocompletion
-  ) => {
+  ) => void = (expressionAutocompletion: ExpressionAutocompletion) => {
     // If the completion is exact, it's not a completion but just
     // shown for informing the user.
     if (expressionAutocompletion.isExact) return;
@@ -314,7 +325,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     this._doValidation();
   }, 250);
 
-  _doValidation = () => {
+  _doValidation: () => null | void = () => {
     const {
       project,
       globalObjectsContainer,
@@ -376,7 +387,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     }));
   };
 
-  render() {
+  render(): React.Node {
     const {
       value,
       expressionType,

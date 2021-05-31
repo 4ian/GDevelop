@@ -310,7 +310,7 @@ type State = {|
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
 
-  state = {
+  state: State = {
     editedPropertiesLayout: null,
     editedVariablesLayout: null,
     renamedItemKind: null,
@@ -323,7 +323,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     layoutVariablesDialogOpen: false,
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
     if (
       nextState.projectPropertiesDialogOpen !==
       this.state.projectPropertiesDialogOpen
@@ -349,38 +349,41 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
   }
 
-  _openProjectProperties = () => {
+  _openProjectProperties: () => void = () => {
     this.setState({
       projectPropertiesDialogOpen: true,
     });
   };
 
-  _openProjectVariables = () => {
+  _openProjectVariables: () => void = () => {
     this.setState({
       projectVariablesEditorOpen: true,
     });
   };
 
-  _onEditName = (kind: ?string, name: string) => {
+  _onEditName: (kind: ?string, name: string) => void = (
+    kind: ?string,
+    name: string
+  ) => {
     this.setState({
       renamedItemKind: kind,
       renamedItemName: name,
     });
   };
 
-  _copyLayout = (layout: gdLayout) => {
+  _copyLayout: (layout: gdLayout) => void = (layout: gdLayout) => {
     Clipboard.set(LAYOUT_CLIPBOARD_KIND, {
       layout: serializeToJSObject(layout),
       name: layout.getName(),
     });
   };
 
-  _cutLayout = (layout: gdLayout) => {
+  _cutLayout: (layout: gdLayout) => void = (layout: gdLayout) => {
     this._copyLayout(layout);
     this.props.onDeleteLayout(layout);
   };
 
-  _pasteLayout = (index: number) => {
+  _pasteLayout: (index: number) => void = (index: number) => {
     if (!Clipboard.has(LAYOUT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
@@ -411,12 +414,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _duplicateLayout = (layout: gdLayout, index: number) => {
+  _duplicateLayout: (layout: gdLayout, index: number) => void = (
+    layout: gdLayout,
+    index: number
+  ) => {
     this._copyLayout(layout);
     this._pasteLayout(index);
   };
 
-  _addLayout = (index: number) => {
+  _addLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
 
     const newName = newNameGenerator('New scene', name =>
@@ -430,15 +436,17 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _onOpenLayoutProperties = (layout: ?gdLayout) => {
+  _onOpenLayoutProperties: (layout: ?gdLayout) => void = (
+    layout: ?gdLayout
+  ) => {
     this.setState({ editedPropertiesLayout: layout });
   };
 
-  _onOpenLayoutVariables = (layout: ?gdLayout) => {
+  _onOpenLayoutVariables: (layout: ?gdLayout) => void = (layout: ?gdLayout) => {
     this.setState({ editedVariablesLayout: layout });
   };
 
-  _addExternalEvents = (index: number) => {
+  _addExternalEvents: (index: number) => void = (index: number) => {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExternalEvents', name =>
@@ -448,7 +456,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _addExternalLayout = (index: number) => {
+  _addExternalLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExternalLayout', name =>
@@ -458,7 +466,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _addEventsFunctionsExtension = (index: number) => {
+  _addEventsFunctionsExtension: (index: number) => void = (index: number) => {
     const { project } = this.props;
 
     const newName = newNameGenerator('NewExtension', name =>
@@ -468,7 +476,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _moveUpLayout = (index: number) => {
+  _moveUpLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
 
@@ -476,7 +484,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _moveDownLayout = (index: number) => {
+  _moveDownLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index >= project.getLayoutsCount() - 1) return;
 
@@ -484,19 +492,23 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _copyExternalEvents = (externalEvents: gdExternalEvents) => {
+  _copyExternalEvents: (externalEvents: gdExternalEvents) => void = (
+    externalEvents: gdExternalEvents
+  ) => {
     Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
       externalEvents: serializeToJSObject(externalEvents),
       name: externalEvents.getName(),
     });
   };
 
-  _cutExternalEvents = (externalEvents: gdExternalEvents) => {
+  _cutExternalEvents: (externalEvents: gdExternalEvents) => void = (
+    externalEvents: gdExternalEvents
+  ) => {
     this._copyExternalEvents(externalEvents);
     this.props.onDeleteExternalEvents(externalEvents);
   };
 
-  _pasteExternalEvents = (index: number) => {
+  _pasteExternalEvents: (index: number) => void = (index: number) => {
     if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EXTERNAL_EVENTS_CLIPBOARD_KIND);
@@ -526,15 +538,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _duplicateExternalEvents = (
+  _duplicateExternalEvents: (
     externalEvents: gdExternalEvents,
     index: number
-  ) => {
+  ) => void = (externalEvents: gdExternalEvents, index: number) => {
     this._copyExternalEvents(externalEvents);
     this._pasteExternalEvents(index);
   };
 
-  _moveUpExternalEvents = (index: number) => {
+  _moveUpExternalEvents: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
 
@@ -542,7 +554,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _moveDownExternalEvents = (index: number) => {
+  _moveDownExternalEvents: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index >= project.getExternalEventsCount() - 1) return;
 
@@ -550,19 +562,23 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _copyExternalLayout = (externalLayout: gdExternalLayout) => {
+  _copyExternalLayout: (externalLayout: gdExternalLayout) => void = (
+    externalLayout: gdExternalLayout
+  ) => {
     Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
       externalLayout: serializeToJSObject(externalLayout),
       name: externalLayout.getName(),
     });
   };
 
-  _cutExternalLayout = (externalLayout: gdExternalLayout) => {
+  _cutExternalLayout: (externalLayout: gdExternalLayout) => void = (
+    externalLayout: gdExternalLayout
+  ) => {
     this._copyExternalLayout(externalLayout);
     this.props.onDeleteExternalLayout(externalLayout);
   };
 
-  _pasteExternalLayout = (index: number) => {
+  _pasteExternalLayout: (index: number) => void = (index: number) => {
     if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(EXTERNAL_LAYOUT_CLIPBOARD_KIND);
@@ -586,15 +602,15 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _duplicateExternalLayout = (
+  _duplicateExternalLayout: (
     externalLayout: gdExternalLayout,
     index: number
-  ) => {
+  ) => void = (externalLayout: gdExternalLayout, index: number) => {
     this._copyExternalLayout(externalLayout);
     this._pasteExternalLayout(index);
   };
 
-  _moveUpExternalLayout = (index: number) => {
+  _moveUpExternalLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index <= 0) return;
 
@@ -602,7 +618,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _moveDownExternalLayout = (index: number) => {
+  _moveDownExternalLayout: (index: number) => void = (index: number) => {
     const { project } = this.props;
     if (index >= project.getExternalLayoutsCount() - 1) return;
 
@@ -610,23 +626,26 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _copyEventsFunctionsExtension = (
+  _copyEventsFunctionsExtension: (
     eventsFunctionsExtension: gdEventsFunctionsExtension
-  ) => {
+  ) => void = (eventsFunctionsExtension: gdEventsFunctionsExtension) => {
     Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
       eventsFunctionsExtension: serializeToJSObject(eventsFunctionsExtension),
       name: eventsFunctionsExtension.getName(),
     });
   };
 
-  _cutEventsFunctionsExtension = (
+  _cutEventsFunctionsExtension: (
     eventsFunctionsExtension: gdEventsFunctionsExtension
-  ) => {
+  ) => void = (eventsFunctionsExtension: gdEventsFunctionsExtension) => {
     this._copyEventsFunctionsExtension(eventsFunctionsExtension);
     this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
   };
 
-  _duplicateEventsFunctionsExtension = (
+  _duplicateEventsFunctionsExtension: (
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    index: number
+  ) => void = (
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     index: number
   ) => {
@@ -634,7 +653,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._pasteEventsFunctionsExtension(index);
   };
 
-  _pasteEventsFunctionsExtension = (index: number) => {
+  _pasteEventsFunctionsExtension: (index: number) => void = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
 
     const clipboardContent = Clipboard.get(
@@ -670,7 +689,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.props.onReloadEventsFunctionsExtensions();
   };
 
-  _moveUpEventsFunctionsExtension = (index: number) => {
+  _moveUpEventsFunctionsExtension: (index: number) => void = (
+    index: number
+  ) => {
     const { project } = this.props;
     if (index <= 0) return;
 
@@ -678,7 +699,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _moveDownEventsFunctionsExtension = (index: number) => {
+  _moveDownEventsFunctionsExtension: (index: number) => void = (
+    index: number
+  ) => {
     const { project } = this.props;
     if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
 
@@ -686,7 +709,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _renderMenu() {
+  _renderMenu(): null | React.Node {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
     if (Window.hasMainMenu()) return null;
@@ -739,22 +762,22 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
   }
 
-  _onSearchChange = (text: string) =>
+  _onSearchChange: (text: string) => void = (text: string) =>
     this.setState({
       searchText: text,
     });
 
-  _onRequestSearch = () => {
+  _onRequestSearch: () => void = () => {
     /* Do nothing for now, but we could open the first result. */
   };
 
-  _onProjectItemModified = () => {
+  _onProjectItemModified: () => void = () => {
     this.forceUpdate();
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const {
       project,
       eventsFunctionsExtensionsError,

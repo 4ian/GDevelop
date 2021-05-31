@@ -7,7 +7,7 @@ import Text from '../UI/Text';
 import Paper from '@material-ui/core/Paper';
 import { Line, Column } from '../UI/Grid';
 
-const EmptyBehaviorsPlaceholder = () => (
+const EmptyBehaviorsPlaceholder = (): React.Node => (
   <Column alignItems="center">
     <Paper
       variant="outlined"

@@ -15,7 +15,7 @@ type Props = {|
 |};
 
 export class Toolbar extends React.PureComponent<Props> {
-  render() {
+  render(): React.Node {
     const {
       onPlay,
       onPause,

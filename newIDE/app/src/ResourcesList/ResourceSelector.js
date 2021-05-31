@@ -112,7 +112,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     this.autoCompleteData = [...resourceSourceItems, ...resourceItems];
   }
 
-  _addFrom = (source: ResourceSource) => {
+  _addFrom: (source: ResourceSource) => void = (source: ResourceSource) => {
     if (!source) return;
 
     const { project, onChooseResource } = this.props;
@@ -146,7 +146,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
   };
 
-  _onResetResourceName = () => {
+  _onResetResourceName: () => void = () => {
     this.setState(
       {
         resourceName: '',
@@ -158,7 +158,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
     );
   };
 
-  _onChangeResourceName = (resourceName: string) => {
+  _onChangeResourceName: (resourceName: string) => void = (
+    resourceName: string
+  ) => {
     if (resourceName === '') {
       this._onResetResourceName();
       return;
@@ -176,7 +178,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
     );
   };
 
-  _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
+  _editWith: (resourceExternalEditor: ResourceExternalEditor) => void = (
+    resourceExternalEditor: ResourceExternalEditor
+  ) => {
     const { project, resourcesLoader, resourceKind } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
@@ -251,7 +255,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     }
   };
 
-  render() {
+  render(): React.Node {
     const errorText = this.state.notExistingError
       ? 'This resource does not exist in the game'
       : null;

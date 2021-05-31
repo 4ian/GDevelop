@@ -49,7 +49,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     index: number,
     windowWidth: WidthType,
     connectIconDragSource?: ?(React.Element<any>) => ?React.Node
-  ) {
+  ): React.Node {
     const {
       selectedItems,
       getItemThumbnail,
@@ -86,7 +86,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     );
   }
 
-  render() {
+  render(): React.Node {
     const {
       height,
       width,

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -16,7 +17,7 @@ export default class AudioResourceField extends Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): null | Node {
     if (
       !this.props.resourceSources ||
       !this.props.onChooseResource ||

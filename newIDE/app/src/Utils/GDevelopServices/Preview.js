@@ -23,6 +23,6 @@ export const uploadObject = (params: UploadedObject): Promise<any> => {
   );
 };
 
-export const getBaseUrl = () => {
+export const getBaseUrl = (): string => {
   return GDevelopGamePreviews.baseUrl;
 };

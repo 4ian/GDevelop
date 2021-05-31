@@ -47,7 +47,7 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   return true;
 };
 
-export default (props: Props) => (
+export default (props: Props): React.Node => (
   <React.Fragment>
     <Text>
       <Trans>General:</Trans>

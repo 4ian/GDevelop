@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import Add from '@material-ui/icons/Add';
@@ -25,7 +26,7 @@ const EditVariableRow = ({
   onPaste,
   hasClipboard,
   onDeleteSelection,
-}: Props) => (
+}: Props): Node => (
   <Line justifyContent="space-between" alignItems="center">
     <Column>
       <Line noMargin>

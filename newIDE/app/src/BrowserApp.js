@@ -28,7 +28,7 @@ import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
-export const create = (authentification: Authentification) => {
+export const create = (authentification: Authentification): React.Node => {
   Window.setUpContextMenu();
 
   let app = null;

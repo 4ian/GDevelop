@@ -1,4 +1,5 @@
 // @flow
+import type { Node, Element } from 'React';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -70,7 +71,7 @@ export default class VariableField extends Component<Props, State> {
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): Node {
     const {
       value,
       onChange,
@@ -128,7 +129,7 @@ export const renderVariableWithIcon = (
   }: ParameterInlineRendererProps,
   iconPath: string,
   tooltip: string
-) => {
+): Element<'span'> | Node => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }

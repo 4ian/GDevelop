@@ -8,6 +8,6 @@ type Props = {|
   color: 'error' | 'primary' | 'secondary' | 'default',
 |};
 
-export default function Badge(props: Props) {
+export default function Badge(props: Props): React.Node {
   return <MuiBadge {...props} />;
 }

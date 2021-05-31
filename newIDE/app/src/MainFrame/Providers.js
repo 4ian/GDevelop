@@ -56,7 +56,7 @@ type Props = {|
  * so that these modules can be used in the children.
  */
 export default class Providers extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     const {
       disableCheckForUpdates,
       authentification,

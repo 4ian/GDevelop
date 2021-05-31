@@ -23,7 +23,7 @@ export const renderObjectListItem = ({
   iconSize,
   onClick,
   selectedValue,
-}: Props) => {
+}: Props): React.Node => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem

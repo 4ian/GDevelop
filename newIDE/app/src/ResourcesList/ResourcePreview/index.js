@@ -25,7 +25,7 @@ type State = {|
  * Display the right preview for any given resource of a project
  */
 export default class ResourcePreview extends React.PureComponent<Props, State> {
-  state = this._loadFrom(this.props);
+  state: State = this._loadFrom(this.props);
 
   componentWillReceiveProps(newProps: Props) {
     if (
@@ -49,7 +49,7 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
     };
   }
 
-  render() {
+  render(): null | React.Node {
     const { resourceKind } = this.state;
 
     switch (resourceKind) {

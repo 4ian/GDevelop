@@ -35,7 +35,7 @@ const addSearchParameterToUrl = (
  * On the contrary, if you're displaying a built-in GDevelop image, coming for example from the
  * "res/" folder (i.e: a GDevelop icon), you don't need this and can use `<img>` as usual.
  */
-export const CorsAwareImage = (props: Props) => (
+export const CorsAwareImage = (props: Props): React.Element<'img'> => (
   <img // eslint-disable-line jsx-a11y/alt-text
     {...props}
     src={

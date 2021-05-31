@@ -50,24 +50,26 @@ const styles = {
 };
 
 class ColorPicker extends React.Component<Props, State> {
-  _swatch = React.createRef<HTMLDivElement>();
-  state = {
+  _swatch: {|
+    current: null | HTMLDivElement,
+  |} = React.createRef<HTMLDivElement>();
+  state: State = {
     displayColorPicker: false,
   };
 
-  open = () => {
+  open: () => void = () => {
     this.setState({ displayColorPicker: true });
   };
 
-  handleClick = () => {
+  handleClick: () => void = () => {
     this.setState({ displayColorPicker: !this.state.displayColorPicker });
   };
 
-  handleClose = () => {
+  handleClose: () => void = () => {
     this.setState({ displayColorPicker: false });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const { style, color, ...otherProps } = this.props;
 
     const displayedColor = color

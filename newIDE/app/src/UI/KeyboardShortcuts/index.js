@@ -50,45 +50,47 @@ type ConstructorArgs = {|
 export default class KeyboardShortcuts {
   _shortcutCallbacks: ShortcutCallbacks;
   _isActive: ?() => boolean;
-  _shiftPressed = false;
-  _ctrlPressed = false;
-  _altPressed = false;
-  _metaPressed = false;
+  _shiftPressed: boolean = false;
+  _ctrlPressed: boolean = false;
+  _altPressed: boolean = false;
+  _metaPressed: boolean = false;
 
   constructor({ isActive, shortcutCallbacks }: ConstructorArgs) {
     this._shortcutCallbacks = shortcutCallbacks;
     this._isActive = isActive;
   }
 
-  shouldCloneInstances() {
+  shouldCloneInstances(): boolean {
     return this._isControlOrCmdPressed();
   }
 
-  shouldMultiSelect() {
+  shouldMultiSelect(): boolean {
     return this._shiftPressed;
   }
 
-  _updateModifiersFromEvent = (evt: KeyboardEvent | DragEvent) => {
+  _updateModifiersFromEvent: (evt: KeyboardEvent | DragEvent) => void = (
+    evt: KeyboardEvent | DragEvent
+  ) => {
     this._metaPressed = evt.metaKey;
     this._altPressed = evt.altKey;
     this._ctrlPressed = evt.ctrlKey;
     this._shiftPressed = evt.shiftKey;
   };
 
-  _isControlOrCmdPressed = () => {
+  _isControlOrCmdPressed: () => boolean = () => {
     // On macOS, meta key (Apple/Command key) acts as Control key on Windows/Linux.
     return this._metaPressed || this._ctrlPressed;
   };
 
-  onDragOver = (evt: DragEvent) => {
+  onDragOver: (evt: DragEvent) => void = (evt: DragEvent) => {
     this._updateModifiersFromEvent(evt);
   };
 
-  onKeyUp = (evt: KeyboardEvent) => {
+  onKeyUp: (evt: KeyboardEvent) => void = (evt: KeyboardEvent) => {
     this._updateModifiersFromEvent(evt);
   };
 
-  onKeyDown = (evt: KeyboardEvent) => {
+  onKeyDown: (evt: KeyboardEvent) => void = (evt: KeyboardEvent) => {
     this._updateModifiersFromEvent(evt);
 
     if (this._isActive && !this._isActive()) return;

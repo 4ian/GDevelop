@@ -23,14 +23,14 @@ export default class BehaviorTypeSelector extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     behaviorMetadata: enumerateBehaviorsMetadata(
       this.props.project.getCurrentPlatform(),
       this.props.project
     ),
   };
 
-  render() {
+  render(): React.Node {
     const { disabled, objectType, value, onChange } = this.props;
     const { behaviorMetadata } = this.state;
 

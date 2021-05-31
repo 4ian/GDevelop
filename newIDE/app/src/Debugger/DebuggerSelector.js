@@ -12,7 +12,7 @@ type Props = {|
 |};
 
 export default class DebuggerSelector extends React.Component<Props, void> {
-  render() {
+  render(): React.Node {
     const hasDebuggers = !!this.props.debuggerIds.length;
     return (
       <SelectField

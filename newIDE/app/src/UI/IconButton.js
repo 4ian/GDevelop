@@ -52,7 +52,7 @@ type Props = {|
  * Supports displaying a tooltip.
  */
 export default class IconButton extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     const { tooltip, acceleratorString, ...otherProps } = this.props;
     const iconButton = <MUIIconButton {...otherProps} />;
 

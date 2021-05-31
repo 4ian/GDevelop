@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t, Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -144,7 +145,7 @@ const hasLightingLayer = (layout: gdLayout) => {
 };
 
 export default class LayersList extends Component<Props, State> {
-  _addLayer = () => {
+  _addLayer: () => void = () => {
     const { layersContainer } = this.props;
     const name = newNameGenerator('Layer', name =>
       layersContainer.hasLayerNamed(name)
@@ -153,7 +154,7 @@ export default class LayersList extends Component<Props, State> {
     this._onLayerModified();
   };
 
-  _addLightingLayer = () => {
+  _addLightingLayer: () => void = () => {
     const { layersContainer } = this.props;
     const name = newNameGenerator('Lighting', name =>
       layersContainer.hasLayerNamed(name)
@@ -166,13 +167,13 @@ export default class LayersList extends Component<Props, State> {
     this._onLayerModified();
   };
 
-  _onLayerModified = () => {
+  _onLayerModified: () => void = () => {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
     this.forceUpdate();
   };
 
-  render() {
+  render(): Node {
     // Force the list to be mounted again if layersContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.

@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { enumerateAllExpressions } from '../../../InstructionOrExpression/EnumerateExpressions';
 import InstructionOrExpressionSelector from './index';
@@ -33,7 +34,7 @@ export default class ExpressionSelector extends Component<Props, {||}> {
   );
   instructionsInfoTree: ExpressionTreeNode = createTree(this.instructionsInfo);
 
-  render() {
+  render(): Node {
     const { expressionType, scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector

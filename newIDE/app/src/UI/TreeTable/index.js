@@ -20,7 +20,9 @@ type TreeTableRowProps = {|
   alignItems?: ?'flex-start',
 |};
 
-export const TreeTableRow = (props: TreeTableRowProps) => {
+export const TreeTableRow = (
+  props: TreeTableRowProps
+): React.Element<'div'> => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
@@ -42,7 +44,9 @@ type TreeTableCellProps = {|
   children?: React.Node,
 |};
 
-export const TreeTableCell = (props: TreeTableCellProps) => (
+export const TreeTableCell = (
+  props: TreeTableCellProps
+): React.Element<'div'> => (
   <div
     style={{
       ...styles.cell,

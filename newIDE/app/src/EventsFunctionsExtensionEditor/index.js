@@ -98,7 +98,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     selectedEventsFunction: null,
     selectedEventsBasedBehavior: null,
     editedEventsBasedBehavior: null,
@@ -127,10 +127,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this._objectsContainer) this._objectsContainer.delete();
   }
 
-  _loadEventsFunctionFrom = (
+  _loadEventsFunctionFrom: (
     project: gdProject,
     eventsFunction: gdEventsFunction
-  ) => {
+  ) => void = (project: gdProject, eventsFunction: gdEventsFunction) => {
     // Create an empty "context" of objects.
     // Avoid recreating containers if they were already created, so that
     // we keep the same objects in memory and avoid remounting components
@@ -153,7 +153,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  updateToolbar = () => {
+  updateToolbar: () => void = () => {
     if (this.editor) {
       this.editor.updateToolbar();
     } else {
@@ -161,10 +161,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  selectEventsFunctionByName = (
+  selectEventsFunctionByName: (
     functionName: string,
     behaviorName: ?string
-  ) => {
+  ) => void = (functionName: string, behaviorName: ?string) => {
     const { eventsFunctionsExtension } = this.props;
 
     if (behaviorName) {
@@ -191,7 +191,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _selectEventsFunction = (
+  _selectEventsFunction: (
+    selectedEventsFunction: ?gdEventsFunction,
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => void = (
     selectedEventsFunction: ?gdEventsFunction,
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior
   ) => {
@@ -230,7 +233,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameFreeEventsFunction = (i18n: I18nType) => (
+  _makeRenameFreeEventsFunction: (
+    i18n: I18nType
+  ) => (
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    done: (boolean) => void
+  ) => void = (i18n: I18nType) => (
     eventsFunction: gdEventsFunction,
     newName: string,
     done: boolean => void
@@ -265,7 +274,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeRenameBehaviorEventsFunction = (i18n: I18nType) => (
+  _makeRenameBehaviorEventsFunction: (
+    i18n: I18nType
+  ) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    done: (boolean) => void
+  ) => void = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     newName: string,
@@ -302,7 +318,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveFreeEventsParameter = (i18n: I18nType) => (
+  _makeMoveFreeEventsParameter: (
+    i18n: I18nType
+  ) => (
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void = (i18n: I18nType) => (
     eventsFunction: gdEventsFunction,
     oldIndex: number,
     newIndex: number,
@@ -322,7 +345,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _makeMoveBehaviorEventsParameter = (i18n: I18nType) => (
+  _makeMoveBehaviorEventsParameter: (
+    i18n: I18nType
+  ) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    oldIndex: number,
+    newIndex: number,
+    done: (boolean) => void
+  ) => void = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction,
     oldIndex: number,
@@ -344,10 +375,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _onDeleteEventsFunction = (
+  _onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
-    cb: boolean => void
-  ) => {
+    cb: (boolean) => void
+  ) => void = (eventsFunction: gdEventsFunction, cb: boolean => void) => {
     if (
       this.state.selectedEventsFunction &&
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
@@ -358,9 +389,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
-  _selectEventsBasedBehavior = (
+  _selectEventsBasedBehavior: (
     selectedEventsBasedBehavior: ?gdEventsBasedBehavior
-  ) => {
+  ) => void = (selectedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
     this.setState(
       {
         selectedEventsBasedBehavior,
@@ -383,7 +414,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
+  _makeRenameEventsBasedBehavior: (
+    i18n: I18nType
+  ) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    newName: string,
+    done: (boolean) => void
+  ) => void = (i18n: I18nType) => (
     eventsBasedBehavior: gdEventsBasedBehavior,
     newName: string,
     done: boolean => void
@@ -409,7 +446,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
-  _onEventsBasedBehaviorRenamed = () => {
+  _onEventsBasedBehaviorRenamed: () => void = () => {
     // Name of a behavior changed, so notify parent
     // that a behavior was edited (to trigger reload of extensions)
     if (this.props.onBehaviorEdited) this.props.onBehaviorEdited();
@@ -426,7 +463,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _onDeleteEventsBasedBehavior = (
+  _onDeleteEventsBasedBehavior: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    cb: (boolean) => void
+  ) => void = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     cb: boolean => void
   ) => {
@@ -440,7 +480,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
-  _onAddFreeEventsFunction = (
+  _onAddFreeEventsFunction: (
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
+  ) => void = (
     onAddEventsFunctionCb: (
       parameters: ?EventsFunctionCreationParameters
     ) => void
@@ -451,9 +495,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _onCloseExtensionFunctionSelectorDialog = (
+  _onCloseExtensionFunctionSelectorDialog: (
     parameters: ?EventsFunctionCreationParameters
-  ) => {
+  ) => void = (parameters: ?EventsFunctionCreationParameters) => {
     const { onAddEventsFunctionCb } = this.state;
     this.setState(
       {
@@ -466,7 +510,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _onAddBehaviorEventsFunction = (
+  _onAddBehaviorEventsFunction: (
+    onAddEventsFunctionCb: (
+      parameters: ?EventsFunctionCreationParameters
+    ) => void
+  ) => void = (
     onAddEventsFunctionCb: (
       parameters: ?EventsFunctionCreationParameters
     ) => void
@@ -477,9 +525,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     });
   };
 
-  _onCloseBehaviorMethodSelectorDialog = (
+  _onCloseBehaviorMethodSelectorDialog: (
     parameters: ?EventsFunctionCreationParameters
-  ) => {
+  ) => void = (parameters: ?EventsFunctionCreationParameters) => {
     const { onAddEventsFunctionCb } = this.state;
     this.setState(
       {
@@ -492,7 +540,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _onBehaviorEventsFunctionAdded = (
+  _onBehaviorEventsFunctionAdded: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction
+  ) => void = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction
   ) => {
@@ -503,7 +554,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _onBehaviorPropertyRenamed = (
+  _onBehaviorPropertyRenamed: (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    oldName: string,
+    newName: string
+  ) => void = (
     eventsBasedBehavior: gdEventsBasedBehavior,
     oldName: string,
     newName: string
@@ -518,13 +573,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _editOptions = (open: boolean = true) => {
+  _editOptions: (open?: boolean) => void = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
     });
   };
 
-  _editBehavior = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+  _editBehavior: (editedEventsBasedBehavior: ?gdEventsBasedBehavior) => void = (
+    editedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => {
     this.setState(
       state => {
         // If we're closing the properties of a behavior, ensure parameters
@@ -563,17 +620,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _openFreeFunctionsListEditor = () => {
+  _openFreeFunctionsListEditor: () => void = () => {
     if (this._editorNavigator)
       this._editorNavigator.openEditor('free-functions-list');
   };
 
-  _openBehaviorsListEditor = () => {
+  _openBehaviorsListEditor: () => void = () => {
     if (this._editorNavigator)
       this._editorNavigator.openEditor('behaviors-list');
   };
 
-  _onEditorNavigatorEditorChanged = (editorName: string) => {
+  _onEditorNavigatorEditorChanged: (editorName: string) => void = (
+    editorName: string
+  ) => {
     // It's important that this method is the same across renders,
     // to avoid confusing EditorNavigator into thinking it's changed
     // and immediately calling it, which would trigger an infinite loop.
@@ -591,7 +650,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  render() {
+  render(): React.Node {
     const { project, eventsFunctionsExtension } = this.props;
     const {
       selectedEventsFunction,

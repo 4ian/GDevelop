@@ -151,7 +151,7 @@ const getKeyDisplayName = (code: string) => {
 /**
  * Parses shortcut string into array of platform-specific key strings
  */
-export const getShortcutDisplayName = (shortcutString: string) => {
+export const getShortcutDisplayName = (shortcutString: string): string => {
   return shortcutString
     .split('+')
     .map<string>(keyCode => {
@@ -179,7 +179,7 @@ const getElectronKeyString = (code: string) => {
 /**
  * Converts given shortcut string into an Electron accelerator string
  */
-export const getElectronAccelerator = (shortcutString: string) => {
+export const getElectronAccelerator = (shortcutString: string): string => {
   return shortcutString
     .split('+')
     .map<string>(keyCode => {

@@ -83,7 +83,11 @@ type Props = {|
   error: ?Error,
 |};
 
-export const FiltersChooser = ({ filtersState, allFilters, error }: Props) => {
+export const FiltersChooser = ({
+  filtersState,
+  allFilters,
+  error,
+}: Props): null | React.Node => {
   if (!allFilters) {
     return <PlaceholderLoader />;
   }

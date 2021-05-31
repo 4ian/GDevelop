@@ -25,7 +25,7 @@ type AccordionHeadProps = {|
  * The header of an accordion section.
  * Based on Material-UI AccordionSummary.
  */
-export const AccordionHeader = (props: AccordionHeadProps) => {
+export const AccordionHeader = (props: AccordionHeadProps): React.Node => {
   return (
     <MUIAccordionSummary
       expandIcon={
@@ -58,7 +58,7 @@ type AccordionBodyProps = {|
  * The collapsible contents of an accordion section.
  * Based on Material-UI AccordionDetails.
  */
-export const AccordionBody = (props: AccordionBodyProps) => {
+export const AccordionBody = (props: AccordionBodyProps): React.Node => {
   return (
     <MUIAccordionDetails
       style={{ ...(props.disableGutters && styles.bodyRoot), ...props.style }}
@@ -78,7 +78,7 @@ type AccordionActionsProps = {|
  * actions specific to the accordion contents.
  * Based on Material-UI AccordionActions.
  */
-export const AccordionActions = (props: AccordionActionsProps) => {
+export const AccordionActions = (props: AccordionActionsProps): React.Node => {
   const accordionActions = props.secondaryActions ? (
     <React.Fragment>
       <div key="secondary-actions">{props.secondaryActions}</div>
@@ -111,7 +111,7 @@ type AccordionProps = {|
  * and accordion-specific actions.
  * Based on Material-UI Accordion.
  */
-export const Accordion = (props: AccordionProps) => {
+export const Accordion = (props: AccordionProps): React.Node => {
   const { costlyBody, ...otherProps } = props;
   const theme = React.useContext(GDevelopThemeContext);
 

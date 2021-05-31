@@ -1,4 +1,5 @@
 // @flow
+import type { Element } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -38,14 +39,14 @@ const styles = {
 };
 
 export default class AnimationPreview extends Component<Props, State> {
-  state = {
+  state: State = {
     currentFrameIndex: 0,
     currentFrameElapsedTime: 0,
     paused: false,
     fps: Math.round(1 / this.props.timeBetweenFrames),
   };
 
-  nextUpdate = null;
+  nextUpdate: null | AnimationFrameID = null;
 
   componentDidMount() {
     this.nextUpdate = requestAnimationFrame(this._updateAnimation);
@@ -55,24 +56,24 @@ export default class AnimationPreview extends Component<Props, State> {
     if (this.nextUpdate) cancelAnimationFrame(this.nextUpdate);
   }
 
-  replay = () =>
+  replay: () => void = () =>
     this.setState({
       currentFrameIndex: 0,
       currentFrameElapsedTime: 0,
       paused: false,
     });
 
-  play = () =>
+  play: () => void = () =>
     this.setState({
       paused: false,
     });
 
-  pause = () =>
+  pause: () => void = () =>
     this.setState({
       paused: true,
     });
 
-  _updateAnimation = () => {
+  _updateAnimation: () => void = () => {
     const animationSpeedScale = 1;
 
     const { spritesContainer, timeBetweenFrames } = this.props;
@@ -104,7 +105,7 @@ export default class AnimationPreview extends Component<Props, State> {
     this.nextUpdate = requestAnimationFrame(this._updateAnimation);
   };
 
-  render() {
+  render(): Element<'div'> {
     const {
       spritesContainer,
       resourcesLoader,

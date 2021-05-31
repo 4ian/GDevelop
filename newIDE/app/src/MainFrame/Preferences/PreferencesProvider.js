@@ -31,7 +31,7 @@ const LocalStorageItem = 'gd-preferences';
 const MAX_RECENT_FILES_COUNT = 20;
 
 export default class PreferencesProvider extends React.Component<Props, State> {
-  state = {
+  state: State = {
     values: this._loadValuesFromLocalStorage() || initialPreferences.values,
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
@@ -249,7 +249,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _verifyIfIsNewVersion() {
+  _verifyIfIsNewVersion(): boolean {
     const currentVersion = getIDEVersion();
     const { lastLaunchedVersion } = this.state.values;
     if (lastLaunchedVersion === currentVersion) {
@@ -333,7 +333,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     }
   }
 
-  _persistValuesToLocalStorage(preferences: Preferences) {
+  _persistValuesToLocalStorage(preferences: Preferences): Preferences {
     try {
       localStorage.setItem(
         LocalStorageItem,
@@ -346,7 +346,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     return preferences;
   }
 
-  _getLastUsedPath(project: gdProject, kind: ResourceKind) {
+  _getLastUsedPath(project: gdProject, kind: ResourceKind): ?string {
     const projectPath = project.getProjectFile();
     const { values } = this.state;
     const projectPaths = values.projectLastUsedPaths[projectPath];
@@ -378,7 +378,17 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getDefaultEditorMosaicNode(name: EditorMosaicName) {
+  _getDefaultEditorMosaicNode(
+    name: EditorMosaicName
+  ):
+    | null
+    | string
+    | {|
+        direction: 'row' | 'column',
+        first: ?EditorMosaicNode,
+        second: ?EditorMosaicNode,
+        splitPercentage: number,
+      |} {
     return this.state.values.defaultEditorMosaicNodes[name] || null;
   }
 
@@ -398,7 +408,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getRecentProjectFiles() {
+  _getRecentProjectFiles(): Array<FileMetadataAndStorageProviderName> {
     return this.state.values.recentProjectFiles;
   }
 
@@ -437,7 +447,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getAutoOpenMostRecentProject() {
+  _getAutoOpenMostRecentProject(): boolean {
     return this.state.values.autoOpenMostRecentProject;
   }
 
@@ -453,7 +463,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _hadProjectOpenedDuringLastSession() {
+  _hadProjectOpenedDuringLastSession(): boolean {
     return this.state.values.hasProjectOpened;
   }
 
@@ -494,7 +504,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getNewObjectDialogDefaultTab() {
+  _getNewObjectDialogDefaultTab(): 'asset-store' | 'new-object' {
     return this.state.values.newObjectDialogDefaultTab;
   }
 
@@ -509,7 +519,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsMenuBarHiddenInPreview() {
+  _getIsMenuBarHiddenInPreview(): boolean {
     return this.state.values.isMenuBarHiddenInPreview;
   }
 
@@ -536,7 +546,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _getIsAlwaysOnTopInPreview() {
+  _getIsAlwaysOnTopInPreview(): boolean {
     return this.state.values.isAlwaysOnTopInPreview;
   }
 
@@ -552,7 +562,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  render() {
+  render(): React.Node {
     return (
       <PreferencesContext.Provider value={this.state}>
         {this.props.children}

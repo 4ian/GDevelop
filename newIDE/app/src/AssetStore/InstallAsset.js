@@ -44,7 +44,7 @@ const toPascalCase = (str: string) => {
     });
 };
 
-export const sanitizeObjectName = (objectName: string) => {
+export const sanitizeObjectName = (objectName: string): string => {
   const trimmedObjectName = objectName.trim();
   if (!trimmedObjectName) return 'UnnamedObject';
 
@@ -141,7 +141,7 @@ export const addAssetToProject = async ({
   project: gdProject,
   events: gdEventsList,
   objectsContainer: gdObjectsContainer,
-|}) => {
+|}): Promise<{| createdObjects: Array<gdObject> |}> => {
   const objectNewNames = {};
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];

@@ -40,7 +40,7 @@ export class SubscriptionCheckDialog extends React.Component<
   DialogProps,
   DialogState
 > {
-  state = { open: false };
+  state: DialogState = { open: false };
 
   checkHasSubscription() {
     const { userProfile, mode, id } = this.props;
@@ -169,7 +169,7 @@ class SubscriptionChecker extends React.Component<Props, {}> {
     return false;
   }
 
-  render() {
+  render(): React.Node {
     return (
       <UserProfileContext.Consumer>
         {(userProfile: UserProfile) => (

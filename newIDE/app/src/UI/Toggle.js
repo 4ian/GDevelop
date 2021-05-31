@@ -21,7 +21,7 @@ type Props = {|
  * A text field based on Material-UI text field.
  */
 export default class Toggle extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     return (
       <FormControlLabel
         control={

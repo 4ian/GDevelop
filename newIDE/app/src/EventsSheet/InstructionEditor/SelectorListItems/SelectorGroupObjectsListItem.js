@@ -20,7 +20,7 @@ export const renderGroupObjectsListItem = ({
   iconSize,
   onClick,
   selectedValue,
-}: Props) => {
+}: Props): React.Node => {
   const groupName: string = groupWithContext.group.getName();
   return (
     <ListItem

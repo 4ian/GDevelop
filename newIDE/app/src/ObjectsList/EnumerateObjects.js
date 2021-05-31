@@ -28,7 +28,7 @@ export type GroupWithContextList = Array<GroupWithContext>;
 
 export const isSameObjectWithContext = (
   objectWithContext: ?ObjectWithContext
-) => (other: ?ObjectWithContext) => {
+): ((other: ?ObjectWithContext) => ?boolean) => (other: ?ObjectWithContext) => {
   return (
     objectWithContext &&
     other &&
@@ -41,7 +41,11 @@ export const enumerateObjects = (
   project: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   type: ?string = undefined
-) => {
+): {|
+  allObjectsList: ObjectWithContextList,
+  containerObjectsList: ObjectWithContextList,
+  projectObjectsList: ObjectWithContextList,
+|} => {
   const filterObject = (object: gdObject): boolean => {
     return (
       !type ||
@@ -167,7 +171,14 @@ export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   type: ?string = undefined
-) => {
+): {|
+  allGroupsList: GroupWithContextList,
+  allObjectsList: ObjectWithContextList,
+  containerGroupsList: GroupWithContextList,
+  containerObjectsList: ObjectWithContextList,
+  projectGroupsList: GroupWithContextList,
+  projectObjectsList: ObjectWithContextList,
+|} => {
   const filterObject = (object: gdObject): boolean => {
     return (
       !type ||

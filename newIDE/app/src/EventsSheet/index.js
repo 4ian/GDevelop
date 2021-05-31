@@ -165,8 +165,10 @@ export default class EventsSheet extends React.Component<Props, State> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
-  _containerDiv = React.createRef<HTMLDivElement>();
-  _keyboardShortcuts = new KeyboardShortcuts({
+  _containerDiv: {|
+    current: null | HTMLDivElement,
+  |} = React.createRef<HTMLDivElement>();
+  _keyboardShortcuts: KeyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
       !this.state.inlineEditing &&
       !this.state.editedInstruction.instruction &&
@@ -187,7 +189,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
 
-  state = {
+  state: State = {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
 
     editedInstruction: {
@@ -256,15 +258,15 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   }
 
-  _addStandardEvent = () => {
+  _addStandardEvent: () => void = () => {
     this.addNewEvent('BuiltinCommonInstructions::Standard');
   };
 
-  _addCommentEvent = () => {
+  _addCommentEvent: () => void = () => {
     this.addNewEvent('BuiltinCommonInstructions::Comment');
   };
 
-  _toggleSearchPanel = () => {
+  _toggleSearchPanel: () => void = () => {
     this.setState(
       state => {
         const show = !state.showSearchPanel;
@@ -284,11 +286,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  _closeSearchPanel = () => {
+  _closeSearchPanel: () => void = () => {
     this.setState({ showSearchPanel: false });
   };
 
-  addSubEvents = () => {
+  addSubEvents: () => void = () => {
     const { project } = this.props;
 
     getSelectedEvents(this.state.selection).forEach(event => {
@@ -308,19 +310,22 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _selectionCanHaveSubEvents = () => {
+  _selectionCanHaveSubEvents: () => boolean = () => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.canHaveSubEvents();
     });
   };
 
-  _selectionCanToggleDisabled = () => {
+  _selectionCanToggleDisabled: () => boolean = () => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.isExecutable();
     });
   };
 
-  addNewEvent = (
+  addNewEvent: (
+    type: string,
+    context: ?EventInsertionContext
+  ) => Array<gdBaseEvent> = (
     type: string,
     context: ?EventInsertionContext
   ): Array<gdBaseEvent> => {
@@ -380,7 +385,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     return newEvents;
   };
 
-  openEventTextDialog = () => {
+  openEventTextDialog: () => void = () => {
     const editableEvents = filterEditableWithEventTextDialog(
       getSelectedEvents(this.state.selection)
     );
@@ -392,20 +397,26 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  closeEventTextDialog = () => {
+  closeEventTextDialog: () => void = () => {
     this.setState({
       textEditedEvent: null,
     });
   };
 
-  openAddInstructionContextMenu = (
+  openAddInstructionContextMenu: (
+    button: HTMLButtonElement,
+    instructionsListContext: InstructionsListContext
+  ) => void = (
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => {
     this.openInstructionEditor(instructionsListContext, button);
   };
 
-  openInstructionEditor = (
+  openInstructionEditor: (
+    instructionContext: InstructionContext | InstructionsListContext,
+    inlineInstructionEditorAnchorEl?: ?HTMLButtonElement
+  ) => void = (
     instructionContext: InstructionContext | InstructionsListContext,
     inlineInstructionEditorAnchorEl?: ?HTMLButtonElement = null
   ) => {
@@ -457,7 +468,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   }
 
-  moveSelectionToInstruction = (destinationContext: InstructionContext) => {
+  moveSelectionToInstruction: (
+    destinationContext: InstructionContext
+  ) => void = (destinationContext: InstructionContext) => {
     this.moveSelectionToInstructionsList(
       {
         instrsList: destinationContext.instrsList,
@@ -467,7 +480,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  moveSelectionToInstructionsList = (
+  moveSelectionToInstructionsList: (
+    destinationContext: InstructionsListContext,
+    indexInList?: ?number
+  ) => void = (
     destinationContext: InstructionsListContext,
     indexInList: ?number = undefined
   ) => {
@@ -495,7 +511,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     }
   };
 
-  selectEvent = (eventContext: EventContext) => {
+  selectEvent: (eventContext: EventContext) => void = (
+    eventContext: EventContext
+  ) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
@@ -505,7 +523,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  openEventContextMenu = (x: number, y: number, eventContext: EventContext) => {
+  openEventContextMenu: (
+    x: number,
+    y: number,
+    eventContext: EventContext
+  ) => void = (x: number, y: number, eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
@@ -518,7 +540,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  openInstructionContextMenu = (
+  openInstructionContextMenu: (
+    x: number,
+    y: number,
+    instructionContext: InstructionContext
+  ) => void = (
     x: number,
     y: number,
     instructionContext: InstructionContext
@@ -539,7 +565,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  selectInstruction = (instructionContext: InstructionContext) => {
+  selectInstruction: (instructionContext: InstructionContext) => void = (
+    instructionContext: InstructionContext
+  ) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
@@ -553,7 +581,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  openParameterEditor = (parameterContext: ParameterContext) => {
+  openParameterEditor: (parameterContext: ParameterContext) => void = (
+    parameterContext: ParameterContext
+  ) => {
     // $FlowFixMe
     this.setState({
       editedParameter: parameterContext,
@@ -565,7 +595,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  closeParameterEditor = () => {
+  closeParameterEditor: () => void = () => {
     if (this.state.inlineEditingChangesMade) {
       this._saveChangesToHistory();
     }
@@ -583,7 +613,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  toggleDisabled = () => {
+  toggleDisabled: () => void = () => {
     getSelectedEvents(this.state.selection).forEach(event =>
       event.setDisabled(!event.isDisabled())
     );
@@ -633,16 +663,16 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  copySelection = () => {
+  copySelection: () => void = () => {
     copySelectionToClipboard(this.state.selection);
   };
 
-  cutSelection = () => {
+  cutSelection: () => void = () => {
     this.copySelection();
     this.deleteSelection();
   };
 
-  pasteEvents = () => {
+  pasteEvents: () => void = () => {
     if (
       !pasteEventsFromClipboardInSelection(
         this.props.project,
@@ -657,7 +687,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  pasteInstructions = () => {
+  pasteInstructions: () => void = () => {
     if (
       !pasteInstructionsFromClipboardInSelection(
         this.props.project,
@@ -672,7 +702,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  pasteEventsOrInstructions = () => {
+  pasteEventsOrInstructions: () => void = () => {
     if (hasEventSelected(this.state.selection)) this.pasteEvents();
     else if (hasInstructionSelected(this.state.selection))
       this.pasteInstructions();
@@ -680,9 +710,9 @@ export default class EventsSheet extends React.Component<Props, State> {
       this.pasteInstructions();
   };
 
-  pasteInstructionsInInstructionsList = (
+  pasteInstructionsInInstructionsList: (
     instructionsListContext: InstructionsListContext
-  ) => {
+  ) => void = (instructionsListContext: InstructionsListContext) => {
     if (
       !pasteInstructionsFromClipboardInInstructionsList(
         this.props.project,
@@ -697,7 +727,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _invertSelectedConditions = () => {
+  _invertSelectedConditions: () => void = () => {
     getSelectedInstructionsContexts(this.state.selection).forEach(
       instructionContext => {
         if (instructionContext.isCondition) {
@@ -713,7 +743,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _saveChangesToHistory = (cb: ?Function) => {
+  _saveChangesToHistory: (cb: ?any) => void = (cb: ?Function) => {
     this.setState(
       {
         history: saveToHistory(this.state.history, this.props.events),
@@ -726,7 +756,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     if (this._searchPanel) this._searchPanel.markSearchResultsDirty();
   };
 
-  undo = () => {
+  undo: () => void = () => {
     if (!canUndo(this.state.history)) return;
 
     const { events, project } = this.props;
@@ -744,7 +774,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  redo = () => {
+  redo: () => void = () => {
     if (!canRedo(this.state.history)) return;
 
     const { events, project } = this.props;
@@ -762,7 +792,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  _openEventsContextAnalyzer = () => {
+  _openEventsContextAnalyzer: () => void = () => {
     const { globalObjectsContainer, objectsContainer } = this.props;
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get(),
@@ -786,13 +816,13 @@ export default class EventsSheet extends React.Component<Props, State> {
     eventsContextAnalyzer.delete();
   };
 
-  _closeEventsContextAnalyzer = () => {
+  _closeEventsContextAnalyzer: () => void = () => {
     this.setState({
       analyzedEventsContextResult: null,
     });
   };
 
-  extractEventsToFunction = () => {
+  extractEventsToFunction: () => void = () => {
     const eventsList = new gd.EventsList();
 
     getSelectedEvents(this.state.selection).forEach(event =>
@@ -806,7 +836,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     eventsList.delete();
   };
 
-  moveEventsIntoNewGroup = () => {
+  moveEventsIntoNewGroup: () => void = () => {
     const eventsList = new gd.EventsList();
 
     getSelectedEvents(this.state.selection).forEach(event =>
@@ -817,10 +847,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     eventsList.delete();
   };
 
-  _replaceSelectionByEventsFunction = (
+  _replaceSelectionByEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction
-  ) => {
+  ) => void = (extensionName: string, eventsFunction: gdEventsFunction) => {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
@@ -844,7 +874,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.deleteSelection({ deleteInstructions: false });
   };
 
-  _replaceSelectionByGroupOfEvents = (eventsList: gdEventsList) => {
+  _replaceSelectionByGroupOfEvents: (eventsList: gdEventsList) => void = (
+    eventsList: gdEventsList
+  ) => {
     const contexts = getSelectedEventContexts(this.state.selection);
     if (!contexts.length) return;
 
@@ -868,14 +900,19 @@ export default class EventsSheet extends React.Component<Props, State> {
     this.deleteSelection({ deleteInstructions: false });
   };
 
-  _ensureEventUnfolded = (cb: () => ?gdBaseEvent) => {
+  _ensureEventUnfolded: (cb: () => ?gdBaseEvent) => void = (
+    cb: () => ?gdBaseEvent
+  ) => {
     const event = cb();
     if (event && this._eventsTree) {
       this._eventsTree.unfoldForEvent(event);
     }
   };
 
-  _replaceInEvents = (
+  _replaceInEvents: (
+    doReplaceInEvents: (inputs: ReplaceInEventsInputs) => void,
+    inputs: ReplaceInEventsInputs
+  ) => void = (
     doReplaceInEvents: (inputs: ReplaceInEventsInputs) => void,
     inputs: ReplaceInEventsInputs
   ) => {
@@ -885,7 +922,10 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _searchInEvents = (
+  _searchInEvents: (
+    doSearchInEvents: (inputs: SearchInEventsInputs, cb: () => void) => void,
+    inputs: SearchInEventsInputs
+  ) => void = (
     doSearchInEvents: (inputs: SearchInEventsInputs, cb: () => void) => void,
     inputs: SearchInEventsInputs
   ) => {
@@ -896,7 +936,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _onEventMoved = () => {
+  _onEventMoved: () => void = () => {
     // Move of the event in the list is handled by EventsTree.
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
@@ -984,7 +1024,7 @@ export default class EventsSheet extends React.Component<Props, State> {
    * lost of focus (for example, after a scroll, the focused element might have
    * been scrolled out of the view and so removed from the DOM)
    */
-  _ensureFocused = () => {
+  _ensureFocused: () => void = () => {
     if (!this._containerDiv || !document) return;
 
     const containerDivElement = this._containerDiv.current;
@@ -1007,7 +1047,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     }
   };
 
-  render() {
+  render(): null | React.Node {
     const {
       project,
       scope,

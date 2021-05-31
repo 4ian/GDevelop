@@ -96,7 +96,7 @@ export const CategoryChooser = ({
   allFilters,
   error,
   allItemsLabel,
-}: Props) => {
+}: Props): null | React.Node => {
   if (!allFilters) {
     return <PlaceholderLoader />;
   }

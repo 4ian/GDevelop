@@ -37,11 +37,17 @@ type State = {|
 |};
 
 export default class MeasuresTable extends React.Component<Props, State> {
-  state = {
+  state: State = {
     collapsedPaths: {},
   };
 
-  _convertToDataRows = (
+  _convertToDataRows: (
+    name: string,
+    parentSection: ?ProfilerMeasuresSection,
+    section: ProfilerMeasuresSection,
+    depth?: number,
+    path?: string
+  ) => Array<ProfilerRowData> = (
     name: string,
     parentSection: ?ProfilerMeasuresSection,
     section: ProfilerMeasuresSection,
@@ -85,11 +91,11 @@ export default class MeasuresTable extends React.Component<Props, State> {
     ];
   };
 
-  _isSectionCollapsed = (path: string) => {
+  _isSectionCollapsed: (path: string) => any | boolean = (path: string) => {
     return this.state.collapsedPaths[path];
   };
 
-  _toggleSection = (path: string) => {
+  _toggleSection: (path: string) => void = (path: string) => {
     this.setState(state => ({
       collapsedPaths: {
         ...state.collapsedPaths,
@@ -98,7 +104,11 @@ export default class MeasuresTable extends React.Component<Props, State> {
     }));
   };
 
-  _rowClassName = ({ index }: { index: number }) => {
+  _rowClassName: ({ index: number, ... }) => string = ({
+    index,
+  }: {
+    index: number,
+  }) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {
@@ -106,7 +116,9 @@ export default class MeasuresTable extends React.Component<Props, State> {
     }
   };
 
-  _renderSectionNameCell = ({ rowData }: { rowData: ProfilerRowData }) => {
+  _renderSectionNameCell: ({ rowData: ProfilerRowData, ... }) => React.Element<
+    'div'
+  > = ({ rowData }: { rowData: ProfilerRowData }) => {
     return (
       <div style={styles.indent}>
         <div style={{ width: rowData.depth * 8 }} />
@@ -122,7 +134,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
     );
   };
 
-  render() {
+  render(): null | React.Node {
     const { profilerMeasures } = this.props;
     if (!profilerMeasures) return null;
 

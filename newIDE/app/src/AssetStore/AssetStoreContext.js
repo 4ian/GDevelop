@@ -26,23 +26,25 @@ type AssetStoreState = {|
   filtersState: FiltersState,
 |};
 
-export const AssetStoreContext = React.createContext<AssetStoreState>({
-  filters: null,
-  authors: null,
-  licenses: null,
-  searchResults: null,
-  fetchAssetsAndFilters: () => {},
-  error: null,
-  searchText: '',
-  setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
-});
+export const AssetStoreContext: React$Context<AssetStoreState> = React.createContext<AssetStoreState>(
+  {
+    filters: null,
+    authors: null,
+    licenses: null,
+    searchResults: null,
+    fetchAssetsAndFilters: () => {},
+    error: null,
+    searchText: '',
+    setSearchText: () => {},
+    filtersState: {
+      chosenFilters: new Set(),
+      addFilter: () => {},
+      removeFilter: () => {},
+      chosenCategory: null,
+      setChosenCategory: () => {},
+    },
+  }
+);
 
 type AssetStoreStateProviderProps = {|
   children: React.Node,
@@ -60,7 +62,7 @@ const getAssetShortHeaderSearchTerms = (assetShortHeader: AssetShortHeader) => {
 
 export const AssetStoreStateProvider = ({
   children,
-}: AssetStoreStateProviderProps) => {
+}: AssetStoreStateProviderProps): React.Node => {
   const [assetShortHeadersById, setAssetShortHeadersById] = React.useState<?{
     [string]: AssetShortHeader,
   }>(null);

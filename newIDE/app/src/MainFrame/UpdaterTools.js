@@ -13,21 +13,25 @@ export type UpdateStatus = {
     | 'unknown',
 };
 
-export const getUpdateNotificationTitle = (updateStatus: UpdateStatus) => {
+export const getUpdateNotificationTitle = (
+  updateStatus: UpdateStatus
+): string => {
   if (updateStatus.status === 'update-available')
     return 'A new update is available!';
 
   return '';
 };
 
-export const getUpdateNotificationBody = (updateStatus: UpdateStatus) => {
+export const getUpdateNotificationBody = (
+  updateStatus: UpdateStatus
+): string => {
   if (updateStatus.status === 'update-available')
     return 'It will be downloaded and installed automatically (unless you deactivated this in preferences)';
 
   return '';
 };
 
-export const getUpdateStatusLabel = (status: string) => {
+export const getUpdateStatusLabel = (status: string): string => {
   if (status === 'checking-for-update') return 'Checking for update...';
   if (status === 'update-available') return 'A new update is available!';
   if (status === 'update-not-available')
@@ -40,11 +44,11 @@ export const getUpdateStatusLabel = (status: string) => {
   return '';
 };
 
-export const getUpdateButtonLabel = (status: string) => {
+export const getUpdateButtonLabel = (status: string): string => {
   if (status === 'update-available') return 'Update GDevelop to latest version';
   return 'Check again for new updates';
 };
 
-export const canDownloadUpdate = (status: string) => {
+export const canDownloadUpdate = (status: string): boolean => {
   return status === 'update-available';
 };

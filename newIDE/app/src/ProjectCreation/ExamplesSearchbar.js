@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import { mapVector } from '../Utils/MapFor';
 import TextField from '../UI/TextField';
@@ -34,7 +35,7 @@ export default class ExamplesSearchbar extends Component<Props> {
     }).filter(Boolean);
   }
 
-  render() {
+  render(): Node {
     const {
       chosenExtensionName,
       onExtensionNameChosen,

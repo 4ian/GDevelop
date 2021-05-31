@@ -43,7 +43,7 @@ export type ResourceFetcher = {|
   fetchResources: FetchResourcesArgs => Promise<FetchedResources>,
 |};
 
-export const ResourceFetcherContext = React.createContext<?ResourceFetcher>(
+export const ResourceFetcherContext: React$Context<?ResourceFetcher> = React.createContext<?ResourceFetcher>(
   null
 );
 
@@ -59,7 +59,7 @@ export const ResourceFetcherDialog = ({
   fetchedResources,
   onAbandon,
   onRetry,
-}: ResourceFetcherDialogProps) => {
+}: ResourceFetcherDialogProps): React.Node => {
   const hasErrors =
     fetchedResources && fetchedResources.erroredResources.length > 0;
 

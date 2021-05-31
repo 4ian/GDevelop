@@ -1,4 +1,5 @@
 //@flow
+import type { Node } from 'React';
 import React from 'react';
 import { Trans, t } from '@lingui/macro';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -39,7 +40,7 @@ type Props = {| eventsFunctionsExtension: gdEventsFunctionsExtension |};
 
 export const ExtensionDependenciesEditor = ({
   eventsFunctionsExtension,
-}: Props) => {
+}: Props): Node => {
   const deps = eventsFunctionsExtension.getAllDependencies();
   const forceUpdate = useForceUpdate();
 
@@ -92,6 +93,7 @@ export const ExtensionDependenciesEditor = ({
               mapVector<gdDependencyMetadata, TableRow>(
                 eventsFunctionsExtension.getAllDependencies(),
                 (dependency, index) => (
+                  // $FlowFixMe - unsure why Flow complains about TableRow.
                   <TableRow key={dependency.getName()}>
                     <TableRowColumn>
                       <SemiControlledTextField

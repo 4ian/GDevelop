@@ -17,7 +17,7 @@ export default class ObjectVariableField extends React.Component<
   State
 > {
   _field: ?VariableField;
-  state = {
+  state: State = {
     editorOpen: false,
   };
 
@@ -25,7 +25,7 @@ export default class ObjectVariableField extends React.Component<
     if (this._field) this._field.focus();
   }
 
-  render() {
+  render(): React.Node {
     const {
       project,
       scope,
@@ -102,7 +102,7 @@ export default class ObjectVariableField extends React.Component<
 
 export const renderInlineObjectVariable = (
   props: ParameterInlineRendererProps
-) => {
+): React.Element<'span'> | React.Node => {
   return renderVariableWithIcon(
     props,
     'res/types/objectvar.png',

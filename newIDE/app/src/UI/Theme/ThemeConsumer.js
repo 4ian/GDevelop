@@ -10,7 +10,7 @@ type Props = {|
 /**
  * Expose the Material UI theme.
  */
-const ThemeConsumer = (props: Props) => (
+const ThemeConsumer = (props: Props): React.Node => (
   <GDevelopThemeContext.Consumer>
     {gdevelopTheme => props.children(gdevelopTheme)}
   </GDevelopThemeContext.Consumer>

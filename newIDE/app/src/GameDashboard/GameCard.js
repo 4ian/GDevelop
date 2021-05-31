@@ -24,7 +24,7 @@ export const GameCard = ({
   onOpenDetails,
   onOpenAnalytics,
   onOpenMonetization,
-}: Props) => (
+}: Props): React.Node => (
   <Card key={game.id}>
     <CardHeader
       title={game.gameName}

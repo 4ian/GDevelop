@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import React, { PureComponent } from 'react';
@@ -34,7 +35,7 @@ type Props = {|
 |};
 
 export class Toolbar extends PureComponent<Props> {
-  render() {
+  render(): Node {
     return (
       <>
         <ToolbarCommands

@@ -22,7 +22,7 @@ const readJSONFile = (filepath: string): Promise<Object> => {
 };
 
 export default class LocalEventsFunctionsExtensionOpener {
-  static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
+  static chooseEventsFunctionExtensionFile: () => Promise<?string> = (): Promise<?string> => {
     if (!dialog) return Promise.reject('Not supported');
     const browserWindow = electron.remote.getCurrentWindow();
 
@@ -44,7 +44,7 @@ export default class LocalEventsFunctionsExtensionOpener {
       });
   };
 
-  static readEventsFunctionExtensionFile = (
+  static readEventsFunctionExtensionFile: (filepath: string) => Promise<any> = (
     filepath: string
   ): Promise<Object> => {
     return readJSONFile(filepath);

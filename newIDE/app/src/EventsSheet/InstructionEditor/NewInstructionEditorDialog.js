@@ -98,7 +98,7 @@ export default function NewInstructionEditorDialog({
   onChooseResource,
   resourceExternalEditors,
   openInstructionOrExpression,
-}: Props) {
+}: Props): React.Node {
   const forceUpdate = useForceUpdate();
   const [
     newInstructionEditorState,

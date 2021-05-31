@@ -85,7 +85,7 @@ export const AssetDetails = ({
   onClose,
   canInstall,
   isBeingInstalled,
-}: Props) => {
+}: Props): React.Node => {
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [error, setError] = React.useState<?Error>(null);

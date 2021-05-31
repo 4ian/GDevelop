@@ -94,7 +94,7 @@ export type Author = {|
 export const isCompatibleWithAsset = (
   ideVersion: string,
   assetHeader: AssetHeader
-) =>
+): any | boolean =>
   assetHeader.gdevelopVersion
     ? semverSatisfies(ideVersion, assetHeader.gdevelopVersion, {
         includePrerelease: true,

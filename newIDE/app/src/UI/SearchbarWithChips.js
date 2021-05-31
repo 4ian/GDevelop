@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React, { Component } from 'react';
 import Chip from '@material-ui/core/Chip';
 import { Column, Line } from '../UI/Grid';
@@ -40,7 +41,7 @@ export default class SearchbarWithChips extends Component<Props> {
       this._searchBar.focus();
   }
 
-  render() {
+  render(): Node {
     const {
       chosenChip,
       onChooseChip,

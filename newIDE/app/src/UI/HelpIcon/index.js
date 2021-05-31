@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import React from 'react';
 import HelpOutline from '@material-ui/icons/HelpOutline';
 import IconButton from '../IconButton';
@@ -27,7 +28,7 @@ type PropsType = {|
 /**
  * The icon that can be used in any dialog to open a help page
  */
-export default (props: PropsType) => {
+export default (props: PropsType): null | Node => {
   const { helpPagePath } = props;
   if (!helpPagePath) return null;
 

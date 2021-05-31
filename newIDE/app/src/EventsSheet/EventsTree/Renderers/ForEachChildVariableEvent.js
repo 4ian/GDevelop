@@ -57,14 +57,17 @@ export default class ForEachChildVariableEvent extends React.Component<
   _keyIteratorField: ?SceneVariableField = null;
   _iterableField: ?SceneVariableField = null;
 
-  state = {
+  state: State = {
     editingValueIteratorVariableName: false,
     editingKeyIteratorVariableName: false,
     editingIterableVariableName: false,
     anchorEl: null,
   };
 
-  edit = (
+  edit: (
+    variable: 'iterable' | 'iteratorValue' | 'iteratorKey',
+    anchorEl: HTMLSpanElement
+  ) => void = (
     variable: 'iterable' | 'iteratorValue' | 'iteratorKey',
     anchorEl: HTMLSpanElement
   ) => {
@@ -98,7 +101,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     );
   };
 
-  endEditing = () => {
+  endEditing: () => void = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
     // $FlowFixMe
@@ -112,7 +115,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );

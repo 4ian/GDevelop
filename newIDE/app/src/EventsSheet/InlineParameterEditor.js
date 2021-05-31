@@ -41,7 +41,7 @@ export default class InlineParameterEditor extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     parameterMetadata: null,
     instructionMetadata: null,
     ParameterComponent: null,
@@ -66,7 +66,7 @@ export default class InlineParameterEditor extends React.Component<
     });
   }
 
-  _loadComponentFromInstruction(props: Props) {
+  _loadComponentFromInstruction(props: Props): void {
     const { project, isCondition, instruction, parameterIndex } = props;
     if (!instruction) return this._unload();
 
@@ -103,7 +103,7 @@ export default class InlineParameterEditor extends React.Component<
     );
   }
 
-  render() {
+  render(): null | React.Node {
     if (!this.state.ParameterComponent || !this.props.open) return null;
     const instruction = this.props.instruction;
     if (!instruction) return null;

@@ -22,7 +22,10 @@ export default [
     displayName: 'Choose a new audio file',
     kind: 'audio',
     component: class LocalAudioFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -52,7 +55,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },
@@ -62,7 +65,10 @@ export default [
     displayName: 'Choose a new image',
     kind: 'image',
     component: class LocalFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -92,7 +98,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },
@@ -102,7 +108,10 @@ export default [
     displayName: 'Choose a new font file',
     kind: 'font',
     component: class LocalFontFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -132,7 +141,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },
@@ -142,7 +151,10 @@ export default [
     displayName: 'Choose a new video file',
     kind: 'video',
     component: class LocalVideoFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -172,7 +184,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },
@@ -182,7 +194,10 @@ export default [
     displayName: 'Choose a new json file',
     kind: 'json',
     component: class LocalJsonFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -212,7 +227,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },
@@ -222,7 +237,10 @@ export default [
     displayName: 'Choose a new bitmap font file (.fnt, .xml)',
     kind: 'bitmapFont',
     component: class LocalBitmapFontFileOpener extends Component<ResourceSourceComponentProps> {
-      chooseResources = (
+      chooseResources: (
+        project: gdProject,
+        multiSelections?: boolean
+      ) => Promise<Array<any>> = (
         project: gdProject,
         multiSelections: boolean = true
       ): Promise<Array<any>> => {
@@ -256,7 +274,7 @@ export default [
         });
       };
 
-      render() {
+      render(): null {
         return null;
       }
     },

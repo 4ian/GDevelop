@@ -46,13 +46,15 @@ const INVALID_VALUE = '';
  * To be used with `SelectOption`.
  */
 export default class SelectField extends React.Component<Props, {||}> {
-  _input = React.createRef<HTMLInputElement>();
+  _input: {|
+    current: null | HTMLInputElement,
+  |} = React.createRef<HTMLInputElement>();
 
   focus() {
     if (this._input.current) this._input.current.focus();
   }
 
-  render() {
+  render(): React.Node {
     const { props } = this;
     const onChange = props.onChange || undefined;
 

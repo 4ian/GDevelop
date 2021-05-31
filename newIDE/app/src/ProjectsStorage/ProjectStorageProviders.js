@@ -85,7 +85,7 @@ export default class ProjectStorageProviders extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     ...computeInitialFileMetadataToOpen(
       this.props.defaultStorageProvider,
       this.props.storageProviders,
@@ -95,19 +95,23 @@ export default class ProjectStorageProviders extends React.Component<
     renderDialog: null,
   };
 
-  _setDialog = (renderDialog: () => React.Node) => {
+  _setDialog: (renderDialog: () => React.Node) => void = (
+    renderDialog: () => React.Node
+  ) => {
     this.setState({
       renderDialog,
     });
   };
 
-  _closeDialog = () => {
+  _closeDialog: () => void = () => {
     this.setState({
       renderDialog: null,
     });
   };
 
-  _getStorageProviderOperations = (
+  _getStorageProviderOperations: (
+    storageProvider: ?StorageProvider
+  ) => Promise<StorageProviderOperations> = (
     storageProvider: ?StorageProvider
   ): Promise<StorageProviderOperations> => {
     // Avoid creating a new storageProviderOperations
@@ -147,7 +151,7 @@ export default class ProjectStorageProviders extends React.Component<
     return this.state.currentStorageProvider || emptyStorageProvider;
   };
 
-  render() {
+  render(): React.Node {
     const { children, storageProviders } = this.props;
     const { renderDialog, initialFileMetadataToOpen } = this.state;
 

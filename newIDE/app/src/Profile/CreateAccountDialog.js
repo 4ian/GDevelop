@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -26,7 +27,7 @@ type State = {|
   form: LoginForm,
 |};
 
-export const getEmailErrorText = (error: ?LoginError) => {
+export const getEmailErrorText = (error: ?LoginError): void | string => {
   if (!error) return undefined;
 
   if (error.code === 'auth/invalid-email') return 'This email is invalid';
@@ -40,7 +41,7 @@ export const getEmailErrorText = (error: ?LoginError) => {
   return undefined;
 };
 
-export const getPasswordErrorText = (error: ?LoginError) => {
+export const getPasswordErrorText = (error: ?LoginError): void | string => {
   if (!error) return undefined;
 
   if (error.code === 'auth/wrong-password') return 'The password is invalid';
@@ -50,19 +51,19 @@ export const getPasswordErrorText = (error: ?LoginError) => {
 };
 
 export default class CreateAccountDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     form: {
       email: '',
       password: '',
     },
   };
 
-  _onCreateAccount = () => {
+  _onCreateAccount: () => void = () => {
     const { form } = this.state;
     this.props.onCreateAccount(form);
   };
 
-  render() {
+  render(): Node {
     const { onClose, createAccountInProgress, onGoToLogin, error } = this.props;
 
     return (

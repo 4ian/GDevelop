@@ -28,7 +28,7 @@ type Props = {|
  * A "flat" button based on Material-UI button.
  */
 export default class FlatButton extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     const { label, primary, icon, keyboardFocused, ...otherProps } = this.props;
 
     // In theory, focus ripple is only shown after a keyboard interaction

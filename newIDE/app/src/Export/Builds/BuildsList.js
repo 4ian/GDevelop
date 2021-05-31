@@ -43,7 +43,7 @@ const formatBuildText = (
   }
 };
 
-export default ({ builds, userProfile, onDownload }: Props) => {
+export default ({ builds, userProfile, onDownload }: Props): React.Node => {
   return (
     <Column noMargin expand>
       <Line>

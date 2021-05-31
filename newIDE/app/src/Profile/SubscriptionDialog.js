@@ -61,7 +61,7 @@ type State = {|
 |};
 
 export default class SubscriptionDialog extends React.Component<Props, State> {
-  state = { isLoading: false, subscriptionPendingDialogOpen: false };
+  state: State = { isLoading: false, subscriptionPendingDialogOpen: false };
 
   componentDidMount() {
     if (this.props.open) {
@@ -75,11 +75,11 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     }
   }
 
-  choosePlan = (
+  choosePlan: (
     i18n: I18nType,
     userProfile: UserProfile,
     plan: PlanDetails
-  ) => {
+  ) => void = (i18n: I18nType, userProfile: UserProfile, plan: PlanDetails) => {
     const { getAuthorizationHeader, subscription, profile } = userProfile;
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
@@ -115,11 +115,11 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     }
   };
 
-  handleUpdatedSubscriptionSuccess = (
+  handleUpdatedSubscriptionSuccess: (
     i18n: I18nType,
     userProfile: UserProfile,
     plan: PlanDetails
-  ) => {
+  ) => void = (i18n: I18nType, userProfile: UserProfile, plan: PlanDetails) => {
     userProfile.onRefreshUserProfile();
     this.setState({ isLoading: false });
     if (plan.planId) {
@@ -137,7 +137,10 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     }
   };
 
-  handleUpdatedSubscriptionFailure = (i18n: I18nType, rawError: Error) => {
+  handleUpdatedSubscriptionFailure: (
+    i18n: I18nType,
+    rawError: Error
+  ) => void = (i18n: I18nType, rawError: Error) => {
     this.setState({ isLoading: false });
     showErrorBox({
       message: i18n._(
@@ -156,10 +159,12 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     );
   }
 
-  _isLoading = (userProfile: UserProfile) =>
+  _isLoading: (userProfile: UserProfile) => boolean = (
+    userProfile: UserProfile
+  ) =>
     !userProfile.subscription || !userProfile.profile || this.state.isLoading;
 
-  render() {
+  render(): React.Node {
     const { open, onClose } = this.props;
     const { subscriptionPendingDialogOpen } = this.state;
 

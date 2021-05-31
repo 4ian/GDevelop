@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -35,24 +36,24 @@ type State = {|
 |};
 
 export default class LoginDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     form: {
       email: '',
       password: '',
     },
   };
 
-  _onLogin = () => {
+  _onLogin: () => void = () => {
     const { form } = this.state;
     this.props.onLogin(form);
   };
 
-  _onForgotPassword = () => {
+  _onForgotPassword: () => void = () => {
     const { form } = this.state;
     this.props.onForgotPassword(form);
   };
 
-  render() {
+  render(): Node {
     const {
       onClose,
       onGoToCreateAccount,

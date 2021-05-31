@@ -393,7 +393,7 @@ type State = {|
 |};
 
 export default class SpriteEditor extends React.Component<EditorProps, State> {
-  state = {
+  state: State = {
     pointsEditorOpen: false,
     collisionMasksEditorOpen: false,
   };
@@ -406,19 +406,21 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
     this.resourcesLoader = ResourcesLoader;
   }
 
-  openPointsEditor = (open: boolean = true) => {
+  openPointsEditor: (open?: boolean) => void = (open: boolean = true) => {
     this.setState({
       pointsEditorOpen: open,
     });
   };
 
-  openCollisionMasksEditor = (open: boolean = true) => {
+  openCollisionMasksEditor: (open?: boolean) => void = (
+    open: boolean = true
+  ) => {
     this.setState({
       collisionMasksEditorOpen: open,
     });
   };
 
-  render() {
+  render(): React.Element<'div'> {
     const {
       object,
       project,

@@ -82,19 +82,21 @@ const isUsingExtension = (
 };
 
 export default class LocalExamples extends React.Component<Props, State> {
-  state = {
+  state: State = {
     searchText: '',
     chosenExtensionName: '',
   };
 
-  changeSearchText = (searchText: string) => {
+  changeSearchText: (searchText: string) => void = (searchText: string) => {
     this.setState({
       searchText,
       chosenExtensionName: '',
     });
   };
 
-  chooseExtensionName = (chosenExtensionName: string) => {
+  chooseExtensionName: (chosenExtensionName: string) => void = (
+    chosenExtensionName: string
+  ) => {
     this.setState({
       searchText: '',
       chosenExtensionName,
@@ -116,7 +118,7 @@ export default class LocalExamples extends React.Component<Props, State> {
     );
   }
 
-  render() {
+  render(): React.Node {
     const { searchText, chosenExtensionName } = this.state;
     const lowercaseSearchText = searchText.toLowerCase();
 

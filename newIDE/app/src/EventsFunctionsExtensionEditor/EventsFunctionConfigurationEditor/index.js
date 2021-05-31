@@ -53,11 +53,13 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
   State
 > {
-  state = {
+  state: State = {
     currentTab: 'config',
   };
 
-  _canObjectOrGroupUseNewName = (newName: string) => {
+  _canObjectOrGroupUseNewName: (newName: string) => boolean = (
+    newName: string
+  ) => {
     const { objectsContainer, globalObjectsContainer } = this.props;
 
     if (
@@ -82,10 +84,10 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     return true;
   };
 
-  _onDeleteGroup = (
+  _onDeleteGroup: (
     groupWithContext: GroupWithContext,
-    done: boolean => void
-  ) => {
+    done: (boolean) => void
+  ) => void = (groupWithContext: GroupWithContext, done: boolean => void) => {
     const { group } = groupWithContext;
     const {
       project,
@@ -110,7 +112,11 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     done(true);
   };
 
-  _onRenameGroup = (
+  _onRenameGroup: (
+    groupWithContext: GroupWithContext,
+    newName: string,
+    done: (boolean) => void
+  ) => void = (
     groupWithContext: GroupWithContext,
     newName: string,
     done: boolean => void
@@ -141,12 +147,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     done(true);
   };
 
-  _chooseTab = (currentTab: TabNames) =>
+  _chooseTab: (currentTab: TabNames) => void = (currentTab: TabNames) =>
     this.setState({
       currentTab,
     });
 
-  render() {
+  render(): React.Node {
     const {
       project,
       globalObjectsContainer,

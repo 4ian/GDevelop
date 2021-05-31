@@ -13,7 +13,11 @@ type Props = {|
   onClose: () => void,
 |};
 
-export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
+export default ({
+  onClose,
+  storageProviders,
+  onChooseProvider,
+}: Props): React.Node => {
   return (
     <I18n>
       {({ i18n }) => (

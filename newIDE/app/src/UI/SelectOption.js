@@ -15,7 +15,7 @@ type Props = {|
  * A native select option to be used with `SelectField`.
  */
 export default class SelectOption extends React.Component<Props, {||}> {
-  render() {
+  render(): React.Node {
     return (
       <I18n>
         {({ i18n }) => (

@@ -74,7 +74,7 @@ export default function InstructionsList({
   renderObjectThumbnail,
   screenType,
   windowWidth,
-}: Props) {
+}: Props): React.Node {
   const [canPaste, setCanPaste] = React.useState(false);
 
   const addNewInstruction = React.useCallback(

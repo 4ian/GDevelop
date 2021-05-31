@@ -120,7 +120,9 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
 
 export default {
   components,
-  getParameterComponent: (rawType: string) => {
+  getParameterComponent: (
+    rawType: string
+  ): any | typeof DefaultField | typeof ObjectField => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
       ? 'object'
       : rawType;

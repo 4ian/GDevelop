@@ -11,7 +11,7 @@ type WatchedComponent = {
  * so it can recompute the internal row heights of the react-virtualized List.
  */
 export default class EventHeightsCache {
-  eventHeights = {};
+  eventHeights: { ... } = {};
   updateTimeoutId: ?TimeoutID = null;
   component: ?WatchedComponent = null;
 

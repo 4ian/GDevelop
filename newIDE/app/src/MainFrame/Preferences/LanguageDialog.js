@@ -1,4 +1,5 @@
 // @flow
+import type { Node } from 'React';
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
@@ -51,11 +52,11 @@ const renderLanguageSelectOption = localeMetadata => {
 };
 
 export default class LanguageDialog extends Component<Props, State> {
-  state = {
+  state: State = {
     languageDidChange: false,
   };
 
-  render() {
+  render(): null | Node {
     const { open, onClose } = this.props;
     if (!open) return null;
 

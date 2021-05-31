@@ -24,7 +24,7 @@ type State = {|
   draggedIndex: number,
 |};
 
-const ShapePreview = (props: Props) => {
+const ShapePreview = (props: Props): React.Element<'div'> => {
   const svgRef = React.useRef<React.ElementRef<'svg'> | null>(null);
   const [state, setState] = React.useState<State>({
     draggedVertex: null,

@@ -157,11 +157,16 @@ type State = {|
  * Must be used inside a component wrapped in a DragDropContext.
  */
 export default class EditorMosaic extends React.Component<Props, State> {
-  state = {
+  state: State = {
     mosaicNode: this.props.initialNodes,
   };
 
-  openEditor = (
+  openEditor: (
+    editorName: string,
+    position: 'start' | 'end',
+    splitPercentage: number,
+    direction: 'row' | 'column'
+  ) => boolean = (
     editorName: string,
     position: 'start' | 'end',
     splitPercentage: number,
@@ -211,18 +216,20 @@ export default class EditorMosaic extends React.Component<Props, State> {
     return true;
   };
 
-  _onChange = (mosaicNode: EditorMosaicNode) => {
+  _onChange: (mosaicNode: EditorMosaicNode) => void = (
+    mosaicNode: EditorMosaicNode
+  ) => {
     this.setState({ mosaicNode });
     this._persistNodes();
   };
 
-  _persistNodes = debounce(() => {
+  _persistNodes: () => void = debounce(() => {
     if (this.props.onPersistNodes && this.state.mosaicNode) {
       this.props.onPersistNodes(this.state.mosaicNode);
     }
   }, 2000);
 
-  render() {
+  render(): React.Node {
     const { editors } = this.props;
     return (
       <ThemeConsumer>

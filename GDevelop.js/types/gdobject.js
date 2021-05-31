@@ -14,6 +14,7 @@ declare class gdObject {
   updateInitialInstanceProperty(instance: gdInitialInstance, name: string, value: string, project: gdProject, scene: gdLayout): boolean;
   exposeResources(worker: gdArbitraryResourceWorker): void;
   getVariables(): gdVariablesContainer;
+  getEffects(): gdEffectsContainer;
   getAllBehaviorNames(): gdVectorString;
   hasBehaviorNamed(name: string): boolean;
   addNewBehavior(project: gdProject, type: string, name: string): gdBehaviorContent;

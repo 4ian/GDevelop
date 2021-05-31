@@ -185,10 +185,11 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
 
+  // Disabled while effects are not implemented at runtime.
+//   SerializerElement& effectsElement = element.AddChild("effects");
+//   effectsContainer.SerializeTo(effectsElement);
+  
   SerializerElement& behaviorsElement = element.AddChild("behaviors");
-  SerializerElement& effectsElement = element.AddChild("effects");
-  effectsContainer.SerializeTo(effectsElement);
-
   behaviorsElement.ConsiderAsArrayOf("behavior");
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
   for (std::size_t i = 0; i < allBehaviors.size(); ++i) {

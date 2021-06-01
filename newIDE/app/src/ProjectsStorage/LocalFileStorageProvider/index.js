@@ -29,7 +29,6 @@ export default ({
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
 
-    // TODO: if it's an URL, it should not be handled (or downloaded on the fly?)
     return {
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
     };

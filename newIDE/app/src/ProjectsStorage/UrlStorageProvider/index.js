@@ -15,6 +15,10 @@ const isURL = (filename: string) => {
   );
 };
 
+const isDeprecatedExampleSchemeURL = (filename: string) => {
+  return filename.startsWith('example://');
+};
+
 /**
  * Storage allowing to download examples from an URL.
  * This is used for examples for the "Example Store".
@@ -29,7 +33,8 @@ export default ({
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;
 
     const argument = appArguments[POSITIONAL_ARGUMENTS_KEY][0];
-    if (!isURL(argument)) return null;
+    if (!isURL(argument) && !isDeprecatedExampleSchemeURL(argument))
+      return null;
 
     return {
       fileIdentifier: argument,
@@ -37,7 +42,13 @@ export default ({
   },
   createOperations: ({ setDialog, closeDialog }) => ({
     onOpen: async (fileMetadata: FileMetadata) => {
-      const url = fileMetadata.fileIdentifier;
+      let url = fileMetadata.fileIdentifier;
+
+      // Backward compatibility with URL arguments that were like "example://particle-effects-demo".
+      if (isDeprecatedExampleSchemeURL(url)) {
+        const exampleName = url.replace('example://', '');
+        url = `https://resources.gdevelop-app.com/examples/${exampleName}/${exampleName}.json`;
+      }
 
       const response = await axios.get(url);
       if (!response.data)

@@ -74,7 +74,6 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
                 width={windowWidth === 'small' ? 150 : 250}
               >
                 <ScrollView>
-                  {/* TODO: categories */}
                   <Subheader>
                     <Trans>Filters</Trans>
                   </Subheader>

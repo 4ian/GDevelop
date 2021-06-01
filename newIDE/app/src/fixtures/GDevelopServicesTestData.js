@@ -714,4 +714,4 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   tags: [],
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
-}
+};

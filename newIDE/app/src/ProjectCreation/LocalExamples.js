@@ -87,7 +87,7 @@ export default function LocalExamples({
                 await writeAndCheckFile(projectFileContent, localFilePath);
 
                 // Open the project file. Note that resources that are URLs will be downloaded
-                // thanks the the LocalResourceFetcher.
+                // thanks to the LocalResourceFetcher.
                 onOpen(LocalFileStorageProvider, {
                   fileIdentifier: localFilePath,
                 });
@@ -95,7 +95,12 @@ export default function LocalExamples({
                 sendNewGameCreated(example.projectFileUrl);
               } catch (error) {
                 showErrorBox({
-                  message: 'TODO',
+                  message:
+                    i18n._(t`Unable to load the example or save it on disk.`) +
+                    ' ' +
+                    i18n._(
+                      t`Verify your internet connection or try again later.`
+                    ),
                   rawError: error,
                   errorId: 'local-example-load-error',
                 });

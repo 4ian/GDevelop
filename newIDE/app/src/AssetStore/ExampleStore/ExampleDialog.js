@@ -1,4 +1,5 @@
 // @flow
+import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
@@ -19,8 +20,12 @@ import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
-import RaisedButton from '../../UI/RaisedButton';
 import { ExampleIcon } from './ExampleIcon';
+import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
+import Window from '../../Utils/Window';
+import optionalRequire from '../../Utils/OptionalRequire';
+
+const electron = optionalRequire('electron');
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
@@ -28,6 +33,12 @@ type Props = {|
   onClose: () => void,
   onOpen: () => void,
 |};
+
+export const openExampleInWebApp = (example: Example) => {
+  Window.openExternalURL(
+    `https://editor.gdevelop-app.com/?project=${example.projectFileUrl}`
+  );
+};
 
 export function ExampleDialog({
   isOpening,
@@ -75,7 +86,7 @@ export function ExampleDialog({
           disabled={isOpening}
         />,
         <LeftLoader isLoading={isOpening} key="open">
-          <RaisedButton
+          <RaisedButtonWithSplitMenu
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
@@ -86,6 +97,17 @@ export function ExampleDialog({
             primary
             onClick={onOpen}
             disabled={isOpening || !isCompatible}
+            buildMenuTemplate={i18n => [
+              {
+                label: electron
+                  ? i18n._(t`Open in the web-app`)
+                  : i18n._(t`Open in a new tab`),
+                disabled: !example,
+                click: () => {
+                  if (example) openExampleInWebApp(example);
+                },
+              },
+            ]}
           />
         </LeftLoader>,
       ]}

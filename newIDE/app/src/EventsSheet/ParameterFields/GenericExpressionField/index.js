@@ -288,6 +288,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         completion: expressionAutocompletion.completion,
         addParenthesis: expressionAutocompletion.addParenthesis,
         addDot: expressionAutocompletion.addDot,
+        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
         addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
       }

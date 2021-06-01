@@ -6,6 +6,8 @@
 #ifndef GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
 #define GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
 
+#include <fstream>
+#include <iostream>
 #include <memory>
 #include <vector>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
@@ -38,6 +40,7 @@ struct ExpressionCompletionDescription {
     Behavior,
     Expression,
     Variable,
+    Text,
   };
 
   /**
@@ -64,6 +67,20 @@ struct ExpressionCompletionDescription {
       const gd::String& type_, const gd::String& prefix_) {
     return ExpressionCompletionDescription(Variable, type_, prefix_);
   }
+
+  /**
+   * \brief Create a completion for a text with the given prefix
+   */
+  static ExpressionCompletionDescription ForText(
+      const gd::String& type_,
+      const gd::String& prefix_,
+      const bool isLastParameter_,
+      const gd::String& objectName_ = "") {
+    auto description = ExpressionCompletionDescription(Text, type_, prefix_, objectName_);
+    description.SetIsLastParameter(isLastParameter_);
+    return description;
+  }
+
   /**
    * \brief Create a completion for an expression (free, object or behavior
    * expression) with the given prefix
@@ -131,6 +148,19 @@ struct ExpressionCompletionDescription {
    */
   bool IsExact() const { return isExact; }
 
+  /**
+   * \brief Set if the expession is the last child of a function call.
+   */
+  ExpressionCompletionDescription& SetIsLastParameter(bool isLastParameter_) {
+    isLastParameter = isLastParameter_;
+    return *this;
+  }
+
+  /**
+   * \brief Check if the expession is the last child of a function call.
+   */
+  bool IsLastParameter() const { return isLastParameter; }
+
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionCompletionDescription() : completionKind(Object){};
 
@@ -145,7 +175,8 @@ struct ExpressionCompletionDescription {
         prefix(prefix_),
         objectName(objectName_),
         behaviorName(behaviorName_),
-        isExact(false) {}
+        isExact(false),
+        isLastParameter(false) {}
 
   CompletionKind completionKind;
   gd::String type;
@@ -153,6 +184,7 @@ struct ExpressionCompletionDescription {
   gd::String objectName;
   gd::String behaviorName;
   bool isExact;
+  bool isLastParameter;
 };
 
 /**
@@ -163,7 +195,8 @@ std::ostream& operator<<(std::ostream& os,
   os << "{ " << value.GetCompletionKind() << ", " << value.GetType() << ", "
      << value.GetPrefix() << ", " << value.GetObjectName() << ", "
      << value.GetBehaviorName() << ", "
-     << (value.IsExact() ? "exact" : "non-exact") << " }";
+     << (value.IsExact() ? "exact" : "non-exact") << ", "
+     << (value.IsLastParameter() ? "last parameter" : "not last parameter") << " }";
   return os;
 }
 
@@ -182,16 +215,20 @@ class GD_CORE_API ExpressionCompletionFinder
   static std::vector<ExpressionCompletionDescription>
   GetCompletionDescriptionsFor(gd::ExpressionNode& node,
                                size_t searchedPosition) {
-    gd::ExpressionNode* nodeAtLocation =
-        gd::ExpressionNodeLocationFinder::GetNodeAtPosition(node,
-                                                            searchedPosition);
+    
+    gd::ExpressionNodeLocationFinder finder(searchedPosition);
+    node.Visit(finder);
+    gd::ExpressionNode* nodeAtLocation = finder.GetNode();
+    gd::ExpressionNode* parentNodeAtLocation = finder.GetParentNode();
 
+    std::cout << "GetCompletionDescriptionsFor Test" << std::endl;
+    
     if (nodeAtLocation == nullptr) {
       std::vector<ExpressionCompletionDescription> emptyCompletions;
       return emptyCompletions;
     }
 
-    gd::ExpressionCompletionFinder autocompletionProvider(searchedPosition);
+    gd::ExpressionCompletionFinder autocompletionProvider(searchedPosition, *parentNodeAtLocation);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -229,7 +266,54 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions
   }
   void OnVisitTextNode(TextNode& node) override {
-    // No completions
+
+    std::cout << "testtest" << std::endl;
+
+    std::cout << "node: " << (long)&node << std::endl;
+
+    FunctionCallNode* functionCall = dynamic_cast<FunctionCallNode*>(parentNodeAtLocation);
+    if (functionCall != NULL) {
+
+      std::cout << "count: " << functionCall->parameters.size() << std::endl;
+      int parameterIndex = -1;
+      for (int i = 0; i < functionCall->parameters.size(); i++)
+      {
+        std::cout << "param: " << (long)functionCall->parameters.at(i).get() << std::endl;
+        if (functionCall->parameters.at(i).get() == &node) {
+          std::cout << "found: " << i << std::endl;
+          parameterIndex = i;
+          break;
+        }
+      }
+      if (parameterIndex < 0) {
+        return;
+      }
+      std::cout << "Metadata: " << functionCall->expressionMetadata.parameters.size() << std::endl;
+      // Search the metadata parameter index skiping invisible ones
+      int visibleParameterIndex = 0;
+      int metadataParameterIndex = 0;
+      while (metadataParameterIndex < functionCall->expressionMetadata.parameters.size()) {
+        if (!functionCall->expressionMetadata.parameters[metadataParameterIndex].IsCodeOnly()) {
+          if (visibleParameterIndex == parameterIndex) {
+            break;
+          }
+          visibleParameterIndex++;
+        }
+        metadataParameterIndex++;
+      }
+      const gd::String &type = functionCall->expressionMetadata.parameters[metadataParameterIndex].GetType();
+      std::cout << "GetType: " << type << std::endl;
+      if (type == "string") {
+        // no completions for general text
+        return;
+      }
+
+
+
+      bool isLastParameter = parameterIndex == functionCall->parameters.size() - 1;
+      completions.push_back(
+        ExpressionCompletionDescription::ForText(type, node.text, isLastParameter, functionCall->objectName));
+    }
   }
   void OnVisitVariableNode(VariableNode& node) override {
     completions.push_back(
@@ -354,11 +438,12 @@ class GD_CORE_API ExpressionCompletionFinder
              (inclusive && searchedPosition <= location.GetEndPosition())));
   }
 
-  ExpressionCompletionFinder(size_t searchedPosition_)
-      : searchedPosition(searchedPosition_){};
+  ExpressionCompletionFinder(size_t searchedPosition_, gd::ExpressionNode& parentNodeAtLocation_)
+      : searchedPosition(searchedPosition_), parentNodeAtLocation(&parentNodeAtLocation_) { };
 
   std::vector<ExpressionCompletionDescription> completions;
   size_t searchedPosition;
+  gd::ExpressionNode* parentNodeAtLocation;
 };
 
 }  // namespace gd

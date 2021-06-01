@@ -47,9 +47,25 @@ class GD_CORE_API ExpressionNodeLocationFinder
   }
 
   /**
+   * \brief Helper function to find the parent of the deepest node at the search position, if
+   * any.
+   */
+  static ExpressionNode* GetParentNodeAtPosition(gd::ExpressionNode& node,
+                                           size_t searchedPosition) {
+    gd::ExpressionNodeLocationFinder finder(searchedPosition);
+    node.Visit(finder);
+    return finder.GetParentNode();
+  }
+
+  /**
    * \brief Return the deepest node found at the search position, if any.
    */
   ExpressionNode* GetNode() { return foundNode; };
+
+  /**
+   * \brief Return the deepest node found at the search position, if any.
+   */
+  ExpressionNode* GetParentNode() { return parentNode; };
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -110,6 +126,8 @@ class GD_CORE_API ExpressionNodeLocationFinder
     if (node.location.GetStartPosition() <= searchedPosition &&
         ((!inclusive && searchedPosition < node.location.GetEndPosition()) ||
          (inclusive && searchedPosition <= node.location.GetEndPosition()))) {
+           
+      parentNode = foundNode;
       foundNode = &node;
       return true;
     }
@@ -119,6 +137,7 @@ class GD_CORE_API ExpressionNodeLocationFinder
 
   size_t searchedPosition;
   ExpressionNode* foundNode;
+  ExpressionNode* parentNode;
 };
 
 }  // namespace gd

@@ -5,6 +5,7 @@ import {
   filterObjectsList,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
+import { enumerateVariables, filterVariablesList } from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
@@ -18,11 +19,13 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
+import uniq from 'lodash/uniq';
 
 type BaseExpressionAutocompletion = {|
   completion: string,
   addParenthesis?: boolean,
   addDot?: boolean,
+  addParameterSeparator?: boolean,
   addNamespaceSeparator?: boolean,
   addClosingParenthesis?: boolean,
   isExact?: boolean,
@@ -218,6 +221,50 @@ const getAutocompletionsForObject = function(
   ];
 };
 
+const getAutocompletionsForText = function(
+  expressionAutocompletionContext: ExpressionAutocompletionContext,
+  completionDescription: gdExpressionCompletionDescription
+): Array<ExpressionAutocompletion> {
+  const prefix: string = completionDescription.getPrefix();
+  const type: string = completionDescription.getType();
+  //const objectName: string = completionDescription.getObjectName();
+  const {
+    globalObjectsContainer,
+    objectsContainer,
+  } = expressionAutocompletionContext;
+
+  console.log("getAutocompletionsForText:" + type);
+
+  let autocompletionTexts: string[] = [];
+  if (type === "layer") {
+    const layout = (objectsContainer: gdLayout);
+    autocompletionTexts.push("\"\"");
+    for (let index = 0; index < layout.getLayersCount(); index++) {
+      autocompletionTexts.push(`"${layout.getLayerAt(index).getName()}"`);
+    }
+  } else if (type === "sceneName") {
+    const project = (globalObjectsContainer: gdProject);
+    for (let index = 0; index < project.getLayoutsCount(); index++) {
+      autocompletionTexts.push(`"${project.getLayoutAt(index).getName()}"`);
+    }
+  } else if (type === "stringWithSelector") {
+    //TODO handle stringWithSelector autocompletion
+  } else if (type === "joyaxis") {
+    //TODO handle joyaxis autocompletion
+  }
+  //TODO add missing string types in Core\GDCore\Extensions\Metadata\ParameterMetadata.h
+
+  const filteredTextList = filterVariablesList(autocompletionTexts, prefix);
+
+  const isLastParameter = completionDescription.isLastParameter();
+  return filteredTextList.map(text => ({
+      kind: 'Text',
+      completion: text,
+      addParameterSeparator: !isLastParameter,
+      addClosingParenthesis: isLastParameter,
+    }));
+};
+
 const getAutocompletionsForBehavior = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
@@ -258,6 +305,8 @@ export const getAutocompletionsFromDescriptions = (
     mapVector(expressionCompletionDescriptions, completionDescription => {
       const completionKind = completionDescription.getCompletionKind();
 
+      console.log("completionKind: " + completionKind);
+
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
         const objectName: string = completionDescription.getObjectName();
         const behaviorName: string = completionDescription.getBehaviorName();
@@ -290,6 +339,13 @@ export const getAutocompletionsFromDescriptions = (
           expressionAutocompletionContext,
           completionDescription
         );
+      } else if (
+        completionKind === gd.ExpressionCompletionDescription.Text
+      ) {
+        return getAutocompletionsForText(
+          expressionAutocompletionContext,
+          completionDescription
+        );
       }
 
       return [];
@@ -297,6 +353,7 @@ export const getAutocompletionsFromDescriptions = (
   );
 };
 
+//TODO handle string expressions
 const separatorChars = ' .:+-/*=()<>[]@!?|\\^%#';
 
 type InsertedAutocompletion = {|
@@ -304,6 +361,7 @@ type InsertedAutocompletion = {|
   addParenthesis?: ?boolean,
   addClosingParenthesis?: ?boolean,
   addDot?: ?boolean,
+  addParameterSeparator?: ?boolean,
   addNamespaceSeparator?: ?boolean,
 |};
 
@@ -319,6 +377,8 @@ export const insertAutocompletionInExpression = (
   const formatCompletion = (nextCharacter: ?string) => {
     const suffix = insertedAutocompletion.addDot
       ? '.'
+      : insertedAutocompletion.addParameterSeparator
+      ? ', '
       : insertedAutocompletion.addNamespaceSeparator
       ? '::'
       : insertedAutocompletion.addParenthesis

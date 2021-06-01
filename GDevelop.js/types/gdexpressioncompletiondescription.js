@@ -10,6 +10,7 @@ declare class gdExpressionCompletionDescription {
   getObjectName(): string;
   getBehaviorName(): string;
   isExact(): boolean;
+  isLastParameter(): boolean;
   delete(): void;
   ptr: number;
 };

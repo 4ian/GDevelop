@@ -93,3 +93,22 @@ export const enumerateVariables = (
     })
   );
 };
+
+
+export const filterVariablesList = (
+  list: Array<string>,
+  searchText: string
+): ObjectWithContextList => {
+  if (!searchText) return list;
+
+  const lowercaseSearchText = searchText.toLowerCase();
+
+  return list
+    .filter((variableName: string) => {
+      return (
+        variableName
+          .toLowerCase()
+          .indexOf(lowercaseSearchText) !== -1
+      );
+    });
+};

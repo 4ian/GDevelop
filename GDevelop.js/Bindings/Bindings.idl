@@ -1972,8 +1972,9 @@ interface ExpressionValidator {
 enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Object",
   "ExpressionCompletionDescription::Behavior",
+  "ExpressionCompletionDescription::Expression",
   "ExpressionCompletionDescription::Variable",
-  "ExpressionCompletionDescription::Expression"
+  "ExpressionCompletionDescription::Text"
 };
 
 interface ExpressionCompletionDescription {
@@ -1983,6 +1984,7 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
   boolean IsExact();
+  boolean IsLastParameter();
 };
 
 interface VectorExpressionCompletionDescription {

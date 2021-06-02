@@ -5,7 +5,6 @@ import {
   filterObjectsList,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
-import { enumerateVariables, filterVariablesList } from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
@@ -19,10 +18,10 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import uniq from 'lodash/uniq';
 
 type BaseExpressionAutocompletion = {|
   completion: string,
+  isString?: boolean,
   addParenthesis?: boolean,
   addDot?: boolean,
   addParameterSeparator?: boolean,
@@ -233,36 +232,54 @@ const getAutocompletionsForText = function(
     objectsContainer,
   } = expressionAutocompletionContext;
 
-  console.log("getAutocompletionsForText:" + type);
+  console.log('getAutocompletionsForText:' + type);
+  console.log('prefix:' + prefix);
 
   let autocompletionTexts: string[] = [];
-  if (type === "layer") {
+  if (type === 'layer') {
     const layout = (objectsContainer: gdLayout);
-    autocompletionTexts.push("\"\"");
     for (let index = 0; index < layout.getLayersCount(); index++) {
       autocompletionTexts.push(`"${layout.getLayerAt(index).getName()}"`);
     }
-  } else if (type === "sceneName") {
+  } else if (type === 'sceneName') {
     const project = (globalObjectsContainer: gdProject);
     for (let index = 0; index < project.getLayoutsCount(); index++) {
       autocompletionTexts.push(`"${project.getLayoutAt(index).getName()}"`);
     }
-  } else if (type === "stringWithSelector") {
+  } else if (type === 'stringWithSelector') {
     //TODO handle stringWithSelector autocompletion
-  } else if (type === "joyaxis") {
+  } else if (type === 'joyaxis') {
     //TODO handle joyaxis autocompletion
   }
   //TODO add missing string types in Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
-  const filteredTextList = filterVariablesList(autocompletionTexts, prefix);
+  const filterStringList = (
+    list: Array<string>,
+    searchText: string
+  ): ObjectWithContextList => {
+    if (!searchText) return list;
+
+    const lowercaseSearchText = searchText.toLowerCase();
+
+    return list.filter((variableName: string) => {
+      return variableName.toLowerCase().indexOf(lowercaseSearchText) !== -1;
+    });
+  };
+  // TODO Add the node to the description?
+  // Won't work because quotes are not included
+  const filteredTextList =
+    prefix[prefix.length - 1] === '"'
+      ? []
+      : filterStringList(autocompletionTexts, prefix);
 
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({
-      kind: 'Text',
-      completion: text,
-      addParameterSeparator: !isLastParameter,
-      addClosingParenthesis: isLastParameter,
-    }));
+    kind: 'Text',
+    completion: text,
+    isString: true,
+    addParameterSeparator: !isLastParameter,
+    addClosingParenthesis: isLastParameter,
+  }));
 };
 
 const getAutocompletionsForBehavior = function(
@@ -305,7 +322,7 @@ export const getAutocompletionsFromDescriptions = (
     mapVector(expressionCompletionDescriptions, completionDescription => {
       const completionKind = completionDescription.getCompletionKind();
 
-      console.log("completionKind: " + completionKind);
+      console.log('completionKind: ' + completionKind);
 
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
         const objectName: string = completionDescription.getObjectName();
@@ -339,9 +356,7 @@ export const getAutocompletionsFromDescriptions = (
           expressionAutocompletionContext,
           completionDescription
         );
-      } else if (
-        completionKind === gd.ExpressionCompletionDescription.Text
-      ) {
+      } else if (completionKind === gd.ExpressionCompletionDescription.Text) {
         return getAutocompletionsForText(
           expressionAutocompletionContext,
           completionDescription
@@ -358,6 +373,7 @@ const separatorChars = ' .:+-/*=()<>[]@!?|\\^%#';
 
 type InsertedAutocompletion = {|
   completion: string,
+  isString?: ?boolean,
   addParenthesis?: ?boolean,
   addClosingParenthesis?: ?boolean,
   addDot?: ?boolean,
@@ -385,6 +401,8 @@ export const insertAutocompletionInExpression = (
       ? insertedAutocompletion.addClosingParenthesis
         ? '()'
         : '('
+      : insertedAutocompletion.addClosingParenthesis
+      ? ')'
       : '';
 
     const addSuffix =
@@ -407,36 +425,72 @@ export const insertAutocompletionInExpression = (
 
   // Start from the character just before the caret.
   const startPosition = caretLocation - 1;
+  let wordStartPosition: integer;
+  let wordEndPosition: integer;
+  if (insertedAutocompletion.isString) {
+    const isSeparatorChar = (expression: string, index: integer) => {
+      if (expression[index] !== '"') {
+        return false;
+      }
+      let firstEscapeCharPosition = index - 1;
+      while (
+        wordStartPosition >= 0 &&
+        expression[firstEscapeCharPosition] === '\\'
+      ) {
+        wordStartPosition--;
+      }
+      const escapeCharCount = index - 1 - firstEscapeCharPosition;
+      return escapeCharCount % 2 === 0;
+    };
 
-  const isSeparatorChar = (char: string) => {
-    return separatorChars.indexOf(char) !== -1;
-  };
-
-  // Find the start position of the current word, unless we're already on a separator.
-  let wordStartPosition = startPosition;
-  const startPositionIsSeparator = isSeparatorChar(
-    expression[wordStartPosition]
-  );
-  if (!startPositionIsSeparator) {
+    // Find the start position of the current word.
+    wordStartPosition = startPosition;
     while (
-      wordStartPosition > 0 &&
-      !isSeparatorChar(expression[wordStartPosition - 1])
+      wordStartPosition >= 0 &&
+      !isSeparatorChar(expression, wordStartPosition)
     ) {
       wordStartPosition--;
     }
-  } else {
-    // If the start position is a separator, the new word start position
-    // must be after the separator.
-    wordStartPosition++;
-  }
 
-  // Find the end position of the current word
-  let wordEndPosition = startPosition;
-  while (
-    wordEndPosition < expression.length &&
-    !isSeparatorChar(expression[wordEndPosition + 1])
-  ) {
-    wordEndPosition++;
+    // Find the end position of the current word
+    wordEndPosition = startPosition + 1;
+    while (
+      wordEndPosition < expression.length &&
+      !isSeparatorChar(expression, wordEndPosition)
+    ) {
+      wordEndPosition++;
+    }
+  } else {
+    const isSeparatorChar = (char: string) => {
+      return separatorChars.indexOf(char) !== -1;
+    };
+
+    // Find the start position of the current word, unless we're already on a separator.
+    wordStartPosition = startPosition;
+    const startPositionIsSeparator = isSeparatorChar(
+      expression[wordStartPosition]
+    );
+    if (!startPositionIsSeparator) {
+      while (
+        wordStartPosition > 0 &&
+        !isSeparatorChar(expression[wordStartPosition - 1])
+      ) {
+        wordStartPosition--;
+      }
+    } else {
+      // If the start position is a separator, the new word start position
+      // must be after the separator.
+      wordStartPosition++;
+    }
+
+    // Find the end position of the current word
+    wordEndPosition = startPosition;
+    while (
+      wordEndPosition < expression.length &&
+      !isSeparatorChar(expression[wordEndPosition + 1])
+    ) {
+      wordEndPosition++;
+    }
   }
 
   // The next character, if any, will be useful to format the completion

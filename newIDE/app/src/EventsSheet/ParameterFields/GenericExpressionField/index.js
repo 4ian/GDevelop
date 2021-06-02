@@ -286,6 +286,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       { expression, caretLocation },
       {
         completion: expressionAutocompletion.completion,
+        isString: expressionAutocompletion.isString,
         addParenthesis: expressionAutocompletion.addParenthesis,
         addDot: expressionAutocompletion.addDot,
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,

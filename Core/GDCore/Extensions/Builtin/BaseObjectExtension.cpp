@@ -631,7 +631,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Remove variable from an object array (by index)"),
          _("Removes a variable at the specified index of an object array "
            "variable."),
-         _("Remove variable at index _PARAM2_ from array variable _PARAM1_ of "
+         _("Remove variable at index _PARAM2_ from object array variable _PARAM1_ of "
            "object _PARAM0_"),
          _("Variables/Collections/Arrays"),
          "res/actions/var24.png",

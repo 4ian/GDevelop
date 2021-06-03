@@ -14,6 +14,7 @@ declare class gdExpressionCompletionDescription {
   isLastParameter(): boolean;
   getReplacementStartPosition(): number;
   getReplacementEndPosition(): number;
+  getParameterMetadata(): gdParameterMetadata;
   delete(): void;
   ptr: number;
 };

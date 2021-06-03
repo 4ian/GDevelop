@@ -1987,6 +1987,7 @@ interface ExpressionCompletionDescription {
   boolean IsLastParameter();
   unsigned long GetReplacementStartPosition();
   unsigned long GetReplacementEndPosition();
+  [Const, Ref] ParameterMetadata GetParameterMetadata();
 };
 
 interface VectorExpressionCompletionDescription {

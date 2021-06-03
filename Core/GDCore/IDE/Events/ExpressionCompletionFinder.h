@@ -80,6 +80,7 @@ struct ExpressionCompletionDescription {
    */
   static ExpressionCompletionDescription ForText(
       const gd::String& type_,
+      const gd::ParameterMetadata &parameterMetadata_,
       const gd::String& prefix_,
       size_t replacementStartPosition_,
       size_t replacementEndPosition_,
@@ -87,6 +88,7 @@ struct ExpressionCompletionDescription {
       const gd::String& objectName_ = "") {
     auto description = ExpressionCompletionDescription(Text, type_, prefix_, replacementStartPosition_, replacementEndPosition_, objectName_);
     description.SetIsLastParameter(isLastParameter_);
+    description.SetParameterMetadata(parameterMetadata_);
     return description;
   }
 
@@ -182,6 +184,19 @@ struct ExpressionCompletionDescription {
    */
   bool IsLastParameter() const { return isLastParameter; }
 
+  /**
+   * \brief Set the parameter metadata.
+   */
+  ExpressionCompletionDescription& SetParameterMetadata(const gd::ParameterMetadata &parameterMetadata_) {
+    parameterMetadata = &parameterMetadata_;
+    return *this;
+  }
+
+  /**
+   * \brief Return the parameter metadata if the completion is about a parameter.
+   */
+  const gd::ParameterMetadata& GetParameterMetadata() const { return *parameterMetadata; }
+
   /** Default constructor, only to be used by Emscripten bindings. */
   ExpressionCompletionDescription() : completionKind(Object){};
 
@@ -201,7 +216,8 @@ struct ExpressionCompletionDescription {
         objectName(objectName_),
         behaviorName(behaviorName_),
         isExact(false),
-        isLastParameter(false) {}
+        isLastParameter(false),
+        parameterMetadata(nullptr) {}
 
   CompletionKind completionKind;
   gd::String type;
@@ -212,6 +228,7 @@ struct ExpressionCompletionDescription {
   gd::String behaviorName;
   bool isExact;
   bool isLastParameter;
+  const gd::ParameterMetadata* parameterMetadata;
 };
 
 /**
@@ -355,6 +372,7 @@ class GD_CORE_API ExpressionCompletionFinder
       completions.push_back(
         ExpressionCompletionDescription::ForText(
           type,
+          *parameterMetadata,
           node.text,
           node.location.GetStartPosition(),
           node.location.GetEndPosition(),

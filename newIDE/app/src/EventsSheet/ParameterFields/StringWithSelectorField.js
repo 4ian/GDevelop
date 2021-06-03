@@ -4,7 +4,7 @@ import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
-const getChoices = (
+export const getParameterChoices = (
   parameterMetadata: ?gdParameterMetadata
 ): Array<ExpressionAutocompletion> => {
   if (!parameterMetadata) {
@@ -41,7 +41,7 @@ export default class StringWithSelectorField extends Component<
       <GenericExpressionField
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
-          getChoices(this.props.parameterMetadata).filter(
+          getParameterChoices(this.props.parameterMetadata).filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }

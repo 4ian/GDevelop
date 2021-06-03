@@ -18,6 +18,7 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
+import { getParameterChoices } from '../EventsSheet/ParameterFields/StringWithSelectorField';
 
 type BaseExpressionAutocompletion = {|
   completion: string,
@@ -272,11 +273,11 @@ const getAutocompletionsForText = function(
       }
     }
   } else if (type === 'stringWithSelector') {
-    //TODO handle stringWithSelector autocompletion
-  } else if (type === 'joyaxis') {
-    //TODO handle joyaxis autocompletion
+    autocompletionTexts = getParameterChoices(
+      completionDescription.getParameterMetadata()
+    ).map(autocompletion => autocompletion.completion);
   }
-  //TODO add missing string types in Core\GDCore\Extensions\Metadata\ParameterMetadata.h
+  // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
   const filteredTextList = filterStringList(autocompletionTexts, prefix);
 

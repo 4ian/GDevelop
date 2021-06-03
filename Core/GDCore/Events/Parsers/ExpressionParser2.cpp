@@ -192,7 +192,6 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   auto text = gd::make_unique<TextNode>(parsedText);
   text->location =
       ExpressionParserLocation(textStartPosition, GetCurrentPosition());
-
   if (!textParsingHasEnded) {
     text->diagnostic =
         RaiseSyntaxError(_("A text must end with a double quote (\"). Add a "

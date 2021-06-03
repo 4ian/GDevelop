@@ -358,6 +358,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project,
         globalObjectsContainer,
         objectsContainer,
         scope,

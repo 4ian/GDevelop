@@ -53,6 +53,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -85,6 +86,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions2 = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -115,6 +117,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -156,6 +159,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -192,6 +196,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -223,6 +228,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,
@@ -262,6 +268,7 @@ describe('ExpressionAutocompletion', () => {
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project: project,
         globalObjectsContainer: project,
         objectsContainer: testLayout,
         scope,

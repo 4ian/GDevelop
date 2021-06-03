@@ -6,8 +6,6 @@
 #ifndef GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
 #define GDCORE_EXPRESSIONAUTOCOMPLETIONPROVIDER_H
 
-#include <fstream>
-#include <iostream>
 #include <memory>
 #include <vector>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
@@ -40,7 +38,7 @@ struct ExpressionCompletionDescription {
     Behavior,
     Expression,
     Variable,
-    Text,
+    Text
   };
 
   /**
@@ -161,8 +159,14 @@ struct ExpressionCompletionDescription {
    */
   bool IsExact() const { return isExact; }
 
+  /**
+   * \brief Return the first character index of the autocompleted part.
+   */
   size_t GetReplacementStartPosition() const { return replacementStartPosition; }
 
+  /**
+   * \brief Return the first character index after the autocompleted part.
+   */
   size_t GetReplacementEndPosition() const { return replacementEndPosition; }
 
   /**
@@ -243,8 +247,6 @@ class GD_CORE_API ExpressionCompletionFinder
     node.Visit(finder);
     gd::ExpressionNode* nodeAtLocation = finder.GetNode();
     gd::ExpressionNode* parentNodeAtLocation = finder.GetParentNode();
-
-    std::cout << "GetCompletionDescriptionsFor Test" << std::endl;
     
     if (nodeAtLocation == nullptr) {
       std::vector<ExpressionCompletionDescription> emptyCompletions;
@@ -314,7 +316,7 @@ class GD_CORE_API ExpressionCompletionFinder
   }
   void OnVisitTextNode(TextNode& node) override {
     FunctionCallNode* functionCall = dynamic_cast<FunctionCallNode*>(parentNodeAtLocation);
-    if (functionCall != NULL) {
+    if (functionCall != nullptr) {
       int parameterIndex = -1;
       for (int i = 0; i < functionCall->parameters.size(); i++)
       {
@@ -326,7 +328,7 @@ class GD_CORE_API ExpressionCompletionFinder
       if (parameterIndex < 0) {
         return;
       }
-      // Search the metadata parameter index skiping invisible ones
+      // Search the metadata parameter index skipping invisible ones
       int visibleParameterIndex = 0;
       int metadataParameterIndex = 0;
       while (metadataParameterIndex < functionCall->expressionMetadata.parameters.size()) {
@@ -337,6 +339,10 @@ class GD_CORE_API ExpressionCompletionFinder
           visibleParameterIndex++;
         }
         metadataParameterIndex++;
+      }
+      if (metadataParameterIndex == functionCall->expressionMetadata.parameters.size()) {
+        // too many parameters
+        return;
       }
       const gd::String &type = functionCall->expressionMetadata.parameters[metadataParameterIndex].GetType();
       if (type == "string") {

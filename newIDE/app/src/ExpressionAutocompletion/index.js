@@ -21,8 +21,8 @@ import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/Generic
 
 type BaseExpressionAutocompletion = {|
   completion: string,
-  replacementStartPosition: integer,
-  replacementEndPosition: integerg,
+  replacementStartPosition?: number,
+  replacementEndPosition?: number,
   addParenthesis?: boolean,
   addDot?: boolean,
   addParameterSeparator?: boolean,
@@ -53,16 +53,30 @@ export type ExpressionAutocompletion =
 
 type ExpressionAutocompletionContext = {|
   gd: libGDevelop,
+  project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   scope: EventsScope,
 |};
 
+const filterStringList = (
+  list: Array<string>,
+  searchText: string
+): Array<string> => {
+  if (!searchText) return list;
+
+  const lowercaseSearchText = searchText.toLowerCase();
+
+  return list.filter((text: string) => {
+    return text.toLowerCase().indexOf(lowercaseSearchText) !== -1;
+  });
+};
+
 const getAutocompletionsForExpressions = (
   expressionMetadatas: Array<EnumeratedExpressionMetadata>,
   prefix: string,
-  replacementStartPosition: integer,
-  replacementEndPosition: integer,
+  replacementStartPosition: number,
+  replacementEndPosition: number,
   isExact: boolean
 ): Array<ExpressionAutocompletion> => {
   return expressionMetadatas
@@ -241,22 +255,21 @@ const getAutocompletionsForText = function(
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
-  //const objectName: string = completionDescription.getObjectName();
-  const {
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
+  const { project, scope } = expressionAutocompletionContext;
 
   let autocompletionTexts: string[] = [];
   if (type === 'layer') {
-    const layout = (objectsContainer: gdLayout);
-    for (let index = 0; index < layout.getLayersCount(); index++) {
-      autocompletionTexts.push(`"${layout.getLayerAt(index).getName()}"`);
+    const layout = scope.layout;
+    if (layout) {
+      for (let index = 0; index < layout.getLayersCount(); index++) {
+        autocompletionTexts.push(`"${layout.getLayerAt(index).getName()}"`);
+      }
     }
   } else if (type === 'sceneName') {
-    const project = (globalObjectsContainer: gdProject);
-    for (let index = 0; index < project.getLayoutsCount(); index++) {
-      autocompletionTexts.push(`"${project.getLayoutAt(index).getName()}"`);
+    if (project) {
+      for (let index = 0; index < project.getLayoutsCount(); index++) {
+        autocompletionTexts.push(`"${project.getLayoutAt(index).getName()}"`);
+      }
     }
   } else if (type === 'stringWithSelector') {
     //TODO handle stringWithSelector autocompletion
@@ -264,19 +277,6 @@ const getAutocompletionsForText = function(
     //TODO handle joyaxis autocompletion
   }
   //TODO add missing string types in Core\GDCore\Extensions\Metadata\ParameterMetadata.h
-
-  const filterStringList = (
-    list: Array<string>,
-    searchText: string
-  ): ObjectWithContextList => {
-    if (!searchText) return list;
-
-    const lowercaseSearchText = searchText.toLowerCase();
-
-    return list.filter((variableName: string) => {
-      return variableName.toLowerCase().indexOf(lowercaseSearchText) !== -1;
-    });
-  };
 
   const filteredTextList = filterStringList(autocompletionTexts, prefix);
 
@@ -379,8 +379,8 @@ export const getAutocompletionsFromDescriptions = (
 
 type InsertedAutocompletion = {|
   completion: string,
-  replacementStartPosition: integer,
-  replacementEndPosition: integerg,
+  replacementStartPosition?: number,
+  replacementEndPosition?: number,
   addParenthesis?: ?boolean,
   addClosingParenthesis?: ?boolean,
   addDot?: ?boolean,
@@ -430,9 +430,12 @@ export const insertAutocompletionInExpression = (
     };
   }
 
-  let wordStartPosition: integer =
-    insertedAutocompletion.replacementStartPosition;
-  let wordEndPosition: integer = insertedAutocompletion.replacementEndPosition;
+  const wordStartPosition: number = insertedAutocompletion.replacementStartPosition
+    ? insertedAutocompletion.replacementStartPosition
+    : 0;
+  const wordEndPosition: number = insertedAutocompletion.replacementEndPosition
+    ? insertedAutocompletion.replacementEndPosition
+    : expression.length;
 
   // The next character, if any, will be useful to format the completion
   // (to avoid repeating an existing character).

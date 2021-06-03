@@ -331,26 +331,27 @@ class GD_CORE_API ExpressionCompletionFinder
       // Search the metadata parameter index skipping invisible ones
       int visibleParameterIndex = 0;
       int metadataParameterIndex = 0;
+      const gd::ParameterMetadata *parameterMetadata = nullptr;
       while (metadataParameterIndex < functionCall->expressionMetadata.parameters.size()) {
         if (!functionCall->expressionMetadata.parameters[metadataParameterIndex].IsCodeOnly()) {
           if (visibleParameterIndex == parameterIndex) {
-            break;
+            parameterMetadata = &functionCall->expressionMetadata.parameters[metadataParameterIndex];
           }
           visibleParameterIndex++;
         }
         metadataParameterIndex++;
       }
-      if (metadataParameterIndex == functionCall->expressionMetadata.parameters.size()) {
-        // too many parameters
+      const int visibleParameterCount = visibleParameterIndex;
+      if (parameterMetadata == nullptr) {
+        // There are too many parameters in the expression
         return;
       }
-      const gd::String &type = functionCall->expressionMetadata.parameters[metadataParameterIndex].GetType();
+      const gd::String &type = parameterMetadata->GetType();
       if (type == "string") {
         // no completions for general text
         return;
       }
-
-      bool isLastParameter = parameterIndex == functionCall->parameters.size() - 1;
+      bool isLastParameter = parameterIndex == visibleParameterCount - 1;
       completions.push_back(
         ExpressionCompletionDescription::ForText(
           type,

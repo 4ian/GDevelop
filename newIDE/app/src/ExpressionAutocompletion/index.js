@@ -18,7 +18,7 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
-import { getParameterChoices } from '../EventsSheet/ParameterFields/StringWithSelectorField';
+import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 
 type BaseExpressionAutocompletion = {|
   completion: string,

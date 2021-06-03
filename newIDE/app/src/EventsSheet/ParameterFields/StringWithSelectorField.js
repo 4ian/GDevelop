@@ -2,29 +2,8 @@
 import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
+import { getParameterChoices } from './ParameterMetadataTools';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
-
-export const getParameterChoices = (
-  parameterMetadata: ?gdParameterMetadata
-): Array<ExpressionAutocompletion> => {
-  if (!parameterMetadata) {
-    return [];
-  }
-
-  try {
-    return JSON.parse(parameterMetadata.getExtraInfo()).map(choice => ({
-      kind: 'Text',
-      completion: `"${choice}"`,
-    }));
-  } catch (exception) {
-    console.error(
-      'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',
-      exception
-    );
-  }
-
-  return [];
-};
 
 export default class StringWithSelectorField extends Component<
   ParameterFieldProps,

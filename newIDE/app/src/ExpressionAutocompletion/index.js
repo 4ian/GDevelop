@@ -247,9 +247,6 @@ const getAutocompletionsForText = function(
     objectsContainer,
   } = expressionAutocompletionContext;
 
-  console.log('getAutocompletionsForText:' + type);
-  console.log('prefix:' + prefix);
-
   let autocompletionTexts: string[] = [];
   if (type === 'layer') {
     const layout = (objectsContainer: gdLayout);
@@ -340,10 +337,6 @@ export const getAutocompletionsFromDescriptions = (
     mapVector(expressionCompletionDescriptions, completionDescription => {
       const completionKind = completionDescription.getCompletionKind();
 
-      console.log('completionKind: ' + completionKind);
-      
-      console.log("replacement: " + completionDescription.getReplacementStartPosition() + " --> " + completionDescription.getReplacementEndPosition());
-
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
         const objectName: string = completionDescription.getObjectName();
         const behaviorName: string = completionDescription.getBehaviorName();
@@ -425,7 +418,6 @@ export const insertAutocompletionInExpression = (
 
     const addSuffix =
       !nextCharacter || !suffix || nextCharacter[0] !== suffix[0];
-      console.log("addSuffix:" + addSuffix);
 
     return insertedAutocompletion.completion + (addSuffix ? suffix : '');
   };
@@ -442,9 +434,9 @@ export const insertAutocompletionInExpression = (
     };
   }
 
-  let wordStartPosition: integer = insertedAutocompletion.replacementStartPosition;
+  let wordStartPosition: integer =
+    insertedAutocompletion.replacementStartPosition;
   let wordEndPosition: integer = insertedAutocompletion.replacementEndPosition;
-  console.log("replacement: " + wordStartPosition + " --> " + wordEndPosition);
 
   // The next character, if any, will be useful to format the completion
   // (to avoid repeating an existing character).

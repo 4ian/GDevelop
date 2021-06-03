@@ -284,17 +284,21 @@ describe('ExpressionAutocompletion', () => {
     expect(
       insertAutocompletionInExpression(
         { expression: '', caretLocation: 0 },
-        { completion: 'HelloWorld',
+        {
+          completion: 'HelloWorld',
           replacementStartPosition: 0,
-          replacementEndPosition: 0, }
+          replacementEndPosition: 0,
+        }
       )
     ).toMatchObject({ expression: 'HelloWorld' });
     expect(
       insertAutocompletionInExpression(
         { expression: '', caretLocation: 1 },
-        { completion: 'HelloWorld',
-        replacementStartPosition: 0,
-        replacementEndPosition: 0, }
+        {
+          completion: 'HelloWorld',
+          replacementStartPosition: 0,
+          replacementEndPosition: 0,
+        }
       )
     ).toMatchObject({ expression: 'HelloWorld' });
 

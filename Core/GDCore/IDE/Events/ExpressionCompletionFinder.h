@@ -313,21 +313,12 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions
   }
   void OnVisitTextNode(TextNode& node) override {
-
-    std::cout << "testtest" << std::endl;
-
-    std::cout << "node: " << (long)&node << std::endl;
-
     FunctionCallNode* functionCall = dynamic_cast<FunctionCallNode*>(parentNodeAtLocation);
     if (functionCall != NULL) {
-
-      std::cout << "count: " << functionCall->parameters.size() << std::endl;
       int parameterIndex = -1;
       for (int i = 0; i < functionCall->parameters.size(); i++)
       {
-        std::cout << "param: " << (long)functionCall->parameters.at(i).get() << std::endl;
         if (functionCall->parameters.at(i).get() == &node) {
-          std::cout << "found: " << i << std::endl;
           parameterIndex = i;
           break;
         }
@@ -335,7 +326,6 @@ class GD_CORE_API ExpressionCompletionFinder
       if (parameterIndex < 0) {
         return;
       }
-      std::cout << "Metadata: " << functionCall->expressionMetadata.parameters.size() << std::endl;
       // Search the metadata parameter index skiping invisible ones
       int visibleParameterIndex = 0;
       int metadataParameterIndex = 0;
@@ -349,13 +339,10 @@ class GD_CORE_API ExpressionCompletionFinder
         metadataParameterIndex++;
       }
       const gd::String &type = functionCall->expressionMetadata.parameters[metadataParameterIndex].GetType();
-      std::cout << "GetType: " << type << std::endl;
       if (type == "string") {
         // no completions for general text
         return;
       }
-
-
 
       bool isLastParameter = parameterIndex == functionCall->parameters.size() - 1;
       completions.push_back(

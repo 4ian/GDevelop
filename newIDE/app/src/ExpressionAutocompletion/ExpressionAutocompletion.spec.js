@@ -157,8 +157,6 @@ describe('ExpressionAutocompletion', () => {
       expressionNode,
       9
     );
-    console.log('completionDescriptions : ' + completionDescriptions.size());
-    //console.log("getCompletionKind() : " + completionDescriptions.at(0).getCompletionKind());
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,

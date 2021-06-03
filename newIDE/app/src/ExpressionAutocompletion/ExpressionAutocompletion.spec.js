@@ -9,6 +9,9 @@ const makeTestContext = () => {
   const project = gd.ProjectHelper.createNewGDJSProject();
   const testLayout = project.insertNewLayout('Scene', 0);
 
+  testLayout.insertNewLayer('Background', 0);
+  testLayout.insertNewLayer('Foreground', 0);
+
   testLayout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
   const spriteObjectWithBehaviors = testLayout.insertNewObject(
     project,
@@ -140,6 +143,38 @@ describe('ExpressionAutocompletion', () => {
           completion: 'TouchX',
           addParenthesis: true,
           isExact: false,
+        }),
+      ])
+    );
+  });
+
+  it('can autocomplete layer parameters', () => {
+    const { project, testLayout, parser } = makeTestContext();
+    const scope = { layout: testLayout };
+
+    const expressionNode = parser.parseExpression('number', 'MouseX("Ba').get();
+    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      expressionNode,
+      9
+    );
+    console.log('completionDescriptions : ' + completionDescriptions.size());
+    //console.log("getCompletionKind() : " + completionDescriptions.at(0).getCompletionKind());
+    const autocompletions = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptions
+    );
+    expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: '"Background"',
+          addParameterSeparator: true,
+          addClosingParenthesis: false,
         }),
       ])
     );

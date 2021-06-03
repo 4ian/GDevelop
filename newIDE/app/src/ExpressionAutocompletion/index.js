@@ -277,12 +277,8 @@ const getAutocompletionsForText = function(
       return variableName.toLowerCase().indexOf(lowercaseSearchText) !== -1;
     });
   };
-  // TODO Add the node to the description?
-  // Won't work because quotes are not included
-  const filteredTextList =
-    prefix[prefix.length - 1] === '"'
-      ? []
-      : filterStringList(autocompletionTexts, prefix);
+
+  const filteredTextList = filterStringList(autocompletionTexts, prefix);
 
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({

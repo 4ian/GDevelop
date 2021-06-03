@@ -21,7 +21,8 @@ import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/Generic
 
 type BaseExpressionAutocompletion = {|
   completion: string,
-  isString?: boolean,
+  replacementStartPosition: integer,
+  replacementEndPosition: integerg,
   addParenthesis?: boolean,
   addDot?: boolean,
   addParameterSeparator?: boolean,
@@ -60,6 +61,8 @@ type ExpressionAutocompletionContext = {|
 const getAutocompletionsForExpressions = (
   expressionMetadatas: Array<EnumeratedExpressionMetadata>,
   prefix: string,
+  replacementStartPosition: integer,
+  replacementEndPosition: integer,
   isExact: boolean
 ): Array<ExpressionAutocompletion> => {
   return expressionMetadatas
@@ -78,6 +81,8 @@ const getAutocompletionsForExpressions = (
       return {
         kind: 'Expression',
         completion: enumeratedExpressionMetadata.name,
+        replacementStartPosition,
+        replacementEndPosition,
         enumeratedExpressionMetadata: enumeratedExpressionMetadata,
         addParenthesis: true,
         addClosingParenthesis:
@@ -105,6 +110,8 @@ const getAutocompletionsForFreeExpressions = function(
   return getAutocompletionsForExpressions(
     filteredFreeExpressions,
     prefix,
+    completionDescription.getReplacementStartPosition(),
+    completionDescription.getReplacementEndPosition(),
     isExact
   );
 };
@@ -138,6 +145,8 @@ const getAutocompletionsForObjectExpressions = function(
   return getAutocompletionsForExpressions(
     filteredObjectExpressions,
     prefix,
+    completionDescription.getReplacementStartPosition(),
+    completionDescription.getReplacementEndPosition(),
     isExact
   );
 };
@@ -174,6 +183,8 @@ const getAutocompletionsForBehaviorExpressions = function(
   return getAutocompletionsForExpressions(
     filteredBehaviorExpressions,
     prefix,
+    completionDescription.getReplacementStartPosition(),
+    completionDescription.getReplacementEndPosition(),
     isExact
   );
 };
@@ -209,12 +220,16 @@ const getAutocompletionsForObject = function(
     ...filteredObjectsList.map(({ object }) => ({
       kind: 'Object',
       completion: object.getName(),
+      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementEndPosition: completionDescription.getReplacementEndPosition(),
       object,
       addDot,
     })),
     ...filteredGroupsList.map(({ group }) => ({
       kind: 'Object',
       completion: group.getName(),
+      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementEndPosition: completionDescription.getReplacementEndPosition(),
       addDot,
     })),
   ];
@@ -276,7 +291,8 @@ const getAutocompletionsForText = function(
   return filteredTextList.map(text => ({
     kind: 'Text',
     completion: text,
-    isString: true,
+    replacementStartPosition: completionDescription.getReplacementStartPosition(),
+    replacementEndPosition: completionDescription.getReplacementEndPosition(),
     addParameterSeparator: !isLastParameter,
     addClosingParenthesis: isLastParameter,
   }));
@@ -307,6 +323,8 @@ const getAutocompletionsForBehavior = function(
     .map(behaviorName => ({
       kind: 'Behavior',
       completion: behaviorName,
+      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementEndPosition: completionDescription.getReplacementEndPosition(),
       addNamespaceSeparator: true,
       isExact,
     }));
@@ -323,6 +341,8 @@ export const getAutocompletionsFromDescriptions = (
       const completionKind = completionDescription.getCompletionKind();
 
       console.log('completionKind: ' + completionKind);
+      
+      console.log("replacement: " + completionDescription.getReplacementStartPosition() + " --> " + completionDescription.getReplacementEndPosition());
 
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
         const objectName: string = completionDescription.getObjectName();
@@ -368,12 +388,10 @@ export const getAutocompletionsFromDescriptions = (
   );
 };
 
-//TODO handle string expressions
-const separatorChars = ' .:+-/*=()<>[]@!?|\\^%#';
-
 type InsertedAutocompletion = {|
   completion: string,
-  isString?: ?boolean,
+  replacementStartPosition: integer,
+  replacementEndPosition: integerg,
   addParenthesis?: ?boolean,
   addClosingParenthesis?: ?boolean,
   addDot?: ?boolean,
@@ -407,6 +425,7 @@ export const insertAutocompletionInExpression = (
 
     const addSuffix =
       !nextCharacter || !suffix || nextCharacter[0] !== suffix[0];
+      console.log("addSuffix:" + addSuffix);
 
     return insertedAutocompletion.completion + (addSuffix ? suffix : '');
   };
@@ -423,83 +442,17 @@ export const insertAutocompletionInExpression = (
     };
   }
 
-  // Start from the character just before the caret.
-  const startPosition = caretLocation - 1;
-  let wordStartPosition: integer;
-  let wordEndPosition: integer;
-  if (insertedAutocompletion.isString) {
-    const isSeparatorChar = (expression: string, index: integer) => {
-      if (expression[index] !== '"') {
-        return false;
-      }
-      let firstEscapeCharPosition = index - 1;
-      while (
-        wordStartPosition >= 0 &&
-        expression[firstEscapeCharPosition] === '\\'
-      ) {
-        wordStartPosition--;
-      }
-      const escapeCharCount = index - 1 - firstEscapeCharPosition;
-      return escapeCharCount % 2 === 0;
-    };
-
-    // Find the start position of the current word.
-    wordStartPosition = startPosition;
-    while (
-      wordStartPosition >= 0 &&
-      !isSeparatorChar(expression, wordStartPosition)
-    ) {
-      wordStartPosition--;
-    }
-
-    // Find the end position of the current word
-    wordEndPosition = startPosition + 1;
-    while (
-      wordEndPosition < expression.length &&
-      !isSeparatorChar(expression, wordEndPosition)
-    ) {
-      wordEndPosition++;
-    }
-  } else {
-    const isSeparatorChar = (char: string) => {
-      return separatorChars.indexOf(char) !== -1;
-    };
-
-    // Find the start position of the current word, unless we're already on a separator.
-    wordStartPosition = startPosition;
-    const startPositionIsSeparator = isSeparatorChar(
-      expression[wordStartPosition]
-    );
-    if (!startPositionIsSeparator) {
-      while (
-        wordStartPosition > 0 &&
-        !isSeparatorChar(expression[wordStartPosition - 1])
-      ) {
-        wordStartPosition--;
-      }
-    } else {
-      // If the start position is a separator, the new word start position
-      // must be after the separator.
-      wordStartPosition++;
-    }
-
-    // Find the end position of the current word
-    wordEndPosition = startPosition;
-    while (
-      wordEndPosition < expression.length &&
-      !isSeparatorChar(expression[wordEndPosition + 1])
-    ) {
-      wordEndPosition++;
-    }
-  }
+  let wordStartPosition: integer = insertedAutocompletion.replacementStartPosition;
+  let wordEndPosition: integer = insertedAutocompletion.replacementEndPosition;
+  console.log("replacement: " + wordStartPosition + " --> " + wordEndPosition);
 
   // The next character, if any, will be useful to format the completion
   // (to avoid repeating an existing character).
-  const maybeNextCharacter: ?string = expression[wordEndPosition + 1];
+  const maybeNextCharacter: ?string = expression[wordEndPosition];
 
   const newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
-  const newExpressionEnd = expression.substring(wordEndPosition + 1);
+  const newExpressionEnd = expression.substring(wordEndPosition);
 
   return {
     caretLocation: newExpressionStart.length + insertedWord.length,

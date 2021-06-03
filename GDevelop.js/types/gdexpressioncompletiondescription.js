@@ -11,6 +11,8 @@ declare class gdExpressionCompletionDescription {
   getBehaviorName(): string;
   isExact(): boolean;
   isLastParameter(): boolean;
+  getReplacementStartPosition(): number;
+  getReplacementEndPosition(): number;
   delete(): void;
   ptr: number;
 };

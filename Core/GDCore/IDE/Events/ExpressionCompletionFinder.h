@@ -46,9 +46,12 @@ struct ExpressionCompletionDescription {
   /**
    * \brief Create a completion for an object with the given prefix
    */
-  static ExpressionCompletionDescription ForObject(const gd::String& type_,
-                                                   const gd::String& prefix_) {
-    return ExpressionCompletionDescription(Object, type_, prefix_);
+  static ExpressionCompletionDescription ForObject(
+      const gd::String& type_,
+      const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_) {
+    return ExpressionCompletionDescription(Object, type_, prefix_, replacementStartPosition_, replacementEndPosition_);
   }
 
   /**
@@ -56,16 +59,22 @@ struct ExpressionCompletionDescription {
    * the specified object
    */
   static ExpressionCompletionDescription ForBehavior(
-      const gd::String& prefix_, const gd::String& objectName_) {
-    return ExpressionCompletionDescription(Behavior, "", prefix_, objectName_);
+      const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_,
+      const gd::String& objectName_) {
+    return ExpressionCompletionDescription(Behavior, "", prefix_, replacementStartPosition_, replacementEndPosition_, objectName_);
   }
 
   /**
    * \brief Create a completion for a variable with the given prefix
    */
   static ExpressionCompletionDescription ForVariable(
-      const gd::String& type_, const gd::String& prefix_) {
-    return ExpressionCompletionDescription(Variable, type_, prefix_);
+      const gd::String& type_,
+      const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_) {
+    return ExpressionCompletionDescription(Variable, type_, prefix_, replacementStartPosition_, replacementEndPosition_);
   }
 
   /**
@@ -74,9 +83,11 @@ struct ExpressionCompletionDescription {
   static ExpressionCompletionDescription ForText(
       const gd::String& type_,
       const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_,
       const bool isLastParameter_,
       const gd::String& objectName_ = "") {
-    auto description = ExpressionCompletionDescription(Text, type_, prefix_, objectName_);
+    auto description = ExpressionCompletionDescription(Text, type_, prefix_, replacementStartPosition_, replacementEndPosition_, objectName_);
     description.SetIsLastParameter(isLastParameter_);
     return description;
   }
@@ -88,10 +99,12 @@ struct ExpressionCompletionDescription {
   static ExpressionCompletionDescription ForExpression(
       const gd::String& type_,
       const gd::String& prefix_,
+      size_t replacementStartPosition_,
+      size_t replacementEndPosition_,
       const gd::String& objectName_ = "",
       const gd::String& behaviorName_ = "") {
     return ExpressionCompletionDescription(
-        Expression, type_, prefix_, objectName_, behaviorName_);
+        Expression, type_, prefix_, replacementStartPosition_, replacementEndPosition_, objectName_, behaviorName_);
   }
 
   /** Check if two description of completions are equal */
@@ -148,6 +161,10 @@ struct ExpressionCompletionDescription {
    */
   bool IsExact() const { return isExact; }
 
+  size_t GetReplacementStartPosition() const { return replacementStartPosition; }
+
+  size_t GetReplacementEndPosition() const { return replacementEndPosition; }
+
   /**
    * \brief Set if the expession is the last child of a function call.
    */
@@ -168,11 +185,15 @@ struct ExpressionCompletionDescription {
   ExpressionCompletionDescription(CompletionKind completionKind_,
                                   const gd::String& type_,
                                   const gd::String& prefix_,
+                                  size_t replacementStartPosition_,
+                                  size_t replacementEndPosition_,
                                   const gd::String& objectName_ = "",
                                   const gd::String& behaviorName_ = "")
       : completionKind(completionKind_),
         type(type_),
         prefix(prefix_),
+        replacementStartPosition(replacementStartPosition_),
+        replacementEndPosition(replacementEndPosition_),
         objectName(objectName_),
         behaviorName(behaviorName_),
         isExact(false),
@@ -181,6 +202,8 @@ struct ExpressionCompletionDescription {
   CompletionKind completionKind;
   gd::String type;
   gd::String prefix;
+  size_t replacementStartPosition;
+  size_t replacementEndPosition;
   gd::String objectName;
   gd::String behaviorName;
   bool isExact;
@@ -246,21 +269,45 @@ class GD_CORE_API ExpressionCompletionFinder
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForObject(node.type, ""));
+        ExpressionCompletionDescription::ForObject(
+            node.type,
+            "",
+            searchedPosition + 1,
+            searchedPosition + 1));
     completions.push_back(
-        ExpressionCompletionDescription::ForExpression(node.type, ""));
+        ExpressionCompletionDescription::ForExpression(
+            node.type,
+            "", 
+            searchedPosition + 1,
+            searchedPosition + 1));
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForObject(node.type, ""));
+        ExpressionCompletionDescription::ForObject(
+            node.type,
+            "",
+            searchedPosition + 1,
+            searchedPosition + 1));
     completions.push_back(
-        ExpressionCompletionDescription::ForExpression(node.type, ""));
+        ExpressionCompletionDescription::ForExpression(
+            node.type,
+            "",
+            searchedPosition + 1,
+            searchedPosition + 1));
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForObject(node.type, ""));
+        ExpressionCompletionDescription::ForObject(
+            node.type,
+            "",
+            searchedPosition + 1,
+            searchedPosition + 1));
     completions.push_back(
-        ExpressionCompletionDescription::ForExpression(node.type, ""));
+        ExpressionCompletionDescription::ForExpression(
+            node.type,
+            "",
+            searchedPosition + 1,
+            searchedPosition + 1));
   }
   void OnVisitNumberNode(NumberNode& node) override {
     // No completions
@@ -312,12 +359,22 @@ class GD_CORE_API ExpressionCompletionFinder
 
       bool isLastParameter = parameterIndex == functionCall->parameters.size() - 1;
       completions.push_back(
-        ExpressionCompletionDescription::ForText(type, node.text, isLastParameter, functionCall->objectName));
+        ExpressionCompletionDescription::ForText(
+          type,
+          node.text,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition(),
+          isLastParameter,
+          functionCall->objectName));
     }
   }
   void OnVisitVariableNode(VariableNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForVariable(node.type, node.name));
+        ExpressionCompletionDescription::ForVariable(
+          node.type,
+          node.name,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition()));
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions
@@ -330,13 +387,22 @@ class GD_CORE_API ExpressionCompletionFinder
     if (gd::ParameterMetadata::IsObject(node.type)) {
       // Only show completions of objects if an object is required
       completions.push_back(ExpressionCompletionDescription::ForObject(
-          node.type, node.identifierName));
+          node.type,
+          node.identifierName,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition()));
     } else {
       // Show completions for expressions and objects otherwise.
       completions.push_back(ExpressionCompletionDescription::ForObject(
-          node.type, node.identifierName));
+          node.type,
+          node.identifierName,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition()));
       completions.push_back(ExpressionCompletionDescription::ForExpression(
-          node.type, node.identifierName));
+          node.type,
+          node.identifierName,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition()));
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
@@ -346,16 +412,24 @@ class GD_CORE_API ExpressionCompletionFinder
       // function name missing)
       if (IsCaretOn(node.objectNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForObject(
-            node.type, node.objectName));
+            node.type,
+            node.objectName,
+            node.objectNameLocation.GetStartPosition(),
+            node.objectNameLocation.GetEndPosition()));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
-            node.objectFunctionOrBehaviorName, node.objectName));
+            node.objectFunctionOrBehaviorName,
+            node.objectFunctionOrBehaviorNameLocation.GetStartPosition(),
+            node.objectFunctionOrBehaviorNameLocation.GetEndPosition(),
+            node.objectName));
       } else if (IsCaretOn(node.behaviorNameNamespaceSeparatorLocation) ||
                  IsCaretOn(node.behaviorFunctionNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForExpression(
             node.type,
             node.behaviorFunctionName,
+            node.behaviorFunctionNameLocation.GetStartPosition(),
+            node.behaviorFunctionNameLocation.GetEndPosition(),
             node.objectName,
             node.objectFunctionOrBehaviorName));
       }
@@ -363,13 +437,23 @@ class GD_CORE_API ExpressionCompletionFinder
       // Object function or behavior name
       if (IsCaretOn(node.objectNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForObject(
-            node.type, node.objectName));
+            node.type,
+            node.objectName,
+            node.objectNameLocation.GetStartPosition(),
+            node.objectNameLocation.GetEndPosition()));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.objectFunctionOrBehaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
-            node.objectFunctionOrBehaviorName, node.objectName));
+            node.objectFunctionOrBehaviorName,
+            node.objectFunctionOrBehaviorNameLocation.GetStartPosition(),
+            node.objectFunctionOrBehaviorNameLocation.GetEndPosition(),
+            node.objectName));
         completions.push_back(ExpressionCompletionDescription::ForExpression(
-            node.type, node.objectFunctionOrBehaviorName, node.objectName));
+            node.type,
+            node.objectFunctionOrBehaviorName,
+            node.objectFunctionOrBehaviorNameLocation.GetStartPosition(),
+            node.objectFunctionOrBehaviorNameLocation.GetEndPosition(),
+            node.objectName));
       }
     }
   }
@@ -381,24 +465,36 @@ class GD_CORE_API ExpressionCompletionFinder
       // Behavior function
       if (IsCaretOn(node.objectNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForObject(
-            node.type, node.objectName));
+            node.type,
+            node.objectName,
+            node.objectNameLocation.GetStartPosition(),
+            node.objectNameLocation.GetEndPosition()));
       } else if (IsCaretOn(node.objectNameDotLocation) ||
                  IsCaretOn(node.behaviorNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForBehavior(
-            node.behaviorName, node.objectName));
+            node.behaviorName,
+            node.behaviorNameLocation.GetStartPosition(),
+            node.behaviorNameLocation.GetEndPosition(),
+            node.objectName));
       } else {
         completions.push_back(
-            ExpressionCompletionDescription::ForExpression(node.type,
-                                                           node.functionName,
-                                                           node.objectName,
-                                                           node.behaviorName)
+            ExpressionCompletionDescription::ForExpression(
+                node.type,
+                node.functionName,
+                node.functionNameLocation.GetStartPosition(),
+                node.functionNameLocation.GetEndPosition(),
+                node.objectName,
+                node.behaviorName)
                 .SetIsExact(isCaretOnParenthesis));
       }
     } else if (!node.objectName.empty()) {
       // Object function
       if (IsCaretOn(node.objectNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForObject(
-            node.type, node.objectName));
+            node.type,
+            node.objectName,
+            node.objectNameLocation.GetStartPosition(),
+            node.objectNameLocation.GetEndPosition()));
       } else {
         // Add completions for behaviors, because we could imagine that the user
         // wants to move from an object function to a behavior function, and so
@@ -407,25 +503,43 @@ class GD_CORE_API ExpressionCompletionFinder
         // function).
         if (!isCaretOnParenthesis) {
           completions.push_back(ExpressionCompletionDescription::ForBehavior(
-              node.functionName, node.objectName));
+              node.functionName,
+              node.objectNameLocation.GetStartPosition(),
+              node.objectNameLocation.GetEndPosition(),
+              node.objectName));
         }
 
         completions.push_back(ExpressionCompletionDescription::ForExpression(
-                                  node.type, node.functionName, node.objectName)
-                                  .SetIsExact(isCaretOnParenthesis));
+            node.type,
+            node.functionName,
+            node.functionNameLocation.GetStartPosition(),
+            node.functionNameLocation.GetEndPosition(),
+            node.objectName)
+            .SetIsExact(isCaretOnParenthesis));
       }
     } else {
       // Free function
       completions.push_back(ExpressionCompletionDescription::ForExpression(
-                                node.type, node.functionName)
-                                .SetIsExact(isCaretOnParenthesis));
+          node.type,
+          node.functionName,
+          node.functionNameLocation.GetStartPosition(),
+          node.functionNameLocation.GetEndPosition())
+          .SetIsExact(isCaretOnParenthesis));
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     completions.push_back(
-        ExpressionCompletionDescription::ForObject(node.type, node.text));
+        ExpressionCompletionDescription::ForObject(
+            node.type,
+            node.text,
+            node.location.GetStartPosition(),
+            node.location.GetEndPosition()));
     completions.push_back(
-        ExpressionCompletionDescription::ForExpression(node.type, node.text));
+        ExpressionCompletionDescription::ForExpression(
+            node.type,
+            node.text,
+            node.location.GetStartPosition(),
+            node.location.GetEndPosition()));
   }
 
  private:

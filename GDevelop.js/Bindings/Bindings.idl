@@ -1985,6 +1985,8 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetBehaviorName();
   boolean IsExact();
   boolean IsLastParameter();
+  unsigned long GetReplacementStartPosition();
+  unsigned long GetReplacementEndPosition();
 };
 
 interface VectorExpressionCompletionDescription {

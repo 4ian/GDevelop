@@ -284,13 +284,17 @@ describe('ExpressionAutocompletion', () => {
     expect(
       insertAutocompletionInExpression(
         { expression: '', caretLocation: 0 },
-        { completion: 'HelloWorld' }
+        { completion: 'HelloWorld',
+          replacementStartPosition: 0,
+          replacementEndPosition: 0, }
       )
     ).toMatchObject({ expression: 'HelloWorld' });
     expect(
       insertAutocompletionInExpression(
         { expression: '', caretLocation: 1 },
-        { completion: 'HelloWorld' }
+        { completion: 'HelloWorld',
+        replacementStartPosition: 0,
+        replacementEndPosition: 0, }
       )
     ).toMatchObject({ expression: 'HelloWorld' });
 
@@ -300,6 +304,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld' });
@@ -308,6 +314,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addDot: true,
         }
       )
@@ -317,6 +325,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addNamespaceSeparator: true,
         }
       )
@@ -326,6 +336,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addParenthesis: true,
         }
       )
@@ -337,6 +349,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addDot: true,
         }
       )
@@ -346,6 +360,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello::', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addNamespaceSeparator: true,
         }
       )
@@ -355,6 +371,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello(', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
           addParenthesis: true,
         }
       )
@@ -366,6 +384,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 7 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld + 456' });
@@ -374,6 +394,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 8 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld + 456' });
@@ -382,6 +404,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 9 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld + 456' });
@@ -390,6 +414,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 10 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld + 456' });
@@ -398,6 +424,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 11 },
         {
           completion: 'HelloWorld',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + HelloWorld + 456' });
@@ -408,6 +436,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello + 456', caretLocation: 12 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 12,
         }
       )
     ).toMatchObject({ expression: '123 + Hello World+ 456' });
@@ -416,6 +446,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello +456', caretLocation: 12 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 12,
         }
       )
     ).toMatchObject({ expression: '123 + Hello World+456' });
@@ -424,6 +456,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello ++456', caretLocation: 12 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 12,
         }
       )
     ).toMatchObject({ expression: '123 + Hello World++456' });
@@ -432,6 +466,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello ++456', caretLocation: 11 },
         {
           completion: 'World',
+          replacementStartPosition: 6,
+          replacementEndPosition: 11,
         }
       )
     ).toMatchObject({ expression: '123 + World ++456' });
@@ -440,6 +476,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.+ 456', caretLocation: 12 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 12,
         }
       )
     ).toMatchObject({ expression: '123 + Hello.World+ 456' });
@@ -448,6 +486,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a+ 456', caretLocation: 12 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
         }
       )
     ).toMatchObject({ expression: '123 + Hello.World+ 456' });
@@ -456,6 +496,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
         }
       )
     ).toMatchObject({ expression: '123 + Hello.World+ 456' });
@@ -464,6 +506,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a:+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
         }
       )
     ).toMatchObject({ expression: '123 + Hello.World:+ 456' });
@@ -474,6 +518,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a:+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addNamespaceSeparator: true,
         }
       )
@@ -483,6 +529,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a:+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addDot: true,
         }
       )
@@ -492,6 +540,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a:+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addParenthesis: true,
         }
       )
@@ -501,6 +551,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a.+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addNamespaceSeparator: true,
         }
       )
@@ -510,6 +562,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a.+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addDot: true,
         }
       )
@@ -519,6 +573,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a.+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addParenthesis: true,
         }
       )
@@ -528,6 +584,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a(+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addNamespaceSeparator: true,
         }
       )
@@ -537,6 +595,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a(+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addDot: true,
         }
       )
@@ -546,6 +606,8 @@ describe('ExpressionAutocompletion', () => {
         { expression: '123 + Hello.a(+ 456', caretLocation: 13 },
         {
           completion: 'World',
+          replacementStartPosition: 12,
+          replacementEndPosition: 13,
           addParenthesis: true,
         }
       )

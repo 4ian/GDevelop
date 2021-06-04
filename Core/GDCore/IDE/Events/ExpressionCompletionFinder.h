@@ -11,6 +11,7 @@
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 namespace gd {
 class Expression;

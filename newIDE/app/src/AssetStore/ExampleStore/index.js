@@ -5,14 +5,14 @@ import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
-import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Asset';
 import { FiltersChooser } from '../../UI/Search/FiltersChooser';
-import { ExtensionStoreContext } from './ExtensionStoreContext';
+import { ExampleStoreContext } from './ExampleStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
-import { ExtensionListItem } from './ExtensionListItem';
+import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import ExtensionInstallDialog from './ExtensionInstallDialog';
 import Subheader from '../../UI/Subheader';
+import { ExampleDialog } from './ExampleDialog';
 
 const styles = {
   searchBar: {
@@ -22,49 +22,34 @@ const styles = {
 };
 
 type Props = {|
-  isInstalling: boolean,
-  project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<void>,
-  showOnlyWithBehaviors: boolean,
+  isOpening: boolean,
+  onOpen: ExampleShortHeader => Promise<void>,
 |};
 
-const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
-  extensionShortHeader.name;
+const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
+  exampleShortHeader.name;
 
-export const ExtensionStore = ({
-  isInstalling,
-  project,
-  onInstall,
-  showOnlyWithBehaviors,
-}: Props) => {
+export const ExampleStore = ({ isOpening, onOpen }: Props) => {
   const [
-    selectedExtensionShortHeader,
-    setSelectedExtensionShortHeader,
-  ] = React.useState<?ExtensionShortHeader>(null);
+    selectedExampleShortHeader,
+    setSelectedExampleShortHeader,
+  ] = React.useState<?ExampleShortHeader>(null);
   const {
     filters,
     searchResults,
     error,
-    fetchExtensionsAndFilters,
+    fetchExamplesAndFilters,
     filtersState,
     searchText,
     setSearchText,
-  } = React.useContext(ExtensionStoreContext);
+  } = React.useContext(ExampleStoreContext);
 
   React.useEffect(
     () => {
-      fetchExtensionsAndFilters();
+      fetchExamplesAndFilters();
     },
-    [fetchExtensionsAndFilters]
+    [fetchExamplesAndFilters]
   );
-
-  const filteredSearchResults = searchResults
-    ? searchResults.filter(
-        extensionShortHeader =>
-          !showOnlyWithBehaviors ||
-          extensionShortHeader.eventsBasedBehaviorsCount > 0
-      )
-    : null;
 
   return (
     <React.Fragment>
@@ -100,17 +85,20 @@ export const ExtensionStore = ({
                 </ScrollView>
               </Background>
               <ListSearchResults
-                onRetry={fetchExtensionsAndFilters}
+                onRetry={fetchExamplesAndFilters}
                 error={error}
-                searchItems={filteredSearchResults}
-                getSearchItemUniqueId={getExtensionName}
-                renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-                  <ExtensionListItem
-                    project={project}
+                searchItems={searchResults}
+                getSearchItemUniqueId={getExampleName}
+                renderSearchItem={(exampleShortHeader, onHeightComputed) => (
+                  <ExampleListItem
+                    isOpening={isOpening}
                     onHeightComputed={onHeightComputed}
-                    extensionShortHeader={extensionShortHeader}
+                    exampleShortHeader={exampleShortHeader}
                     onChoose={() => {
-                      setSelectedExtensionShortHeader(extensionShortHeader);
+                      setSelectedExampleShortHeader(exampleShortHeader);
+                    }}
+                    onOpen={() => {
+                      onOpen(exampleShortHeader);
                     }}
                   />
                 )}
@@ -119,17 +107,14 @@ export const ExtensionStore = ({
           </Column>
         )}
       </ResponsiveWindowMeasurer>
-      {!!selectedExtensionShortHeader && (
-        <ExtensionInstallDialog
-          isInstalling={isInstalling}
-          extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
-          onInstall={() => {
-            onInstall(selectedExtensionShortHeader);
+      {!!selectedExampleShortHeader && (
+        <ExampleDialog
+          isOpening={isOpening}
+          exampleShortHeader={selectedExampleShortHeader}
+          onOpen={() => {
+            onOpen(selectedExampleShortHeader);
           }}
-          onClose={() => setSelectedExtensionShortHeader(null)}
+          onClose={() => setSelectedExampleShortHeader(null)}
         />
       )}
     </React.Fragment>

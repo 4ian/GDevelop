@@ -105,6 +105,7 @@ import {
   gameRollingMetrics1,
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
+  exampleFromFutureVersion,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
@@ -221,6 +222,9 @@ import { AssetCard } from '../AssetStore/AssetCard';
 import { AssetDetails } from '../AssetStore/AssetDetails';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ResourceStore } from '../AssetStore/ResourceStore';
+import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
+import { ExampleStore } from '../AssetStore/ExampleStore';
+import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
@@ -2706,26 +2710,30 @@ storiesOf('AboutDialog', module)
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <CreateProjectDialog
-      open
-      examplesComponent={Placeholder}
-      startersComponent={Placeholder}
-      onClose={action('onClose')}
-      onCreate={action('onCreate')}
-      onOpen={action('onOpen')}
-      initialTab="starters"
-    />
+    <ExampleStoreStateProvider>
+      <CreateProjectDialog
+        open
+        examplesComponent={Placeholder}
+        startersComponent={Placeholder}
+        onClose={action('onClose')}
+        onCreate={action('onCreate')}
+        onOpen={action('onOpen')}
+        initialTab="starters"
+      />
+    </ExampleStoreStateProvider>
   ))
   .add('Games showcase as initial tab', () => (
-    <CreateProjectDialog
-      open
-      examplesComponent={Placeholder}
-      startersComponent={Placeholder}
-      onClose={action('onClose')}
-      onCreate={action('onCreate')}
-      onOpen={action('onOpen')}
-      initialTab="games-showcase"
-    />
+    <ExampleStoreStateProvider>
+      <CreateProjectDialog
+        open
+        examplesComponent={Placeholder}
+        startersComponent={Placeholder}
+        onClose={action('onClose')}
+        onCreate={action('onCreate')}
+        onOpen={action('onOpen')}
+        initialTab="games-showcase"
+      />
+    </ExampleStoreStateProvider>
   ));
 
 storiesOf('OpenFromStorageProviderDialog', module)
@@ -4679,6 +4687,26 @@ storiesOf('AssetStore', module)
         />
       </AssetStoreStateProvider>
     </FixedHeightFlexContainer>
+  ));
+
+storiesOf('AssetStore/ExampleStore', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <FixedHeightFlexContainer height={400}>
+      <ExampleStoreStateProvider>
+        <ExampleStore onOpen={action('onOpen')} isOpening={false} />
+      </ExampleStoreStateProvider>
+    </FixedHeightFlexContainer>
+  ));
+storiesOf('AssetStore/ExampleStore/ExampleDialog', module)
+  .addDecorator(muiDecorator)
+  .add('non existing example, from a future version', () => (
+    <ExampleDialog
+      exampleShortHeader={exampleFromFutureVersion}
+      onOpen={action('onOpen')}
+      isOpening={false}
+      onClose={action('onClose')}
+    />
   ));
 
 storiesOf('AssetStore/ResourceStore', module)

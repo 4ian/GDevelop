@@ -1,0 +1,155 @@
+// @flow
+import { t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
+import * as React from 'react';
+import Dialog from '../../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import {
+  type ExampleShortHeader,
+  type Example,
+  isCompatibleWithAsset,
+  getExample,
+} from '../../Utils/GDevelopServices/Asset';
+import LeftLoader from '../../UI/LeftLoader';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import PlaceholderError from '../../UI/PlaceholderError';
+import { MarkdownText } from '../../UI/MarkdownText';
+import Text from '../../UI/Text';
+import AlertMessage from '../../UI/AlertMessage';
+import { getIDEVersion } from '../../Version';
+import { Column, Line } from '../../UI/Grid';
+import { Divider } from '@material-ui/core';
+import { ColumnStackLayout } from '../../UI/Layout';
+import { ExampleIcon } from './ExampleIcon';
+import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
+import Window from '../../Utils/Window';
+import optionalRequire from '../../Utils/OptionalRequire';
+
+const electron = optionalRequire('electron');
+
+type Props = {|
+  exampleShortHeader: ExampleShortHeader,
+  isOpening: boolean,
+  onClose: () => void,
+  onOpen: () => void,
+|};
+
+export const openExampleInWebApp = (example: Example) => {
+  Window.openExternalURL(
+    `https://editor.gdevelop-app.com/?project=${example.projectFileUrl}`
+  );
+};
+
+export function ExampleDialog({
+  isOpening,
+  exampleShortHeader,
+  onClose,
+  onOpen,
+}: Props) {
+  const [error, setError] = React.useState<?Error>(null);
+  const [example, setExample] = React.useState<?Example>(null);
+
+  const loadExample = React.useCallback(
+    async () => {
+      setError(null);
+      try {
+        const example = await getExample(exampleShortHeader);
+        setExample(example);
+      } catch (error) {
+        setError(error);
+      }
+    },
+    [exampleShortHeader]
+  );
+
+  React.useEffect(
+    () => {
+      loadExample();
+    },
+    [loadExample]
+  );
+
+  const isCompatible = isCompatibleWithAsset(
+    getIDEVersion(),
+    exampleShortHeader
+  );
+  const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
+
+  return (
+    <Dialog
+      actions={[
+        <FlatButton
+          key="close"
+          label={<Trans>Back</Trans>}
+          primary={false}
+          onClick={onClose}
+          disabled={isOpening}
+        />,
+        <LeftLoader isLoading={isOpening} key="open">
+          <RaisedButtonWithSplitMenu
+            label={
+              !isCompatible ? (
+                <Trans>Not compatible</Trans>
+              ) : (
+                <Trans>Open</Trans>
+              )
+            }
+            primary
+            onClick={onOpen}
+            disabled={isOpening || !isCompatible}
+            buildMenuTemplate={i18n => [
+              {
+                label: electron
+                  ? i18n._(t`Open in the web-app`)
+                  : i18n._(t`Open in a new tab`),
+                disabled: !example,
+                click: () => {
+                  if (example) openExampleInWebApp(example);
+                },
+              },
+            ]}
+          />
+        </LeftLoader>,
+      ]}
+      cannotBeDismissed={false}
+      open
+      onRequestClose={onClose}
+    >
+      <ColumnStackLayout expand noMargin>
+        {!isCompatible && (
+          <AlertMessage kind="error">
+            <Trans>
+              Unfortunately, this example requires a newer version of GDevelop
+              to work. Upgrade GDevelop to be able to use this extension in your
+              project.
+            </Trans>
+          </AlertMessage>
+        )}
+        <Line alignItems="center" noMargin>
+          {hasIcon ? (
+            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+          ) : null}
+          <Column expand noMargin={!hasIcon}>
+            <Text noMargin size="title">
+              {exampleShortHeader.name}
+            </Text>
+          </Column>
+        </Line>
+        <Text noMargin>{exampleShortHeader.shortDescription}</Text>
+        <Divider />
+        {example && (
+          <MarkdownText source={example.description} isStandaloneText />
+        )}
+        {!example && !error && <PlaceholderLoader />}
+        {!example && error && (
+          <PlaceholderError onRetry={loadExample}>
+            <Trans>
+              Can't load the example. Verify your internet connection or try
+              again later.
+            </Trans>
+          </PlaceholderError>
+        )}
+      </ColumnStackLayout>
+    </Dialog>
+  );
+}

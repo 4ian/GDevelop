@@ -9,7 +9,7 @@ import { Column, Line } from '../UI/Grid';
 import ListIcon from '../UI/ListIcon';
 import Text from '../UI/Text';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -56,8 +56,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('platformer');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://platformer',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/platformer/platformer.json',
                   });
                 }}
               />
@@ -79,8 +80,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('space-shooter');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://space-shooter',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/space-shooter/space-shooter.json',
                   });
                 }}
               />
@@ -101,8 +103,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('geometry-monster');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://geometry-monster',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/geometry-monster/geometry-monster.json',
                   });
                 }}
               />
@@ -123,8 +126,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('isometric-game');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://isometric-game',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/isometric-game/isometric-game.json',
                   });
                 }}
               />
@@ -145,8 +149,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('downhill-bike-physics-demo');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://downhill-bike-physics-demo',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/downhill-bike-physics-demo/downhill-bike-physics-demo.json',
                   });
                 }}
               />
@@ -165,8 +170,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('pairs');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://pairs',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/pairs/pairs.json',
                   });
                 }}
               />
@@ -205,8 +211,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('particle-effects-demo');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://particle-effects-demo',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/particle-effects-demo/particle-effects-demo.json',
                   });
                 }}
               />
@@ -228,8 +235,9 @@ export default class BrowserStarters extends Component<Props> {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('game-feel-demo');
-                  this.props.onOpen(InternalFileStorageProvider, {
-                    fileIdentifier: 'example://game-feel-demo',
+                  this.props.onOpen(UrlStorageProvider, {
+                    fileIdentifier:
+                      'https://resources.gdevelop-app.com/examples/game-feel-demo/game-feel-demo.json',
                   });
                 }}
               />

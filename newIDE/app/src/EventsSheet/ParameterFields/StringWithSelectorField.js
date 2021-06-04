@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getParameterChoices } from './ParameterMetadataTools';
-import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
 export default class StringWithSelectorField extends Component<
   ParameterFieldProps,

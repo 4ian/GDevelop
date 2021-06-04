@@ -1,5 +1,6 @@
 // @flow
 import { type ExpressionParameters } from './ParameterFieldCommons';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 const gd: libGDevelop = global.gd;
 
 /**

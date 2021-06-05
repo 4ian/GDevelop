@@ -48,6 +48,39 @@ const formatParameterTypesString = (
     .join(', ');
 };
 
+const DisplayedTextAutocompletion = React.forwardRef(
+  (
+    {
+      expressionAutocompletion,
+      isSelected,
+      onClick,
+    }: {|
+      expressionAutocompletion: ExpressionAutocompletion,
+      isSelected: boolean,
+      onClick: () => void,
+    |},
+    ref
+  ) => (
+    <ButtonBase
+      style={styles.button}
+      onPointerDown={() => {
+        // Trigger the onClick on the mouse/touch down
+        // to avoid the blur event of the text field to discard the autocompletions.
+        onClick();
+      }}
+      ref={ref}
+    >
+      <Text style={defaultTextStyle} noMargin align="left">
+        {isSelected ? (
+          <b>{expressionAutocompletion.completion}</b>
+        ) : (
+          expressionAutocompletion.completion
+        )}
+      </Text>
+    </ButtonBase>
+  )
+);
+
 const DisplayedExpressionAutocompletion = React.forwardRef(
   (
     {
@@ -313,7 +346,15 @@ export default function ExpressionAutocompletionsDisplayer({
                     ? selectedAutocompletionElement
                     : undefined;
 
-                  return expressionAutocompletion.kind === 'Expression' ? (
+                  return expressionAutocompletion.kind === 'Text' ? (
+                    <DisplayedTextAutocompletion
+                      key={index}
+                      expressionAutocompletion={expressionAutocompletion}
+                      isSelected={isSelected}
+                      onClick={() => onChoose(expressionAutocompletion)}
+                      ref={ref}
+                    />
+                  ) : expressionAutocompletion.kind === 'Expression' ? (
                     !expressionAutocompletion.isExact ? (
                       <DisplayedExpressionAutocompletion
                         key={index}

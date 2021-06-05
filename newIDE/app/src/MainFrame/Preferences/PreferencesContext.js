@@ -172,6 +172,7 @@ export type PreferencesValues = {|
   eventsSheetShowObjectThumbnails: boolean,
   autosaveOnPreview: boolean,
   useNewInstructionEditorDialog: boolean,
+  useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
   showEffectParameterNames: boolean,
@@ -183,7 +184,8 @@ export type PreferencesValues = {|
   userShortcutMap: ShortcutMap,
   newObjectDialogDefaultTab: 'asset-store' | 'new-object',
   isMenuBarHiddenInPreview: boolean,
-  backdropClickBehavior: string,
+  isAlwaysOnTopInPreview: boolean,
+  backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
 |};
 
 /**
@@ -203,6 +205,7 @@ export type Preferences = {|
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
   setAutosaveOnPreview: (enabled: boolean) => void,
   setUseNewInstructionEditorDialog: (enabled: boolean) => void,
+  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
@@ -235,6 +238,8 @@ export type Preferences = {|
   getIsMenuBarHiddenInPreview: () => boolean,
   setIsMenuBarHiddenInPreview: (enabled: boolean) => void,
   setBackdropClickBehavior: (value: string) => void,
+  getIsAlwaysOnTopInPreview: () => boolean,
+  setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -254,6 +259,7 @@ export const initialPreferences = {
     eventsSheetShowObjectThumbnails: true,
     autosaveOnPreview: true,
     useNewInstructionEditorDialog: true,
+    useUndefinedVariablesInAutocompletion: false,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
     showEffectParameterNames: false,
@@ -265,7 +271,8 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    backdropClickBehavior: 'cancel',
+    isAlwaysOnTopInPreview: true,
+    backdropClickBehavior: 'nothing',
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -279,6 +286,7 @@ export const initialPreferences = {
   setEventsSheetShowObjectThumbnails: () => {},
   setAutosaveOnPreview: () => {},
   setUseNewInstructionEditorDialog: (enabled: boolean) => {},
+  setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
@@ -307,6 +315,8 @@ export const initialPreferences = {
   getIsMenuBarHiddenInPreview: () => true,
   setIsMenuBarHiddenInPreview: () => {},
   setBackdropClickBehavior: () => {},
+  getIsAlwaysOnTopInPreview: () => true,
+  setIsAlwaysOnTopInPreview: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

@@ -92,6 +92,15 @@ type State = {|
 
 type Props = {|
   expressionType: 'number' | 'string',
+  /** An optional callback that can be used to provide additional autocompletions. */
+  onGetAdditionalAutocompletions?: (
+    currentExpression: string
+  ) => Array<ExpressionAutocompletion>,
+  /** An optional callback that can be used to show a custom error message. */
+  onExtractAdditionalErrors?: (
+    currentExpression: string,
+    currentExpressionNode: gdExpressionNode
+  ) => ?string,
   renderExtraButton?: ({|
     style: Object,
   |}) => React.Node,
@@ -277,8 +286,12 @@ export default class ExpressionField extends React.Component<Props, State> {
       { expression, caretLocation },
       {
         completion: expressionAutocompletion.completion,
+        replacementStartPosition:
+          expressionAutocompletion.replacementStartPosition,
+        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
         addParenthesis: expressionAutocompletion.addParenthesis,
         addDot: expressionAutocompletion.addDot,
+        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
         addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
       }
@@ -312,6 +325,8 @@ export default class ExpressionField extends React.Component<Props, State> {
       objectsContainer,
       expressionType,
       scope,
+      onGetAdditionalAutocompletions,
+      onExtractAdditionalErrors,
     } = this.props;
     if (!project) return null;
 
@@ -329,6 +344,9 @@ export default class ExpressionField extends React.Component<Props, State> {
       .get();
 
     const { errorText, errorHighlights } = extractErrors(expressionNode);
+    const extraErrorText = onExtractAdditionalErrors
+      ? onExtractAdditionalErrors(expression, expressionNode)
+      : null;
 
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
@@ -340,21 +358,25 @@ export default class ExpressionField extends React.Component<Props, State> {
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
+        project,
         globalObjectsContainer,
         objectsContainer,
         scope,
       },
       completionDescriptions
     );
+    const allNewAutocompletions = onGetAdditionalAutocompletions
+      ? onGetAdditionalAutocompletions(expression).concat(newAutocompletions)
+      : newAutocompletions;
 
     parser.delete();
 
     this.setState(state => ({
-      errorText,
+      errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
       errorHighlights,
       autocompletions: setNewAutocompletions(
         state.autocompletions,
-        newAutocompletions
+        allNewAutocompletions
       ),
     }));
   };

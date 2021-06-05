@@ -1,52 +1,38 @@
 // @flow
 import React, { Component } from 'react';
-import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete, {
-  type SemiControlledAutoCompleteInterface,
-} from '../../UI/SemiControlledAutoComplete';
+import GenericExpressionField from './GenericExpressionField';
 import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
 export default class SceneNameField extends Component<
   ParameterFieldProps,
-  {||}
+  void
 > {
-  _field: ?SemiControlledAutoCompleteInterface;
+  _field: ?GenericExpressionField;
 
   focus() {
     if (this._field) this._field.focus();
   }
 
   render() {
-    const {
-      value,
-      onChange,
-      isInline,
-      project,
-      parameterMetadata,
-    } = this.props;
-    const layoutNames = project
-      ? enumerateLayouts(project).map(layout => layout.getName())
+    const layoutNames: Array<ExpressionAutocompletion> = this.props.project
+      ? enumerateLayouts(this.props.project).map(layout => ({
+          kind: 'Text',
+          completion: `"${layout.getName()}"`,
+        }))
       : [];
 
     return (
-      <SemiControlledAutoComplete
-        margin={this.props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
+      <GenericExpressionField
+        expressionType="string"
+        onGetAdditionalAutocompletions={expression =>
+          layoutNames.filter(
+            ({ completion }) => completion.indexOf(expression) === 0
+          )
         }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
-        fullWidth
-        value={value}
-        onChange={onChange}
-        openOnFocus={isInline}
-        dataSource={layoutNames.map(layoutName => ({
-          text: `"${layoutName}"`,
-          value: `"${layoutName}"`,
-        }))}
-        hintText={'""'}
         ref={field => (this._field = field)}
+        {...this.props}
       />
     );
   }

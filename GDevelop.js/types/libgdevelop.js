@@ -48,6 +48,7 @@ declare class libGDevelop {
   MapExtensionProperties: Class<gdMapExtensionProperties>;
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
+  EventsVariablesFinder: Class<gdEventsVariablesFinder>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;
   JsPlatform: Class<gdJsPlatform>;
@@ -74,6 +75,7 @@ declare class libGDevelop {
   ExternalEvents: Class<gdExternalEvents>;
   ExternalLayout: Class<gdExternalLayout>;
   Effect: Class<gdEffect>;
+  EffectsContainer: Class<gdEffectsContainer>;
   Layer: Class<gdLayer>;
   PropertyDescriptor: Class<gdPropertyDescriptor>;
   NamedPropertyDescriptor: Class<gdNamedPropertyDescriptor>;

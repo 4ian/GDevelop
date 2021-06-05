@@ -92,6 +92,7 @@ export const ExtensionDependenciesEditor = ({
               mapVector<gdDependencyMetadata, TableRow>(
                 eventsFunctionsExtension.getAllDependencies(),
                 (dependency, index) => (
+                  // $FlowFixMe - unsure why Flow complains about TableRow.
                   <TableRow key={dependency.getName()}>
                     <TableRowColumn>
                       <SemiControlledTextField

@@ -1,0 +1,663 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": true,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.gamename",
+    "projectUuid": "e8ab3fc3-5bbb-4319-add8-3e51298f3d0f",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "file": "bitmatt_24_white.fnt",
+        "kind": "bitmapFont",
+        "metadata": "",
+        "name": "bitmatt_24_white.fnt",
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "bitmatt_24_white.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "bitmatt_24_white.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "desyrel.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "desyrel.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "desyrel.xml",
+        "kind": "bitmapFont",
+        "metadata": "",
+        "name": "desyrel.xml",
+        "userAdded": true
+      },
+      {
+        "file": "ArialGradient.fnt",
+        "kind": "bitmapFont",
+        "metadata": "",
+        "name": "ArialGradient.fnt",
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "ArialGradient.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "ArialGradient.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "New_32scene",
+      "name": "New scene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridType": "rectangular",
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 0.5364
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "ExampleText",
+          "persistentUuid": "3323e1e3-43fa-4719-bb8c-3f8902d90636",
+          "width": 0,
+          "x": 66,
+          "y": 25,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 82,
+          "layer": "",
+          "locked": false,
+          "name": "ExampleText2",
+          "persistentUuid": "c80ac089-ef6a-43a9-812f-7f86eadeecdf",
+          "width": 597,
+          "x": 84,
+          "y": 77,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 83,
+          "layer": "",
+          "locked": false,
+          "name": "ColoredText",
+          "persistentUuid": "04020887-66c6-4b4e-9b1e-a9987b0d898f",
+          "width": 640,
+          "x": 72,
+          "y": 263,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "AnimatedText",
+          "persistentUuid": "ebf29660-2d15-4c27-9c0b-36cd9ac09368",
+          "width": 0,
+          "x": 246,
+          "y": 450,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "ExampleText",
+          "tags": "",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "THIS IS A BITMAP TEXT, USING A FONT CALLED BITMATT.",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "#ffffff",
+            "bitmapFontResourceName": "bitmatt_24_white.fnt",
+            "textureAtlasResourceName": "bitmatt_24_white.png",
+            "align": "left",
+            "wordWrap": true
+          }
+        },
+        {
+          "name": "ExampleText2",
+          "tags": "",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "You can create bitmap fonts with third party softwares like bmFont or bmGlyph.",
+            "opacity": 255,
+            "scale": 0.5,
+            "fontSize": 20,
+            "tint": "#ffffff",
+            "bitmapFontResourceName": "desyrel.xml",
+            "textureAtlasResourceName": "desyrel.png",
+            "align": "left",
+            "wordWrap": true
+          }
+        },
+        {
+          "name": "ColoredText",
+          "tags": "",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "This text will change its color thanks to events.",
+            "opacity": 255,
+            "scale": 0.5,
+            "fontSize": 20,
+            "tint": "#01ce95",
+            "bitmapFontResourceName": "desyrel.xml",
+            "textureAtlasResourceName": "desyrel.png",
+            "align": "left",
+            "wordWrap": true
+          }
+        },
+        {
+          "name": "AnimatedText",
+          "tags": "",
+          "type": "BitmapText::BitmapTextObject",
+          "variables": [],
+          "behaviors": [],
+          "content": {
+            "text": "Score: 000",
+            "opacity": 255,
+            "scale": 1,
+            "fontSize": 20,
+            "tint": "#ffffff",
+            "bitmapFontResourceName": "ArialGradient.fnt",
+            "textureAtlasResourceName": "ArialGradient.png",
+            "align": "left",
+            "wordWrap": true
+          }
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "BitmapText::SetTint"
+              },
+              "parameters": [
+                "ColoredText",
+                "ColorConversion::HslToRgb(TimeFromStart()*100, 50, 50)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "BitmapText::BitmapTextObject::SetText"
+              },
+              "parameters": [
+                "AnimatedText",
+                "=",
+                "\"Score: \" + ToString(round(TimeFromStart()))"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 36,
+          "ambientLightColorG": 6950232,
+          "ambientLightColorR": 32,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "Add00, AlanPH, Tristan (Victris Games)",
+      "description": "Expressions to convert RGB color values into various other colour formats (HSV, HSL, named colors) and vice versa.",
+      "extensionNamespace": "",
+      "fullName": "Color Conversion",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLWludmVydC1jb2xvcnMiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIsMTkuNThWMTkuNThDMTAuNCwxOS41OCA4Ljg5LDE4Ljk2IDcuNzYsMTcuODNDNi42MiwxNi42OSA2LDE1LjE5IDYsMTMuNThDNiwxMiA2LjYyLDEwLjQ3IDcuNzYsOS4zNEwxMiw1LjFNMTcuNjYsNy45M0wxMiwyLjI3VjIuMjdMNi4zNCw3LjkzQzMuMjIsMTEuMDUgMy4yMiwxNi4xMiA2LjM0LDE5LjI0QzcuOSwyMC44IDkuOTUsMjEuNTggMTIsMjEuNThDMTQuMDUsMjEuNTggMTYuMSwyMC44IDE3LjY2LDE5LjI0QzIwLjc4LDE2LjEyIDIwLjc4LDExLjA1IDE3LjY2LDcuOTNaIiAvPjwvc3ZnPg==",
+      "name": "ColorConversion",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/invert-colors.svg",
+      "shortDescription": "Expressions to convert RGB color values into various other colour formats (HSV, HSL, named colors) and vice versa.",
+      "version": "1.1.3",
+      "tags": [
+        "color",
+        "conversion",
+        "hexadecimal",
+        "RGB",
+        "HSL",
+        "HSV",
+        "HSB",
+        "numbers",
+        "string"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Converts a hexadecimal string into a RGB string.  Example input: \"0459AF\"",
+          "fullName": "Hexadecimal to RGB",
+          "functionType": "StringExpression",
+          "name": "HexToRgb",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n    let n = eventsFunctionContext.getArgument(\"n\");\n\n    //input validation\n    let v = parseInt(n, 16);\n    if (v.toString(16) === n.toUpperCase()) throw 'input is not hexadecimal'; \n\n    let shorthandRegex = /^#?([a-f\\d])([a-f\\d])([a-f\\d])$/i;\n    n = n.replace(shorthandRegex, function (m, r, g, b) {\n        return r + r + g + g + b + b;\n    });\n    let result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(n);\n\n    let r = parseInt(result[1], 16),\n        g = parseInt(result[2], 16),\n        b = parseInt(result[3], 16);\n\n    eventsFunctionContext.returnValue = r + ';' + g + ';' + b;\n} catch(e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"0;0;0\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Hex value",
+              "longDescription": "",
+              "name": "n",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "color"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts a RGB string into a hexadecimal string.  Example input: \"0;128;255\"",
+          "fullName": "RGB to hexadecimal",
+          "functionType": "StringExpression",
+          "name": "RgbToHex",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n    const n = eventsFunctionContext.getArgument(\"n\");\n    const col = n.split(\";\");\n    \n    let r = parseFloat(col[0]),\n        g = parseFloat(col[1]),\n        b = parseFloat(col[2]);\n\n    r = gdjs.evtTools.common.clamp(r, 0, 255);\n    g = gdjs.evtTools.common.clamp(g, 0, 255);\n    b = gdjs.evtTools.common.clamp(b, 0, 255);\n\n    eventsFunctionContext.returnValue = \"#\" + gdjs.rgbToHex(r, g, b).toUpperCase();\n} catch (e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"#000000\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "RGB value",
+              "longDescription": "",
+              "name": "n",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "color"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts a RGB string into a HSL string.  Example input: \"0;128;255\"\"",
+          "fullName": "RGB to HSL",
+          "functionType": "StringExpression",
+          "name": "RgbToHsl",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const n = eventsFunctionContext.getArgument(\"n\");\nconst col = n.split(\";\");\n\nlet r = parseFloat(col[0]),\n    g = parseFloat(col[1]),\n    b = parseFloat(col[2]);\n\n    r = gdjs.evtTools.common.clamp(r, 0, 255);\n    g = gdjs.evtTools.common.clamp(g, 0, 255);\n    b = gdjs.evtTools.common.clamp(b, 0, 255);\n\nr /= 255;\ng /= 255;\nb /= 255;\n\nlet v = Math.max(r, g, b), c = v - Math.min(r, g, b), f = (1 - Math.abs(v + v - c - 1));\nlet h = c && ((v === r) ? (g - b) / c: ((v === g) ? 2 + (b - r) / c: 4 + (r - g) / c)); \n\neventsFunctionContext.returnValue = Math.round(60 * (h < 0 ? h + 6: h)) + ';' + Math.round((f ? c / f: 0) * 100) + ';' + Math.round(((v + v - c) / 2) * 100);\n",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "RGB value",
+              "longDescription": "",
+              "name": "n",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "color"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts HSV color values into a RGB string.  Valid input ranges:  H(0 to 360), S(0 to 100), V(0 to 100)",
+          "fullName": "HSV to RGB",
+          "functionType": "StringExpression",
+          "name": "HsvToRgb",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n\n    let h = parseFloat(eventsFunctionContext.getArgument(\"h\")),\n        s = parseFloat(eventsFunctionContext.getArgument(\"s\")),\n        v = parseFloat(eventsFunctionContext.getArgument(\"v\"));\n    \n    s = gdjs.evtTools.common.clamp(s, 0, 100);\n    v = gdjs.evtTools.common.clamp(v, 0, 100);\n\n    h %= 360;\n    if (h < 0) {\n        h += 360;\n    }\n\n    s /= 100;\n    v /= 100;\n\n    let f = (n , k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);\n\n    eventsFunctionContext.returnValue = Math.round(f(5) * 255) + ';' + Math.round(f(3) * 255) + ';' + Math.round(f(1) * 255);\n} catch(e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"0;0;0\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Hue 0-360",
+              "longDescription": "",
+              "name": "h",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Saturation 0-100",
+              "longDescription": "",
+              "name": "s",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Value 0-100",
+              "longDescription": "",
+              "name": "v",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts a RGB string into a HSV string.  Example input: \"0;128;255\"",
+          "fullName": "RGB to HSV",
+          "functionType": "StringExpression",
+          "name": "RgbToHsv",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n    const n = eventsFunctionContext.getArgument(\"n\");\n    const col = n.split(\";\");\n\n    let r = parseFloat(col[0]),\n        g = parseFloat(col[1]),\n        b = parseFloat(col[2]);\n\n    r = gdjs.evtTools.common.clamp(r, 0, 255);\n    g = gdjs.evtTools.common.clamp(g, 0, 255);\n    b = gdjs.evtTools.common.clamp(b, 0, 255);\n\n    r /= 255;\n    g /= 255;\n    b /= 255;\n\n    let v = Math.max(r, g, b), \n        c = v - Math.min(r, g, b);\n\n    let h = c && ((v == r) ? (g - b) / c: ((v == g) ? 2 + (b - r) / c: 4 + (r - g) / c)); \n\n    eventsFunctionContext.returnValue = Math.round(60 * (h < 0 ? h + 6: h)) + ';' + Math.round((v && c / v) * 100) + ';' + Math.round(v * 100);\n} catch (e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"0;0;0\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "RGB value",
+              "longDescription": "",
+              "name": "n",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "color"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts a color name into a RGB string.  (Examples: black, gray, white, red, purple, green, yellow, blue)  \nFull list of colors: https://www.w3schools.com/colors/colors_names.asp",
+          "fullName": "Color name to RGB",
+          "functionType": "StringExpression",
+          "name": "NameToRgb",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "let n = eventsFunctionContext.getArgument(\"n\");\n\nn = n.toLowerCase();\n\nswitch (n) {\n    case 'black':\n        eventsFunctionContext.returnValue = '0;0;0';\n        break;\n    case 'silver':\n        eventsFunctionContext.returnValue = '192;192;192';\n        break;\n    case 'gray':\n        eventsFunctionContext.returnValue = '128;128;128';\n        break;\n    case 'white':\n        eventsFunctionContext.returnValue = '255;255;255';\n        break;\n    case 'maroon':\n        eventsFunctionContext.returnValue = '128;0;0';\n        break;\n    case 'red':\n        eventsFunctionContext.returnValue = '255;0;0';\n        break;\n    case 'purple':\n        eventsFunctionContext.returnValue = '128;0;128';\n        break;\n    case 'fuchsia':\n        eventsFunctionContext.returnValue = '255;0;255';\n        break;\n    case 'green':\n        eventsFunctionContext.returnValue = '0;128;0';\n        break;\n    case 'lime':\n        eventsFunctionContext.returnValue = '0;255;0';\n        break;\n    case 'olive':\n        eventsFunctionContext.returnValue = '128;128;0';\n        break;\n    case 'yellow':\n        eventsFunctionContext.returnValue = '255;255;0';\n        break;\n    case 'navy':\n        eventsFunctionContext.returnValue = '0;0;128';\n        break;\n    case 'blue':\n        eventsFunctionContext.returnValue = '0;0;255';\n        break;\n    case 'teal':\n        eventsFunctionContext.returnValue = '0;128;128';\n        break;\n    case 'aqua':\n        eventsFunctionContext.returnValue = '0;255;255';\n        break;\n    case 'orange':\n        eventsFunctionContext.returnValue = '255;165;0';\n        break;\n    case 'aliceblue':\n        eventsFunctionContext.returnValue = '240;248;255';\n        break;\n    case 'antiquewhite':\n        eventsFunctionContext.returnValue = '250;235;215';\n        break;\n    case 'aquamarine':\n        eventsFunctionContext.returnValue = '127;255;212';\n        break;\n    case 'azure':\n        eventsFunctionContext.returnValue = '240;255;255';\n        break;\n    case 'beige':\n        eventsFunctionContext.returnValue = '245;245;220';\n        break;\n    case 'bisque':\n        eventsFunctionContext.returnValue = '255;228;196';\n        break;\n    case 'blanchedalmond':\n        eventsFunctionContext.returnValue = '255;235;205';\n        break;\n    case 'blueviolet':\n        eventsFunctionContext.returnValue = '128;43;226';\n        break;\n    case 'brown':\n        eventsFunctionContext.returnValue = '165;42;42';\n        break;\n    case 'burlywood':\n        eventsFunctionContext.returnValue = '222;184;135';\n        break;\n    case 'cadetblue':\n        eventsFunctionContext.returnValue = '95;158;160';\n        break;\n    case 'chartreuse':\n        eventsFunctionContext.returnValue = '127;255;0';\n        break;\n    case 'chocolate':\n        eventsFunctionContext.returnValue = '210;105;30';\n        break;\n    case 'coral':\n        eventsFunctionContext.returnValue = '255;127;80';\n        break;\n    case 'cornflowerblue':\n        eventsFunctionContext.returnValue = '100;149;237';\n        break;\n    case 'cornsilk':\n        eventsFunctionContext.returnValue = '255;248;220';\n        break;\n    case 'crimson':\n        eventsFunctionContext.returnValue = '220;20;60';\n        break;\n    case 'cyan':\n        eventsFunctionContext.returnValue = '220;20;60';\n        break;\n    case 'darkblue':\n        eventsFunctionContext.returnValue = '0;0;139';\n        break;\n    case 'darkcyan':\n        eventsFunctionContext.returnValue = '0;139;139';\n        break;\n    case 'darkgoldenrod':\n        eventsFunctionContext.returnValue = '184;134;11';\n        break;\n    case 'darkgray':\n    case 'darkgrey':\n        eventsFunctionContext.returnValue = '169;169;169';\n        break;\n    case 'darkgreen':\n        eventsFunctionContext.returnValue = '0;100;0';\n        break;\n    case 'darkkhaki':\n        eventsFunctionContext.returnValue = '189;183;107';\n        break;\n    case 'darkmagenta':\n        eventsFunctionContext.returnValue = '139;0;139';\n        break;\n    case 'darkolivegreen':\n        eventsFunctionContext.returnValue = '85;107;47';\n        break;\n    case 'darkorange':\n        eventsFunctionContext.returnValue = '255;140;0';\n        break;\n    case 'darkorchid':\n        eventsFunctionContext.returnValue = '153;50;204';\n        break;\n    case 'darkred':\n        eventsFunctionContext.returnValue = '139;0;0';\n        break;\n    case 'darksalmon':\n        eventsFunctionContext.returnValue = '233;150;122';\n        break;\n    case 'darkseagreen':\n        eventsFunctionContext.returnValue = '143;188;143';\n        break;\n    case 'darkslateblue':\n        eventsFunctionContext.returnValue = '72;61;139';\n        break;\n    case 'darkslategray':\n    case 'darkslategrey':\n        eventsFunctionContext.returnValue = '47;79;79';\n        break;\n    case 'darkturquoise':\n        eventsFunctionContext.returnValue = '0;206;209';\n        break;\n    case 'darkviolet':\n        eventsFunctionContext.returnValue = '148;0;211';\n        break;\n    case 'deeppink':\n        eventsFunctionContext.returnValue = '255;20;147';\n        break;\n    case 'deepskyblue':\n        eventsFunctionContext.returnValue = '0;191;255';\n        break;\n    case 'dimgray':\n    case 'dimgrey':\n        eventsFunctionContext.returnValue = '105;105;105';\n        break;\n    case 'dodgerblue':\n        eventsFunctionContext.returnValue = '30;144;255';\n        break;\n    case 'firebrick':\n        eventsFunctionContext.returnValue = '178;34;34';\n        break;\n    case 'floralwhite':\n        eventsFunctionContext.returnValue = '255;250;240';\n        break;\n    case 'forestgreen':\n        eventsFunctionContext.returnValue = '32;139;34';\n        break;\n    case 'gainsboro':\n        eventsFunctionContext.returnValue = '220;220;220';\n        break;\n    case 'ghostwhite':\n        eventsFunctionContext.returnValue = '248;248;255';\n        break;\n    case 'gold':\n        eventsFunctionContext.returnValue = '255;215;0';\n        break;\n    case 'goldenrod':\n        eventsFunctionContext.returnValue = '218;165;32';\n        break;\n    case 'greenyellow':\n        eventsFunctionContext.returnValue = '173;255;47';\n        break;\n    case 'grey':\n        eventsFunctionContext.returnValue = '128;128;128';\n        break;\n    case 'honeydew':\n        eventsFunctionContext.returnValue = '240;255;240';\n        break;\n    case 'hotpink':\n        eventsFunctionContext.returnValue = '255;105;180';\n        break;\n    case 'indianred':\n        eventsFunctionContext.returnValue = '205;92;92';\n        break;\n    case 'indigo':\n        eventsFunctionContext.returnValue = '75;0;130';\n        break;\n    case 'ivory':\n        eventsFunctionContext.returnValue = '255;255;240';\n        break;\n    case 'khaki':\n        eventsFunctionContext.returnValue = '240;230;140';\n        break;\n    case 'lavender':\n        eventsFunctionContext.returnValue = '230;230;250';\n        break;\n    case 'lavenderblush':\n        eventsFunctionContext.returnValue = '255;240;245';\n        break;\n    case 'lawngreen':\n        eventsFunctionContext.returnValue = '124;252;0';\n        break;\n    case 'lemonchiffon':\n        eventsFunctionContext.returnValue = '255;250;205';\n        break;\n    case 'lightblue':\n        eventsFunctionContext.returnValue = '173;216;230';\n        break;\n    case 'lightcoral':\n        eventsFunctionContext.returnValue = '240;128;128';\n        break;\n    case 'lightcyan':\n        eventsFunctionContext.returnValue = '224;255;255';\n        break;\n    case 'lightgoldenrodyellow':\n        eventsFunctionContext.returnValue = '250;250;210';\n        break;\n    case 'lightgray':\n    case 'lightgrey':\n        eventsFunctionContext.returnValue = '211;211;211';\n        break;\n    case 'lightgreen':\n        eventsFunctionContext.returnValue = '144;238;144';\n        break;\n    case 'lightpink':\n        eventsFunctionContext.returnValue = '255;182;193';\n        break;\n    case 'lightsalmon':\n        eventsFunctionContext.returnValue = '255;160;122';\n        break;\n    case 'lightseagreen':\n        eventsFunctionContext.returnValue = '32;178;170';\n        break;\n    case 'lightskyblue':\n        eventsFunctionContext.returnValue = '135;206;250';\n        break;\n    case 'lightslategray':\n    case 'lightslategrey':\n        eventsFunctionContext.returnValue = '119;136;153';\n        break;\n    case 'lightsteelblue':\n        eventsFunctionContext.returnValue = '176;196;222';\n        break;\n    case 'lightyellow':\n        eventsFunctionContext.returnValue = '255;255;224';\n        break;\n    case 'limegreen':\n        eventsFunctionContext.returnValue = '50;205;50';\n        break;\n    case 'linen':\n        eventsFunctionContext.returnValue = '250;240;230';\n        break;\n    case 'magenta':\n        eventsFunctionContext.returnValue = '255;0;255';\n        break;\n    case 'mediumaquamarine':\n        eventsFunctionContext.returnValue = '102;205;170';\n        break;\n    case 'mediumblue':\n        eventsFunctionContext.returnValue = '0;0;205';\n        break;\n    case 'mediumorchid':\n        eventsFunctionContext.returnValue = '186;85;211';\n        break;\n    case 'mediumpurple':\n        eventsFunctionContext.returnValue = '147;112;219';\n        break;\n    case 'mediumseagreen':\n        eventsFunctionContext.returnValue = '60;179;113';\n        break;\n    case 'mediumslateblue':\n        eventsFunctionContext.returnValue = '123;104;238';\n        break;\n    case 'mediumspringgreen':\n        eventsFunctionContext.returnValue = '0;250;154';\n        break;\n    case 'mediumturquoise':\n        eventsFunctionContext.returnValue = '72;209;204';\n        break;\n    case 'mediumvioletred':\n        eventsFunctionContext.returnValue = '199;21;133';\n        break;\n    case 'midnightblue':\n        eventsFunctionContext.returnValue = '25;25;112';\n        break;\n    case 'mintcream':\n        eventsFunctionContext.returnValue = '245;255;250';\n        break;\n    case 'mistyrose':\n        eventsFunctionContext.returnValue = '255;228;225';\n        break;\n    case 'moccasin':\n        eventsFunctionContext.returnValue = '255;228;181';\n        break;\n    case 'navajowhite':\n        eventsFunctionContext.returnValue = '255;222;173';\n        break;\n    case 'oldlace':\n        eventsFunctionContext.returnValue = '253;245;230';\n        break;\n    case 'olivedrab':\n        eventsFunctionContext.returnValue = '107;142;35';\n        break;\n    case 'orangered':\n        eventsFunctionContext.returnValue = '255;69;0';\n        break;\n    case 'orchid':\n        eventsFunctionContext.returnValue = '218;112;214';\n        break;\n    case 'palegoldenrod':\n        eventsFunctionContext.returnValue = '238;232;170';\n        break;\n    case 'palegreen':\n        eventsFunctionContext.returnValue = '152;251;152';\n        break;\n    case 'paleturquoise':\n        eventsFunctionContext.returnValue = '175;238;238';\n        break;\n    case 'palevioletred':\n        eventsFunctionContext.returnValue = '219;112;147';\n        break;\n    case 'papayawhip':\n        eventsFunctionContext.returnValue = '255;239;213';\n        break;\n    case 'peachpuff':\n        eventsFunctionContext.returnValue = '255;218;185';\n        break;\n    case 'peru':\n        eventsFunctionContext.returnValue = '205;133;63';\n        break;\n    case 'pink':\n        eventsFunctionContext.returnValue = '255;192;203';\n        break;\n    case 'plum':\n        eventsFunctionContext.returnValue = '221;160;221';\n        break;\n    case 'powderblue':\n        eventsFunctionContext.returnValue = '176;224;230';\n        break;\n    case 'rosybrown':\n        eventsFunctionContext.returnValue = '188;143;143';\n        break;\n    case 'royalblue':\n        eventsFunctionContext.returnValue = '65;105;225';\n        break;\n    case 'saddlebrown':\n        eventsFunctionContext.returnValue = '139;69;19';\n        break;\n    case 'salmon':\n        eventsFunctionContext.returnValue = '150;128;114';\n        break;\n    case 'sandybrown':\n        eventsFunctionContext.returnValue = '244;164;96';\n        break;\n    case 'seagreen':\n        eventsFunctionContext.returnValue = '46;139;87';\n        break;\n    case 'seashell':\n        eventsFunctionContext.returnValue = '255;245;238';\n        break;\n    case 'sienna':\n        eventsFunctionContext.returnValue = '160;82;45';\n        break;\n    case 'skyblue':\n        eventsFunctionContext.returnValue = '135;206;235';\n        break;\n    case 'slateblue':\n        eventsFunctionContext.returnValue = '106;90;205';\n        break;\n    case 'slategray':\n    case 'slategrey':\n        eventsFunctionContext.returnValue = '112;128;144';\n        break;\n    case 'snow':\n        eventsFunctionContext.returnValue = '255;250;250';\n        break;\n    case 'springgreen':\n        eventsFunctionContext.returnValue = '0;255;127';\n        break;\n    case 'steelblue':\n        eventsFunctionContext.returnValue = '70;130;180';\n        break;\n    case 'tan':\n        eventsFunctionContext.returnValue = '210;180;140';\n        break;\n    case 'thistle':\n        eventsFunctionContext.returnValue = '216;191;216';\n        break;\n    case 'tomato':\n        eventsFunctionContext.returnValue = '255;99;71';\n        break;\n    case 'turquoise':\n        eventsFunctionContext.returnValue = '64;224;208';\n        break;\n    case 'violet':\n        eventsFunctionContext.returnValue = '238;130;238';\n        break;\n    case 'wheat':\n        eventsFunctionContext.returnValue = '245;222;179';\n        break;\n    case 'whitesmoke':\n        eventsFunctionContext.returnValue = '245;245;245';\n        break;\n    case 'yellowgreen':\n        eventsFunctionContext.returnValue = '154;205;50';\n        break;\n    case 'rebeccapurple':\n        eventsFunctionContext.returnValue = '102;51;153';\n        break;\n    default:\n        eventsFunctionContext.returnValue = '0;0;0';\n        console.error(\"Not a vaild color name\");        \n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Name of a color",
+              "longDescription": "",
+              "name": "n",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "color"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts HSL color values into a RGB string.  Valid input ranges:  H(0 to 360), S(0 to 100), L(0 to 100)",
+          "fullName": "HSL to RGB",
+          "functionType": "StringExpression",
+          "name": "HslToRgb",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n    let h = parseFloat(eventsFunctionContext.getArgument(\"Hue\")),\n        s = parseFloat(eventsFunctionContext.getArgument(\"Saturation\")),\n        l = parseFloat(eventsFunctionContext.getArgument(\"Lightness\"));\n\n    s = gdjs.evtTools.common.clamp(s, 0, 100);\n    l = gdjs.evtTools.common.clamp(l, 0, 100);\n\n    h %= 360;\n    if (h < 0) {\n        h += 360;\n    }\n\n    s /= 100;\n    l /= 100;\n\n    let a = s * Math.min(l, 1 - l);\n    let f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 \n\n    eventsFunctionContext.returnValue = Math.round(f(0) * 255) + ';' + Math.round(f(8) * 255) + ';' + Math.round(f(4) * 255);\n} catch(e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"0;0;0\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Hue 0-360",
+              "longDescription": "",
+              "name": "Hue",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Saturation 0-100",
+              "longDescription": "",
+              "name": "Saturation",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Lightness 0-100",
+              "longDescription": "",
+              "name": "Lightness",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Converts a color hue (range: 0 to 360) into an RGB color string with 100% saturation and 50% lightness.",
+          "fullName": "Hue to RGB",
+          "functionType": "StringExpression",
+          "name": "HueToRgb",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "try {\n    let h = parseFloat(eventsFunctionContext.getArgument(\"Hue\")),\n        s = 100,\n        l = 50;\n\n    s /= 100;\n    l /= 100;\n\n    h %= 360;\n    if (h < 0) {\n        h += 360;\n    }\n\n    let a = s * Math.min(l, 1 - l);\n    let f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k , 1), - 1);                 \n\n    eventsFunctionContext.returnValue = Math.round(f(0) * 255) + ';' + Math.round(f(8) * 255) + ';' + Math.round(f(4) * 255);\n} catch(e) {\n    console.error(\"Unable to convert a color: \", e);\n    eventsFunctionContext.returnValue = \"0;0;0\";\n}",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": true
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Hue 0-360",
+              "longDescription": "",
+              "name": "Hue",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    }
+  ],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

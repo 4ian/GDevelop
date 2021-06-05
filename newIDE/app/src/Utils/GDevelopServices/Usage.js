@@ -57,14 +57,6 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
         message: t`One-click packaging for Windows, macOS and Linux up to 70 times a day (every 24 hours).`,
       },
       {
-        message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
-        isLocalAppOnly: true,
-      },
-      {
-        message: t`Use the Debugger to find and solve issues in your games.`,
-        isLocalAppOnly: true,
-      },
-      {
         message: t`Immerse your players by removing GDevelop logo when the game loads.`,
       },
     ],
@@ -81,14 +73,6 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
       },
       {
         message: t`One-click packaging for Windows, macOS and Linux up to 10 times a day (every 24 hours).`,
-      },
-      {
-        message: t`Use Live Preview over Wifi to quickly test your game on mobiles and tablets.`,
-        isLocalAppOnly: true,
-      },
-      {
-        message: t`Use the Debugger to find and solve issues in your games.`,
-        isLocalAppOnly: true,
       },
       {
         message: t`Immerse your players by removing GDevelop logo when the game loads`,

@@ -35,6 +35,7 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
+  onComputeAllVariableNames: () => Array<string>,
   inheritedVariablesContainer?: ?gdVariablesContainer,
   emptyExplanationMessage?: React.Node,
   emptyExplanationSecondMessage?: React.Node,
@@ -45,6 +46,7 @@ type State = {|
   nameErrors: { [string]: string },
   selectedVariables: { [number]: ?VariableAndName },
   mode: 'select' | 'move',
+  allVariableNames: string[],
 |};
 
 export default class VariablesList extends React.Component<Props, State> {
@@ -52,7 +54,12 @@ export default class VariablesList extends React.Component<Props, State> {
     nameErrors: {},
     selectedVariables: getInitialSelection(),
     mode: 'select',
+    allVariableNames: [],
   };
+
+  componentDidMount() {
+    this.setState({ allVariableNames: this.props.onComputeAllVariableNames() });
+  }
 
   _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
     this.setState({
@@ -133,7 +140,7 @@ export default class VariablesList extends React.Component<Props, State> {
 
     // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
     // that's why it's important to only delete ancestor variables.
-    ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
+    ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) =>
       variablesContainer.removeRecursively(variable)
     );
     this.clearSelection();
@@ -280,8 +287,7 @@ export default class VariablesList extends React.Component<Props, State> {
           variable.castTo(newType);
           this.forceUpdate();
         }}
-        onBlur={event => {
-          const text = event.target.value;
+        onChangeName={text => {
           if (name === text) return;
 
           let success = true;
@@ -337,6 +343,14 @@ export default class VariablesList extends React.Component<Props, State> {
         isSelected={!!this.state.selectedVariables[variable.ptr]}
         onSelect={select =>
           this._selectVariable({ name, ptr: variable.ptr, variable }, select)
+        }
+        undefinedVariableNames={
+          // autocompletion is not handled for child variables.
+          depth === 0
+            ? this.state.allVariableNames.filter(
+                variableName => !this.props.variablesContainer.has(variableName)
+              )
+            : []
         }
       />
     );

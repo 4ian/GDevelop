@@ -148,6 +148,7 @@ namespace gdjs {
     setText(text: string): void {
       this._text = text;
       this._renderer.updateTextContent();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -174,6 +175,7 @@ namespace gdjs {
     setScale(scale: float): void {
       this._scale = scale;
       this._renderer.updateScale();
+      this.hitBoxesDirty = true;
     }
 
     getScale(): float {
@@ -255,6 +257,12 @@ namespace gdjs {
      * @param opacity The new opacity of the object (0-255).
      */
     setOpacity(opacity: float): void {
+      if (opacity < 0) {
+        opacity = 0;
+      }
+      if (opacity > 255) {
+        opacity = 255;
+      }
       this._opacity = opacity;
       this._renderer.updateOpacity();
     }
@@ -273,6 +281,7 @@ namespace gdjs {
     setWrappingWidth(width: float): void {
       this._wrappingWidth = width;
       this._renderer.updateWrappingWidth();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -285,6 +294,7 @@ namespace gdjs {
     setWordWrap(wordWrap: boolean): void {
       this._wordWrap = wordWrap;
       this._renderer.updateWrappingWidth();
+      this.hitBoxesDirty = true;
     }
 
     getWordWrap(): boolean {
@@ -295,14 +305,14 @@ namespace gdjs {
      * Get the width of the object.
      */
     getWidth(): float {
-      return this._renderer.getWidth() * this.getScale();
+      return this._renderer.getWidth();
     }
 
     /**
      * Get the height of the object.
      */
     getHeight(): float {
-      return this._renderer.getHeight() * this.getScale();
+      return this._renderer.getHeight();
     }
   }
   gdjs.registerObject(

@@ -8,6 +8,7 @@ import { type Profile } from '../Utils/GDevelopServices/Authentification';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 import { type UserProfile } from '../Profile/UserProfileContext';
@@ -703,4 +704,14 @@ export const showcasedGame1: ShowcasedGame = {
   thumbnailUrl:
     'https://resources.gdevelop-app.com/games-showcase/images/bub-animated-logo.gif',
   editorDescription: '',
+};
+
+export const exampleFromFutureVersion: ExampleShortHeader = {
+  id: 'fake-id',
+  name: 'Fake example',
+  shortDescription: 'This is a fake example made in a future GDevelop version',
+  license: 'MIT',
+  tags: [],
+  previewImageUrls: [],
+  gdevelopVersion: '99.0.0',
 };

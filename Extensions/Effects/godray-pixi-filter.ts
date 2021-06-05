@@ -26,6 +26,8 @@ namespace gdjs {
         filter.y = value;
       } else if (parameterName === 'animationSpeed') {
         filter.animationSpeed = value;
+      } else if (parameterName === 'padding') {
+        filter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {},

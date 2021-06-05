@@ -78,6 +78,7 @@ export const ExtensionStore = ({
               style={styles.searchBar}
             />
             <Line
+              expand
               overflow={
                 'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }

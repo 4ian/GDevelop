@@ -9,6 +9,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Project/Effect.h"
 #include "GDCore/Project/Layer.h"
+#include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 
@@ -26,10 +27,9 @@ void ExposeProjectEffects(
     auto& layout = project.GetLayout(s);
 
     for (std::size_t l = 0; l < layout.GetLayersCount(); ++l) {
-      auto& layer = layout.GetLayer(l);
-
-      for (std::size_t e = 0; e < layer.GetEffectsCount(); ++e) {
-        auto& effect = layer.GetEffect(e);
+      auto& effects = layout.GetLayer(l).GetEffects();
+      for (std::size_t e = 0; e < effects.GetEffectsCount(); ++e) {
+        auto& effect = effects.GetEffect(e);
         worker(effect);
       }
     }

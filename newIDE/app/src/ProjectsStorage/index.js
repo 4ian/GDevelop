@@ -8,7 +8,7 @@ import { type AppArguments } from '../Utils/Window';
  * by a storage provider.
  */
 export type FileMetadata = {|
-  // The file id, path or local path according to the provider
+  /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
 |};
 

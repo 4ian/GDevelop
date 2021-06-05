@@ -1049,6 +1049,339 @@ module.exports = {
     /* ====== CLOUD FIRESTORE ====== */
 
     extension
+      .addStrExpression(
+        'ServerTimestamp',
+        _('Get server timestamp'),
+        _(
+          'Set a field to the timstamp on the server when the request arrives there'
+        ),
+        _('Firebase/Cloud Firestore'),
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName(
+        'gdjs.evtTools.firebaseTools.firestore.getServerTimestamp'
+      );
+
+    extension
+      .addAction(
+        'FirestoreStartQuery',
+        _('Start a query'),
+        _(
+          'Start a query on a collection. ' +
+            'A query allows to get a filtered and ordered list of documents in a collection.'
+        ),
+        _('Create a query named _PARAM0_ for collection _PARAM1_'),
+        _('Firebase/Cloud Firestore/Queries/Initialize'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('string', _('Collection'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.startQuery');
+
+    extension
+      .addAction(
+        'FirestoreStartQueryFrom',
+        _('Start a query from another query'),
+        _('Start a query with the same collection and filters as another one.'),
+        _('Create a query named _PARAM0_ from query _PARAM1_'),
+        _('Firebase/Cloud Firestore/Queries/Initialize'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('string', _('Source query name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.startQueryFrom');
+
+    const operatorDesc =
+      'See the [Firebase documentation]' +
+      '(https://firebase.google.com/docs/firestore/query-data/queries#query_operators) to understand the operators. ' +
+      "It is important as some [don't work when combined]" +
+      '(https://firebase.google.com/docs/firestore/query-data/queries#query_limitations).';
+
+    extension
+      .addAction(
+        'FirestoreQueryWhereNumber',
+        _('Filter by field value'),
+        _('Only match the documents that have a field passing a check.'),
+        _(
+          'Filter query _PARAM0_ to remove documents whose field _PARAM1_ is not _PARAM2__PARAM3_'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Filters'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('string', _('Field to check'), '', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Check type'),
+        '["<", "<=", "==", "!=", ">=", ">", "array-contains"]',
+        false
+      )
+      .setParameterLongDescription(operatorDesc)
+      .addParameter('expression', _('Value to check'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.queryWhere');
+
+    extension
+      .addAction(
+        'FirestoreQueryWhereText',
+        _('Filter by field text'),
+        _('Only match the documents that have a field passing a check.'),
+        _(
+          'Filter query _PARAM0_ to remove documents whose field _PARAM1_ is not _PARAM2__PARAM3_'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Filters'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('string', _('Field to check'), '', false)
+      .addParameter(
+        'stringWithSelector',
+        _('Check type'),
+        '["<", "<=", "==", "!=", ">=", ">", "array-contains"]',
+        false
+      )
+      .setParameterLongDescription(operatorDesc)
+      .addParameter('string', _('Text to check'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.queryWhere');
+
+    extension
+      .addAction(
+        'FirestoreQueryOrderBy',
+        _('Order by field value'),
+        _('Orders all documents in the query by a the value of a field.'),
+        _('Order query _PARAM0_ by field _PARAM1_ (direction: _PARAM2_)'),
+        _('Firebase/Cloud Firestore/Queries/Filters'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('string', _('Field to order by'), '', false)
+      .setParameterLongDescription(
+        'Note that [some limitations may apply when combined with a where query](https://firebase.google.com/docs/firestore/query-data/order-limit-data#limitations).'
+      )
+      .addParameter(
+        'stringWithSelector',
+        _('Direction (ascending or descending)'),
+        '["asc", "desc"]',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.queryOrderBy');
+
+    extension
+      .addAction(
+        'FirestoreQueryLimit',
+        _('Limit amount of documents'),
+        _(
+          'Limits the amount of documents returned by the query. Can only be used after an order filter.'
+        ),
+        _(
+          'Limit query _PARAM0_ to _PARAM1_ documents (begin from the end: _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Filters'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter('expression', _('Amount to limit by'), '', false)
+      .addParameter('yesorno', _('Begin from the end'), '', false)
+      .setDefaultValue('false')
+      .setParameterLongDescription(
+        'If yes, the last X documents will be kept, else the first X documents will be kept.'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.queryLimit');
+
+    extension
+      .addAction(
+        'FirestoreQuerySkipSome',
+        _('Skip some documents'),
+        _(
+          'Removes documents before or after a certain value on the field ordered by in a query. Can only be used after an order filter.'
+        ),
+        _(
+          'Skip documents with fields (before: _PARAM2_) value _PARAM1_ in query _PARAM0_ (include documents at that value: _PARAM3_)'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Filters'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter(
+        'expression',
+        _('The value of the field ordered by to skip after'),
+        '',
+        false
+      )
+      .addParameter('yesorno', _('Skip documents before?'), '', false)
+      .setParameterLongDescription(
+        'If yes, the documents with a bigger field value will be kept, else the documents with a smaller field value be kept by the query.'
+      )
+      .addParameter(
+        'yesorno',
+        _(
+          'Include documents which field value equals the value to skip after?'
+        ),
+        '',
+        false
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.querySkipSome');
+
+    extension
+      .addAction(
+        'FirestoreExecuteQuery',
+        _('Execute a query'),
+        _('Execute the query and store results in a scene variable.'),
+        _(
+          'Execute query _PARAM0_ and store results into _PARAM1_ (store result state in _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Execute'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable where to load the results'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        'See the shape of the returned data on [the wiki page](http://wiki.compilgames.net/doku.php/gdevelop5/all-features/firebase/firestore#the_query_result).'
+      )
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error message)'),
+        '',
+        true
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.executeQuery');
+
+    extension
+      .addAction(
+        'FirestoreWatchQuery',
+        _('Watch a query'),
+        _(
+          'Executes the query every time a new documents starts ' +
+            'or stops matching the query, or a document that matches the query has been changed.'
+        ),
+        _(
+          'Watch and automatically execute query _PARAM0_ and store results into _PARAM1_ (store result state in _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore/Queries/Execute'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Query name'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable where to load the results'),
+        '',
+        true
+      )
+      .setParameterLongDescription(
+        'See the shape of the returned data on [the wiki page]().'
+      )
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error message)'),
+        '',
+        true
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.watchQuery');
+
+    extension
       .addAction(
         'FirestoreEnablePersistence',
         _('Enable persistence'),
@@ -1152,7 +1485,7 @@ module.exports = {
         _(
           'Write _PARAM2_ to firestore in document _PARAM1_ of collection _PARAM0_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1178,13 +1511,44 @@ module.exports = {
 
     extension
       .addAction(
+        'FirestoreAddDocument',
+        _('Add a document to firestore'),
+        _('Adds a document (variable) to cloud firestore with a unique name.'),
+        _(
+          'Add _PARAM1_ to firestore collection _PARAM0_ (store result state in _PARAM2_)'
+        ),
+        _('Firebase/Cloud Firestore/Documents'),
+        'JsPlatform/Extensions/firebase.png',
+        'JsPlatform/Extensions/firebase.png'
+      )
+      .addParameter('string', _('Collection'), '', false)
+      .addParameter('scenevar', _('Variable to write'), '', false)
+      .addParameter(
+        'scenevar',
+        _('Callback variable with state (ok or error)'),
+        '',
+        true
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
+      .addIncludeFile(
+        'Extensions/Firebase/A_firebasejs/B_firebase-firestore.js'
+      )
+      .addIncludeFile('Extensions/Firebase/B_firebasetools/C_firebasetools.js')
+      .addIncludeFile(
+        'Extensions/Firebase/B_firebasetools/D_cloudfirestoretools.js'
+      )
+      .setFunctionName('gdjs.evtTools.firebaseTools.firestore.addDocument');
+
+    extension
+      .addAction(
         'FirestoreWriteField',
         _('Write a field in firestore'),
         _('Writes a field of a firestore document.'),
         _(
           'Write _PARAM3_ to firestore in field _PARAM2_ of document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM4_, Merge: _PARAM5_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1218,7 +1582,7 @@ module.exports = {
         _(
           'Update firestore document _PARAM1_ in collection _PARAM0_ with _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1250,7 +1614,7 @@ module.exports = {
         _(
           'Update field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1283,7 +1647,7 @@ module.exports = {
         _(
           'Delete firestore document _PARAM1_ in collection _PARAM0_ (store result state in _PARAM2_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1314,7 +1678,7 @@ module.exports = {
         _(
           'Delete field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ with (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1346,7 +1710,7 @@ module.exports = {
         _(
           'Load firestore document _PARAM1_ from collection _PARAM0_ into _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1383,7 +1747,7 @@ module.exports = {
         _(
           'Load field _PARAM2_ of firestore document _PARAM1_ in collection _PARAM0_ into _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1423,7 +1787,7 @@ module.exports = {
         _(
           'Check for existence of _PARAM1_ in collection _PARAM0_ and store result in _PARAM2_ (store result state in _PARAM3_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Documents'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1462,7 +1826,7 @@ module.exports = {
         _(
           'Check for existence of _PARAM2_ in document _PARAM1_ of collection _PARAM0_ and store result in _PARAM3_ (store result state in _PARAM4_)'
         ),
-        _('Firebase/Cloud Firestore'),
+        _('Firebase/Cloud Firestore/Fields'),
         'JsPlatform/Extensions/firebase.png',
         'JsPlatform/Extensions/firebase.png'
       )
@@ -1519,6 +1883,7 @@ module.exports = {
         '',
         true
       )
+      .setHidden()
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Firebase/A_firebasejs/A_firebase-base.js')
       .addIncludeFile(

@@ -28,12 +28,12 @@ module.exports = {
     extension
       .setExtensionInformation(
         'BitmapText',
-        _('Bitmap Text Object'),
-        _('Displays a text as a bitmap image.'),
+        _('Bitmap Text'),
+        _('Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/objects/bitmaptext');
+      .setExtensionHelpPath('/objects/bitmap_text');
 
     const bitmapTextObject = new gd.ObjectJsImplementation();
     // $FlowExpectedError
@@ -152,9 +152,9 @@ module.exports = {
     const object = extension
       .addObject(
         'BitmapTextObject',
-        _('BitmapText'),
+        _('Bitmap Text'),
         _(
-          'Displays a text using a "Bitmap Font", which is more performant than a traditional text but also less flexible (only alphanumerical characters are supported).'
+          'Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'
         ),
         'JsPlatform/Extensions/bitmapfont32.png',
         bitmapTextObject
@@ -563,9 +563,7 @@ module.exports = {
       if (bitmapFontUsageCount[bitmapFontInstallKey] === 0) {
         PIXI.BitmapFont.uninstall(bitmapFontInstallKey);
         console.info(
-          'Uninstalled BitmapFont "' +
-            bitmapFontInstallKey +
-            '" from memory.'
+          'Uninstalled BitmapFont "' + bitmapFontInstallKey + '" from memory.'
         );
       }
     };
@@ -686,9 +684,9 @@ module.exports = {
       }
 
       this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
+        this._instance.getX() + (this._pixiObject.textWidth * scale) / 2;
       this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
+        this._instance.getY() + (this._pixiObject.textHeight * scale) / 2;
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );

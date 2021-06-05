@@ -2,47 +2,35 @@
 import React, { Component } from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SemiControlledAutoComplete, {
-  type SemiControlledAutoCompleteInterface,
-} from '../../UI/SemiControlledAutoComplete';
+import GenericExpressionField from './GenericExpressionField';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
 export default class LayerField extends Component<ParameterFieldProps, {||}> {
-  _field: ?SemiControlledAutoCompleteInterface;
+  _field: ?GenericExpressionField;
 
   focus() {
     if (this._field) this._field.focus();
   }
 
   render() {
-    const { value, onChange, isInline, scope, parameterMetadata } = this.props;
-    const { layout } = scope;
-    const layerNames = layout
+    const { layout } = this.props.scope;
+    const layerNames: Array<ExpressionAutocompletion> = layout
       ? mapFor(0, layout.getLayersCount(), i => {
           const layer = layout.getLayerAt(i);
-          return layer.getName();
+          return { kind: 'Text', completion: `"${layer.getName()}"` };
         })
       : [];
 
     return (
-      <SemiControlledAutoComplete
-        margin={this.props.isInline ? 'none' : 'dense'}
-        floatingLabelText={
-          parameterMetadata ? parameterMetadata.getDescription() : undefined
+      <GenericExpressionField
+        expressionType="string"
+        onGetAdditionalAutocompletions={expression =>
+          layerNames.filter(
+            ({ completion }) => completion.indexOf(expression) === 0
+          )
         }
-        helperMarkdownText={
-          parameterMetadata ? parameterMetadata.getLongDescription() : undefined
-        }
-        fullWidth
-        value={value}
-        onChange={onChange}
-        onRequestClose={this.props.onRequestClose}
-        openOnFocus={isInline}
-        dataSource={layerNames.map(layerName => ({
-          text: layerName ? `"${layerName}"` : '"" (Base layer)',
-          value: `"${layerName}"`,
-        }))}
-        hintText={'""'}
         ref={field => (this._field = field)}
+        {...this.props}
       />
     );
   }

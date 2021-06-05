@@ -198,27 +198,33 @@ describe('libGD.js', function () {
     it('can have effects', function () {
       const layer = new gd.Layer();
 
-      expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
-      expect(layer.getEffectsCount()).toBe(0);
+      const effects = layer.getEffects();
 
-      layer.insertNewEffect('MyEffect', 0);
-      expect(layer.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
-      expect(layer.hasEffectNamed('MyEffect')).toBe(true);
-      expect(layer.getEffectsCount()).toBe(1);
-      expect(layer.getEffectPosition('MyEffect')).toBe(0);
+      expect(effects.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(effects.getEffectsCount()).toBe(0);
+
+      expect(effects.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(effects.getEffectsCount()).toBe(0);
+
+      effects.insertNewEffect('MyEffect', 0);
+      expect(effects.hasEffectNamed('EffectThatDoesNotExist')).toBe(false);
+      expect(effects.hasEffectNamed('MyEffect')).toBe(true);
+      expect(effects.getEffectsCount()).toBe(1);
+      expect(effects.getEffectPosition('MyEffect')).toBe(0);
 
       const effect2 = new gd.Effect();
       effect2.setName('MyEffect2');
 
-      layer.insertEffect(effect2, 1);
-      expect(layer.hasEffectNamed('MyEffect2')).toBe(true);
-      expect(layer.getEffectsCount()).toBe(2);
-      expect(layer.getEffectPosition('MyEffect')).toBe(0);
-      expect(layer.getEffectPosition('MyEffect2')).toBe(1);
+      effects.insertEffect(effect2, 1);
+      expect(effects.hasEffectNamed('MyEffect2')).toBe(true);
+      expect(effects.getEffectsCount()).toBe(2);
+      expect(effects.getEffectPosition('MyEffect')).toBe(0);
 
-      layer.swapEffects(0, 1);
-      expect(layer.getEffectPosition('MyEffect2')).toBe(0);
-      expect(layer.getEffectPosition('MyEffect')).toBe(1);
+      expect(effects.getEffectPosition('MyEffect2')).toBe(1);
+
+      effects.swapEffects(0, 1);
+      expect(effects.getEffectPosition('MyEffect2')).toBe(0);
+      expect(effects.getEffectPosition('MyEffect')).toBe(1);
 
       layer.delete();
     });
@@ -228,7 +234,7 @@ describe('libGD.js', function () {
 
       layer.setName('GUI');
       layer.setVisibility(false);
-      layer.insertNewEffect('MyEffect', 0);
+      layer.getEffects().insertNewEffect('MyEffect', 0);
 
       const element = new gd.SerializerElement();
       layer.serializeTo(element);
@@ -236,8 +242,8 @@ describe('libGD.js', function () {
 
       expect(layer2.getName()).toBe('GUI');
       expect(layer2.getVisibility()).toBe(false);
-      expect(layer2.getEffectsCount()).toBe(1);
-      expect(layer2.getEffectAt(0).getName()).toBe('MyEffect');
+      expect(layer2.getEffects().getEffectsCount()).toBe(1);
+      expect(layer2.getEffects().getEffectAt(0).getName()).toBe('MyEffect');
 
       layer.delete();
       layer2.delete();

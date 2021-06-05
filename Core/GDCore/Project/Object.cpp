@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/Object.h"
+
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Layout.h"
@@ -116,6 +117,11 @@ void Object::UnserializeFrom(gd::Project& project,
       element.GetChild("variables", 0, "Variables"));
   behaviors.clear();
 
+  if (element.HasChild("effects")) {
+    const SerializerElement& effectsElement = element.GetChild("effects");
+    effectsContainer.UnserializeFrom(effectsElement);
+  }
+
   // Compatibility with GD <= 3.3
   if (element.HasChild("Automatism")) {
     for (std::size_t i = 0; i < element.GetChildrenCount("Automatism"); ++i) {
@@ -180,6 +186,7 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("type", GetType());
   element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
+  effectsContainer.SerializeTo(element.AddChild("effects"));
 
   SerializerElement& behaviorsElement = element.AddChild("behaviors");
   behaviorsElement.ConsiderAsArrayOf("behavior");

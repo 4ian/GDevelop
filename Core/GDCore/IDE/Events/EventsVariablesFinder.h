@@ -24,11 +24,17 @@ namespace gd {
  * global or object variables.
  *
  * \todo Refactor this class using ArbitraryEventsWorker
+ * \todo Rework this class to return the shapes (maybe even types?) of the
+ * variables (in particular for structures and arrays), so we can use this
+ * for better autocompletions in the variables dialogs in the IDE.
  *
  * \ingroup IDE
  */
 class EventsVariablesFinder {
  public:
+  EventsVariablesFinder(){};
+  virtual ~EventsVariablesFinder(){};
+
   /**
    * Construct a list containing the name of all global variables used in the
    * project.
@@ -114,9 +120,6 @@ class EventsVariablesFinder {
       const gd::EventsList& events,
       const gd::String& parameterType,
       const gd::String& objectName = "");
-
-  EventsVariablesFinder(){};
-  virtual ~EventsVariablesFinder(){};
 };
 
 }  // namespace gd

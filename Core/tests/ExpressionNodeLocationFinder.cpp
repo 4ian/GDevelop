@@ -24,6 +24,18 @@ bool CheckNodeAtLocationIs(gd::ExpressionParser2& parser,
                  *node, searchPosition)) != nullptr;
 }
 
+template <class TNode>
+bool CheckParentNodeAtLocationIs(gd::ExpressionParser2& parser,
+                           const gd::String& type,
+                           const gd::String& expression,
+                           size_t searchPosition) {
+  auto node = parser.ParseExpression(type, expression);
+  REQUIRE(node != nullptr);
+  return dynamic_cast<TNode*>(
+             gd::ExpressionNodeLocationFinder::GetParentNodeAtPosition(
+                 *node, searchPosition)) != nullptr;
+}
+
 bool CheckNoNodeAtLocation(gd::ExpressionParser2& parser,
                            const gd::String& type,
                            const gd::String& expression,
@@ -31,6 +43,16 @@ bool CheckNoNodeAtLocation(gd::ExpressionParser2& parser,
   auto node = parser.ParseExpression(type, expression);
   REQUIRE(node != nullptr);
   return gd::ExpressionNodeLocationFinder::GetNodeAtPosition(
+             *node, searchPosition) == nullptr;
+}
+
+bool CheckNoParentNodeAtLocation(gd::ExpressionParser2& parser,
+                           const gd::String& type,
+                           const gd::String& expression,
+                           size_t searchPosition) {
+  auto node = parser.ParseExpression(type, expression);
+  REQUIRE(node != nullptr);
+  return gd::ExpressionNodeLocationFinder::GetParentNodeAtPosition(
              *node, searchPosition) == nullptr;
 }
 
@@ -186,6 +208,13 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
     REQUIRE(CheckNodeAtLocationIs<gd::TextNode>(parser, "number", "12+\"hello\"", 3) == true);
   }
 
+  SECTION("Numbers and texts mismatchs (parent node)") {
+    REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(parser, "number", "12+\"hello\"", 0) == true);
+    REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(parser, "number", "12+\"hello\"", 1) == true);
+    REQUIRE(CheckNoParentNodeAtLocation(parser, "number", "12+\"hello\"", 2) == true);
+    REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(parser, "number", "12+\"hello\"", 3) == true);
+  }
+
   SECTION("Valid objects") {
     REQUIRE(CheckNodeAtLocationIs<gd::IdentifierNode>(
                 parser, "object", "HelloWorld1", 0) == true);
@@ -194,6 +223,10 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
     REQUIRE(CheckNodeAtLocationIs<gd::IdentifierNode>(
                 parser, "object", "HelloWorld1", 10) == true);
     REQUIRE(CheckNoNodeAtLocation(parser, "object", "HelloWorld1", 11) == true);
+  }
+  SECTION("Valid objects (parent node)") {
+    REQUIRE(CheckNoParentNodeAtLocation(
+                parser, "object", "HelloWorld1", 0) == true);
   }
   SECTION("Invalid objects") {
     REQUIRE(CheckNodeAtLocationIs<gd::IdentifierNode>(
@@ -296,6 +329,29 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
                   "MyExtension::GetNumberWith2Params(12, \"hello world\")",
                   52) == true);
     }
+    SECTION("Parent node") {
+      REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(
+                  parser, "number", "12 + MyExtension::GetNumber()", 0) ==
+              true);
+      REQUIRE(CheckParentNodeAtLocationIs<gd::OperatorNode>(
+                  parser, "number", "12 + MyExtension::GetNumber()", 6) ==
+              true);
+      REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
+                  parser,
+                  "number",
+                  "MyExtension::GetNumberWith2Params(12, \"hello world\")",
+                  35) == true);
+      REQUIRE(CheckParentNodeAtLocationIs<gd::FunctionCallNode>(
+                  parser,
+                  "number",
+                  "MyExtension::GetNumberWith2Params(12, \"hello world\")",
+                  35) == true);
+      REQUIRE(CheckParentNodeAtLocationIs<gd::FunctionCallNode>(
+                  parser,
+                  "number",
+                  "MyExtension::GetNumberWith2Params(12, \"hello world\")",
+                  39) == true);
+    }
   }
 
   SECTION("Invalid function calls") {
@@ -315,6 +371,12 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
                 parser, "number", "Idontexist(12)", 13) == true);
     REQUIRE(CheckNoNodeAtLocation(parser, "number", "Idontexist(12)", 14) ==
             true);
+  }
+  SECTION("Invalid function calls (parent node)") {
+    REQUIRE(CheckNodeAtLocationIs<gd::NumberNode>(
+                parser, "number", "Idontexist(12)", 12) == true);
+    REQUIRE(CheckParentNodeAtLocationIs<gd::FunctionCallNode>(
+                parser, "number", "Idontexist(12)", 12) == true);
   }
 
   SECTION("Unterminated function calls") {

@@ -8,18 +8,6 @@ import { Column, Line } from '../../UI/Grid';
 import { ExtensionIcon } from './ExtensionIcon';
 
 const styles = {
-  iconBackground: {
-    flex: 0,
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    background: 'linear-gradient(45deg, #FFFFFF33, #FFFFFF)',
-    padding: 4,
-    borderRadius: 4,
-  },
   container: {
     display: 'flex',
     textAlign: 'left',

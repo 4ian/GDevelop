@@ -4,6 +4,40 @@ namespace gdjs {
     export type Tweenable = any;
   }
 
+  function rgbToHsl(r: number, g: number, b: number): number[] {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    let v = Math.max(r, g, b),
+      c = v - Math.min(r, g, b),
+      f = 1 - Math.abs(v + v - c - 1);
+    let h =
+      c &&
+      (v === r ? (g - b) / c : v === g ? 2 + (b - r) / c : 4 + (r - g) / c);
+    return [
+      Math.round(60 * (h < 0 ? h + 6 : h)),
+      Math.round((f ? c / f : 0) * 100),
+      Math.round(((v + v - c) / 2) * 100),
+    ];
+  }
+
+  function hslToRgb(h: number, s: number, l: number): number[] {
+    h = h %= 360;
+    if (h < 0) {
+      h += 360;
+    }
+    s = s / 100;
+    l = l / 100;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n = 0, k = (n + h / 30) % 12) =>
+      l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return [
+      Math.round(f(0) * 255),
+      Math.round(f(8) * 255),
+      Math.round(f(4) * 255),
+    ];
+  }
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     /** @type Object.<string, TweenRuntimeBehavior.TweenInstance > */
     _tweens: { [key: string]: TweenRuntimeBehavior.TweenInstance } = {};
@@ -644,15 +678,18 @@ namespace gdjs {
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     * @param useHSLColorTransition Tween using HSL color mappings, rather than direct RGB line
      */
     addObjectColorTween(
       identifier: string,
       toColorStr: string,
       easingValue: string,
       durationValue: float,
-      destroyObjectWhenFinished: boolean
+      destroyObjectWhenFinished: boolean,
+      useHSLColorTransition: boolean
     ) {
       const that = this;
+
       if (!this._isActive) {
         return;
       }
@@ -674,30 +711,175 @@ namespace gdjs {
         this.removeTween(identifier);
       }
       // @ts-ignore - objects are duck typed
-      const fromColor = this.owner.getColor().split(';');
-      let toColor = toColorStr.split(';');
+      const fromColor: string[] = this.owner.getColor().split(';');
+      const toColor: string[] = toColorStr.split(';');
       if (toColor.length !== 3) {
         return;
       }
+
       const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
         this._runtimeScene
       );
+
+      if (useHSLColorTransition) {
+        const fromColorAsHSL = rgbToHsl(
+          parseFloat(fromColor[0]),
+          parseFloat(fromColor[1]),
+          parseFloat(fromColor[2])
+        );
+        const toColorAsHSL = rgbToHsl(
+          parseFloat(toColor[0]),
+          parseFloat(toColor[1]),
+          parseFloat(toColor[2])
+        );
+
+        newTweenable.setConfig({
+          from: {
+            hue: fromColorAsHSL[0],
+            saturation: fromColorAsHSL[1],
+            lightness: fromColorAsHSL[2],
+          },
+          to: {
+            hue: toColorAsHSL[0],
+            saturation: toColorAsHSL[1],
+            lightness: toColorAsHSL[2],
+          },
+          duration: durationValue,
+          easing: easingValue,
+          step: function step(state) {
+            const rgbFromHslColor = hslToRgb(
+              state.hue,
+              state.saturation,
+              state.lightness
+            );
+            // @ts-ignore - objects are duck typed
+            that.owner.setColor(
+              Math.floor(rgbFromHslColor[0]) +
+                ';' +
+                Math.floor(rgbFromHslColor[1]) +
+                ';' +
+                Math.floor(rgbFromHslColor[2])
+            );
+          },
+        });
+      } else {
+        newTweenable.setConfig({
+          from: { red: fromColor[0], green: fromColor[1], blue: fromColor[2] },
+          to: { red: toColor[0], green: toColor[1], blue: toColor[2] },
+          duration: durationValue,
+          easing: easingValue,
+          step: function step(state) {
+            // @ts-ignore - objects are duck typed
+            that.owner.setColor(
+              Math.floor(state.red) +
+                ';' +
+                Math.floor(state.green) +
+                ';' +
+                Math.floor(state.blue)
+            );
+          },
+        });
+      }
+      this._addTween(
+        identifier,
+        newTweenable,
+        this._runtimeScene.getTimeManager().getTimeFromStart(),
+        durationValue
+      );
+      this._setupTweenEnding(identifier, destroyObjectWhenFinished);
+    }
+
+    /**
+     * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
+     * @param identifier Unique id to idenfify the tween
+     * @param toHue The target hue, or the same as the from color's hue if blank
+     * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
+     * @param toSaturation The target saturation, or the same as the from color's saturation if blank
+     * @param toHue The target lightness, or the same as the from color's lightness if blank
+     * @param easingValue Type of easing
+     * @param durationValue Duration in milliseconds
+     * @param destroyObjectWhenFinished Destroy this object when the tween ends
+     */
+    addObjectColorHSLTween(
+      identifier: string,
+      toHue: number,
+      animateHue: boolean,
+      toSaturation: number,
+      toLightness: number,
+      easingValue: string,
+      durationValue: float,
+      destroyObjectWhenFinished: boolean
+    ) {
+      const that = this;
+
+      if (!this._isActive) {
+        return;
+      }
+      // @ts-ignore - objects are duck typed
+      if (!this.owner.getColor || !this.owner.setColor) {
+        return;
+      }
+      if (!!TweenRuntimeBehavior.easings[easingValue]) {
+        return;
+      }
+
+      if (this._tweenExists(identifier)) {
+        this.removeTween(identifier);
+      }
+
+      // @ts-ignore - objects are duck typed
+      const fromColor: string[] = this.owner.getColor().split(';');
+      if (fromColor.length < 3) return;
+      const fromColorAsHSL = rgbToHsl(
+        parseFloat(fromColor[0]),
+        parseFloat(fromColor[1]),
+        parseFloat(fromColor[2])
+      );
+
+      const toH = animateHue ? toHue : fromColorAsHSL[0];
+      const toS =
+        -1 === toSaturation
+          ? fromColorAsHSL[1]
+          : Math.min(Math.max(toSaturation, 0), 100);
+      const toL =
+        -1 === toLightness
+          ? fromColorAsHSL[2]
+          : Math.min(Math.max(toLightness, 0), 100);
+
+      const newTweenable = TweenRuntimeBehavior.makeNewTweenable(
+        this._runtimeScene
+      );
+
       newTweenable.setConfig({
-        from: { red: fromColor[0], green: fromColor[1], blue: fromColor[2] },
-        to: { red: toColor[0], green: toColor[1], blue: toColor[2] },
+        from: {
+          hue: fromColorAsHSL[0],
+          saturation: fromColorAsHSL[1],
+          lightness: fromColorAsHSL[2],
+        },
+        to: {
+          hue: toH,
+          saturation: toS,
+          lightness: toL,
+        },
         duration: durationValue,
         easing: easingValue,
         step: function step(state) {
+          const rgbFromHslColor = hslToRgb(
+            state.hue,
+            state.saturation,
+            state.lightness
+          );
           // @ts-ignore - objects are duck typed
           that.owner.setColor(
-            Math.floor(state.red) +
+            Math.floor(rgbFromHslColor[0]) +
               ';' +
-              Math.floor(state.green) +
+              Math.floor(rgbFromHslColor[1]) +
               ';' +
-              Math.floor(state.blue)
+              Math.floor(rgbFromHslColor[2])
           );
         },
       });
+
       this._addTween(
         identifier,
         newTweenable,

@@ -1,31 +1,57 @@
-import React, { Component } from 'react';
+// @flow
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import * as React from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
-import { Column } from '../UI/Grid';
-import ExamplesList from './ExamplesList';
-import InternalFileStorageProvider from '../ProjectsStorage/InternalFileStorageProvider';
-import ExamplesInformation from './ExamplesInformation';
+import { ExampleStore } from '../AssetStore/ExampleStore';
+import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
+import { showErrorBox } from '../UI/Messages/MessageBox';
+import {
+  getExample,
+  type ExampleShortHeader,
+} from '../Utils/GDevelopServices/Asset';
+import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
-// To add a new example, add it first in resources/examples (at which point you can see it
-// in the desktop version), then run these scripts:
-// * scripts/update-examples-information-from-resources-examples.js (update metadata)
-// * scripts/update-fixtures-from-resources-examples.js (update web-app examples)
-// and upload the examples to `gdevelop-resources` s3.
-const exampleNames: Array<string> = Object.keys(ExamplesInformation);
+type Props = {|
+  onOpen: (
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => Promise<void>,
+|};
 
-export default class BrowserExamples extends Component {
-  render() {
-    return (
-      <Column noMargin>
-        <ExamplesList
-          exampleNames={exampleNames}
-          onCreateFromExample={exampleName => {
-            sendNewGameCreated(exampleName);
-            this.props.onOpen(InternalFileStorageProvider, {
-              fileIdentifier: `example://${exampleName}`,
-            });
+export default function BrowserExamples(props: Props) {
+  const [isOpening, setIsOpening] = React.useState(false);
+
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <ExampleStore
+          isOpening={isOpening}
+          onOpen={async (exampleShortHeader: ExampleShortHeader) => {
+            try {
+              setIsOpening(true);
+              const example = await getExample(exampleShortHeader);
+              props.onOpen(UrlStorageProvider, {
+                fileIdentifier: example.projectFileUrl,
+              });
+              sendNewGameCreated(example.projectFileUrl);
+            } catch (error) {
+              showErrorBox({
+                message:
+                  i18n._(t`Unable to fetch the example.`) +
+                  ' ' +
+                  i18n._(
+                    t`Verify your internet connection or try again later.`
+                  ),
+                rawError: error,
+                errorId: 'browser-example-load-error',
+              });
+            } finally {
+              setIsOpening(false);
+            }
           }}
         />
-      </Column>
-    );
-  }
+      )}
+    </I18n>
+  );
 }

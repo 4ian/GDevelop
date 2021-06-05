@@ -5,6 +5,7 @@ import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flo
 import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 type State = {|
   editorOpen: boolean,
@@ -26,10 +27,19 @@ export default class GlobalVariableField extends React.Component<
   render() {
     const { project, scope } = this.props;
 
+    const onComputeAllVariableNames = () =>
+      project
+        ? EventsRootVariablesFinder.findAllGlobalVariables(
+            project.getCurrentPlatform(),
+            project
+          )
+        : [];
+
     return (
       <React.Fragment>
         <VariableField
           variablesContainer={project ? project.getVariables() : null}
+          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -56,6 +66,7 @@ export default class GlobalVariableField extends React.Component<
                 scenes during the game.
               </Trans>
             }
+            onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}
       </React.Fragment>

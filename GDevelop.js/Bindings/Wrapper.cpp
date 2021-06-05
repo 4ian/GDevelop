@@ -35,6 +35,7 @@
 #include <GDCore/IDE/Events/TextFormatting.h>
 #include <GDCore/IDE/Events/UsedExtensionsFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
+#include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
@@ -551,6 +552,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   SanityCheckObjectInitialInstanceProperty
 #define STATIC_SanityCheckBehaviorsSharedDataProperty \
   SanityCheckBehaviorsSharedDataProperty
+#define STATIC_FindAllGlobalVariables FindAllGlobalVariables
+#define STATIC_FindAllLayoutVariables FindAllLayoutVariables
+#define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
 

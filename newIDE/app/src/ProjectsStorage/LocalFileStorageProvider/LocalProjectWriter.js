@@ -42,7 +42,7 @@ const checkFileContent = (filePath: string, expectedContent: string) => {
   });
 };
 
-const writeAndCheckFile = async (
+export const writeAndCheckFile = async (
   content: string,
   filePath: string
 ): Promise<void> => {

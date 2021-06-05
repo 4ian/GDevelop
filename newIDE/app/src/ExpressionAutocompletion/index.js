@@ -5,6 +5,7 @@ import {
   filterObjectsList,
   filterGroupsList,
 } from '../ObjectsList/EnumerateObjects';
+import { enumerateVariables } from '../EventsSheet/ParameterFields/EnumerateVariables';
 import flatten from 'lodash/flatten';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
 import {
@@ -19,6 +20,7 @@ import {
 } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
 import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
+import getObjectByName from '../Utils/GetObjectByName';
 
 type BaseExpressionAutocompletion = {|
   completion: string,
@@ -292,6 +294,52 @@ const getAutocompletionsForText = function(
   }));
 };
 
+const getAutocompletionsForVariable = function(
+  expressionAutocompletionContext: ExpressionAutocompletionContext,
+  completionDescription: gdExpressionCompletionDescription
+): Array<ExpressionAutocompletion> {
+  const prefix: string = completionDescription.getPrefix();
+  const type: string = completionDescription.getType();
+  const objectName: string = completionDescription.getObjectName();
+  const { project, scope } = expressionAutocompletionContext;
+
+  let variablesContainer: gdVariablesContainer;
+  if (type === 'globalvar') {
+    variablesContainer = project.getVariables();
+  } else if (type === 'scenevar') {
+    const layout = scope.layout;
+    variablesContainer = layout.getVariables();
+  } else if (type === 'objectvar') {
+    const layout = scope.layout;
+    const object = getObjectByName(project, layout, objectName);
+    if (!object) {
+      // No variable completion for unknown objet
+      return [];
+    }
+    variablesContainer = object.getVariables();
+  }
+
+  const definedVariableNames = enumerateVariables(variablesContainer)
+    .map(({ name, isValidName }) =>
+      isValidName
+        ? name
+        : // Hide invalid variable names - they would not
+          // be parsed correctly anyway.
+          null
+    )
+    .filter(Boolean);
+
+  const filteredVariablesList = filterStringList(definedVariableNames, prefix);
+
+  return filteredVariablesList.map(variableName => ({
+    kind: 'Text',
+    completion: variableName,
+    replacementStartPosition: completionDescription.getReplacementStartPosition(),
+    replacementEndPosition: completionDescription.getReplacementEndPosition(),
+    addClosingParenthesis: true,
+  }));
+};
+
 const getAutocompletionsForBehavior = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
@@ -368,6 +416,13 @@ export const getAutocompletionsFromDescriptions = (
         );
       } else if (completionKind === gd.ExpressionCompletionDescription.Text) {
         return getAutocompletionsForText(
+          expressionAutocompletionContext,
+          completionDescription
+        );
+      } else if (
+        completionKind === gd.ExpressionCompletionDescription.Variable
+      ) {
+        return getAutocompletionsForVariable(
           expressionAutocompletionContext,
           completionDescription
         );

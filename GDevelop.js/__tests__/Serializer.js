@@ -68,7 +68,7 @@ describe('libGD.js object serialization', function() {
       obj.delete();
 
       expect(jsonObject).toBe(
-        '{"bold":false,"italic":false,"name":"testObject","smoothed":true,"tags":"inventory, player","type":"TextObject::Text","underlined":false,"variables":[],"behaviors":[],"string":"Text of the object, with 官话 characters","font":"","characterSize":20.0,"color":{"b":0,"g":0,"r":0}}'
+        '{"bold":false,"italic":false,"name":"testObject","smoothed":true,"tags":"inventory, player","type":"TextObject::Text","underlined":false,"variables":[],"effects":[],"behaviors":[],"string":"Text of the object, with 官话 characters","font":"","characterSize":20.0,"color":{"b":0,"g":0,"r":0}}'
       );
     });
   });

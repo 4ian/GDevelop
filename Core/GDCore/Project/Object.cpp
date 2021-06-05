@@ -117,8 +117,10 @@ void Object::UnserializeFrom(gd::Project& project,
       element.GetChild("variables", 0, "Variables"));
   behaviors.clear();
 
-  const SerializerElement& effectsElement = element.GetChild("effects");
-  effectsContainer.UnserializeFrom(effectsElement);
+  if (element.HasChild("effects")) {
+    const SerializerElement& effectsElement = element.GetChild("effects");
+    effectsContainer.UnserializeFrom(effectsElement);
+  }
 
   // Compatibility with GD <= 3.3
   if (element.HasChild("Automatism")) {
@@ -184,11 +186,8 @@ void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("type", GetType());
   element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
+  effectsContainer.SerializeTo(element.AddChild("effects"));
 
-  // Disabled while effects are not implemented at runtime.
-//   SerializerElement& effectsElement = element.AddChild("effects");
-//   effectsContainer.SerializeTo(effectsElement);
-  
   SerializerElement& behaviorsElement = element.AddChild("behaviors");
   behaviorsElement.ConsiderAsArrayOf("behavior");
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();

@@ -302,15 +302,22 @@ const getAutocompletionsForVariable = function(
   const type: string = completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
   const { project, scope } = expressionAutocompletionContext;
+  const layout = scope.layout;
 
   let variablesContainer: gdVariablesContainer;
   if (type === 'globalvar') {
+    if (!project) {
+      // No variable completion
+      return [];
+    }
     variablesContainer = project.getVariables();
   } else if (type === 'scenevar') {
-    const layout = scope.layout;
+    if (!layout) {
+      // No variable completion
+      return [];
+    }
     variablesContainer = layout.getVariables();
   } else if (type === 'objectvar') {
-    const layout = scope.layout;
     const object = getObjectByName(project, layout, objectName);
     if (!object) {
       // No variable completion for unknown objet

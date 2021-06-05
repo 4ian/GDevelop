@@ -1,5 +1,6 @@
 // @flow
 import { type ExpressionParameters } from './ParameterFieldCommons';
+import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 const gd: libGDevelop = global.gd;
 
 /**
@@ -69,4 +70,26 @@ export const getLastObjectParameterObjectType = (
   }
 
   return parameters.at(objectParameterIndex).getExtraInfo();
+};
+
+export const getParameterChoices = (
+  parameterMetadata: ?gdParameterMetadata
+): Array<ExpressionAutocompletion> => {
+  if (!parameterMetadata) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(parameterMetadata.getExtraInfo()).map(choice => ({
+      kind: 'Text',
+      completion: `"${choice}"`,
+    }));
+  } catch (exception) {
+    console.error(
+      'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',
+      exception
+    );
+  }
+
+  return [];
 };

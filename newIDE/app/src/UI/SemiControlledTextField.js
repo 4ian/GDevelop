@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
 import TextField from './TextField';
+import {
+  shouldValidate,
+} from './KeyboardShortcuts/InteractionKeys';
 const mexp = require('math-expression-evaluator');
 
 type State = {|
@@ -73,6 +76,7 @@ export default class SemiControlledTextField extends React.Component<
     const input = this.getInputNode();
     input.addEventListener('wheel', this._onWheel.bind(this));
     input.addEventListener('keydown', this._onApply.bind(this));
+    input.addEventListener('keyup', this._onApply.bind(this));
   }
 
   componentWillUnmount() {
@@ -120,21 +124,28 @@ export default class SemiControlledTextField extends React.Component<
   }
 
   _evaluateValue(value: string): number {
-    return mexp.eval(value);
+    // while an expression not returned a number an error is catched and return the current string of the unfinished expression.
+    try {
+      return mexp.eval(value);
+    } catch (error) {
+      return value;
+    }
   }
 
   _onApply(evt) {
-    if (evt.keyCode == 13) {
-      const previousValue = this.state.text;
-      let value = this._evaluateValue(this.state.text);
-      // value can be Infinite or isNaN
-      // maybe worth to move this check in _evaluateValue()
-      if (!Number.isInteger(value)) {
+    const previousValue = this.state.text;
+    let value = previousValue;
+    if (shouldValidate(evt)) {
+      value = this._evaluateValue(value);
+
+      // the evaluated value isn't a number but a string of an unfinished expression (e.g. "0.1+")
+      if (!isFinite(value)) {
         value = previousValue;
       }
-      this.setState({ text: value });
-      this.props.onChange(value);
+      value = Number.parseFloat(value).toFixed(2); // 0.111+1 goes to 1.11 but react do an update after escpaing the input field and change to 1.1100000143051147
     }
+    this.setState({ text: value });
+    this.props.onChange(value);
   }
 
   render() {

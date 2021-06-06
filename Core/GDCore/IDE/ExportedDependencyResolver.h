@@ -21,7 +21,7 @@ struct DependencyMetadataAndExtension {
   gd::DependencyMetadata &GetDependency() const { return *dependency; };
   gd::PlatformExtension &GetExtension() const { return *extension; };
 
-private:
+ private:
   gd::DependencyMetadata *dependency;
   gd::PlatformExtension *extension;
 };
@@ -31,20 +31,20 @@ private:
  * with a game.
  */
 class ExportedDependencyResolver {
-public:
+ public:
   /**
-   * \brief Return the list of dependencies to be exported for the given project, 
-   * used extensions list and dependency type.
+   * \brief Return the list of dependencies to be exported for the given
+   * project, used extensions list and dependency type.
    *
    * Not all dependencies declared by extensions must be exported: some are only
    * exported when some settings are filled. Then, some others are only exported
    * when some other dependencies are exported (this won't work for more than
    * one level though).
    */
-  static std::vector<DependencyMetadataAndExtension>
-  GetDependenciesFor(const gd::Project &project,
-                     std::set<gd::String> usedExtensions,
-                     const gd::String &dependencyType) {
+  static std::vector<DependencyMetadataAndExtension> GetDependenciesFor(
+      const gd::Project &project,
+      std::set<gd::String> usedExtensions,
+      const gd::String &dependencyType) {
     std::vector<DependencyMetadataAndExtension> dependenciesWithProperType;
     for (const gd::String &extensionName : usedExtensions) {
       auto extension = project.GetCurrentPlatform().GetExtension(extensionName);
@@ -123,4 +123,4 @@ public:
   };
 };
 
-} // namespace gd
+}  // namespace gd

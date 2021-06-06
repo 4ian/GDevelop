@@ -38,7 +38,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/LayoutCodeGenerator.h"
 #include "GDJS/Extensions/JsPlatform.h"
-#undef CopyFile // Disable an annoying macro
+#undef CopyFile  // Disable an annoying macro
 
 namespace {
 double GetTimeNow() {
@@ -56,7 +56,7 @@ double LogTimeSpent(const gd::String &name, double previousTime) {
   std::cout << std::endl;
   return GetTimeNow();
 }
-} // namespace
+}  // namespace
 
 namespace gdjs {
 
@@ -66,7 +66,8 @@ static void InsertUnique(std::vector<gd::String> &container, gd::String str) {
 }
 
 ExporterHelper::ExporterHelper(gd::AbstractFileSystem &fileSystem,
-                               gd::String gdjsRoot_, gd::String codeOutputDir_)
+                               gd::String gdjsRoot_,
+                               gd::String codeOutputDir_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_), codeOutputDir(codeOutputDir_){};
 
 bool ExporterHelper::ExportProjectForPixiPreview(
@@ -112,8 +113,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       return false;
 
     // Export source files
-    if (!ExportExternalSourceFiles(exportedProject, codeOutputDir,
-                                   includesFiles)) {
+    if (!ExportExternalSourceFiles(
+            exportedProject, codeOutputDir, includesFiles)) {
       gd::LogError(
           _("Error during exporting! Unable to export source files:\n") +
           lastError);
@@ -158,14 +159,14 @@ bool ExporterHelper::ExportProjectForPixiPreview(
     gd::String scriptSrc = GetExportedIncludeFilename(includeFile);
     scriptFilesElement.AddChild("scriptFile")
         .SetStringAttribute("path", scriptSrc)
-        .SetIntAttribute("hash", hashIt != options.includeFileHashes.end()
-                                     ? hashIt->second
-                                     : 0);
+        .SetIntAttribute(
+            "hash",
+            hashIt != options.includeFileHashes.end() ? hashIt->second : 0);
   }
 
   // Export the project
-  ExportProjectData(fs, exportedProject, codeOutputDir + "/data.js",
-                    runtimeGameOptions);
+  ExportProjectData(
+      fs, exportedProject, codeOutputDir + "/data.js", runtimeGameOptions);
   includesFiles.push_back(codeOutputDir + "/data.js");
 
   previousTime = LogTimeSpent("Project data export", previousTime);
@@ -174,8 +175,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   ExportIncludesAndLibs(includesFiles, options.exportPath, true);
 
   // Create the index file
-  if (!ExportPixiIndexFile(exportedProject, gdjsRoot + "/Runtime/index.html",
-                           options.exportPath, includesFiles,
+  if (!ExportPixiIndexFile(exportedProject,
+                           gdjsRoot + "/Runtime/index.html",
+                           options.exportPath,
+                           includesFiles,
                            options.nonRuntimeScriptsCacheBurst,
                            "gdjs.runtimeGameOptions"))
     return false;
@@ -185,7 +188,9 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 }
 
 gd::String ExporterHelper::ExportProjectData(
-    gd::AbstractFileSystem &fs, const gd::Project &project, gd::String filename,
+    gd::AbstractFileSystem &fs,
+    const gd::Project &project,
+    gd::String filename,
     const gd::SerializerElement &runtimeGameOptions) {
   fs.MkDir(fs.DirNameFrom(filename));
 
@@ -197,21 +202,26 @@ gd::String ExporterHelper::ExportProjectData(
       "gdjs.runtimeGameOptions = " +
       gd::Serializer::ToJSON(runtimeGameOptions) + ";\n";
 
-  if (!fs.WriteToFile(filename, output))
-    return "Unable to write " + filename;
+  if (!fs.WriteToFile(filename, output)) return "Unable to write " + filename;
 
   return "";
 }
 
 bool ExporterHelper::ExportPixiIndexFile(
-    const gd::Project &project, gd::String source, gd::String exportDir,
+    const gd::Project &project,
+    gd::String source,
+    gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
-    unsigned int nonRuntimeScriptsCacheBurst, gd::String additionalSpec) {
+    unsigned int nonRuntimeScriptsCacheBurst,
+    gd::String additionalSpec) {
   gd::String str = fs.ReadFile(source);
 
   // Generate the file
-  if (!CompleteIndexFile(str, exportDir, includesFiles,
-                         nonRuntimeScriptsCacheBurst, additionalSpec))
+  if (!CompleteIndexFile(str,
+                         exportDir,
+                         includesFiles,
+                         nonRuntimeScriptsCacheBurst,
+                         additionalSpec))
     return false;
 
   // Write the index.html file
@@ -228,9 +238,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
                                         std::set<gd::String> usedExtensions) {
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
-  auto getIconFilename = [&resourceManager,
-                          &platformSpecificAssets](const gd::String &platform,
-                                                   const gd::String &name) {
+  auto getIconFilename = [&resourceManager, &platformSpecificAssets](
+                             const gd::String &platform,
+                             const gd::String &name) {
     const gd::String &file =
         resourceManager.GetResource(platformSpecificAssets.Get(platform, name))
             .GetFile();
@@ -238,9 +248,12 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   auto makeIconsAndroid = [&getIconFilename]() {
-    std::vector<std::pair<gd::String, gd::String>> sizes = {
-        {"36", "ldpi"},  {"48", "mdpi"},    {"72", "hdpi"},
-        {"96", "xhdpi"}, {"144", "xxhdpi"}, {"192", "xxxhdpi"}};
+    std::vector<std::pair<gd::String, gd::String>> sizes = {{"36", "ldpi"},
+                                                            {"48", "mdpi"},
+                                                            {"72", "hdpi"},
+                                                            {"96", "xhdpi"},
+                                                            {"144", "xxhdpi"},
+                                                            {"192", "xxxhdpi"}};
 
     gd::String output;
     for (auto &size : sizes) {
@@ -353,7 +366,9 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 }
 
 bool ExporterHelper::ExportCocos2dFiles(
-    const gd::Project &project, gd::String exportDir, bool debugMode,
+    const gd::Project &project,
+    gd::String exportDir,
+    bool debugMode,
     const std::vector<gd::String> &includesFiles) {
   if (!fs.CopyFile(gdjsRoot + "/Runtime/Cocos2d/main.js",
                    exportDir + "/main.js")) {
@@ -376,8 +391,11 @@ bool ExporterHelper::ExportCocos2dFiles(
 
     // Generate the file
     std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(str, exportDir, noIncludesInThisFile,
-                           /*nonRuntimeScriptsCacheBurst=*/0, "")) {
+    if (!CompleteIndexFile(str,
+                           exportDir,
+                           noIncludesInThisFile,
+                           /*nonRuntimeScriptsCacheBurst=*/0,
+                           "")) {
       lastError = "Unable to complete Cocos2d-JS index.html file.";
       return false;
     }
@@ -479,11 +497,12 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     for (auto &dependencyAndExtension : dependenciesAndExtensions) {
       const auto &dependency = dependencyAndExtension.GetDependency();
       if (dependency.GetVersion() == "") {
-        gd::LogError("Latest Version not available for NPM dependencies, "
-                     "dependency " +
-                     dependency.GetName() +
-                     " is not exported. Please specify a version when calling "
-                     "addDependency.");
+        gd::LogError(
+            "Latest Version not available for NPM dependencies, "
+            "dependency " +
+            dependency.GetName() +
+            " is not exported. Please specify a version when calling "
+            "addDependency.");
         continue;
       }
 
@@ -542,11 +561,12 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 }
 
 bool ExporterHelper::CompleteIndexFile(
-    gd::String &str, gd::String exportDir,
+    gd::String &str,
+    gd::String exportDir,
     const std::vector<gd::String> &includesFiles,
-    unsigned int nonRuntimeScriptsCacheBurst, gd::String additionalSpec) {
-  if (additionalSpec.empty())
-    additionalSpec = "{}";
+    unsigned int nonRuntimeScriptsCacheBurst,
+    gd::String additionalSpec) {
+  if (additionalSpec.empty()) additionalSpec = "{}";
 
   gd::String codeFilesIncludes;
   for (auto &include : includesFiles) {
@@ -575,7 +595,8 @@ bool ExporterHelper::CompleteIndexFile(
   return true;
 }
 
-void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers,
+void ExporterHelper::AddLibsInclude(bool pixiRenderers,
+                                    bool cocosRenderers,
                                     bool websocketDebuggerClient,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -664,7 +685,8 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers,
   }
 }
 
-void ExporterHelper::RemoveIncludes(bool pixiRenderers, bool cocosRenderers,
+void ExporterHelper::RemoveIncludes(bool pixiRenderers,
+                                    bool cocosRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
     for (size_t i = 0; i < includesFiles.size();) {
@@ -695,8 +717,7 @@ bool ExporterHelper::ExportEffectIncludes(
   gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(
       project.GetCurrentPlatform(), project, effectIncludes);
 
-  for (auto &include : effectIncludes)
-    InsertUnique(includesFiles, include);
+  for (auto &include : effectIncludes) InsertUnique(includesFiles, include);
 
   return true;
 }
@@ -718,8 +739,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
     // Export the code
     if (fs.WriteToFile(filename, eventsOutput)) {
-      for (auto &include : eventsIncludes)
-        InsertUnique(includesFiles, include);
+      for (auto &include : eventsIncludes) InsertUnique(includesFiles, include);
 
       InsertUnique(includesFiles, filename);
     } else {
@@ -732,14 +752,13 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 }
 
 bool ExporterHelper::ExportExternalSourceFiles(
-    gd::Project &project, gd::String outputDir,
+    gd::Project &project,
+    gd::String outputDir,
     std::vector<gd::String> &includesFiles) {
   const auto &allFiles = project.GetAllSourceFiles();
   for (std::size_t i = 0; i < allFiles.size(); ++i) {
-    if (!allFiles[i])
-      continue;
-    if (allFiles[i]->GetLanguage() != "Javascript")
-      continue;
+    if (!allFiles[i]) continue;
+    if (allFiles[i]->GetLanguage() != "Javascript") continue;
 
     gd::SourceFile &file = *allFiles[i];
 
@@ -788,13 +807,15 @@ gd::String ExporterHelper::GetExportedIncludeFilename(
     // for cases where the browser is caching files that are getting
     // overwritten.
     return addSearchParameterToUrl(
-        resolvedInclude, "gdCacheBurst",
+        resolvedInclude,
+        "gdCacheBurst",
         gd::String::From(nonRuntimeScriptsCacheBurst));
   }
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    const std::vector<gd::String> &includesFiles, gd::String exportDir,
+    const std::vector<gd::String> &includesFiles,
+    gd::String exportDir,
     bool exportSourceMaps) {
   for (auto &include : includesFiles) {
     if (!fs.IsAbsolute(include)) {
@@ -804,8 +825,7 @@ bool ExporterHelper::ExportIncludesAndLibs(
       gd::String source = gdjsRoot + "/Runtime/" + include;
       if (fs.FileExists(source)) {
         gd::String path = fs.DirNameFrom(exportDir + "/" + include);
-        if (!fs.DirExists(path))
-          fs.MkDir(path);
+        if (!fs.DirExists(path)) fs.MkDir(path);
 
         fs.CopyFile(source, exportDir + "/" + include);
 
@@ -874,13 +894,15 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
 void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
                                      gd::Project &project,
                                      gd::String exportDir) {
-  gd::ProjectResourcesCopier::CopyAllResourcesTo(project, fs, exportDir, true,
-                                                 false, false);
+  gd::ProjectResourcesCopier::CopyAllResourcesTo(
+      project, fs, exportDir, true, false, false);
 }
 
 void ExporterHelper::AddDeprecatedFontFilesToFontResources(
-    gd::AbstractFileSystem &fs, gd::ResourcesManager &resourcesManager,
-    const gd::String &exportDir, gd::String urlPrefix) {
+    gd::AbstractFileSystem &fs,
+    gd::ResourcesManager &resourcesManager,
+    const gd::String &exportDir,
+    gd::String urlPrefix) {
   // Compatibility with GD <= 5.0-beta56
   //
   // Before, fonts were detected by scanning the export folder for .TTF files.
@@ -907,4 +929,4 @@ void ExporterHelper::AddDeprecatedFontFilesToFontResources(
   // end of compatibility code
 }
 
-} // namespace gdjs
+}  // namespace gdjs

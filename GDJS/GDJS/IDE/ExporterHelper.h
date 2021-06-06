@@ -18,7 +18,7 @@ class ExternalLayout;
 class SerializerElement;
 class AbstractFileSystem;
 class ResourcesManager;
-} // namespace gd
+}  // namespace gd
 class wxProgressDialog;
 
 namespace gdjs {
@@ -32,8 +32,10 @@ struct PreviewExportOptions {
    * \param exportPath_ The path in the filesystem where to export the files
    */
   PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
-      : project(project_), exportPath(exportPath_),
-        projectDataOnlyExport(false), nonRuntimeScriptsCacheBurst(0){};
+      : project(project_),
+        exportPath(exportPath_),
+        projectDataOnlyExport(false),
+        nonRuntimeScriptsCacheBurst(0){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
@@ -58,8 +60,8 @@ struct PreviewExportOptions {
    * \brief Set the (optional) external layout to be instanciated in the scene
    * at the beginning of the previewed game.
    */
-  PreviewExportOptions &
-  SetExternalLayoutName(const gd::String &externalLayoutName_) {
+  PreviewExportOptions &SetExternalLayoutName(
+      const gd::String &externalLayoutName_) {
     externalLayoutName = externalLayoutName_;
     return *this;
   }
@@ -109,8 +111,9 @@ struct PreviewExportOptions {
  * game.
  */
 class ExporterHelper {
-public:
-  ExporterHelper(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_,
+ public:
+  ExporterHelper(gd::AbstractFileSystem &fileSystem,
+                 gd::String gdjsRoot_,
                  gd::String codeOutputDir);
   virtual ~ExporterHelper(){};
 
@@ -129,10 +132,11 @@ public:
    * in gdjs.runtimeGameOptions \return Empty string if everthing is ok,
    * description of the error otherwise.
    */
-  static gd::String
-  ExportProjectData(gd::AbstractFileSystem &fs, const gd::Project &project,
-                    gd::String filename,
-                    const gd::SerializerElement &runtimeGameOptions);
+  static gd::String ExportProjectData(
+      gd::AbstractFileSystem &fs,
+      const gd::Project &project,
+      gd::String filename,
+      const gd::SerializerElement &runtimeGameOptions);
 
   /**
    * \brief Copy all the resources of the project to to the export directory,
@@ -144,20 +148,23 @@ public:
    * \param progressDlg Optional wxProgressDialog which will be updated with the
    * progress.
    */
-  static void ExportResources(gd::AbstractFileSystem &fs, gd::Project &project,
+  static void ExportResources(gd::AbstractFileSystem &fs,
+                              gd::Project &project,
                               gd::String exportDir);
 
   /**
    * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.
    */
-  void AddLibsInclude(bool pixiRenderers, bool cocosRenderers,
+  void AddLibsInclude(bool pixiRenderers,
+                      bool cocosRenderers,
                       bool websocketDebuggerClient,
                       std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Remove include files that are Pixi or Cocos2d renderers.
    */
-  void RemoveIncludes(bool pixiRenderers, bool cocosRenderers,
+  void RemoveIncludes(bool pixiRenderers,
+                      bool cocosRenderers,
                       std::vector<gd::String> &includesFiles);
 
   /**
@@ -171,7 +178,8 @@ public:
    * previews only.
    */
   bool ExportIncludesAndLibs(const std::vector<gd::String> &includesFiles,
-                             gd::String exportDir, bool exportSourceMaps);
+                             gd::String exportDir,
+                             bool exportSourceMaps);
 
   /**
    * \brief Generate the events JS code, and save them to the export directory.
@@ -182,7 +190,8 @@ public:
    * includesFiles A reference to a vector that will be filled with JS files to
    * be exported along with the project. ( including "codeX.js" files ).
    */
-  bool ExportEventsCode(gd::Project &project, gd::String outputDir,
+  bool ExportEventsCode(gd::Project &project,
+                        gd::String outputDir,
                         std::vector<gd::String> &includesFiles,
                         bool exportForPreview);
 
@@ -210,7 +219,8 @@ public:
    * with JS files to be exported along with the project. (including
    * "ext-codeX.js" files).
    */
-  bool ExportExternalSourceFiles(gd::Project &project, gd::String outputDir,
+  bool ExportExternalSourceFiles(gd::Project &project,
+                                 gd::String outputDir,
                                  std::vector<gd::String> &includesFiles);
 
   /**
@@ -230,7 +240,8 @@ public:
    * \param additionalSpec JSON string that will be passed to the
    * gdjs.RuntimeGame object.
    */
-  bool ExportPixiIndexFile(const gd::Project &project, gd::String source,
+  bool ExportPixiIndexFile(const gd::Project &project,
+                           gd::String source,
                            gd::String exportDir,
                            const std::vector<gd::String> &includesFiles,
                            unsigned int nonRuntimeScriptsCacheBurst,
@@ -252,7 +263,8 @@ public:
    * surrounded by comments marks will be replaced by the
    * content of this string.
    */
-  bool CompleteIndexFile(gd::String &indexFileContent, gd::String exportDir,
+  bool CompleteIndexFile(gd::String &indexFileContent,
+                         gd::String exportDir,
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
@@ -264,13 +276,15 @@ public:
    * \param project The project to be used to generate the configuration file.
    * \param exportDir The directory where the config.xml must be created.
    */
-  bool ExportCordovaFiles(const gd::Project &project, gd::String exportDir,
+  bool ExportCordovaFiles(const gd::Project &project,
+                          gd::String exportDir,
                           std::set<gd::String> usedExtensions);
 
   /**
    * \brief Generate the base Cocos2d files.
    */
-  bool ExportCocos2dFiles(const gd::Project &project, gd::String exportDir,
+  bool ExportCocos2dFiles(const gd::Project &project,
+                          gd::String exportDir,
                           bool debugMode,
                           const std::vector<gd::String> &includesFiles);
 
@@ -281,7 +295,8 @@ public:
    * \param project The project to be used to generate the files.
    * \param exportDir The directory where the files must be created.
    */
-  bool ExportElectronFiles(const gd::Project &project, gd::String exportDir,
+  bool ExportElectronFiles(const gd::Project &project,
+                           gd::String exportDir,
                            std::set<gd::String> usedExtensions);
 
   /**
@@ -307,9 +322,8 @@ public:
    * \brief Given an include file, returns the name of the file to reference
    * in the exported game.
    */
-  gd::String
-  GetExportedIncludeFilename(const gd::String &include,
-                             unsigned int nonRuntimeScriptsCacheBurst = 0);
+  gd::String GetExportedIncludeFilename(
+      const gd::String &include, unsigned int nonRuntimeScriptsCacheBurst = 0);
 
   /**
    * \brief Change the directory where code files are generated.
@@ -321,17 +335,19 @@ public:
   }
 
   static void AddDeprecatedFontFilesToFontResources(
-      gd::AbstractFileSystem &fs, gd::ResourcesManager &resourcesManager,
-      const gd::String &exportDir, gd::String urlPrefix = "");
+      gd::AbstractFileSystem &fs,
+      gd::ResourcesManager &resourcesManager,
+      const gd::String &exportDir,
+      gd::String urlPrefix = "");
 
   gd::AbstractFileSystem
-      &fs; ///< The abstract file system to be used for exportation.
-  gd::String lastError; ///< The last error that occurred.
+      &fs;  ///< The abstract file system to be used for exportation.
+  gd::String lastError;  ///< The last error that occurred.
   gd::String
-      gdjsRoot; ///< The root directory of GDJS, used to copy runtime files.
-  gd::String codeOutputDir; ///< The directory where JS code is outputted. Will
-                            ///< be then copied to the final output directory.
+      gdjsRoot;  ///< The root directory of GDJS, used to copy runtime files.
+  gd::String codeOutputDir;  ///< The directory where JS code is outputted. Will
+                             ///< be then copied to the final output directory.
 };
 
-} // namespace gdjs
-#endif // EXPORTER_HELPER_H
+}  // namespace gdjs
+#endif  // EXPORTER_HELPER_H

@@ -1,1 +1,0 @@
-Change the speed of the animation of an object according to its movement speed.

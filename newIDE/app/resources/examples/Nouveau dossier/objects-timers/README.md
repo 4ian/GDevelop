@@ -1,1 +1,0 @@
-Example showing various usage of objects timers (timers that are stored into instances of objects on the scene, as opposed to scene timers which are stored by the scene).

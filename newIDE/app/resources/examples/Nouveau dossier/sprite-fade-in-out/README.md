@@ -1,1 +1,0 @@
-This shows how to make a sprite fade in and out on the screen.

@@ -1,1 +1,0 @@
-This shows how to move the camera to the position of an object on a map.

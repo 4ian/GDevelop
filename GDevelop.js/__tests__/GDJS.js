@@ -16,34 +16,35 @@ describe('libGD.js - GDJS related tests', function () {
   );
 
   describe('Exporter', () => {
+    // Fake files to simulate a file system (see tests below).
+    const fakeIndexHtmlContent = '';
+    const fakeConfigXmlContent = `
+<widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION">
+  <name>GDJS_PROJECTNAME</name>
+  <platform name="android">
+<!-- GDJS_ICONS_ANDROID -->
+  </platform>
+  <platform name="ios">
+<!-- GDJS_ICONS_IOS -->
+  </platform>
+<!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
+</widget>`;
+    const fakePackageJsonContent = `
+{
+  "name": "GDJS_GAME_MANGLED_NAME",
+  "displayName": "GDJS_GAME_NAME",
+  "version": "GDJS_GAME_VERSION",
+  "description": "GDJS_GAME_NAME",
+  "author": "GDJS_GAME_AUTHOR"
+}`;
+
     it('properly exports Cordova files', () => {
-      // Create a project with some content
+      // Create a simple project
       const project = gd.ProjectHelper.createNewGDJSProject();
       project.setName('My great project with spaces and "quotes"!');
-      project.setVersion("1.2.3");
-      project.getExtensionProperties().setValue("AdMob", "AdMobAppIdAndroid", "my android app id");
+      project.setVersion('1.2.3');
 
       // Prepare a fake file system
-      const fakeIndexHtmlContent = '';
-      const fakeConfigXmlContent = `
-      <widget id="GDJS_PACKAGENAME" version="GDJS_PROJECTVERSION">
-          <name>GDJS_PROJECTNAME</name>
-          <platform name="android">
-              <!-- GDJS_ICONS_ANDROID -->
-          </platform>
-          <platform name="ios">
-              <!-- GDJS_ICONS_IOS -->
-          </platform>
-          <!-- GDJS_EXTENSION_CORDOVA_DEPENDENCY -->
-      </widget>`;
-      const fakePackageJsonContent = `
-      {
-        "name": "GDJS_GAME_MANGLED_NAME",
-        "displayName": "GDJS_GAME_NAME",
-        "version": "GDJS_GAME_VERSION",
-        "description": "GDJS_GAME_NAME",
-        "author": "GDJS_GAME_AUTHOR"
-      }`;
       var fs = makeFakeAbstractFileSystem(gd, {
         '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
         '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
@@ -67,29 +68,92 @@ describe('libGD.js - GDJS related tests', function () {
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/config.xml',
         `
-      <widget id="com.example.gamename" version="1.2.3">
-          <name>My great project with spaces and &quot;quotes&quot;!</name>
-          <platform name="android">
-              
-          </platform>
-          <platform name="ios">
-              
-          </platform>
-          <plugin name=\"gdevelop-cordova-admob-plus\" spec=\"0.43.0\">
-    <variable name=\"APP_ID_ANDROID\" value=\"my android app id\" />
-</plugin>
-      </widget>`
+<widget id="com.example.gamename" version="1.2.3">
+  <name>My great project with spaces and &quot;quotes&quot;!</name>
+  <platform name="android">
+
+  </platform>
+  <platform name="ios">
+
+  </platform>
+
+</widget>`
       );
       expect(fs.writeToFile).toHaveBeenCalledWith(
         '/fake-export-dir/package.json',
         `
-      {
-        \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
-        \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
-        \"version\": \"1.2.3\",
-        \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
-        \"author\": \"\"
-      }`
+{
+  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
+  \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"version\": \"1.2.3\",
+  \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"author\": \"\"
+}`
+      );
+    });
+    it('properly exports Cordova plugins config if required by an extension', () => {
+      // Create a project with some content using the AdMob extension.
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      project.setName('My great project with spaces and "quotes"!');
+      project.setVersion('1.2.3');
+      project
+        .getExtensionProperties()
+        .setValue('AdMob', 'AdMobAppIdAndroid', 'my android app id');
+      const layout = project.insertNewLayout('Scene', 0);
+      const event = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      const action = new gd.Instruction();
+      action.setType('AdMob::ShowInterstitial');
+      gd.asStandardEvent(event).getActions().insert(action, 0);
+
+      // Prepare a fake file system
+      var fs = makeFakeAbstractFileSystem(gd, {
+        '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
+        '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+      });
+
+      // Export and check the content of written files.
+      const exporter = new gd.Exporter(fs, '/fake-gdjs-root');
+      const exportOptions = new gd.MapStringBoolean();
+      exportOptions.set('exportForCordova', true);
+      expect(
+        exporter.exportWholePixiProject(
+          project,
+          '/fake-export-dir',
+          exportOptions
+        )
+      ).toBe(true);
+      exportOptions.delete();
+      exporter.delete();
+
+      expect(fs.writeToFile).toHaveBeenCalledWith(
+        '/fake-export-dir/config.xml',
+        `
+<widget id="com.example.gamename" version="1.2.3">
+  <name>My great project with spaces and &quot;quotes&quot;!</name>
+  <platform name="android">
+
+  </platform>
+  <platform name="ios">
+
+  </platform>
+<plugin name=\"gdevelop-cordova-admob-plus\" spec=\"0.43.0\">
+    <variable name=\"APP_ID_ANDROID\" value=\"my android app id\" />
+</plugin>
+</widget>`
+      );
+      expect(fs.writeToFile).toHaveBeenCalledWith(
+        '/fake-export-dir/package.json',
+        `
+{
+  \"name\": \"my_32great_32project_32with_32spaces_32and_32_34quotes_34_33\",
+  \"displayName\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"version\": \"1.2.3\",
+  \"description\": \"My great project with spaces and \\\"quotes\\\"!\",
+  \"author\": \"\"
+}`
       );
     });
   });
@@ -194,15 +258,15 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action2, 1);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
-        project
-      );
-      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-        eventsFunction,
-        namespace,
-        includeFiles,
-        true
-      );
+      const eventsFunctionsExtensionCodeGenerator =
+        new gd.EventsFunctionsExtensionCodeGenerator(project);
+      const code =
+        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          eventsFunction,
+          namespace,
+          includeFiles,
+          true
+        );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');
@@ -298,15 +362,15 @@ describe('libGD.js - GDJS related tests', function () {
       gd.asRepeatEvent(evt).getActions().insert(action, 0);
 
       const namespace = 'gdjs.eventsFunction.myTest';
-      const eventsFunctionsExtensionCodeGenerator = new gd.EventsFunctionsExtensionCodeGenerator(
-        project
-      );
-      const code = eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
-        eventsFunction,
-        namespace,
-        includeFiles,
-        true
-      );
+      const eventsFunctionsExtensionCodeGenerator =
+        new gd.EventsFunctionsExtensionCodeGenerator(project);
+      const code =
+        eventsFunctionsExtensionCodeGenerator.generateFreeEventsFunctionCompleteCode(
+          eventsFunction,
+          namespace,
+          includeFiles,
+          true
+        );
 
       // Check that the function name is properly generated
       expect(code).toMatch(namespace + '.func = function(');

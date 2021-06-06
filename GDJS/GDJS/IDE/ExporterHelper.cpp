@@ -234,7 +234,8 @@ bool ExporterHelper::ExportPixiIndexFile(
 }
 
 bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
-                                        gd::String exportDir) {
+                                        gd::String exportDir,
+                                        std::set<gd::String> usedExtensions) {
   auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
   auto &resourceManager = project.GetResourcesManager();
   auto getIconFilename = [&resourceManager, &platformSpecificAssets](
@@ -294,7 +295,8 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   gd::String plugins = "";
   auto dependenciesAndExtensions =
-      gd::ExportedDependencyResolver::GetDependenciesFor(project, "cordova");
+      gd::ExportedDependencyResolver::GetDependenciesFor(
+          project, usedExtensions, "cordova");
   for (auto &dependencyAndExtension : dependenciesAndExtensions) {
     const auto &dependency = dependencyAndExtension.GetDependency();
 
@@ -462,7 +464,8 @@ bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
 }
 
 bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
-                                         gd::String exportDir) {
+                                         gd::String exportDir,
+                                         std::set<gd::String> usedExtensions) {
   gd::String jsonName =
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
   gd::String jsonPackageName =
@@ -489,7 +492,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
     gd::String packages = "";
 
     auto dependenciesAndExtensions =
-        gd::ExportedDependencyResolver::GetDependenciesFor(project, "npm");
+        gd::ExportedDependencyResolver::GetDependenciesFor(
+            project, usedExtensions, "npm");
     for (auto &dependencyAndExtension : dependenciesAndExtensions) {
       const auto &dependency = dependencyAndExtension.GetDependency();
       if (dependency.GetVersion() == "") {

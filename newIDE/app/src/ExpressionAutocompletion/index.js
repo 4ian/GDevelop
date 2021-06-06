@@ -46,6 +46,10 @@ export type ExpressionAutocompletion =
     |}
   | {|
       ...BaseExpressionAutocompletion,
+      kind: 'Variable',
+    |}
+  | {|
+      ...BaseExpressionAutocompletion,
       object?: gdObject,
       kind: 'Object',
     |}
@@ -339,7 +343,7 @@ const getAutocompletionsForVariable = function(
   const filteredVariablesList = filterStringList(definedVariableNames, prefix);
 
   return filteredVariablesList.map(variableName => ({
-    kind: 'Text',
+    kind: 'Variable',
     completion: variableName,
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),

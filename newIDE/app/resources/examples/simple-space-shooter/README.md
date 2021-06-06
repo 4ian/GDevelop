@@ -1,1 +1,0 @@
-An older, simple space shooter demo, made without any behaviors from extensions. Prefer taking a look at the Space Shooter starter to learn about useful behaviors and patterns for making your games.

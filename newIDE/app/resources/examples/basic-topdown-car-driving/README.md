@@ -1,1 +1,0 @@
-Show how to create a car that can be controlled by the player.

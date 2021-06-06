@@ -1,1 +1,0 @@
-A small game similar to the Lost Woods of The Legend of Zelda Ocarina of Time, that uses spatial sound.

@@ -76,12 +76,14 @@ struct ExpressionCompletionDescription {
       const gd::String& type_,
       const gd::String& prefix_,
       size_t replacementStartPosition_,
-      size_t replacementEndPosition_) {
+      size_t replacementEndPosition_,
+      const gd::String& objectName_ = "") {
     return ExpressionCompletionDescription(Variable,
                                            type_,
                                            prefix_,
                                            replacementStartPosition_,
-                                           replacementEndPosition_);
+                                           replacementEndPosition_,
+                                           objectName_);
   }
 
   /**
@@ -397,7 +399,8 @@ class GD_CORE_API ExpressionCompletionFinder
         node.type,
         node.name,
         node.location.GetStartPosition(),
-        node.location.GetEndPosition()));
+        node.location.GetEndPosition(),
+        node.objectName));
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions

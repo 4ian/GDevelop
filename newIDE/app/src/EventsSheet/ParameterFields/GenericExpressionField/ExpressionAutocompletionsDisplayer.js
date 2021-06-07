@@ -346,7 +346,8 @@ export default function ExpressionAutocompletionsDisplayer({
                     ? selectedAutocompletionElement
                     : undefined;
 
-                  return expressionAutocompletion.kind === 'Text' ? (
+                  return expressionAutocompletion.kind === 'Text' ||
+                    expressionAutocompletion.kind === 'Variable' ? (
                     <DisplayedTextAutocompletion
                       key={index}
                       expressionAutocompletion={expressionAutocompletion}

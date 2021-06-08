@@ -22,6 +22,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
+import EffectsList from '../EffectsList';
 
 type Props = {|
   open: boolean,
@@ -118,6 +119,11 @@ const InnerDialog = (props: InnerDialogProps) => {
               value={'behaviors'}
               key={'behaviors'}
             />
+            <Tab
+              label={<Trans>Effects</Trans>}
+              value={'effects'}
+              key={'effects'}
+            />
           </Tabs>
         </div>
       }
@@ -165,6 +171,18 @@ const InnerDialog = (props: InnerDialogProps) => {
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
+        />
+      )}
+      {currentTab === 'effects' && (
+        <EffectsList
+          project={props.project}
+          resourceSources={props.resourceSources}
+          onChooseResource={props.onChooseResource}
+          resourceExternalEditors={props.resourceExternalEditors}
+          effectsContainer={props.object.getEffects()}
+          onEffectsUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positionned*/
+          }
         />
       )}
     </Dialog>

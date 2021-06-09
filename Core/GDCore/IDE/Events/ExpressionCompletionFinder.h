@@ -14,7 +14,6 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 namespace gd {
 class Expression;
 class ObjectsContainer;

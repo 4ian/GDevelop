@@ -101,7 +101,6 @@ std::set<gd::String> EventsVariablesFinder::FindAllGlobalVariables(
             platform,
             project,
             project.GetLayout(i),
-            project.GetLayout(i).GetEvents(),
             "globalvar");
     results.insert(results2.begin(), results2.end());
   }
@@ -116,7 +115,7 @@ std::set<gd::String> EventsVariablesFinder::FindAllLayoutVariables(
   std::set<gd::String> results;
 
   std::set<gd::String> results2 = FindArgumentsInEventsAndDependencies(
-      platform, project, layout, layout.GetEvents(), "scenevar");
+      platform, project, layout, "scenevar");
   results.insert(results2.begin(), results2.end());
 
   return results;
@@ -133,7 +132,6 @@ std::set<gd::String> EventsVariablesFinder::FindAllObjectVariables(
       platform,
       project,
       layout,
-      layout.GetEvents(),
       "objectvar",
       object.GetName());
   results.insert(results2.begin(), results2.end());
@@ -211,24 +209,30 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInEventsAndDependencies
     const gd::Platform& platform,
     const gd::Project& project,
     const gd::Layout& layout,
-    const gd::EventsList& events,
     const gd::String& parameterType,
     const gd::String& objectName) {
   std::set<gd::String> results;
 
   std::set<gd::String> results2 = FindArgumentsInEvents(
-      platform, project, layout, events, parameterType, objectName);
+      platform, project, layout, layout.GetEvents(), parameterType, objectName);
   results.insert(results2.begin(), results2.end());
 
   DependenciesAnalyzer dependenciesAnalyzer = DependenciesAnalyzer(project, layout);
   dependenciesAnalyzer.Analyze();
-  for (gd::String externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
+  for (const gd::String& externalEventName : dependenciesAnalyzer.GetExternalEventsDependencies()) {
     const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
 
     std::set<gd::String> results3 = FindArgumentsInEvents(
         platform, project, layout, externalEvents.GetEvents(), parameterType, objectName);
     results.insert(results3.begin(), results3.end());
   }
+  for (const gd::String& externalEventName : dependenciesAnalyzer.GetScenesDependencies()) {
+    const gd::ExternalEvents& externalEvents = project.GetExternalEvents(externalEventName);
+
+    std::set<gd::String> results3 = FindArgumentsInEvents(
+        platform, project, layout, externalEvents.GetEvents(), parameterType, objectName);
+    results.insert(results3.begin(), results3.end());
+  } 
 
   return results;
 }

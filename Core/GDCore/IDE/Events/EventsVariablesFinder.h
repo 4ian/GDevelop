@@ -102,8 +102,9 @@ class EventsVariablesFinder {
    * Construct a list of the value of the arguments for parameters of type @
    * parameterType. It searchs in events dependencies.
    *
+   * \param platform The platform of the project
    * \param project The project used
-   * \param project The layout used
+   * \param layout The layout used
    * \param events The events to be analyzed
    * \param parameterType The parameters type to be analyzed
    * \param objectName If not empty, parameters will be taken into account
@@ -117,7 +118,6 @@ class EventsVariablesFinder {
       const gd::Platform& platform,
       const gd::Project& project,
       const gd::Layout& layout,
-      const gd::EventsList& events,
       const gd::String& parameterType,
       const gd::String& objectName = "");
 
@@ -125,8 +125,9 @@ class EventsVariablesFinder {
    * Construct a list of the value of the arguments for parameters of type @
    * parameterType. It doesn't search in events dependencies.
    *
+   * \param platform The platform of the project
    * \param project The project used
-   * \param project The layout used
+   * \param layout The layout used
    * \param events The events to be analyzed
    * \param parameterType The parameters type to be analyzed
    * \param objectName If not empty, parameters will be taken into account

@@ -45,7 +45,7 @@
     "date-fns": "2.16.1",
     "downshift": "^3.2.12",
     "element-closest": "2.0.2",
-    "firebase": "8.0.2",
+    "firebase": "9.0.0-beta.2",
     "fontfaceobserver": "2.0.13",
     "js-worker-search": "^1.4.1",
     "jss-rtl": "^0.3.0",

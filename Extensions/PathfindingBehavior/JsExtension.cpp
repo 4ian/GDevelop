@@ -113,6 +113,8 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");
       autExpressions["CellWidth"].SetFunctionName("getCellWidth");
       autExpressions["CellHeight"].SetFunctionName("getCellHeight");
+      autExpressions["GridOffsetX"].SetFunctionName("getGridOffsetX");
+      autExpressions["GridOffsetY"].SetFunctionName("getGridOffsetY");
     }
 
     GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")

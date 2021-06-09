@@ -559,6 +559,26 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCellHeight")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
+    aut.AddExpression("GridOffsetX",
+                      _("Grid X offset"),
+                      _("X offset of the virtual grid"),
+                      _("Virtual grid"),
+                      "CppPlatform/Extensions/AStaricon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
+        .SetFunctionName("GetGridOffsetX")
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+
+    aut.AddExpression("GridOffsetY",
+                      _("Grid Y offset"),
+                      _("Y offset of the virtual grid"),
+                      _("Virtual grid"),
+                      "CppPlatform/Extensions/AStaricon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
+        .SetFunctionName("GetGridOffsetY")
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+
 #endif
   }
   {

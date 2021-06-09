@@ -35,7 +35,7 @@ class GD_CORE_API DependenciesAnalyzer {
   /**
    * \brief Constructor for analyzing the dependencies of a layout
    */
-  DependenciesAnalyzer(gd::Project& project_, gd::Layout& layout_);
+  DependenciesAnalyzer(const gd::Project& project_, const gd::Layout& layout_);
 
   /**
    * \brief Constructor for analyzing the dependencies of external events.
@@ -45,8 +45,8 @@ class GD_CORE_API DependenciesAnalyzer {
    * external events can be compiled separatly and called by a scene. \see
    * DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene
    */
-  DependenciesAnalyzer(gd::Project& project_,
-                       gd::ExternalEvents& externalEvents);
+  DependenciesAnalyzer(const gd::Project& project_,
+                       const gd::ExternalEvents& externalEvents);
 
   virtual ~DependenciesAnalyzer();
 
@@ -124,13 +124,7 @@ class GD_CORE_API DependenciesAnalyzer {
    * (they have no parents). \return false if a circular dependency exists, true
    * otherwise.
    */
-  bool Analyze(gd::EventsList& events, bool isOnTopLevel);
-
-  /**
-   * \brief Internal constructor used when analyzing a linked layout/external
-   * events.
-   */
-  DependenciesAnalyzer(const DependenciesAnalyzer& parent);
+  bool Analyze(const gd::EventsList& events, bool isOnTopLevel);
 
   void AddParentScene(gd::String parentScene) {
     parentScenes.push_back(parentScene);
@@ -161,9 +155,9 @@ class GD_CORE_API DependenciesAnalyzer {
   std::vector<gd::String>
       parentExternalEvents;  ///< Used to check for circular dependencies.
 
-  gd::Project& project;
-  gd::Layout* layout;
-  gd::ExternalEvents* externalEvents;
+  const gd::Project& project;
+  const gd::Layout* layout;
+  const gd::ExternalEvents* externalEvents;
 };
 
 #endif  // DEPENDENCIESANALYZER_H

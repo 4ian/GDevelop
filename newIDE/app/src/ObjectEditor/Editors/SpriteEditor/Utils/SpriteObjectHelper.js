@@ -44,7 +44,6 @@ export const getCurrentElements = (
  * @param {*} object
  */
 export const getAllPointNames = object => {
-  console.log("object: " + object.getName());
   const allPointNames = new Set();
   for (
     let animationIndex = 0;

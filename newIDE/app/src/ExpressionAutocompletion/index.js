@@ -302,9 +302,11 @@ const getAutocompletionsForText = function(
       return [];
     }
 
-    autocompletionTexts = getAllPointNames(spriteObject).map(
-      spriteObjectName => `"${spriteObjectName}"`
-    );
+    autocompletionTexts = getAllPointNames(spriteObject)
+      .map(spriteObjectName =>
+        spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
+      )
+      .filter(Boolean);
   } else if (type === 'objectAnimationName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {
@@ -324,13 +326,16 @@ const getAutocompletionsForText = function(
     autocompletionTexts = mapFor(
       0,
       spriteObject.getAnimationsCount(),
-      index => `"${spriteObject.getAnimation(index).getName()}"`
-    );
+      index => {
+        const animationName = spriteObject.getAnimation(index).getName();
+        return animationName.length > 0 ? `"${animationName}"` : null;
+      }
+    ).filter(Boolean);
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
-  const filteredTextList = filterStringList(autocompletionTexts, prefix);
-
+  const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();
+  
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({
     kind: 'Text',

@@ -54,12 +54,15 @@ export default class ObjectAnimationNameField extends Component<
     }
 
     return mapFor(0, spriteObject.getAnimationsCount(), index => {
-      const animation = spriteObject.getAnimation(index);
-      return {
+      const animationName = spriteObject.getAnimation(index).getName();
+      return animationName.length > 0 ? animationName : null;
+    })
+      .filter(Boolean)
+      .sort()
+      .map(animationName => ({
         kind: 'Text',
-        completion: `"${animation.getName()}"`,
-      };
-    });
+        completion: `"${animationName}"`,
+      }));
   }
 
   render() {

@@ -53,10 +53,16 @@ export default class ObjectPointNameField extends Component<
       return [];
     }
 
-    return getAllPointNames(spriteObject).map(pointName => ({
-      kind: 'Text',
-      completion: `"${pointName}"`,
-    }));
+    return getAllPointNames(spriteObject)
+      .map(spriteObjectName =>
+        spriteObjectName.length > 0 ? spriteObjectName : null
+      )
+      .filter(Boolean)
+      .sort()
+      .map(pointName => ({
+        kind: 'Text',
+        completion: `"${pointName}"`,
+      }));
   }
 
   render() {

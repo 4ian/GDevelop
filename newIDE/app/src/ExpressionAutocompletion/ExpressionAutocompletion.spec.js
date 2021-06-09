@@ -12,16 +12,21 @@ const makeTestContext = () => {
   testLayout.insertNewLayer('Background', 0);
   testLayout.insertNewLayer('Foreground', 0);
 
-  const object = testLayout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+  const object = testLayout.insertNewObject(
+    project,
+    'Sprite',
+    'MySpriteObject',
+    0
+  );
   const spriteObject = gd.asSpriteObject(object);
   const point = new gd.Point();
-  point.setName("Head");
+  point.setName('Head');
   const sprite = new gd.Sprite();
   sprite.addPoint(point);
   const direction = new gd.Direction();
   direction.addSprite(sprite);
   const animation = new gd.Animation();
-  animation.setName("Jump");
+  animation.setName('Jump');
   animation.setDirectionsCount(1);
   animation.setDirection(direction, 0);
   spriteObject.addAnimation(animation);

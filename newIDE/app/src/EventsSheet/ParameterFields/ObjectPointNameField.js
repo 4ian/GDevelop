@@ -19,9 +19,7 @@ export default class ObjectPointNameField extends Component<
     if (this._field) this._field.focus();
   }
 
-  getPointNames(
-    props: Readonly<any> & Readonly<{ children?: React.ReactNode }>
-  ): Array<ExpressionAutocompletion> {
+  getPointNames(props: ParameterFieldProps): Array<ExpressionAutocompletion> {
     const {
       project,
       scope,

@@ -19,8 +19,7 @@ const makeTestContext = () => {
     0
   );
   const spriteObject = gd.asSpriteObject(object);
-  const point = new gd.Point();
-  point.setName('Head');
+  const point = new gd.Point('Head');
   const sprite = new gd.Sprite();
   sprite.addPoint(point);
   const direction = new gd.Direction();

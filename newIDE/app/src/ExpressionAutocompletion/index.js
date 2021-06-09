@@ -335,7 +335,7 @@ const getAutocompletionsForText = function(
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
   const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();
-  
+
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({
     kind: 'Text',

@@ -20,7 +20,7 @@ export default class ObjectAnimationNameField extends Component<
   }
 
   getAnimationNames(
-    props: Readonly<any> & Readonly<{ children?: React.ReactNode }>
+    props: ParameterFieldProps
   ): Array<ExpressionAutocompletion> {
     const {
       project,

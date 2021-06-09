@@ -37,7 +37,7 @@ export default class ObjectPointNameField extends Component<
       expression,
       parameterIndex,
     });
-    if (!objectName) {
+    if (!objectName || !project) {
       return [];
     }
 

@@ -39,7 +39,7 @@ export default class ObjectAnimationNameField extends Component<
       expression,
       parameterIndex,
     });
-    if (!objectName) {
+    if (!objectName || !project) {
       return [];
     }
 

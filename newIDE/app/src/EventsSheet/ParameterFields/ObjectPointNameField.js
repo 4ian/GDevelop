@@ -19,7 +19,7 @@ export default class ObjectPointNameField extends Component<
     if (this._field) this._field.focus();
   }
 
-  getPointNames(props: ParameterFieldProps): Array<ExpressionAutocompletion> {
+  getPointNames(): Array<ExpressionAutocompletion> {
     const {
       project,
       scope,
@@ -28,7 +28,7 @@ export default class ObjectPointNameField extends Component<
       expressionMetadata,
       expression,
       parameterIndex,
-    } = props;
+    } = this.props;
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -46,31 +46,30 @@ export default class ObjectPointNameField extends Component<
       return [];
     }
 
-    const spriteObject = gd.asSpriteObject(object);
-    if (!spriteObject) {
-      return [];
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      return getAllPointNames(spriteObject)
+        .map(spriteObjectName =>
+          spriteObjectName.length > 0 ? spriteObjectName : null
+        )
+        .filter(Boolean)
+        .sort()
+        .map(pointName => ({
+          kind: 'Text',
+          completion: `"${pointName}"`,
+        }));
     }
 
-    return getAllPointNames(spriteObject)
-      .map(spriteObjectName =>
-        spriteObjectName.length > 0 ? spriteObjectName : null
-      )
-      .filter(Boolean)
-      .sort()
-      .map(pointName => ({
-        kind: 'Text',
-        completion: `"${pointName}"`,
-      }));
+    return [];
   }
 
   render() {
-    const pointsNames = this.getPointNames(this.props);
-
     return (
       <GenericExpressionField
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
-          pointsNames.filter(
+          this.getPointNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }

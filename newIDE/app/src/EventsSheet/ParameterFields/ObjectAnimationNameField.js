@@ -19,9 +19,7 @@ export default class ObjectAnimationNameField extends Component<
     if (this._field) this._field.focus();
   }
 
-  getAnimationNames(
-    props: ParameterFieldProps
-  ): Array<ExpressionAutocompletion> {
+  getAnimationNames(): Array<ExpressionAutocompletion> {
     const {
       project,
       scope,
@@ -30,7 +28,7 @@ export default class ObjectAnimationNameField extends Component<
       expressionMetadata,
       expression,
       parameterIndex,
-    } = props;
+    } = this.props;
 
     const objectName = getLastObjectParameterValue({
       instructionMetadata,
@@ -48,21 +46,22 @@ export default class ObjectAnimationNameField extends Component<
       return [];
     }
 
-    const spriteObject = gd.asSpriteObject(object);
-    if (!spriteObject) {
-      return [];
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      return mapFor(0, spriteObject.getAnimationsCount(), index => {
+        const animationName = spriteObject.getAnimation(index).getName();
+        return animationName.length > 0 ? animationName : null;
+      })
+        .filter(Boolean)
+        .sort()
+        .map(animationName => ({
+          kind: 'Text',
+          completion: `"${animationName}"`,
+        }));
     }
 
-    return mapFor(0, spriteObject.getAnimationsCount(), index => {
-      const animationName = spriteObject.getAnimation(index).getName();
-      return animationName.length > 0 ? animationName : null;
-    })
-      .filter(Boolean)
-      .sort()
-      .map(animationName => ({
-        kind: 'Text',
-        completion: `"${animationName}"`,
-      }));
+    return [];
   }
 
   render() {
@@ -70,7 +69,7 @@ export default class ObjectAnimationNameField extends Component<
       <GenericExpressionField
         expressionType="string"
         onGetAdditionalAutocompletions={expression =>
-          this.getAnimationNames(this.props).filter(
+          this.getAnimationNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }

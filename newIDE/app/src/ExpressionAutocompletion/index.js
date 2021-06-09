@@ -297,16 +297,17 @@ const getAutocompletionsForText = function(
       return [];
     }
 
-    const spriteObject = gd.asSpriteObject(object);
-    if (!spriteObject) {
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      autocompletionTexts = getAllPointNames(spriteObject)
+        .map(spriteObjectName =>
+          spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
+        )
+        .filter(Boolean);
+    } else {
       return [];
     }
-
-    autocompletionTexts = getAllPointNames(spriteObject)
-      .map(spriteObjectName =>
-        spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
-      )
-      .filter(Boolean);
   } else if (type === 'objectAnimationName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {
@@ -318,19 +319,20 @@ const getAutocompletionsForText = function(
       return [];
     }
 
-    const spriteObject = gd.asSpriteObject(object);
-    if (!spriteObject) {
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      autocompletionTexts = mapFor(
+        0,
+        spriteObject.getAnimationsCount(),
+        index => {
+          const animationName = spriteObject.getAnimation(index).getName();
+          return animationName.length > 0 ? `"${animationName}"` : null;
+        }
+      ).filter(Boolean);
+    } else {
       return [];
     }
-
-    autocompletionTexts = mapFor(
-      0,
-      spriteObject.getAnimationsCount(),
-      index => {
-        const animationName = spriteObject.getAnimation(index).getName();
-        return animationName.length > 0 ? `"${animationName}"` : null;
-      }
-    ).filter(Boolean);
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 

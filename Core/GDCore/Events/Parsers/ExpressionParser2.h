@@ -66,6 +66,13 @@ class GD_CORE_API ExpressionParser2 {
     return Start(type, objectName);
   }
 
+  static size_t WrittenParametersFirstIndex(const gd::String &objectName,
+                                            const gd::String &behaviorName) {
+    // By convention, object is always the first parameter, and behavior the
+    // second one.
+    return !behaviorName.empty() ? 2 : (!objectName.empty() ? 1 : 0);
+  }
+
  private:
   /** \name Grammar
    * Each method is a part of the grammar.
@@ -998,13 +1005,6 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(RaiseTypeError(message, beginningPosition));
   }
   ///@}
-
-  static size_t WrittenParametersFirstIndex(const gd::String &objectName,
-                                            const gd::String &behaviorName) {
-    // By convention, object is always the first parameter, and behavior the
-    // second one.
-    return !behaviorName.empty() ? 2 : (!objectName.empty() ? 1 : 0);
-  }
 
   gd::String expression;
   std::size_t currentPosition;

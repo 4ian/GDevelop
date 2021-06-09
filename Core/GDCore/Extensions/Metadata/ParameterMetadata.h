@@ -175,7 +175,8 @@ class GD_CORE_API ParameterMetadata {
    * \brief Return true if the type of the parameter is an expression of the
    * given type.
    * \note If you had a new type of parameter, also add it in the IDE (
-   * see EventsFunctionParametersEditor) and in the EventsCodeGenerator.
+   * see EventsFunctionParametersEditor, ParameterRenderingService
+   * and ExpressionAutocompletion) and in the EventsCodeGenerator.
    */
   static bool IsExpression(const gd::String &type,
                            const gd::String &parameterType) {
@@ -187,7 +188,9 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "color" || parameterType == "file" ||
              parameterType == "joyaxis" ||
              parameterType == "stringWithSelector" ||
-             parameterType == "sceneName";
+             parameterType == "sceneName" ||
+             parameterType == "objectPointName" ||
+             parameterType == "objectAnimationName";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 namespace gd {
 class Expression;
 class ObjectsContainer;
@@ -338,6 +339,14 @@ class GD_CORE_API ExpressionCompletionFinder
   void OnVisitNumberNode(NumberNode& node) override {
     // No completions
   }
+
+  static size_t WrittenParametersFirstIndex(const gd::String &objectName,
+                                            const gd::String &behaviorName) {
+    // By convention, object is always the first parameter, and behavior the
+    // second one.
+    return !behaviorName.empty() ? 2 : (!objectName.empty() ? 1 : 0);
+  }
+
   void OnVisitTextNode(TextNode& node) override {
     // Completions are searched in the case the text node is a parameter of a
     // function call.
@@ -355,8 +364,10 @@ class GD_CORE_API ExpressionCompletionFinder
         return;
       }
       // Search the parameter metadata index skipping invisible ones.
-      int visibleParameterIndex = 0;
-      int metadataParameterIndex = 0;
+      size_t visibleParameterIndex = 0;
+      size_t metadataParameterIndex = WrittenParametersFirstIndex(
+          functionCall->objectName, functionCall->behaviorName);
+
       const gd::ParameterMetadata* parameterMetadata = nullptr;
       while (metadataParameterIndex <
              functionCall->expressionMetadata.parameters.size()) {

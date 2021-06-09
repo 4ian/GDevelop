@@ -46,6 +46,8 @@ import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
 import SceneNameField from './ParameterFields/SceneNameField';
+import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
+import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 const gd: libGDevelop = global.gd;
 
@@ -77,6 +79,8 @@ const components = {
   joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
+  objectPointName: ObjectPointNameField,
+  objectAnimationName: ObjectAnimationNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -116,6 +120,8 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,
+  objectPointName: t`Object point name`,
+  objectAnimationName: t`Object animation name`,
 };
 
 export default {

@@ -21,6 +21,10 @@ import {
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
 import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
+import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
+import { mapFor } from '../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 type BaseExpressionAutocompletion = {|
   completion: string,
@@ -282,6 +286,46 @@ const getAutocompletionsForText = function(
     autocompletionTexts = getParameterChoices(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
+  } else if (type === 'objectPointName') {
+    const objectName: string = completionDescription.getObjectName();
+    if (!objectName) {
+      return [];
+    }
+
+    const object = getObjectByName(project, scope.layout, objectName);
+    if (!object) {
+      return [];
+    }
+
+    const spriteObject = gd.asSpriteObject(object);
+    if (!spriteObject) {
+      return [];
+    }
+
+    autocompletionTexts = getAllPointNames(spriteObject).map(
+      spriteObjectName => `"${spriteObjectName}"`
+    );
+  } else if (type === 'objectAnimationName') {
+    const objectName: string = completionDescription.getObjectName();
+    if (!objectName) {
+      return [];
+    }
+
+    const object = getObjectByName(project, scope.layout, objectName);
+    if (!object) {
+      return [];
+    }
+
+    const spriteObject = gd.asSpriteObject(object);
+    if (!spriteObject) {
+      return [];
+    }
+
+    autocompletionTexts = mapFor(
+      0,
+      spriteObject.getAnimationsCount(),
+      index => `"${spriteObject.getAnimation(index).getName()}"`
+    );
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 

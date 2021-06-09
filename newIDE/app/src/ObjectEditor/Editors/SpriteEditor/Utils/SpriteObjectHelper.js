@@ -39,6 +39,43 @@ export const getCurrentElements = (
   };
 };
 
+/**
+ * Return all the point names
+ * @param {*} object
+ */
+export const getAllPointNames = object => {
+  console.log("object: " + object.getName());
+  const allPointNames = new Set();
+  for (
+    let animationIndex = 0;
+    animationIndex < object.getAnimationsCount();
+    animationIndex++
+  ) {
+    const animation = object.getAnimation(animationIndex);
+    for (
+      let directionIndex = 0;
+      directionIndex < animation.getDirectionsCount();
+      directionIndex++
+    ) {
+      const direction = animation.getDirection(directionIndex);
+      for (
+        let spriteIndex = 0;
+        spriteIndex < direction.getSpritesCount();
+        spriteIndex++
+      ) {
+        const points = direction
+          .getSprite(spriteIndex)
+          .getAllNonDefaultPoints();
+        for (let pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+          const point = points.at(pointIndex);
+          allPointNames.add(point.getName());
+        }
+      }
+    }
+  }
+  return [...allPointNames];
+};
+
 export const copyPoint = (originalPoint, destinationPoint) => {
   destinationPoint.setX(originalPoint.getX());
   destinationPoint.setY(originalPoint.getY());

@@ -59,7 +59,6 @@ namespace gdjs {
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
-        this,
         this._manager
       );
     }
@@ -325,6 +324,7 @@ namespace gdjs {
       this._searchContext.allowDiagonals(this._allowDiagonals);
       this._searchContext.setObstacles(this._manager);
       this._searchContext.setCellSize(this._cellWidth, this._cellHeight);
+      this._searchContext.setGridOffset(this._gridOffsetX, this._gridOffsetY);
       this._searchContext.setStartPosition(owner.getX(), owner.getY());
       this._searchContext.setObjectSize(
         owner.getX() - owner.getDrawableX() + this._extraBorder,
@@ -512,35 +512,28 @@ namespace gdjs {
       _maxComplexityFactor: integer = 50;
       _cellWidth: float = 20;
       _cellHeight: float = 20;
-
-      _behavior: gdjs.PathfindingRuntimeBehavior;
+      _gridOffsetX: float = 0;
+      _gridOffsetY: float = 0;
 
       _leftBorder: integer = 0;
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
       _bottomBorder: integer = 0;
       _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
-      _allNodes: Node[][] = [];
-
       //An array of array. Nodes are indexed by their x position, and then by their y position.
+      _allNodes: Node[][] = [];
+      //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       _openNodes: Node[] = [];
-      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
-
       //Used by getNodes to temporarily store obstacles near a position.
+      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
+      //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
       _nodeCache: Node[] = [];
 
-      constructor(
-        behavior: gdjs.PathfindingRuntimeBehavior,
-        obstacles: PathfindingObstaclesManager
-      ) {
+      constructor(obstacles: PathfindingObstaclesManager) {
         this._obstacles = obstacles;
-        this._behavior = behavior;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
-
-        //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       }
 
-      //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
       setObstacles(
         obstacles: PathfindingObstaclesManager
       ): PathfindingRuntimeBehavior.SearchContext {
@@ -591,6 +584,15 @@ namespace gdjs {
         return this;
       }
 
+      setGridOffset(
+        gridOffsetX: float,
+        gridOffsetY: float
+      ): PathfindingRuntimeBehavior.SearchContext {
+        this._gridOffsetX = gridOffsetX;
+        this._gridOffsetY = gridOffsetY;
+        return this;
+      }
+
       computePathTo(targetX: float, targetY: float) {
         if (this._obstacles === null) {
           console.log(
@@ -599,16 +601,16 @@ namespace gdjs {
           return;
         }
         this._destination[0] = Math.round(
-          (targetX - this._behavior._gridOffsetX) / this._cellWidth
+          (targetX - this._gridOffsetX) / this._cellWidth
         );
         this._destination[1] = Math.round(
-          (targetY - this._behavior._gridOffsetY) / this._cellHeight
+          (targetY - this._gridOffsetY) / this._cellHeight
         );
         this._start[0] = Math.round(
-          (this._startX - this._behavior._gridOffsetX) / this._cellWidth
+          (this._startX - this._gridOffsetX) / this._cellWidth
         );
         this._start[1] = Math.round(
-          (this._startY - this._behavior._gridOffsetY) / this._cellHeight
+          (this._startY - this._gridOffsetY) / this._cellHeight
         );
 
         //Initialize the algorithm
@@ -748,10 +750,8 @@ namespace gdjs {
           newNode = new Node(xPos, yPos);
         }
 
-        const nodeCenterX =
-          xPos * this._cellWidth + this._behavior._gridOffsetX;
-        const nodeCenterY =
-          yPos * this._cellHeight + this._behavior._gridOffsetY;
+        const nodeCenterX = xPos * this._cellWidth + this._gridOffsetX;
+        const nodeCenterY = yPos * this._cellHeight + this._gridOffsetY;
 
         //...and update its cost according to obstacles
         let objectsOnCell = false;
@@ -768,29 +768,25 @@ namespace gdjs {
         for (let k = 0; k < this._closeObstacles.length; ++k) {
           const obj = this._closeObstacles[k].owner;
           const topLeftCellX = Math.floor(
-            (obj.getDrawableX() -
-              this._rightBorder -
-              this._behavior._gridOffsetX) /
+            (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
               this._cellWidth
           );
           const topLeftCellY = Math.floor(
-            (obj.getDrawableY() -
-              this._bottomBorder -
-              this._behavior._gridOffsetY) /
+            (obj.getDrawableY() - this._bottomBorder - this._gridOffsetY) /
               this._cellHeight
           );
           const bottomRightCellX = Math.ceil(
             (obj.getDrawableX() +
               obj.getWidth() +
               this._leftBorder -
-              this._behavior._gridOffsetX) /
+              this._gridOffsetX) /
               this._cellWidth
           );
           const bottomRightCellY = Math.ceil(
             (obj.getDrawableY() +
               obj.getHeight() +
               this._topBorder -
-              this._behavior._gridOffsetY) /
+              this._gridOffsetY) /
               this._cellHeight
           );
           if (

@@ -1,0 +1,4541 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 99,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adaptGameResolutionAtRuntime": false,
+    "folderProject": false,
+    "orientation": "landscape",
+    "packageName": "com.example.mindator",
+    "projectUuid": "7fdecd0b-2524-4677-9743-a6387befd43f",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "version": "0.1.0",
+    "name": "Mindator_Isometric_Maze",
+    "author": "D8H",
+    "windowWidth": 1280,
+    "windowHeight": 720,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 20,
+    "verticalSync": false,
+    "platformSpecificAssets": {
+      "android-icon-144": "android-icon-144.png",
+      "android-icon-192": "android-icon-192.png",
+      "android-icon-36": "android-icon-36.png",
+      "android-icon-48": "android-icon-48.png",
+      "android-icon-72": "android-icon-72.png",
+      "android-icon-96": "android-icon-96.png",
+      "desktop-icon-512": "desktop-icon-512.png",
+      "ios-icon-100": "ios-icon-100.png",
+      "ios-icon-114": "ios-icon-114.png",
+      "ios-icon-120": "ios-icon-120.png",
+      "ios-icon-144": "ios-icon-144.png",
+      "ios-icon-152": "ios-icon-152.png",
+      "ios-icon-167": "ios-icon-167.png",
+      "ios-icon-180": "ios-icon-180.png",
+      "ios-icon-29": "ios-icon-29.png",
+      "ios-icon-40": "ios-icon-40.png",
+      "ios-icon-50": "ios-icon-50.png",
+      "ios-icon-57": "ios-icon-57.png",
+      "ios-icon-58": "ios-icon-58.png",
+      "ios-icon-60": "ios-icon-60.png",
+      "ios-icon-72": "ios-icon-72.png",
+      "ios-icon-76": "ios-icon-76.png",
+      "ios-icon-80": "ios-icon-80.png"
+    },
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensionProperties": [],
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/test_shadow.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "test_shadow.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/Left/left0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "left0001.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/Right/right0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "right0001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/Up/up0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "up0001.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/Down/down0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "down0001.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/-X/-X0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "-X0001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/-Y/-Y0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "-Y0001.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/Y/Y0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Y0001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Perso_GD/with_shadow/X/X0001.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "X0001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/NodeMarker.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\NodeMarker.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/Target.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\Target.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/NodeMarker-1.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\NodeMarker-1.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/IsoPinkTarget.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\IsoPinkTarget.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/IsoHalfCube.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\IsoHalfCube.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/IsoSquareEmpty.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\IsoSquareEmpty.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Assets/IsoGrid.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "Assets\\IsoGrid.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [
+    {
+      "name": "level",
+      "type": "string",
+      "value": "0"
+    },
+    {
+      "name": "levelCount",
+      "type": "string",
+      "value": "1"
+    }
+  ],
+  "layouts": [
+    {
+      "b": 49,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "MyGame",
+      "name": "MyGame",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 49,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "Game",
+      "v": 49,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 26,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 45,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 0.586
+      },
+      "objectsGroups": [
+        {
+          "name": "bg_grp",
+          "objects": []
+        }
+      ],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Flag",
+          "persistentUuid": "5c09ccfc-afc8-4cbc-a781-65785a11ce8f",
+          "width": 0,
+          "x": 1080,
+          "y": 844,
+          "zOrder": 5003,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Minda",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "index",
+              "type": "string",
+              "value": "0"
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "YSort",
+              "type": "YSort::YSort"
+            }
+          ],
+          "animations": [
+            {
+              "name": "idle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "down0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Right",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "X0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Down_Right",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "down0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Down",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "-Y0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Down_Left",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "left0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Left",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "-X0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Up_Left",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "up0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Up",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Y0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Up_Right",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 0.03,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "right0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 80.4000015258789,
+                        "y": 110.69999694824219
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 80,
+                            "y": 98.5
+                          },
+                          {
+                            "x": 100,
+                            "y": 110
+                          },
+                          {
+                            "x": 80,
+                            "y": 121.5
+                          },
+                          {
+                            "x": 60,
+                            "y": 110
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "PlayerSquare",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "index",
+              "type": "string",
+              "value": "0"
+            }
+          ],
+          "behaviors": [
+            {
+              "extraBorder": 0,
+              "name": "Pathfinding",
+              "type": "PathfindingBehavior::PathfindingBehavior",
+              "cellHeight": 52.25578308105469,
+              "cellWidth": 90.50969696044922,
+              "viewpoint": "Isometry",
+              "collisionMethod": "HitBoxes",
+              "acceleration": 800,
+              "allowDiagonals": false,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "customIsometryAngle": 30,
+              "maxSpeed": 200,
+              "rotateObject": false
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Assets\\IsoPinkTarget.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 45.5,
+                        "y": 26
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 45.5,
+                            "y": 0
+                          },
+                          {
+                            "x": 90.5333023071289,
+                            "y": 26
+                          },
+                          {
+                            "x": 45.5,
+                            "y": 52
+                          },
+                          {
+                            "x": 0.46667900681495667,
+                            "y": 26
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Wall",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "YSort",
+              "type": "YSort::YSort"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\IsoHalfCube.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 45.5,
+                        "y": 51
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Obstacle",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [
+            {
+              "name": "align",
+              "type": "string",
+              "value": "1"
+            }
+          ],
+          "behaviors": [
+            {
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior",
+              "cost": 2,
+              "impassable": true
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": true,
+                      "image": "Assets\\IsoSquareEmpty.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 45.5,
+                        "y": 26
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 45.5,
+                            "y": 0
+                          },
+                          {
+                            "x": 90.5333023071289,
+                            "y": 26
+                          },
+                          {
+                            "x": 45.5,
+                            "y": 52
+                          },
+                          {
+                            "x": 0.46667900681495667,
+                            "y": 26
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Grid",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\IsoGrid.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Flag",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\Target.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 25,
+                        "y": 13
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NodeMarker",
+          "tags": "",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "NodeMarker",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Assets\\NodeMarker-1.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 5,
+                        "y": 3
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "DepartScene"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout"
+              },
+              "parameters": [
+                "",
+                "\"Level\" + ToString(GlobalVariable(level))",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Obstacle",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarObjet"
+                  },
+                  "parameters": [
+                    "Obstacle",
+                    "align",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SnapToGrid::SnapObjectToVirtualGrid"
+                  },
+                  "parameters": [
+                    "",
+                    "Obstacle",
+                    "Isometry::SquareDigonalX(64, 30) / 2",
+                    "Isometry::SquareDigonalY(64, 30) / 2",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Wall",
+                    "Obstacle.X()",
+                    "Obstacle.Y()",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Cache"
+                  },
+                  "parameters": [
+                    "Obstacle"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "KeyReleased"
+              },
+              "parameters": [
+                "",
+                "PageDown"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarGlobal"
+              },
+              "parameters": [
+                "level",
+                "=",
+                "mod(GlobalVariable(level) + 1, GlobalVariable(levelCount))"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"MyGame\"",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "KeyReleased"
+              },
+              "parameters": [
+                "",
+                "PageUp"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarGlobal"
+              },
+              "parameters": [
+                "level",
+                "=",
+                "mod(GlobalVariable(level) - 1, GlobalVariable(levelCount))"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Scene"
+              },
+              "parameters": [
+                "",
+                "\"MyGame\"",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Player controls",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MouseButtonReleased"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Flag",
+                "=",
+                "MouseX(\"\",0)",
+                "=",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "PathfindingBehavior::SetDestination"
+              },
+              "parameters": [
+                "PlayerSquare",
+                "Pathfinding",
+                "",
+                "MouseX()",
+                "MouseY()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "NodeMarker",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "<",
+                    "PlayerSquare.Pathfinding::NodeCount()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "NodeMarker",
+                    "PlayerSquare.Pathfinding::GetNodeX(Variable(i))",
+                    "PlayerSquare.Pathfinding::GetNodeY(Variable(i))",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangePlan"
+                  },
+                  "parameters": [
+                    "NodeMarker",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "+",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Player animation",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "PlayerSquare",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "PathfindingBehavior::Speed"
+                      },
+                      "parameters": [
+                        "PlayerSquare",
+                        "Pathfinding",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreXY"
+                      },
+                      "parameters": [
+                        "Minda",
+                        "=",
+                        "PlayerSquare.X()",
+                        "=",
+                        "PlayerSquare.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "PlayerSquare.X()",
+                            "<",
+                            "PlayerSquare.Pathfinding::NextNodeX()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "PlayerSquare.Y()",
+                                "<",
+                                "PlayerSquare.Pathfinding::NextNodeY()"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "Minda",
+                                "=",
+                                "1"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "PlayerSquare.Y()",
+                                ">",
+                                "PlayerSquare.Pathfinding::NextNodeY()"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "Minda",
+                                "=",
+                                "7"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Egal"
+                          },
+                          "parameters": [
+                            "PlayerSquare.X()",
+                            ">",
+                            "PlayerSquare.Pathfinding::NextNodeX()"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "PlayerSquare.Y()",
+                                "<",
+                                "PlayerSquare.Pathfinding::NextNodeY()"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "Minda",
+                                "=",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Egal"
+                              },
+                              "parameters": [
+                                "PlayerSquare.Y()",
+                                ">",
+                                "PlayerSquare.Pathfinding::NextNodeY()"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "Minda",
+                                "=",
+                                "5"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "PathfindingBehavior::Speed"
+                      },
+                      "parameters": [
+                        "PlayerSquare",
+                        "Pathfinding",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ChangeAnimation"
+                      },
+                      "parameters": [
+                        "Minda",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "PlayerSquare",
+                        "Obstacle",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SeparateFromObjects"
+                      },
+                      "parameters": [
+                        "PlayerSquare",
+                        "Obstacle",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "ambientLightColorB": 1702453632,
+          "ambientLightColorG": 0,
+          "ambientLightColorR": 12,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "Grid",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 1702453632,
+          "ambientLightColorG": 0,
+          "ambientLightColorR": 1,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "Collision",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "ambientLightColorB": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorR": 200,
+          "followBaseLayerCamera": false,
+          "isLightingLayer": false,
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Pathfinding",
+          "type": "PathfindingBehavior::PathfindingBehavior"
+        },
+        {
+          "name": "PathfindingObstacle",
+          "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+        },
+        {
+          "name": "YSort",
+          "type": "YSort::YSort"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
+    {
+      "author": "D8H",
+      "description": "This extension allow to\n* Convert coordinates\n* Follow a slope",
+      "extensionNamespace": "",
+      "fullName": "Isometry Helper Extension",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjMsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iSWNvbnMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMzIgMzIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyIDMyOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDt9DQoJLnN0MXtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO30NCgkuc3Qye2ZpbGw6bm9uZTtzdHJva2U6IzAwMDAwMDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLWRhc2hhcnJheTo2LDY7fQ0KCS5zdDN7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtZGFzaGFycmF5OjQsNDt9DQoJLnN0NHtmaWxsOm5vbmU7c3Ryb2tlOiMwMDAwMDA7c3Ryb2tlLXdpZHRoOjI7c3Ryb2tlLWxpbmVjYXA6cm91bmQ7fQ0KCS5zdDV7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1kYXNoYXJyYXk6My4xMDgxLDMuMTA4MTt9DQoJDQoJCS5zdDZ7ZmlsbDpub25lO3N0cm9rZTojMDAwMDAwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2UtZGFzaGFycmF5OjQsMzt9DQo8L3N0eWxlPg0KPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI0LDkuNyA0LDIzLjIgMTYsMzAgMjgsMjMuMiAyOCw5LjcgMTYsMyAiLz4NCjxwb2x5bGluZSBjbGFzcz0ic3QwIiBwb2ludHM9IjQsMTAuMiAxNiwxNyAyOCwxMC4yICIvPg0KPGxpbmUgY2xhc3M9InN0MCIgeDE9IjE2IiB5MT0iMzAiIHgyPSIxNiIgeTI9IjE3Ii8+DQo8L3N2Zz4NCg==",
+      "name": "Isometry",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/Line Hero Pack/Master/SVG/Graphic Design/Graphic Design_3d_cube_isometric.svg",
+      "shortDescription": "Various functions and behaviors related to isometry",
+      "version": "0.0.1",
+      "tags": [
+        "Isometric-depth",
+        "Movement",
+        "Position",
+        "Math"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "X coordinate on the screen from a given isometric coordinates",
+          "fullName": "X coordinate in the screen",
+          "functionType": "Expression",
+          "name": "ScreenX",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const x = eventsFunctionContext.getArgument(\"worldX\");\nconst y = eventsFunctionContext.getArgument(\"worldY\");\n\neventsFunctionContext.returnValue = (x - y) * Math.sqrt(2) / 2;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the x axis of the isometric world",
+              "longDescription": "",
+              "name": "worldX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the y axis of the isometric world",
+              "longDescription": "",
+              "name": "worldY",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the z axis of the isometric world",
+              "longDescription": "",
+              "name": "worldZ",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Y coordinate on the screen from a given isometric coordinates",
+          "fullName": "Y coordinate in the screen",
+          "functionType": "Expression",
+          "name": "ScreenY",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const x = eventsFunctionContext.getArgument(\"worldX\");\nconst y = eventsFunctionContext.getArgument(\"worldY\");\nconst z = eventsFunctionContext.getArgument(\"worldZ\");\nconst angle = eventsFunctionContext.getArgument(\"angle\");\n\nconst a = Math.asin(Math.tan(angle * Math.PI / 180));\neventsFunctionContext.returnValue =  (x + y) * Math.sin(a) * Math.sqrt(2) / 2 - Math.cos(a) * z;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the x axis of the isometric world",
+              "longDescription": "",
+              "name": "worldX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the y axis of the isometric world",
+              "longDescription": "",
+              "name": "worldY",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the z axis of the isometric world",
+              "longDescription": "",
+              "name": "worldZ",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "X coordinate in the isometric world from a given screen coordinates",
+          "fullName": "X coordinate in the isometric world",
+          "functionType": "Expression",
+          "name": "WorldX",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const x = eventsFunctionContext.getArgument(\"screenX\");\nconst y = eventsFunctionContext.getArgument(\"screenY\");\nconst angle = eventsFunctionContext.getArgument(\"angle\");\n\nconst a = Math.asin(Math.tan(angle * Math.PI / 180));\neventsFunctionContext.returnValue = (x + y / Math.sin(a)) * Math.sqrt(2) / 2;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the x axis of the screen",
+              "longDescription": "",
+              "name": "screenX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the y axis of the screen",
+              "longDescription": "",
+              "name": "screenY",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Y coordinate in the isometric world from a given screen coordinates",
+          "fullName": "Y coordinate in the isometric world",
+          "functionType": "Expression",
+          "name": "WorldY",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const x = eventsFunctionContext.getArgument(\"screenX\");\nconst y = eventsFunctionContext.getArgument(\"screenY\");\nconst angle = eventsFunctionContext.getArgument(\"angle\");\n\nconst a = Math.asin(Math.tan(angle * Math.PI / 180));\neventsFunctionContext.returnValue =  (-x + y / Math.sin(a)) * Math.sqrt(2) / 2;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the x axis of the screen",
+              "longDescription": "",
+              "name": "screenX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Position on the y axis of the screen",
+              "longDescription": "",
+              "name": "screenY",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Length of the diagonal on the x axis of an isometric square projected on the screen",
+          "fullName": "X square diagonal length",
+          "functionType": "Expression",
+          "name": "SquareDigonalX",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const squareSize = eventsFunctionContext.getArgument(\"squareSize\");\n\neventsFunctionContext.returnValue = Math.sqrt(2) * squareSize;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Square size",
+              "longDescription": "",
+              "name": "squareSize",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Length of the diagonal on the y axis of an isometric square projected on the screen",
+          "fullName": "Y square diagonal length",
+          "functionType": "Expression",
+          "name": "SquareDigonalY",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const squareSize = eventsFunctionContext.getArgument(\"squareSize\");\nconst angle = eventsFunctionContext.getArgument(\"angle\");\n\nconst a = Math.asin(Math.tan(angle * Math.PI / 180));\neventsFunctionContext.returnValue = Math.cos(a) * squareSize;",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Square size",
+              "longDescription": "",
+              "name": "squareSize",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        },
+        {
+          "description": "Square size from the length of the diagonal on the x axis of an isometric square projected on the screen",
+          "fullName": "Square Size",
+          "functionType": "Expression",
+          "name": "SquareSize",
+          "private": false,
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": "const diagonalX = eventsFunctionContext.getArgument(\"diagonalX\");\n\neventsFunctionContext.returnValue = squareSize / Math.sqrt(2);",
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "X diagonal length",
+              "longDescription": "",
+              "name": "diagonalX",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Isometry  angle",
+              "longDescription": "",
+              "name": "angle",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Objects passing by the slop will appear to move up or down using the `Follow` action.",
+          "fullName": "Isometric Slop",
+          "name": "Slope",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "Follow the slope",
+              "fullName": "Follow the slope",
+              "functionType": "Action",
+              "name": "Follow",
+              "private": false,
+              "sentence": "_PARAM2_ follows the slope of _PARAM0_ as it moves _PARAM3_ on x axis and _PARAM4_ on y axis.",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::JsCode",
+                  "inlineCode": "// Take first slope only because slopes don't add up.\nconst behavior = eventsFunctionContext.getObjects(\"Object\")[0].getBehavior(eventsFunctionContext.getBehaviorName(\"Behavior\"));\nconst followers = eventsFunctionContext.getObjects(\"Follower\");\nfor (var i = 0; i < followers.length; i++) {\n    const follower = eventsFunctionContext.getObjects(\"Follower\")[i];\n    const deltaScreenX = eventsFunctionContext.getArgument(\"DeltaX\");\n    const deltaScreenY = eventsFunctionContext.getArgument(\"DeltaY\");\n\n    const isometry = behavior._behaviorData.IsometryAngle * Math.PI / 180;\n    // Take the opposite to avoid to always set negative angles\n    const inclinationAngle = - behavior._behaviorData.InclinationAngle * Math.PI / 180;\n    const directionAngle = behavior._behaviorData.DirectionAngle * Math.PI / 180;\n\n    const a = Math.asin(Math.tan(isometry));\n\n    // Transformation in the isometric basis\n    const deltaWorldX = (deltaScreenX + deltaScreenY / Math.sin(a)) * Math.sqrt(2) / 2;\n    const deltaWorldY = (-deltaScreenX + deltaScreenY / Math.sin(a)) * Math.sqrt(2) / 2;\n\n    // Unit vector of the rotation axis for inclination\n    // (rotation of the vector (0; 1) by directionAngle)\n    const uX = -Math.sin(directionAngle);\n    const uY = Math.cos(directionAngle);\n\n    const cosR = Math.cos(inclinationAngle);\n    const sinR = Math.sin(inclinationAngle);\n\n    // https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle\n    const rotatedDeltaWorldX = (cosR+uX*uX*(1-cosR)) * deltaWorldX + (uX*uY*(1-cosR)) * deltaWorldY;\n    const rotatedDeltaWorldY = (uY*uX*(1-cosR)) * deltaWorldX + (cosR+uY*uY*(1-cosR)) * deltaWorldY;\n    const rotatedDeltaWorldZ = -uY*sinR * deltaWorldX + uX*sinR * deltaWorldY;\n\n    // Transformasion in the screen basis\n    const rotatedDeltaScreenX = (rotatedDeltaWorldX - rotatedDeltaWorldY) * Math.sqrt(2) / 2;\n    const rotatedDeltaScreenY = (rotatedDeltaWorldX + rotatedDeltaWorldY) * Math.sin(a) * Math.sqrt(2) / 2 - Math.cos(a) * rotatedDeltaWorldZ;\n\n    follower.setPosition(\n        follower.getX() - deltaScreenX + rotatedDeltaScreenX,\n        follower.getY() - deltaScreenY + rotatedDeltaScreenY);\n}",
+                  "parameterObjects": "",
+                  "useStrict": true,
+                  "eventsSheetExpanded": true
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "Isometry::Slope",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Follower of the slop",
+                  "longDescription": "",
+                  "name": "Follower",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "objectList"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Displacement on x axis",
+                  "longDescription": "",
+                  "name": "DeltaX",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Displacement on y axis",
+                  "longDescription": "",
+                  "name": "DeltaY",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": [
+            {
+              "value": "30",
+              "type": "Number",
+              "label": "Isometry angle",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "IsometryAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Inclination angle",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "InclinationAngle"
+            },
+            {
+              "value": "0",
+              "type": "Number",
+              "label": "Direction angle (rotation around the z axis)",
+              "description": "",
+              "extraInformation": [],
+              "hidden": false,
+              "name": "DirectionAngle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "author": "Gustavo Marciano",
+      "description": "Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.\n\nUseful for isometric games, 2D games with a \"Top-Down\" view, RPG...",
+      "extensionNamespace": "",
+      "fullName": "YSort",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXNvcnQtYXNjZW5kaW5nIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5IDE3SDIyTDE4IDIxTDE0IDE3SDE3VjNIMTlNMiAxN0gxMlYxOUgyTTYgNVY3SDJWNU0yIDExSDlWMTNIMlYxMVoiIC8+PC9zdmc+",
+      "name": "YSort",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/sort-ascending.svg",
+      "shortDescription": "Create an illusion of depth by setting the Z-order based on the Y position of the object. Useful for isometric games, 2D games with a \"Top-Down\" view, RPG...",
+      "version": "0.0.1",
+      "tags": [
+        "z-order",
+        "y-sort",
+        "depth",
+        "fake-depth",
+        "isometric-depth",
+        "rpg"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [],
+      "eventsBasedBehaviors": [
+        {
+          "description": "Set the depth (Z-order) of the instance to the value of its Y position in the scene, creating an illusion of depth. The origin point of the object is used to determine the Z-order.",
+          "fullName": "YSort",
+          "name": "YSort",
+          "objectType": "",
+          "eventsFunctions": [
+            {
+              "description": "",
+              "fullName": "",
+              "functionType": "Action",
+              "name": "doStepPreEvents",
+              "private": false,
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ChangePlan"
+                      },
+                      "parameters": [
+                        "Object",
+                        "=",
+                        "Object.Y()"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "longDescription": "",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "longDescription": "",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "YSort::YSort",
+                  "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            }
+          ],
+          "propertyDescriptors": []
+        }
+      ]
+    },
+    {
+      "author": "@Lizard-13",
+      "description": "An action which, when applied on some objects, snap these objects to a *virtual grid*, with cells having customizable width and height.\n\nUseful for level editors or putting objects on a tiled based map (RPG, strategy games, or any tiled based game in general).",
+      "extensionNamespace": "",
+      "fullName": "Snap objects to a virtual grid",
+      "helpPath": "",
+      "iconUrl": "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0ibWRpLXZpZXctZ3JpZC1wbHVzLW91dGxpbmUiIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMyAyMUgxMVYxM0gzTTUgMTVIOVYxOUg1TTMgMTFIMTFWM0gzTTUgNUg5VjlINU0xMyAzVjExSDIxVjNNMTkgOUgxNVY1SDE5TTE4IDE2SDIxVjE4SDE4VjIxSDE2VjE4SDEzVjE2SDE2VjEzSDE4WiIgLz48L3N2Zz4=",
+      "name": "SnapToGrid",
+      "previewIconUrl": "https://resources.gdevelop-app.com/assets/Icons/view-grid-plus-outline.svg",
+      "shortDescription": "Action to snap objects to a virtual grid during the game.",
+      "version": "0.0.1",
+      "tags": [
+        "snap",
+        "grid",
+        "positioning",
+        "tiles"
+      ],
+      "dependencies": [],
+      "eventsFunctions": [
+        {
+          "description": "Snap object to a virtual grid (i.e: this is not the grid used in the editor)",
+          "fullName": "Snap objects to a virtual grid",
+          "functionType": "Action",
+          "name": "SnapObjectToVirtualGrid",
+          "private": false,
+          "sentence": "Snap _PARAM1_ to a virtual grid using cells with width: _PARAM2_px and height _PARAM3_px",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "temp_cell_width",
+                    "=",
+                    "GetArgumentAsNumber(\"CellWidth\")"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "temp_cell_height",
+                    "=",
+                    "GetArgumentAsNumber(\"CellHeight\")"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Round the Object position to snap to the in-game grid",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Object",
+                    "=",
+                    "Variable(temp_cell_width)*round(Object.X()/Variable(temp_cell_width))",
+                    "=",
+                    "Variable(temp_cell_height)*round(Object.Y()/Variable(temp_cell_height))"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Objects to to snap to the virtual grid",
+              "longDescription": "",
+              "name": "Object",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Width of a cell of the virtual grid (in pixels)",
+              "longDescription": "",
+              "name": "CellWidth",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Height of a cell of the virtual grid (in pixels)",
+              "longDescription": "",
+              "name": "CellHeight",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ],
+          "objectGroups": []
+        }
+      ],
+      "eventsBasedBehaviors": []
+    }
+  ],
+  "externalLayouts": [
+    {
+      "associatedLayout": "MyGame",
+      "name": "Level0",
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 100,
+          "layer": "",
+          "locked": false,
+          "name": "Minda",
+          "persistentUuid": "b4e4a75b-99cf-4656-9018-ff512737146c",
+          "width": 100,
+          "x": 633,
+          "y": 581,
+          "zOrder": 2,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Grid",
+          "locked": false,
+          "name": "Grid",
+          "persistentUuid": "33d2c252-7169-496b-8072-25e8cbbea308",
+          "width": 0,
+          "x": -91,
+          "y": -24,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d4ece390-ef5d-4530-8402-0c61313784c7",
+          "width": 0,
+          "x": 679,
+          "y": 707,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ec7a114b-59b7-4afc-972d-683f61f04aeb",
+          "width": 0,
+          "x": 725,
+          "y": 681,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "dc2fe10f-8aa1-4ea7-94a0-992320d810a4",
+          "width": 0,
+          "x": 771,
+          "y": 655,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "324f32d7-959e-4006-b26f-730ee34b30d4",
+          "width": 0,
+          "x": 816,
+          "y": 629,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ecc3f99d-8a46-47ad-92ab-279f1493398e",
+          "width": 0,
+          "x": 861,
+          "y": 603,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "bb9a9962-eaaf-4b88-b991-7e98bac6a6f9",
+          "width": 0,
+          "x": 905,
+          "y": 577,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "40d4f34b-909d-4153-a795-c25886a89ed9",
+          "width": 0,
+          "x": 950,
+          "y": 551,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "af21203f-de49-440f-a57b-aef0a222396a",
+          "width": 0,
+          "x": 635,
+          "y": 732,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "68844532-7688-4e89-9feb-171fb076fa6c",
+          "width": 0,
+          "x": 589,
+          "y": 706,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "09bd727a-4baf-446e-a6fb-15fa13adea1f",
+          "width": 0,
+          "x": 543,
+          "y": 680,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "5dd80c7c-168c-49ca-86ac-ca1417e61218",
+          "width": 0,
+          "x": 498,
+          "y": 654,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "3f14aba1-dfe1-49ea-9726-70b562f65866",
+          "width": 0,
+          "x": 453,
+          "y": 628,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "6ebfca29-eda6-433c-b73e-2d0cb1926fae",
+          "width": 0,
+          "x": 409,
+          "y": 602,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "6c0272a1-df35-4a6e-9453-f9003aa73f2e",
+          "width": 0,
+          "x": 363,
+          "y": 576,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "1f607933-825c-4759-beb8-e3ba398d02c2",
+          "width": 0,
+          "x": 318,
+          "y": 550,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f6a38fb4-7861-4f15-be5c-69952c10a3dc",
+          "width": 0,
+          "x": 813,
+          "y": 421,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "PlayerSquare",
+          "persistentUuid": "112a140f-eb4b-44d8-bf3d-99d276bb2db8",
+          "width": 0,
+          "x": 633,
+          "y": 576,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "82c7ada2-33a9-4b76-9de3-6c6feb00f35b",
+          "width": 0,
+          "x": 995,
+          "y": 525,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "463e7943-f84b-4b35-b764-ea7a7f92cf2a",
+          "width": 0,
+          "x": 1041,
+          "y": 499,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "a79fb3cd-d245-43a9-a87c-258a4afbb8b6",
+          "width": 0,
+          "x": 1086,
+          "y": 473,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "12e410a7-9ca8-41fc-8429-672480417172",
+          "width": 0,
+          "x": 1133,
+          "y": 446,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "8f73f119-49ef-4227-a36a-c7133bea8ab5",
+          "width": 0,
+          "x": 1178,
+          "y": 419,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ecade9af-7ffc-4cfb-a5cd-797c9c97c21b",
+          "width": 0,
+          "x": 1224,
+          "y": 392,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "fc19eecb-09e8-423e-b1d6-b7d0edbf2140",
+          "width": 0,
+          "x": 906,
+          "y": 368,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ec663419-3f8a-44b3-9f7f-dde5e381c038",
+          "width": 0,
+          "x": 814,
+          "y": 314,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "5773bf52-62d5-45f7-ba04-045ae7f4dbec",
+          "width": 0,
+          "x": 722,
+          "y": 368,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "a8d41bf7-9d65-4649-b149-0bb2b79dc9c7",
+          "width": 0,
+          "x": 902,
+          "y": 473,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "495ea4b5-a899-4799-b0b8-9aa251ca50a9",
+          "width": 0,
+          "x": 992,
+          "y": 420,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "0917b7ab-ae09-43ab-881d-41205b7639dc",
+          "width": 0,
+          "x": 902,
+          "y": 262,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "abd8df70-6f2e-4607-bdb3-769e5bbc862e",
+          "width": 0,
+          "x": 999,
+          "y": 314,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "7628ce19-73fb-452d-9a6f-7624b27d2cd2",
+          "width": 0,
+          "x": 1090,
+          "y": 368,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "94670562-a487-42e0-b7c8-43ccdbe7f45d",
+          "width": 0,
+          "x": 1269,
+          "y": 366,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "bbd9e496-0e56-4b1d-a67b-8a008dfc6ae4",
+          "width": 0,
+          "x": 1224,
+          "y": 340,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "de435916-ef8d-42e0-b49c-54beba93e9b2",
+          "width": 0,
+          "x": 1178,
+          "y": 314,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "2f84280d-136a-4bd1-b845-56672c2a7a33",
+          "width": 0,
+          "x": 1132,
+          "y": 288,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "2b45dab0-17c8-4260-b09c-df3552c17dab",
+          "width": 0,
+          "x": 1086,
+          "y": 262,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "984770bd-0452-4020-ae74-4ff5861a4a0c",
+          "width": 0,
+          "x": 1041,
+          "y": 236,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "bd4c4edc-b964-4b05-9934-e203dde9b56f",
+          "width": 0,
+          "x": 997,
+          "y": 210,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "49cde21d-6ad4-4637-b834-8b60396594e0",
+          "width": 0,
+          "x": 951,
+          "y": 184,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "1b035ecc-d408-4a57-a11c-48beb7cd59d8",
+          "width": 0,
+          "x": 905,
+          "y": 157,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "abfe53ae-e5f1-4f05-b972-e433e86115b5",
+          "width": 0,
+          "x": 861,
+          "y": 131,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f2953505-a3fb-4400-8018-2296914f8e71",
+          "width": 0,
+          "x": 816,
+          "y": 105,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "3969c07f-50e5-4555-a1f5-bc3a806eeca9",
+          "width": 0,
+          "x": 770,
+          "y": 79,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "45873cf7-92d6-4b4b-a759-8308edc1700c",
+          "width": 0,
+          "x": 725,
+          "y": 53,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "0a103e17-8f3b-4452-ac51-2f5abb74efed",
+          "width": 0,
+          "x": 679,
+          "y": 26,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "01e9ed3c-de53-484a-922a-2fdf322f0c27",
+          "width": 0,
+          "x": 633,
+          "y": 0,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "9d770535-7865-4275-bf1c-e7dbc01c6500",
+          "width": 0,
+          "x": 590,
+          "y": 26,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "8d0f1117-dda1-4d2a-a8f0-221759cf64be",
+          "width": 0,
+          "x": 546,
+          "y": 51,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ed79d415-ecd0-4fb0-a621-4a83d648a4c0",
+          "width": 0,
+          "x": 1,
+          "y": 366,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "93c96517-db93-4735-a487-a22201e40b49",
+          "width": 0,
+          "x": 47,
+          "y": 340,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "7a74b9d1-7a5d-46c3-bf21-f609df2280ba",
+          "width": 0,
+          "x": 91,
+          "y": 315,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "36f62068-b897-4fa8-a73b-82075680c8f1",
+          "width": 0,
+          "x": 136,
+          "y": 289,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "8328eba1-3a83-407c-b06f-43765a107855",
+          "width": 0,
+          "x": 181,
+          "y": 263,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d14293fa-b1aa-489f-b479-69b7f34232c7",
+          "width": 0,
+          "x": 227,
+          "y": 237,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "b0c5c59d-1690-4293-b8d2-6be6333efc32",
+          "width": 0,
+          "x": 272,
+          "y": 210,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f708d0f3-d0b0-4ba8-9660-a88b8664e633",
+          "width": 0,
+          "x": 46,
+          "y": 393,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "c9b041f6-7053-47b6-8425-423371a02266",
+          "width": 0,
+          "x": 92,
+          "y": 419,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "77936f12-6819-4289-bd73-3f77f4f42633",
+          "width": 0,
+          "x": 136,
+          "y": 444,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "bd4488ee-51fc-4282-9b6e-5976c0c0f0e5",
+          "width": 0,
+          "x": 181,
+          "y": 470,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "50be1628-2f99-4670-b813-2ffd5d4c8706",
+          "width": 0,
+          "x": 226,
+          "y": 496,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d0c2a637-134e-460c-bd91-5bb0bcd7bfef",
+          "width": 0,
+          "x": 272,
+          "y": 522,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "cc9f1d5c-a07d-42f1-922b-3ac901eca729",
+          "width": 0,
+          "x": 317,
+          "y": 184,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "7978610e-cf8e-49fe-a026-e9da232f823f",
+          "width": 0,
+          "x": 362,
+          "y": 158,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "efc72864-7383-4627-9c33-89791c13b72d",
+          "width": 0,
+          "x": 408,
+          "y": 132,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d8628c7c-019b-40d4-a1ab-d2d8eb6212cb",
+          "width": 0,
+          "x": 453,
+          "y": 106,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "5116e02c-338c-47b4-ae40-39dc563d90b6",
+          "width": 0,
+          "x": 499,
+          "y": 79,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "bbdf5b3b-cae8-4ee9-ac4d-8c67915fe8a7",
+          "width": 0,
+          "x": 357,
+          "y": 262,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "465c578a-30da-4362-a68e-f2309db88860",
+          "width": 0,
+          "x": 269,
+          "y": 316,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d3e2f448-1bc1-41ca-8555-0773d3ed909c",
+          "width": 0,
+          "x": 181,
+          "y": 366,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "5e628e7d-7bd4-46ad-8831-83abe172daf7",
+          "width": 0,
+          "x": 629,
+          "y": 316,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "57ebd9ec-90f0-4db2-938c-51cb644bc4c9",
+          "width": 0,
+          "x": 356,
+          "y": 368,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "2b6c33af-07fd-48c8-aa84-309f14199595",
+          "width": 0,
+          "x": 447,
+          "y": 313,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "6fd0db70-0ee1-4982-a154-ff193518280e",
+          "width": 0,
+          "x": 811,
+          "y": 211,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "638dcfc4-3414-465c-8f9e-c0de990f0580",
+          "width": 0,
+          "x": 718,
+          "y": 161,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "9a5be8a3-0157-4887-a40d-532f3a60b3dc",
+          "width": 0,
+          "x": 630,
+          "y": 106,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "dd81c226-4477-4af7-ac61-7c3977ce3341",
+          "width": 0,
+          "x": 540,
+          "y": 157,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ae27e1d9-e1cb-4345-a5f4-3a6e33d491e8",
+          "width": 0,
+          "x": 630,
+          "y": 211,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "b7ab0ccc-8bdf-4d6f-8dbe-80e179fa10a8",
+          "width": 0,
+          "x": 719,
+          "y": 263,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f58eb2ab-ad4f-4cd8-8ea4-e0bdd2165819",
+          "width": 0,
+          "x": 447,
+          "y": 211,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f9df0bea-a4b7-43cb-86d9-716df306a4cb",
+          "width": 0,
+          "x": 539,
+          "y": 263,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "41f0602b-2b3c-4436-b6d0-d207ee8f614e",
+          "width": 0,
+          "x": 541,
+          "y": 367,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "862ef604-7479-4100-863c-102a65fb5788",
+          "width": 0,
+          "x": 631,
+          "y": 421,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "dcc8738f-5ea8-4ae4-9716-22ff16e5fe0a",
+          "width": 0,
+          "x": 724,
+          "y": 471,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ade85f1f-e628-4b9a-a1e7-0e6d11af3eca",
+          "width": 0,
+          "x": 806,
+          "y": 523,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "1e3ae6d4-61eb-4b67-a7ca-a094505b9f70",
+          "width": 0,
+          "x": 449,
+          "y": 419,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ec768bd0-d0e9-47ed-ad68-941dcd0cd85a",
+          "width": 0,
+          "x": 267,
+          "y": 418,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "b4adca86-23ff-45f3-8d8b-462a5cbb270e",
+          "width": 0,
+          "x": 357,
+          "y": 471,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "652077ad-7342-45f7-894d-470651bce944",
+          "width": 0,
+          "x": 538,
+          "y": 471,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "0411481a-a7ec-4543-b222-31eb6fcb6bc0",
+          "width": 0,
+          "x": 630,
+          "y": 523,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "8ded361d-d76b-4e04-9ff1-abb5ffcc7f82",
+          "width": 0,
+          "x": 721,
+          "y": 578,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "ad3b57ff-d535-4bd2-adc9-175ab89493a3",
+          "width": 0,
+          "x": 630,
+          "y": 627,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "5c641b5e-b7bf-49c3-a83d-21eacdce7852",
+          "width": 0,
+          "x": 539,
+          "y": 576,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "712df8e4-45b2-4797-9646-5b83fa3a68c8",
+          "width": 0,
+          "x": 446,
+          "y": 524,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "3d3d182d-097e-4c55-b3bc-06a4bfdf7253",
+          "width": 0,
+          "x": 766,
+          "y": 135,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "a58e68c0-bf18-4c5e-8a9e-bfe52bf4b0aa",
+          "width": 0,
+          "x": 673,
+          "y": 236,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d776d91b-c1a5-4292-bf7a-d0f848e6acf9",
+          "width": 0,
+          "x": 496,
+          "y": 337,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "efdd34f6-bbf3-412f-99b6-d9d4564ba333",
+          "width": 0,
+          "x": 671,
+          "y": 288,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "b18e6e3c-a0cd-4a30-97ee-2c0bf0148a2d",
+          "width": 0,
+          "x": 487,
+          "y": 288,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f48c9d96-786e-4454-9707-ddbd3ba579f8",
+          "width": 0,
+          "x": 494,
+          "y": 233,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "4f15843a-6fdf-4d92-9348-ad153f4842c3",
+          "width": 0,
+          "x": 589,
+          "y": 131,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "3c99c1b6-b43d-4433-85d0-0025d55e0bea",
+          "width": 0,
+          "x": 671,
+          "y": 131,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "0ac9a540-1a96-4b3c-bd47-cd84806055d8",
+          "width": 0,
+          "x": 861,
+          "y": 338,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "d1f5528b-ae43-4411-9f02-bd2ef9b51275",
+          "width": 0,
+          "x": 953,
+          "y": 341,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "eb05c315-445c-4922-9cd7-e1a92405b3df",
+          "width": 0,
+          "x": 948,
+          "y": 236,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f6c6a404-7a63-48af-b040-fbe628dfd2d1",
+          "width": 0,
+          "x": 852,
+          "y": 233,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "aac8288c-9e35-430e-a0a8-80e312ceaeaa",
+          "width": 0,
+          "x": 763,
+          "y": 496,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "3e62613a-5059-422a-b1eb-9867d0ee8262",
+          "width": 0,
+          "x": 859,
+          "y": 397,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "cf116095-84cf-4615-8ff7-729f28754af4",
+          "width": 0,
+          "x": 1038,
+          "y": 447,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "13703716-b4f4-4f52-8efc-73e6b165249b",
+          "width": 0,
+          "x": 578,
+          "y": 447,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "326ccc64-1b21-4e4d-9388-cc6d289a8bf9",
+          "width": 0,
+          "x": 491,
+          "y": 444,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "1c7e747d-6397-42f0-8d0a-b56d2492746a",
+          "width": 0,
+          "x": 308,
+          "y": 393,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "210ca947-eeda-425d-ad88-ad23e4704da1",
+          "width": 0,
+          "x": 225,
+          "y": 290,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "1726f41e-c5a6-4090-8846-35f71cf7fd03",
+          "width": 0,
+          "x": 229,
+          "y": 390,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "f68af1c0-b99a-43a9-a423-43574d3c6a45",
+          "width": 0,
+          "x": 401,
+          "y": 447,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "74dddce5-f157-4bc9-8781-b8f00ecda633",
+          "width": 0,
+          "x": 398,
+          "y": 550,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "22624d1c-fd5f-4889-8dbb-46bb3772a11a",
+          "width": 0,
+          "x": 852,
+          "y": 447,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Collision",
+          "locked": false,
+          "name": "Obstacle",
+          "persistentUuid": "b8fc2c11-4ec9-4570-997a-cf11efcf66f7",
+          "width": 0,
+          "x": 850,
+          "y": 550,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "editionSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 0.832
+      }
+    }
+  ],
+  "externalSourceFiles": []
+}

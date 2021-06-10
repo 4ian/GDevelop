@@ -1,0 +1,1 @@
+This shows how to have an object move automatically and avoid obstacles in an isometric game.

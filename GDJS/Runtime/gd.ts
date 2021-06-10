@@ -55,6 +55,22 @@ namespace gdjs {
   };
 
   /**
+   * Convert a string hex color value to an array [r, g, b], where each component is in the range [0, 255].
+   *
+   * @param {string} hex Color hexadecimal
+   */
+  export const hexToRGBColor = function (
+    hexString: string
+  ): [number, number, number] {
+    var hexNumber = parseInt(hexString.replace('#', ''), 16);
+    return [
+      (hexNumber >> 16) & 0xff,
+      (hexNumber >> 8) & 0xff,
+      hexNumber & 0xff,
+    ];
+  };
+
+  /**
    * Convert a rgb color value to a hex value.
    * @param r Red
    * @param g Green
@@ -142,7 +158,7 @@ namespace gdjs {
    * @param angleInDegrees The angle in degrees.
    */
   export const toRad = function (angleInDegrees: float): float {
-    return (angleInDegrees / 180) * 3.14159;
+    return (angleInDegrees / 180) * Math.PI;
   };
 
   /**
@@ -150,7 +166,7 @@ namespace gdjs {
    * @param angleInRadians The angle in radians.
    */
   export const toDegrees = function (angleInRadians: float): float {
-    return (angleInRadians * 180) / 3.14159;
+    return (angleInRadians * 180) / Math.PI;
   };
 
   /**

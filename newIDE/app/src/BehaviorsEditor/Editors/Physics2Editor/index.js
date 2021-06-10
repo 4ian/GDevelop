@@ -19,6 +19,8 @@ import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 type Props = BehaviorEditorProps;
 
@@ -43,29 +45,24 @@ const NumericProperty = (props: {|
   );
 };
 
-const BitProperty = (props: {|
-  enabled: boolean,
-  propertyName: string,
-  pos: number,
-  spacing: boolean,
-  onUpdate: (enabled: boolean) => void,
+const BitGroupEditor = (props: {|
+  bits: Array<boolean>,
+  onChange: (index: number, value: boolean) => void,
 |}) => {
-  const { enabled, propertyName, pos, spacing, onUpdate } = props;
-
   return (
-    <div style={{ width: spacing ? '7.5%' : '5%' }}>
-      {
-        <Checkbox
-          checked={enabled}
-          onCheck={(e, checked) => onUpdate(checked)}
-        />
-      }
-      {spacing && (
-        <div
-          style={{ width: '33%' }}
-          key={propertyName + '-space' + pos.toString(10)}
-        />
-      )}
+    <div style={{ overflowX: 'auto', flex: 1 }}>
+      <ButtonGroup disableElevation fullWidth>
+        {props.bits.map((bit, index) => (
+          <Button
+            key={index}
+            variant={bit ? 'contained' : 'outlined'}
+            color={bit ? 'primary' : 'default'}
+            onClick={() => props.onChange(index, !bit)}
+          >
+            {index + 1}
+          </Button>
+        ))}
+      </ButtonGroup>
     </div>
   );
 };
@@ -93,7 +90,11 @@ const Physics2Editor = (props: Props) => {
   const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
   return (
-    <Column expand>
+    <Column
+      expand
+      // Avoid overflow on small screens
+      noOverflowParent
+    >
       <Line>
         <SelectField
           key={'bodyType'}
@@ -359,43 +360,51 @@ const Physics2Editor = (props: Props) => {
               project={props.project}
               resourcesLoader={resourcesLoader}
               fixedHeight={200}
-              renderOverlay={overlayProps => (
-                <ShapePreview
-                  shape={properties.get('shape').getValue()}
-                  dimensionA={parseFloat(
-                    properties.get('shapeDimensionA').getValue()
-                  )}
-                  dimensionB={parseFloat(
-                    properties.get('shapeDimensionB').getValue()
-                  )}
-                  offsetX={parseFloat(
-                    properties.get('shapeOffsetX').getValue()
-                  )}
-                  offsetY={parseFloat(
-                    properties.get('shapeOffsetY').getValue()
-                  )}
-                  polygonOrigin={properties.get('polygonOrigin').getValue()}
-                  vertices={JSON.parse(properties.get('vertices').getValue())}
-                  width={overlayProps.imageWidth}
-                  height={overlayProps.imageHeight}
-                  frameOffsetTop={overlayProps.offsetTop}
-                  frameOffsetLeft={overlayProps.offsetLeft}
-                  zoomFactor={overlayProps.imageZoomFactor}
-                  onMoveVertex={(index, newX, newY) => {
-                    let vertices = JSON.parse(
-                      properties.get('vertices').getValue()
-                    );
-                    vertices[index].x = newX;
-                    vertices[index].y = newY;
-                    behavior.updateProperty(
-                      behaviorContent.getContent(),
-                      'vertices',
-                      JSON.stringify(vertices)
-                    );
-                    forceUpdate();
-                  }}
-                />
-              )}
+              renderOverlay={overlayProps => {
+                // The result from `getProperties` is temporary, and because this renderOverlay
+                // function can be called outside of the render, we must get the properties again.
+                const properties = behavior.getProperties(
+                  behaviorContent.getContent()
+                );
+
+                return (
+                  <ShapePreview
+                    shape={properties.get('shape').getValue()}
+                    dimensionA={parseFloat(
+                      properties.get('shapeDimensionA').getValue()
+                    )}
+                    dimensionB={parseFloat(
+                      properties.get('shapeDimensionB').getValue()
+                    )}
+                    offsetX={parseFloat(
+                      properties.get('shapeOffsetX').getValue()
+                    )}
+                    offsetY={parseFloat(
+                      properties.get('shapeOffsetY').getValue()
+                    )}
+                    polygonOrigin={properties.get('polygonOrigin').getValue()}
+                    vertices={JSON.parse(properties.get('vertices').getValue())}
+                    width={overlayProps.imageWidth}
+                    height={overlayProps.imageHeight}
+                    frameOffsetTop={overlayProps.offsetTop}
+                    frameOffsetLeft={overlayProps.offsetLeft}
+                    zoomFactor={overlayProps.imageZoomFactor}
+                    onMoveVertex={(index, newX, newY) => {
+                      let vertices = JSON.parse(
+                        properties.get('vertices').getValue()
+                      );
+                      vertices[index].x = newX;
+                      vertices[index].y = newY;
+                      behavior.updateProperty(
+                        behaviorContent.getContent(),
+                        'vertices',
+                        JSON.stringify(vertices)
+                      );
+                      forceUpdate();
+                    }}
+                  />
+                );
+              }}
             />
           </div>
         </Line>
@@ -533,50 +542,38 @@ const Physics2Editor = (props: Props) => {
         />
       </ResponsiveLineStackLayout>
       <Line>
-        <Text>{properties.get('layers').getLabel()}</Text>
-        {bits.map((value, index) => {
-          return (
-            <BitProperty
-              enabled={isBitEnabled(layersValues, index)}
-              propertyName={'layers'}
-              pos={index}
-              spacing={index === 7}
-              onUpdate={enabled => {
-                const newValue = enableBit(layersValues, index, enabled);
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'layers',
-                  newValue.toString(10)
-                );
-                forceUpdate();
-              }}
-              key={`layer${index}`}
-            />
-          );
-        })}
+        <Text style={{ marginRight: 10 }}>
+          {properties.get('layers').getLabel()}
+        </Text>
+        <BitGroupEditor
+          bits={bits.map((_, idx) => isBitEnabled(layersValues, idx))}
+          onChange={(index, value) => {
+            const newValue = enableBit(layersValues, index, value);
+            behavior.updateProperty(
+              behaviorContent.getContent(),
+              'layers',
+              newValue.toString(10)
+            );
+            forceUpdate();
+          }}
+        />
       </Line>
       <Line>
-        <Text>{properties.get('masks').getLabel()}</Text>
-        {bits.map((value, index) => {
-          return (
-            <BitProperty
-              enabled={isBitEnabled(masksValues, index)}
-              propertyName={'masks'}
-              pos={index}
-              spacing={index === 7}
-              onUpdate={enabled => {
-                const newValue = enableBit(masksValues, index, enabled);
-                behavior.updateProperty(
-                  behaviorContent.getContent(),
-                  'masks',
-                  newValue.toString(10)
-                );
-                forceUpdate();
-              }}
-              key={`mask${index}`}
-            />
-          );
-        })}
+        <Text style={{ marginRight: 10 }}>
+          {properties.get('masks').getLabel()}
+        </Text>
+        <BitGroupEditor
+          bits={bits.map((_, idx) => isBitEnabled(masksValues, idx))}
+          onChange={(index, value) => {
+            const newValue = enableBit(masksValues, index, value);
+            behavior.updateProperty(
+              behaviorContent.getContent(),
+              'masks',
+              newValue.toString(10)
+            );
+            forceUpdate();
+          }}
+        />
       </Line>
     </Column>
   );

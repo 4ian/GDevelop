@@ -1,6 +1,0 @@
-Images, sounds, fonts are included for demonstration purposes only.
-The actual project file is free to use for any purposes.
-
-For more game templates visit https://gametemplates.itch.io/
-
-Have fun!

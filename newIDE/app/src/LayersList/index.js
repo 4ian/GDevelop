@@ -54,7 +54,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           layerName={layerName}
           isLightingLayer={isLightingLayer}
           nameError={this.state.nameErrors[layerName]}
-          effectsCount={layer.getEffectsCount()}
+          effectsCount={layer.getEffects().getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
           onEdit={() => onEdit(layer)}
           onBlur={event => {

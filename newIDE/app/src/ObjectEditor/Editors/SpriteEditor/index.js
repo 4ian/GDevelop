@@ -111,7 +111,7 @@ class Animation extends React.Component<AnimationProps, void> {
         <MiniToolbar>
           <DragHandle />
           <MiniToolbarText>Animation #{id} </MiniToolbarText>
-          <Column expand margin>
+          <Column expand>
             <SemiControlledTextField
               commitOnBlur
               margin="none"

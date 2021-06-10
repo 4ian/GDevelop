@@ -9,6 +9,8 @@ namespace gdjs {
       const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
       if (parameterName === 'thickness') {
         outlineFilter.thickness = value;
+      } else if (parameterName === 'padding') {
+        outlineFilter.padding = value;
       }
     },
     updateStringParameter: function (filter, parameterName, value) {

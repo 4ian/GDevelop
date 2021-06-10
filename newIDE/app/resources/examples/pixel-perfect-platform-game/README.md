@@ -1,1 +1,0 @@
-Very simple example showing the settings to have a pixel-perfect platform game (also applicable to other kind of games).

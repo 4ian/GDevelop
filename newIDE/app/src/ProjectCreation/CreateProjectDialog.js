@@ -55,11 +55,6 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
 
   _showExamples = () => this._onChangeTab('examples');
 
-  _onExamplesLoaded = () => {
-    // Force an update to ensure dialog is properly positioned.
-    this.forceUpdate();
-  };
-
   render() {
     const { open, onClose, onOpen, onCreate } = this.props;
     if (!open) return null;
@@ -78,23 +73,34 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             onClick={onClose}
           />,
         ]}
-        secondaryActions={
-          this.state.currentTab === 'games-showcase'
-            ? [
-                <FlatButton
-                  key="submit-game-showcase"
-                  onClick={() => {
-                    Window.openExternalURL(
-                      'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
-                    );
-                  }}
-                  primary
-                  icon={<PublishIcon />}
-                  label={<Trans>Submit your game to the showcase</Trans>}
-                />,
-              ]
-            : null
-        }
+        secondaryActions={[
+          this.state.currentTab === 'games-showcase' ? (
+            <FlatButton
+              key="submit-game-showcase"
+              onClick={() => {
+                Window.openExternalURL(
+                  'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+                );
+              }}
+              primary
+              icon={<PublishIcon />}
+              label={<Trans>Submit your game to the showcase</Trans>}
+            />
+          ) : null,
+          this.state.currentTab === 'examples' ? (
+            <FlatButton
+              key="submit-example"
+              onClick={() => {
+                Window.openExternalURL(
+                  'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+                );
+              }}
+              primary
+              icon={<PublishIcon />}
+              label={<Trans>Submit your game as an example</Trans>}
+            />
+          ) : null,
+        ]}
         cannotBeDismissed={false}
         onRequestClose={onClose}
         open={open}
@@ -121,15 +127,11 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
             </ScrollView>
           )}
           {this.state.currentTab === 'examples' && (
-            <ScrollView>
-              <ExamplesComponent
-                onOpen={onOpen}
-                onCreate={onCreate}
-                onChangeOutputPath={outputPath => this.setState({ outputPath })}
-                onExamplesLoaded={this._onExamplesLoaded}
-                outputPath={this.state.outputPath}
-              />
-            </ScrollView>
+            <ExamplesComponent
+              onOpen={onOpen}
+              onChangeOutputPath={outputPath => this.setState({ outputPath })}
+              outputPath={this.state.outputPath}
+            />
           )}
           {this.state.currentTab === 'tutorials' && (
             <ScrollView>

@@ -51,14 +51,19 @@ const CollisionMasksEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
+
+  // Note: these two booleans are set to false to avoid erasing points of other
+  // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
+  // theory, they should be set to the appropriate value at their initialization,
+  // for consistency of the state.
   const [
     sameCollisionMasksForAnimations,
     setSameCollisionMasksForAnimations,
-  ] = React.useState<boolean>(true);
+  ] = React.useState(false);
   const [
     sameCollisionMasksForSprites,
     setSameCollisionMasksForSprites,
-  ] = React.useState<boolean>(true);
+  ] = React.useState(false);
   const [spriteWidth, setSpriteWidth] = React.useState(0);
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();

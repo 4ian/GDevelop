@@ -33,7 +33,9 @@
 #include <GDCore/IDE/Events/InstructionSentenceFormatter.h>
 #include <GDCore/IDE/Events/InstructionsTypeRenamer.h>
 #include <GDCore/IDE/Events/TextFormatting.h>
+#include <GDCore/IDE/Events/UsedExtensionsFinder.h>
 #include <GDCore/IDE/EventsFunctionTools.h>
+#include <GDCore/IDE/Events/EventsVariablesFinder.h>
 #include <GDCore/IDE/Project/ArbitraryResourceWorker.h>
 #include <GDCore/IDE/Project/ProjectResourcesAdder.h>
 #include <GDCore/IDE/Project/ProjectResourcesCopier.h>
@@ -405,12 +407,10 @@ typedef std::vector<gd::ExpressionCompletionDescription>
 typedef std::map<gd::String, std::map<gd::String, gd::PropertyDescriptor>>
     MapExtensionProperties;
 typedef gd::Variable::Type Variable_Type;
-typedef std::map<gd::String, gd::SerializerValue>
-    MapStringSerializerValue;
+typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
-typedef std::shared_ptr<SerializerElement>
-    SharedPtrSerializerElement;
+typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -552,6 +552,9 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   SanityCheckObjectInitialInstanceProperty
 #define STATIC_SanityCheckBehaviorsSharedDataProperty \
   SanityCheckBehaviorsSharedDataProperty
+#define STATIC_FindAllGlobalVariables FindAllGlobalVariables
+#define STATIC_FindAllLayoutVariables FindAllLayoutVariables
+#define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
 
@@ -581,6 +584,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   IsExtensionLifecycleEventsFunction
 
 #define STATIC_GetCompletionDescriptionsFor GetCompletionDescriptionsFor
+
+#define STATIC_ScanProject ScanProject
 
 // We postfix some methods with "At" as Javascript does not support overloading
 #define GetLayoutAt GetLayout

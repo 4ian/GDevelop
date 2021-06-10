@@ -171,6 +171,25 @@ module.exports = {
 
     extension
       .addAction(
+        'OverrideID',
+        _('Override the client ID'),
+        _(
+          'Overrides the client ID of the current game instance with a specified ID. ' +
+            'Must be called BEFORE connecting to a broker.'
+        ),
+        _('Override the client ID with _PARAM0_'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('ID'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.overrideId');
+
+    extension
+      .addAction(
         'SendToAll',
         _('Trigger event on all connected clients'),
         _('Triggers an event on all connected clients'),
@@ -281,6 +300,69 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.p2p.getEventVariable');
 
     extension
+      .addAction(
+        'DisconnectFromPeer',
+        _('Disconnect from a peer'),
+        _('Disconnects this client from another client.'),
+        _('Disconnect from client _PARAM0_'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', 'ID of the peer to disconnect from', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.disconnectFromPeer');
+
+    extension
+      .addAction(
+        'DisconnectFromAllPeers',
+        _('Disconnect from all peers'),
+        _('Disconnects this client from all other clients.'),
+        _('Disconnect from all clients'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.disconnectFromAllPeers');
+
+    extension
+      .addAction(
+        'DisconnectFromBroker',
+        _('Disconnect from broker'),
+        _('Disconnects the client from the broker server.'),
+        _('Disconnect the client from the broker'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.disconnectFromBroker');
+
+    extension
+      .addAction(
+        'DisconnectFromAll',
+        _('Disconnect from all'),
+        _(
+          'Disconnects the client from the broker server and all other clients.'
+        ),
+        _('Disconnect the client from the broker and other clients'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.disconnectFromAll');
+
+    extension
       .addStrExpression(
         'GetEventData',
         _('Get event data'),
@@ -300,9 +382,7 @@ module.exports = {
       .addStrExpression(
         'GetEventSender',
         _('Get event sender'),
-        _(
-          'Returns the id of the peer that triggered the event'
-        ),
+        _('Returns the id of the peer that triggered the event'),
         _('P2P (experimental)'),
         'JsPlatform/Extensions/p2picon.svg'
       )

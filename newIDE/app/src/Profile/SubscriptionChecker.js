@@ -104,15 +104,14 @@ export class SubscriptionCheckDialog extends React.Component<
         cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
-        title={this.props.title}
+        title={mode === 'try' ? 'We need your support!' : this.props.title}
       >
         <Column noMargin>
           <Line noMargin alignItems="center">
             {mode === 'try' ? (
               <Text>
                 <Trans>
-                  You can try this feature, but if you're using it regularly, we
-                  ask you to get a subscription to GDevelop.
+                  Please get a subscription to keep GDevelop running.
                 </Trans>
               </Text>
             ) : (
@@ -128,9 +127,9 @@ export class SubscriptionCheckDialog extends React.Component<
             <Star style={styles.icon} />
             <Text style={styles.iconText}>
               <Trans>
-                Having a subscription allows you to use the one-click export for
-                Android, Windows, macOS and Linux, launch live previews over
-                wifi, disable the GDevelop splashscreen during loading and more!
+                Get a subscription to gain more one-click exports, remove the
+                GDevelop splashscreen, this message asking you to get a
+                subscription.
               </Trans>
             </Text>
           </Line>

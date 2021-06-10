@@ -53,6 +53,20 @@ module.exports = {
         )
         .onlyIfSomeExtraSettingsNonEmpty();
 
+      extension
+        .addAction(
+          'ShowInterstitial',
+          'Show interstitial',
+          'Fake action that would show an interstitial screen.',
+          'Show the loaded interstitial',
+          'AdMob',
+          'JsPlatform/Extensions/admobicon24.png',
+          'JsPlatform/Extensions/admobicon16.png'
+        )
+        .getCodeExtraInformation()
+        .setIncludeFile('Extensions/FakeAdMob/admobtools.js')
+        .setFunctionName('gdjs.fakeAdMob.showInterstitial');
+
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
     }

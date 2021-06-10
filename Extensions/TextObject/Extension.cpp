@@ -456,7 +456,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
          _("Wrapping"),
          _("De/activate word wrapping. Note that word wrapping is a graphical "
            "option,\nyou can't get the number of lines displayed"),
-         _("Set word wrapping style of _PARAM0_: _PARAM1_"),
+         _("Activate wrapping style of _PARAM0_: _PARAM1_"),
          _("Style"),
          "res/actions/wordWrap24.png",
          "res/actions/wordWrap.png")

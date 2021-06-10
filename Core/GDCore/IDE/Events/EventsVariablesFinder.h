@@ -24,11 +24,17 @@ namespace gd {
  * global or object variables.
  *
  * \todo Refactor this class using ArbitraryEventsWorker
+ * \todo Rework this class to return the shapes (maybe even types?) of the
+ * variables (in particular for structures and arrays), so we can use this
+ * for better autocompletions in the variables dialogs in the IDE.
  *
  * \ingroup IDE
  */
 class EventsVariablesFinder {
  public:
+  EventsVariablesFinder(){};
+  virtual ~EventsVariablesFinder(){};
+
   /**
    * Construct a list containing the name of all global variables used in the
    * project.
@@ -94,10 +100,34 @@ class EventsVariablesFinder {
 
   /**
    * Construct a list of the value of the arguments for parameters of type @
-   * parameterType
+   * parameterType. It searchs in events dependencies.
    *
+   * \param platform The platform of the project
    * \param project The project used
-   * \param project The layout used
+   * \param layout The layout used
+   * \param events The events to be analyzed
+   * \param parameterType The parameters type to be analyzed
+   * \param objectName If not empty, parameters will be taken into account
+   * only if the last object parameter is filled with
+   * this value.
+   *
+   * \return A std::set filled with the values used for all parameters of the
+   * specified type
+   */
+  static std::set<gd::String> FindArgumentsInEventsAndDependencies(
+      const gd::Platform& platform,
+      const gd::Project& project,
+      const gd::Layout& layout,
+      const gd::String& parameterType,
+      const gd::String& objectName = "");
+
+  /**
+   * Construct a list of the value of the arguments for parameters of type @
+   * parameterType. It doesn't search in events dependencies.
+   *
+   * \param platform The platform of the project
+   * \param project The project used
+   * \param layout The layout used
    * \param events The events to be analyzed
    * \param parameterType The parameters type to be analyzed
    * \param objectName If not empty, parameters will be taken into account
@@ -113,10 +143,7 @@ class EventsVariablesFinder {
       const gd::Layout& layout,
       const gd::EventsList& events,
       const gd::String& parameterType,
-      const gd::String& objectName = "");
-
-  EventsVariablesFinder(){};
-  virtual ~EventsVariablesFinder(){};
+      const gd::String& objectName);
 };
 
 }  // namespace gd

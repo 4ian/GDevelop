@@ -120,6 +120,16 @@ interface ProjectHelper {
     [Const, Value] DOMString STATIC_SanityCheckObjectInitialInstanceProperty(gdObject obj, [Const] DOMString propertyName, [Const] DOMString newValue);
 };
 
+interface EventsVariablesFinder {
+    void EventsVariablesFinder();
+
+    [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
+    [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
+    [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
+    
+    //Inherited from ExpressionParser2NodeWorker:
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -350,7 +360,6 @@ interface Project {
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();
 
-    [Const, Ref] VectorString GetUsedExtensions();
     [Ref] ExtensionProperties GetExtensionProperties();
     void AddPlatform([Ref] Platform platform);
     [Ref] Platform GetCurrentPlatform();
@@ -506,6 +515,7 @@ interface gdObject {
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
 
     [Ref] VariablesContainer GetVariables();
+    [Ref] EffectsContainer GetEffects();
     [Value] VectorString GetAllBehaviorNames();
     boolean HasBehaviorNamed([Const] DOMString name);
     BehaviorContent AddNewBehavior([Ref] Project project, [Const] DOMString type, [Const] DOMString name);
@@ -655,6 +665,23 @@ interface Effect {
   void UnserializeFrom([Const, Ref] SerializerElement element);
 };
 
+interface EffectsContainer {
+  void EffectsContainer();
+  
+  boolean HasEffectNamed([Const] DOMString name);
+  [Ref] Effect GetEffect([Const] DOMString name);
+  [Ref] Effect GetEffectAt(unsigned long index);
+  unsigned long GetEffectPosition([Const] DOMString name);
+  unsigned long GetEffectsCount();
+  [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
+  void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
+  void RemoveEffect([Const] DOMString name);
+  void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+
+  void SerializeTo([Ref] SerializerElement element);
+  void UnserializeFrom([Const, Ref] SerializerElement element);
+};
+
 interface Layer {
     void Layer();
     void SetName([Const] DOMString name);
@@ -671,15 +698,7 @@ interface Layer {
     unsigned long GetAmbientLightColorGreen();
     unsigned long GetAmbientLightColorBlue();
 
-    boolean HasEffectNamed([Const] DOMString name);
-    [Ref] Effect GetEffect([Const] DOMString name);
-    [Ref] Effect GetEffectAt(unsigned long index);
-    unsigned long GetEffectPosition([Const] DOMString name);
-    unsigned long GetEffectsCount();
-    [Ref] Effect InsertNewEffect([Const] DOMString name, unsigned long position);
-    void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
-    void RemoveEffect([Const] DOMString name);
-    void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+    [Ref] EffectsContainer GetEffects();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -803,6 +822,11 @@ interface FontResource {
     void FontResource();
 };
 FontResource implements Resource;
+
+interface BitmapFontResource {
+    void BitmapFontResource();
+};
+BitmapFontResource implements Resource;
 
 interface VideoResource {
     void VideoResource();
@@ -1868,6 +1892,10 @@ interface WholeProjectRefactorer {
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
 };
 
+interface UsedExtensionsFinder {
+  [Value] SetString STATIC_ScanProject([Ref] Project project);
+};
+
 interface ExtensionAndBehaviorMetadata {
   [Const, Ref] PlatformExtension GetExtension();
   [Const, Ref] BehaviorMetadata GetMetadata();
@@ -1945,8 +1973,9 @@ interface ExpressionValidator {
 enum ExpressionCompletionDescription_CompletionKind {
   "ExpressionCompletionDescription::Object",
   "ExpressionCompletionDescription::Behavior",
+  "ExpressionCompletionDescription::Expression",
   "ExpressionCompletionDescription::Variable",
-  "ExpressionCompletionDescription::Expression"
+  "ExpressionCompletionDescription::Text"
 };
 
 interface ExpressionCompletionDescription {
@@ -1956,6 +1985,10 @@ interface ExpressionCompletionDescription {
   [Const, Ref] DOMString GetObjectName();
   [Const, Ref] DOMString GetBehaviorName();
   boolean IsExact();
+  boolean IsLastParameter();
+  unsigned long GetReplacementStartPosition();
+  unsigned long GetReplacementEndPosition();
+  [Const, Ref] ParameterMetadata GetParameterMetadata();
 };
 
 interface VectorExpressionCompletionDescription {
@@ -2242,6 +2275,7 @@ interface ResourcesInUseHelper {
     [Ref] SetString GetAllImages();
     [Ref] SetString GetAllAudios();
     [Ref] SetString GetAllFonts();
+    [Ref] SetString GetAllBitmapFonts();
     [Ref] SetString GetAll([Const] DOMString resourceType);
 };
 ResourcesInUseHelper implements ArbitraryResourceWorker;

@@ -231,11 +231,7 @@ namespace gdjs {
        * @param max The  maximum value.
        * @returns The new value.
        */
-      export const clamp = function (
-        x: float,
-        min: number,
-        max: float
-      ): number {
+      export const clamp = function (x: float, min: float, max: float): float {
         return Math.min(Math.max(x, min), max);
       };
 
@@ -457,6 +453,32 @@ namespace gdjs {
        */
       export const trunc = function (x: float): number {
         return x | 0;
+      };
+
+      /**
+       * Compute the X position when given an angle and distance relative to the origin (0;0).
+       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+       * @param angle The angle, in degrees.
+       * @param distance The distance from the object, in pixels.
+       */
+      export const getXFromAngleAndDistance = function (
+        angle: float,
+        distance: float
+      ): number {
+        return distance * Math.cos(gdjs.toRad(angle));
+      };
+
+      /**
+       * Compute the Y position when given an angle and distance relative to the origin (0;0).
+       * This is also known as getting the cartesian coordinates of a 2D vector, using its polar coordinates.
+       * @param angle The angle, in degrees.
+       * @param distance The distance from the object, in pixels.
+       */
+      export const getYFromAngleAndDistance = function (
+        angle: float,
+        distance: float
+      ): number {
+        return distance * Math.sin(gdjs.toRad(angle));
       };
     }
   }

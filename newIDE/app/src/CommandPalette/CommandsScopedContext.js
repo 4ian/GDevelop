@@ -53,6 +53,7 @@ class ScopedCommandManager implements CommandManagerInterface {
   getAllNamedCommands = () => {
     return Object.keys(this._commands).map<NamedCommand>(commandName => {
       const cmd = this._commands[commandName];
+      // $FlowFixMe
       return { ...cmd, name: commandName };
     });
   };

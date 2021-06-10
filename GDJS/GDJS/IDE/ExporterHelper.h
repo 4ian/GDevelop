@@ -276,7 +276,9 @@ class ExporterHelper {
    * \param project The project to be used to generate the configuration file.
    * \param exportDir The directory where the config.xml must be created.
    */
-  bool ExportCordovaFiles(const gd::Project &project, gd::String exportDir);
+  bool ExportCordovaFiles(const gd::Project &project,
+                          gd::String exportDir,
+                          std::set<gd::String> usedExtensions);
 
   /**
    * \brief Generate the base Cocos2d files.
@@ -293,7 +295,9 @@ class ExporterHelper {
    * \param project The project to be used to generate the files.
    * \param exportDir The directory where the files must be created.
    */
-  bool ExportElectronFiles(const gd::Project &project, gd::String exportDir);
+  bool ExportElectronFiles(const gd::Project &project,
+                           gd::String exportDir,
+                           std::set<gd::String> usedExtensions);
 
   /**
    * \brief Generate the Facebook Instant Games files for packaging and save it

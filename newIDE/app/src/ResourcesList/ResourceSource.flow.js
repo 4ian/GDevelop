@@ -4,7 +4,13 @@ import { type I18n as I18nType } from '@lingui/core';
 
 // These are all the kind of resources that can be found in
 // Core/GDCore/Project/ResourcesManager.h
-export type ResourceKind = 'image' | 'audio' | 'font' | 'video' | 'json';
+export type ResourceKind =
+  | 'image'
+  | 'audio'
+  | 'font'
+  | 'video'
+  | 'json'
+  | 'bitmapFont';
 
 export type ResourceSourceComponentProps = {|
   i18n: I18nType,

@@ -4,15 +4,17 @@
  * reserved. This project is released under the MIT License.
  */
 #include "WholeProjectRefactorer.h"
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
-#include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
-#include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
+#include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsParameterMover.h"
+#include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
+#include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -140,6 +142,13 @@ void WholeProjectRefactorer::ExposeProjectEvents(
     }
   }
 }
+
+void WholeProjectRefactorer::ExposeProjectObjects(
+    gd::Project& project, gd::ArbitraryObjectsWorker& worker) {
+  worker.Launch(project);
+  for (size_t i = 0; i < project.GetLayoutsCount(); i++)
+    worker.Launch(project.GetLayout(i));
+};
 
 std::set<gd::String>
 WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(

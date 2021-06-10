@@ -207,7 +207,7 @@ export default class LayerRenderer {
     );
     this._updatePixiObjectsZOrder();
     this._updateVisibility();
-    this._cleanRenderers();
+    this._destroyUnusedInstanceRenderers();
   }
 
   _updatePixiObjectsZOrder() {
@@ -227,12 +227,12 @@ export default class LayerRenderer {
    * the next render.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetRenderersFor(objectName) {
+  resetInstanceRenderersFor(objectName) {
     for (let i in this.renderedInstances) {
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         if (renderedInstance.getInstance().getObjectName() === objectName) {
-          renderedInstance.instanceRemovedFromScene();
+          renderedInstance.onRemovedFromScene();
           delete this.renderedInstances[i];
         }
       }
@@ -240,15 +240,15 @@ export default class LayerRenderer {
   }
 
   /**
-   * Clean up rendered instances that are not associated to any instance anymore
+   * Remove rendered instances that are not associated to any instance anymore
    * (this can happen after an instance has been deleted).
    */
-  _cleanRenderers() {
+  _destroyUnusedInstanceRenderers() {
     for (let i in this.renderedInstances) {
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         if (!renderedInstance.wasUsed) {
-          renderedInstance.instanceRemovedFromScene();
+          renderedInstance.onRemovedFromScene();
           delete this.renderedInstances[i];
         } else renderedInstance.wasUsed = false;
       }
@@ -256,6 +256,19 @@ export default class LayerRenderer {
   }
 
   delete() {
+    // Destroy all instances
+    for (let i in this.renderedInstances) {
+      if (this.renderedInstances.hasOwnProperty(i)) {
+        const renderedInstance = this.renderedInstances[i];
+        renderedInstance.onRemovedFromScene(); // TODO: pass argument to tell it's even worth removing from container?
+        delete this.renderedInstances[i];
+      }
+    }
+
+    // Destroy the container
+    this.pixiContainer.destroy();
+
+    // Destroy the object iterating on isntances
     this.instancesRenderer.delete();
   }
 }

@@ -74,12 +74,10 @@ class GD_CORE_API Effect {
     booleanParameters.clear();
   }
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize layer.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the layer.

@@ -10,6 +10,7 @@ export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
   audio: 'wav,mp3,ogg,WAV,MP3,OGG',
   font: 'ttf,ttc,otf,TTF,TTC,OTF',
+  bitmapFont: 'fnt,xml,FNT,XML',
   video: 'mp4,MP4',
 };
 

@@ -15,24 +15,17 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
 
-DependenciesAnalyzer::DependenciesAnalyzer(gd::Project& project_,
-                                           gd::Layout& layout_)
+DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
+                                           const gd::Layout& layout_)
     : project(project_), layout(&layout_), externalEvents(NULL) {
   parentScenes.push_back(layout->GetName());
 }
 
-DependenciesAnalyzer::DependenciesAnalyzer(gd::Project& project_,
-                                           gd::ExternalEvents& externalEvents_)
+DependenciesAnalyzer::DependenciesAnalyzer(const gd::Project& project_,
+                                           const gd::ExternalEvents& externalEvents_)
     : project(project_), layout(NULL), externalEvents(&externalEvents_) {
   parentExternalEvents.push_back(externalEvents->GetName());
 }
-
-DependenciesAnalyzer::DependenciesAnalyzer(const DependenciesAnalyzer& parent)
-    : parentScenes(parent.parentScenes),
-      parentExternalEvents(parent.parentExternalEvents),
-      project(parent.project),
-      layout(NULL),
-      externalEvents(NULL) {}
 
 bool DependenciesAnalyzer::Analyze() {
   if (layout)
@@ -47,9 +40,9 @@ bool DependenciesAnalyzer::Analyze() {
 
 DependenciesAnalyzer::~DependenciesAnalyzer() {}
 
-bool DependenciesAnalyzer::Analyze(gd::EventsList& events, bool isOnTopLevel) {
+bool DependenciesAnalyzer::Analyze(const gd::EventsList& events, bool isOnTopLevel) {
   for (unsigned int i = 0; i < events.size(); ++i) {
-    gd::LinkEvent* linkEvent = dynamic_cast<gd::LinkEvent*>(&events[i]);
+    const gd::LinkEvent* linkEvent = dynamic_cast<const gd::LinkEvent*>(&events[i]);
     if (linkEvent) {
       DependenciesAnalyzer analyzer(*this);
 
@@ -113,7 +106,7 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList& events, bool isOnTopLevel) {
     sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
 
     const gd::String& associatedSourceFile =
-        events[i].GetAssociatedGDManagedSourceFile(project);
+        events[i].GetAssociatedGDManagedSourceFile(const_cast<gd::Project&>(project));
     if (!associatedSourceFile.empty())
       sourceFilesDependencies.insert(associatedSourceFile);
 

@@ -7,27 +7,30 @@ namespace gdjs {
    * Manages the links between objects.
    */
   export class LinksManager {
-    links: any = {};
+    private links: { [objectId: number]: gdjs.RuntimeObject[] } = {};
 
     /**
      * Get the links manager of a scene.
      */
-    static getManager(runtimeScene) {
+    static getManager(runtimeScene: gdjs.RuntimeScene): gdjs.LinksManager {
+      // @ts-ignore
       if (!runtimeScene.linkedObjectsManager) {
         //Create the shared manager if necessary.
+        // @ts-ignore
         runtimeScene.linkedObjectsManager = new gdjs.LinksManager();
       }
+      // @ts-ignore
       return runtimeScene.linkedObjectsManager;
     }
 
-    getObjectsLinkedWith(objA) {
+    getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
       if (!this.links.hasOwnProperty(objA.id)) {
         this.links[objA.id] = [];
       }
       return this.links[objA.id];
     }
 
-    linkObjects(objA, objB) {
+    linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
       const objALinkedObjects = this.getObjectsLinkedWith(objA);
       if (objALinkedObjects.indexOf(objB) === -1) {
         objALinkedObjects.push(objB);
@@ -38,7 +41,7 @@ namespace gdjs {
       }
     }
 
-    removeAllLinksOf(obj) {
+    removeAllLinksOf(obj: gdjs.RuntimeObject) {
       const objLinkedObjects = this.getObjectsLinkedWith(obj);
       for (let i = 0; i < objLinkedObjects.length; i++) {
         if (this.links.hasOwnProperty(objLinkedObjects[i].id)) {
@@ -54,18 +57,17 @@ namespace gdjs {
       }
     }
 
-    removeLinkBetween(objA, objB) {
-      let list, index;
+    removeLinkBetween(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
       if (this.links.hasOwnProperty(objA.id)) {
-        list = this.links[objA.id];
-        index = list.indexOf(objB);
+        const list = this.links[objA.id];
+        const index = list.indexOf(objB);
         if (index !== -1) {
           list.splice(index, 1);
         }
       }
       if (this.links.hasOwnProperty(objB.id)) {
-        list = this.links[objB.id];
-        index = list.indexOf(objA);
+        const list = this.links[objB.id];
+        const index = list.indexOf(objA);
         if (index !== -1) {
           list.splice(index, 1);
         }
@@ -78,31 +80,45 @@ namespace gdjs {
       gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
         LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
       });
-      export const linkObjects = function (runtimeScene, objA, objB) {
+      export const linkObjects = function (
+        runtimeScene: gdjs.RuntimeScene,
+        objA: gdjs.RuntimeObject,
+        objB: gdjs.RuntimeObject
+      ) {
         if (objA === null || objB === null) {
           return;
         }
         LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
       };
-      export const removeLinkBetween = function (runtimeScene, objA, objB) {
+      export const removeLinkBetween = function (
+        runtimeScene: gdjs.RuntimeScene,
+        objA: gdjs.RuntimeObject,
+        objB: gdjs.RuntimeObject
+      ) {
         if (objA === null || objB === null) {
           return;
         }
         LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
       };
-      export const removeAllLinksOf = function (runtimeScene, objA) {
+      export const removeAllLinksOf = function (
+        runtimeScene: gdjs.RuntimeScene,
+        objA: gdjs.RuntimeObject
+      ) {
         if (objA === null) {
           return;
         }
         LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
       };
-      export const _objectIsInList = function (obj, linkedObjects) {
+      export const _objectIsInList = function (
+        obj: gdjs.RuntimeObject,
+        linkedObjects: gdjs.RuntimeObject[]
+      ) {
         return linkedObjects.indexOf(obj) !== -1;
       };
       export const pickObjectsLinkedTo = function (
-        runtimeScene,
-        objectsLists,
-        obj
+        runtimeScene: gdjs.RuntimeScene,
+        objectsLists: Hashtable<gdjs.RuntimeObject[]>,
+        obj: gdjs.RuntimeObject
       ) {
         if (obj === null) {
           return false;

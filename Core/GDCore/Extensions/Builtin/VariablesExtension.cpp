@@ -341,7 +341,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "SceneVariableRemoveAt",
           _("Remove variable from a scene array (by index)"),
           _("Removes a variable at the specified index of a scene array variable."),
-          _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
+          _("Remove variable at index _PARAM1_ from scene array variable _PARAM0_"),
           _("Variables/Collections/Arrays"),
           "res/actions/var24.png",
           "res/actions/var.png")
@@ -367,7 +367,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "GlobalVariableRemoveAt",
           _("Remove variable from a global array (by index)"),
           _("Removes a variable at the specified index of a global array variable."),
-          _("Remove variable at index _PARAM1_ from array variable _PARAM0_"),
+          _("Remove variable at index _PARAM1_ from global array variable _PARAM0_"),
           _("Variables/Global variables/Collections/Arrays"),
           "res/actions/var24.png",
           "res/actions/var.png")

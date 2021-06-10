@@ -2,6 +2,18 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
+   * Codes (as in `event.code`) of keys that should have their event `preventDefault`
+   * called. This is used to avoid scrolling in a webpage when these keys are pressed
+   * in the game.
+   */
+  const defaultPreventedKeys = [
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+  ];
+
+  /**
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
   export class RuntimeGamePixiRenderer {
@@ -410,9 +422,17 @@ namespace gdjs {
 
       //Keyboard
       document.onkeydown = function (e) {
+        if (defaultPreventedKeys.includes(e.keyCode)) {
+          e.preventDefault();
+        }
+
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
+        if (defaultPreventedKeys.includes(e.keyCode)) {
+          e.preventDefault();
+        }
+
         manager.onKeyReleased(e.keyCode, e.location);
       };
 

@@ -39,6 +39,7 @@ type State = {|
     backgroundColor: string,
   },
   hideMenuBar: boolean,
+  alwaysOnTop: boolean,
 |};
 
 export default class LocalPreviewLauncher extends React.Component<
@@ -58,6 +59,7 @@ export default class LocalPreviewLauncher extends React.Component<
     previewBrowserWindowConfig: null,
     hotReloadsCount: 0,
     hideMenuBar: true,
+    alwaysOnTop: true,
   };
   _networkPreviewSubscriptionChecker: ?SubscriptionChecker = null;
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
@@ -73,6 +75,7 @@ export default class LocalPreviewLauncher extends React.Component<
     const win = new BrowserWindow(this.state.previewBrowserWindowConfig);
     win.loadURL(`file://${this.state.previewGamePath}/index.html`);
     win.setMenuBarVisibility(this.state.hideMenuBar);
+    win.setAlwaysOnTop(this.state.alwaysOnTop);
     win.webContents.on('devtools-opened', () => {
       this.setState({ devToolsOpen: true });
     });
@@ -101,6 +104,7 @@ export default class LocalPreviewLauncher extends React.Component<
         },
         previewGamePath: gamePath,
         hideMenuBar: !options.getIsMenuBarHiddenInPreview(),
+        alwaysOnTop: options.getIsAlwaysOnTopInPreview(),
       },
       () => {
         if (!options.networkPreview) {

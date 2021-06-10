@@ -14,16 +14,16 @@ namespace gd {
  * \note Both objects must be kept alive, as this is keeping a pointer to them.
  */
 struct DependencyMetadataAndExtension {
-  DependencyMetadataAndExtension(gd::DependencyMetadata& dependency_,
-                                 gd::PlatformExtension& extension_)
+  DependencyMetadataAndExtension(gd::DependencyMetadata &dependency_,
+                                 gd::PlatformExtension &extension_)
       : dependency(&dependency_), extension(&extension_){};
 
-  gd::DependencyMetadata& GetDependency() const { return *dependency; };
-  gd::PlatformExtension& GetExtension() const { return *extension; };
+  gd::DependencyMetadata &GetDependency() const { return *dependency; };
+  gd::PlatformExtension &GetExtension() const { return *extension; };
 
  private:
-  gd::DependencyMetadata* dependency;
-  gd::PlatformExtension* extension;
+  gd::DependencyMetadata *dependency;
+  gd::PlatformExtension *extension;
 };
 
 /**
@@ -33,8 +33,8 @@ struct DependencyMetadataAndExtension {
 class ExportedDependencyResolver {
  public:
   /**
-   * \brief Return the list of dependencies to be exported for the given project
-   * and dependency type.
+   * \brief Return the list of dependencies to be exported for the given
+   * project, used extensions list and dependency type.
    *
    * Not all dependencies declared by extensions must be exported: some are only
    * exported when some settings are filled. Then, some others are only exported
@@ -42,11 +42,13 @@ class ExportedDependencyResolver {
    * one level though).
    */
   static std::vector<DependencyMetadataAndExtension> GetDependenciesFor(
-      const gd::Project& project, const gd::String& dependencyType) {
+      const gd::Project &project,
+      std::set<gd::String> usedExtensions,
+      const gd::String &dependencyType) {
     std::vector<DependencyMetadataAndExtension> dependenciesWithProperType;
-    for (std::shared_ptr<gd::PlatformExtension> extension :
-         project.GetCurrentPlatform().GetAllPlatformExtensions()) {
-      for (gd::DependencyMetadata& dependency :
+    for (const gd::String &extensionName : usedExtensions) {
+      auto extension = project.GetCurrentPlatform().GetExtension(extensionName);
+      for (gd::DependencyMetadata &dependency :
            extension->GetAllDependencies()) {
         if (dependency.GetDependencyType() == dependencyType) {
           DependencyMetadataAndExtension dependencyMetadataAndExtension(
@@ -60,7 +62,7 @@ class ExportedDependencyResolver {
     // and those that don't require extra settings to be filled.
     std::vector<DependencyMetadataAndExtension> dependenciesWithFilledSettings;
     for (auto dependencyAndExtension : dependenciesWithProperType) {
-      auto& dependency = dependencyAndExtension.GetDependency();
+      auto &dependency = dependencyAndExtension.GetDependency();
       auto extraSettingValues = GetExtensionDependencyExtraSettingValues(
           project, dependencyAndExtension);
 
@@ -73,15 +75,15 @@ class ExportedDependencyResolver {
     // exported (or dependencies that don't require another dependency).
     std::vector<DependencyMetadataAndExtension> exportedDependencies;
     for (auto dependencyAndExtension : dependenciesWithFilledSettings) {
-      auto& dependency = dependencyAndExtension.GetDependency();
-      auto& otherDependencyName =
+      auto &dependency = dependencyAndExtension.GetDependency();
+      auto &otherDependencyName =
           dependency.GetOtherDependencyThatMustBeExported();
       if (otherDependencyName.empty() ||
           std::find_if(
               dependenciesWithFilledSettings.begin(),
               dependenciesWithFilledSettings.end(),
               [&otherDependencyName](
-                  DependencyMetadataAndExtension& otherDependencyAndExtension) {
+                  DependencyMetadataAndExtension &otherDependencyAndExtension) {
                 return otherDependencyAndExtension.GetDependency().GetName() ==
                        otherDependencyName;
               }) != dependenciesWithFilledSettings.end()) {
@@ -98,15 +100,15 @@ class ExportedDependencyResolver {
    */
   static std::map<gd::String, gd::String>
   GetExtensionDependencyExtraSettingValues(
-      const gd::Project& project,
-      const gd::DependencyMetadataAndExtension& dependencyAndExtension) {
+      const gd::Project &project,
+      const gd::DependencyMetadataAndExtension &dependencyAndExtension) {
     std::map<gd::String, gd::String> values;
-    auto& dependency = dependencyAndExtension.GetDependency();
-    const gd::String& extensionName =
+    auto &dependency = dependencyAndExtension.GetDependency();
+    const gd::String &extensionName =
         dependencyAndExtension.GetExtension().GetName();
 
-    for (const auto& extraSetting : dependency.GetAllExtraSettings()) {
-      const gd::String& type = extraSetting.second.GetType();
+    for (const auto &extraSetting : dependency.GetAllExtraSettings()) {
+      const gd::String &type = extraSetting.second.GetType();
       const gd::String extraSettingValue =
           type == "ExtensionProperty"
               ? project.GetExtensionProperties().GetValue(

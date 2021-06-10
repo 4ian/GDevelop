@@ -177,6 +177,11 @@ export function getMuiOverrides(
         padding: 0,
       },
     },
+    MuiAccordionDetails: {
+      root: {
+        padding: 8,
+      },
+    },
   };
 }
 

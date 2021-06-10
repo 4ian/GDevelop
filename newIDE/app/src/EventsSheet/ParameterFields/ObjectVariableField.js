@@ -6,6 +6,7 @@ import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getLastObjectParameterValue } from './ParameterMetadataTools';
+import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
 
 type State = {|
   editorOpen: boolean,
@@ -43,20 +44,34 @@ export default class ObjectVariableField extends React.Component<
       parameterIndex,
     });
 
+    const { layout } = scope;
+    let object = null;
     let variablesContainer = null;
     if (objectName) {
-      const { layout } = scope;
       if (layout && layout.hasObjectNamed(objectName)) {
-        variablesContainer = layout.getObject(objectName).getVariables();
+        object = layout.getObject(objectName);
+        variablesContainer = object.getVariables();
       } else if (project && project.hasObjectNamed(objectName)) {
-        variablesContainer = project.getObject(objectName).getVariables();
+        object = project.getObject(objectName);
+        variablesContainer = object.getVariables();
       }
     }
+
+    const onComputeAllVariableNames = () =>
+      project && layout && object
+        ? EventsRootVariablesFinder.findAllObjectVariables(
+            project.getCurrentPlatform(),
+            project,
+            layout,
+            object
+          )
+        : [];
 
     return (
       <React.Fragment>
         <VariableField
           variablesContainer={variablesContainer}
+          onComputeAllVariableNames={onComputeAllVariableNames}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -73,6 +88,7 @@ export default class ObjectVariableField extends React.Component<
             title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
+            onComputeAllVariableNames={onComputeAllVariableNames}
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });

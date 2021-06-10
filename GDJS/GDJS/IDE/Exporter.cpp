@@ -13,6 +13,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
+#include "GDCore/IDE/Events/UsedExtensionsFinder.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -26,11 +27,12 @@
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/IDE/ExporterHelper.h"
+
 #undef CopyFile  // Disable an annoying macro
 
 namespace gdjs {
 
-Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
+Exporter::Exporter(gd::AbstractFileSystem &fileSystem, gd::String gdjsRoot_)
     : fs(fileSystem), gdjsRoot(gdjsRoot_) {
   SetCodeOutputDirectory(fs.GetTempDir() + "/GDTemporaries/JSCodeTemp");
 }
@@ -38,17 +40,19 @@ Exporter::Exporter(gd::AbstractFileSystem& fileSystem, gd::String gdjsRoot_)
 Exporter::~Exporter() {}
 
 bool Exporter::ExportProjectForPixiPreview(
-    const PreviewExportOptions& options) {
+    const PreviewExportOptions &options) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   return helper.ExportProjectForPixiPreview(options);
 }
 
 bool Exporter::ExportWholePixiProject(
-    gd::Project& project,
+    gd::Project &project,
     gd::String exportDir,
-    std::map<gd::String, bool>& exportOptions) {
+    std::map<gd::String, bool> &exportOptions) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   gd::Project exportedProject = project;
+
+  auto usedExtensions = gd::UsedExtensionsFinder::ScanProject(project);
 
   auto exportProject = [this, &exportedProject, &exportOptions, &helper](
                            gd::String exportDir) {
@@ -141,13 +145,15 @@ bool Exporter::ExportWholePixiProject(
 
     if (!exportProject(exportDir + "/www")) return false;
 
-    if (!helper.ExportCordovaFiles(exportedProject, exportDir)) return false;
+    if (!helper.ExportCordovaFiles(exportedProject, exportDir, usedExtensions))
+      return false;
   } else if (exportOptions["exportForElectron"]) {
     fs.MkDir(exportDir);
 
     if (!exportProject(exportDir + "/app")) return false;
 
-    if (!helper.ExportElectronFiles(exportedProject, exportDir)) return false;
+    if (!helper.ExportElectronFiles(exportedProject, exportDir, usedExtensions))
+      return false;
   } else if (exportOptions["exportForFacebookInstantGames"]) {
     if (!exportProject(exportDir)) return false;
 
@@ -160,12 +166,12 @@ bool Exporter::ExportWholePixiProject(
   return true;
 }
 
-bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
+bool Exporter::ExportWholeCocos2dProject(gd::Project &project,
                                          bool debugMode,
                                          gd::String exportDir) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
 
-  wxProgressDialog* progressDialogPtr = NULL;
+  wxProgressDialog *progressDialogPtr = NULL;
 
   // Prepare the export directory
   fs.MkDir(exportDir);

@@ -256,6 +256,10 @@ export default class ResourcesList extends React.Component<Props, State> {
             RESOURCE_EXTENSIONS.font,
             () => new gd.FontResource()
           );
+          this._scanForNewResources(
+            RESOURCE_EXTENSIONS.bitmapFont,
+            () => new gd.BitmapFontResource()
+          );
         },
         enabled: hasElectron,
       },
@@ -286,6 +290,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: i18n._(t`Remove Unused Fonts`),
         click: () => {
           this.props.onRemoveUnusedResources('font');
+          this.props.onRemoveUnusedResources('bitmapFont');
         },
       },
       {

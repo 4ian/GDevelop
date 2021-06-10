@@ -389,6 +389,7 @@ export default class InstancesEditor extends Component<Props> {
     this.longTouchHandler.unmount();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     stopPIXITicker();
+    this.pixiRenderer.destroy();
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -448,9 +449,9 @@ export default class InstancesEditor extends Component<Props> {
    * See also ResourcesLoader and PixiResourcesLoader.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetRenderersFor(objectName: string) {
+  resetInstanceRenderersFor(objectName: string) {
     if (this.instancesRenderer)
-      this.instancesRenderer.resetRenderersFor(objectName);
+      this.instancesRenderer.resetInstanceRenderersFor(objectName);
   }
 
   zoomBy(value: number) {

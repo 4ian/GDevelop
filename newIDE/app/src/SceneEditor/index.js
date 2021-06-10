@@ -71,6 +71,8 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
+import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+
 const gd: libGDevelop = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -639,6 +641,11 @@ export default class SceneEditor extends React.Component<Props, State> {
       'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
     );
 
+    // Unselect instances of the deleted object because these instances
+    // will be deleted by gd.WholeProjectRefactorer (and after that, they will
+    // be invalid references, as pointing to deleted objects).
+    this.instancesSelection.unselectInstancesOfObject(object.getName());
+
     if (global) {
       gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
         project,
@@ -655,7 +662,12 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
+
     done(true);
+
+    // We modified the selection, so force an update of editors dealing with it.
+    this.forceUpdatePropertiesEditor();
+    this.updateToolbar();
   };
 
   _canObjectOrGroupUseNewName = (newName: string) => {
@@ -751,6 +763,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         !!answer
       );
     }
+
     done(true);
   };
 
@@ -915,7 +928,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       objectResourceNames,
       () => {},
       () => {
-        if (this.editor) this.editor.resetRenderersFor(object.getName());
+        if (this.editor)
+          this.editor.resetInstanceRenderersFor(object.getName());
       }
     );
   };
@@ -1297,6 +1311,26 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
             }}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onComputeAllVariableNames={() => {
+              const variablesEditedInstance = this.state
+                .variablesEditedInstance;
+              if (!variablesEditedInstance) {
+                return [];
+              }
+              const variablesEditedObject = getObjectByName(
+                project,
+                layout,
+                variablesEditedInstance.getObjectName()
+              );
+              return variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
           />
         )}
         {!!this.state.variablesEditedObject && (
@@ -1317,6 +1351,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             title={<Trans>Object Variables</Trans>}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
+            onComputeAllVariableNames={() => {
+              const variablesEditedObject = this.state.variablesEditedObject;
+              return variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
           />
         )}
         {!!this.state.layerRemoveDialogOpen && (
@@ -1358,6 +1403,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         {!!this.state.layoutVariablesDialogOpen && (
           <SceneVariablesDialog
             open
+            project={project}
             layout={layout}
             onApply={() => this.editLayoutVariables(false)}
             onClose={() => this.editLayoutVariables(false)}

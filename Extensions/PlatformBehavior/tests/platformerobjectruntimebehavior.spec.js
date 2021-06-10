@@ -1,4 +1,6 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
+  const epsilon = 1 / (2 << 8);
+
   const makeTestRuntimeScene = () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
@@ -28,7 +30,27 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       behaviors: [
         {
           type: 'PlatformBehavior::PlatformBehavior',
+          name: 'Platform',
           canBeGrabbed: true,
+        },
+      ],
+    });
+    platform.setCustomWidthAndHeight(60, 32);
+    runtimeScene.addObject(platform);
+
+    return platform;
+  };
+
+  const addJumpThroughPlatformObject = (runtimeScene) => {
+    const platform = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj2',
+      type: '',
+      behaviors: [
+        {
+          type: 'PlatformBehavior::PlatformBehavior',
+          name: 'Platform',
+          platformType: 'Jumpthru',
+          canBeGrabbed: false,
         },
       ],
     });
@@ -45,6 +67,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       behaviors: [
         {
           type: 'PlatformBehavior::PlatformBehavior',
+          name: 'Platform',
           canBeGrabbed: false,
           platformType: 'Ladder',
         },
@@ -128,26 +151,24 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
     });
 
-    it('can grab, and release, a platform', function () {
-      //Put the object near the right ledge of the platform.
-      object.setPosition(
-        platform.getX() + platform.getWidth() + 2,
-        platform.getY() - 10
-      );
+    it.skip('must not move when on the floor at startup', function () {
+      object.setPosition(0, platform.getY() - object.getHeight());
 
-      for (let i = 0; i < 35; ++i) {
-        object.getBehavior('auto1').simulateLeftKey();
+      for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
+        // Check the platformer object stays still.
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          false
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(false);
       }
+    });
 
-      //Check that the object grabbed the platform
-      expect(object.getX()).to.be.within(
-        platform.getX() + platform.getWidth() + 0,
-        platform.getX() + platform.getWidth() + 1
-      );
-      expect(object.getY()).to.be(platform.getY());
+    it('must not move when put on a platform while falling', function () {
+      object.setPosition(0, platform.getY() - object.getHeight() - 300);
 
-      object.getBehavior('auto1').simulateReleaseKey();
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -156,37 +177,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         );
       }
 
-      //Check that the object is falling
-      expect(object.getY()).to.be(3.75);
-    });
+      object.setPosition(0, platform.getY() - object.getHeight());
 
-    it('can grab a platform and jump', function () {
-      //Put the object near the right ledge of the platform.
-      object.setPosition(
-        platform.getX() + platform.getWidth() + 2,
-        platform.getY() - 10
-      );
-
-      for (let i = 0; i < 35; ++i) {
-        object.getBehavior('auto1').simulateLeftKey();
-        runtimeScene.renderAndStep(1000 / 60);
-      }
-
-      //Check that the object grabbed the platform
-      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
-      expect(object.getX()).to.be.within(
-        platform.getX() + platform.getWidth() + 0,
-        platform.getX() + platform.getWidth() + 1
-      );
-      expect(object.getY()).to.be(platform.getY());
-
-      object.getBehavior('auto1').simulateJumpKey();
-      //Check that the object is jumping
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
-        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+        // Check the platformer object stays still.
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          false
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(false);
       }
-      expect(object.getY()).to.be.below(platform.getY());
     });
 
     it('can track object height changes', function () {
@@ -207,9 +209,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be(10);
       expect(object.getY()).to.be.within(-31, -30); // -30 = -10 (platform y) + -20 (object height)
 
-      object.getHeight = function () {
-        return 9;
-      };
+      object.setCustomWidthAndHeight(object.getWidth(), 9);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
@@ -228,9 +228,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(-19);
       expect(object.getX()).to.be.within(17.638, 17.639);
 
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(object.getWidth(), 20);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
     });
@@ -278,6 +276,170 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
+  describe('(grab platforms)', function () {
+    let runtimeScene;
+    let object;
+
+    beforeEach(function () {
+      runtimeScene = makeTestRuntimeScene();
+
+      // Put a platformer object in the air.
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 900,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 1500,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+          },
+        ],
+      });
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      object.setPosition(0, -100);
+    });
+
+    it('can grab, and release, a platform', function () {
+      // Put a platform.
+      const platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      //Put the object near the right ledge of the platform.
+      object.setPosition(
+        platform.getX() + platform.getWidth() + 2,
+        platform.getY() - 10
+      );
+
+      for (let i = 0; i < 35; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check that the object grabbed the platform
+      expect(object.getX()).to.be.within(
+        platform.getX() + platform.getWidth() + 0,
+        platform.getX() + platform.getWidth() + 1
+      );
+      expect(object.getY()).to.be(platform.getY());
+
+      object.getBehavior('auto1').simulateReleaseKey();
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+      }
+
+      //Check that the object is falling
+      expect(object.getY()).to.be(3.75);
+    });
+
+    [true, false].forEach((addTopPlatformFirst) => {
+      it('can grab every platform when colliding 2', function () {
+        // The 2 platforms will be simultaneously in collision
+        // with the object when it grabs one.
+        let upperPlatform, lowerPlatform;
+        if (addTopPlatformFirst) {
+          upperPlatform = addPlatformObject(runtimeScene);
+          upperPlatform.setPosition(0, -10);
+          upperPlatform.setCustomWidthAndHeight(60, 10);
+
+          lowerPlatform = addPlatformObject(runtimeScene);
+          lowerPlatform.setPosition(0, 0);
+          lowerPlatform.setCustomWidthAndHeight(60, 10);
+        } else {
+          lowerPlatform = addPlatformObject(runtimeScene);
+          lowerPlatform.setPosition(0, 0);
+          lowerPlatform.setCustomWidthAndHeight(60, 10);
+
+          upperPlatform = addPlatformObject(runtimeScene);
+          upperPlatform.setPosition(0, -10);
+          upperPlatform.setCustomWidthAndHeight(60, 10);
+        }
+
+        // Put the object near the right ledge of the platform.
+        object.setPosition(
+          upperPlatform.getX() + upperPlatform.getWidth() + 2,
+          upperPlatform.getY() - 10
+        );
+        runtimeScene.renderAndStep(1000 / 60);
+
+        for (let i = 0; i < 35; ++i) {
+          object.getBehavior('auto1').simulateLeftKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Check that the object grabbed the upper platform
+        expect(object.getX()).to.be.within(
+          upperPlatform.getX() + upperPlatform.getWidth() + 0,
+          upperPlatform.getX() + upperPlatform.getWidth() + 1
+        );
+        expect(object.getY()).to.be(upperPlatform.getY());
+        expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+
+        // Release upper platform
+        object.getBehavior('auto1').simulateReleaseKey();
+        for (let i = 0; i < 35; ++i) {
+          object.getBehavior('auto1').simulateLeftKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Check that the object grabbed the lower platform
+        expect(object.getX()).to.be.within(
+          lowerPlatform.getX() + lowerPlatform.getWidth() + 0,
+          lowerPlatform.getX() + lowerPlatform.getWidth() + 1
+        );
+        expect(object.getY()).to.be(lowerPlatform.getY());
+        expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+      });
+    });
+
+    it('can grab a platform and jump', function () {
+      // Put a platform.
+      platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      //Put the object near the right ledge of the platform.
+      object.setPosition(
+        platform.getX() + platform.getWidth() + 2,
+        platform.getY() - 10
+      );
+
+      for (let i = 0; i < 35; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check that the object grabbed the platform
+      expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
+      expect(object.getX()).to.be.within(
+        platform.getX() + platform.getWidth() + 0,
+        platform.getX() + platform.getWidth() + 1
+      );
+      expect(object.getY()).to.be(platform.getY());
+
+      object.getBehavior('auto1').simulateJumpKey();
+      //Check that the object is jumping
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      }
+      expect(object.getY()).to.be.below(platform.getY());
+    });
+  });
+
   describe('(jump and jump sustain, round coordinates on)', function () {
     let runtimeScene;
     let object;
@@ -287,7 +449,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -308,12 +470,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
       object.setPosition(0, -32);
 
@@ -644,7 +801,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform.
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -664,12 +821,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
       object.setPosition(0, -30);
 
@@ -679,23 +831,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
       // Put a jump thru, higher than the platform so that the object jump from under it
       // and will land on it at the end of the jump.
-      jumpthru = new gdjs.RuntimeObject(runtimeScene, {
+      jumpthru = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj2',
         type: '',
         behaviors: [
           {
             type: 'PlatformBehavior::PlatformBehavior',
+            name: 'Platform',
             canBeGrabbed: true,
             platformType: 'Jumpthru',
           },
         ],
       });
-      jumpthru.getWidth = function () {
-        return 60;
-      };
-      jumpthru.getHeight = function () {
-        return 5;
-      };
+      jumpthru.setCustomWidthAndHeight(60, 5);
       runtimeScene.addObject(jumpthru);
       jumpthru.setPosition(0, -33);
     });
@@ -753,18 +901,43 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
     });
+
+    it('can fall through the jumpthru from the left side', function () {
+      object.setPosition(0, -100);
+      jumpthru.setPosition(12, -90);
+      jumpthru.setCustomWidthAndHeight(60, 100);
+
+      // Check the jumpthru let the platformer object go through.
+      for (let i = 0; i < 10; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      }
+      // Overlapping the jumpthru
+      expect(object.getX()).to.above(5);
+      expect(object.getY()).to.be.within(-100, -80);
+    });
   });
 
   describe('(rounded coordinates, moving platforms)', function () {
     let runtimeScene;
     let object;
     let platform;
+    const maxSpeed = 500;
+    const maxFallingSpeed = 1500;
+    const timeDelta = 1 / 60;
+    const maxDeltaX = maxSpeed * timeDelta;
+    const maxDeltaY = maxFallingSpeed * timeDelta;
 
     beforeEach(function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform.
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -773,10 +946,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             name: 'auto1',
             roundCoordinates: true,
             gravity: 900,
-            maxFallingSpeed: 1500,
+            maxFallingSpeed: maxFallingSpeed,
             acceleration: 500,
             deceleration: 1500,
-            maxSpeed: 500,
+            maxSpeed: maxSpeed,
             jumpSpeed: 1500,
             canGrabPlatforms: true,
             ignoreDefaultControls: true,
@@ -784,22 +957,17 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
-      object.setPosition(0, -30);
+      object.setPosition(0, -40);
 
       // Put a platform.
       platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
     });
 
-    it('follows the platform', function () {
-      for (let i = 0; i < 30; ++i) {
+    it('follows a platform moving less than one pixel', function () {
+      for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
       }
 
@@ -822,17 +990,86 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be(0.36);
     });
 
+    it('falls from a platform moving down faster than the maximum falling speed', function () {
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Check the object has not moved.
+      expect(object.getY()).to.be(-30);
+      expect(object.getX()).to.be(0);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Check that the object falls
+      // +1 because it's the margin to check the floor
+      platform.setY(platform.getY() + maxDeltaY + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      expect(object.getY()).to.be.above(-30);
+    });
+
+    // This test doesn't pass because the platform AABB are not always updated
+    // before the platformer object moves.
+    it.skip('follows a platform that is slightly overlapping its top', function () {
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Check the object has not moved.
+      expect(object.getY()).to.be(-30);
+      expect(object.getX()).to.be(0);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // the platform is slightly overlapping the top of the object
+      platform.setY(object.getY() - platform.getHeight() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // Check that the object stays on the floor
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+      expect(object.getY()).to.be(platform.getY() - object.getHeight());
+    });
+
+    // This test doesn't pass because there is no collision test.
+    // As long as the platform is in the result of the spacial search
+    // for nearby platforms the object will follow it.
+    it.skip('must not follow a platform that is moved over its top', function () {
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object has not moved.
+      expect(object.getY()).to.be(-30);
+      expect(object.getX()).to.be(0);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // move the platform over the object
+      platform.setY(object.getY() - platform.getHeight());
+      runtimeScene.renderAndStep(1000 / 60);
+      // Check that the object falls
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      expect(object.getY()).to.be.above(-30);
+    });
+
     it('follows a moving platform when was grabbed to another', function () {
       const topPlatform = addPlatformObject(runtimeScene);
       topPlatform.setPosition(platform.getX() + 30, -50);
-      runtimeScene.renderAndStep(1000 / 60);
 
       // Fall and Grab the platform
       object.setPosition(
         topPlatform.getX() - object.getWidth(),
         topPlatform.getY() - 10
       );
-      for (let i = 0; i < 8; ++i) {
+
+      for (let i = 0; i < 9; ++i) {
         object.getBehavior('auto1').simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -893,6 +1130,191 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isOnLadder()).to.be(false);
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
     });
+
+    // The following tests doesn't pass because the object sometimes round inside the moving platform and can't move right and left.
+    [-10, -10.1, -9.9].forEach((platformY) => {
+      [
+        -maxDeltaY + epsilon,
+        maxDeltaY - epsilon,
+        -10,
+        10,
+        -10.1,
+        10.1,
+        0,
+      ].forEach((deltaY) => {
+        [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
+          it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+            platform.setPosition(platform.getX(), platformY);
+            for (let i = 0; i < 10; ++i) {
+              runtimeScene.renderAndStep(1000 / 60);
+            }
+            // Check the object has not moved.
+            expect(object.getX()).to.be(0);
+            // The object must not be inside the platform or it gets stuck
+            expect(object.getY()).to.be(
+              Math.floor(platform.getY() - object.getHeight())
+            );
+            expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+            expect(object.getBehavior('auto1').isFalling()).to.be(false);
+            expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+            // Check that the object follow the platform, even if the
+            // movement is less than one pixel.
+            for (let i = 0; i < 5; ++i) {
+              platform.setPosition(
+                platform.getX() + deltaX,
+                platform.getY() + deltaY
+              );
+              runtimeScene.renderAndStep(1000 / 60);
+              expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+              expect(object.getBehavior('auto1').isFalling()).to.be(false);
+              expect(object.getBehavior('auto1').isMoving()).to.be(false);
+              // The object must not be inside the platform or it gets stuck
+              expect(object.getY()).to.be(
+                Math.floor(platform.getY() - object.getHeight())
+              );
+            }
+            expect(object.getX()).to.be(0 + 5 * deltaX);
+          });
+        });
+      });
+    });
+  });
+
+  [false, true].forEach((useJumpthru) => {
+    describe(`(${
+      useJumpthru ? 'useJumpthru' : 'regular'
+    } moving platforms, no rounding)`, function () {
+      let runtimeScene;
+      let object;
+      let platform;
+      const maxSpeed = 500;
+      const maxFallingSpeed = 1500;
+      const timeDelta = 1 / 60;
+      const maxDeltaX = maxSpeed * timeDelta;
+      const maxDeltaY = maxFallingSpeed * timeDelta;
+
+      beforeEach(function () {
+        runtimeScene = makeTestRuntimeScene();
+
+        // Put a platformer object on a platform.
+        object = new gdjs.TestRuntimeObject(runtimeScene, {
+          name: 'obj1',
+          type: '',
+          behaviors: [
+            {
+              type: 'PlatformBehavior::PlatformerObjectBehavior',
+              name: 'auto1',
+              roundCoordinates: false,
+              gravity: 900,
+              maxFallingSpeed: maxFallingSpeed,
+              acceleration: 500,
+              deceleration: 1500,
+              maxSpeed: maxSpeed,
+              jumpSpeed: 1500,
+              canGrabPlatforms: true,
+              ignoreDefaultControls: true,
+              slopeMaxAngle: 60,
+            },
+          ],
+        });
+        object.setCustomWidthAndHeight(10, 20);
+        runtimeScene.addObject(object);
+        object.setPosition(0, -40);
+
+        // Put a platform.
+        if (useJumpthru) {
+          platform = addJumpThroughPlatformObject(runtimeScene);
+        } else {
+          platform = addPlatformObject(runtimeScene);
+        }
+        platform.setPosition(0, -10);
+      });
+
+      // This test doesn't pass with jumpthru
+      // because jumpthru that overlap the object are excluded from collision.
+      it.skip('can land to a platform that moved up and overlapped the object', function () {
+        // Put the platform away so it won't collide with the falling object
+        platform.setPosition(platform.getX(), 200);
+
+        for (let i = 0; i < 10; ++i) {
+          const oldY = object.getY();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        // Put the platform under the falling object and overlap it a little
+        // like a platform moving quickly can do
+        platform.setPosition(
+          platform.getX(),
+          object.getY() + object.getHeight() - 2
+        );
+        runtimeScene.renderAndStep(1000 / 60);
+
+        // Check the object has landed on the platform.
+        expect(object.getX()).to.be(0);
+        // The object must not be inside the platform or it gets stuck
+        expect(object.getY()).to.be.within(
+          platform.getY() - object.getHeight() - epsilon,
+          platform.getY() - object.getHeight() + epsilon
+        );
+        expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isMoving()).to.be(false);
+      });
+
+      // The following tests doesn't pass
+      // because the object sometimes round inside the moving platform
+      // so it can't move right and left
+      // or there is a gap between the moving platform and the object.
+      [-10, -10.1, -9.9].forEach((platformY) => {
+        [
+          -maxDeltaY + epsilon,
+          maxDeltaY - epsilon,
+          -10,
+          10,
+          -10.1,
+          10.1,
+          0,
+        ].forEach((deltaY) => {
+          [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
+            it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+              platform.setPosition(platform.getX(), platformY);
+              for (let i = 0; i < 10; ++i) {
+                runtimeScene.renderAndStep(1000 / 60);
+              }
+              // Check the object has not moved.
+              expect(object.getX()).to.be(0);
+              // The object must not be inside the platform or it gets stuck
+              expect(object.getY()).to.be.within(
+                platform.getY() - object.getHeight() - epsilon,
+                platform.getY() - object.getHeight() + epsilon
+              );
+              expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+              expect(object.getBehavior('auto1').isFalling()).to.be(false);
+              expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+              // Check that the object follow the platform, even if the
+              // movement is less than one pixel.
+              for (let i = 0; i < 5; ++i) {
+                platform.setPosition(
+                  platform.getX() + deltaX,
+                  platform.getY() + deltaY
+                );
+                runtimeScene.renderAndStep(1000 / 60);
+                expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+                expect(object.getBehavior('auto1').isFalling()).to.be(false);
+                expect(object.getBehavior('auto1').isMoving()).to.be(false);
+                // The object must not be inside the platform or it gets stuck
+                expect(object.getY()).to.be.within(
+                  platform.getY() - object.getHeight() - epsilon,
+                  platform.getY() - object.getHeight() + epsilon
+                );
+              }
+              expect(object.getX()).to.be(0 + 5 * deltaX);
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('and gdjs.PlatformRuntimeBehavior at same time', function () {
@@ -905,7 +1327,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform.
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -925,12 +1347,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
       object.setPosition(0, -30);
 
@@ -939,7 +1356,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       platform.setPosition(0, -10);
 
       // Put a platformer object that is also a platform itself.
-      object2 = new gdjs.RuntimeObject(runtimeScene, {
+      object2 = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj2',
         type: '',
         behaviors: [
@@ -959,17 +1376,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
           {
             type: 'PlatformBehavior::PlatformBehavior',
+            name: 'Platform',
             canBeGrabbed: true,
             platformType: 'Platform',
           },
         ],
       });
-      object2.getWidth = function () {
-        return 10;
-      };
-      object2.getHeight = function () {
-        return 20;
-      };
+      object2.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object2);
 
       // Position it above the other platformer object and just on its right,
@@ -1071,7 +1484,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -1092,12 +1505,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
 
       // Put a platform.
@@ -1449,7 +1857,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene = makeTestRuntimeScene();
 
       // Put a platformer object on a platform
-      object = new gdjs.RuntimeObject(runtimeScene, {
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
         name: 'obj1',
         type: '',
         behaviors: [
@@ -1470,12 +1878,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           },
         ],
       });
-      object.getWidth = function () {
-        return 10;
-      };
-      object.getHeight = function () {
-        return 20;
-      };
+      object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
 
       // Put a platform.

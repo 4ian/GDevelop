@@ -188,11 +188,12 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                       <Line>
                         <Text>
                           <Trans>
-                            Get a subscription to package your games for
-                            Android, Windows, macOS and Linux, use live preview
-                            over wifi and more. With a subscription, you're also
-                            supporting the development of GDevelop, which is an
-                            open-source software.
+                            Get a subscription to gain more one-click exports,
+                            remove the GDevelop splashscreen and messages asking
+                            you to get a subscription. With a subscription,
+                            you're also supporting the development of GDevelop,
+                            which is an open-source software maintained by
+                            volunteers in their free time.
                           </Trans>
                         </Text>
                       </Line>
@@ -301,7 +302,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                           <Trans>
                             Create a GDevelop account to continue. It's free and
                             you'll be able to access to online services like
-                            one-click build for Android:
+                            one-click builds:
                           </Trans>
                         </Text>
                         <RaisedButton

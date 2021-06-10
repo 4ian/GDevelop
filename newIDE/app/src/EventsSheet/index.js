@@ -82,7 +82,10 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { shouldCloseOrCancel } from '../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldApplyChangesField,
+} from '../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -581,7 +584,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       eventsSheetCancelInputParameterPopover
     ) {
       const { instruction, parameterIndex } = this.state.editedParameter;
-
+      
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
       instruction.setParameter(
         parameterIndex,

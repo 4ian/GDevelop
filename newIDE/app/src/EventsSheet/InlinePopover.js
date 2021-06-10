@@ -8,6 +8,7 @@ import {
   shouldCloseOrCancel,
   shouldFocusNextField,
   shouldFocusPreviousField,
+  shouldApplyChangesField
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const styles = {
@@ -36,6 +37,7 @@ type Props = {|
   anchorEl: ?HTMLElement,
   open: boolean,
   onRequestClose: () => void,
+  onChange: () => void,
 |};
 
 /**
@@ -85,6 +87,11 @@ export default function InlinePopover(props: Props) {
           // when showing autocompletion), which is fine.
           if (shouldCloseOrCancel(event)) {
             props.onRequestClose(event);
+          }
+
+          //
+          if (shouldApplyChangesField(event)) {
+            props.onChange(event);
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

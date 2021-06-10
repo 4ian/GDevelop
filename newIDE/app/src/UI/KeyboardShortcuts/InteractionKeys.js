@@ -43,3 +43,10 @@ export const shouldFocusNextField = (event: SupportedEvent) => {
 export const shouldFocusPreviousField = (event: SupportedEvent) => {
   return event.key === 'Tab' && event.shiftKey;
 };
+
+/**
+ * Check if the use want apply changes, used for inline popover in eventsheets
+ */
+export const shouldApplyChangesField = (event: SupportedEvent) => {
+  return event.key === 'Ctrl' && event.ctrlKey && event.key === 'Enter';
+};

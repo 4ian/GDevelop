@@ -55,6 +55,16 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           .SetGetter("getCellHeight");
       autConditions["PathfindingBehavior::CellHeight"].SetFunctionName(
           "getCellHeight");
+      autActions["PathfindingBehavior::SetGridOffsetX"]
+          .SetFunctionName("setGridOffsetX")
+          .SetGetter("getGridOffsetX");
+      autConditions["PathfindingBehavior::GridOffsetX"].SetFunctionName(
+          "getGridOffsetX");
+      autActions["PathfindingBehavior::SetGridOffsetY"]
+          .SetFunctionName("setGridOffsetY")
+          .SetGetter("getGridOffsetY");
+      autConditions["PathfindingBehavior::GridOffsetY"].SetFunctionName(
+          "getGridOffsetY");
       autActions["PathfindingBehavior::Acceleration"]
           .SetFunctionName("setAcceleration")
           .SetGetter("getAcceleration");
@@ -113,6 +123,8 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");
       autExpressions["CellWidth"].SetFunctionName("getCellWidth");
       autExpressions["CellHeight"].SetFunctionName("getCellHeight");
+      autExpressions["GridOffsetX"].SetFunctionName("getGridOffsetX");
+      autExpressions["GridOffsetY"].SetFunctionName("getGridOffsetY");
     }
 
     GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")

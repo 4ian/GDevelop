@@ -17,8 +17,10 @@ namespace gdjs {
     _angularMaxSpeed: float;
     _rotateObject: boolean;
     _angleOffset: float;
-    _cellWidth: integer;
-    _cellHeight: integer;
+    _cellWidth: float;
+    _cellHeight: float;
+    _gridOffsetX: float;
+    _gridOffsetY: float;
     _extraBorder: float;
 
     //Attributes used for traveling on the path:
@@ -52,9 +54,12 @@ namespace gdjs {
       this._angleOffset = behaviorData.angleOffset;
       this._cellWidth = behaviorData.cellWidth;
       this._cellHeight = behaviorData.cellHeight;
+      this._gridOffsetX = behaviorData.gridOffsetX || 0;
+      this._gridOffsetY = behaviorData.gridOffsetY || 0;
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.PathfindingObstaclesManager.getManager(runtimeScene);
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
+        this,
         this._manager
       );
     }
@@ -84,26 +89,48 @@ namespace gdjs {
       if (oldBehaviorData.cellHeight !== newBehaviorData.cellHeight) {
         this.setCellHeight(newBehaviorData.cellHeight);
       }
+      if (oldBehaviorData.gridOffsetX !== newBehaviorData.gridOffsetX) {
+        this._gridOffsetX = newBehaviorData.gridOffsetX;
+      }
+      if (oldBehaviorData.gridOffsetY !== newBehaviorData.gridOffsetY) {
+        this._gridOffsetY = newBehaviorData.gridOffsetY;
+      }
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this.setExtraBorder(newBehaviorData.extraBorder);
       }
       return true;
     }
 
-    setCellWidth(width: integer): void {
+    setCellWidth(width: float): void {
       this._cellWidth = width;
     }
 
-    getCellWidth(): integer {
+    getCellWidth(): float {
       return this._cellWidth;
     }
 
-    setCellHeight(height: integer): void {
+    setCellHeight(height: float): void {
       this._cellHeight = height;
     }
 
-    getCellHeight(): integer {
+    getCellHeight(): float {
       return this._cellHeight;
+    }
+
+    setGridOffsetX(gridOffsetX: float): void {
+      this._gridOffsetX = gridOffsetX;
+    }
+
+    getGridOffsetX(): float {
+      return this._gridOffsetX;
+    }
+
+    setGridOffsetY(gridOffsetY: float): void {
+      this._gridOffsetY = gridOffsetY;
+    }
+
+    getGridOffsetY(): float {
+      return this._gridOffsetY;
     }
 
     setAcceleration(acceleration: float): void {
@@ -275,10 +302,16 @@ namespace gdjs {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
-      const targetCellX = Math.round(x / this._cellWidth);
-      const targetCellY = Math.round(y / this._cellHeight);
-      const startCellX = Math.round(owner.getX() / this._cellWidth);
-      const startCellY = Math.round(owner.getY() / this._cellHeight);
+      const targetCellX = Math.round((x - this._gridOffsetX) / this._cellWidth);
+      const targetCellY = Math.round(
+        (y - this._gridOffsetY) / this._cellHeight
+      );
+      const startCellX = Math.round(
+        (owner.getX() - this._gridOffsetX) / this._cellWidth
+      );
+      const startCellY = Math.round(
+        (owner.getY() - this._gridOffsetY) / this._cellHeight
+      );
       if (startCellX == targetCellX && startCellY == targetCellY) {
         this._path.length = 0;
         this._path.push([owner.getX(), owner.getY()]);
@@ -311,8 +344,10 @@ namespace gdjs {
           if (finalPathLength === this._path.length) {
             this._path.push([0, 0]);
           }
-          this._path[finalPathLength][0] = node.pos[0] * this._cellWidth;
-          this._path[finalPathLength][1] = node.pos[1] * this._cellHeight;
+          this._path[finalPathLength][0] =
+            node.pos[0] * this._cellWidth + this._gridOffsetX;
+          this._path[finalPathLength][1] =
+            node.pos[1] * this._cellHeight + this._gridOffsetY;
           node = node.parent;
           finalPathLength++;
         }
@@ -446,11 +481,11 @@ namespace gdjs {
       parent: Node | null = null;
       open: boolean = true;
 
-      constructor(xPos: float, yPos: float) {
+      constructor(xPos: integer, yPos: integer) {
         this.pos = [xPos, yPos];
       }
 
-      reinitialize(xPos: float, yPos: float) {
+      reinitialize(xPos: integer, yPos: integer) {
         this.pos[0] = xPos;
         this.pos[1] = yPos;
         this.cost = 0;
@@ -477,6 +512,9 @@ namespace gdjs {
       _maxComplexityFactor: integer = 50;
       _cellWidth: float = 20;
       _cellHeight: float = 20;
+
+      _behavior: gdjs.PathfindingRuntimeBehavior;
+
       _leftBorder: integer = 0;
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
@@ -491,8 +529,12 @@ namespace gdjs {
       //Used by getNodes to temporarily store obstacles near a position.
       _nodeCache: Node[] = [];
 
-      constructor(obstacles: PathfindingObstaclesManager) {
+      constructor(
+        behavior: gdjs.PathfindingRuntimeBehavior,
+        obstacles: PathfindingObstaclesManager
+      ) {
         this._obstacles = obstacles;
+        this._behavior = behavior;
         this._distanceFunction = PathfindingRuntimeBehavior.euclideanDistance;
 
         //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
@@ -556,10 +598,18 @@ namespace gdjs {
           );
           return;
         }
-        this._destination[0] = Math.round(targetX / this._cellWidth);
-        this._destination[1] = Math.round(targetY / this._cellHeight);
-        this._start[0] = Math.round(this._startX / this._cellWidth);
-        this._start[1] = Math.round(this._startY / this._cellHeight);
+        this._destination[0] = Math.round(
+          (targetX - this._behavior._gridOffsetX) / this._cellWidth
+        );
+        this._destination[1] = Math.round(
+          (targetY - this._behavior._gridOffsetY) / this._cellHeight
+        );
+        this._start[0] = Math.round(
+          (this._startX - this._behavior._gridOffsetX) / this._cellWidth
+        );
+        this._start[1] = Math.round(
+          (this._startY - this._behavior._gridOffsetY) / this._cellHeight
+        );
 
         //Initialize the algorithm
         this._freeAllNodes();
@@ -679,7 +729,7 @@ namespace gdjs {
        * *All* nodes should be created using this method: The cost of the node is computed thanks
        * to the objects flagged as obstacles.
        */
-      _getNode(xPos: float, yPos: float): Node {
+      _getNode(xPos: integer, yPos: integer): Node {
         //First check if their is a node a the specified position.
         if (this._allNodes.hasOwnProperty(xPos)) {
           if (this._allNodes[xPos].hasOwnProperty(yPos)) {
@@ -698,6 +748,11 @@ namespace gdjs {
           newNode = new Node(xPos, yPos);
         }
 
+        const nodeCenterX =
+          xPos * this._cellWidth + this._behavior._gridOffsetX;
+        const nodeCenterY =
+          yPos * this._cellHeight + this._behavior._gridOffsetY;
+
         //...and update its cost according to obstacles
         let objectsOnCell = false;
         const radius =
@@ -705,25 +760,37 @@ namespace gdjs {
             ? this._cellHeight * 2
             : this._cellWidth * 2;
         this._obstacles.getAllObstaclesAround(
-          xPos * this._cellWidth,
-          yPos * this._cellHeight,
+          nodeCenterX,
+          nodeCenterY,
           radius,
           this._closeObstacles
         );
         for (let k = 0; k < this._closeObstacles.length; ++k) {
           const obj = this._closeObstacles[k].owner;
           const topLeftCellX = Math.floor(
-            (obj.getDrawableX() - this._rightBorder) / this._cellWidth
+            (obj.getDrawableX() -
+              this._rightBorder -
+              this._behavior._gridOffsetX) /
+              this._cellWidth
           );
           const topLeftCellY = Math.floor(
-            (obj.getDrawableY() - this._bottomBorder) / this._cellHeight
+            (obj.getDrawableY() -
+              this._bottomBorder -
+              this._behavior._gridOffsetY) /
+              this._cellHeight
           );
           const bottomRightCellX = Math.ceil(
-            (obj.getDrawableX() + obj.getWidth() + this._leftBorder) /
+            (obj.getDrawableX() +
+              obj.getWidth() +
+              this._leftBorder -
+              this._behavior._gridOffsetX) /
               this._cellWidth
           );
           const bottomRightCellY = Math.ceil(
-            (obj.getDrawableY() + obj.getHeight() + this._topBorder) /
+            (obj.getDrawableY() +
+              obj.getHeight() +
+              this._topBorder -
+              this._behavior._gridOffsetY) /
               this._cellHeight
           );
           if (
@@ -733,14 +800,12 @@ namespace gdjs {
             yPos < bottomRightCellY
           ) {
             objectsOnCell = true;
-
-            //The cell is impassable, stop here.
-
-            //Superimpose obstacles
             if (this._closeObstacles[k].isImpassable()) {
+              //The cell is impassable, stop here.
               newNode.cost = -1;
               break;
             } else {
+              //Superimpose obstacles
               newNode.cost += this._closeObstacles[k].getCost();
             }
           }
@@ -758,8 +823,8 @@ namespace gdjs {
        * Add a node to the openNodes (only if the cost to reach it is less than the existing cost, if any).
        */
       _addOrUpdateNode(
-        newNodeX: float,
-        newNodeY: float,
+        newNodeX: integer,
+        newNodeY: integer,
         currentNode: Node,
         factor: float
       ) {

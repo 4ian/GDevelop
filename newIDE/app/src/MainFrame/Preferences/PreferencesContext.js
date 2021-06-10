@@ -186,6 +186,7 @@ export type PreferencesValues = {|
   isMenuBarHiddenInPreview: boolean,
   isAlwaysOnTopInPreview: boolean,
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
+  eventsSheetCancelInputParameterPopover: boolean,
 |};
 
 /**
@@ -240,6 +241,7 @@ export type Preferences = {|
   setBackdropClickBehavior: (value: string) => void,
   getIsAlwaysOnTopInPreview: () => boolean,
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
+  setEventsSheetCancelInputParameterPopover: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -273,6 +275,7 @@ export const initialPreferences = {
     isMenuBarHiddenInPreview: true,
     isAlwaysOnTopInPreview: true,
     backdropClickBehavior: 'nothing',
+    eventsSheetCancelInputParameterPopover: false,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -317,6 +320,7 @@ export const initialPreferences = {
   setBackdropClickBehavior: () => {},
   getIsAlwaysOnTopInPreview: () => true,
   setIsAlwaysOnTopInPreview: () => {},
+  setEventsSheetCancelInputParameterPopover: () => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

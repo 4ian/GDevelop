@@ -557,6 +557,8 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   openParameterEditor = (parameterContext: ParameterContext) => {
+    const { instruction, parameterIndex } = parameterContext;
+
     // $FlowFixMe
     this.setState({
       editedParameter: parameterContext,
@@ -565,17 +567,22 @@ export default class EventsSheet extends React.Component<Props, State> {
         ? parameterContext.domEvent.currentTarget
         : null,
       inlineEditingChangesMade: false,
+      inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
     });
   };
 
-  closeParameterEditor = (event: SyntheticKeyboardEvent<HTMLInputElement>) => {
-    if (event && shouldCloseOrCancel(event)) {
+  closeParameterEditor = (
+    event: SyntheticKeyboardEvent<HTMLInputElement>,
+    eventsSheetCancelInputParameterPopover: boolean
+  ) => {
+    if (
+      event &&
+      shouldCloseOrCancel(event) &&
+      eventsSheetCancelInputParameterPopover
+    ) {
       const { instruction, parameterIndex } = this.state.editedParameter;
+
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
-      // TODO
-      // first press on Escape isn't working, the state inlineEditingPreviousValue in undefined, the next are correct.
-      // Somewhere the state isn't correctly updated i guess.
-      console.log('Cancel changes:' + this.state.inlineEditingPreviousValue);
       instruction.setParameter(
         parameterIndex,
         this.state.inlineEditingPreviousValue
@@ -1162,7 +1169,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={event => {
-                            this.closeParameterEditor(event);
+                            this.closeParameterEditor(
+                              event,
+                              values.eventsSheetCancelInputParameterPopover
+                            );
                           }}
                           project={project}
                           scope={scope}

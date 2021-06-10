@@ -51,6 +51,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
     setIsAlwaysOnTopInPreview,
+    setEventsSheetCancelInputParameterPopover,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -257,6 +258,21 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 <Trans>
                   Suggest names of variables used in events but not declared in
                   the list of variables
+                </Trans>
+              }
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) =>
+                setEventsSheetCancelInputParameterPopover(check)
+              }
+              toggled={values.eventsSheetCancelInputParameterPopover}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Use Escape for cancel changes on inline parameter, CTRL+ENTER
+                  for apply
                 </Trans>
               }
             />

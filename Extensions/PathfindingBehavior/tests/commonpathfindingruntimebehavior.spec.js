@@ -188,7 +188,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     });
   };
 
-  ['Legacy'].forEach((collisionMethod) => {
+  ['Legacy', 'AABB', 'HitBoxes'].forEach((collisionMethod) => {
     describe(`(collisionMethod: ${collisionMethod}, `, function () {
       [false, true].forEach((allowDiagonals) => {
         describe(`(allowDiagonals: ${allowDiagonals})`, function () {

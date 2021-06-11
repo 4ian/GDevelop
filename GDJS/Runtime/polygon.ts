@@ -476,5 +476,27 @@ namespace gdjs {
         farSqDist: 0,
       },
     };
+
+    /**
+     * Clone all the vertices of the given polygon so a change on the clone
+     * won't affect the original.
+     *
+     * @param polygon The polygon to clone
+     * @return the cloned polygon
+     */
+    static deepClone(polygon: gdjs.Polygon): gdjs.Polygon {
+      const copyPolygon = new gdjs.Polygon();
+      const copyVertices = new Array<FloatPoint>(polygon.vertices.length);
+      for (let vi = 0; vi < polygon.vertices.length; ++vi) {
+        const coords = polygon.vertices[vi];
+        const copyCoords: FloatPoint = [0, 0];
+        for (let ci = 0; ci < coords.length; ++ci) {
+          copyCoords[ci] = coords[ci];
+        }
+        copyVertices[vi] = copyCoords;
+      }
+      copyPolygon.vertices = copyVertices;
+      return copyPolygon;
+    }
   }
 }

@@ -55,15 +55,15 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           .SetGetter("getCellHeight");
       autConditions["PathfindingBehavior::CellHeight"].SetFunctionName(
           "getCellHeight");
-      autActions["PathfindingBehavior::SetGridOffsetX"]
+      autActions["PathfindingBehavior::PathfindingBehavior::SetGridOffsetX"]
           .SetFunctionName("setGridOffsetX")
           .SetGetter("getGridOffsetX");
-      autConditions["PathfindingBehavior::GridOffsetX"].SetFunctionName(
+      autConditions["PathfindingBehavior::PathfindingBehavior::GridOffsetX"].SetFunctionName(
           "getGridOffsetX");
-      autActions["PathfindingBehavior::SetGridOffsetY"]
+      autActions["PathfindingBehavior::PathfindingBehavior::SetGridOffsetY"]
           .SetFunctionName("setGridOffsetY")
           .SetGetter("getGridOffsetY");
-      autConditions["PathfindingBehavior::GridOffsetY"].SetFunctionName(
+      autConditions["PathfindingBehavior::PathfindingBehavior::GridOffsetY"].SetFunctionName(
           "getGridOffsetY");
       autActions["PathfindingBehavior::Acceleration"]
           .SetFunctionName("setAcceleration")

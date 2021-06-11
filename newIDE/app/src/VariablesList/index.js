@@ -140,7 +140,7 @@ export default class VariablesList extends React.Component<Props, State> {
 
     // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
     // that's why it's important to only delete ancestor variables.
-    ancestorOnlyVariables.forEach(({ name, variable }: VariableAndName) =>
+    ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
       variablesContainer.removeRecursively(variable)
     );
     this.clearSelection();

@@ -454,6 +454,14 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   value="trueorfalse"
                                   primaryText={t`True or False (boolean)`}
                                 />
+                                <SelectOption
+                                  value="objectPointName"
+                                  primaryText={t`Object point (text)`}
+                                />
+                                <SelectOption
+                                  value="objectAnimationName"
+                                  primaryText={t`Object animation (text)`}
+                                />
                               </SelectField>
                             )}
                             {gd.ParameterMetadata.isObject(

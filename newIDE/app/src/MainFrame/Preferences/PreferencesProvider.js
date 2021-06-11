@@ -238,7 +238,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  /**----- set BOUH */
   _setEventsSheetCancelInputParameterPopover(
     eventsSheetCancelInputParameterPopover: boolean
   ) {

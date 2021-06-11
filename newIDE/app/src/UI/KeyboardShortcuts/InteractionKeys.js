@@ -45,8 +45,8 @@ export const shouldFocusPreviousField = (event: SupportedEvent) => {
 };
 
 /**
- * Check if the use want apply changes, used for inline popover in eventsheets
+ * Check if the user want apply changes, used for inline popover in eventsheets
  */
-export const shouldApplyChangesField = (event: SupportedEvent) => {
-  return event.key === 'Ctrl' && event.ctrlKey && event.key === 'Enter';
+export const shouldSubmit = (event: SupportedEvent) => {
+  return (event.metaKey || event.ctrlKey) && event.key === 'Enter';
 };

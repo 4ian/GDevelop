@@ -8,7 +8,7 @@ import {
   shouldCloseOrCancel,
   shouldFocusNextField,
   shouldFocusPreviousField,
-  shouldApplyChangesField
+  shouldSubmit,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const styles = {
@@ -37,7 +37,6 @@ type Props = {|
   anchorEl: ?HTMLElement,
   open: boolean,
   onRequestClose: () => void,
-  onChange: () => void,
 |};
 
 /**
@@ -85,13 +84,15 @@ export default function InlinePopover(props: Props) {
           // Note that the content of the popover can capture the event
           // and stop its propagation (for example, the GenericExpressionField
           // when showing autocompletion), which is fine.
+
+          // When the event match with Escape key changes are canceled.
           if (shouldCloseOrCancel(event)) {
             props.onRequestClose(event);
           }
 
-          //
-          if (shouldApplyChangesField(event)) {
-            props.onChange(event);
+          // When event match with ctrlOrCmd + Enter changes are applied.
+          if (shouldSubmit(event)) {
+            props.onRequestClose();
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

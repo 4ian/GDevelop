@@ -82,10 +82,6 @@ import InfoBar from '../UI/Messages/InfoBar';
 import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import {
-  shouldCloseOrCancel,
-  shouldApplyChangesField,
-} from '../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -576,15 +572,11 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   closeParameterEditor = (
     event: SyntheticKeyboardEvent<HTMLInputElement>,
-    eventsSheetCancelInputParameterPopover: boolean
+    peferenceEventsSheetCancelInputParameterPopover: boolean
   ) => {
-    if (
-      event &&
-      shouldCloseOrCancel(event) &&
-      eventsSheetCancelInputParameterPopover
-    ) {
+    if (event && peferenceEventsSheetCancelInputParameterPopover) {
       const { instruction, parameterIndex } = this.state.editedParameter;
-      
+
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
       instruction.setParameter(
         parameterIndex,

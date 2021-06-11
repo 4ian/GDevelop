@@ -66,6 +66,15 @@ class GD_CORE_API ExpressionParser2 {
     return Start(type, objectName);
   }
 
+  /**
+   * Given an object name (or empty if none) and a behavior name (or empty if none),
+   * return the index of the first parameter that is inside the parenthesis: 
+   * 0, 1 or 2.
+   * 
+   * For example, in an expression like `Object.MyBehavior::Method("hello")`, the
+   * parameter "hello" is the second parameter (the first being by convention Object,
+   * and the second MyBehavior, also by convention).
+   */
   static size_t WrittenParametersFirstIndex(const gd::String &objectName,
                                             const gd::String &behaviorName) {
     // By convention, object is always the first parameter, and behavior the

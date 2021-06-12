@@ -882,36 +882,36 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceX",
-                    _("X coordinate of the forces sum"),
-                    _("X coordinate of the forces sum"),
+                    _("X coordinate of the sum of forces"),
+                    _("X coordinate of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceY",
-                    _("Y coordinate of the forces sum"),
-                    _("Y coordinate of the forces sum"),
+                    _("Y coordinate of the sum of forces"),
+                    _("Y coordinate of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceAngle",
-                    _("Angle of the forces sum"),
-                    _("Angle of the forces sum"),
+                    _("Angle of the sum of forces"),
+                    _("Angle of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("ForceLength",
-                    _("Length of the forces sum"),
-                    _("Length of the forces sum"),
+                    _("Length of the sum of forces"),
+                    _("Length of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"));
 
   obj.AddExpression("Longueur",
-                    _("Average length of the forces"),
-                    _("Average length of the forces"),
+                    _("Length of the sum of forces"),
+                    _("Length of the sum of forces"),
                     _("Movement using forces"),
                     "res/actions/force.png")
       .AddParameter("object", _("Object"))

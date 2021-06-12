@@ -25,6 +25,7 @@ void Object::Init(const gd::Object& object) {
   type = object.type;
   objectVariables = object.objectVariables;
   tags = object.tags;
+  effectsContainer = object.effectsContainer;
 
   behaviors.clear();
   for (auto& it : object.behaviors) {

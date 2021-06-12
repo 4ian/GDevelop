@@ -12,6 +12,7 @@
 #include "GDCore/Project/EffectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/Object.h"
 
 namespace gd {
 
@@ -32,6 +33,15 @@ void ExposeProjectEffects(
         auto& effect = effects.GetEffect(e);
         worker(effect);
       }
+    }
+  }
+
+  // Add object effects
+  for (std::size_t s = 0; s < project.GetObjectsCount(); s++) {
+    auto& effects = project.GetObject(s).GetEffects();
+    for (std::size_t e = 0; e < effects.GetEffectsCount(); e++) {
+      auto& effect = effects.GetEffect(e);
+      worker(effect);
     }
   }
 }

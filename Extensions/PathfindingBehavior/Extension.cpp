@@ -215,8 +215,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Speed",
-                     _("Speed"),
-                     _("Compare the speed of the object on the path"),
+                     _("Speed on its path"),
+                     _("Compare the speed of the object on its path."),
                      _("the speed"),
                      _("Path"),
                      "CppPlatform/Extensions/AStaricon24.png",
@@ -229,9 +229,9 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddScopedCondition("MovementAngleIsAround",
-                          _("Angle of movement"),
-                          _("Compare the angle of displacement of an object"),
-                          _("Angle of displacement of _PARAM0_ is _PARAM2_ (tolerance "
+                          _("Angle of movement on its path"),
+                          _("Compare the angle of movement of an object on its path."),
+                          _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
                               ": _PARAM3_ degrees)"),
                           _("Path"),
                          "CppPlatform/Extensions/AStaricon24.png",
@@ -240,9 +240,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("expression", _("Angle, in degrees"))
-        .AddParameter("expression", _("Tolerance"))
-        .SetFunctionName("MovementAngleIsAround")
-        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+        .AddParameter("expression", _("Tolerance, in degrees"));
 
     aut.AddAction("AngularMaxSpeed",
                   _("Angular maximum speed"),
@@ -576,14 +574,12 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("MovementAngle",
-                    _("Angle of movement"),
-                    _("Angle of displacement of an object"),
+                    _("Angle of movement on its path"),
+                    _("Angle of movement on its path"),
                     _("Path"),
                     "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
-        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
-        .SetFunctionName("GetMovementAngle")
-        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior");
 
     aut.AddExpressionAndConditionAndAction("number",
                       "GridOffsetX",

@@ -163,7 +163,7 @@ namespace gdjs {
     }
 
     movementAngleIsAround(degreeAngle: float, tolerance: float) {
-      return Math.abs((this._movementAngle - degreeAngle) % 360) <= tolerance;
+      return gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle) <= tolerance;
     }
 
     setAngularMaxSpeed(angularMaxSpeed: float): void {

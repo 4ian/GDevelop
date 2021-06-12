@@ -44,6 +44,8 @@ export type CommandName =
   | 'EDIT_LAYER'
   | 'EDIT_NETWORK_PREVIEW'
   | 'EDIT_OBJECT'
+  | 'EDIT_OBJECT_BEHAVIORS'
+  | 'EDIT_OBJECT_EFFECTS'
   | 'EDIT_OBJECT_VARIABLES'
   | 'EDIT_OBJECT_GROUP'
   | 'ADD_STANDARD_EVENT'
@@ -246,6 +248,14 @@ const commandsList: { [CommandName]: CommandMetadata } = {
 
   // Objects list commands
   EDIT_OBJECT: { area: 'SCENE', displayText: t`Edit object...` },
+  EDIT_OBJECT_BEHAVIORS: {
+    area: 'SCENE',
+    displayText: t`Edit object behaviors...`,
+  },
+  EDIT_OBJECT_EFFECTS: {
+    area: 'SCENE',
+    displayText: t`Edit object effects...`,
+  },
   EDIT_OBJECT_VARIABLES: {
     area: 'SCENE',
     displayText: t`Edit object variables...`,

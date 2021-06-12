@@ -42,6 +42,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
+  initialTab: ?string,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -56,7 +57,9 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
-  const [currentTab, setCurrentTab] = React.useState('properties');
+  const [currentTab, setCurrentTab] = React.useState(
+    props.initialTab || 'properties'
+  );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
@@ -251,7 +254,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
   }
 
   render() {
-    const { object } = this.props;
+    const { object, initialTab } = this.props;
     const { editorComponent, castToObjectType, helpPagePath } = this.state;
 
     if (!object || !castToObjectType) return null;
@@ -264,6 +267,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         helpPagePath={helpPagePath}
         object={castToObjectType(object)}
         objectName={this.state.objectName}
+        initialTab={initialTab}
       />
     );
   }

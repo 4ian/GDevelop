@@ -228,6 +228,22 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetSpeed")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
+    aut.AddScopedCondition("MovementAngleIsAround",
+                          _("Angle of movement"),
+                          _("Compare the angle of displacement of an object"),
+                          _("Angle of displacement of _PARAM0_ is _PARAM2_ (tolerance "
+                              ": _PARAM3_ degrees)"),
+                          _("Path"),
+                         "CppPlatform/Extensions/AStaricon24.png",
+                         "CppPlatform/Extensions/AStaricon16.png")
+
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
+        .AddParameter("expression", _("Angle, in degrees"))
+        .AddParameter("expression", _("Tolerance"))
+        .SetFunctionName("MovementAngleIsAround")
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+
     aut.AddAction("AngularMaxSpeed",
                   _("Angular maximum speed"),
                   _("Change the maximum angular speed when moving the object"),
@@ -559,13 +575,23 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCellHeight")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
+    aut.AddExpression("MovementAngle",
+                    _("Angle of movement"),
+                    _("Angle of displacement of an object"),
+                    _("Path"),
+                    "CppPlatform/Extensions/AStaricon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
+        .SetFunctionName("GetMovementAngle")
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+
     aut.AddExpressionAndConditionAndAction("number",
                       "GridOffsetX",
                       _("Grid X offset"),
                       _("X offset of the virtual grid"),
                       _("X offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number");
@@ -576,7 +602,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Y offset of the virtual grid"),
                       _("Y offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number");

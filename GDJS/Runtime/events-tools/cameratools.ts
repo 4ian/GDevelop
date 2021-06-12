@@ -357,23 +357,15 @@ namespace gdjs {
         layerName: string,
         rgbColor: string
       ) {
-        if (!runtimeScene.hasLayer(layerName)) {
+        if (
+          !rgbColor ||
+          !runtimeScene.hasLayer(layerName) ||
+          !runtimeScene.getLayer(layerName).isLightingLayer()
+        ) {
           return;
         }
-        if (!runtimeScene.getLayer(layerName).isLightingLayer()) {
-          return;
-        }
-        const colors = rgbColor.split(';');
-        if (colors.length < 3) {
-          return;
-        }
-        return runtimeScene
-          .getLayer(layerName)
-          .setClearColor(
-            parseInt(colors[0]),
-            parseInt(colors[1]),
-            parseInt(colors[2])
-          );
+
+        return runtimeScene.getLayer(layerName).setClearColor(rgbColor);
       };
     }
   }

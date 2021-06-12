@@ -490,24 +490,16 @@ namespace gdjs {
 
     /**
      * Set the clear color in format [r, g, b], with components in the range of 0 to 1.;
-     * @param r Red color component in the range 0-255.
-     * @param g Green color component in the range 0-255.
-     * @param b Blue color component in the range 0-255.
+     * @param rgbColor The color, in RGB format ("128;200;255").
      */
-    setClearColor(
-      r: integer | null,
-      g: integer | null,
-      b: integer | null
-    ): void {
-      if (r) {
-        this._clearColor[0] = r / 255;
-      }
-      if (g) {
-        this._clearColor[1] = g / 255;
-      }
-      if (b) {
-        this._clearColor[2] = b / 255;
-      }
+    setClearColor(rgbColor: string): void {
+      const splitValue = rgbColor.split(';');
+      if (splitValue.length !== 3) return;
+
+      this._clearColor[0] = parseInt(splitValue[0], 10) / 255;
+      this._clearColor[1] = parseInt(splitValue[1], 10) / 255;
+      this._clearColor[2] = parseInt(splitValue[2], 10) / 255;
+
       this._renderer.updateClearColor();
     }
 

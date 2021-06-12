@@ -79,6 +79,8 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           .SetFunctionName("setSpeed")
           .SetGetter("getSpeed");
       autConditions["PathfindingBehavior::Speed"].SetFunctionName("getSpeed");
+      autConditions["PathfindingBehavior::PathfindingBehavior::MovementAngleIsAround"]
+          .SetFunctionName("movementAngleIsAround");
       autActions["PathfindingBehavior::AngularMaxSpeed"]
           .SetFunctionName("setAngularMaxSpeed")
           .SetGetter("getAngularMaxSpeed");
@@ -118,6 +120,7 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["Acceleration"].SetFunctionName("getAcceleration");
       autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
       autExpressions["Speed"].SetFunctionName("getSpeed");
+      autExpressions["MovementAngle"].SetFunctionName("getMovementAngle");
       autExpressions["AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
       autExpressions["AngleOffset"].SetFunctionName("getAngleOffset");
       autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");

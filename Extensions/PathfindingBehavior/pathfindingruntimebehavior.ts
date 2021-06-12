@@ -34,6 +34,8 @@ namespace gdjs {
     _manager: PathfindingObstaclesManager;
     _searchContext: PathfindingRuntimeBehavior.SearchContext;
 
+    _movementAngle: float = 0;
+
     constructor(
       runtimeScene: gdjs.RuntimeScene,
       behaviorData,
@@ -154,6 +156,14 @@ namespace gdjs {
 
     getSpeed() {
       return this._speed;
+    }
+
+    getMovementAngle() {
+      return this._movementAngle;
+    }
+
+    movementAngleIsAround(degreeAngle: float, tolerance: float) {
+      return gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle) <= tolerance;
     }
 
     setAngularMaxSpeed(angularMaxSpeed: float): void {
@@ -379,6 +389,7 @@ namespace gdjs {
         this._totalSegmentTime = Math.sqrt(pathX * pathX + pathY * pathY);
         this._timeOnSegment = 0;
         this._reachedEnd = false;
+        this._movementAngle = (Math.atan2(pathY, pathX) * 180 / Math.PI + 360) % 360;
       } else {
         this._reachedEnd = true;
         this._speed = 0;

@@ -510,8 +510,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("AngleOfDisplacement",
                    _("Angle of movement (using forces)"),
-                   _("Compare the angle of movement of an object using forces."
-                     " according to the forces."),
+                   _("Compare the angle of movement of an object according to the forces applied on it."),
                    _("Angle of movement of _PARAM0_ is _PARAM1_ (tolerance"
                      ": _PARAM2_ degrees)"),
                    _("Movement using forces"),
@@ -1167,7 +1166,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     "res/conditions/sedirige.png")
       .AddParameter("objectList", _("Object"))
       .AddParameter("objectList", _("Object 2"))
-      .AddParameter("expression", _("Angle of tolerance in degrees"))
+      .AddParameter("expression", _("Tolerance, in degrees"))
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
 

@@ -70,6 +70,9 @@ namespace gdjs {
     //Variables:
     protected _variables: gdjs.VariablesContainer;
 
+    //Effects:
+    protected _effects: EffectData[];
+
     //Forces:
     protected _forces: gdjs.Force[] = [];
     _averageForce: gdjs.Force;
@@ -98,6 +101,7 @@ namespace gdjs {
       );
       this._averageForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
+      this._effects = objectData.effects;
 
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
@@ -123,6 +127,14 @@ namespace gdjs {
       for (let i = 0; i < this._behaviors.length; ++i) {
         this._behaviors[i].onCreated();
       }
+
+      const objectEffectsManager = this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager();
+      objectEffectsManager.initializeEffects(
+        this,
+        this._effects
+      );
     }
 
     /**

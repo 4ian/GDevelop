@@ -14,7 +14,7 @@ namespace gdjs {
       return arr.indexOf(value) !== -1 ? value : min;
     };
 
-    const _filterCreators: {
+    export const _filterCreators: {
       [filterName: string]: FilterCreator;
     } = {};
 
@@ -88,7 +88,7 @@ namespace gdjs {
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
     export type FilterCreator = {
       /** Function to call to create the filter */
-      makePIXIFilter: (layer: gdjs.Layer, effectData: EffectData) => any;
+      makePIXIFilter: (layer: gdjs.Layer | gdjs.RuntimeObject, effectData: EffectData) => any;
       /** The function to be called to update the filter at every frame */
       update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
       /** The function to be called to update a parameter (with a number) */

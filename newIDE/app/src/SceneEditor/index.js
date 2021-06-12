@@ -133,6 +133,7 @@ type State = {|
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
   editedObjectWithContext: ?ObjectWithContext,
+  editedObjectInitialTab: ?string,
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
@@ -184,6 +185,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedLayer: null,
       editedLayerInitialTab: 'properties',
       editedObjectWithContext: null,
+      editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
@@ -361,7 +363,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = (editedObject: ?gdObject) => {
+  editObject = (editedObject: ?gdObject, initialTab: ?string) => {
     const { project } = this.props;
     if (editedObject) {
       this.setState({
@@ -369,10 +371,12 @@ export default class SceneEditor extends React.Component<Props, State> {
           object: editedObject,
           global: project.hasObjectNamed(editedObject.getName()),
         },
+        editedObjectInitialTab: initialTab || 'properties',
       });
     } else {
       this.setState({
         editedObjectWithContext: null,
+        editedObjectInitialTab: 'properties',
       });
     }
   };
@@ -1168,6 +1172,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           <ObjectEditorDialog
             open
             object={this.state.editedObjectWithContext.object}
+            initialTab={this.state.editedObjectInitialTab}
             project={project}
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}

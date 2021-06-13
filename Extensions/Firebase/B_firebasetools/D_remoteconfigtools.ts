@@ -10,7 +10,8 @@ namespace gdjs {
          * Set the interval between auto-config updates.
          */
         export const setAutoUpdateInterval = (interval: integer) => {
-          firebase.remoteConfig().settings.minimumFetchIntervalMillis = interval;
+          firebase.remoteConfig().settings.minimumFetchIntervalMillis =
+            interval;
         };
 
         /**
@@ -18,9 +19,7 @@ namespace gdjs {
          * @param variable - A structure defining the default variables.
          */
         export const setDefaultConfig = (variable: gdjs.Variable) => {
-          firebase.remoteConfig().defaultConfig = JSON.parse(
-            gdjs.evtTools.network.variableStructureToJSON(variable)
-          );
+          firebase.remoteConfig().defaultConfig = variable.toJSObject();
         };
 
         gdjs.evtTools.firebaseTools.onAppCreated.push(() => {

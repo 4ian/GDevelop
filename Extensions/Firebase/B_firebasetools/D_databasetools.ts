@@ -20,11 +20,7 @@ namespace gdjs {
           firebase
             .database()
             .ref(path)
-            .set(
-              JSON.parse(
-                gdjs.evtTools.network.variableStructureToJSON(variable)
-              )
-            )
+            .set(variable.toJSObject())
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -76,11 +72,7 @@ namespace gdjs {
           firebase
             .database()
             .ref(path)
-            .update(
-              JSON.parse(
-                gdjs.evtTools.network.variableStructureToJSON(variable)
-              )
-            )
+            .update(variable.toJSObject())
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -190,10 +182,7 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                gdjs.evtTools.network._objectToVariable(
-                  snapshot.val(),
-                  callbackValueVariable
-                );
+                callbackValueVariable.fromJSObject(snapshot.val());
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')
@@ -223,10 +212,7 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                gdjs.evtTools.network._objectToVariable(
-                  snapshot.val()[field],
-                  callbackValueVariable
-                );
+                callbackValueVariable.fromJSObject(snapshot.val()[field]);
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')

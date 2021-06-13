@@ -101,6 +101,102 @@ namespace gdjs {
     }
 
     /**
+     * Converts a JavaScript object into a value compatible
+     * with GDevelop variables and store it inside this variable.
+     * @param obj - The value to convert.
+     */
+    fromJSObject(obj: any): this {
+      if (obj === null) {
+        this.setString('null');
+      } else if (typeof obj === 'number') {
+        if (Number.isNaN(obj)) {
+          console.warn('Variables cannot be set to NaN, setting it to 0.');
+          this.setNumber(0);
+        } else {
+          this.setNumber(obj);
+        }
+      } else if (typeof obj === 'string') {
+        this.setString(obj);
+      } else if (typeof obj === 'undefined') {
+        // Do not modify the variable, as there is no value to set it to.
+      } else if (typeof obj === 'boolean') {
+        this.setBoolean(obj);
+      } else if (Array.isArray(obj)) {
+        this.castTo('array');
+        this.clearChildren();
+        for (const i in obj) this.getChild(i).fromJSObject(obj[i]);
+      } else if (typeof obj === 'object') {
+        this.castTo('structure');
+        this.clearChildren();
+        for (var p in obj)
+          if (obj.hasOwnProperty(p)) this.getChild(p).fromJSObject(obj[p]);
+      } else if (typeof obj === 'symbol') {
+        this.setString(obj.toString());
+      } else if (typeof obj === 'bigint') {
+        if (obj > Number.MAX_SAFE_INTEGER)
+          console.warn(
+            'Integers bigger than ' +
+              Number.MAX_SAFE_INTEGER +
+              " aren't supported by GDevelop variables, it will be reduced to that size."
+          );
+        // @ts-ignore
+        variable.setNumber(parseInt(obj, 10));
+      } else if (typeof obj === 'function') {
+        console.error('Error: Impossible to set variable value to a function.');
+      } else {
+        console.error('Cannot identify type of object:', obj);
+      }
+      return this;
+    }
+
+    /**
+     * Unserialize JSON into this variable.
+     * @param json - A JSON string.
+     */
+    fromJSON(json: string): this {
+      try {
+        var obj = JSON.parse(json);
+      } catch (e) {
+        console.error('Unable to parse JSON: ', json, e);
+        return this;
+      }
+      this.fromJSObject(obj);
+      return this;
+    }
+
+    /**
+     * Converts this variable into an equivalent JavaScript object.
+     * @returns A JavaScript object equivalent to the variable.
+     */
+    toJSObject(): any {
+      switch (this._type) {
+        case 'string':
+          return this.getAsString();
+        case 'number':
+          return this.getAsNumber();
+        case 'boolean':
+          return this.getAsBoolean();
+        case 'structure':
+          const obj = {};
+          for (const name in this._children)
+            obj[name] = this._children[name].toJSObject();
+          return obj;
+        case 'array':
+          const arr: any[] = [];
+          for (const item of this._childrenArray) arr.push(item.toJSObject());
+          return arr;
+      }
+    }
+
+    /**
+     * Converts this variable to JSON.
+     * @returns A JSON representation of the variable.
+     */
+    toJSON(): string {
+      return JSON.stringify(this.toJSObject());
+    }
+
+    /**
      * Return true if the type of the variable is a primitive type.
      */
     isPrimitive() {

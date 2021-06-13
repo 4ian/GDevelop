@@ -318,11 +318,7 @@ namespace gdjs {
         eventName: string,
         variable: gdjs.Variable
       ) => {
-        sendDataTo(
-          id,
-          eventName,
-          gdjs.evtTools.network.variableStructureToJSON(variable)
-        );
+        sendDataTo(id, eventName, variable.toJSON());
       };
 
       /**
@@ -334,10 +330,7 @@ namespace gdjs {
         eventName: string,
         variable: gdjs.Variable
       ) => {
-        sendDataToAll(
-          eventName,
-          gdjs.evtTools.network.variableStructureToJSON(variable)
-        );
+        sendDataToAll(eventName, variable.toJSON());
       };
 
       /**
@@ -364,10 +357,7 @@ namespace gdjs {
         eventName: string,
         variable: gdjs.Variable
       ) => {
-        gdjs.evtTools.network.jsonToVariableStructure(
-          getEventData(eventName),
-          variable
-        );
+        variable.fromJSON(getEventData(eventName));
       };
 
       /**

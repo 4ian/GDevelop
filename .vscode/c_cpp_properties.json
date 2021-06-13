@@ -1,104 +1,98 @@
 {
-    "configurations": [
-        {
-            "name": "Mac",
-            "includePath": [
-                "${workspaceRoot}",
-                "${workspaceRoot}/GDCpp",
-                "${workspaceRoot}/GDJS",
-                "${workspaceRoot}/Extensions",
-                "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                "/usr/local/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/usr/include",
-                "${workspaceRoot}"
-            ],
-            "defines": [
-                "GD_IDE_ONLY",
-                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "browse": {
-                "path": [
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                    "/usr/local/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                    "/usr/include",
-                    "${workspaceRoot}"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            },
-            "macFrameworkPath": [
-                "/System/Library/Frameworks",
-                "/Library/Frameworks"
-            ],
-            "compilerPath": "/usr/bin/clang",
-            "cStandard": "c11",
-            "cppStandard": "c++17"
-        },
-        {
-            "name": "Linux",
-            "includePath": [
-                "${workspaceRoot}",
-                "${workspaceRoot}/GDCpp",
-                "${workspaceRoot}/GDJS",
-                "${workspaceRoot}/Extensions",
-                "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
-                "/usr/include",
-                "/usr/local/include",
-                "${workspaceRoot}"
-            ],
-            "defines": [
-                "GD_IDE_ONLY",
-                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "browse": {
-                "path": [
-                    "/usr/include",
-                    "/usr/local/include",
-                    "${workspaceRoot}"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            }
-        },
-        {
-            "name": "Win32",
-            "includePath": [
-                "${workspaceRoot}",
-                "${workspaceRoot}/GDCpp",
-                "${workspaceRoot}/GDJS",
-                "${workspaceRoot}/Extensions",
-                "${workspaceRoot}/Core",
-                "${workspaceRoot}/ExtLibs/SFML/include",
-                "${workspaceRoot}"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "GD_IDE_ONLY",
-                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_API=/* Macro used to export classes on Windows, please ignore */",
-                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
-            ],
-            "intelliSenseMode": "msvc-x64",
-            "browse": {
-                "path": [
-                    "${workspaceRoot}"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            }
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "Mac",
+      "includePath": [
+        "${workspaceRoot}",
+        "${workspaceRoot}/GDCpp",
+        "${workspaceRoot}/GDJS",
+        "${workspaceRoot}/Extensions",
+        "${workspaceRoot}/Core",
+        "${workspaceRoot}/ExtLibs/SFML/include",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+        "/usr/local/include",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+        "/usr/include",
+        "${workspaceRoot}"
+      ],
+      "defines": [
+        "EMSCRIPTEN",
+        "GD_IDE_ONLY",
+        "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
+      ],
+      "intelliSenseMode": "clang-x64",
+      "browse": {
+        "path": [
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+          "/usr/local/include",
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+          "/usr/include",
+          "${workspaceRoot}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      },
+      "macFrameworkPath": ["/System/Library/Frameworks", "/Library/Frameworks"],
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "c11",
+      "cppStandard": "c++17"
+    },
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceRoot}",
+        "${workspaceRoot}/GDCpp",
+        "${workspaceRoot}/GDJS",
+        "${workspaceRoot}/Extensions",
+        "${workspaceRoot}/Core",
+        "${workspaceRoot}/ExtLibs/SFML/include",
+        "/usr/include",
+        "/usr/local/include",
+        "${workspaceRoot}"
+      ],
+      "defines": [
+        "EMSCRIPTEN",
+        "GD_IDE_ONLY",
+        "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
+      ],
+      "intelliSenseMode": "clang-x64",
+      "browse": {
+        "path": ["/usr/include", "/usr/local/include", "${workspaceRoot}"],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    },
+    {
+      "name": "Win32",
+      "includePath": [
+        "${workspaceRoot}",
+        "${workspaceRoot}/GDCpp",
+        "${workspaceRoot}/GDJS",
+        "${workspaceRoot}/Extensions",
+        "${workspaceRoot}/Core",
+        "${workspaceRoot}/ExtLibs/SFML/include",
+        "${workspaceRoot}"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "EMSCRIPTEN",
+        "GD_IDE_ONLY",
+        "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_API=/* Macro used to export classes on Windows, please ignore */",
+        "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */"
+      ],
+      "intelliSenseMode": "msvc-x64",
+      "browse": {
+        "path": ["${workspaceRoot}"],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    }
+  ],
+  "version": 4
 }

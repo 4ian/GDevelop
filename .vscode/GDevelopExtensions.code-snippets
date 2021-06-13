@@ -97,7 +97,7 @@
       "\t)",
       "\t.getCodeExtraInformation()",
       "\t.setIncludeFile('Extensions/${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/$2/}/${8:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}tools}.js')",
-      "\t.setFunctionName('gdjs.${6:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}.}');",
+      "\t.setFunctionName('gdjs.evtTools.${6:${TM_DIRECTORY/(.*)[\\\\\\/](.*)[\\\\\\/]?$/${2:/downcase}/}.}');",
       "",
       "$0"
     ]

@@ -570,11 +570,17 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  /**
+   * Handle how are managed changes on InlinePopover component
+   *
+   * @param shouldCancel Set to true for cancel changes
+   * @param eventsSheetCancelInlinePopover
+   */
   closeParameterEditor = (
-    event: SyntheticKeyboardEvent<HTMLInputElement>,
-    peferenceEventsSheetCancelInputParameterPopover: boolean
+    shouldCancel: boolean,
+    eventsSheetCancelInlinePopover: string
   ) => {
-    if (event && peferenceEventsSheetCancelInputParameterPopover) {
+    if (shouldCancel && eventsSheetCancelInlinePopover === "cancel") {
       const { instruction, parameterIndex } = this.state.editedParameter;
 
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
@@ -1163,9 +1169,9 @@ export default class EventsSheet extends React.Component<Props, State> {
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={event => {
+                          onRequestClose={shouldCancel => {
                             this.closeParameterEditor(
-                              event,
+                              shouldCancel,
                               values.eventsSheetCancelInputParameterPopover
                             );
                           }}

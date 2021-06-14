@@ -239,7 +239,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setEventsSheetCancelInputParameterPopover(
-    eventsSheetCancelInputParameterPopover: boolean
+    eventsSheetCancelInputParameterPopover: string
   ) {
     this.setState(
       state => ({

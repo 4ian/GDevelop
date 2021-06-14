@@ -263,19 +263,19 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             />
           </Line>
           <Line>
-            <Toggle
-              onToggle={(e, check) =>
-                setEventsSheetCancelInputParameterPopover(check)
+            <SelectField
+              floatingLabelText={
+                <Trans>Inline popover parameter behavior when escaping</Trans>
               }
-              toggled={values.eventsSheetCancelInputParameterPopover}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Use Escape for cancel changes on inline parameter, CTRL+ENTER
-                  for apply
-                </Trans>
-              }
-            />
+              value={values.eventsSheetCancelInputParameterPopover}
+              onChange={(e, i, value: string) => {
+                setEventsSheetCancelInputParameterPopover(value);
+              }}
+              fullWidth
+            >
+              <SelectOption value="cancel" primaryText={t`Cancel changes`} />
+              <SelectOption value="apply" primaryText={t`Apply changes`} />
+            </SelectField>
           </Line>
           <Text size="title">
             <Trans>Advanced</Trans>

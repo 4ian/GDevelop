@@ -85,14 +85,16 @@ export default function InlinePopover(props: Props) {
           // and stop its propagation (for example, the GenericExpressionField
           // when showing autocompletion), which is fine.
 
-          // When the event match with Escape key changes are canceled.
+          const applyChange = true;
+
           if (shouldCloseOrCancel(event)) {
-            props.onRequestClose(event);
+            // Changes are canceled by setting true on props.
+            props.onRequestClose(applyChange);
           }
 
-          // When event match with ctrlOrCmd + Enter changes are applied.
           if (shouldSubmit(event)) {
-            props.onRequestClose();
+            // Changes are applied by setting false on props.
+            props.onRequestClose(!applyChange);
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

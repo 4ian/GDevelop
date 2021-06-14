@@ -190,7 +190,7 @@ const getDefaultStylingProps = (
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
         if (shouldCloseOrCancel(event) && props.onRequestClose)
-          props.onRequestClose(event);
+          props.onRequestClose();
       },
     },
   };

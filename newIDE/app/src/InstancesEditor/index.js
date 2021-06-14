@@ -204,9 +204,11 @@ export default class InstancesEditor extends Component<Props> {
 
       this._onBackgroundClicked(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.on('mousemove', event =>
-      this._onMouseMove(event.data.global.x, event.data.global.y)
-    );
+    this.backgroundArea.on('mousemove', event => {
+      const cursorX = event.data.global.x || 0;
+      const cursorY = event.data.global.y || 0;
+      this._onMouseMove(cursorX, cursorY);
+    });
     this.backgroundArea.on('panmove', event =>
       this._onPanMove(
         event.deltaX,
@@ -497,8 +499,8 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onMouseMove = (x: number, y: number) => {
-    this.lastCursorX = x || 0;
-    this.lastCursorY = y || 0;
+    this.lastCursorX = x;
+    this.lastCursorY = y;
   };
 
   _onBackgroundClicked = (x: number, y: number) => {

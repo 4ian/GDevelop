@@ -497,8 +497,8 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   _onMouseMove = (x: number, y: number) => {
-    this.lastCursorX = x;
-    this.lastCursorY = y;
+    this.lastCursorX = x || 0;
+    this.lastCursorY = y || 0;
   };
 
   _onBackgroundClicked = (x: number, y: number) => {

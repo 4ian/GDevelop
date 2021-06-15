@@ -1,13 +1,44 @@
+// @flow
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import RenderedInstance from '../../ObjectsRendering/Renderers/RenderedInstance';
 import getObjectByName from '../../Utils/GetObjectByName';
+import ViewPosition from '../ViewPosition';
 
 import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-const gd /* TODO: add flow in this file */ = global.gd;
+const gd = global.gd;
 
 export default class LayerRenderer {
+  project: gdProject;
+  instances: gdInitialInstancesContainer;
+  layout: gdLayout;
+  /** `layer` can be changed at any moment (see InstancesRenderer).
+   * /!\ Don't store any other reference.
+   */
+  layer: gdLayer;
+  viewPosition: ViewPosition;
+  onInstanceClicked: gdInitialInstance => void;
+  onInstanceDoubleClicked: gdInitialInstance => void;
+  onOverInstance: gdInitialInstance => void;
+  onOutInstance: gdInitialInstance => void;
+  onMoveInstance: (gdInitialInstance, number, number) => void;
+  onMoveInstanceEnd: void => void;
+  onDownInstance: gdInitialInstance => void;
+  /**Used for instances culling on rendering */
+  viewTopLeft: [number, number];
+  /** Used for instances culling on rendering */
+  viewBottomRight: [number, number];
+
+  renderedInstances: { [number]: RenderedInstance };
+  pixiContainer: PIXI.Container;
+
+  /** Functor used to render an instance */
+  instancesRenderer: gd.InitialInstanceJSFunctor;
+
+  wasUsed: boolean = false;
+
   constructor({
     project,
     layout,
@@ -21,6 +52,19 @@ export default class LayerRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+  }: {
+    project: gdProject,
+    instances: gdInitialInstancesContainer,
+    layout: gdLayout,
+    layer: gdLayer,
+    viewPosition: ViewPosition,
+    onInstanceClicked: gdInitialInstance => void,
+    onInstanceDoubleClicked: gdInitialInstance => void,
+    onOverInstance: gdInitialInstance => void,
+    onOutInstance: gdInitialInstance => void,
+    onMoveInstance: (gdInitialInstance, number, number) => void,
+    onMoveInstanceEnd: void => void,
+    onDownInstance: gdInitialInstance => void,
   }) {
     this.project = project;
     this.instances = instances;
@@ -48,7 +92,9 @@ export default class LayerRenderer {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
-      var renderedInstance = this.getRendererOfInstance(instance);
+      var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
+        instance
+      );
       if (!renderedInstance) return;
 
       const pixiObject = renderedInstance.getPixiObject();
@@ -68,7 +114,7 @@ export default class LayerRenderer {
     return this.pixiContainer;
   }
 
-  getInstanceLeft = instance => {
+  getInstanceLeft = (instance: gdInitialInstance) => {
     return (
       instance.getX() -
       (this.renderedInstances[instance.ptr]
@@ -77,7 +123,7 @@ export default class LayerRenderer {
     );
   };
 
-  getInstanceTop = instance => {
+  getInstanceTop = (instance: gdInitialInstance) => {
     return (
       instance.getY() -
       (this.renderedInstances[instance.ptr]
@@ -86,7 +132,7 @@ export default class LayerRenderer {
     );
   };
 
-  getInstanceWidth = instance => {
+  getInstanceWidth = (instance: gdInitialInstance) => {
     if (instance.hasCustomSize()) return instance.getCustomWidth();
 
     return this.renderedInstances[instance.ptr]
@@ -94,7 +140,7 @@ export default class LayerRenderer {
       : 0;
   };
 
-  getInstanceHeight = instance => {
+  getInstanceHeight = (instance: gdInitialInstance) => {
     if (instance.hasCustomSize()) return instance.getCustomHeight();
 
     return this.renderedInstances[instance.ptr]
@@ -102,7 +148,7 @@ export default class LayerRenderer {
       : 0;
   };
 
-  getRendererOfInstance = instance => {
+  getRendererOfInstance = (instance: gdInitialInstance) => {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
@@ -112,7 +158,7 @@ export default class LayerRenderer {
         this.layout,
         associatedObjectName
       );
-      if (!associatedObject) return;
+      if (!associatedObject) return null;
 
       //...so let's create a renderer.
       renderedInstance = this.renderedInstances[
@@ -142,7 +188,7 @@ export default class LayerRenderer {
       });
       renderedInstance._pixiObject.on('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
-          return;
+          return null;
         }
 
         this.onDownInstance(instance);
@@ -152,7 +198,7 @@ export default class LayerRenderer {
       });
       renderedInstance._pixiObject.on('panmove', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
-          return;
+          return null;
         }
 
         this.onMoveInstance(instance, event.deltaX, event.deltaY);
@@ -171,7 +217,7 @@ export default class LayerRenderer {
    * levels.
    * @param {*} instance
    */
-  _isInstanceVisible(instance) {
+  _isInstanceVisible(instance: gdInitialInstance) {
     //TODO: Properly handle rotation
     const left = this.getInstanceLeft(instance);
     const top = this.getInstanceTop(instance);
@@ -227,8 +273,9 @@ export default class LayerRenderer {
    * the next render.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetInstanceRenderersFor(objectName) {
-    for (let i in this.renderedInstances) {
+  resetInstanceRenderersFor(objectName: string) {
+    for (let s in this.renderedInstances) {
+      let i = Number(s);
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         if (renderedInstance.getInstance().getObjectName() === objectName) {
@@ -244,7 +291,8 @@ export default class LayerRenderer {
    * (this can happen after an instance has been deleted).
    */
   _destroyUnusedInstanceRenderers() {
-    for (let i in this.renderedInstances) {
+    for (let s in this.renderedInstances) {
+      let i = Number(s);
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         if (!renderedInstance.wasUsed) {
@@ -257,7 +305,8 @@ export default class LayerRenderer {
 
   delete() {
     // Destroy all instances
-    for (let i in this.renderedInstances) {
+    for (let s in this.renderedInstances) {
+      let i = Number(s);
       if (this.renderedInstances.hasOwnProperty(i)) {
         const renderedInstance = this.renderedInstances[i];
         renderedInstance.onRemovedFromScene(); // TODO: pass argument to tell it's even worth removing from container?

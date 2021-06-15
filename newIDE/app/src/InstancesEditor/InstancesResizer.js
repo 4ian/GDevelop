@@ -1,5 +1,23 @@
+// @flow
+type Dimension = {
+  width: number,
+  height: number,
+};
+
 export default class InstancesResizer {
-  constructor({ instanceMeasurer, options }) {
+  instanceMeasurer: any;
+  options: Object;
+  instanceSizes: { [number]: Dimension };
+  totalDeltaX: number;
+  totalDeltaY: number;
+
+  constructor({
+    instanceMeasurer,
+    options,
+  }: {
+    instanceMeasurer: any,
+    options: Object,
+  }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instanceSizes = {};
@@ -7,11 +25,11 @@ export default class InstancesResizer {
     this.totalDeltaY = 0;
   }
 
-  setOptions(options) {
+  setOptions(options: Object) {
     this.options = options;
   }
 
-  _roundWidth(width) {
+  _roundWidth(width: number) {
     if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0)
       return Math.max(Math.round(width), 1);
 
@@ -21,7 +39,7 @@ export default class InstancesResizer {
     );
   }
 
-  _roundHeight(height) {
+  _roundHeight(height: number) {
     if (
       !this.options.snap ||
       !this.options.grid ||
@@ -35,21 +53,26 @@ export default class InstancesResizer {
     );
   }
 
-  _getSizeDeltaX(proportional, initialSize) {
+  _getSizeDeltaX(proportional: boolean, initialSize: Dimension) {
     if (proportional && Math.abs(this.totalDeltaX) < Math.abs(this.totalDeltaY))
       return (initialSize.width / initialSize.height) * this.totalDeltaY;
 
     return this.totalDeltaX;
   }
 
-  _getSizeDeltaY(proportional, initialSize) {
+  _getSizeDeltaY(proportional: boolean, initialSize: Dimension) {
     if (proportional && Math.abs(this.totalDeltaY) < Math.abs(this.totalDeltaX))
       return (initialSize.height / initialSize.width) * this.totalDeltaX;
 
     return this.totalDeltaY;
   }
 
-  resizeBy(instances, deltaX, deltaY, proportional) {
+  resizeBy(
+    instances: gdInitialInstance[],
+    deltaX: number,
+    deltaY: number,
+    proportional: boolean
+  ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 

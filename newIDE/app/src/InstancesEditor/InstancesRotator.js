@@ -1,4 +1,9 @@
+// @flow
 export default class InstancesRotator {
+  instanceAngles: { [number]: number };
+  totalDeltaX: number;
+  totalDeltaY: number;
+
   constructor() {
     this.instanceAngles = {};
     this.totalDeltaX = 0;
@@ -12,7 +17,12 @@ export default class InstancesRotator {
     return proportional ? Math.round(angle / 15) * 15 : angle;
   }
 
-  rotateBy(instances, deltaX, deltaY, proportional) {
+  rotateBy(
+    instances: gdInitialInstance[],
+    deltaX: number,
+    deltaY: number,
+    proportional: boolean
+  ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 

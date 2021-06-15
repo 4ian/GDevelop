@@ -1,12 +1,27 @@
+// @flow
 import * as PIXI from 'pixi.js-legacy';
 const gd /* TODO: add flow in this file */ = global.gd;
 
 export default class SelectionRectangle {
+  instances: gdInitialInstancesContainer;
+  instanceMeasurer: any;
+  toSceneCoordinates: (x: number, y: number) => [number, number];
+
+  pixiRectangle: PIXI.Graphics;
+  selectionRectangleStart: any;
+  selectionRectangleEnd: any;
+  _instancesInSelectionRectangle: gdInitialInstance[];
+
+  selector: gd.InitialInstanceJSFunctor;
+
   constructor({
     instances,
     instanceMeasurer,
     toSceneCoordinates,
-    toCanvasCoordinates,
+  }: {
+    instances: gdInitialInstancesContainer,
+    instanceMeasurer: any,
+    toSceneCoordinates: (x: number, y: number) => [number, number],
   }) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
@@ -52,12 +67,12 @@ export default class SelectionRectangle {
     return this.selectionRectangleStart;
   }
 
-  startSelectionRectangle = (x, y) => {
+  startSelectionRectangle = (x: number, y: number) => {
     this.selectionRectangleStart = { x, y };
     this.selectionRectangleEnd = { x, y };
   };
 
-  updateSelectionRectangle = (lastX, lastY) => {
+  updateSelectionRectangle = (lastX: number, lastY: number) => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 

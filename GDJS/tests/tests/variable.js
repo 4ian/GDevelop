@@ -147,26 +147,26 @@ describe('gdjs.Variable', function () {
     array.pushVariableCopy(structure.getChild('b'));
 
     // Verify empty string serialization
-    structure.getChild('d').setString("");
+    structure.getChild('d').setString('');
 
     // Verify boolean serialization
     structure.getChild('e').setBoolean(false);
     structure.getChild('f').setBoolean(true);
 
     const b =
-      '{"alpha": "Apples","beta": true,"Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';
+      '{"alpha":"Apples","beta":true,"Child with quotes \\"\\" and a backlash \\\\":"String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';
     expect(gdjs.evtTools.network.variableStructureToJSON(structure)).to.be(
-      `{"a": 5,"b": ${b},"c": [49,${b}],"d": "","e": false,"f": true}`
+      `{"a":5,"b":${b},"c":[49,${b}],"d":"","e":false,"f":true}`
     );
   });
 
   it('can be unserialized from JSON', function () {
     var structure = new gdjs.Variable({ value: '0' });
     const b =
-      '{"alpha": "Apples","beta": true,"Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';
+      '{"alpha":"Apples","beta":true,"Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}';
 
     gdjs.evtTools.network.jsonToVariableStructure(
-      `{"a": 5,"b": ${b},"c": [49,${b}],"d": "","e": false, "f": true}`,
+      `{"a":5,"b":${b},"c":[49,${b}],"d":"","e": false,"f":true}`,
       structure
     );
 

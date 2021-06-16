@@ -1,5 +1,6 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import Rectangle from '../Utils/Rectangle';
 const gd: libGDevelop = global.gd;
 
 export default class SelectionRectangle {
@@ -10,9 +11,10 @@ export default class SelectionRectangle {
   pixiRectangle: PIXI.Graphics;
   selectionRectangleStart: any;
   selectionRectangleEnd: any;
-  _instancesInSelectionRectangle: gdInitialInstance[];
+  _instancesInSelectionRectangle: any[];
 
   selector: gdInitialInstanceJSFunctor;
+  _temporaryRectangle: Rectangle;
 
   constructor({
     instances,
@@ -33,15 +35,16 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
 
+    this._temporaryRectangle = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
     this.selector.invoke = instancePtr => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
-      const x = this.instanceMeasurer.getInstanceLeft(instance);
-      const y = this.instanceMeasurer.getInstanceTop(instance);
-      const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
-      const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
+      const instanceAABB = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        this._temporaryRectangle
+      );
 
       if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return;
 
@@ -55,10 +58,10 @@ export default class SelectionRectangle {
       );
 
       if (
-        selectionSceneStart[0] <= x &&
-        x + instanceWidth <= selectionSceneEnd[0] &&
-        selectionSceneStart[1] <= y &&
-        y + instanceHeight <= selectionSceneEnd[1]
+        selectionSceneStart[0] <= instanceAABB.left &&
+        instanceAABB.right <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= instanceAABB.top &&
+        instanceAABB.bottom <= selectionSceneEnd[1]
       ) {
         this._instancesInSelectionRectangle.push(instance);
       }

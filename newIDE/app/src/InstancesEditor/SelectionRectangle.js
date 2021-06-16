@@ -34,7 +34,9 @@ export default class SelectionRectangle {
     this._instancesInSelectionRectangle = [];
 
     this.selector = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
     this.selector.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const x = this.instanceMeasurer.getInstanceLeft(instance);
       const y = this.instanceMeasurer.getInstanceTop(instance);
@@ -95,7 +97,8 @@ export default class SelectionRectangle {
     }
 
     this.instances.iterateOverInstances(
-      gd.castObject(this.selector, gd.InitialInstanceFunctor)
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      this.selector
     );
 
     this.selectionRectangleStart = null;

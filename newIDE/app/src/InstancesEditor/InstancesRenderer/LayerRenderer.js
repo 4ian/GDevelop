@@ -88,7 +88,9 @@ export default class LayerRenderer {
 
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
     this.instancesRenderer.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
@@ -248,7 +250,8 @@ export default class LayerRenderer {
   render() {
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
-      gd.castObject(this.instancesRenderer, gd.InitialInstanceFunctor),
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      this.instancesRenderer,
       this.layer.getName()
     );
     this._updatePixiObjectsZOrder();

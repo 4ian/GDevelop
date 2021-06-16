@@ -8,7 +8,7 @@ import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
-const gd = global.gd;
+const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
   project: gdProject;
@@ -35,7 +35,7 @@ export default class LayerRenderer {
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
-  instancesRenderer: gd.InitialInstanceJSFunctor;
+  instancesRenderer: gdInitialInstanceJSFunctor;
 
   wasUsed: boolean = false;
 
@@ -248,7 +248,7 @@ export default class LayerRenderer {
   render() {
     this._computeViewBounds();
     this.instances.iterateOverInstancesWithZOrdering(
-      this.instancesRenderer,
+      gd.castObject(this.instancesRenderer, gd.InitialInstanceFunctor),
       this.layer.getName()
     );
     this._updatePixiObjectsZOrder();

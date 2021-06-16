@@ -1,6 +1,6 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
-const gd /* TODO: add flow in this file */ = global.gd;
+const gd: libGDevelop = global.gd;
 
 export default class SelectionRectangle {
   instances: gdInitialInstancesContainer;
@@ -12,7 +12,7 @@ export default class SelectionRectangle {
   selectionRectangleEnd: any;
   _instancesInSelectionRectangle: gdInitialInstance[];
 
-  selector: gd.InitialInstanceJSFunctor;
+  selector: gdInitialInstanceJSFunctor;
 
   constructor({
     instances,
@@ -94,7 +94,9 @@ export default class SelectionRectangle {
       this.selectionRectangleEnd.y = tmp;
     }
 
-    this.instances.iterateOverInstances(this.selector);
+    this.instances.iterateOverInstances(
+      gd.castObject(this.selector, gd.InitialInstanceFunctor)
+    );
 
     this.selectionRectangleStart = null;
     return this._instancesInSelectionRectangle;

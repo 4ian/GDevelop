@@ -1,8 +1,8 @@
 // @flow
-type Dimension = {
+type Dimension = {|
   width: number,
   height: number,
-};
+|};
 
 export default class InstancesResizer {
   instanceMeasurer: any;

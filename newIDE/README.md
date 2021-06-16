@@ -42,15 +42,7 @@ cd newIDE/app && npm start # Be sure to have this running in another terminal, b
 # In a new terminal:
 cd newIDE/electron-app
 npm install # or yarn
-
-#For macOS:
-npm run electron-mac
-
-#For Windows:
-npm run electron-win
-
-#For Linux:
-npm run electron-linux
+npm run start # or yarn start
 ```
 
 ### Quick Install and Run

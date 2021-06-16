@@ -1,7 +1,21 @@
+// @flow
 import { roundPosition } from '../Utils/GridHelpers';
 
 export default class InstancesMover {
-  constructor({ instanceMeasurer, options }) {
+  instanceMeasurer: any;
+  options: Object;
+  instancePositions: { [number]: { x: number, y: number } };
+  totalDeltaX: number;
+  totalDeltaY: number;
+  temporaryPoint: [number, number];
+
+  constructor({
+    instanceMeasurer,
+    options,
+  }: {
+    instanceMeasurer: any,
+    options: Object,
+  }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instancePositions = {};
@@ -10,11 +24,11 @@ export default class InstancesMover {
     this.temporaryPoint = [0, 0];
   }
 
-  setOptions(options) {
+  setOptions(options: Object) {
     this.options = options;
   }
 
-  _roundPosition(pos, noGridSnap) {
+  _roundPosition(pos: [number, number], noGridSnap: boolean) {
     if (!this.options.snap || !this.options.grid || noGridSnap) {
       pos[0] = Math.round(pos[0]);
       pos[1] = Math.round(pos[1]);
@@ -30,21 +44,27 @@ export default class InstancesMover {
     );
   }
 
-  _getMoveDeltaX(followAxis) {
+  _getMoveDeltaX(followAxis: boolean) {
     if (followAxis && Math.abs(this.totalDeltaX) < Math.abs(this.totalDeltaY))
       return 0;
 
     return this.totalDeltaX;
   }
 
-  _getMoveDeltaY(followAxis) {
+  _getMoveDeltaY(followAxis: boolean) {
     if (followAxis && Math.abs(this.totalDeltaY) < Math.abs(this.totalDeltaX))
       return 0;
 
     return this.totalDeltaY;
   }
 
-  moveBy(instances, deltaX, deltaY, followAxis, noGridSnap) {
+  moveBy(
+    instances: gdInitialInstance[],
+    deltaX: number,
+    deltaY: number,
+    followAxis: boolean,
+    noGridSnap: boolean
+  ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 

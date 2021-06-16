@@ -156,7 +156,7 @@ export default class InstancesEditor extends Component<Props> {
       return false;
     });
 
-    this.pixiRenderer.view.onwheel = event => {
+    this.pixiRenderer.view.onwheel = (event: any) => {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomOnCursorBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {

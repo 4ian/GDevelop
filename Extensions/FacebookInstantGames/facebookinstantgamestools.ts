@@ -43,10 +43,7 @@ namespace gdjs {
         FBInstant.player
           .getDataAsync([key])
           .then(function (data) {
-            gdjs.evtTools.network.jsonToVariableStructure(
-              data[key],
-              successVariable
-            );
+            successVariable.fromJSON(data[key]);
           })
           .catch(function (error) {
             errorVariable.setString(error.message || 'Unknown error');
@@ -64,7 +61,7 @@ namespace gdjs {
         errorVariable.setString('');
         successVariable.setString('');
         const data = {};
-        data[key] = gdjs.evtTools.network.variableStructureToJSON(variable);
+        data[key] = variable.toJSON();
         FBInstant.player
           .setDataAsync(data)
           .then(function () {
@@ -86,9 +83,7 @@ namespace gdjs {
         }
         errorVariable.setString('');
         successVariable.setString('');
-        const data = gdjs.evtTools.network.variableStructureToJSON(
-          extraDataVariable
-        );
+        const data = extraDataVariable.toJSON();
         FBInstant.getLeaderboardAsync(leaderboardName)
           .then(function (leaderboard) {
             return leaderboard.setScoreAsync(score, data);
@@ -123,10 +118,7 @@ namespace gdjs {
             scoreVariable.setNumber(
               entry.getScore() === null ? -1 : entry.getScore()
             );
-            gdjs.evtTools.network.jsonToVariableStructure(
-              entry.getExtraData(),
-              extraDataVariable
-            );
+            extraDataVariable.fromJSON(entry.getExtraData());
           })
           .catch(function (error) {
             errorVariable.setString(error.message || 'Unknown error');

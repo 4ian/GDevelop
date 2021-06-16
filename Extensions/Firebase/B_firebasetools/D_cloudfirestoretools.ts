@@ -173,9 +173,8 @@ namespace gdjs {
                 callbackStatusVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                gdjs.evtTools.network._objectToVariable(
-                  querySnapshotToSerializable(snapshot),
-                  callbackValueVariable
+                callbackValueVariable.fromJSObject(
+                  querySnapshotToSerializable(snapshot)
                 );
             })
             .catch((error) => {
@@ -206,9 +205,8 @@ namespace gdjs {
                 callbackStatusVariable.setString('ok');
 
               if (typeof callbackValueVariable !== 'undefined')
-                gdjs.evtTools.network._objectToVariable(
-                  querySnapshotToSerializable(snapshot),
-                  callbackValueVariable
+                callbackValueVariable.fromJSObject(
+                  querySnapshotToSerializable(snapshot)
                 );
             },
             (error) => {
@@ -232,13 +230,7 @@ namespace gdjs {
           firebase
             .firestore()
             .collection(collectionName)
-            .add(
-              replaceTimestampsInObject(
-                JSON.parse(
-                  gdjs.evtTools.network.variableStructureToJSON(variable)
-                )
-              )
-            )
+            .add(replaceTimestampsInObject(variable.toJSObject()))
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -266,13 +258,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(variableName)
-            .set(
-              replaceTimestampsInObject(
-                JSON.parse(
-                  gdjs.evtTools.network.variableStructureToJSON(variable)
-                )
-              )
-            )
+            .set(replaceTimestampsInObject(variable.toJSObject()))
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -332,13 +318,7 @@ namespace gdjs {
             .firestore()
             .collection(collectionName)
             .doc(variableName)
-            .update(
-              replaceTimestampsInObject(
-                JSON.parse(
-                  gdjs.evtTools.network.variableStructureToJSON(variable)
-                )
-              )
-            )
+            .update(replaceTimestampsInObject(variable.toJSObject()))
             .then(() => {
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');
@@ -456,10 +436,7 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (callbackValueVariable)
-                gdjs.evtTools.network._objectToVariable(
-                  doc.data(),
-                  callbackValueVariable
-                );
+                callbackValueVariable.fromJSObject(doc.data());
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')
@@ -492,10 +469,7 @@ namespace gdjs {
                 callbackStateVariable.setString('ok');
 
               if (callbackValueVariable)
-                gdjs.evtTools.network._objectToVariable(
-                  doc.get(field),
-                  callbackValueVariable
-                );
+                callbackValueVariable.fromJSObject(doc.get(field));
             })
             .catch((error) => {
               if (typeof callbackStateVariable !== 'undefined')
@@ -595,9 +569,8 @@ namespace gdjs {
                 );
 
               if (callbackValueVariable)
-                gdjs.evtTools.network._objectToVariable(
-                  snapshot.docs.map((doc) => doc.id),
-                  callbackValueVariable
+                callbackValueVariable.fromJSObject(
+                  snapshot.docs.map((doc) => doc.id)
                 );
             })
             .catch((error) => {

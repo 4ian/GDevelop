@@ -134,10 +134,10 @@ describe('EnumerateExpressions', () => {
           type: 'Angle',
         },
       },
-      Movement: {
-        'Average X coordinates of forces': {
-          displayedName: 'Average X coordinates of forces',
-          fullGroupName: 'Movement',
+      'Movement using forces': {
+        'X coordinate of the sum of forces': {
+          displayedName: 'X coordinate of the sum of forces',
+          fullGroupName: 'Movement using forces',
           name: 'ForceX',
           type: 'ForceX',
         },

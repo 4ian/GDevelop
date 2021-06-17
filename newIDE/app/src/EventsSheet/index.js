@@ -573,7 +573,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   /**
    * Handle how are managed changes on InlinePopover component
    *
-   * @param shouldCancel Set to true for cancel changes
+   * @param shouldCancel Set to true to cancel changes
    * @param eventsSheetCancelInlinePopover
    */
   closeParameterEditor = (

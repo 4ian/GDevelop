@@ -51,7 +51,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
     setIsAlwaysOnTopInPreview,
-    setEventsSheetCancelInputParameterPopover,
+    setEventsSheetCancelInlineParameter,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -267,9 +267,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               floatingLabelText={
                 <Trans>Inline popover parameter behavior when escaping</Trans>
               }
-              value={values.eventsSheetCancelInputParameterPopover}
+              value={values.eventsSheetCancelInlineParameter}
               onChange={(e, i, value: string) => {
-                setEventsSheetCancelInputParameterPopover(value);
+                setEventsSheetCancelInlineParameter(value);
               }}
               fullWidth
             >

@@ -79,7 +79,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
-    setEventsSheetCancelInputParameterPopover: this._setEventsSheetCancelInputParameterPopover.bind(
+    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
   };
@@ -238,14 +238,14 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setEventsSheetCancelInputParameterPopover(
-    eventsSheetCancelInputParameterPopover: string
+  _setEventsSheetCancelInlineParameter(
+    eventsSheetCancelInlineParameter: string
   ) {
     this.setState(
       state => ({
         values: {
           ...state.values,
-          eventsSheetCancelInputParameterPopover,
+          eventsSheetCancelInlineParameter,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

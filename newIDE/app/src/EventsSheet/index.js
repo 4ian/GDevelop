@@ -580,7 +580,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     shouldCancel: boolean,
     eventsSheetCancelInlinePopover: string
   ) => {
-    if (shouldCancel && eventsSheetCancelInlinePopover === "cancel") {
+    if (shouldCancel && eventsSheetCancelInlinePopover === 'cancel') {
       const { instruction, parameterIndex } = this.state.editedParameter;
 
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
@@ -1172,7 +1172,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           onRequestClose={shouldCancel => {
                             this.closeParameterEditor(
                               shouldCancel,
-                              values.eventsSheetCancelInputParameterPopover
+                              values.eventsSheetCancelInlineParameter
                             );
                           }}
                           project={project}

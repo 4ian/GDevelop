@@ -132,7 +132,7 @@ type State = {|
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
   inlineEditingChangesMade: boolean,
-  inlineEditingPreviousValue: string,
+  inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
 
@@ -1170,6 +1170,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={shouldCancel => {
+                            if (!shouldCancel) shouldCancel = false;
                             this.closeParameterEditor(
                               shouldCancel,
                               values.eventsSheetCancelInlineParameter

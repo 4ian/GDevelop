@@ -239,7 +239,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setEventsSheetCancelInlineParameter(
-    eventsSheetCancelInlineParameter: string
+    eventsSheetCancelInlineParameter: 'apply' | 'cancel'
   ) {
     this.setState(
       state => ({

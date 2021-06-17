@@ -36,7 +36,7 @@ type Props = {|
   children: React.Node,
   anchorEl: ?HTMLElement,
   open: boolean,
-  onRequestClose: () => void,
+  onRequestClose: (value?: boolean) => void,
 |};
 
 /**

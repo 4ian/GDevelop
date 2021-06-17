@@ -17,7 +17,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
 
   open: boolean,
-  onRequestClose: () => void,
+  onRequestClose: (value?: boolean) => void,
   onChange: string => void,
 
   instruction: ?gdInstruction,

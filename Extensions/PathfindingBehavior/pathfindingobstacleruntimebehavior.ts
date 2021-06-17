@@ -64,15 +64,14 @@ namespace gdjs {
      * @param x X position
      * @param y Y position
      * @param radius The radius of the search
-     * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
-     * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
+     * @param result If defined, the obstacles near the object will be inserted into result.
      */
     getAllObstaclesAround(
       x: float,
       y: float,
       radius: float,
       result: gdjs.PathfindingObstacleRuntimeBehavior[]
-    ): any {
+    ): void {
       const searchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAround
       );
@@ -90,13 +89,14 @@ namespace gdjs {
     }
 
     /**
-     * Returns all the platforms around the specified AABB.
-     * @return An array with all platforms near the AABB.
+     * Returns all the obstacles around the specified AABB.
+     * @param aabb
+     * @param result If defined, the obstacles near the object will be inserted into result.
      */
     getAllObstaclesAroundAABB(
-      aabb: AABB,
+      aabb: gdjs.AABB,
       result: gdjs.PathfindingObstacleRuntimeBehavior[]
-    ): any {
+    ): void {
       const searchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAroundAABB
       );

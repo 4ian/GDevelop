@@ -847,8 +847,7 @@ namespace gdjs {
         let objectsOnCell = false;
 
         if (
-          this._collisionMethod ==
-          PathfindingRuntimeBehavior.LEGACY_COLLISION
+          this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
         ) {
           const radius =
             this._cellHeight > this._cellWidth
@@ -875,19 +874,14 @@ namespace gdjs {
           const obj = this._closeObstacles[k].owner;
 
           if (
-            this._collisionMethod ==
-            PathfindingRuntimeBehavior.LEGACY_COLLISION
+            this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
           ) {
             const topLeftCellX = Math.floor(
-              (obj.getDrawableX() -
-                this._rightBorder -
-                this._gridOffsetX) /
+              (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
                 this._cellWidth
             );
             const topLeftCellY = Math.floor(
-              (obj.getDrawableY() -
-                this._bottomBorder -
-                this._gridOffsetY) /
+              (obj.getDrawableY() - this._bottomBorder - this._gridOffsetY) /
                 this._cellHeight
             );
             const bottomRightCellX = Math.ceil(
@@ -918,8 +912,7 @@ namespace gdjs {
               this._moveStampHitBoxesTo(nodeCenterX, nodeCenterY);
               objectsOnCell = this._checkCollisionWithStamp(obj.getHitBoxes());
             } else if (
-              this._collisionMethod ==
-              PathfindingRuntimeBehavior.AABB_COLLISION
+              this._collisionMethod == PathfindingRuntimeBehavior.AABB_COLLISION
             ) {
               // this is needed to exclude touching edges
               const obstacleAABB = obj.getAABB();

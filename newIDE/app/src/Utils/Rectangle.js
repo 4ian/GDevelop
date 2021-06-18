@@ -24,4 +24,19 @@ export default class Rectangle {
   height() {
     return this.bottom - this.top;
   }
+
+  union(rectangle: Rectangle) {
+    if (rectangle.left < this.left) {
+      this.left = rectangle.left;
+    }
+    if (rectangle.top < this.top) {
+      this.top = rectangle.top;
+    }
+    if (rectangle.right > this.right) {
+      this.right = rectangle.right;
+    }
+    if (rectangle.bottom > this.bottom) {
+      this.bottom = rectangle.bottom;
+    }
+  }
 }

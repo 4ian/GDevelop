@@ -9,6 +9,7 @@ type Dimension = {|
 export default class InstancesResizer {
   instanceMeasurer: any;
   options: Object;
+  initialSelectionAABB: ?Rectangle;
   instanceOBBs: { [number]: Rectangle };
   instanceAABBs: { [number]: Rectangle };
   instancePositions: { [number]: { x: number, y: number } };
@@ -81,6 +82,25 @@ export default class InstancesResizer {
   ) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
+    
+    if (!this.initialSelectionAABB) {
+      this.initialSelectionAABB = new Rectangle();
+      for (let i = 0; i < instances.length; i++) {
+        const selectedInstance = instances[i];
+
+        let initialAABB = this.instanceAABBs[selectedInstance.ptr];
+        if (!initialAABB) {
+          initialAABB = new Rectangle();
+          initialAABB = this.instanceMeasurer.getInstanceAABB(
+            selectedInstance,
+            initialAABB
+          );
+          this.instanceAABBs[selectedInstance.ptr] = initialAABB;
+        }
+
+        this.initialSelectionAABB.union(initialAABB);
+      }
+    }
 
     let hasRotatedInstance = false;
     for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
@@ -90,6 +110,9 @@ export default class InstancesResizer {
 
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
+
+      // already populated above
+      let initialAABB = this.instanceAABBs[selectedInstance.ptr];
 
       if (!selectedInstance.hasCustomSize()) {
         selectedInstance.setCustomWidth(
@@ -109,15 +132,6 @@ export default class InstancesResizer {
         );
         this.instanceOBBs[selectedInstance.ptr] = initialOBB;
       }
-      let initialAABB = this.instanceAABBs[selectedInstance.ptr];
-      if (!initialAABB) {
-        initialAABB = new Rectangle();
-        initialAABB = this.instanceMeasurer.getInstanceAABB(
-          selectedInstance,
-          initialAABB
-        );
-        this.instanceAABBs[selectedInstance.ptr] = initialAABB;
-      }
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
         initialPosition = this.instancePositions[selectedInstance.ptr] = {
@@ -131,10 +145,10 @@ export default class InstancesResizer {
         const ratio =
           !this.totalDeltaY ||
           (this.totalDeltaX &&
-            this.totalDeltaX * initialAABB.height() >
-              initialAABB.width() * this.totalDeltaY)
-            ? (initialAABB.width() + this.totalDeltaX) / initialAABB.width()
-            : (initialAABB.height() + this.totalDeltaY) / initialAABB.height();
+            this.totalDeltaX * this.initialSelectionAABB.height() >
+            this.initialSelectionAABB.width() * this.totalDeltaY)
+            ? (this.initialSelectionAABB.width() + this.totalDeltaX) / this.initialSelectionAABB.width()
+            : (this.initialSelectionAABB.height() + this.totalDeltaY) / this.initialSelectionAABB.height();
         selectedInstance.setCustomWidth(
           this._roundWidth(ratio * initialOBB.width())
         );
@@ -142,27 +156,37 @@ export default class InstancesResizer {
           this._roundHeight(ratio * initialOBB.height())
         );
         selectedInstance.setX(
-          initialPosition.x + (initialOBB.left - initialAABB.left) * (ratio - 1)
+          initialPosition.x + (initialAABB.left - this.initialSelectionAABB.left + initialOBB.left - initialAABB.left) * (ratio - 1)
         );
         selectedInstance.setY(
-          initialPosition.y + (initialOBB.top - initialAABB.top) * (ratio - 1)
+          initialPosition.y + (initialAABB.top - this.initialSelectionAABB.top + initialOBB.top - initialAABB.top) * (ratio - 1)
         );
       } else {
+        const scaleX = (this.initialSelectionAABB.width() + this._getSizeDeltaX(proportional, initialOBB)) / this.initialSelectionAABB.width();
+        const scaleY = (this.initialSelectionAABB.height() + this._getSizeDeltaY(proportional, initialOBB)) / this.initialSelectionAABB.height();
+
         selectedInstance.setCustomWidth(
           this._roundWidth(
-            initialOBB.width() + this._getSizeDeltaX(proportional, initialOBB)
+            initialOBB.width() * scaleX
           )
         );
         selectedInstance.setCustomHeight(
           this._roundHeight(
-            initialOBB.height() + this._getSizeDeltaY(proportional, initialOBB)
+            initialOBB.height() * scaleY
           )
+        );
+        selectedInstance.setX(
+          initialPosition.x + (initialAABB.left - this.initialSelectionAABB.left) * scaleX
+        );
+        selectedInstance.setY(
+          initialPosition.y + (initialAABB.top - this.initialSelectionAABB.top) * scaleY
         );
       }
     }
   }
 
   endResize() {
+    this.initialSelectionAABB = null;
     this.instanceOBBs = {};
     this.instanceAABBs = {};
     this.instancePositions = {};

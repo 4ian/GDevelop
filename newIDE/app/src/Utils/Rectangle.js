@@ -17,12 +17,39 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
+  set(
+    left: number,
+    top: number,
+    right: number,
+    bottom: number
+  ) {
+    this.left = left;
+    this.top = top;
+    this.right = right;
+    this.bottom = bottom;
+  }
+
+  set(rectangle: Rectangle) {
+    this.left = rectangle.left;
+    this.top = rectangle.top;
+    this.right = rectangle.right;
+    this.bottom = rectangle.bottom;
+  }
+
   width() {
     return this.right - this.left;
   }
 
   height() {
     return this.bottom - this.top;
+  }
+
+  centerX() {
+    return (this.left + this.right) / 2;
+  }
+
+  centerY() {
+    return (this.top + this.bottom) / 2;
   }
 
   union(rectangle: Rectangle) {
@@ -38,5 +65,9 @@ export default class Rectangle {
     if (rectangle.bottom > this.bottom) {
       this.bottom = rectangle.bottom;
     }
+  }
+
+  toString() {
+    return "[" + this.left + " -> " + this.right + " ; " + this.top + " -> " + this.bottom + "]"; 
   }
 }

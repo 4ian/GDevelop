@@ -1,11 +1,6 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
 
-type Dimension = {|
-  width: number,
-  height: number,
-|};
-
 export default class InstancesResizer {
   instanceMeasurer: any;
   options: Object;
@@ -74,6 +69,19 @@ export default class InstancesResizer {
     return this.totalDeltaY;
   }
 
+  _getOrCreateAABB(instance: gdInitialInstance) {
+    let initialAABB = this.instanceAABBs[instance.ptr];
+    if (!initialAABB) {
+      initialAABB = new Rectangle();
+      initialAABB = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        initialAABB
+      );
+      this.instanceAABBs[instance.ptr] = initialAABB;
+    }
+    return initialAABB;
+  }
+
   resizeBy(
     instances: gdInitialInstance[],
     deltaX: number,
@@ -85,20 +93,9 @@ export default class InstancesResizer {
     
     if (!this.initialSelectionAABB) {
       this.initialSelectionAABB = new Rectangle();
-      for (let i = 0; i < instances.length; i++) {
-        const selectedInstance = instances[i];
-
-        let initialAABB = this.instanceAABBs[selectedInstance.ptr];
-        if (!initialAABB) {
-          initialAABB = new Rectangle();
-          initialAABB = this.instanceMeasurer.getInstanceAABB(
-            selectedInstance,
-            initialAABB
-          );
-          this.instanceAABBs[selectedInstance.ptr] = initialAABB;
-        }
-
-        this.initialSelectionAABB.union(initialAABB);
+      this.initialSelectionAABB.set(this._getOrCreateAABB(instances[0]));
+      for (let i = 1; i < instances.length; i++) {
+        this.initialSelectionAABB.union(this._getOrCreateAABB(instances[i]));
       }
     }
 
@@ -112,16 +109,7 @@ export default class InstancesResizer {
       const selectedInstance = instances[i];
 
       // already populated above
-      let initialAABB = this.instanceAABBs[selectedInstance.ptr];
-
-      if (!selectedInstance.hasCustomSize()) {
-        selectedInstance.setCustomWidth(
-          this.instanceMeasurer.getInstanceOBB(selectedInstance).width
-        );
-        selectedInstance.setCustomHeight(
-          this.instanceMeasurer.getInstanceOBB(selectedInstance).height
-        );
-      }
+      let initialAABB = this._getOrCreateAABB(selectedInstance);
 
       let initialOBB = this.instanceOBBs[selectedInstance.ptr];
       if (!initialOBB) {
@@ -132,6 +120,16 @@ export default class InstancesResizer {
         );
         this.instanceOBBs[selectedInstance.ptr] = initialOBB;
       }
+
+      if (!selectedInstance.hasCustomSize()) {
+        selectedInstance.setCustomWidth(
+          initialOBB.width()
+        );
+        selectedInstance.setCustomHeight(
+          initialOBB.height()
+        );
+      }
+
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
         initialPosition = this.instancePositions[selectedInstance.ptr] = {

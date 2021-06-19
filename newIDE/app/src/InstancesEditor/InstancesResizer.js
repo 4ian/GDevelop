@@ -157,24 +157,14 @@ export default class InstancesResizer {
           flippedTotalDeltaX * initialSelectionAABB.height() >
           initialSelectionAABB.width() * flippedTotalDeltaY)) {
         scaleY = scaleX;
-        if (grabbingLocation === "Left" || grabbingLocation === "Right") {
-          translationY = - roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width() / 2;
-        }
-        else if (isTop) {
-          translationY = roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
-        }
-        if (isLeft !== isTop) {
+        translationY = (1 - resizeGrabbingRelativePositions[grabbingLocation][1]) * roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
+        if (grabbingLocation === "TopRight" || grabbingLocation === "Right") {
           translationY = -translationY;
         }
       } else {
         scaleX = scaleY;
-        if (grabbingLocation === "Top" || grabbingLocation === "Bottom") {
-          translationX = - roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height() / 2;
-        }
-        else if (isLeft) {
-          translationX = roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height();
-        }
-        if (isLeft !== isTop) {
+        translationX = (1 - resizeGrabbingRelativePositions[grabbingLocation][0]) * roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height();
+        if (grabbingLocation === "BottomLeft" || grabbingLocation === "Bottom") {
           translationX = -translationX;
         }
       }

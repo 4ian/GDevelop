@@ -4,11 +4,12 @@ import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
+import { type ResizeAnchorLocation } from './InstancesResizer';
 
 type Props = {|
   instancesSelection: InstancesSelection,
   instanceMeasurer: Object, // To be typed in InstancesRenderer
-  onResize: (deltaX: number | null, deltaY: number | null) => void,
+  onResize: (deltaX: number, deltaY: number, anchorLocation: ResizeAnchorLocation) => void,
   onResizeEnd: () => void,
   onRotate: (number, number) => void,
   onRotateEnd: () => void,
@@ -43,7 +44,7 @@ const CIRCLE_BUTTON_SHAPE = 1;
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
-  onResize: (deltaX: number | null, deltaY: number | null) => void;
+  onResize: (deltaX: number, deltaY: number, anchorLocation: ResizeAnchorLocation) => void;
   onResizeEnd: () => void;
   onRotate: (number, number) => void;
   onRotateEnd: () => void;
@@ -83,7 +84,7 @@ export default class SelectedInstances {
     this._makeButton(
       this.resizeButton,
       event => {
-        this.onResize(event.deltaX, event.deltaY);
+        this.onResize(event.deltaX, event.deltaY, "TopLeft");
       },
       () => {
         this.onResizeEnd();
@@ -93,7 +94,7 @@ export default class SelectedInstances {
     this._makeButton(
       this.rightResizeButton,
       event => {
-        this.onResize(event.deltaX, null);
+        this.onResize(event.deltaX, event.deltaY, "Left");
       },
       () => {
         this.onResizeEnd();
@@ -103,7 +104,7 @@ export default class SelectedInstances {
     this._makeButton(
       this.bottomResizeButton,
       event => {
-        this.onResize(null, event.deltaY);
+        this.onResize(event.deltaX, event.deltaY, "Top");
       },
       () => {
         this.onResizeEnd();

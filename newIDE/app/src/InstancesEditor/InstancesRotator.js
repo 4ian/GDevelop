@@ -2,16 +2,16 @@
 import Rectangle from '../Utils/Rectangle';
 
 export default class InstancesRotator {
-  instanceMeasurer: any;
-  instanceAngles: { [number]: number } = {};
-  instancePositions: { [number]: { x: number, y: number } } = {};
-  instanceAABBs: { [number]: Rectangle } = {};
+  _instanceMeasurer: any;
+  _instanceAngles: { [number]: number } = {};
+  _instancePositions: { [number]: { x: number, y: number } } = {};
+  _instanceAABBs: { [number]: Rectangle } = {};
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
-  anchor: ?[number, number] = null;
+  _anchor: ?[number, number] = null;
 
   constructor(instanceMeasurer: any) {
-    this.instanceMeasurer = instanceMeasurer;
+    this._instanceMeasurer = instanceMeasurer;
   }
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
@@ -22,14 +22,14 @@ export default class InstancesRotator {
   }
 
   _getOrCreateAABB(instance: gdInitialInstance) {
-    let initialAABB = this.instanceAABBs[instance.ptr];
+    let initialAABB = this._instanceAABBs[instance.ptr];
     if (!initialAABB) {
       initialAABB = new Rectangle();
-      initialAABB = this.instanceMeasurer.getInstanceAABB(
+      initialAABB = this._instanceMeasurer.getInstanceAABB(
         instance,
         initialAABB
       );
-      this.instanceAABBs[instance.ptr] = initialAABB;
+      this._instanceAABBs[instance.ptr] = initialAABB;
     }
     return initialAABB;
   }
@@ -40,15 +40,14 @@ export default class InstancesRotator {
     deltaY: number,
     proportional: boolean
   ) {
-    if (!this.anchor) {
+    if (!this._anchor) {
       let selectionAABB = new Rectangle();
       selectionAABB.set(this._getOrCreateAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
         selectionAABB.union(this._getOrCreateAABB(instances[i]));
       }
-      this.anchor = [selectionAABB.centerX(), selectionAABB.centerY()];
+      this._anchor = [selectionAABB.centerX(), selectionAABB.centerY()];
       this.totalDeltaY -= selectionAABB.height() / 2;
-      console.log("selectionAABB: " + selectionAABB);
     }
 
     this.totalDeltaX += deltaX;
@@ -60,16 +59,16 @@ export default class InstancesRotator {
       // already populated above
       let initialAABB = this._getOrCreateAABB(selectedInstance);
 
-      let initialAngle = this.instanceAngles[selectedInstance.ptr];
+      let initialAngle = this._instanceAngles[selectedInstance.ptr];
       if (initialAngle === undefined) {
-        initialAngle = this.instanceAngles[
+        initialAngle = this._instanceAngles[
           selectedInstance.ptr
         ] = selectedInstance.getAngle();
       }
       
-      let initialPosition = this.instancePositions[selectedInstance.ptr];
+      let initialPosition = this._instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
-        initialPosition = this.instancePositions[selectedInstance.ptr] = {
+        initialPosition = this._instancePositions[selectedInstance.ptr] = {
           x: selectedInstance.getX(),
           y: selectedInstance.getY(),
         };
@@ -81,23 +80,23 @@ export default class InstancesRotator {
       const angle = (degreeAngle - initialAngle) * Math.PI / 180;
       const cosa = Math.cos(-angle);
       const sina = Math.sin(-angle);
-      const deltaX = -(initialAABB.centerX() - this.anchor[0]);
-      const deltaY = -(initialAABB.centerY() - this.anchor[1]);
+      const deltaX = -(initialAABB.centerX() - this._anchor[0]);
+      const deltaY = -(initialAABB.centerY() - this._anchor[1]);
       selectedInstance.setX(
-        this.anchor[0] + (initialPosition.x - initialAABB.centerX()) + cosa * deltaX + sina * deltaY
+        this._anchor[0] + (initialPosition.x - initialAABB.centerX()) + cosa * deltaX + sina * deltaY
       );
       selectedInstance.setY(
-        this.anchor[1] + (initialPosition.y - initialAABB.centerY()) - sina * deltaX + cosa * deltaY
+        this._anchor[1] + (initialPosition.y - initialAABB.centerY()) - sina * deltaX + cosa * deltaY
       );
     }
   }
 
   endRotate() {
-    this.instanceAngles = {};
-    this.instancePositions = {};
-    this.instanceAABBs = {};
+    this._instanceAngles = {};
+    this._instancePositions = {};
+    this._instanceAABBs = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
-    this.anchor = null;
+    this._anchor = null;
   }
 }

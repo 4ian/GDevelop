@@ -218,6 +218,11 @@ export default class LayerRenderer {
   }
 
   getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
+    const angle = (instance.getAngle() * Math.PI) / 180;
+    if (angle === 0) {
+      return this.getInstanceOBB(instance, bounds);
+    }
+
     const rotatedRectangle = this.getRotatedRectangle(instance);
 
     let left = Number.MAX_VALUE;

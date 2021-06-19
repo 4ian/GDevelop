@@ -7,7 +7,7 @@ import ViewPosition from './ViewPosition';
 import SelectedInstances from './SelectedInstances';
 import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
-import InstancesResizer from './InstancesResizer';
+import InstancesResizer, { type ResizeAnchorLocation } from './InstancesResizer';
 import InstancesRotator from './InstancesRotator';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
@@ -656,19 +656,20 @@ export default class InstancesEditor extends Component<Props> {
     this.props.onInstancesMoved(selectedInstances);
   };
 
-  _onResize = (deltaX: number | null, deltaY: number | null) => {
-    const sceneDeltaX = deltaX !== null ? deltaX / this.getZoomFactor() : 0;
-    const sceneDeltaY = deltaY !== null ? deltaY / this.getZoomFactor() : 0;
+  _onResize = (deltaX: number, deltaY: number, anchorLocation: ResizeAnchorLocation) => {
+    const sceneDeltaX = deltaX / this.getZoomFactor();
+    const sceneDeltaY = deltaY / this.getZoomFactor();
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     const forceProportional =
-      this.props.screenType === 'touch' && deltaX !== null && deltaY !== null;
+      this.props.screenType === 'touch' && anchorLocation === "TopLeft";
     const proportional =
       forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
+      anchorLocation,
       proportional
     );
   };

@@ -1,7 +1,14 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
+import { roundPosition } from '../Utils/GridHelpers';
 
 export type ResizeAnchorLocation = "TopLeft" | "Top" | "Left";
+
+const grabbingRelativePositions = {
+  TopLeft: [1, 1],
+  Top: [0, 1],
+  Left: [1, 0],
+};
 
 export default class InstancesResizer {
   instanceMeasurer: any;
@@ -12,6 +19,8 @@ export default class InstancesResizer {
   _instancePositions: { [number]: { x: number, y: number } } = {};
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
+
+  _temporaryGrabbingPosition: [number, number] = [0, 0];
 
   constructor({
     instanceMeasurer,
@@ -26,30 +35,6 @@ export default class InstancesResizer {
 
   setOptions(options: Object) {
     this.options = options;
-  }
-
-  //TODO make the dragged square magnet to the grid instead.
-  _roundWidth(width: number) {
-    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0)
-      return Math.max(Math.round(width), 1);
-
-    return Math.max(
-      Math.round(width / this.options.gridWidth) * this.options.gridWidth,
-      1
-    );
-  }
-  _roundHeight(height: number) {
-    if (
-      !this.options.snap ||
-      !this.options.grid ||
-      this.options.gridHeight <= 0
-    )
-      return Math.max(Math.round(height), 1);
-
-    return Math.max(
-      Math.round(height / this.options.gridHeight) * this.options.gridHeight,
-      1
-    );
   }
 
   _getOrCreateAABB(instance: gdInitialInstance) {
@@ -109,12 +94,8 @@ export default class InstancesResizer {
     anchorLocation: ResizeAnchorLocation,
     proportional: boolean
   ) {
-    if (anchorLocation !== "Top") {
-      this.totalDeltaX += deltaX;
-    }
-    if (anchorLocation !== "Left") {
-      this.totalDeltaY += deltaY;
-    }
+    this.totalDeltaX += deltaX;
+    this.totalDeltaY += deltaY;
     
     let hasRotatedInstance = false;
     for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
@@ -123,14 +104,38 @@ export default class InstancesResizer {
     }
     
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
-    let scaleX = (initialSelectionAABB.width() + this.totalDeltaX) / initialSelectionAABB.width();
-    let scaleY = (initialSelectionAABB.height() + this.totalDeltaY) / initialSelectionAABB.height();
+
+    let roundedTotalDeltaX;
+    let roundedTotalDeltaY;
+    if (this.options.snap) {
+      const grabbingRelativePosition = grabbingRelativePositions[anchorLocation];
+      const initialGrabbingX = initialSelectionAABB.left + initialSelectionAABB.width() * grabbingRelativePosition[0];
+      const initialGrabbingY = initialSelectionAABB.top + initialSelectionAABB.height() * grabbingRelativePosition[1];
+      const grabbingPosition = this._temporaryGrabbingPosition;
+      grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
+      grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
+      roundPosition(grabbingPosition, this.options.gridWidth, this.options.gridHeight, this.options.gridOffsetX, this.options.gridOffsetY, this.options.gridType);
+      roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
+      roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
+    } else {
+      roundedTotalDeltaX = this.totalDeltaX;
+      roundedTotalDeltaY = this.totalDeltaY;
+    }
+    if (anchorLocation === "Top") {
+      roundedTotalDeltaX = 0;
+    }
+    if (anchorLocation === "Left") {
+      roundedTotalDeltaY = 0;
+    }
+
+    let scaleX = (initialSelectionAABB.width() + roundedTotalDeltaX) / initialSelectionAABB.width();
+    let scaleY = (initialSelectionAABB.height() + roundedTotalDeltaY) / initialSelectionAABB.height();
     if (proportional || hasRotatedInstance) {
       scaleX =
-        (!this.totalDeltaY ||
-        (this.totalDeltaX &&
-          this.totalDeltaX * initialSelectionAABB.height() >
-          initialSelectionAABB.width() * this.totalDeltaY))
+        (!roundedTotalDeltaY ||
+        (roundedTotalDeltaX &&
+          roundedTotalDeltaX * initialSelectionAABB.height() >
+          initialSelectionAABB.width() * roundedTotalDeltaY))
           ? scaleX
           : scaleY;
       scaleY = scaleX;

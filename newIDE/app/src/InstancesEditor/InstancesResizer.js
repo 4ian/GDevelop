@@ -157,23 +157,28 @@ export default class InstancesResizer {
           flippedTotalDeltaX * initialSelectionAABB.height() >
           initialSelectionAABB.width() * flippedTotalDeltaY)) {
         scaleY = scaleX;
-        if (translationY != 0) {
+        if (grabbingLocation === "Left" || grabbingLocation === "Right") {
+          translationY = - roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width() / 2;
+        }
+        else if (isTop) {
           translationY = roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
-          if (isLeft != isTop) {
-            translationY = -translationY;
-          }
+        }
+        if (isLeft !== isTop) {
+          translationY = -translationY;
         }
       } else {
         scaleX = scaleY;
-        if (translationX != 0) {
+        if (grabbingLocation === "Top" || grabbingLocation === "Bottom") {
+          translationX = - roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height() / 2;
+        }
+        else if (isLeft) {
           translationX = roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height();
-          if (isLeft != isTop) {
-            translationX = -translationX;
-          }
+        }
+        if (isLeft !== isTop) {
+          translationX = -translationX;
         }
       }
     }
-
     
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];

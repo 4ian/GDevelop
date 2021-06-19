@@ -29,7 +29,7 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
-  set(rectangle: Rectangle) {
+  setRectangle(rectangle: Rectangle) {
     this.left = rectangle.left;
     this.top = rectangle.top;
     this.right = rectangle.right;

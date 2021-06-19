@@ -11,7 +11,7 @@ export default class SelectionRectangle {
   pixiRectangle: PIXI.Graphics;
   selectionRectangleStart: any;
   selectionRectangleEnd: any;
-  _instancesInSelectionRectangle: any[];
+  _instancesInSelectionRectangle: gdInitialInstance[];
 
   selector: gdInitialInstanceJSFunctor;
   _temporaryRectangle: Rectangle;

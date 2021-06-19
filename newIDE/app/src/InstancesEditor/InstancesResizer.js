@@ -2,13 +2,26 @@
 import Rectangle from '../Utils/Rectangle';
 import { roundPosition } from '../Utils/GridHelpers';
 
-export type ResizeAnchorLocation = "TopLeft" | "Top" | "Left";
+export type ResizeGrabbingLocation = "TopLeft" | "BottomLeft" | "BottomRight" | "TopRight" | "Top" | "Left" | "Bottom" | "Right";
 
-const grabbingRelativePositions = {
-  TopLeft: [1, 1],
-  Top: [0, 1],
-  Left: [1, 0],
+export const resizeGrabbingLocationValues = ["TopLeft", "BottomLeft", "BottomRight", "TopRight", "Top", "Left", "Bottom", "Right"];
+
+export const resizeGrabbingRelativePositions = {
+  TopLeft: [0, 0],
+  BottomLeft: [0, 1],
+  BottomRight: [1, 1],
+  TopRight: [1, 0],
+  Top: [0.5, 0],
+  Left: [0, 0.5],
+  Bottom: [0.5, 1],
+  Right: [1, 0.5],
 };
+
+export const isFreeOnX = (location: ResizeGrabbingLocation) =>
+  location !== "Top" && location !== "Bottom";
+
+export const isFreeOnY = (location: ResizeGrabbingLocation) =>
+  location !== "Left" && location !== "Right";
 
 export default class InstancesResizer {
   instanceMeasurer: any;
@@ -78,7 +91,7 @@ export default class InstancesResizer {
     let initialSelectionAABB = this._initialSelectionAABB;
     if (!initialSelectionAABB) {
       initialSelectionAABB = new Rectangle();
-      initialSelectionAABB.set(this._getOrCreateAABB(instances[0]));
+      initialSelectionAABB.setRectangle(this._getOrCreateAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
         initialSelectionAABB.union(this._getOrCreateAABB(instances[i]));
       }
@@ -91,7 +104,7 @@ export default class InstancesResizer {
     instances: gdInitialInstance[],
     deltaX: number,
     deltaY: number,
-    anchorLocation: ResizeAnchorLocation,
+    grabbingLocation: ResizeGrabbingLocation,
     proportional: boolean
   ) {
     this.totalDeltaX += deltaX;
@@ -108,7 +121,7 @@ export default class InstancesResizer {
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
     if (this.options.snap) {
-      const grabbingRelativePosition = grabbingRelativePositions[anchorLocation];
+      const grabbingRelativePosition = resizeGrabbingRelativePositions[grabbingLocation];
       const initialGrabbingX = initialSelectionAABB.left + initialSelectionAABB.width() * grabbingRelativePosition[0];
       const initialGrabbingY = initialSelectionAABB.top + initialSelectionAABB.height() * grabbingRelativePosition[1];
       const grabbingPosition = this._temporaryGrabbingPosition;
@@ -121,25 +134,46 @@ export default class InstancesResizer {
       roundedTotalDeltaX = this.totalDeltaX;
       roundedTotalDeltaY = this.totalDeltaY;
     }
-    if (anchorLocation === "Top") {
+    if (!isFreeOnX(grabbingLocation)) {
       roundedTotalDeltaX = 0;
     }
-    if (anchorLocation === "Left") {
+    if (!isFreeOnY(grabbingLocation)) {
       roundedTotalDeltaY = 0;
     }
 
-    let scaleX = (initialSelectionAABB.width() + roundedTotalDeltaX) / initialSelectionAABB.width();
-    let scaleY = (initialSelectionAABB.height() + roundedTotalDeltaY) / initialSelectionAABB.height();
+    const isLeft = grabbingLocation === "TopLeft" || grabbingLocation === "BottomLeft" || grabbingLocation === "Left";
+    const isTop = grabbingLocation === "TopLeft" || grabbingLocation === "TopRight" || grabbingLocation === "Top";
+
+    const flippedTotalDeltaX = (isLeft ? -roundedTotalDeltaX : roundedTotalDeltaX);
+    const flippedTotalDeltaY = (isTop ? -roundedTotalDeltaY : roundedTotalDeltaY);
+
+    let scaleX = (initialSelectionAABB.width() + flippedTotalDeltaX) / initialSelectionAABB.width();
+    let scaleY = (initialSelectionAABB.height() + flippedTotalDeltaY) / initialSelectionAABB.height();
+    let translationX = isLeft ? roundedTotalDeltaX : 0;
+    let translationY = isTop ? roundedTotalDeltaY : 0;
     if (proportional || hasRotatedInstance) {
-      scaleX =
-        (!roundedTotalDeltaY ||
-        (roundedTotalDeltaX &&
-          roundedTotalDeltaX * initialSelectionAABB.height() >
-          initialSelectionAABB.width() * roundedTotalDeltaY))
-          ? scaleX
-          : scaleY;
-      scaleY = scaleX;
+      if (!flippedTotalDeltaY ||
+        (flippedTotalDeltaX &&
+          flippedTotalDeltaX * initialSelectionAABB.height() >
+          initialSelectionAABB.width() * flippedTotalDeltaY)) {
+        scaleY = scaleX;
+        if (translationY != 0) {
+          translationY = roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
+          if (isLeft != isTop) {
+            translationY = -translationY;
+          }
+        }
+      } else {
+        scaleX = scaleY;
+        if (translationX != 0) {
+          translationX = roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height();
+          if (isLeft != isTop) {
+            translationX = -translationX;
+          }
+        }
+      }
     }
+
     
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
@@ -155,10 +189,10 @@ export default class InstancesResizer {
       );
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setX(
-        initialPosition.x + (initialOBB.left - initialSelectionAABB.left) * (scaleX - 1)
+        initialPosition.x + translationX + (initialOBB.left - initialSelectionAABB.left) * (scaleX - 1)
       );
       selectedInstance.setY(
-        initialPosition.y + (initialOBB.top - initialSelectionAABB.top) * (scaleY - 1)
+        initialPosition.y + translationY + (initialOBB.top - initialSelectionAABB.top) * (scaleY - 1)
       );
     }
   }

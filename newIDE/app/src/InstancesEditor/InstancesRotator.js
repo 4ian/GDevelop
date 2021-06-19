@@ -42,7 +42,7 @@ export default class InstancesRotator {
   ) {
     if (!this._anchor) {
       let selectionAABB = new Rectangle();
-      selectionAABB.set(this._getOrCreateAABB(instances[0]));
+      selectionAABB.setRectangle(this._getOrCreateAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
         selectionAABB.union(this._getOrCreateAABB(instances[i]));
       }

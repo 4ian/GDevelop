@@ -17,12 +17,7 @@ export default class Rectangle {
     this.bottom = bottom;
   }
 
-  set(
-    left: number,
-    top: number,
-    right: number,
-    bottom: number
-  ) {
+  set(left: number, top: number, right: number, bottom: number) {
     this.left = left;
     this.top = top;
     this.right = right;
@@ -68,6 +63,16 @@ export default class Rectangle {
   }
 
   toString() {
-    return "[" + this.left + " -> " + this.right + " ; " + this.top + " -> " + this.bottom + "]"; 
+    return (
+      '[' +
+      this.left +
+      ' -> ' +
+      this.right +
+      ' ; ' +
+      this.top +
+      ' -> ' +
+      this.bottom +
+      ']'
+    );
   }
 }

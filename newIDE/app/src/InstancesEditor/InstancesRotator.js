@@ -17,7 +17,8 @@ export default class InstancesRotator {
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
     const angle =
-      Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180 / Math.PI - 90 +
+      (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI -
+      90 +
       initialAngle;
     return proportional ? Math.round(angle / 15) * 15 : angle;
   }
@@ -82,22 +83,30 @@ export default class InstancesRotator {
           selectedInstance.ptr
         ] = selectedInstance.getAngle();
       }
-      
-      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(selectedInstance);
+
+      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
+        selectedInstance
+      );
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
       selectedInstance.setAngle(degreeAngle);
 
-      const angle = (degreeAngle - initialAngle) * Math.PI / 180;
+      const angle = ((degreeAngle - initialAngle) * Math.PI) / 180;
       const cosa = Math.cos(-angle);
       const sina = Math.sin(-angle);
       const deltaX = -(initialAABB.centerX() - this._anchor[0]);
       const deltaY = -(initialAABB.centerY() - this._anchor[1]);
       selectedInstance.setX(
-        this._anchor[0] + (initialInstanceOriginPosition.x - initialAABB.centerX()) + cosa * deltaX + sina * deltaY
+        this._anchor[0] +
+          (initialInstanceOriginPosition.x - initialAABB.centerX()) +
+          cosa * deltaX +
+          sina * deltaY
       );
       selectedInstance.setY(
-        this._anchor[1] + (initialInstanceOriginPosition.y - initialAABB.centerY()) - sina * deltaX + cosa * deltaY
+        this._anchor[1] +
+          (initialInstanceOriginPosition.y - initialAABB.centerY()) -
+          sina * deltaX +
+          cosa * deltaY
       );
     }
   }

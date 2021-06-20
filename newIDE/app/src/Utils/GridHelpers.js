@@ -1,7 +1,5 @@
 // @flow
 
-
-
 export const roundPosition = (
   pos: [number, number],
   gridWidth: number,
@@ -87,7 +85,8 @@ export const roundPositionForResizing = (
       gridHeight / 2,
       gridOffsetX,
       gridOffsetY,
-      'rectangular');
+      'rectangular'
+    );
   }
   return roundPosition(
     pos,
@@ -95,5 +94,6 @@ export const roundPositionForResizing = (
     gridHeight,
     gridOffsetX,
     gridOffsetY,
-    gridType);
-}
+    gridType
+  );
+};

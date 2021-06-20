@@ -4,12 +4,22 @@ import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
-import { type ResizeGrabbingLocation, resizeGrabbingLocationValues, resizeGrabbingRelativePositions, isFreeOnX, isFreeOnY } from './InstancesResizer';
+import {
+  type ResizeGrabbingLocation,
+  resizeGrabbingLocationValues,
+  resizeGrabbingRelativePositions,
+  isFreeOnX,
+  isFreeOnY,
+} from './InstancesResizer';
 
 type Props = {|
   instancesSelection: InstancesSelection,
   instanceMeasurer: Object, // To be typed in InstancesRenderer
-  onResize: (deltaX: number, deltaY: number, grabbingLocation: ResizeGrabbingLocation) => void,
+  onResize: (
+    deltaX: number,
+    deltaY: number,
+    grabbingLocation: ResizeGrabbingLocation
+  ) => void,
   onResizeEnd: () => void,
   onRotate: (number, number) => void,
   onRotateEnd: () => void,
@@ -44,7 +54,11 @@ const CIRCLE_BUTTON_SHAPE = 1;
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
-  onResize: (deltaX: number, deltaY: number, grabbingLocation: ResizeGrabbingLocation) => void;
+  onResize: (
+    deltaX: number,
+    deltaY: number,
+    grabbingLocation: ResizeGrabbingLocation
+  ) => void;
   onResizeEnd: () => void;
   onRotate: (number, number) => void;
   onRotateEnd: () => void;
@@ -54,7 +68,7 @@ export default class SelectedInstances {
   pixiContainer = new PIXI.Container();
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
-  resizeButtons : { [ResizeGrabbingLocation]: PIXI.Graphics } = {};
+  resizeButtons: { [ResizeGrabbingLocation]: PIXI.Graphics } = {};
   resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
   rotateButton = new PIXI.Graphics();
 
@@ -233,9 +247,11 @@ export default class SelectedInstances {
     //Position the resize button.
     for (const grabbingLocation of resizeGrabbingLocationValues) {
       const resizeButton = this.resizeButtons[grabbingLocation];
-      const relativePositions = resizeGrabbingRelativePositions[grabbingLocation];
-      
-      const useBigButton = isFreeOnX(grabbingLocation) && isFreeOnY(grabbingLocation)
+      const relativePositions =
+        resizeGrabbingRelativePositions[grabbingLocation];
+
+      const useBigButton =
+        isFreeOnX(grabbingLocation) && isFreeOnY(grabbingLocation);
       const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
       const padding = buttonPadding + buttonSize / 2;
       const resizeButtonPos = this.toCanvasCoordinates(

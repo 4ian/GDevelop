@@ -42,7 +42,12 @@ export default class LayerRenderer {
   wasUsed: boolean = false;
 
   _temporaryRectangle: Rectangle = new Rectangle();
-  _temporaryRectanglePath: Array<[number, number]> = [[0, 0], [0, 0], [0, 0], [0, 0]];
+  _temporaryRectanglePath: Array<[number, number]> = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ];
 
   constructor({
     project,
@@ -154,7 +159,10 @@ export default class LayerRenderer {
       : 0;
   };
 
-  getUnrotatedInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
+  getUnrotatedInstanceAABB(
+    instance: gdInitialInstance,
+    bounds: Rectangle
+  ): Rectangle {
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);

@@ -41,6 +41,9 @@ export default class InstancesRotator {
     proportional: boolean
   ) {
     if (!this._anchor) {
+      //TODO the same thing is calculated in InstanceResizer and SelectedInstances,
+      // does it worth extracting this in a selection model
+      // who would know when to reprocess it?
       let selectionAABB = new Rectangle();
       selectionAABB.setRectangle(this._getOrCreateAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {

@@ -88,6 +88,9 @@ export default class InstancesResizer {
   }
 
   _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+    //TODO the same thing is calculated in InstanceRotator and SelectedInstances,
+    // does it worth extracting this in a selection model
+    // who would know when to reprocess it?
     let initialSelectionAABB = this._initialSelectionAABB;
     if (!initialSelectionAABB) {
       initialSelectionAABB = new Rectangle();
@@ -121,6 +124,7 @@ export default class InstancesResizer {
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
     if (this.options.snap) {
+      // round the grabbed node position on the grid
       const grabbingRelativePosition = resizeGrabbingRelativePositions[grabbingLocation];
       const initialGrabbingX = initialSelectionAABB.left + initialSelectionAABB.width() * grabbingRelativePosition[0];
       const initialGrabbingY = initialSelectionAABB.top + initialSelectionAABB.height() * grabbingRelativePosition[1];
@@ -151,7 +155,12 @@ export default class InstancesResizer {
     let scaleY = (initialSelectionAABB.height() + flippedTotalDeltaY) / initialSelectionAABB.height();
     let translationX = isLeft ? roundedTotalDeltaX : 0;
     let translationY = isTop ? roundedTotalDeltaY : 0;
+    // Applying a rotation then a scaling can result to
+    // an affine transformation with a shear composite.
+    // So, keeping the aspect ratio ensures a transformation without any shear.
     if (proportional || hasRotatedInstance) {
+      // Choose the axis where the selection is the biggest.
+      // That way the cursor is always on one edge.
       if (!flippedTotalDeltaY ||
         (flippedTotalDeltaX &&
           flippedTotalDeltaX * initialSelectionAABB.height() >
@@ -159,6 +168,11 @@ export default class InstancesResizer {
         scaleY = scaleX;
         translationY = (1 - resizeGrabbingRelativePositions[grabbingLocation][1]) * roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
         if (grabbingLocation === "TopRight" || grabbingLocation === "Right") {
+          // This is because of roundedTotalDeltaX.
+          // Draw a rectangle and for each grabable node draw a L...
+          // ...to show in which direction the object will move on X and Y.
+          // for these 2 and the 2 nodes bellow it will be a L (so y = -x).
+          // The other ones will be a mirrored _| (so y = x).
           translationY = -translationY;
         }
       } else {

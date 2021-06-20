@@ -153,8 +153,6 @@ export default class InstancesResizer {
 
     let scaleX = (initialSelectionAABB.width() + flippedTotalDeltaX) / initialSelectionAABB.width();
     let scaleY = (initialSelectionAABB.height() + flippedTotalDeltaY) / initialSelectionAABB.height();
-    let translationX = isLeft ? roundedTotalDeltaX : 0;
-    let translationY = isTop ? roundedTotalDeltaY : 0;
     // Applying a rotation then a scaling can result to
     // an affine transformation with a shear composite.
     // So, keeping the aspect ratio ensures a transformation without any shear.
@@ -166,23 +164,13 @@ export default class InstancesResizer {
           flippedTotalDeltaX * initialSelectionAABB.height() >
           initialSelectionAABB.width() * flippedTotalDeltaY)) {
         scaleY = scaleX;
-        translationY = (1 - resizeGrabbingRelativePositions[grabbingLocation][1]) * roundedTotalDeltaX * initialSelectionAABB.height() / initialSelectionAABB.width();
-        if (grabbingLocation === "TopRight" || grabbingLocation === "Right") {
-          // This is because of roundedTotalDeltaX.
-          // Draw a rectangle and for each grabable node draw a L...
-          // ...to show in which direction the object will move on X and Y.
-          // for these 2 and the 2 nodes bellow it will be a L (so y = -x).
-          // The other ones will be a mirrored _| (so y = x).
-          translationY = -translationY;
-        }
       } else {
         scaleX = scaleY;
-        translationX = (1 - resizeGrabbingRelativePositions[grabbingLocation][0]) * roundedTotalDeltaY * initialSelectionAABB.width() / initialSelectionAABB.height();
-        if (grabbingLocation === "BottomLeft" || grabbingLocation === "Bottom") {
-          translationX = -translationX;
-        }
       }
     }
+
+    const anchorX = initialSelectionAABB.right - resizeGrabbingRelativePositions[grabbingLocation][0] * initialSelectionAABB.width();
+    const anchorY = initialSelectionAABB.bottom - resizeGrabbingRelativePositions[grabbingLocation][1] * initialSelectionAABB.height();
     
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
@@ -198,10 +186,10 @@ export default class InstancesResizer {
       );
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setX(
-        initialInstanceOriginPosition.x + translationX + (initialInstanceOriginPosition.x - initialSelectionAABB.left) * (scaleX - 1)
+        (initialInstanceOriginPosition.x - anchorX) * (scaleX) + anchorX
       );
       selectedInstance.setY(
-        initialInstanceOriginPosition.y + translationY + (initialInstanceOriginPosition.y - initialSelectionAABB.top) * (scaleY - 1)
+        (initialInstanceOriginPosition.y - anchorY) * (scaleY) + anchorY
       );
     }
   }

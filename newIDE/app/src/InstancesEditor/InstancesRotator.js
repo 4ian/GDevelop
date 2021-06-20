@@ -88,7 +88,7 @@ export default class InstancesRotator {
       );
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
-      selectedInstance.setAngle((degreeAngle % 360 + 360) % 360);
+      selectedInstance.setAngle(((degreeAngle % 360) + 360) % 360);
 
       const angle = ((degreeAngle - initialAngle) * Math.PI) / 180;
       const cosa = Math.cos(-angle);

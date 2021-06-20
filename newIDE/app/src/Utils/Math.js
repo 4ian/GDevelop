@@ -29,7 +29,7 @@ export class Softener {
  * @param y Divisor value.
  * @returns Return the remainder for the values.
  */
-export const mod = function(x: float, y: float): number {
+export const mod = function(x: number, y: number): number {
   return x - y * Math.floor(x / y);
 };
 

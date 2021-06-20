@@ -102,7 +102,7 @@ export default class InstancesMover {
         ) *
           180) /
         Math.PI;
-      
+
       // leave a 2 * 15° margin to avoid flickering
       if (Math.abs(angleDifference(directionAngle, -90)) < 75) {
         this._magnetTop = true;

@@ -8,7 +8,8 @@ export default class InstancesRotator {
   _instanceAABBs: { [number]: Rectangle } = {};
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
-  _anchor: ?[number, number] = null;
+  _anchorIsUpToDate: boolean = false;
+  _anchor: [number, number] = [0, 0];
 
   constructor(instanceMeasurer: any) {
     this._instanceMeasurer = instanceMeasurer;
@@ -51,7 +52,8 @@ export default class InstancesRotator {
     deltaY: number,
     proportional: boolean
   ) {
-    if (!this._anchor) {
+    if (!this._anchorIsUpToDate) {
+      this._anchorIsUpToDate = true;
       //TODO the same thing is calculated in InstanceResizer and SelectedInstances,
       // does it worth extracting this in a selection model
       // who would know when to reprocess it?
@@ -60,7 +62,8 @@ export default class InstancesRotator {
       for (let i = 1; i < instances.length; i++) {
         selectionAABB.union(this._getOrCreateAABB(instances[i]));
       }
-      this._anchor = [selectionAABB.centerX(), selectionAABB.centerY()];
+      this._anchor[0] = selectionAABB.centerX();
+      this._anchor[1] = selectionAABB.centerY();
       this.totalDeltaY -= selectionAABB.height() / 2;
     }
 
@@ -105,6 +108,6 @@ export default class InstancesRotator {
     this._instanceAABBs = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
-    this._anchor = null;
+    this._anchorIsUpToDate = false;
   }
 }

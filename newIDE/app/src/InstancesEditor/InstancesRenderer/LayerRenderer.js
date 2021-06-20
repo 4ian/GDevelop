@@ -9,6 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle';
+import rotatePolygon from '../../Utils/PolygonHelper';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -32,7 +33,7 @@ export default class LayerRenderer {
   /** Used for instances culling on rendering */
   viewBottomRight: [number, number];
 
-  renderedInstances: { [number]: RenderedInstance };
+  renderedInstances: { [number]: RenderedInstance } = {};
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
@@ -40,8 +41,8 @@ export default class LayerRenderer {
 
   wasUsed: boolean = false;
 
-  temporaryRectangle: Rectangle;
-  temporaryRectanglePath: Array<[number, number]>;
+  _temporaryRectangle: Rectangle = new Rectangle();
+  _temporaryRectanglePath: Array<[number, number]> = [[0, 0], [0, 0], [0, 0], [0, 0]];
 
   constructor({
     project,
@@ -87,7 +88,6 @@ export default class LayerRenderer {
     this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
     this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
 
-    this.renderedInstances = {};
     this.pixiContainer = new PIXI.Container();
 
     // Functor used to render an instance
@@ -114,9 +114,6 @@ export default class LayerRenderer {
 
       renderedInstance.wasUsed = true;
     };
-
-    this.temporaryRectangle = new Rectangle();
-    this.temporaryRectanglePath = [[0, 0], [0, 0], [0, 0], [0, 0]];
   }
 
   getPixiContainer() {
@@ -170,50 +167,33 @@ export default class LayerRenderer {
     return bounds;
   }
 
-  getRectanglePath(instance: gdInitialInstance): Array<[number, number]> {
+  _getRectanglePath(instance: gdInitialInstance): Array<[number, number]> {
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
     const bottom = top + this.getUnrotatedInstanceHeight(instance);
 
-    this.temporaryRectanglePath[0][0] = left;
-    this.temporaryRectanglePath[0][1] = top;
+    this._temporaryRectanglePath[0][0] = left;
+    this._temporaryRectanglePath[0][1] = top;
 
-    this.temporaryRectanglePath[1][0] = left;
-    this.temporaryRectanglePath[1][1] = bottom;
+    this._temporaryRectanglePath[1][0] = left;
+    this._temporaryRectanglePath[1][1] = bottom;
 
-    this.temporaryRectanglePath[2][0] = right;
-    this.temporaryRectanglePath[2][1] = bottom;
+    this._temporaryRectanglePath[2][0] = right;
+    this._temporaryRectanglePath[2][1] = bottom;
 
-    this.temporaryRectanglePath[3][0] = right;
-    this.temporaryRectanglePath[3][1] = top;
+    this._temporaryRectanglePath[3][0] = right;
+    this._temporaryRectanglePath[3][1] = top;
 
-    return this.temporaryRectanglePath;
+    return this._temporaryRectanglePath;
   }
 
-  rotate(
-    vertices: Array<[number, number]>,
-    centerX: number,
-    centerY: number,
-    angle: number
-  ): void {
-    //We want a clockwise rotation
-    const cosa = Math.cos(-angle);
-    const sina = Math.sin(-angle);
-    for (let i = 0, len = vertices.length; i < len; ++i) {
-      let x = vertices[i][0] - centerX;
-      let y = vertices[i][1] - centerY;
-      vertices[i][0] = centerX + x * cosa + y * sina;
-      vertices[i][1] = centerY - x * sina + y * cosa;
-    }
-  }
-
-  getRotatedRectangle(instance: gdInitialInstance): Array<[number, number]> {
-    const rectangle = this.getRectanglePath(instance);
+  _getRotatedRectangle(instance: gdInitialInstance): Array<[number, number]> {
+    const rectangle = this._getRectanglePath(instance);
     const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
     const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
     const angle = (instance.getAngle() * Math.PI) / 180;
-    this.rotate(rectangle, centerX, centerY, angle);
+    rotatePolygon(rectangle, centerX, centerY, angle);
     return rectangle;
   }
 
@@ -223,7 +203,7 @@ export default class LayerRenderer {
       return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
-    const rotatedRectangle = this.getRotatedRectangle(instance);
+    const rotatedRectangle = this._getRotatedRectangle(instance);
 
     let left = Number.MAX_VALUE;
     let right = -Number.MAX_VALUE;
@@ -313,7 +293,7 @@ export default class LayerRenderer {
    */
   _isInstanceVisible(instance: gdInitialInstance) {
     //TODO: Properly handle rotation
-    const aabb = this.getInstanceAABB(instance, this.temporaryRectangle);
+    const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
       aabb.left + aabb.width() < this.viewTopLeft[0] ||
       aabb.top + aabb.height() < this.viewTopLeft[1] ||

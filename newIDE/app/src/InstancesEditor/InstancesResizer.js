@@ -113,12 +113,6 @@ export default class InstancesResizer {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
     
-    let hasRotatedInstance = false;
-    for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
-      const selectedInstance = instances[i];
-      hasRotatedInstance = selectedInstance.getAngle() !== 0;
-    }
-    
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
 
     let roundedTotalDeltaX;
@@ -145,6 +139,12 @@ export default class InstancesResizer {
       roundedTotalDeltaY = 0;
     }
 
+    let hasRotatedInstance = false;
+    for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
+      const selectedInstance = instances[i];
+      hasRotatedInstance = selectedInstance.getAngle() !== 0;
+    }
+
     const isLeft = grabbingLocation === "TopLeft" || grabbingLocation === "BottomLeft" || grabbingLocation === "Left";
     const isTop = grabbingLocation === "TopLeft" || grabbingLocation === "TopRight" || grabbingLocation === "Top";
 
@@ -169,6 +169,7 @@ export default class InstancesResizer {
       }
     }
 
+    // instances can't be mirrored
     scaleX = Math.max(0, scaleX);
     scaleY = Math.max(0, scaleY);
 

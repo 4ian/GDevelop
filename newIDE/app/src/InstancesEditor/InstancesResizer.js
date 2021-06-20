@@ -169,6 +169,9 @@ export default class InstancesResizer {
       }
     }
 
+    scaleX = Math.max(0, scaleX);
+    scaleY = Math.max(0, scaleY);
+
     const anchorX = initialSelectionAABB.right - resizeGrabbingRelativePositions[grabbingLocation][0] * initialSelectionAABB.width();
     const anchorY = initialSelectionAABB.bottom - resizeGrabbingRelativePositions[grabbingLocation][1] * initialSelectionAABB.height();
     
@@ -186,10 +189,10 @@ export default class InstancesResizer {
       );
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setX(
-        (initialInstanceOriginPosition.x - anchorX) * (scaleX) + anchorX
+        (initialInstanceOriginPosition.x - anchorX)  * scaleX + anchorX
       );
       selectedInstance.setY(
-        (initialInstanceOriginPosition.y - anchorY) * (scaleY) + anchorY
+        (initialInstanceOriginPosition.y - anchorY) * scaleY + anchorY
       );
     }
   }

@@ -69,14 +69,15 @@ export default class InstancesResizer {
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
     let initialInstanceAABB = this._instanceAABBs[instance.ptr];
-    if (!initialInstanceAABB) {
-      initialInstanceAABB = new Rectangle();
-      initialInstanceAABB = this.instanceMeasurer.getInstanceAABB(
-        instance,
-        initialInstanceAABB
-      );
-      this._instanceAABBs[instance.ptr] = initialInstanceAABB;
+    if (initialInstanceAABB) {
+      return initialInstanceAABB;
     }
+    initialInstanceAABB = new Rectangle();
+    initialInstanceAABB = this.instanceMeasurer.getInstanceAABB(
+      instance,
+      initialInstanceAABB
+    );
+    this._instanceAABBs[instance.ptr] = initialInstanceAABB;
     return initialInstanceAABB;
   }
 
@@ -84,43 +85,43 @@ export default class InstancesResizer {
     let initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
       instance.ptr
     ];
-    if (!initialUnrotatedInstanceAABB) {
-      initialUnrotatedInstanceAABB = new Rectangle();
-      initialUnrotatedInstanceAABB = this.instanceMeasurer.getUnrotatedInstanceAABB(
-        instance,
-        initialUnrotatedInstanceAABB
-      );
-      this._unrotatedInstanceAABBs[instance.ptr] = initialUnrotatedInstanceAABB;
+    if (initialUnrotatedInstanceAABB) {
+      return initialUnrotatedInstanceAABB;
     }
+    initialUnrotatedInstanceAABB = new Rectangle();
+    initialUnrotatedInstanceAABB = this.instanceMeasurer.getUnrotatedInstanceAABB(
+      instance,
+      initialUnrotatedInstanceAABB
+    );
+    this._unrotatedInstanceAABBs[instance.ptr] = initialUnrotatedInstanceAABB;
     return initialUnrotatedInstanceAABB;
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
     let initialPosition = this._instancePositions[instance.ptr];
-    if (!initialPosition) {
-      initialPosition = this._instancePositions[instance.ptr] = {
-        x: instance.getX(),
-        y: instance.getY(),
-      };
+    if (initialPosition) {
+      return initialPosition;
     }
+    initialPosition = this._instancePositions[instance.ptr] = {
+      x: instance.getX(),
+      y: instance.getY(),
+    };
     return initialPosition;
   }
 
   _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
-    //TODO the same thing is calculated in InstanceRotator and SelectedInstances,
-    // does it worth extracting this in a selection model
-    // who would know when to reprocess it?
     let initialSelectionAABB = this._initialSelectionAABB;
-    if (!initialSelectionAABB) {
-      initialSelectionAABB = new Rectangle();
-      initialSelectionAABB.setRectangle(
-        this._getOrCreateInstanceAABB(instances[0])
-      );
-      for (let i = 1; i < instances.length; i++) {
-        initialSelectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
-      }
-      this._initialSelectionAABB = initialSelectionAABB;
+    if (initialSelectionAABB) {
+      return initialSelectionAABB;
     }
+    initialSelectionAABB = new Rectangle();
+    initialSelectionAABB.setRectangle(
+      this._getOrCreateInstanceAABB(instances[0])
+    );
+    for (let i = 1; i < instances.length; i++) {
+      initialSelectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
+    }
+    this._initialSelectionAABB = initialSelectionAABB;
     return initialSelectionAABB;
   }
 

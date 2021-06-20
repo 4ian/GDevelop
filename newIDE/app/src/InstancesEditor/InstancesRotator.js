@@ -23,27 +23,26 @@ export default class InstancesRotator {
     return proportional ? Math.round(angle / 15) * 15 : angle;
   }
 
-  _getOrCreateAABB(instance: gdInitialInstance) {
+  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
     let initialAABB = this._instanceAABBs[instance.ptr];
-    if (!initialAABB) {
-      initialAABB = new Rectangle();
-      initialAABB = this._instanceMeasurer.getInstanceAABB(
-        instance,
-        initialAABB
-      );
-      this._instanceAABBs[instance.ptr] = initialAABB;
+    if (initialAABB) {
+      return initialAABB;
     }
+    initialAABB = new Rectangle();
+    initialAABB = this._instanceMeasurer.getInstanceAABB(instance, initialAABB);
+    this._instanceAABBs[instance.ptr] = initialAABB;
     return initialAABB;
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
     let initialPosition = this._instancePositions[instance.ptr];
-    if (!initialPosition) {
-      initialPosition = this._instancePositions[instance.ptr] = {
-        x: instance.getX(),
-        y: instance.getY(),
-      };
+    if (initialPosition) {
+      return initialPosition;
     }
+    initialPosition = this._instancePositions[instance.ptr] = {
+      x: instance.getX(),
+      y: instance.getY(),
+    };
     return initialPosition;
   }
 
@@ -55,16 +54,14 @@ export default class InstancesRotator {
   ) {
     if (!this._anchorIsUpToDate) {
       this._anchorIsUpToDate = true;
-      //TODO the same thing is calculated in InstanceResizer and SelectedInstances,
-      // does it worth extracting this in a selection model
-      // who would know when to reprocess it?
       let selectionAABB = new Rectangle();
-      selectionAABB.setRectangle(this._getOrCreateAABB(instances[0]));
+      selectionAABB.setRectangle(this._getOrCreateInstanceAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
-        selectionAABB.union(this._getOrCreateAABB(instances[i]));
+        selectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
       }
       this._anchor[0] = selectionAABB.centerX();
       this._anchor[1] = selectionAABB.centerY();
+      // Because the button is on top.
       this.totalDeltaY -= selectionAABB.height() / 2;
     }
 
@@ -74,7 +71,7 @@ export default class InstancesRotator {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
-      let initialAABB = this._getOrCreateAABB(selectedInstance);
+      let initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
 
       let initialAngle = this._instanceAngles[selectedInstance.ptr];
       if (initialAngle === undefined) {
@@ -90,9 +87,9 @@ export default class InstancesRotator {
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
       selectedInstance.setAngle(((degreeAngle % 360) + 360) % 360);
 
-      const angle = ((degreeAngle - initialAngle) * Math.PI) / 180;
-      const cosa = Math.cos(-angle);
-      const sina = Math.sin(-angle);
+      const rotationAngle = ((degreeAngle - initialAngle) * Math.PI) / 180;
+      const cosa = Math.cos(-rotationAngle);
+      const sina = Math.sin(-rotationAngle);
       const deltaX = initialAABB.centerX() - this._anchor[0];
       const deltaY = initialAABB.centerY() - this._anchor[1];
       selectedInstance.setX(

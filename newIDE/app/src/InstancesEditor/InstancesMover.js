@@ -56,23 +56,17 @@ export default class InstancesMover {
   }
 
   _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
-    //TODO the same thing is calculated in InstanceRotator and SelectedInstances,
-    // does it worth extracting this in a selection model
-    // who would know when to reprocess it?
-    let initialSelectionAABB = this._initialSelectionAABB;
-    if (!initialSelectionAABB) {
-      initialSelectionAABB = new Rectangle();
-      this.instanceMeasurer.getInstanceAABB(instances[0], initialSelectionAABB);
-      const initialInstanceAABB = new Rectangle();
-      for (let i = 1; i < instances.length; i++) {
-        this.instanceMeasurer.getInstanceAABB(
-          instances[i],
-          initialInstanceAABB
-        );
-        initialSelectionAABB.union(initialInstanceAABB);
-      }
-      this._initialSelectionAABB = initialSelectionAABB;
+    if (this._initialSelectionAABB) {
+      return this._initialSelectionAABB;
     }
+    let initialSelectionAABB = new Rectangle();
+    this.instanceMeasurer.getInstanceAABB(instances[0], initialSelectionAABB);
+    const initialInstanceAABB = new Rectangle();
+    for (let i = 1; i < instances.length; i++) {
+      this.instanceMeasurer.getInstanceAABB(instances[i], initialInstanceAABB);
+      initialSelectionAABB.union(initialInstanceAABB);
+    }
+    this._initialSelectionAABB = initialSelectionAABB;
     return initialSelectionAABB;
   }
 

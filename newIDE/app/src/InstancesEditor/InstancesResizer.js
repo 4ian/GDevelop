@@ -1,6 +1,6 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
-import { roundPosition } from '../Utils/GridHelpers';
+import { roundPositionForResizing } from '../Utils/GridHelpers';
 
 export type ResizeGrabbingLocation = "TopLeft" | "BottomLeft" | "BottomRight" | "TopRight" | "Top" | "Left" | "Bottom" | "Right";
 
@@ -131,7 +131,7 @@ export default class InstancesResizer {
       const grabbingPosition = this._temporaryGrabbingPosition;
       grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
       grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
-      roundPosition(grabbingPosition, this.options.gridWidth, this.options.gridHeight, this.options.gridOffsetX, this.options.gridOffsetY, this.options.gridType);
+      roundPositionForResizing(grabbingPosition, this.options.gridWidth, this.options.gridHeight, this.options.gridOffsetX, this.options.gridOffsetY, this.options.gridType);
       roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
       roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
     } else {

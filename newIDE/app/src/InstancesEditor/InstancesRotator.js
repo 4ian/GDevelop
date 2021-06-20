@@ -17,7 +17,7 @@ export default class InstancesRotator {
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
     const angle =
-      (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI -
+      (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI +
       90 +
       initialAngle;
     return proportional ? Math.round(angle / 15) * 15 : angle;
@@ -74,7 +74,6 @@ export default class InstancesRotator {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
-      // already populated above
       let initialAABB = this._getOrCreateAABB(selectedInstance);
 
       let initialAngle = this._instanceAngles[selectedInstance.ptr];
@@ -89,13 +88,13 @@ export default class InstancesRotator {
       );
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
-      selectedInstance.setAngle(degreeAngle);
+      selectedInstance.setAngle((degreeAngle % 360 + 360) % 360);
 
       const angle = ((degreeAngle - initialAngle) * Math.PI) / 180;
       const cosa = Math.cos(-angle);
       const sina = Math.sin(-angle);
-      const deltaX = -(initialAABB.centerX() - this._anchor[0]);
-      const deltaY = -(initialAABB.centerY() - this._anchor[1]);
+      const deltaX = initialAABB.centerX() - this._anchor[0];
+      const deltaY = initialAABB.centerY() - this._anchor[1];
       selectedInstance.setX(
         this._anchor[0] +
           (initialInstanceOriginPosition.x - initialAABB.centerX()) +

@@ -216,9 +216,10 @@ export default class InstancesResizer {
       }
     }
 
-    // instances can't be mirrored
-    scaleX = Math.max(0, scaleX);
-    scaleY = Math.max(0, scaleY);
+    // No negative scale because instances can't be mirrored
+    // Make the minimal selection size to 1 to avoid absorption
+    scaleX = Math.max(1 / initialSelectionAABB.width(), scaleX);
+    scaleY = Math.max(1 / initialSelectionAABB.height(), scaleY);
 
     const anchorX =
       initialSelectionAABB.right -

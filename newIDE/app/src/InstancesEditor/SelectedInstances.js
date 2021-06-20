@@ -48,7 +48,7 @@ const getButtonSizes = (screenType: ScreenType) => {
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
-export const resizeGrabbingIconNames = {
+const resizeGrabbingIconNames = {
   TopLeft: 'nwse-resize',
   BottomLeft: 'nesw-resize',
   BottomRight: 'nwse-resize',

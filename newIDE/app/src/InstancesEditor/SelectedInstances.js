@@ -48,6 +48,17 @@ const getButtonSizes = (screenType: ScreenType) => {
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
+export const resizeGrabbingIconNames = {
+  TopLeft: 'nwse-resize',
+  BottomLeft: 'nesw-resize',
+  BottomRight: 'nwse-resize',
+  TopRight: 'nesw-resize',
+  Top: 'ns-resize',
+  Left: 'ew-resize',
+  Bottom: 'ns-resize',
+  Right: 'ew-resize',
+};
+
 /**
  * Render selection rectangle for selected instances.
  */
@@ -104,7 +115,7 @@ export default class SelectedInstances {
         () => {
           this.onResizeEnd();
         },
-        resizeGrabbingLocation
+        resizeGrabbingIconNames[resizeGrabbingLocation]
       );
     }
     this._makeButton(

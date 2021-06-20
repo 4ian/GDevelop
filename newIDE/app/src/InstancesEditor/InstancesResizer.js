@@ -198,10 +198,10 @@ export default class InstancesResizer {
       );
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setX(
-        initialPosition.x + translationX + (initialOBB.left - initialSelectionAABB.left) * (scaleX - 1)
+        initialPosition.x + translationX + (initialPosition.x - initialSelectionAABB.left) * (scaleX - 1)
       );
       selectedInstance.setY(
-        initialPosition.y + translationY + (initialOBB.top - initialSelectionAABB.top) * (scaleY - 1)
+        initialPosition.y + translationY + (initialPosition.y - initialSelectionAABB.top) * (scaleY - 1)
       );
     }
   }

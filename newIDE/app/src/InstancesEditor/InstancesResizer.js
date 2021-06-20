@@ -138,7 +138,7 @@ export default class InstancesResizer {
 
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
-    if (this.options.snap) {
+    if (this.options.snap && this.options.grid) {
       // round the grabbed node position on the grid
       const grabbingRelativePosition =
         resizeGrabbingRelativePositions[grabbingLocation];

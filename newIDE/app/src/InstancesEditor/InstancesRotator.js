@@ -34,6 +34,17 @@ export default class InstancesRotator {
     return initialAABB;
   }
 
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
+    let initialPosition = this._instancePositions[instance.ptr];
+    if (!initialPosition) {
+      initialPosition = this._instancePositions[instance.ptr] = {
+        x: instance.getX(),
+        y: instance.getY(),
+      };
+    }
+    return initialPosition;
+  }
+
   rotateBy(
     instances: gdInitialInstance[],
     deltaX: number,
@@ -69,13 +80,7 @@ export default class InstancesRotator {
         ] = selectedInstance.getAngle();
       }
       
-      let initialPosition = this._instancePositions[selectedInstance.ptr];
-      if (!initialPosition) {
-        initialPosition = this._instancePositions[selectedInstance.ptr] = {
-          x: selectedInstance.getX(),
-          y: selectedInstance.getY(),
-        };
-      }
+      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(selectedInstance);
 
       const degreeAngle = this._getNewAngle(proportional, initialAngle);
       selectedInstance.setAngle(degreeAngle);
@@ -86,10 +91,10 @@ export default class InstancesRotator {
       const deltaX = -(initialAABB.centerX() - this._anchor[0]);
       const deltaY = -(initialAABB.centerY() - this._anchor[1]);
       selectedInstance.setX(
-        this._anchor[0] + (initialPosition.x - initialAABB.centerX()) + cosa * deltaX + sina * deltaY
+        this._anchor[0] + (initialInstanceOriginPosition.x - initialAABB.centerX()) + cosa * deltaX + sina * deltaY
       );
       selectedInstance.setY(
-        this._anchor[1] + (initialPosition.y - initialAABB.centerY()) - sina * deltaX + cosa * deltaY
+        this._anchor[1] + (initialInstanceOriginPosition.y - initialAABB.centerY()) - sina * deltaX + cosa * deltaY
       );
     }
   }

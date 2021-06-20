@@ -157,7 +157,7 @@ export default class LayerRenderer {
       : 0;
   };
 
-  getInstanceOBB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
+  getUnrotatedInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
@@ -220,7 +220,7 @@ export default class LayerRenderer {
   getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
     const angle = (instance.getAngle() * Math.PI) / 180;
     if (angle === 0) {
-      return this.getInstanceOBB(instance, bounds);
+      return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
     const rotatedRectangle = this.getRotatedRectangle(instance);

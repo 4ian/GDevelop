@@ -27,7 +27,7 @@ export default class InstancesResizer {
   instanceMeasurer: any;
   options: Object;
   _initialSelectionAABB: ?Rectangle = null;
-  _instanceOBBs: { [number]: Rectangle } = {};
+  _unrotatedInstanceAABBs: { [number]: Rectangle } = {};
   _instanceAABBs: { [number]: Rectangle } = {};
   _instancePositions: { [number]: { x: number, y: number } } = {};
   totalDeltaX: number = 0;
@@ -50,33 +50,33 @@ export default class InstancesResizer {
     this.options = options;
   }
 
-  _getOrCreateAABB(instance: gdInitialInstance) {
-    let initialAABB = this._instanceAABBs[instance.ptr];
-    if (!initialAABB) {
-      initialAABB = new Rectangle();
-      initialAABB = this.instanceMeasurer.getInstanceAABB(
+  _getOrCreateInstanceAABB(instance: gdInitialInstance) {
+    let initialInstanceAABB = this._instanceAABBs[instance.ptr];
+    if (!initialInstanceAABB) {
+      initialInstanceAABB = new Rectangle();
+      initialInstanceAABB = this.instanceMeasurer.getInstanceAABB(
         instance,
-        initialAABB
+        initialInstanceAABB
       );
-      this._instanceAABBs[instance.ptr] = initialAABB;
+      this._instanceAABBs[instance.ptr] = initialInstanceAABB;
     }
-    return initialAABB;
+    return initialInstanceAABB;
   }
 
-  _getOrCreateOBB(instance: gdInitialInstance) {
-    let initialOBB = this._instanceOBBs[instance.ptr];
-    if (!initialOBB) {
-      initialOBB = new Rectangle();
-      initialOBB = this.instanceMeasurer.getInstanceOBB(
+  _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
+    let initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[instance.ptr];
+    if (!initialUnrotatedInstanceAABB) {
+      initialUnrotatedInstanceAABB = new Rectangle();
+      initialUnrotatedInstanceAABB = this.instanceMeasurer.getUnrotatedInstanceAABB(
         instance,
-        initialOBB
+        initialUnrotatedInstanceAABB
       );
-      this._instanceOBBs[instance.ptr] = initialOBB;
+      this._unrotatedInstanceAABBs[instance.ptr] = initialUnrotatedInstanceAABB;
     }
-    return initialOBB;
+    return initialUnrotatedInstanceAABB;
   }
 
-  _getOrCreatePosition(instance: gdInitialInstance) {
+  _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
     let initialPosition = this._instancePositions[instance.ptr];
     if (!initialPosition) {
       initialPosition = this._instancePositions[instance.ptr] = {
@@ -94,9 +94,9 @@ export default class InstancesResizer {
     let initialSelectionAABB = this._initialSelectionAABB;
     if (!initialSelectionAABB) {
       initialSelectionAABB = new Rectangle();
-      initialSelectionAABB.setRectangle(this._getOrCreateAABB(instances[0]));
+      initialSelectionAABB.setRectangle(this._getOrCreateInstanceAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
-        initialSelectionAABB.union(this._getOrCreateAABB(instances[i]));
+        initialSelectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
       }
       this._initialSelectionAABB = initialSelectionAABB;
     }
@@ -187,28 +187,28 @@ export default class InstancesResizer {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
-      let initialOBB = this._getOrCreateOBB(selectedInstance);
-      let initialPosition = this._getOrCreatePosition(selectedInstance);
+      let initialUnrotatedInstanceAABB = this._getOrCreateUnrotatedInstanceAABB(selectedInstance);
+      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(selectedInstance);
 
       selectedInstance.setCustomWidth(
-        scaleX * initialOBB.width()
+        scaleX * initialUnrotatedInstanceAABB.width()
       );
       selectedInstance.setCustomHeight(
-        scaleY * initialOBB.height()
+        scaleY * initialUnrotatedInstanceAABB.height()
       );
       selectedInstance.setHasCustomSize(true);
       selectedInstance.setX(
-        initialPosition.x + translationX + (initialPosition.x - initialSelectionAABB.left) * (scaleX - 1)
+        initialInstanceOriginPosition.x + translationX + (initialInstanceOriginPosition.x - initialSelectionAABB.left) * (scaleX - 1)
       );
       selectedInstance.setY(
-        initialPosition.y + translationY + (initialPosition.y - initialSelectionAABB.top) * (scaleY - 1)
+        initialInstanceOriginPosition.y + translationY + (initialInstanceOriginPosition.y - initialSelectionAABB.top) * (scaleY - 1)
       );
     }
   }
 
   endResize() {
     this._initialSelectionAABB = null;
-    this._instanceOBBs = {};
+    this._unrotatedInstanceAABBs = {};
     this._instanceAABBs = {};
     this._instancePositions = {};
     this.totalDeltaX = 0;

@@ -66,6 +66,7 @@ export default class InstancesRenderer {
     this.pixiContainer = new PIXI.Container();
 
     this.temporaryRectangle = new Rectangle();
+    //TODO extract this to a class to have type checking (maybe rethink it)
     this.instanceMeasurer = {
       getInstanceAABB: (instance, bounds) => {
         const layerName = instance.getLayer();
@@ -80,7 +81,7 @@ export default class InstancesRenderer {
 
         return layerRenderer.getInstanceAABB(instance, bounds);
       },
-      getInstanceOBB: (instance, bounds) => {
+      getUnrotatedInstanceAABB: (instance, bounds) => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) {
@@ -91,7 +92,7 @@ export default class InstancesRenderer {
           return bounds;
         }
 
-        return layerRenderer.getInstanceOBB(instance, bounds);
+        return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
       //TODO Replace by getInstanceAABB (make TransformRect uses Rectangle)
       getInstanceRect: instance => {

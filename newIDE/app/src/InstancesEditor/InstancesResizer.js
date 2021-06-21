@@ -173,12 +173,6 @@ export default class InstancesResizer {
       roundedTotalDeltaY = 0;
     }
 
-    let hasRotatedInstance = false;
-    for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
-      const selectedInstance = instances[i];
-      hasRotatedInstance = selectedInstance.getAngle() !== 0;
-    }
-
     const isLeft =
       grabbingLocation === 'TopLeft' ||
       grabbingLocation === 'BottomLeft' ||
@@ -199,9 +193,15 @@ export default class InstancesResizer {
     let scaleY =
       (initialSelectionAABB.height() + flippedTotalDeltaY) /
       initialSelectionAABB.height();
+
     // Applying a rotation then a scaling can result to
     // an affine transformation with a shear composite.
     // So, keeping the aspect ratio ensures a transformation without any shear.
+    let hasRotatedInstance = false;
+    for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
+      // It only applies to instances that are not strait.
+      hasRotatedInstance = instances[i].getAngle() % 90 !== 0;
+    }
     if (proportional || hasRotatedInstance) {
       // Choose the axis where the selection is the biggest.
       // That way the cursor is always on one edge.
@@ -241,19 +241,55 @@ export default class InstancesResizer {
         selectedInstance
       );
 
-      selectedInstance.setCustomWidth(
-        scaleX * initialUnrotatedInstanceAABB.width()
-      );
-      selectedInstance.setCustomHeight(
-        scaleY * initialUnrotatedInstanceAABB.height()
-      );
-      selectedInstance.setHasCustomSize(true);
-      selectedInstance.setX(
-        (initialInstanceOriginPosition.x - anchorX) * scaleX + anchorX
-      );
-      selectedInstance.setY(
-        (initialInstanceOriginPosition.y - anchorY) * scaleY + anchorY
-      );
+      const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
+      if (
+        (!proportional && !hasRotatedInstance && angle === 90) ||
+        angle === 270
+      ) {
+        selectedInstance.setCustomWidth(
+          scaleY * initialUnrotatedInstanceAABB.width()
+        );
+        selectedInstance.setCustomHeight(
+          scaleX * initialUnrotatedInstanceAABB.height()
+        );
+        selectedInstance.setHasCustomSize(true);
+
+        // these 4 variable are the positions and vector after the scaling
+        // It's easier to scale the instance center
+        // because it's not affected by the instance rotation.
+        const centerX =
+          (initialUnrotatedInstanceAABB.centerX() - anchorX) * scaleX + anchorX;
+        const centerY =
+          (initialUnrotatedInstanceAABB.centerY() - anchorY) * scaleY + anchorY;
+        // and then add the vector from the center to the origin.
+        // It's the vector on the unrotated instance
+        // and the scale was applied on the rotated one so it's switched.
+        const centerToOriginX =
+          scaleY *
+          (initialInstanceOriginPosition.x -
+            initialUnrotatedInstanceAABB.centerX());
+        const centerToOriginY =
+          scaleX *
+          (initialInstanceOriginPosition.y -
+            initialUnrotatedInstanceAABB.centerY());
+        selectedInstance.setX(centerX + centerToOriginX);
+        selectedInstance.setY(centerY + centerToOriginY);
+      } else {
+        selectedInstance.setCustomWidth(
+          scaleX * initialUnrotatedInstanceAABB.width()
+        );
+        selectedInstance.setCustomHeight(
+          scaleY * initialUnrotatedInstanceAABB.height()
+        );
+        selectedInstance.setHasCustomSize(true);
+
+        selectedInstance.setX(
+          (initialInstanceOriginPosition.x - anchorX) * scaleX + anchorX
+        );
+        selectedInstance.setY(
+          (initialInstanceOriginPosition.y - anchorY) * scaleY + anchorY
+        );
+      }
     }
   }
 

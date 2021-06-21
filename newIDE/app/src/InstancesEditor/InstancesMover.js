@@ -113,7 +113,7 @@ export default class InstancesMover {
       const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
       const initialMagnetX = this._magnetLeft
         ? initialSelectionAABB.left
-        : initialSelectionAABB.top;
+        : initialSelectionAABB.right;
       const initialMagnetY = this._magnetTop
         ? initialSelectionAABB.top
         : initialSelectionAABB.bottom;

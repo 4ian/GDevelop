@@ -15,6 +15,8 @@ export default class InstancesMover {
   _lastDeltaSumY: Softener = new Softener(8);
   _magnetLeft: boolean = true;
   _magnetTop: boolean = true;
+  _lastRoundedTotalDeltaX: number = 0;
+  _lastRoundedTotalDeltaY: number = 0;
 
   constructor({
     instanceMeasurer,
@@ -83,8 +85,13 @@ export default class InstancesMover {
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
     if (this.options.snap && this.options.grid && !noGridSnap) {
-      // round one side of the selection to the grid
+      // Round one side of the selection to the grid
       // according to the cursor direction.
+
+      // This allow to align each side of the selection
+      // with a small movement.
+      // And also do full column or row jumps
+      // to stay fluid on big gestures.
 
       // more than one delta avoid noise
       this._lastDeltaSumX.push(deltaX);
@@ -130,6 +137,29 @@ export default class InstancesMover {
       );
       roundedTotalDeltaX = magnetPosition[0] - initialMagnetX;
       roundedTotalDeltaY = magnetPosition[1] - initialMagnetY;
+
+      // When changing magnet side, the selection
+      // could move the opposite way of the cursor movement
+      // This ensures it doesn't.
+
+      // prettier-ignore to keep parenthesis
+      if (
+        this._magnetTop ===
+        (roundedTotalDeltaY < this._lastRoundedTotalDeltaY)
+      ) {
+        this._lastRoundedTotalDeltaY = roundedTotalDeltaY;
+      } else {
+        roundedTotalDeltaY = this._lastRoundedTotalDeltaY;
+      }
+      // prettier-ignore to keep parenthesis
+      if (
+        this._magnetLeft ===
+        (roundedTotalDeltaX < this._lastRoundedTotalDeltaX)
+      ) {
+        this._lastRoundedTotalDeltaX = roundedTotalDeltaX;
+      } else {
+        roundedTotalDeltaX = this._lastRoundedTotalDeltaX;
+      }
     } else {
       roundedTotalDeltaX = this.totalDeltaX;
       roundedTotalDeltaY = this.totalDeltaY;
@@ -169,5 +199,7 @@ export default class InstancesMover {
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
+    this._lastRoundedTotalDeltaX = 0;
+    this._lastRoundedTotalDeltaY = 0;
   }
 }

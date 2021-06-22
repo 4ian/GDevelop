@@ -71,7 +71,7 @@ namespace gdjs {
      */
     _debuggerClient: gdjs.IDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
-    _disableMetrics: boolean = false;
+    _disableMetrics: boolean = true;
     _isPreview: boolean;
 
     /**
@@ -584,9 +584,6 @@ namespace gdjs {
         }
         return false;
       });
-      setTimeout(() => {
-        this._setupSessionMetrics();
-      }, 10000);
     }
 
     /**

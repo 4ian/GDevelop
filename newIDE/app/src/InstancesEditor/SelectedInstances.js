@@ -231,9 +231,6 @@ export default class SelectedInstances {
       );
       this.selectedRectangles[i].endFill();
 
-      //TODO the same thing is calculated in InstanceRotator and InstanceResizer,
-      // does it worth extracting this in a selection model
-      // who would know when to reprocess it?
       if (i === 0) {
         x1 = instanceRect.x;
         y1 = instanceRect.y;

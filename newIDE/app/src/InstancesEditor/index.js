@@ -586,7 +586,11 @@ export default class InstancesEditor extends Component<Props> {
     this.highlightedInstance.setInstance(instance);
   };
 
-  _onDownInstance = (instance: gdInitialInstance) => {
+  _onDownInstance = (
+    instance: gdInitialInstance,
+    sceneX: number,
+    sceneY: number
+  ) => {
     if (this.keyboardShortcuts.shouldMoveView()) {
       // If the user wants to move the view, discard the click on an instance:
       // it's just the beginning of the user panning the view.
@@ -614,6 +618,8 @@ export default class InstancesEditor extends Component<Props> {
         );
       }
     }
+
+    this.instancesMover.startMove(sceneX, sceneY);
   };
 
   _onOutInstance = (instance: gdInitialInstance) => {

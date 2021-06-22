@@ -1,7 +1,6 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
-import { Softener, angleDifference } from '../Utils/Math';
 
 export default class InstancesMover {
   instanceMeasurer: any;
@@ -11,12 +10,8 @@ export default class InstancesMover {
   totalDeltaY: number;
   _temporaryPoint: [number, number];
   _initialSelectionAABB: ?Rectangle = null;
-  _lastDeltaSumX: Softener = new Softener(8);
-  _lastDeltaSumY: Softener = new Softener(8);
-  _magnetLeft: boolean = true;
-  _magnetTop: boolean = true;
-  _lastRoundedTotalDeltaX: number = 0;
-  _lastRoundedTotalDeltaY: number = 0;
+  _startX: number = 0;
+  _startY: number = 0;
 
   constructor({
     instanceMeasurer,
@@ -72,6 +67,11 @@ export default class InstancesMover {
     return initialSelectionAABB;
   }
 
+  startMove(startX: number, startY: number) {
+    this._startX = startX;
+    this._startY = startY;
+  }
+
   moveBy(
     instances: gdInitialInstance[],
     deltaX: number,
@@ -85,43 +85,22 @@ export default class InstancesMover {
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
     if (this.options.snap && this.options.grid && !noGridSnap) {
-      // Round one side of the selection to the grid
-      // according to the cursor direction.
-
-      // This allow to align each side of the selection
-      // with a small movement.
-      // And also do full column or row jumps
-      // to stay fluid on big gestures.
-
-      // more than one delta avoid noise
-      this._lastDeltaSumX.push(deltaX);
-      this._lastDeltaSumY.push(deltaY);
-      const directionAngle =
-        (Math.atan2(
-          this._lastDeltaSumY.getSum(),
-          this._lastDeltaSumX.getSum()
-        ) *
-          180) /
-        Math.PI;
-
-      // leave a 2 * 15° margin to avoid flickering
-      if (Math.abs(angleDifference(directionAngle, -90)) < 75) {
-        this._magnetTop = true;
-      }
-      if (Math.abs(angleDifference(directionAngle, 90)) < 75) {
-        this._magnetTop = false;
-      }
-      if (Math.abs(angleDifference(directionAngle, 0)) < 75) {
-        this._magnetLeft = false;
-      }
-      if (Math.abs(angleDifference(directionAngle, 180)) < 75) {
-        this._magnetLeft = true;
-      }
+      // It will magnet the corner nearest to the grabbing position
       const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
-      const initialMagnetX = this._magnetLeft
+      console.log('start: ' + this._startX + ' ; ' + this._startY);
+      console.log(
+        'center: ' +
+          initialSelectionAABB.centerX() +
+          ' ; ' +
+          initialSelectionAABB.centerY()
+      );
+      const magnetLeft = this._startX < initialSelectionAABB.centerX();
+      const magnetTop = this._startY < initialSelectionAABB.centerY();
+
+      const initialMagnetX = magnetLeft
         ? initialSelectionAABB.left
         : initialSelectionAABB.right;
-      const initialMagnetY = this._magnetTop
+      const initialMagnetY = magnetTop
         ? initialSelectionAABB.top
         : initialSelectionAABB.bottom;
       const magnetPosition = this._temporaryPoint;
@@ -137,29 +116,6 @@ export default class InstancesMover {
       );
       roundedTotalDeltaX = magnetPosition[0] - initialMagnetX;
       roundedTotalDeltaY = magnetPosition[1] - initialMagnetY;
-
-      // When changing magnet side, the selection
-      // could move the opposite way of the cursor movement
-      // This ensures it doesn't.
-
-      // prettier-ignore to keep parenthesis
-      if (
-        this._magnetTop ===
-        (roundedTotalDeltaY < this._lastRoundedTotalDeltaY)
-      ) {
-        this._lastRoundedTotalDeltaY = roundedTotalDeltaY;
-      } else {
-        roundedTotalDeltaY = this._lastRoundedTotalDeltaY;
-      }
-      // prettier-ignore to keep parenthesis
-      if (
-        this._magnetLeft ===
-        (roundedTotalDeltaX < this._lastRoundedTotalDeltaX)
-      ) {
-        this._lastRoundedTotalDeltaX = roundedTotalDeltaX;
-      } else {
-        roundedTotalDeltaX = this._lastRoundedTotalDeltaX;
-      }
     } else {
       roundedTotalDeltaX = this.totalDeltaX;
       roundedTotalDeltaY = this.totalDeltaY;
@@ -199,7 +155,5 @@ export default class InstancesMover {
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
-    this._lastRoundedTotalDeltaX = 0;
-    this._lastRoundedTotalDeltaY = 0;
   }
 }

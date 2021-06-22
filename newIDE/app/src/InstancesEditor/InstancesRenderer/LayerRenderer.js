@@ -27,7 +27,7 @@ export default class LayerRenderer {
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
-  onDownInstance: gdInitialInstance => void;
+  onDownInstance: (gdInitialInstance, number, number) => void;
   /**Used for instances culling on rendering */
   viewTopLeft: [number, number];
   /** Used for instances culling on rendering */
@@ -74,7 +74,7 @@ export default class LayerRenderer {
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
-    onDownInstance: gdInitialInstance => void,
+    onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
     this.instances = instances;
@@ -265,15 +265,25 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on('mousedown', () => {
-        this.onDownInstance(instance);
+      renderedInstance._pixiObject.on('mousedown', event => {
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.on('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
 
-        this.onDownInstance(instance);
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);

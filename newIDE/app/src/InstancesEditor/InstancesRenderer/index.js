@@ -15,7 +15,7 @@ export default class InstancesRenderer {
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
-  onDownInstance: gdInitialInstance => void;
+  onDownInstance: (gdInitialInstance, number, number) => void;
 
   layersRenderers: { [string]: LayerRenderer };
 
@@ -47,7 +47,7 @@ export default class InstancesRenderer {
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
-    onDownInstance: gdInitialInstance => void,
+    onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
     this.instances = instances;

@@ -87,13 +87,6 @@ export default class InstancesMover {
     if (this.options.snap && this.options.grid && !noGridSnap) {
       // It will magnet the corner nearest to the grabbing position
       const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
-      console.log('start: ' + this._startX + ' ; ' + this._startY);
-      console.log(
-        'center: ' +
-          initialSelectionAABB.centerX() +
-          ' ; ' +
-          initialSelectionAABB.centerY()
-      );
       const magnetLeft = this._startX < initialSelectionAABB.centerX();
       const magnetTop = this._startY < initialSelectionAABB.centerY();
 

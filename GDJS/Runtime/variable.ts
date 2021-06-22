@@ -13,6 +13,7 @@ namespace gdjs {
    * A Variable is an object storing a value (number or a string) or children variables.
    */
   export class Variable {
+    // TODO: convert this to an integer to speed up the type checks at runtime.
     _type: VariableType = 'number';
     _value: float = 0;
     _str: string = '0';
@@ -455,7 +456,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the object containing all the children of the variable
+     * Return the object containing all the children of the variable.
      * @return All the children of the variable
      */
     getAllChildren(): Children {
@@ -467,7 +468,7 @@ namespace gdjs {
     }
 
     /**
-     * Return an Array containing all the children of the variable
+     * Return an Array containing all the children of the variable.
      */
     getAllChildrenArray(): gdjs.Variable[] {
       return this._type === 'structure'
@@ -478,11 +479,14 @@ namespace gdjs {
     }
 
     /**
-     * Return the length of the collection
+     * Return the length of the collection.
      */
-    getChildrenCount() {
-      if (this.isPrimitive()) return 0;
-      return this.getAllChildrenArray().length;
+    getChildrenCount(): integer {
+      return this._type === 'structure'
+        ? Object.keys(this._children).length
+        : this._type === 'array'
+        ? this._childrenArray.length
+        : 0;
     }
 
     /**

@@ -310,7 +310,6 @@ export default class LayerRenderer {
    * @param {*} instance
    */
   _isInstanceVisible(instance: gdInitialInstance) {
-    //TODO: Properly handle rotation
     const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
       aabb.left + aabb.width() < this.viewTopLeft[0] ||

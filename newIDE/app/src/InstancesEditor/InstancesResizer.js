@@ -182,6 +182,9 @@ export default class InstancesResizer {
       grabbingLocation === 'TopRight' ||
       grabbingLocation === 'Top';
 
+    // Flip the deltas to end up in the nominal case of a bottom-right grabbed node.
+    // Because a negative deltaX on the left grabbing node will make the width greater
+    // as a positive deltaX on the right grabbing node would do.
     const flippedTotalDeltaX = isLeft
       ? -roundedTotalDeltaX
       : roundedTotalDeltaX;
@@ -243,8 +246,9 @@ export default class InstancesResizer {
 
       const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
       if (
-        (!proportional && !hasRotatedInstance && angle === 90) ||
-        angle === 270
+        !proportional &&
+        !hasRotatedInstance &&
+        (angle === 90 || angle === 270)
       ) {
         selectedInstance.setCustomWidth(
           scaleY * initialUnrotatedInstanceAABB.width()

@@ -191,6 +191,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
 type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
+  restoreCollisionMask: () => void,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -199,7 +200,13 @@ type PolygonsListProps = {|
 |};
 
 const PolygonsList = (props: PolygonsListProps) => {
-  const { polygons, spriteHeight, spriteWidth, onPolygonsUpdated } = props;
+  const {
+    polygons,
+    spriteHeight,
+    spriteWidth,
+    onPolygonsUpdated,
+    restoreCollisionMask,
+  } = props;
 
   const addCollisionMask = () => {
     const newPolygon = gd.Polygon2d.createRectangle(32, 32);
@@ -231,6 +238,9 @@ const PolygonsList = (props: PolygonsListProps) => {
               onUpdated={onPolygonsUpdated}
               onRemove={() => {
                 gd.removeFromVectorPolygon2d(polygons, i);
+                if (polygons.size() === 0) {
+                  restoreCollisionMask();
+                }
                 onPolygonsUpdated();
               }}
               spriteWidth={spriteWidth}

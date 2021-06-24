@@ -246,6 +246,7 @@ const CollisionMasksEditor = (props: Props) => {
               <PolygonsList
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={updateCollisionMasks}
+                restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />

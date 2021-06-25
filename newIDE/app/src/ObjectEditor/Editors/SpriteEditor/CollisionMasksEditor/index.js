@@ -250,13 +250,6 @@ const CollisionMasksEditor = (props: Props) => {
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />
-              <Line justifyContent="center">
-                <FlatButton
-                  label={<Trans>Restore the default collision mask</Trans>}
-                  primary={false}
-                  onClick={() => onSetCollisionMaskAutomatic(true)}
-                />
-              </Line>
             </React.Fragment>
           )}
           {!!sprite && sprite.isCollisionMaskAutomatic() && (

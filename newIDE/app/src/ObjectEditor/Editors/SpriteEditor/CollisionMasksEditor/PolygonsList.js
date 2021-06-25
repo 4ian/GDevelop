@@ -25,7 +25,7 @@ import AddIcon from '@material-ui/icons/Add';
 import FlatButton from '../../../../UI/FlatButton';
 import { Trans, t } from '@lingui/macro';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
-import RaisedButton from '../../../../UI/RaisedButton';
+import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
@@ -250,13 +250,19 @@ const PolygonsList = (props: PolygonsListProps) => {
         </ScrollView>
         <Column>
           <Line alignItems="center" justifyContent="center">
-            <RaisedButton
+            <RaisedButtonWithSplitMenu
               primary
               icon={<AddIcon />}
               label={<Trans>Add collision mask</Trans>}
               onClick={() => {
                 addCollisionMask();
               }}
+              buildMenuTemplate={i18n => [
+                {
+                  label: i18n._(t`Restore the default collision mask`),
+                  click: restoreCollisionMask,
+                },
+              ]}
             />
           </Line>
         </Column>

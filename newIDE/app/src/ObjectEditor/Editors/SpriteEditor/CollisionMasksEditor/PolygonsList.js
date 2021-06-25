@@ -28,6 +28,7 @@ import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
 import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
+import ScrollView from '../../../../UI/ScrollView';
 const gd = global.gd;
 
 const SortableVerticeRow = SortableElement(VerticeRow);
@@ -190,6 +191,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
 type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
+  restoreCollisionMask: () => void,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -198,35 +200,66 @@ type PolygonsListProps = {|
 |};
 
 const PolygonsList = (props: PolygonsListProps) => {
+  const {
+    polygons,
+    spriteHeight,
+    spriteWidth,
+    onPolygonsUpdated,
+    restoreCollisionMask,
+  } = props;
+
+  const addCollisionMask = () => {
+    const newPolygon = gd.Polygon2d.createRectangle(32, 32);
+    newPolygon.move(spriteWidth / 2, spriteHeight / 2);
+    polygons.push_back(newPolygon);
+    onPolygonsUpdated();
+  };
+
+  React.useEffect(
+    () => {
+      if (polygons.size() === 0) {
+        const newPolygon = gd.Polygon2d.createRectangle(32, 32);
+        newPolygon.move(spriteWidth / 2, spriteHeight / 2);
+        polygons.push_back(newPolygon);
+        onPolygonsUpdated();
+      }
+    },
+    [polygons, spriteWidth, spriteHeight, onPolygonsUpdated]
+  );
+
   return (
     <React.Fragment>
-      <Column expand>
-        {mapVector(props.polygons, (polygon, i) => (
-          <PolygonSection
-            key={`polygon-${i}`}
-            polygon={polygon}
-            onUpdated={props.onPolygonsUpdated}
-            onRemove={() => {
-              gd.removeFromVectorPolygon2d(props.polygons, i);
-              props.onPolygonsUpdated();
-            }}
-            spriteWidth={props.spriteWidth}
-            spriteHeight={props.spriteHeight}
-          />
-        ))}
-        <Line alignItems="center" justifyContent="center">
-          <RaisedButton
-            primary
-            icon={<AddIcon />}
-            label={<Trans>Add collision mask</Trans>}
-            onClick={() => {
-              const newPolygon = gd.Polygon2d.createRectangle(32, 32);
-              newPolygon.move(props.spriteWidth / 2, props.spriteHeight / 2);
-              props.polygons.push_back(newPolygon);
-              props.onPolygonsUpdated();
-            }}
-          />
-        </Line>
+      <Column noMargin expand useFullHeight>
+        <ScrollView>
+          {mapVector(polygons, (polygon, i) => (
+            <PolygonSection
+              key={`polygon-${i}`}
+              polygon={polygon}
+              onUpdated={onPolygonsUpdated}
+              onRemove={() => {
+                gd.removeFromVectorPolygon2d(polygons, i);
+                if (polygons.size() === 0) {
+                  restoreCollisionMask();
+                }
+                onPolygonsUpdated();
+              }}
+              spriteWidth={spriteWidth}
+              spriteHeight={spriteHeight}
+            />
+          ))}
+        </ScrollView>
+        <Column>
+          <Line alignItems="center" justifyContent="center">
+            <RaisedButton
+              primary
+              icon={<AddIcon />}
+              label={<Trans>Add collision mask</Trans>}
+              onClick={() => {
+                addCollisionMask();
+              }}
+            />
+          </Line>
+        </Column>
       </Column>
     </React.Fragment>
   );

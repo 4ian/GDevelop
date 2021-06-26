@@ -21,6 +21,10 @@ import {
 import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/GenericExpressionField/FormatExpressionCall';
 import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
+import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
+import { mapFor } from '../Utils/MapFor';
+
+const gd: libGDevelop = global.gd;
 
 type BaseExpressionAutocompletion = {|
   completion: string,
@@ -282,10 +286,57 @@ const getAutocompletionsForText = function(
     autocompletionTexts = getParameterChoices(
       completionDescription.getParameterMetadata()
     ).map(autocompletion => autocompletion.completion);
+  } else if (type === 'objectPointName') {
+    const objectName: string = completionDescription.getObjectName();
+    if (!objectName) {
+      return [];
+    }
+
+    const object = getObjectByName(project, scope.layout, objectName);
+    if (!object) {
+      return [];
+    }
+
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      autocompletionTexts = getAllPointNames(spriteObject)
+        .map(spriteObjectName =>
+          spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
+        )
+        .filter(Boolean);
+    } else {
+      return [];
+    }
+  } else if (type === 'objectAnimationName') {
+    const objectName: string = completionDescription.getObjectName();
+    if (!objectName) {
+      return [];
+    }
+
+    const object = getObjectByName(project, scope.layout, objectName);
+    if (!object) {
+      return [];
+    }
+
+    if (object.getType() === 'Sprite') {
+      const spriteObject = gd.asSpriteObject(object);
+
+      autocompletionTexts = mapFor(
+        0,
+        spriteObject.getAnimationsCount(),
+        index => {
+          const animationName = spriteObject.getAnimation(index).getName();
+          return animationName.length > 0 ? `"${animationName}"` : null;
+        }
+      ).filter(Boolean);
+    } else {
+      return [];
+    }
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
-  const filteredTextList = filterStringList(autocompletionTexts, prefix);
+  const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();
 
   const isLastParameter = completionDescription.isLastParameter();
   return filteredTextList.map(text => ({

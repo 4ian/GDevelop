@@ -8,6 +8,8 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
+import { setupInstructionParameters } from '../InstructionOrExpression/SetupInstructionParameters';
+import { getObjectParameterIndex } from '../InstructionOrExpression/EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -103,6 +105,29 @@ export default class InlineParameterEditor extends React.Component<
     );
   }
 
+  _onRequestClose = () => {
+    const { instruction } = this.props;
+    const { instructionMetadata } = this.state;
+
+    // When the parameter is done being edited, ensure the instruction parameters
+    // are properly set up. For example, it's possible that the object name was
+    // changed, and so the associated behavior should be updated.
+    if (instruction && instructionMetadata) {
+      const objectParameterIndex = getObjectParameterIndex(instructionMetadata);
+      setupInstructionParameters(
+        this.props.globalObjectsContainer,
+        this.props.objectsContainer,
+        instruction,
+        instructionMetadata,
+        objectParameterIndex !== -1
+          ? instruction.getParameter(objectParameterIndex)
+          : null
+      );
+    }
+
+    this.props.onRequestClose();
+  };
+
   render() {
     if (!this.state.ParameterComponent || !this.props.open) return null;
     const instruction = this.props.instruction;
@@ -114,7 +139,7 @@ export default class InlineParameterEditor extends React.Component<
       <InlinePopover
         open={this.props.open}
         anchorEl={this.props.anchorEl}
-        onRequestClose={this.props.onRequestClose}
+        onRequestClose={this._onRequestClose}
       >
         <ParameterComponent
           instruction={instruction}
@@ -123,7 +148,7 @@ export default class InlineParameterEditor extends React.Component<
           parameterIndex={this.props.parameterIndex}
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
-          onRequestClose={this.props.onRequestClose}
+          onRequestClose={this._onRequestClose}
           project={this.props.project}
           scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}

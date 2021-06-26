@@ -357,10 +357,10 @@ namespace gdjs {
         layerName: string,
         rgbColor: string
       ) {
-        if (!runtimeScene.hasLayer(layerName)) {
-          return;
-        }
-        if (!runtimeScene.getLayer(layerName).isLightingLayer()) {
+        if (
+          !runtimeScene.hasLayer(layerName) ||
+          !runtimeScene.getLayer(layerName).isLightingLayer()
+        ) {
           return;
         }
         const colors = rgbColor.split(';');
@@ -370,9 +370,9 @@ namespace gdjs {
         return runtimeScene
           .getLayer(layerName)
           .setClearColor(
-            parseInt(colors[0]),
-            parseInt(colors[1]),
-            parseInt(colors[2])
+            parseInt(colors[0], 10),
+            parseInt(colors[1], 10),
+            parseInt(colors[2], 10)
           );
       };
     }

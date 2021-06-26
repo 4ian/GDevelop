@@ -14,9 +14,7 @@
     "build": "node scripts/build.js",
     "format": "prettier --write --ignore-path .gitignore \"**/*.js\"",
     "check-format": "prettier --list-different --ignore-path .gitignore \"**/*.js\"",
-    "electron-win": "node node_modules/electron/cli.js app",
-    "electron-linux": "./node_modules/electron/dist/electron app",
-    "electron-mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app",
+    "start": "electron app",
     "reload-extensions": "cd ../app/scripts && node import-GDJS-Runtime.js",
     "import-zipped-electron-extensions": "node scripts/import-zipped-electron-extension.js ReactDeveloperTools app/extensions/"
   },

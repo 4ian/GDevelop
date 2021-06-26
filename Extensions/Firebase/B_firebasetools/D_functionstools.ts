@@ -24,10 +24,7 @@ namespace gdjs {
             .httpsCallable(httpFunctionName)(parameter)
             .then((response) => {
               if (callbackValueVariable)
-                gdjs.evtTools.network._objectToVariable(
-                  response.data,
-                  callbackValueVariable
-                );
+                callbackValueVariable.fromJSObject(response.data);
 
               if (typeof callbackStateVariable !== 'undefined')
                 callbackStateVariable.setString('ok');

@@ -15,7 +15,7 @@ const firebaseConfig = {
 /**
  * Turns a callback variable into a promise.
  * @param {(callbackVariable: {setString: (result: "ok" | string) => void}, result: gdjs.Variable) => any} executor
- * @returns
+ * @returns {Promise<gdjs.Variable>}
  */
 const promisifyCallbackVariables = (executor) =>
   new Promise((done, err) => {
@@ -32,11 +32,11 @@ const promisifyCallbackVariables = (executor) =>
   });
 
 /** A complex variable using all variables types. */
-const variable = new gdjs.Variable();
-gdjs.evtTools.network._objectToVariable(
-  { my: 'test', object: { with: 'all', types: 2 }, it: ['is', true] },
-  variable
-);
+const variable = new gdjs.Variable().fromJSObject({
+  my: 'test',
+  object: { with: 'all', types: 2 },
+  it: ['is', true],
+});
 
 // The tests require an internet connection, as a real Firebase instance is used.
 const describeIfOnline = navigator.onLine ? describe : describe.skip;
@@ -126,13 +126,9 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
         goodbye: 'Goodbye',
       });
 
-      const updater = new gdjs.Variable();
-      gdjs.evtTools.network._objectToVariable(
-        {
-          goodbye: 'See you later',
-        },
-        updater
-      );
+      const updater = new gdjs.Variable().fromJSObject({
+        goodbye: 'See you later',
+      });
 
       await promisifyCallbackVariables((callback) =>
         gdjs.evtTools.firebaseTools.database.updateVariable(
@@ -295,13 +291,9 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           goodbye: 'Goodbye',
         });
 
-        const updater = new gdjs.Variable();
-        gdjs.evtTools.network._objectToVariable(
-          {
-            goodbye: 'See you later',
-          },
-          updater
-        );
+        const updater = new gdjs.Variable().fromJSObject({
+          goodbye: 'See you later',
+        });
 
         await promisifyCallbackVariables((callback) =>
           gdjs.evtTools.firebaseTools.firestore.updateDocument(
@@ -434,17 +426,15 @@ describeIfOnline('Firebase extension end-to-end tests', function () {
           .set({ index: 3, val: 1 });
 
         const executeQuery = async (query) =>
-          JSON.parse(
-            gdjs.evtTools.network.variableStructureToJSON(
-              await promisifyCallbackVariables((callback, result) =>
-                gdjs.evtTools.firebaseTools.firestore.executeQuery(
-                  query,
-                  result,
-                  callback
-                )
+          (
+            await promisifyCallbackVariables((callback, result) =>
+              gdjs.evtTools.firebaseTools.firestore.executeQuery(
+                query,
+                result,
+                callback
               )
             )
-          );
+          ).toJSObject();
 
         // Empty query
         gdjs.evtTools.firebaseTools.firestore.startQuery('main', subcollection);

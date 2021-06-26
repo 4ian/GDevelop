@@ -66,7 +66,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                 "res/actions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Animation name"))
+      .AddParameter("objectAnimationName", _("Animation name"))
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -230,7 +230,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                    "res/conditions/animation.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Animation name"))
+      .AddParameter("objectAnimationName", _("Animation name"))
       .MarkAsAdvanced();
 
   obj.AddCondition(
@@ -455,7 +455,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
       .SetHidden()
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Name of the point"), "", true);
+      .AddParameter("objectPointName", _("Name of the point"), "", true);
 
   obj.AddExpression("Y",
                     _("Y position of a point"),
@@ -464,7 +464,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
       .SetHidden()
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Name of the point"), "", true);
+      .AddParameter("objectPointName", _("Name of the point"), "", true);
 
   obj.AddExpression("PointX",
                     _("X position of a point"),
@@ -473,7 +473,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Name of the point"));
+      .AddParameter("objectPointName", _("Name of the point"));
 
   obj.AddExpression("PointY",
                     _("Y position of a point"),
@@ -482,7 +482,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("string", _("Name of the point"));
+      .AddParameter("objectPointName", _("Name of the point"));
 
   obj.AddExpression("Direc",
                     _("Direction"),

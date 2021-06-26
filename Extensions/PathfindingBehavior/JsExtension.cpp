@@ -55,6 +55,16 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           .SetGetter("getCellHeight");
       autConditions["PathfindingBehavior::CellHeight"].SetFunctionName(
           "getCellHeight");
+      autActions["PathfindingBehavior::PathfindingBehavior::SetGridOffsetX"]
+          .SetFunctionName("setGridOffsetX")
+          .SetGetter("getGridOffsetX");
+      autConditions["PathfindingBehavior::PathfindingBehavior::GridOffsetX"].SetFunctionName(
+          "getGridOffsetX");
+      autActions["PathfindingBehavior::PathfindingBehavior::SetGridOffsetY"]
+          .SetFunctionName("setGridOffsetY")
+          .SetGetter("getGridOffsetY");
+      autConditions["PathfindingBehavior::PathfindingBehavior::GridOffsetY"].SetFunctionName(
+          "getGridOffsetY");
       autActions["PathfindingBehavior::Acceleration"]
           .SetFunctionName("setAcceleration")
           .SetGetter("getAcceleration");
@@ -69,6 +79,8 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
           .SetFunctionName("setSpeed")
           .SetGetter("getSpeed");
       autConditions["PathfindingBehavior::Speed"].SetFunctionName("getSpeed");
+      autConditions["PathfindingBehavior::PathfindingBehavior::MovementAngleIsAround"]
+          .SetFunctionName("movementAngleIsAround");
       autActions["PathfindingBehavior::AngularMaxSpeed"]
           .SetFunctionName("setAngularMaxSpeed")
           .SetGetter("getAngularMaxSpeed");
@@ -108,11 +120,14 @@ class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
       autExpressions["Acceleration"].SetFunctionName("getAcceleration");
       autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
       autExpressions["Speed"].SetFunctionName("getSpeed");
+      autExpressions["MovementAngle"].SetFunctionName("getMovementAngle");
       autExpressions["AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
       autExpressions["AngleOffset"].SetFunctionName("getAngleOffset");
       autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");
       autExpressions["CellWidth"].SetFunctionName("getCellWidth");
       autExpressions["CellHeight"].SetFunctionName("getCellHeight");
+      autExpressions["GridOffsetX"].SetFunctionName("getGridOffsetX");
+      autExpressions["GridOffsetY"].SetFunctionName("getGridOffsetY");
     }
 
     GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")

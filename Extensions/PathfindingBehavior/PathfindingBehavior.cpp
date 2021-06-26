@@ -21,6 +21,8 @@ void PathfindingBehavior::InitializeContent(
   behaviorContent.SetAttribute("angleOffset", 0);
   behaviorContent.SetAttribute("cellWidth", 20);
   behaviorContent.SetAttribute("cellHeight", 20);
+  behaviorContent.SetAttribute("gridOffsetX", 0);
+  behaviorContent.SetAttribute("gridOffsetY", 0);
   behaviorContent.SetAttribute("extraBorder", 0);
 }
 
@@ -46,9 +48,13 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
   properties[_("Angle offset")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties[_("Virtual cell width")].SetValue(
-      gd::String::From(behaviorContent.GetIntAttribute("cellWidth", 0)));
+      gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
   properties[_("Virtual cell height")].SetValue(
-      gd::String::From(behaviorContent.GetIntAttribute("cellHeight", 0)));
+      gd::String::From(behaviorContent.GetDoubleAttribute("cellHeight", 0)));
+  properties[_("Virtual grid X offset")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
+  properties[_("Virtual grid Y offset")].SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
   properties[_("Extra border size")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
 
@@ -82,9 +88,13 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
   else if (name == _("Angle offset"))
     behaviorContent.SetAttribute("angleOffset", value.To<float>());
   else if (name == _("Virtual cell width"))
-    behaviorContent.SetAttribute("cellWidth", (int)value.To<unsigned int>());
+    behaviorContent.SetAttribute("cellWidth", value.To<float>());
   else if (name == _("Virtual cell height"))
-    behaviorContent.SetAttribute("cellHeight", (int)value.To<unsigned int>());
+    behaviorContent.SetAttribute("cellHeight", value.To<float>());
+  else if (name == _("Virtual grid X offset"))
+    behaviorContent.SetAttribute("gridOffsetX", value.To<float>());
+  else if (name == _("Virtual grid Y offset"))
+    behaviorContent.SetAttribute("gridOffsetY", value.To<float>());
   else
     return false;
 

@@ -94,6 +94,8 @@ describe('FormatExpressionCall', () => {
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(pointXExpression).not.toBeUndefined();
 
-    expect(getVisibleParameterTypes(pointXExpression)).toEqual(['string']);
+    expect(getVisibleParameterTypes(pointXExpression)).toEqual([
+      'objectPointName',
+    ]);
   });
 });

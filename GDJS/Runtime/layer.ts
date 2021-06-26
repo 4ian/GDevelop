@@ -494,20 +494,10 @@ namespace gdjs {
      * @param g Green color component in the range 0-255.
      * @param b Blue color component in the range 0-255.
      */
-    setClearColor(
-      r: integer | null,
-      g: integer | null,
-      b: integer | null
-    ): void {
-      if (r) {
-        this._clearColor[0] = r / 255;
-      }
-      if (g) {
-        this._clearColor[1] = g / 255;
-      }
-      if (b) {
-        this._clearColor[2] = b / 255;
-      }
+    setClearColor(r: integer, g: integer, b: integer): void {
+      this._clearColor[0] = r / 255;
+      this._clearColor[1] = g / 255;
+      this._clearColor[2] = b / 255;
       this._renderer.updateClearColor();
     }
 

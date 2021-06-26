@@ -5,10 +5,10 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
+#include <iostream>
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
-#include <iostream>
 
 void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension);
 
@@ -68,17 +68,20 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
         .SetGetter("getAngleOffset");
     autConditions["TopDownMovementBehavior::AngleOffset"].SetFunctionName(
         "getAngleOffset");
-    autConditions["TopDownMovementBehavior::Angle"].SetFunctionName(
-        "getAngle");
+    autConditions["TopDownMovementBehavior::Angle"].SetFunctionName("getAngle");
     autConditions["TopDownMovementBehavior::XVelocity"].SetFunctionName(
         "getXVelocity");
     autConditions["TopDownMovementBehavior::YVelocity"].SetFunctionName(
         "getYVelocity");
-    autActions["TopDownMovementBehavior::SetMovementAngleOffset"]
-        .SetFunctionName("setMovementAngleOffset")
-        .SetGetter("getMovementAngleOffset");
-    autConditions["TopDownMovementBehavior::MovementAngleOffset"].SetFunctionName(
-        "getMovementAngleOffset");
+    autActions
+        ["TopDownMovementBehavior::TopDownMovementBehavior::"
+         "SetMovementAngleOffset"]
+            .SetFunctionName("setMovementAngleOffset")
+            .SetGetter("getMovementAngleOffset");
+    autConditions
+        ["TopDownMovementBehavior::TopDownMovementBehavior::"
+         "MovementAngleOffset"]
+            .SetFunctionName("getMovementAngleOffset");
 
     autActions["TopDownMovementBehavior::AllowDiagonals"].SetFunctionName(
         "allowDiagonals");
@@ -113,7 +116,8 @@ class TopDownMovementBehaviorJsExtension : public gd::PlatformExtension {
     autExpressions["Angle"].SetFunctionName("getAngle");
     autExpressions["XVelocity"].SetFunctionName("getXVelocity");
     autExpressions["YVelocity"].SetFunctionName("getYVelocity");
-    autExpressions["MovementAngleOffset"].SetFunctionName("getMovementAngleOffset");
+    autExpressions["MovementAngleOffset"].SetFunctionName(
+        "getMovementAngleOffset");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

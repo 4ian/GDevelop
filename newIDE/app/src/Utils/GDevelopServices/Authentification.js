@@ -1,6 +1,15 @@
 // @flow
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import {
+  Auth,
+  getAuth,
+  onAuthStateChanged,
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+} from 'firebase/auth';
 import { GDevelopFirebaseConfig } from './ApiConfigs';
 
 export type Profile = {
@@ -27,12 +36,14 @@ export type LoginError = {
 };
 
 export default class Authentification {
-  user: ?$npm$firebase$auth$User = null;
+  user: ?User = null;
+  auth: Auth;
   _onUserChangeCb: ?() => void = null;
 
   constructor() {
-    firebase.initializeApp(GDevelopFirebaseConfig);
-    firebase.auth().onAuthStateChanged(user => {
+    const app = initializeApp(GDevelopFirebaseConfig);
+    this.auth = getAuth(app);
+    onAuthStateChanged(this.auth, user => {
       if (user) {
         this.user = user;
       } else {
@@ -48,9 +59,7 @@ export default class Authentification {
   };
 
   createAccount = (form: LoginForm): Promise<void> => {
-    return firebase
-      .auth()
-      .createUserWithEmailAndPassword(form.email, form.password)
+    return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
         this.user = userCredentials.user;
       })
@@ -61,9 +70,7 @@ export default class Authentification {
   };
 
   login = (form: LoginForm): Promise<void> => {
-    return firebase
-      .auth()
-      .signInWithEmailAndPassword(form.email, form.password)
+    return signInWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
         this.user = userCredentials.user;
       })
@@ -74,7 +81,7 @@ export default class Authentification {
   };
 
   forgotPassword = (form: LoginForm): Promise<void> => {
-    return firebase.auth().sendPasswordResetEmail(form.email);
+    return sendPasswordResetEmail(this.auth, form.email);
   };
 
   getUserProfile = (cb: (any, ?Profile) => void) => {
@@ -88,9 +95,7 @@ export default class Authentification {
   };
 
   logout = () => {
-    firebase
-      .auth()
-      .signOut()
+    signOut(this.auth)
       .then(() => {
         console.log('Logout successful');
       })

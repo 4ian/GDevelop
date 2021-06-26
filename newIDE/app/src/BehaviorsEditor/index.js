@@ -29,20 +29,9 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
-const gd: libGDevelop = global.gd;
+import ScrollView from '../UI/ScrollView';
 
-const AddBehaviorLine = ({ onAdd }) => (
-  <Column>
-    <Line justifyContent="flex-end" expand>
-      <RaisedButton
-        label={<Trans>Add a behavior to the object</Trans>}
-        primary
-        onClick={onAdd}
-        icon={<Add />}
-      />
-    </Line>
-  </Column>
-);
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: gdProject,
@@ -120,25 +109,70 @@ const BehaviorsEditor = (props: Props) => {
   };
 
   return (
-    <Column expand>
-      {allBehaviorNames.length === 0 && (
-        <div style={{ height: 300, display: 'flex' }}>
-          <Line expand alignItems="center" justifyContent="center">
-            <EmptyBehaviorsPlaceholder />
-          </Line>
-        </div>
-      )}
-      {allBehaviorNames.map((behaviorName, index) => {
-        const behaviorContent = object.getBehavior(behaviorName);
-        const behaviorTypeName = behaviorContent.getTypeName();
-        const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
-        if (isNullPtr(gd, behavior)) {
+    <Column noMargin expand useFullHeight>
+      <ScrollView>
+        {allBehaviorNames.length === 0 && (
+          <div style={{ height: 300, display: 'flex' }}>
+            <Line expand alignItems="center" justifyContent="center">
+              <EmptyBehaviorsPlaceholder />
+            </Line>
+          </div>
+        )}
+        {allBehaviorNames.map((behaviorName, index) => {
+          const behaviorContent = object.getBehavior(behaviorName);
+          const behaviorTypeName = behaviorContent.getTypeName();
+          const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
+          if (isNullPtr(gd, behavior)) {
+            return (
+              <Accordion key={behaviorName} defaultExpanded>
+                <AccordionHeader
+                  actions={[
+                    <IconButton
+                      key="delete"
+                      onClick={ev => {
+                        ev.stopPropagation();
+                        onRemoveBehavior(behaviorName);
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>,
+                  ]}
+                >
+                  <MiniToolbarText>
+                    <Trans>Unknown behavior</Trans>{' '}
+                  </MiniToolbarText>
+                  <Column noMargin expand>
+                    <TextField margin="none" value={behaviorName} disabled />
+                  </Column>
+                </AccordionHeader>
+                <AccordionBody>
+                  <EmptyMessage>
+                    <Trans>
+                      This behavior is unknown. It might be a behavior that was
+                      defined in an extension and that was later removed. You
+                      should delete it.
+                    </Trans>
+                  </EmptyMessage>
+                </AccordionBody>
+              </Accordion>
+            );
+          }
+
+          const BehaviorComponent = BehaviorsEditorService.getEditor(
+            behaviorTypeName
+          );
+          const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
+          const enabledTutorialHints = tutorialHints.filter(
+            hint => !values.hiddenTutorialHints[hint.identifier]
+          );
+
           return (
             <Accordion key={behaviorName} defaultExpanded>
               <AccordionHeader
                 actions={[
                   <IconButton
                     key="delete"
+                    size="small"
                     onClick={ev => {
                       ev.stopPropagation();
                       onRemoveBehavior(behaviorName);
@@ -146,111 +180,76 @@ const BehaviorsEditor = (props: Props) => {
                   >
                     <Delete />
                   </IconButton>,
+                  <HelpIcon
+                    key="help"
+                    size="small"
+                    helpPagePath={getBehaviorHelpPagePath(behavior)}
+                  />,
                 ]}
               >
                 <MiniToolbarText>
-                  <Trans>Unknown behavior</Trans>{' '}
+                  <Trans>Behavior</Trans>{' '}
                 </MiniToolbarText>
                 <Column noMargin expand>
-                  <TextField margin="none" value={behaviorName} disabled />
+                  <TextField
+                    value={behaviorName}
+                    hintText={t`Behavior name`}
+                    margin="none"
+                    fullWidth
+                    disabled
+                    onChange={(e, text) =>
+                      onChangeBehaviorName(behaviorContent, text)
+                    }
+                  />
                 </Column>
               </AccordionHeader>
               <AccordionBody>
-                <EmptyMessage>
-                  <Trans>
-                    This behavior is unknown. It might be a behavior that was
-                    defined in an extension and that was later removed. You
-                    should delete it.
-                  </Trans>
-                </EmptyMessage>
+                <Column
+                  expand
+                  noMargin
+                  // Avoid Physics2 behavior overflow on small screens
+                  noOverflowParent
+                >
+                  {enabledTutorialHints.length ? (
+                    <Line>
+                      <ColumnStackLayout expand>
+                        {tutorialHints.map(tutorialHint => (
+                          <DismissableTutorialMessage
+                            key={tutorialHint.identifier}
+                            tutorialHint={tutorialHint}
+                          />
+                        ))}
+                      </ColumnStackLayout>
+                    </Line>
+                  ) : null}
+                  <Line>
+                    <BehaviorComponent
+                      behavior={behavior}
+                      behaviorContent={behaviorContent}
+                      project={project}
+                      resourceSources={props.resourceSources}
+                      onChooseResource={props.onChooseResource}
+                      resourceExternalEditors={props.resourceExternalEditors}
+                    />
+                  </Line>
+                </Column>
               </AccordionBody>
             </Accordion>
           );
-        }
+        })}
+      </ScrollView>
+      <Column>
+        <Line justifyContent="flex-end" expand>
+          <RaisedButton
+            key="add-behavior-line"
+            label={<Trans>Add a behavior to the object</Trans>}
+            primary
+            onClick={() => setNewBehaviorDialogOpen(true)}
+            icon={<Add />}
+          />
+        </Line>
+      </Column>
 
-        const BehaviorComponent = BehaviorsEditorService.getEditor(
-          behaviorTypeName
-        );
-        const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
-        const enabledTutorialHints = tutorialHints.filter(
-          hint => !values.hiddenTutorialHints[hint.identifier]
-        );
-
-        return (
-          <Accordion key={behaviorName} defaultExpanded>
-            <AccordionHeader
-              actions={[
-                <IconButton
-                  key="delete"
-                  size="small"
-                  onClick={ev => {
-                    ev.stopPropagation();
-                    onRemoveBehavior(behaviorName);
-                  }}
-                >
-                  <Delete />
-                </IconButton>,
-                <HelpIcon
-                  key="help"
-                  size="small"
-                  helpPagePath={getBehaviorHelpPagePath(behavior)}
-                />,
-              ]}
-            >
-              <MiniToolbarText>
-                <Trans>Behavior</Trans>{' '}
-              </MiniToolbarText>
-              <Column noMargin expand>
-                <TextField
-                  value={behaviorName}
-                  hintText={t`Behavior name`}
-                  margin="none"
-                  fullWidth
-                  disabled
-                  onChange={(e, text) =>
-                    onChangeBehaviorName(behaviorContent, text)
-                  }
-                />
-              </Column>
-            </AccordionHeader>
-            <AccordionBody>
-              <Column
-                expand
-                noMargin
-                // Avoid Physics2 behavior overflow on small screens
-                noOverflowParent
-              >
-                {enabledTutorialHints.length ? (
-                  <Line>
-                    <ColumnStackLayout expand>
-                      {tutorialHints.map(tutorialHint => (
-                        <DismissableTutorialMessage
-                          key={tutorialHint.identifier}
-                          tutorialHint={tutorialHint}
-                        />
-                      ))}
-                    </ColumnStackLayout>
-                  </Line>
-                ) : null}
-                <Line>
-                  <BehaviorComponent
-                    behavior={behavior}
-                    behaviorContent={behaviorContent}
-                    project={project}
-                    resourceSources={props.resourceSources}
-                    onChooseResource={props.onChooseResource}
-                    resourceExternalEditors={props.resourceExternalEditors}
-                  />
-                </Line>
-              </Column>
-            </AccordionBody>
-          </Accordion>
-        );
-      })}
-      <AddBehaviorLine
-        key="add-behavior-line"
-        onAdd={() => setNewBehaviorDialogOpen(true)}
-      />
       {newBehaviorDialogOpen && (
         <NewBehaviorDialog
           open={newBehaviorDialogOpen}

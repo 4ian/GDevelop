@@ -1,7 +1,27 @@
+// @flow
 import LayerRenderer from './LayerRenderer';
+import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
 
 export default class InstancesRenderer {
+  project: gdProject;
+  instances: gdInitialInstancesContainer;
+  layout: gdLayout;
+  viewPosition: ViewPosition;
+  onInstanceClicked: gdInitialInstance => void;
+  onInstanceDoubleClicked: gdInitialInstance => void;
+  onOverInstance: gdInitialInstance => void;
+  onOutInstance: gdInitialInstance => void;
+  onMoveInstance: (gdInitialInstance, number, number) => void;
+  onMoveInstanceEnd: void => void;
+  onDownInstance: gdInitialInstance => void;
+
+  layersRenderers: { [string]: LayerRenderer };
+
+  pixiContainer: PIXI.Container;
+
+  instanceMeasurer: any;
+
   constructor({
     project,
     layout,
@@ -14,6 +34,18 @@ export default class InstancesRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+  }: {
+    project: gdProject,
+    instances: gdInitialInstancesContainer,
+    layout: gdLayout,
+    viewPosition: ViewPosition,
+    onInstanceClicked: gdInitialInstance => void,
+    onInstanceDoubleClicked: gdInitialInstance => void,
+    onOverInstance: gdInitialInstance => void,
+    onOutInstance: gdInitialInstance => void,
+    onMoveInstance: (gdInitialInstance, number, number) => void,
+    onMoveInstanceEnd: void => void,
+    onDownInstance: gdInitialInstance => void,
   }) {
     this.project = project;
     this.instances = instances;
@@ -31,21 +63,21 @@ export default class InstancesRenderer {
 
     this.pixiContainer = new PIXI.Container();
     this.instanceMeasurer = {
-      getInstanceLeft: instance => {
+      getInstanceLeft: (instance: gdInitialInstance) => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) return instance.getX();
 
         return layerRenderer.getInstanceLeft(instance);
       },
-      getInstanceTop: instance => {
+      getInstanceTop: (instance: gdInitialInstance) => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
         if (!layerRenderer) return instance.getY();
 
         return layerRenderer.getInstanceTop(instance);
       },
-      getInstanceWidth: instance => {
+      getInstanceWidth: (instance: gdInitialInstance) => {
         if (instance.hasCustomSize()) return instance.getCustomWidth();
 
         const layerName = instance.getLayer();
@@ -55,7 +87,7 @@ export default class InstancesRenderer {
         return layerRenderer.getInstanceWidth(instance);
       },
 
-      getInstanceHeight: instance => {
+      getInstanceHeight: (instance: gdInitialInstance) => {
         if (instance.hasCustomSize()) return instance.getCustomHeight();
 
         const layerName = instance.getLayer();
@@ -64,7 +96,7 @@ export default class InstancesRenderer {
 
         return layerRenderer.getInstanceHeight(instance);
       },
-      getInstanceRect: instance => {
+      getInstanceRect: (instance: gdInitialInstance) => {
         return {
           x: this.instanceMeasurer.getInstanceLeft(instance),
           y: this.instanceMeasurer.getInstanceTop(instance),
@@ -134,7 +166,7 @@ export default class InstancesRenderer {
    * the next render.
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
-  resetInstanceRenderersFor(objectName) {
+  resetInstanceRenderersFor(objectName: string) {
     for (let i in this.layersRenderers) {
       if (this.layersRenderers.hasOwnProperty(i)) {
         const layerRenderer = this.layersRenderers[i];

@@ -150,6 +150,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               open={this.state.editing}
               anchorEl={this.state.anchorEl}
               onRequestClose={this.endEditing}
+              onApply={() => console.log("TODO")}
             >
               <ExternalEventsAutoComplete
                 project={this.props.project}
@@ -160,6 +161,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 }}
                 isInline
                 onRequestClose={this.endEditing}
+                onApply={() => console.log("TODO")}
                 ref={externalEventsAutoComplete =>
                   (this._externalEventsAutoComplete = externalEventsAutoComplete)
                 }

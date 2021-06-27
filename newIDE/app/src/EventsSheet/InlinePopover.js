@@ -36,7 +36,8 @@ type Props = {|
   children: React.Node,
   anchorEl: ?HTMLElement,
   open: boolean,
-  onRequestClose: (value?: boolean) => void,
+  onRequestClose: () => void,
+  onApply: () => void,
 |};
 
 /**
@@ -52,13 +53,17 @@ export default function InlinePopover(props: Props) {
   return (
     <ClickAwayListener
       onClickAway={event => {
+        // For a popover, clicking/touching away means validating,
+        // as it's very easy to do it and almost the only way to do it on a touch screen. 
+        // The user can cancel with Escape.
+
         if (event instanceof MouseEvent) {
           // onClickAway is triggered on a "click" (which can actually happen
           // on a touchscreen too!).
           // The click already gave the opportunity to the popover content to
           // get blurred (allowing "semi controlled" text fields
           // to apply their changes). We can close now.
-          props.onRequestClose();
+          props.onApply();
         } else {
           // Give a bit of time to the popover content to be blurred
           // (useful for the "semi controlled" text fields for example)
@@ -68,7 +73,7 @@ export default function InlinePopover(props: Props) {
           // blur events for GenericExpressionField are not triggered on iOS.
           // There might be a better way to do this without waiting this much time.
           setTimeout(() => {
-            props.onRequestClose();
+            props.onApply();
           }, 50);
         }
       }}
@@ -84,17 +89,12 @@ export default function InlinePopover(props: Props) {
           // Note that the content of the popover can capture the event
           // and stop its propagation (for example, the GenericExpressionField
           // when showing autocompletion), which is fine.
-
-          const applyChange = true;
-
           if (shouldCloseOrCancel(event)) {
-            // Changes are canceled by setting true on props.
-            props.onRequestClose(applyChange);
-          }
-
-          if (shouldSubmit(event)) {
-            // Changes are applied by setting false on props.
-            props.onRequestClose(!applyChange);
+            console.log("Inline popover should cancel");
+            props.onRequestClose();
+          } else if (shouldSubmit(event)) {
+            console.log("Inline popover should submit");
+            props.onApply();
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

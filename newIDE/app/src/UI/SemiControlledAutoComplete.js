@@ -13,7 +13,7 @@ import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
-import { shouldCloseOrCancel } from './KeyboardShortcuts/InteractionKeys';
+import { shouldCloseOrCancel, shouldSubmit } from './KeyboardShortcuts/InteractionKeys';
 
 type Option =
   | {|
@@ -37,6 +37,7 @@ type Props = {|
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   onRequestClose?: () => void,
+  onApply?: () => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -160,20 +161,21 @@ const handleChange = (
     // onChange could be called again. Hence why we immediately set the input.value below.
     // Search for "blur-value" in this file for the rest of this "workaround".
     if (props.onChoose) {
+      console.log("props.onChoose from handleChange in autocomplete");
       props.onChoose(option.value);
     } else {
+      console.log("props.onChange from handleChange in autocomplete");
       props.onChange(option.value);
     }
 
-    if (props.onRequestClose) {
-      props.onRequestClose();
-    }
+    console.log("Autcomplete onApply (or onRequestClose) from handleChange");
+    if (props.onApply) props.onApply();
+    else if (props.onRequestClose) props.onRequestClose();
   }
 };
 
 const getDefaultStylingProps = (
   params: Object,
-  value: string,
   props: Props
 ): Object => {
   const { InputProps, inputProps, InputLabelProps, ...other } = params;
@@ -189,8 +191,15 @@ const getDefaultStylingProps = (
       className: null,
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
-        if (shouldCloseOrCancel(event) && props.onRequestClose)
-          props.onRequestClose();
+        if (shouldCloseOrCancel(event)) {
+          console.log('shouldCloseOrCancel from autocomplete');
+          if (props.onRequestClose) props.onRequestClose();
+        } else if (shouldSubmit(event)) {
+          console.log("Validate onChange");
+          props.onChange(event.currentTarget.value);
+          if (props.onApply) props.onApply();
+          else if (props.onRequestClose) props.onRequestClose();
+        }
       },
     },
   };
@@ -268,7 +277,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                 InputProps,
                 inputProps,
                 ...otherStylingProps
-              } = getDefaultStylingProps(params, currentInputValue, props);
+              } = getDefaultStylingProps(params, props);
               return (
                 <TextField
                   InputProps={{
@@ -300,6 +309,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                       // Use the value of the input, rather than inputValue
                       // that could be not updated.
                       // Search for "blur-value" in this file for the rest of this "workaround".
+                      console.log("BLUR ON CHANGE");
                       props.onChange(event.currentTarget.value);
 
                       if (props.onBlur) props.onBlur(event);

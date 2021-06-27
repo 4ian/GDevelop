@@ -32,6 +32,7 @@ type Props = {|
   project?: gdProject,
   isInline?: boolean,
   onRequestClose?: () => void,
+  onApply?: () => void,
 |};
 
 export default class ExternalEventsAutoComplete extends React.Component<
@@ -45,7 +46,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
   }
 
   render() {
-    const { value, onChange, onRequestClose, isInline, project } = this.props;
+    const { value, onChange, onRequestClose, onApply, isInline, project } = this.props;
 
     return (
       <SemiControlledAutoComplete
@@ -55,6 +56,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
         value={value}
         onChange={onChange}
         onRequestClose={onRequestClose}
+        onApply={onApply}
         dataSource={getList(project)}
         openOnFocus={!isInline}
         ref={field => (this._field = field)}

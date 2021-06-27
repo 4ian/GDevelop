@@ -19,7 +19,8 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
 
   open: boolean,
-  onRequestClose: (value?: boolean) => void,
+  onRequestClose: () => void,
+  onApply: () => void,
   onChange: string => void,
 
   instruction: ?gdInstruction,
@@ -105,7 +106,7 @@ export default class InlineParameterEditor extends React.Component<
     );
   }
 
-  _onRequestClose = () => {
+  _onApply = () => {
     const { instruction } = this.props;
     const { instructionMetadata } = this.state;
 
@@ -125,7 +126,7 @@ export default class InlineParameterEditor extends React.Component<
       );
     }
 
-    this.props.onRequestClose();
+    this.props.onApply();
   };
 
   render() {
@@ -139,7 +140,8 @@ export default class InlineParameterEditor extends React.Component<
       <InlinePopover
         open={this.props.open}
         anchorEl={this.props.anchorEl}
-        onRequestClose={this._onRequestClose}
+        onRequestClose={this.props.onRequestClose}
+        onApply={this._onApply}
       >
         <ParameterComponent
           instruction={instruction}
@@ -148,7 +150,8 @@ export default class InlineParameterEditor extends React.Component<
           parameterIndex={this.props.parameterIndex}
           value={instruction.getParameter(this.props.parameterIndex)}
           onChange={this.props.onChange}
-          onRequestClose={this._onRequestClose}
+          onRequestClose={this.props.onRequestClose}
+          onApply={this._onApply}
           project={this.props.project}
           scope={this.props.scope}
           globalObjectsContainer={this.props.globalObjectsContainer}

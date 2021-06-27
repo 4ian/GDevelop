@@ -44,6 +44,8 @@ export default class BitmapFontResourceField extends Component<
         floatingLabelText={
           <Trans>Choose the bitmap font file (.fnt, .xml) to use</Trans>
         }
+        onRequestClose={this.props.onRequestClose}
+        onApply={this.props.onApply}
         ref={field => (this._field = field)}
       />
     );

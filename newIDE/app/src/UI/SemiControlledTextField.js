@@ -121,6 +121,7 @@ export default class SemiControlledTextField extends React.Component<
           if (!commitOnBlur) onChange(newValue);
         }}
         onBlur={event => {
+          console.log("Change onBlur");
           onChange(event.currentTarget.value);
           this.setState({
             focused: false,

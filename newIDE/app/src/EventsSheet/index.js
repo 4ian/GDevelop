@@ -570,16 +570,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  /**
-   * Handle how are managed changes on InlinePopover component
-   *
-   * @param shouldCancel Set to true to cancel changes
-   * @param eventsSheetCancelInlinePopover
-   */
   closeParameterEditor = (
     shouldCancel: boolean,
     eventsSheetCancelInlinePopover: string
   ) => {
+    console.log({shouldCancel, eventsSheetCancelInlinePopover})
     if (shouldCancel && eventsSheetCancelInlinePopover === 'cancel') {
       const { instruction, parameterIndex } = this.state.editedParameter;
 
@@ -587,30 +582,27 @@ export default class EventsSheet extends React.Component<Props, State> {
       instruction.setParameter(
         parameterIndex,
         this.state.inlineEditingPreviousValue
-      );
-
-      this.setState({
-        inlineEditingChangesMade: true,
-        inlineEditingAnchorEl: null,
-        inlineEditing: false,
-      });
-      return;
+        );
+        console.log("CANCELLING TO ", this.state.inlineEditingPreviousValue);
+    } else {
+      if (this.state.inlineEditingChangesMade) {
+        this._saveChangesToHistory();
+      }
     }
 
-    if (this.state.inlineEditingChangesMade) {
-      this._saveChangesToHistory();
-    }
-
-    if (this.state.inlineEditingAnchorEl) {
-      // Focus back the parameter - especially useful when editing
-      // with the keyboard only.
-      this.state.inlineEditingAnchorEl.focus();
-    }
+    const { inlineEditingAnchorEl } = this.state;
 
     this.setState({
       inlineEditing: false,
       inlineEditingAnchorEl: null,
       inlineEditingChangesMade: false,
+    }, () => {
+      console.log("SET STATE DONE");
+      if (inlineEditingAnchorEl) {
+        // Focus back the parameter - especially useful when editing
+        // with the keyboard only.
+        inlineEditingAnchorEl.focus();
+      }
     });
   };
 
@@ -1169,10 +1161,17 @@ export default class EventsSheet extends React.Component<Props, State> {
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={shouldCancel => {
-                            if (!shouldCancel) shouldCancel = false;
+                          onRequestClose={() => {
+                            console.log("InlineParameterEditor shoudl CLOSE");
                             this.closeParameterEditor(
-                              shouldCancel,
+                              true,
+                              values.eventsSheetCancelInlineParameter
+                            );
+                          }}
+                          onApply={() => {
+                            console.log("InlineParameterEditor shoudl APPLY");
+                            this.closeParameterEditor(
+                              false,
                               values.eventsSheetCancelInlineParameter
                             );
                           }}
@@ -1190,12 +1189,13 @@ export default class EventsSheet extends React.Component<Props, State> {
                               instruction,
                               parameterIndex,
                             } = this.state.editedParameter;
-                            if (!instruction) return;
+                            if (!instruction || !this.state.inlineEditing) {
+                              console.log("Discarding onChange");
+                              return;
+                            }
                             instruction.setParameter(parameterIndex, value);
+                            console.log("ON CHANGED")
                             this.setState({
-                              inlineEditingPreviousValue: instruction.getParameter(
-                                parameterIndex
-                              ),
                               inlineEditingChangesMade: true,
                             });
                             if (this._searchPanel)

@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle';
-import rotatePolygon from '../../Utils/PolygonHelper';
+import rotatePolygon, { type Polygon } from '../../Utils/PolygonHelper';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -175,29 +175,26 @@ export default class LayerRenderer {
     return bounds;
   }
 
-  _getRectanglePath(instance: gdInitialInstance): Array<[number, number]> {
+  _getInstanceRotatedRectangle(instance: gdInitialInstance): Polygon {
     const left = this.getUnrotatedInstanceLeft(instance);
     const top = this.getUnrotatedInstanceTop(instance);
     const right = left + this.getUnrotatedInstanceWidth(instance);
     const bottom = top + this.getUnrotatedInstanceHeight(instance);
 
-    this._temporaryRectanglePath[0][0] = left;
-    this._temporaryRectanglePath[0][1] = top;
+    const rectangle = this._temporaryRectanglePath;
 
-    this._temporaryRectanglePath[1][0] = left;
-    this._temporaryRectanglePath[1][1] = bottom;
+    rectangle[0][0] = left;
+    rectangle[0][1] = top;
 
-    this._temporaryRectanglePath[2][0] = right;
-    this._temporaryRectanglePath[2][1] = bottom;
+    rectangle[1][0] = left;
+    rectangle[1][1] = bottom;
 
-    this._temporaryRectanglePath[3][0] = right;
-    this._temporaryRectanglePath[3][1] = top;
+    rectangle[2][0] = right;
+    rectangle[2][1] = bottom;
 
-    return this._temporaryRectanglePath;
-  }
+    rectangle[3][0] = right;
+    rectangle[3][1] = top;
 
-  _getRotatedRectangle(instance: gdInitialInstance): Array<[number, number]> {
-    const rectangle = this._getRectanglePath(instance);
     const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
     const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
     const angle = (instance.getAngle() * Math.PI) / 180;
@@ -211,7 +208,7 @@ export default class LayerRenderer {
       return this.getUnrotatedInstanceAABB(instance, bounds);
     }
 
-    const rotatedRectangle = this._getRotatedRectangle(instance);
+    const rotatedRectangle = this._getInstanceRotatedRectangle(instance);
 
     let left = Number.MAX_VALUE;
     let right = -Number.MAX_VALUE;

@@ -14,7 +14,10 @@ export default class SelectionRectangle {
   _instancesInSelectionRectangle: gdInitialInstance[];
 
   selector: gdInitialInstanceJSFunctor;
-  _temporaryRectangle: Rectangle;
+  /**
+   * Used to check if an instance is in the selection rectangle
+   */
+  _temporaryAABB: Rectangle;
 
   constructor({
     instances,
@@ -35,7 +38,7 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
 
-    this._temporaryRectangle = new Rectangle();
+    this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
     this.selector.invoke = instancePtr => {
@@ -43,7 +46,7 @@ export default class SelectionRectangle {
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
       const instanceAABB = this.instanceMeasurer.getInstanceAABB(
         instance,
-        this._temporaryRectangle
+        this._temporaryAABB
       );
 
       if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return;

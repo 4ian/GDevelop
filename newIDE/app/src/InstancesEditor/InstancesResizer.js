@@ -34,10 +34,10 @@ export const resizeGrabbingRelativePositions = {
   Right: [1, 0.5],
 };
 
-export const isFreeOnX = (location: ResizeGrabbingLocation) =>
+export const canMoveOnX = (location: ResizeGrabbingLocation) =>
   location !== 'Top' && location !== 'Bottom';
 
-export const isFreeOnY = (location: ResizeGrabbingLocation) =>
+export const canMoveOnY = (location: ResizeGrabbingLocation) =>
   location !== 'Left' && location !== 'Right';
 
 export default class InstancesResizer {
@@ -166,10 +166,10 @@ export default class InstancesResizer {
       roundedTotalDeltaX = this.totalDeltaX;
       roundedTotalDeltaY = this.totalDeltaY;
     }
-    if (!isFreeOnX(grabbingLocation)) {
+    if (!canMoveOnX(grabbingLocation)) {
       roundedTotalDeltaX = 0;
     }
-    if (!isFreeOnY(grabbingLocation)) {
+    if (!canMoveOnY(grabbingLocation)) {
       roundedTotalDeltaY = 0;
     }
 
@@ -209,10 +209,10 @@ export default class InstancesResizer {
       // Choose the axis where the selection is the biggest.
       // That way the cursor is always on one edge.
       if (
-        !flippedTotalDeltaY ||
-        (flippedTotalDeltaX &&
+        !canMoveOnY(grabbingLocation) ||
+        (canMoveOnX(grabbingLocation) &&
           flippedTotalDeltaX * initialSelectionAABB.height() >
-            initialSelectionAABB.width() * flippedTotalDeltaY)
+          flippedTotalDeltaY * initialSelectionAABB.width())
       ) {
         scaleY = scaleX;
       } else {

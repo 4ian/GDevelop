@@ -8,8 +8,8 @@ import {
   type ResizeGrabbingLocation,
   resizeGrabbingLocationValues,
   resizeGrabbingRelativePositions,
-  isFreeOnX,
-  isFreeOnY,
+  canMoveOnX,
+  canMoveOnY,
 } from './InstancesResizer';
 
 type Props = {|
@@ -259,7 +259,7 @@ export default class SelectedInstances {
         resizeGrabbingRelativePositions[grabbingLocation];
 
       const useBigButton =
-        isFreeOnX(grabbingLocation) && isFreeOnY(grabbingLocation);
+        canMoveOnX(grabbingLocation) && canMoveOnY(grabbingLocation);
       const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
       const padding = buttonPadding + buttonSize / 2;
       const resizeButtonPos = this.toCanvasCoordinates(

@@ -9,8 +9,8 @@ import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer, {
   type ResizeGrabbingLocation,
-  isFreeOnX,
-  isFreeOnY,
+  canMoveOnX,
+  canMoveOnY,
 } from './InstancesResizer';
 import InstancesRotator from './InstancesRotator';
 import InstancesMover from './InstancesMover';
@@ -679,8 +679,8 @@ export default class InstancesEditor extends Component<Props> {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     const forceProportional =
       this.props.screenType === 'touch' &&
-      isFreeOnX(grabbingLocation) &&
-      isFreeOnY(grabbingLocation);
+      canMoveOnX(grabbingLocation) &&
+      canMoveOnY(grabbingLocation);
     const proportional =
       forceProportional || this.keyboardShortcuts.shouldResizeProportionally();
     this.instancesResizer.resizeBy(

@@ -1,6 +1,8 @@
 // @flow
+export type Polygon = Array<[number, number]>
+
 export default function rotatePolygon(
-  vertices: Array<[number, number]>,
+  vertices: Polygon,
   centerX: number,
   centerY: number,
   angle: number

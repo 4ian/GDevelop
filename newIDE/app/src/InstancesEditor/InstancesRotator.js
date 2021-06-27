@@ -3,13 +3,23 @@ import Rectangle from '../Utils/Rectangle';
 
 export default class InstancesRotator {
   _instanceMeasurer: any;
+  // initial state of the instance
+  // from which the rotation is calculated
   _instanceAngles: { [number]: number } = {};
   _instancePositions: { [number]: { x: number, y: number } } = {};
   _instanceAABBs: { [number]: Rectangle } = {};
+
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
-  _anchorIsUpToDate: boolean = false;
-  _anchor: [number, number] = [0, 0];
+  /**
+   * The fixed point is invalidated when the rotation end.
+   */
+  _fixedPointIsUpToDate: boolean = false;
+  //TODO the fixed point could be made draggable
+  /**
+   * The fixed point is the center of the selection
+   */
+  _fixedPoint: [number, number] = [0, 0];
 
   constructor(instanceMeasurer: any) {
     this._instanceMeasurer = instanceMeasurer;
@@ -52,15 +62,15 @@ export default class InstancesRotator {
     deltaY: number,
     proportional: boolean
   ) {
-    if (!this._anchorIsUpToDate) {
-      this._anchorIsUpToDate = true;
+    if (!this._fixedPointIsUpToDate) {
+      this._fixedPointIsUpToDate = true;
       let selectionAABB = new Rectangle();
       selectionAABB.setRectangle(this._getOrCreateInstanceAABB(instances[0]));
       for (let i = 1; i < instances.length; i++) {
         selectionAABB.union(this._getOrCreateInstanceAABB(instances[i]));
       }
-      this._anchor[0] = selectionAABB.centerX();
-      this._anchor[1] = selectionAABB.centerY();
+      this._fixedPoint[0] = selectionAABB.centerX();
+      this._fixedPoint[1] = selectionAABB.centerY();
       // Because the button is on top.
       this.totalDeltaY -= selectionAABB.height() / 2;
     }
@@ -90,16 +100,16 @@ export default class InstancesRotator {
       const rotationAngle = ((degreeAngle - initialAngle) * Math.PI) / 180;
       const cosa = Math.cos(-rotationAngle);
       const sina = Math.sin(-rotationAngle);
-      const deltaX = initialAABB.centerX() - this._anchor[0];
-      const deltaY = initialAABB.centerY() - this._anchor[1];
+      const deltaX = initialAABB.centerX() - this._fixedPoint[0];
+      const deltaY = initialAABB.centerY() - this._fixedPoint[1];
       selectedInstance.setX(
-        this._anchor[0] +
+        this._fixedPoint[0] +
           (initialInstanceOriginPosition.x - initialAABB.centerX()) +
           cosa * deltaX +
           sina * deltaY
       );
       selectedInstance.setY(
-        this._anchor[1] +
+        this._fixedPoint[1] +
           (initialInstanceOriginPosition.y - initialAABB.centerY()) -
           sina * deltaX +
           cosa * deltaY
@@ -113,6 +123,6 @@ export default class InstancesRotator {
     this._instanceAABBs = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
-    this._anchorIsUpToDate = false;
+    this._fixedPointIsUpToDate = false;
   }
 }

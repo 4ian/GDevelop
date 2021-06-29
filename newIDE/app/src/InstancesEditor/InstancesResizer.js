@@ -212,7 +212,7 @@ export default class InstancesResizer {
         !canMoveOnY(grabbingLocation) ||
         (canMoveOnX(grabbingLocation) &&
           flippedTotalDeltaX * initialSelectionAABB.height() >
-          flippedTotalDeltaY * initialSelectionAABB.width())
+            flippedTotalDeltaY * initialSelectionAABB.width())
       ) {
         scaleY = scaleX;
       } else {

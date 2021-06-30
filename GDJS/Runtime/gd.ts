@@ -502,7 +502,7 @@ namespace gdjs {
     message: string,
     type: 'info' | 'warning' | 'error' = 'info'
   ) => {
-    const logger = _console[type];
+    const logger = _console[type] || _console.info;
     logger(`[${group}] ${message}`);
   };
 

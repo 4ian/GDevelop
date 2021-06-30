@@ -167,7 +167,7 @@ namespace gdjs {
       try {
         var obj = JSON.parse(json);
       } catch (e) {
-        gdjs.runtimeLog('Unable to parse JSON: ', json, e);
+        gdjs.runtimeLog('Unable to parse JSON: ' + json + e, 'error');
         return this;
       }
       this.fromJSObject(obj);

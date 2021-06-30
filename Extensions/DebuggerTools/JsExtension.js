@@ -89,13 +89,12 @@ module.exports = {
         _('Log a message to the console'),
         _("Logs a message to the debugger's console."),
         _(
-          'Log message _PARAM1_ of type _PARAM2_ to the console in group _PARAM3_'
+          'Log message _PARAM0_ of type _PARAM1_ to the console in group _PARAM2_'
         ),
         _('Debugger Tools'),
         'res/actions/bug32.png',
         'res/actions/bug32.png'
       )
-      .addCodeOnlyParameter('currentScene', '')
       .addParameter('string', 'Message to log', '', false)
       .addParameter(
         'stringWithSelector',

@@ -21,14 +21,11 @@ namespace gdjs {
        * @param type - The type of log (info, warning or error).
        */
       export const log = function (
-        runtimeScene: gdjs.RuntimeScene,
         message: string,
         type: 'info' | 'warning' | 'error',
         group: string
       ) {
-        const game = runtimeScene.getGame();
-        if (game._debuggerClient)
-          game._debuggerClient.log(message, { group, type });
+        gdjs.log(group, message, type);
       };
 
       /**

@@ -265,7 +265,9 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           <Line>
             <SelectField
               floatingLabelText={
-                <Trans>Inline popover parameter behavior when escaping</Trans>
+                <Trans>
+                  Escape key behavior when editing an parameter inline
+                </Trans>
               }
               value={values.eventsSheetCancelInlineParameter}
               onChange={(e, i, value: string) => {

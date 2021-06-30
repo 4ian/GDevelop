@@ -13,7 +13,10 @@ import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
-import { shouldCloseOrCancel, shouldSubmit } from './KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldSubmit,
+} from './KeyboardShortcuts/InteractionKeys';
 
 type Option =
   | {|
@@ -172,10 +175,7 @@ const handleChange = (
   }
 };
 
-const getDefaultStylingProps = (
-  params: Object,
-  props: Props
-): Object => {
+const getDefaultStylingProps = (params: Object, props: Props): Object => {
   const { InputProps, inputProps, InputLabelProps, ...other } = params;
   return {
     ...other,

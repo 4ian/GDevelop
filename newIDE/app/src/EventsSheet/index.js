@@ -570,11 +570,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  closeParameterEditor = (
-    shouldCancel: boolean,
-    eventsSheetCancelInlinePopover: string
-  ) => {
-    if (shouldCancel && eventsSheetCancelInlinePopover === 'cancel') {
+  closeParameterEditor = (shouldCancel: boolean) => {
+    if (shouldCancel) {
       const { instruction, parameterIndex } = this.state.editedParameter;
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
 
@@ -1171,15 +1168,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={() => {
                             this.closeParameterEditor(
-                              true,
-                              values.eventsSheetCancelInlineParameter
+                              /*shouldCancel=*/ values.eventsSheetCancelInlineParameter ===
+                                'cancel'
                             );
                           }}
                           onApply={() => {
-                            this.closeParameterEditor(
-                              false,
-                              values.eventsSheetCancelInlineParameter
-                            );
+                            this.closeParameterEditor(/*shouldCancel=*/ false);
                           }}
                           project={project}
                           scope={scope}

@@ -46,7 +46,14 @@ export default class ExternalEventsAutoComplete extends React.Component<
   }
 
   render() {
-    const { value, onChange, onRequestClose, onApply, isInline, project } = this.props;
+    const {
+      value,
+      onChange,
+      onRequestClose,
+      onApply,
+      isInline,
+      project,
+    } = this.props;
 
     return (
       <SemiControlledAutoComplete

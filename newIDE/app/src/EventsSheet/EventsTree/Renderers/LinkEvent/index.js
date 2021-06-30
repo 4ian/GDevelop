@@ -42,10 +42,14 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
 
   state = {
     editing: false,
+    editingPreviousValue: null,
     anchorEl: null,
   };
 
   edit = (domEvent: any) => {
+    const linkEvent = gd.asLinkEvent(this.props.event);
+    const target = linkEvent.getTarget();
+
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -56,6 +60,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         this.setState(
           {
             editing: true,
+            editingPreviousValue: target,
             anchorEl,
           },
           () => {
@@ -88,6 +93,17 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
     }
   };
 
+  cancelEditing = () => {
+    this.endEditing();
+
+    const linkEvent = gd.asLinkEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (editingPreviousValue != null) {
+      linkEvent.setTarget(editingPreviousValue);
+      this.forceUpdate();
+    }
+  };
+
   endEditing = () => {
     const { anchorEl } = this.state;
 
@@ -97,6 +113,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
 
     this.setState({
       editing: false,
+      editingPreviousValue: null,
       anchorEl: null,
     });
   };
@@ -149,7 +166,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
             <InlinePopover
               open={this.state.editing}
               anchorEl={this.state.anchorEl}
-              onRequestClose={this.endEditing}
+              onRequestClose={this.cancelEditing}
+              onApply={this.endEditing}
             >
               <ExternalEventsAutoComplete
                 project={this.props.project}
@@ -159,7 +177,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                   this.props.onUpdate();
                 }}
                 isInline
-                onRequestClose={this.endEditing}
+                onRequestClose={this.cancelEditing}
+                onApply={this.endEditing}
                 ref={externalEventsAutoComplete =>
                   (this._externalEventsAutoComplete = externalEventsAutoComplete)
                 }

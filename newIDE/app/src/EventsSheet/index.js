@@ -132,6 +132,7 @@ type State = {|
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
   inlineEditingChangesMade: boolean,
+  inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
 
@@ -209,6 +210,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
     inlineEditingChangesMade: false,
+    inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
 
@@ -554,6 +556,8 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   openParameterEditor = (parameterContext: ParameterContext) => {
+    const { instruction, parameterIndex } = parameterContext;
+
     // $FlowFixMe
     this.setState({
       editedParameter: parameterContext,
@@ -562,25 +566,49 @@ export default class EventsSheet extends React.Component<Props, State> {
         ? parameterContext.domEvent.currentTarget
         : null,
       inlineEditingChangesMade: false,
+      inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
     });
   };
 
-  closeParameterEditor = () => {
-    if (this.state.inlineEditingChangesMade) {
-      this._saveChangesToHistory();
+  closeParameterEditor = (shouldCancel: boolean) => {
+    if (shouldCancel) {
+      const { instruction, parameterIndex } = this.state.editedParameter;
+      if (!instruction || !this.state.inlineEditingPreviousValue) return;
+
+      instruction.setParameter(
+        parameterIndex,
+        this.state.inlineEditingPreviousValue
+      );
+    } else {
+      if (this.state.inlineEditingChangesMade) {
+        this._saveChangesToHistory();
+      }
     }
 
-    if (this.state.inlineEditingAnchorEl) {
-      // Focus back the parameter - especially useful when editing
-      // with the keyboard only.
-      this.state.inlineEditingAnchorEl.focus();
-    }
+    const { inlineEditingAnchorEl } = this.state;
 
-    this.setState({
-      inlineEditing: false,
-      inlineEditingAnchorEl: null,
-      inlineEditingChangesMade: false,
-    });
+    this.setState(
+      {
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+        inlineEditingChangesMade: false,
+      },
+      () => {
+        if (inlineEditingAnchorEl) {
+          // Focus back the parameter - especially useful when editing
+          // with the keyboard only.
+          //
+          // Do this **after** the state change is applied.
+          // Otherwise this could cause a blur event for the input field
+          // that was focused in the inline popover,
+          // which would override the changes just applied to the
+          // instruction in case of cancellation.
+          // As the state change is applied, the inline popover is already
+          // gone and we can change the focus without worries.
+          inlineEditingAnchorEl.focus();
+        }
+      }
+    );
   };
 
   toggleDisabled = () => {
@@ -1138,7 +1166,15 @@ export default class EventsSheet extends React.Component<Props, State> {
                         <InlineParameterEditor
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={this.closeParameterEditor}
+                          onRequestClose={() => {
+                            this.closeParameterEditor(
+                              /*shouldCancel=*/ values.eventsSheetCancelInlineParameter ===
+                                'cancel'
+                            );
+                          }}
+                          onApply={() => {
+                            this.closeParameterEditor(/*shouldCancel=*/ false);
+                          }}
                           project={project}
                           scope={scope}
                           globalObjectsContainer={globalObjectsContainer}
@@ -1153,7 +1189,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                               instruction,
                               parameterIndex,
                             } = this.state.editedParameter;
-                            if (!instruction) return;
+                            if (!instruction || !this.state.inlineEditing) {
+                              // Unlikely to ever happen, but maybe a component could
+                              // fire the "onChange" while the inline editor was just
+                              // dismissed.
+                              return;
+                            }
                             instruction.setParameter(parameterIndex, value);
                             this.setState({
                               inlineEditingChangesMade: true,

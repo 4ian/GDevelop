@@ -78,6 +78,7 @@ export default class VariableField extends Component<Props, State> {
       onOpenDialog,
       parameterMetadata,
       onRequestClose,
+      onApply,
     } = this.props;
 
     const description = parameterMetadata
@@ -99,6 +100,7 @@ export default class VariableField extends Component<Props, State> {
             value={value}
             onChange={onChange}
             onRequestClose={onRequestClose}
+            onApply={onApply}
             dataSource={this.state.autocompletionVariableNames}
             openOnFocus={!isInline}
             ref={field => (this._field = field)}

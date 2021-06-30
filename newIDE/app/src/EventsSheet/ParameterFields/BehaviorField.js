@@ -147,6 +147,7 @@ export default class BehaviorField extends React.Component<
         value={this.props.value}
         onChange={this.props.onChange}
         onRequestClose={this.props.onRequestClose}
+        onApply={this.props.onApply}
         onBlur={event => {
           this._doValidation(event.currentTarget.value);
         }}

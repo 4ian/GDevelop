@@ -46,6 +46,7 @@ export default class ObjectField extends React.Component<
         value={this.props.value}
         onChange={this.props.onChange}
         onRequestClose={this.props.onRequestClose}
+        onApply={this.props.onApply}
         allowedObjectType={this._allowedObjectType}
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}

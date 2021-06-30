@@ -46,6 +46,7 @@ type State = {|
   editingValueIteratorVariableName: boolean,
   editingKeyIteratorVariableName: boolean,
   editingIterableVariableName: boolean,
+  editingPreviousValue: ?string,
   anchorEl: ?HTMLSpanElement,
 |};
 
@@ -61,6 +62,7 @@ export default class ForEachChildVariableEvent extends React.Component<
     editingValueIteratorVariableName: false,
     editingKeyIteratorVariableName: false,
     editingIterableVariableName: false,
+    editingPreviousValue: null,
     anchorEl: null,
   };
 
@@ -68,6 +70,13 @@ export default class ForEachChildVariableEvent extends React.Component<
     variable: 'iterable' | 'iteratorValue' | 'iteratorKey',
     anchorEl: HTMLSpanElement
   ) => {
+    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
+      this.props.event
+    );
+    const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
+    const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
+    const iterableName = forEachChildVariableEvent.getIterableVariableName();
+
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -79,6 +88,12 @@ export default class ForEachChildVariableEvent extends React.Component<
             editingValueIteratorVariableName: variable === 'iteratorValue',
             editingKeyIteratorVariableName: variable === 'iteratorKey',
             editingIterableVariableName: variable === 'iterable',
+            editingPreviousValue:
+              variable === 'iterable'
+                ? iterableName
+                : variable === 'iteratorValue'
+                ? valueIteratorName
+                : keyIteratorName,
             anchorEl,
           },
           () => {
@@ -98,6 +113,34 @@ export default class ForEachChildVariableEvent extends React.Component<
     );
   };
 
+  cancelEditing = () => {
+    this.endEditing();
+
+    const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
+      this.props.event
+    );
+    const {
+      editingPreviousValue,
+      editingIterableVariableName,
+      editingValueIteratorVariableName,
+      editingKeyIteratorVariableName,
+    } = this.state;
+    if (editingPreviousValue != null) {
+      if (editingIterableVariableName) {
+        forEachChildVariableEvent.setIterableVariableName(editingPreviousValue);
+      } else if (editingValueIteratorVariableName) {
+        forEachChildVariableEvent.setValueIteratorVariableName(
+          editingPreviousValue
+        );
+      } else if (editingKeyIteratorVariableName) {
+        forEachChildVariableEvent.setKeyIteratorVariableName(
+          editingPreviousValue
+        );
+      }
+      this.forceUpdate();
+    }
+  };
+
   endEditing = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
@@ -108,6 +151,7 @@ export default class ForEachChildVariableEvent extends React.Component<
       editingKeyIteratorVariableName: false,
       editingValueIteratorVariableName: false,
       editingIterableVariableName: false,
+      editingPreviousValue: null,
       anchorEl: null,
     });
   };
@@ -135,7 +179,6 @@ export default class ForEachChildVariableEvent extends React.Component<
               className={classNames({
                 [disabledText]: this.props.disabled,
               })}
-              tabIndex={0}
             >
               For every child in
               <span
@@ -152,6 +195,7 @@ export default class ForEachChildVariableEvent extends React.Component<
                     this.edit('iterable', event.currentTarget);
                   }
                 }}
+                tabIndex={0}
               >
                 <img
                   className={icon}
@@ -181,6 +225,7 @@ export default class ForEachChildVariableEvent extends React.Component<
                     this.edit('iteratorValue', event.currentTarget);
                   }
                 }}
+                tabIndex={0}
               >
                 <img
                   className={icon}
@@ -210,6 +255,7 @@ export default class ForEachChildVariableEvent extends React.Component<
                     this.edit('iteratorKey', event.currentTarget);
                   }
                 }}
+                tabIndex={0}
               >
                 <img
                   className={icon}
@@ -287,7 +333,8 @@ export default class ForEachChildVariableEvent extends React.Component<
         <InlinePopover
           open={this.state.editingValueIteratorVariableName}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+          onRequestClose={this.cancelEditing}
+          onApply={this.endEditing}
         >
           <SceneVariableField
             project={this.props.project}
@@ -300,14 +347,16 @@ export default class ForEachChildVariableEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
-            onRequestClose={this.endEditing}
+            onRequestClose={this.cancelEditing}
+            onApply={this.endEditing}
             ref={iteratorField => (this._valueIteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover
           open={this.state.editingKeyIteratorVariableName}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+          onRequestClose={this.cancelEditing}
+          onApply={this.endEditing}
         >
           <SceneVariableField
             project={this.props.project}
@@ -320,14 +369,16 @@ export default class ForEachChildVariableEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
-            onRequestClose={this.endEditing}
+            onRequestClose={this.cancelEditing}
+            onApply={this.endEditing}
             ref={iteratorField => (this._keyIteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover
           open={this.state.editingIterableVariableName}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+          onRequestClose={this.cancelEditing}
+          onApply={this.endEditing}
         >
           <SceneVariableField
             project={this.props.project}
@@ -340,7 +391,8 @@ export default class ForEachChildVariableEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
-            onRequestClose={this.endEditing}
+            onRequestClose={this.cancelEditing}
+            onApply={this.endEditing}
             ref={iterableField => (this._iterableField = iterableField)}
           />
         </InlinePopover>

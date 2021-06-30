@@ -111,7 +111,10 @@ namespace gdjs {
         this.setString('null');
       } else if (typeof obj === 'number') {
         if (Number.isNaN(obj)) {
-          console.warn('Variables cannot be set to NaN, setting it to 0.');
+          gdjs.runtimeLog(
+            'Variables cannot be set to NaN, setting it to 0.',
+            'warning'
+          );
           this.setNumber(0);
         } else {
           this.setNumber(obj);
@@ -135,17 +138,23 @@ namespace gdjs {
         this.setString(obj.toString());
       } else if (typeof obj === 'bigint') {
         if (obj > Number.MAX_SAFE_INTEGER)
-          console.warn(
-            'Integers bigger than ' +
+          gdjs.runtimeLog(
+            'Error while converting JS variable to GDevelop variable: Integers bigger than ' +
               Number.MAX_SAFE_INTEGER +
-              " aren't supported by GDevelop variables, it will be reduced to that size."
+              " aren't supported by GDevelop variables, it will be reduced to that size.",
+            'warning'
           );
         // @ts-ignore
         variable.setNumber(parseInt(obj, 10));
       } else if (typeof obj === 'function') {
-        console.error('Error: Impossible to set variable value to a function.');
+        gdjs.runtimeLog(
+          'Error while converting JS variable to GDevelop variable: Impossible to set variable value to a function.'
+        );
       } else {
-        console.error('Cannot identify type of object:', obj);
+        gdjs.runtimeLog(
+          'Error while converting JS variable to GDevelop variable: Cannot identify type of object ' +
+            obj
+        );
       }
       return this;
     }
@@ -158,7 +167,7 @@ namespace gdjs {
       try {
         var obj = JSON.parse(json);
       } catch (e) {
-        console.error('Unable to parse JSON: ', json, e);
+        gdjs.runtimeLog('Unable to parse JSON: ', json, e);
         return this;
       }
       this.fromJSObject(obj);

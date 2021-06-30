@@ -311,7 +311,7 @@ namespace gdjs {
    * @private
    */
   export const registerGlobalCallbacks = function (): void {
-    console.warn(
+    gdjs.runtimeLog(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
   };
@@ -344,7 +344,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.objectsTypes.containsKey(name))
       return gdjs.objectsTypes.get(name);
 
-    console.warn('Object type "' + name + '" was not found.');
+    gdjs.runtimeLog('Object type "' + name + '" was not found.', 'warning');
     return gdjs.objectsTypes.get(''); //Create a base empty runtime object.
   };
 
@@ -359,7 +359,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
       return gdjs.behaviorsTypes.get(name);
 
-    console.warn('Behavior type "' + name + '" was not found.');
+    gdjs.runtimeLog('Behavior type "' + name + '" was not found.', 'warning');
     return gdjs.behaviorsTypes.get(''); //Create a base empty runtime behavior.
   };
 
@@ -486,6 +486,33 @@ namespace gdjs {
       hex[r[15]]
     );
   };
+
+  const _console = {
+    info: console.log,
+    warning: console.warn,
+    error: console.error,
+  };
+
+  /**
+   * Internal method for logging messages to the JS console or the Debugger if available.
+   * Should be used in engine code or extensions, console.log is fine for JS events.
+   */
+  export let log = (
+    group: string,
+    message: string,
+    type: 'info' | 'warning' | 'error' = 'info'
+  ) => {
+    const logger = _console[type];
+    logger(`[${group}] ${message}`);
+  };
+
+  /**
+   * Shortcut loggin function for the runtime engine code.
+   */
+  export const runtimeLog = (
+    message: string,
+    type: 'info' | 'warning' | 'error' = 'info'
+  ) => log('Engine runtime', message, type);
 }
 
 //Make sure console.warn and console.error are available.

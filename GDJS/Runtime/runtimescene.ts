@@ -126,7 +126,7 @@ namespace gdjs {
      */
     loadFromScene(sceneData: LayoutData | null) {
       if (!sceneData) {
-        console.error('loadFromScene was called without a scene');
+        gdjs.runtimeLog('loadFromScene was called without a scene', 'error');
         return;
       }
       if (this._isLoaded) {
@@ -240,10 +240,11 @@ namespace gdjs {
      */
     updateObject(objectData: ObjectData): void {
       if (!this.isObjectRegistered(objectData.name)) {
-        console.warn(
+        gdjs.runtimeLog(
           'Tried to call updateObject for an object that was not registered (' +
             objectData.name +
-            '). Call registerObject first.'
+            '). Call registerObject first.',
+          'warning'
         );
       }
       this._objects.put(objectData.name, objectData);
@@ -435,8 +436,9 @@ namespace gdjs {
       if (module && module.func) {
         this._eventsFunction = module.func;
       } else {
-        console.log(
-          'Warning: no function found for running logic of scene ' + this._name
+        gdjs.runtimeLog(
+          'No function found for running logic of scene ' + this._name,
+          'warning'
         );
         this._eventsFunction = function () {};
       }
@@ -806,7 +808,7 @@ namespace gdjs {
      */
     getObjects(name: string): gdjs.RuntimeObject[] {
       if (!this._instances.containsKey(name)) {
-        console.log(
+        gdjs.runtimeLog(
           'RuntimeScene.getObjects: No instances called "' +
             name +
             '"! Adding it.'
@@ -922,7 +924,10 @@ namespace gdjs {
       if (behaviorSharedData) {
         return behaviorSharedData;
       }
-      console.error("Can't find shared data for behavior with name:", name);
+      gdjs.runtimeLog(
+        "Can't find shared data for behavior with name: " + name,
+        'error'
+      );
       return null;
     }
 

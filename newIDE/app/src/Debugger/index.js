@@ -15,6 +15,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
 } from '../Export/PreviewLauncher.flow';
+import { type Log } from './DebuggerConsole';
 
 export type ProfilerMeasuresSection = {|
   time: number,
@@ -45,6 +46,7 @@ type State = {|
   profilerOutputs: { [DebuggerId]: ProfilerOutput },
   profilingInProgress: { [DebuggerId]: boolean },
   selectedId: DebuggerId,
+  logs: { [DebuggerId]: Array<Log> },
 |};
 
 /**
@@ -61,6 +63,7 @@ export default class Debugger extends React.Component<Props, State> {
     profilerOutputs: {},
     profilingInProgress: {},
     selectedId: 0,
+    logs: {},
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
@@ -124,15 +127,34 @@ export default class Debugger extends React.Component<Props, State> {
       },
       onConnectionClosed: ({ id, debuggerIds }) => {
         this.setState(
-          ({ selectedId }) => ({
-            debuggerIds,
-            selectedId:
-              selectedId !== id
-                ? selectedId
-                : debuggerIds.length
-                ? debuggerIds[debuggerIds.length - 1]
-                : selectedId,
-          }),
+          ({
+            selectedId,
+            logs,
+            debuggerGameData,
+            profilerOutputs,
+            profilingInProgress,
+          }) => {
+            // Remove any data bound to the instance that might have been stored
+            // Otherwise it would be a data leak
+            if (logs[id]) delete logs[id];
+            if (debuggerGameData[id]) delete debuggerGameData[id];
+            if (profilerOutputs[id]) delete profilerOutputs[id];
+            if (profilingInProgress[id]) delete profilingInProgress[id];
+
+            return {
+              debuggerIds,
+              selectedId:
+                selectedId !== id
+                  ? selectedId
+                  : debuggerIds.length
+                  ? debuggerIds[debuggerIds.length - 1]
+                  : selectedId,
+              logs,
+              debuggerGameData,
+              profilerOutputs,
+              profilingInProgress,
+            };
+          },
           () => this.updateToolbar()
         );
       },
@@ -188,6 +210,13 @@ export default class Debugger extends React.Component<Props, State> {
       }));
     } else if (data.command === 'hotReloader.logs') {
       // Nothing to do.
+    } else if (data.command === 'console.log') {
+      this.setState(state => ({
+        logs: {
+          ...state.logs,
+          [id]: [...(state.logs[id] || []), data.payload],
+        },
+      }));
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -310,6 +339,7 @@ export default class Debugger extends React.Component<Props, State> {
                 onStopProfiler={() => this._stopProfiler(selectedId)}
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
+                logs={this.state.logs[selectedId]}
               />
             )}
             {!this._hasSelectedDebugger() && (

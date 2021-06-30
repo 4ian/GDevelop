@@ -102,12 +102,13 @@ namespace gdjs {
         effectData.effectType
       );
       if (!filterCreator) {
-        console.log(
+        gdjs.runtimeLog(
           'Filter "' +
             effectData.name +
             '" has an unknown effect type: "' +
             effectData.effectType +
-            '". Was it registered properly? Is the effect type correct?'
+            '". Was it registered properly? Is the effect type correct?',
+          'warning'
         );
         return;
       }

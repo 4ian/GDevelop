@@ -30,11 +30,17 @@ namespace gdjs {
           }
         }
       } catch (error) {
-        console.warn('Unable to get access to the localStorage: ', error);
+        gdjs.log(
+          'Storage extension',
+          'Unable to get access to the localStorage: ' + error,
+          'error'
+        );
       }
       if (!localStorage) {
-        console.warn(
-          "Storage actions won't work as no localStorage was found."
+        gdjs.log(
+          'Storage extension',
+          "Storage actions won't work as no localStorage was found.",
+          'warning'
         );
       }
 
@@ -64,9 +70,13 @@ namespace gdjs {
             serializedString = localStorage.getItem('GDJS_' + name);
           }
         } catch (error) {
-          console.warn(
-            'Unable to load data from localStorage for "' + name + '":',
-            error
+          gdjs.log(
+            'Storage extension',
+            'Unable to load data from localStorage for "' +
+              name +
+              '": ' +
+              error,
+            'warning'
           );
         }
         let jsObject = {};
@@ -75,9 +85,13 @@ namespace gdjs {
             jsObject = JSON.parse(serializedString);
           }
         } catch (error) {
-          console.warn(
-            'Unable to load data from "' + name + '" - data is not valid JSON:',
-            error
+          gdjs.log(
+            'Storage extension',
+            'Unable to load data from "' +
+              name +
+              '" - data is not valid JSON: ' +
+              error,
+            'warning'
           );
         }
         loadedObjects.put(name, jsObject);
@@ -107,9 +121,10 @@ namespace gdjs {
             localStorage.setItem('GDJS_' + name, serializedString);
           }
         } catch (error) {
-          console.warn(
-            'Unable to save data to localStorage for "' + name + '":',
-            error
+          gdjs.log(
+            'Storage extension',
+            'Unable to save data to localStorage for "' + name + '": ' + error,
+            'warning'
           );
         }
         loadedObjects.remove(name);

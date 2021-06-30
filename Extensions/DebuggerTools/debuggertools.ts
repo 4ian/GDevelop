@@ -14,6 +14,24 @@ namespace gdjs {
       };
 
       /**
+       * Logs a message to the console.
+       * @param runtimeScene - The current scene.
+       * @param message - The message to log.
+       * @param group - The group of messages it belongs to.
+       * @param type - The type of log (info, warning or error).
+       */
+      export const log = function (
+        runtimeScene: gdjs.RuntimeScene,
+        message: string,
+        type: 'info' | 'warning' | 'error',
+        group: string
+      ) {
+        const game = runtimeScene.getGame();
+        if (game._debuggerClient)
+          game._debuggerClient.log(message, { group, type });
+      };
+
+      /**
        * Enable or disable the debug draw.
        * @param runtimeScene - The current scene.
        * @param enableDebugDraw - true to enable the debug draw, false to disable it.

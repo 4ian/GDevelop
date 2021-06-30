@@ -49,7 +49,10 @@ namespace gdjs {
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
-          console.error('Unrecognized change in scene stack.');
+          gdjs.runtimeLog(
+            'Unrecognized change in scene stack: ' + request,
+            'error'
+          );
           return false;
         }
       }

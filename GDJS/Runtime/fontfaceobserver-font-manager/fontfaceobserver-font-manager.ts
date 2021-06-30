@@ -198,13 +198,14 @@ namespace gdjs {
             onFontLoaded(fontFamily, fontResources);
           },
           function (error) {
-            console.error(
+            gdjs.runtimeLog(
               'Error loading font resource "' +
                 fontResources[0].name +
                 '" (file: ' +
                 file +
                 '): ' +
-                (error.message || 'Unknown error')
+                (error.message || 'Unknown error'),
+              'error'
             );
             onFontLoaded(fontFamily, fontResources);
           }

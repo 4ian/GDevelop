@@ -69,7 +69,10 @@ namespace gdjs {
 
       const onLoad: JsonManagerRequestCallback = function (error) {
         if (error) {
-          console.error('Error while preloading a json resource:' + error);
+          gdjs.runtimeLog(
+            'Error while preloading a json resource:' + error,
+            'error'
+          );
         }
         loaded++;
         if (loaded === jsonResources.length) {

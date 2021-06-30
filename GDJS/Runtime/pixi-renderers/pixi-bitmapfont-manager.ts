@@ -152,10 +152,12 @@ namespace gdjs {
       }
 
       if (!this._pixiBitmapFontsInUse[bitmapFontInstallKey]) {
-        console.error(
+        gdjs.log(
+          'Bitmap Text',
           'BitmapFont with name ' +
             bitmapFontInstallKey +
-            ' was tried to be released but was never marked as used.'
+            ' was tried to be released but was never marked as used.',
+          'error'
         );
         return;
       }
@@ -176,7 +178,8 @@ namespace gdjs {
           const oldestUnloadedPixiBitmapFontName = this._pixiBitmapFontsToUninstall.shift() as string;
 
           PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
-          console.log(
+          gdjs.log(
+            'Bitmap Text',
             'Uninstalled BitmapFont "' +
               oldestUnloadedPixiBitmapFontName +
               '" from memory.'
@@ -209,10 +212,12 @@ namespace gdjs {
       // First get the font data:
       const fontData = this._loadedFontsData[bitmapFontResourceName];
       if (!fontData) {
-        console.warn(
+        gdjs.log(
+          'Bitmap Text',
           'Could not find Bitmap Font for resource named "' +
             bitmapFontResourceName +
-            '". The default font will be used.'
+            '". The default font will be used.',
+          'warning'
         );
         return this.getDefaultBitmapFont();
       }
@@ -231,11 +236,13 @@ namespace gdjs {
         this._markBitmapFontAsUsed(bitmapFontInstallKey);
         return bitmapFont;
       } catch (error) {
-        console.warn(
+        gdjs.log(
+          'Bitmap Text',
           'Could not load the Bitmap Font for resource named "' +
             bitmapFontResourceName +
             '". The default font will be used. Error is: ' +
-            error
+            error,
+          'error'
         );
         return this.getDefaultBitmapFont();
       }
@@ -264,11 +271,13 @@ namespace gdjs {
               this._loadedFontsData[bitmapFontResource.name] = fontData;
             })
             .catch((error) => {
-              console.error(
+              gdjs.log(
+                'Bitmap Text',
                 "Can't fetch the bitmap font file " +
                   bitmapFontResource.file +
                   ', error: ' +
-                  error
+                  error,
+                'error'
               );
             })
             .then(() => {

@@ -4,6 +4,20 @@ namespace gdjs {
    */
   export interface IDebuggerClient {
     /**
+     * Logs a value in the debugger console.
+     * @param message - The value to log inside the console.
+     * @param additionalData - Additional data about the log.
+     */
+    log(
+      message: string,
+      additionalData?: {
+        type?: 'info' | 'warning' | 'error';
+        group?: string;
+        internal?: boolean;
+      }
+    ): void;
+
+    /**
      * Update a value, specified by a path starting from the {@link RuntimeGame} instance.
      * @param path - The path to the variable, starting from {@link RuntimeGame}.
      * @param newValue - The new value.
@@ -156,7 +170,70 @@ namespace gdjs {
           );
         }
       };
-      return;
+
+      ((log, warn, error, gdjsLog) => {
+        // Hook the console logging functions to log to the Debugger as well
+        console.log = (...messages) => {
+          log(...messages);
+          this._consoleLogHook('info', ...messages);
+        };
+
+        console.warn = (...messages) => {
+          warn(...messages);
+          this._consoleLogHook('warning', ...messages);
+        };
+
+        console.error = (...messages) => {
+          error(...messages);
+          this._consoleLogHook('error', ...messages);
+        };
+
+        gdjs.log = (
+          group: string,
+          message: string,
+          type: 'info' | 'warning' | 'error' = 'info'
+        ) => {
+          gdjsLog(group, message, type);
+          this.log(message, { internal: true, type, group });
+        };
+      })(console.log, console.warn, console.error, gdjs.log);
+    }
+
+    _consoleLogHook(type: 'info' | 'warning' | 'error', ...messages) {
+      this.log(
+        messages.reduce(
+          (accumulator, value) => accumulator + value.toString(),
+          ''
+        ),
+        { group: 'JavaScript', type }
+      );
+    }
+
+    log(
+      message: string,
+      additionalData?: {
+        type?: 'info' | 'warning' | 'error';
+        group?: string;
+        internal?: boolean;
+      }
+    ) {
+      if (!this._ws) {
+        console.warn('No connection to debugger opened to send logs');
+        return;
+      }
+      if (this._ws.readyState === 1)
+        this._ws.send(
+          JSON.stringify({
+            command: 'console.log',
+            payload: {
+              message,
+              type: 'log',
+              group: 'Default',
+              internal: false,
+              ...(additionalData || {}),
+            },
+          })
+        );
     }
 
     set(path: string[], newValue: any): boolean {

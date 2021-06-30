@@ -8,9 +8,17 @@ namespace gdjs {
   const HowlParameters: HowlOptions = {
     preload: true,
     onplayerror: (_, error) =>
-      console.error("Can't play an audio file: ", error),
+      gdjs.log(
+        'Sound extension',
+        "Can't play an audio file: " + error,
+        'error'
+      ),
     onloaderror: (_, error) =>
-      console.error('Error while loading an audio file: ', error),
+      gdjs.log(
+        'Sound extension',
+        'Error while loading an audio file: ' + error,
+        'error'
+      ),
   };
 
   /**
@@ -682,9 +690,10 @@ namespace gdjs {
       let loadedCount: integer = 0;
       const onLoad = (_?: any, error?: string) => {
         if (error)
-          console.error(
-            'There was an error while loading an audio file:',
-            error
+          gdjs.log(
+            'Sound extension',
+            'There was an error while loading an audio file: ' + error,
+            'error'
           );
 
         loadedCount++;

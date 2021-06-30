@@ -22,6 +22,7 @@ import Flash from '@material-ui/icons/FlashOn';
 import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
+import { DebuggerConsole } from './DebuggerConsole';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
@@ -54,7 +55,12 @@ const initialMosaicEditorNodes = {
     second: 'selected-inspector',
     splitPercentage: 25,
   },
-  second: 'profiler',
+  second: {
+    direction: 'row',
+    first: 'profiler',
+    second: 'console',
+    splitPercentage: 25,
+  },
   splitPercentage: 65,
 };
 
@@ -85,6 +91,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onStopProfiler,
       profilerOutput,
       profilingInProgress,
+      logs,
     } = this.props;
     const {
       selectedInspector,
@@ -204,6 +211,15 @@ export default class DebuggerContent extends React.Component<Props, State> {
             profilerOutput={profilerOutput}
             profilingInProgress={profilingInProgress}
           />
+        ),
+      },
+      console: {
+        type: 'secondary',
+        title: t`Console`,
+        renderEditor: () => (
+          <Background>
+            <DebuggerConsole logs={logs || []} />
+          </Background>
         ),
       },
     };

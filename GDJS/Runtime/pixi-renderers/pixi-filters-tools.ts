@@ -60,10 +60,12 @@ namespace gdjs {
       filterCreator: FilterCreator
     ) {
       if (_filterCreators.hasOwnProperty(filterName)) {
-        console.warn(
+        gdjs.log(
+          'Filters',
           'Filter "' +
             filterName +
-            '" was already registered in gdjs.PixiFiltersTools. Replacing it with the new one.'
+            '" was already registered in gdjs.PixiFiltersTools. Replacing it with the new one.',
+          'warning'
         );
       }
       _filterCreators[filterName] = filterCreator;

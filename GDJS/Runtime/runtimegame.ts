@@ -225,7 +225,10 @@ namespace gdjs {
         }
       }
       if (scene === null) {
-        console.warn('The game has no scene called "' + sceneName + '"');
+        gdjs.runtimeLog(
+          'The game has no scene called "' + sceneName + '"',
+          'warning'
+        );
       }
       return scene;
     }
@@ -520,73 +523,77 @@ namespace gdjs {
      * Start the game loop, to be called once assets are loaded.
      */
     startGameLoop() {
-      if (!this.hasScene()) {
-        console.log('The game has no scene.');
-        return;
+      try {
+        if (!this.hasScene()) {
+          gdjs.runtimeLog('The game has no scene.', 'warning');
+          return;
+        }
+        this._forceGameResolutionUpdate();
+
+        //Load the first scene
+        const firstSceneName = this._data.firstLayout;
+        this._sceneStack.push(
+          this.hasScene(firstSceneName)
+            ? firstSceneName
+            : // @ts-ignore - no risk of null object.
+              this.getSceneData().name,
+          this._injectExternalLayout
+        );
+
+        //Uncomment to profile the first x frames of the game.
+        // var x = 500;
+        // var startTime = Date.now();
+        // console.profile("Stepping for " + x + " frames")
+        // for(var i = 0; i < x; ++i) {
+        //     this._sceneStack.step(16);
+        // }
+        // console.profileEnd();
+        // var time = Date.now() - startTime;
+        // console.log("Took", time, "ms");
+        // return;
+
+        //The standard game loop
+        const that = this;
+        let accumulatedElapsedTime = 0;
+        this._renderer.startGameLoop(function (lastCallElapsedTime) {
+          if (that._paused) {
+            return true;
+          }
+
+          // Skip the frame if we rendering frames too fast
+          accumulatedElapsedTime += lastCallElapsedTime;
+          if (
+            that._maxFPS > 0 &&
+            1000.0 / accumulatedElapsedTime > that._maxFPS + 7
+          ) {
+            // Only skip frame if the framerate is 7 frames above the maximum framerate.
+            // Most browser/engines will try to run at slightly more than 60 frames per second.
+            // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
+            // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
+            return true;
+          }
+          const elapsedTime = accumulatedElapsedTime;
+          accumulatedElapsedTime = 0;
+
+          //Manage resize events.
+          if (that._notifyScenesForGameResolutionResize) {
+            that._sceneStack.onGameResolutionResized();
+            that._notifyScenesForGameResolutionResize = false;
+          }
+
+          //Render and step the scene.
+          if (that._sceneStack.step(elapsedTime)) {
+            that.getInputManager().onFrameEnded();
+            return true;
+          }
+          return false;
+        });
+        setTimeout(() => {
+          this._setupSessionMetrics();
+        }, 10000);
+      } catch (e) {
+        gdjs.log('Internal crash', '' + e, 'error');
       }
-      this._forceGameResolutionUpdate();
-
-      //Load the first scene
-      const firstSceneName = this._data.firstLayout;
-      this._sceneStack.push(
-        this.hasScene(firstSceneName)
-          ? firstSceneName
-          : // @ts-ignore - no risk of null object.
-            this.getSceneData().name,
-        this._injectExternalLayout
-      );
-
-      //Uncomment to profile the first x frames of the game.
-      // var x = 500;
-      // var startTime = Date.now();
-      // console.profile("Stepping for " + x + " frames")
-      // for(var i = 0; i < x; ++i) {
-      //     this._sceneStack.step(16);
-      // }
-      // console.profileEnd();
-      // var time = Date.now() - startTime;
-      // console.log("Took", time, "ms");
-      // return;
-
-      //The standard game loop
-      const that = this;
-      let accumulatedElapsedTime = 0;
-      this._renderer.startGameLoop(function (lastCallElapsedTime) {
-        if (that._paused) {
-          return true;
-        }
-
-        // Skip the frame if we rendering frames too fast
-        accumulatedElapsedTime += lastCallElapsedTime;
-        if (
-          that._maxFPS > 0 &&
-          1000.0 / accumulatedElapsedTime > that._maxFPS + 7
-        ) {
-          // Only skip frame if the framerate is 7 frames above the maximum framerate.
-          // Most browser/engines will try to run at slightly more than 60 frames per second.
-          // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
-          // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
-          return true;
-        }
-        const elapsedTime = accumulatedElapsedTime;
-        accumulatedElapsedTime = 0;
-
-        //Manage resize events.
-        if (that._notifyScenesForGameResolutionResize) {
-          that._sceneStack.onGameResolutionResized();
-          that._notifyScenesForGameResolutionResize = false;
-        }
-
-        //Render and step the scene.
-        if (that._sceneStack.step(elapsedTime)) {
-          that.getInputManager().onFrameEnded();
-          return true;
-        }
-        return false;
-      });
-      setTimeout(() => {
-        this._setupSessionMetrics();
-      }, 10000);
     }
 
     /**

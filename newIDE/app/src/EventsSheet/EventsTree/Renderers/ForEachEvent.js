@@ -37,10 +37,14 @@ export default class ForEachEvent extends React.Component<
   _objectField: ?ObjectField = null;
   state = {
     editing: false,
+    editingPreviousValue: null,
     anchorEl: null,
   };
 
   edit = (domEvent: any) => {
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    const objectName = forEachEvent.getObjectToPick();
+
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -51,6 +55,7 @@ export default class ForEachEvent extends React.Component<
         this.setState(
           {
             editing: true,
+            editingPreviousValue: objectName,
             anchorEl,
           },
           () => {
@@ -64,6 +69,17 @@ export default class ForEachEvent extends React.Component<
     );
   };
 
+  cancelEditing = () => {
+    this.endEditing();
+
+    const forEachEvent = gd.asForEachEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (editingPreviousValue !== null) {
+      forEachEvent.setObjectToPick(editingPreviousValue);
+      this.forceUpdate();
+    }
+  };
+
   endEditing = () => {
     const { anchorEl } = this.state;
     // Put back the focus after closing the inline popover.
@@ -72,14 +88,15 @@ export default class ForEachEvent extends React.Component<
 
     this.setState({
       editing: false,
+      editingPreviousValue: null,
       anchorEl: null,
     });
   };
 
   render() {
-    var forEachEvent = gd.asForEachEvent(this.props.event);
-
+    const forEachEvent = gd.asForEachEvent(this.props.event);
     const objectName = forEachEvent.getObjectToPick();
+
     return (
       <div
         style={styles.container}
@@ -173,7 +190,8 @@ export default class ForEachEvent extends React.Component<
         <InlinePopover
           open={this.state.editing}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+          onRequestClose={this.cancelEditing}
+          onApply={this.endEditing}
         >
           <ObjectField
             project={this.props.project}
@@ -186,7 +204,8 @@ export default class ForEachEvent extends React.Component<
               this.props.onUpdate();
             }}
             isInline
-            onRequestClose={this.endEditing}
+            onRequestClose={this.cancelEditing}
+            onApply={this.endEditing}
             ref={objectField => (this._objectField = objectField)}
           />
         </InlinePopover>

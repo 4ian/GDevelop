@@ -37,10 +37,14 @@ export default class RepeatEvent extends React.Component<
   _field: ?DefaultField = null;
   state = {
     editing: false,
+    editingPreviousValue: null,
     anchorEl: null,
   };
 
   edit = (domEvent: any) => {
+    const repeatEvent = gd.asRepeatEvent(this.props.event);
+    const expression = repeatEvent.getRepeatExpression();
+
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -51,6 +55,7 @@ export default class RepeatEvent extends React.Component<
         this.setState(
           {
             editing: true,
+            editingPreviousValue: expression,
             anchorEl,
           },
           () => {
@@ -64,6 +69,17 @@ export default class RepeatEvent extends React.Component<
     );
   };
 
+  cancelEditing = () => {
+    this.endEditing();
+
+    const repeatEvent = gd.asRepeatEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (editingPreviousValue !== null) {
+      repeatEvent.setRepeatExpression(editingPreviousValue);
+      this.forceUpdate();
+    }
+  };
+
   endEditing = () => {
     const { anchorEl } = this.state;
 
@@ -73,14 +89,15 @@ export default class RepeatEvent extends React.Component<
 
     this.setState({
       editing: false,
+      editingPreviousValue: null,
       anchorEl: null,
     });
   };
 
   render() {
-    var repeatEvent = gd.asRepeatEvent(this.props.event);
-
+    const repeatEvent = gd.asRepeatEvent(this.props.event);
     const expression = repeatEvent.getRepeatExpression();
+
     return (
       <div
         style={styles.container}

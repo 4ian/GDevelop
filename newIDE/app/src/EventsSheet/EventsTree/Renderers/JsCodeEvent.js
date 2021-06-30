@@ -58,8 +58,8 @@ const styles = {
 };
 
 type State = {|
-  editing: boolean,
   editingObject: boolean,
+  editingPreviousValue: ?string,
   anchorEl: ?any,
 |};
 
@@ -69,43 +69,12 @@ export default class JsCodeEvent extends React.Component<
 > {
   _objectField: ?ObjectField = null;
   state = {
-    editing: false,
     editingObject: false,
+    editingPreviousValue: null,
     anchorEl: null,
   };
 
   _input: ?any;
-
-  edit = () => {
-    this.setState(
-      {
-        editing: true,
-      },
-      () => {
-        // $FlowFixMe
-        const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
-        if (input) {
-          input.focus();
-          input.value = gd.asJsCodeEvent(this.props.event).getInlineCode();
-        }
-      }
-    );
-  };
-
-  endEditing = () => {
-    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
-
-    // $FlowFixMe
-    const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
-    if (input) jsCodeEvent.setInlineCode(input.value);
-
-    this.setState(
-      {
-        editing: false,
-      },
-      () => this.props.onUpdate()
-    );
-  };
 
   onChange = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
@@ -113,6 +82,9 @@ export default class JsCodeEvent extends React.Component<
   };
 
   editObject = (domEvent: any) => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const parameterObjects = jsCodeEvent.getParameterObjects();
+
     // We should not need to use a timeout, but
     // if we don't do this, the InlinePopover's clickaway listener
     // is immediately picking up the event and closing.
@@ -123,6 +95,7 @@ export default class JsCodeEvent extends React.Component<
         this.setState(
           {
             editingObject: true,
+            editingPreviousValue: parameterObjects,
             anchorEl,
           },
           () => {
@@ -136,6 +109,17 @@ export default class JsCodeEvent extends React.Component<
     );
   };
 
+  cancelObjectEditing = () => {
+    this.endObjectEditing();
+
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (editingPreviousValue !== null) {
+      jsCodeEvent.setParameterObjects(editingPreviousValue);
+      this.forceUpdate();
+    }
+  };
+
   endObjectEditing = () => {
     const { anchorEl } = this.state;
 
@@ -145,6 +129,7 @@ export default class JsCodeEvent extends React.Component<
 
     this.setState({
       editingObject: false,
+      editingPreviousValue: null,
       anchorEl: null,
     });
   };
@@ -274,7 +259,8 @@ export default class JsCodeEvent extends React.Component<
             <InlinePopover
               open={this.state.editingObject}
               anchorEl={this.state.anchorEl}
-              onRequestClose={this.endObjectEditing}
+              onRequestClose={this.cancelObjectEditing}
+              onApply={this.endObjectEditing}
             >
               <ObjectField
                 project={this.props.project}
@@ -287,7 +273,8 @@ export default class JsCodeEvent extends React.Component<
                   this.props.onUpdate();
                 }}
                 isInline
-                onRequestClose={this.endObjectEditing}
+                onRequestClose={this.cancelObjectEditing}
+                onApply={this.endObjectEditing}
                 ref={objectField => (this._objectField = objectField)}
               />
             </InlinePopover>

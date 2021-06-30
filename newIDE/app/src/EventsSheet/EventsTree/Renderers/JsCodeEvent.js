@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import ExpandLess from '@material-ui/icons/ExpandLess';
@@ -114,7 +113,7 @@ export default class JsCodeEvent extends React.Component<
 
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const { editingPreviousValue } = this.state;
-    if (editingPreviousValue !== null) {
+    if (editingPreviousValue != null) {
       jsCodeEvent.setParameterObjects(editingPreviousValue);
       this.forceUpdate();
     }

@@ -74,7 +74,7 @@ export default class RepeatEvent extends React.Component<
 
     const repeatEvent = gd.asRepeatEvent(this.props.event);
     const { editingPreviousValue } = this.state;
-    if (editingPreviousValue !== null) {
+    if (editingPreviousValue != null) {
       repeatEvent.setRepeatExpression(editingPreviousValue);
       this.forceUpdate();
     }
@@ -189,7 +189,8 @@ export default class RepeatEvent extends React.Component<
         <InlinePopover
           open={this.state.editing}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+          onRequestClose={this.cancelEditing}
+          onApply={this.endEditing}
         >
           <DefaultField
             project={this.props.project}

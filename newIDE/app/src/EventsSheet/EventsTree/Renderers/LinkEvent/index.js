@@ -98,8 +98,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
 
     const linkEvent = gd.asLinkEvent(this.props.event);
     const { editingPreviousValue } = this.state;
-    if (editingPreviousValue !== null) {
-      kinkEvent.setTarget(editingPreviousValue);
+    if (editingPreviousValue != null) {
+      linkEvent.setTarget(editingPreviousValue);
       this.forceUpdate();
     }
   };

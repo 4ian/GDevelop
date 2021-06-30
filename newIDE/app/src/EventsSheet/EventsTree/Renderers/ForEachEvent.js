@@ -74,7 +74,7 @@ export default class ForEachEvent extends React.Component<
 
     const forEachEvent = gd.asForEachEvent(this.props.event);
     const { editingPreviousValue } = this.state;
-    if (editingPreviousValue !== null) {
+    if (editingPreviousValue != null) {
       forEachEvent.setObjectToPick(editingPreviousValue);
       this.forceUpdate();
     }

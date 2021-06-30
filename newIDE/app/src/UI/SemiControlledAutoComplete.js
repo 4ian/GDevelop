@@ -161,14 +161,12 @@ const handleChange = (
     // onChange could be called again. Hence why we immediately set the input.value below.
     // Search for "blur-value" in this file for the rest of this "workaround".
     if (props.onChoose) {
-      console.log("props.onChoose from handleChange in autocomplete");
       props.onChoose(option.value);
     } else {
-      console.log("props.onChange from handleChange in autocomplete");
       props.onChange(option.value);
     }
 
-    console.log("Autcomplete onApply (or onRequestClose) from handleChange");
+    // Call onApply (if specified) as an option was chosen.
     if (props.onApply) props.onApply();
     else if (props.onRequestClose) props.onRequestClose();
   }
@@ -192,11 +190,13 @@ const getDefaultStylingProps = (
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
         if (shouldCloseOrCancel(event)) {
-          console.log('shouldCloseOrCancel from autocomplete');
           if (props.onRequestClose) props.onRequestClose();
         } else if (shouldSubmit(event)) {
-          console.log("Validate onChange");
+          // Make sure the current value is reported to the parent before
+          // calling onApply (or onRequestClose), otherwise the parent would only
+          // know about the previous value.
           props.onChange(event.currentTarget.value);
+
           if (props.onApply) props.onApply();
           else if (props.onRequestClose) props.onRequestClose();
         }
@@ -309,7 +309,6 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                       // Use the value of the input, rather than inputValue
                       // that could be not updated.
                       // Search for "blur-value" in this file for the rest of this "workaround".
-                      console.log("BLUR ON CHANGE");
                       props.onChange(event.currentTarget.value);
 
                       if (props.onBlur) props.onBlur(event);

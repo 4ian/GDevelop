@@ -574,16 +574,14 @@ export default class EventsSheet extends React.Component<Props, State> {
     shouldCancel: boolean,
     eventsSheetCancelInlinePopover: string
   ) => {
-    console.log({shouldCancel, eventsSheetCancelInlinePopover})
     if (shouldCancel && eventsSheetCancelInlinePopover === 'cancel') {
       const { instruction, parameterIndex } = this.state.editedParameter;
-
       if (!instruction || !this.state.inlineEditingPreviousValue) return;
+
       instruction.setParameter(
         parameterIndex,
         this.state.inlineEditingPreviousValue
-        );
-        console.log("CANCELLING TO ", this.state.inlineEditingPreviousValue);
+      );
     } else {
       if (this.state.inlineEditingChangesMade) {
         this._saveChangesToHistory();
@@ -592,18 +590,28 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     const { inlineEditingAnchorEl } = this.state;
 
-    this.setState({
-      inlineEditing: false,
-      inlineEditingAnchorEl: null,
-      inlineEditingChangesMade: false,
-    }, () => {
-      console.log("SET STATE DONE");
-      if (inlineEditingAnchorEl) {
-        // Focus back the parameter - especially useful when editing
-        // with the keyboard only.
-        inlineEditingAnchorEl.focus();
+    this.setState(
+      {
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+        inlineEditingChangesMade: false,
+      },
+      () => {
+        if (inlineEditingAnchorEl) {
+          // Focus back the parameter - especially useful when editing
+          // with the keyboard only.
+          //
+          // Do this **after** the state change is applied.
+          // Otherwise this could cause a blur event for the input field
+          // that was focused in the inline popover,
+          // which would override the changes just applied to the
+          // instruction in case of cancellation.
+          // As the state change is applied, the inline popover is already
+          // gone and we can change the focus without worries.
+          inlineEditingAnchorEl.focus();
+        }
       }
-    });
+    );
   };
 
   toggleDisabled = () => {
@@ -1162,14 +1170,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                           open={this.state.inlineEditing}
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={() => {
-                            console.log("InlineParameterEditor shoudl CLOSE");
                             this.closeParameterEditor(
                               true,
                               values.eventsSheetCancelInlineParameter
                             );
                           }}
                           onApply={() => {
-                            console.log("InlineParameterEditor shoudl APPLY");
                             this.closeParameterEditor(
                               false,
                               values.eventsSheetCancelInlineParameter
@@ -1190,11 +1196,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                               parameterIndex,
                             } = this.state.editedParameter;
                             if (!instruction || !this.state.inlineEditing) {
-                              console.log("Discarding onChange");
+                              // Unlikely to ever happen, but maybe a component could
+                              // fire the "onChange" while the inline editor was just
+                              // dismissed.
                               return;
                             }
                             instruction.setParameter(parameterIndex, value);
-                            console.log("ON CHANGED")
                             this.setState({
                               inlineEditingChangesMade: true,
                             });

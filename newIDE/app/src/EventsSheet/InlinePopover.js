@@ -54,7 +54,7 @@ export default function InlinePopover(props: Props) {
     <ClickAwayListener
       onClickAway={event => {
         // For a popover, clicking/touching away means validating,
-        // as it's very easy to do it and almost the only way to do it on a touch screen. 
+        // as it's very easy to do it and almost the only way to do it on a touch screen.
         // The user can cancel with Escape.
 
         if (event instanceof MouseEvent) {
@@ -90,10 +90,8 @@ export default function InlinePopover(props: Props) {
           // and stop its propagation (for example, the GenericExpressionField
           // when showing autocompletion), which is fine.
           if (shouldCloseOrCancel(event)) {
-            console.log("Inline popover should cancel");
             props.onRequestClose();
           } else if (shouldSubmit(event)) {
-            console.log("Inline popover should submit");
             props.onApply();
           }
 

@@ -43,13 +43,19 @@ export const canMoveOnY = (location: ResizeGrabbingLocation) =>
 export default class InstancesResizer {
   instanceMeasurer: any;
   options: Object;
+
+  // the initial state before the scaling
   _initialSelectionAABB: ?Rectangle = null;
   _unrotatedInstanceAABBs: { [number]: Rectangle } = {};
   _instanceAABBs: { [number]: Rectangle } = {};
   _instancePositions: { [number]: { x: number, y: number } } = {};
+
+  // The coordinates of the vector of the resize being done
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
-
+  /**
+   * Used when rounding on the grid
+   */
   _temporaryGrabbingPosition: [number, number] = [0, 0];
 
   constructor({
@@ -98,15 +104,14 @@ export default class InstancesResizer {
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
-    let initialPosition = this._instancePositions[instance.ptr];
+    const initialPosition = this._instancePositions[instance.ptr];
     if (initialPosition) {
       return initialPosition;
     }
-    initialPosition = this._instancePositions[instance.ptr] = {
+    return (this._instancePositions[instance.ptr] = {
       x: instance.getX(),
       y: instance.getY(),
-    };
-    return initialPosition;
+    });
   }
 
   _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
@@ -202,7 +207,7 @@ export default class InstancesResizer {
     // So, keeping the aspect ratio ensures a transformation without any shear.
     let hasRotatedInstance = false;
     for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
-      // It only applies to instances that are not strait.
+      // It only applies to instances that are not straight.
       hasRotatedInstance = instances[i].getAngle() % 90 !== 0;
     }
     if (proportional || hasRotatedInstance) {
@@ -225,11 +230,11 @@ export default class InstancesResizer {
     scaleX = Math.max(1 / initialSelectionAABB.width(), scaleX);
     scaleY = Math.max(1 / initialSelectionAABB.height(), scaleY);
 
-    const anchorX =
+    const fixedPointX =
       initialSelectionAABB.right -
       resizeGrabbingRelativePositions[grabbingLocation][0] *
         initialSelectionAABB.width();
-    const anchorY =
+    const fixedPointY =
       initialSelectionAABB.bottom -
       resizeGrabbingRelativePositions[grabbingLocation][1] *
         initialSelectionAABB.height();
@@ -244,6 +249,12 @@ export default class InstancesResizer {
         selectedInstance
       );
 
+      // The position and size of an instance describe the shape
+      // before the rotation is applied.
+      // The calculus is like a 90° or 270° rotation of the basis around the scaling.
+      // The AABB dimensions are the same in both cases and the AABB center
+      // is stable by instance rotation. This allows to use the same formula
+      // for both 90° or 270°.
       const angle = ((selectedInstance.getAngle() % 360) + 360) % 360;
       if (
         !proportional &&
@@ -262,9 +273,11 @@ export default class InstancesResizer {
         // It's easier to scale the instance center
         // because it's not affected by the instance rotation.
         const centerX =
-          (initialUnrotatedInstanceAABB.centerX() - anchorX) * scaleX + anchorX;
+          (initialUnrotatedInstanceAABB.centerX() - fixedPointX) * scaleX +
+          fixedPointX;
         const centerY =
-          (initialUnrotatedInstanceAABB.centerY() - anchorY) * scaleY + anchorY;
+          (initialUnrotatedInstanceAABB.centerY() - fixedPointY) * scaleY +
+          fixedPointY;
         // and then add the vector from the center to the origin.
         // It's the vector on the unrotated instance
         // and the scale was applied on the rotated one so it's switched.
@@ -288,10 +301,10 @@ export default class InstancesResizer {
         selectedInstance.setHasCustomSize(true);
 
         selectedInstance.setX(
-          (initialInstanceOriginPosition.x - anchorX) * scaleX + anchorX
+          (initialInstanceOriginPosition.x - fixedPointX) * scaleX + fixedPointX
         );
         selectedInstance.setY(
-          (initialInstanceOriginPosition.y - anchorY) * scaleY + anchorY
+          (initialInstanceOriginPosition.y - fixedPointY) * scaleY + fixedPointY
         );
       }
     }

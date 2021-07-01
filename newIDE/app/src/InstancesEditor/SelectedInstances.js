@@ -252,7 +252,7 @@ export default class SelectedInstances {
 
     const show = selection.length !== 0;
 
-    //Position the resize button.
+    // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {
       const resizeButton = this.resizeButtons[grabbingLocation];
       const relativePositions =

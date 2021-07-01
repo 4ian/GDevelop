@@ -26,6 +26,11 @@ export default class InstancesRotator {
   }
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
+    // The grabbale node for rotation is on top.
+    // Initially totalDelta = (0 , selectionAABB.height() / 2)
+    // (see the affectation of totalDeltaY in the rotateBy method)
+    // So the initial angle given by atan2 is -90.
+    // 90 is added to start with a angle delta of 0.
     const angle =
       (Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180) / Math.PI +
       90 +
@@ -81,7 +86,7 @@ export default class InstancesRotator {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
-      let initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
+      const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
 
       let initialAngle = this._instanceAngles[selectedInstance.ptr];
       if (initialAngle === undefined) {
@@ -90,7 +95,7 @@ export default class InstancesRotator {
         ] = selectedInstance.getAngle();
       }
 
-      let initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
+      const initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
         selectedInstance
       );
 

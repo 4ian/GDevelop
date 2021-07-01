@@ -42,12 +42,7 @@ export default class LayerRenderer {
   wasUsed: boolean = false;
 
   _temporaryRectangle: Rectangle = new Rectangle();
-  _temporaryRectanglePath: Array<[number, number]> = [
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [0, 0],
-  ];
+  _temporaryRectanglePath: Polygon = [[0, 0], [0, 0], [0, 0], [0, 0]];
 
   constructor({
     project,

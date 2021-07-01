@@ -128,13 +128,9 @@ namespace gdjs {
         this._behaviors[i].onCreated();
       }
 
-      const objectEffectsManager = this._runtimeScene
-        .getGame()
-        .getObjectEffectsManager();
-      objectEffectsManager.initializeEffects(
-        this,
-        this._effects
-      );
+      for (let i = 0; i < this._effects.length; i++) {
+        this.addEffect(this._effects[i]);
+      }
     }
 
     /**
@@ -212,7 +208,9 @@ namespace gdjs {
      * Called once during the game loop, before events and rendering.
      * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
      */
-    update(runtimeScene: gdjs.RuntimeScene): void {}
+    update(runtimeScene: gdjs.RuntimeScene): void {
+      this._runtimeScene.getGame().getObjectEffectsManager().update(this);
+    }
 
     /**
      * Called once during the game loop, after events and before rendering.
@@ -740,6 +738,136 @@ namespace gdjs {
      */
     hasVariable(name: string): boolean {
       return this._variables.has(name);
+    }
+
+    /**
+     * Add a new effect, or replace the one with the same name.
+     * @param effectData The data of the effect to add.
+     */
+    addEffect(effectData) {
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .addEffect(this, effectData);
+      for (let name in effectData.doubleParameters) {
+        this.setEffectDoubleParameter(
+          effectData.name,
+          name,
+          effectData.doubleParameters[name]
+        );
+      }
+      for (let name in effectData.stringParameters) {
+        this.setEffectStringParameter(
+          effectData.name,
+          name,
+          effectData.stringParameters[name]
+        );
+      }
+      for (let name in effectData.booleanParameters) {
+        this.setEffectBooleanParameter(
+          effectData.name,
+          name,
+          effectData.booleanParameters[name]
+        );
+      }
+    }
+
+    /**
+     * Remove the effect with the specified name
+     * @param effectName The name of the effect.
+     */
+    removeEffect(effectName) {
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .removeEffect(this, effectName);
+    }
+
+    /**
+     * Change an effect parameter value (for parameters that are numbers).
+     * @param name The name of the effect to update.
+     * @param parameterName The name of the parameter to update.
+     * @param value The new value (number).
+     */
+    setEffectDoubleParameter(
+      name: string,
+      parameterName: string,
+      value: float
+    ) {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .setEffectDoubleParameter(this, name, parameterName, value);
+    }
+
+    /**
+     * Change an effect parameter value (for parameters that are strings).
+     * @param name The name of the effect to update.
+     * @param parameterName The name of the parameter to update.
+     * @param value The new value (string).
+     */
+    setEffectStringParameter(
+      name: string,
+      parameterName: string,
+      value: string
+    ) {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .setEffectStringParameter(this, name, parameterName, value);
+    }
+
+    /**
+     * Change an effect parameter value (for parameters that are booleans).
+     * @param name The name of the effect to update.
+     * @param parameterName The name of the parameter to update.
+     * @param value The new value (boolean).
+     */
+    setEffectBooleanParameter(
+      name: string,
+      parameterName: string,
+      value: boolean
+    ): void {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .setEffectBooleanParameter(this, name, parameterName, value);
+    }
+
+    /**
+     * Enable or disable an effect.
+     * @param name The name of the effect to enable or disable.
+     * @param enable true to enable, false to disable
+     */
+    enableEffect(name: string, enable: boolean): void {
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .enableEffect(this, name, enable);
+    }
+
+    /**
+     * Check if an effect is enabled
+     * @param name The name of the effect
+     * @return true if the effect is enabled, false otherwise.
+     */
+    isEffectEnabled(name: string): boolean {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .isEffectEnabled(this, name);
+    }
+
+    /**
+     * Check if an effect exists on this object
+     * @param name The name of the effect
+     * @return true if the effect exists, false otherwise.
+     */
+    hasEffect(name: string): boolean {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .hasEffect(this, name);
     }
 
     /**

@@ -90,7 +90,7 @@ namespace gdjs {
       /** Function to call to create the filter */
       makePIXIFilter: (layer: gdjs.Layer | gdjs.RuntimeObject, effectData: EffectData) => any;
       /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
+      update: (filter: PIXI.Filter, layer: gdjs.Layer | gdjs.RuntimeObject) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,
@@ -116,7 +116,7 @@ namespace gdjs {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
       /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
+      update: (filter: PIXI.Filter, layer: gdjs.Layer | gdjs.RuntimeObject) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,

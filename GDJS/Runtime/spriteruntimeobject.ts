@@ -438,6 +438,7 @@ namespace gdjs {
      * Update the current frame of the object according to the elapsed time on the scene.
      */
     update(runtimeScene: gdjs.RuntimeScene): void {
+      super.update(runtimeScene);
       //Playing the animation of all objects including the ones outside the screen can be
       //costly when the scene is big with a lot of animated objects. By default, we skip
       //updating the object if it is not visible.

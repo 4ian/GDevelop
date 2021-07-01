@@ -80,7 +80,6 @@ export default class SelectedInstances {
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
   resizeButtons: { [ResizeGrabbingLocation]: PIXI.Graphics } = {};
-  resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
   rotateButton = new PIXI.Graphics();
 
   constructor({

@@ -40,19 +40,27 @@ export const canMoveOnX = (location: ResizeGrabbingLocation) =>
 export const canMoveOnY = (location: ResizeGrabbingLocation) =>
   location !== 'Left' && location !== 'Right';
 
+const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
+  for (let i = 0; i < instances.length; i++) {
+    if (instances[i].getAngle() % 90 !== 0) return true;
+  }
+  return false;
+};
+
 export default class InstancesResizer {
   instanceMeasurer: any;
   options: Object;
 
-  // the initial state before the scaling
+  // The initial state of instances before a resize:
   _initialSelectionAABB: ?Rectangle = null;
   _unrotatedInstanceAABBs: { [number]: Rectangle } = {};
   _instanceAABBs: { [number]: Rectangle } = {};
   _instancePositions: { [number]: { x: number, y: number } } = {};
 
-  // The coordinates of the vector of the resize being done
+  // The coordinates of the vector of the resize being done:
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
+
   /**
    * Used when rounding on the grid
    */
@@ -74,40 +82,32 @@ export default class InstancesResizer {
   }
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
-    let initialInstanceAABB = this._instanceAABBs[instance.ptr];
-    if (initialInstanceAABB) {
-      return initialInstanceAABB;
-    }
-    initialInstanceAABB = new Rectangle();
-    initialInstanceAABB = this.instanceMeasurer.getInstanceAABB(
-      instance,
-      initialInstanceAABB
-    );
-    this._instanceAABBs[instance.ptr] = initialInstanceAABB;
-    return initialInstanceAABB;
+    const initialInstanceAABB = this._instanceAABBs[instance.ptr];
+    if (initialInstanceAABB) return initialInstanceAABB;
+
+    return (this._instanceAABBs[
+      instance.ptr
+    ] = this.instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
   _getOrCreateUnrotatedInstanceAABB(instance: gdInitialInstance) {
-    let initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
+    const initialUnrotatedInstanceAABB = this._unrotatedInstanceAABBs[
       instance.ptr
     ];
-    if (initialUnrotatedInstanceAABB) {
-      return initialUnrotatedInstanceAABB;
-    }
-    initialUnrotatedInstanceAABB = new Rectangle();
-    initialUnrotatedInstanceAABB = this.instanceMeasurer.getUnrotatedInstanceAABB(
+    if (initialUnrotatedInstanceAABB) return initialUnrotatedInstanceAABB;
+
+    return (this._unrotatedInstanceAABBs[
+      instance.ptr
+    ] = this.instanceMeasurer.getUnrotatedInstanceAABB(
       instance,
-      initialUnrotatedInstanceAABB
-    );
-    this._unrotatedInstanceAABBs[instance.ptr] = initialUnrotatedInstanceAABB;
-    return initialUnrotatedInstanceAABB;
+      new Rectangle()
+    ));
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
     const initialPosition = this._instancePositions[instance.ptr];
-    if (initialPosition) {
-      return initialPosition;
-    }
+    if (initialPosition) return initialPosition;
+
     return (this._instancePositions[instance.ptr] = {
       x: instance.getX(),
       y: instance.getY(),
@@ -145,7 +145,7 @@ export default class InstancesResizer {
     let roundedTotalDeltaX;
     let roundedTotalDeltaY;
     if (this.options.snap && this.options.grid) {
-      // round the grabbed node position on the grid
+      // Round the grabbed handle position on the grid.
       const grabbingRelativePosition =
         resizeGrabbingRelativePositions[grabbingLocation];
       const initialGrabbingX =
@@ -188,8 +188,8 @@ export default class InstancesResizer {
       grabbingLocation === 'Top';
 
     // Flip the deltas to end up in the nominal case of a bottom-right grabbed node.
-    // Because a negative deltaX on the left grabbing node will make the width greater
-    // as a positive deltaX on the right grabbing node would do.
+    // Because a negative deltaX on the left grabbing handle will make the width greater
+    // as a positive deltaX on the right grabbing handle would do.
     const flippedTotalDeltaX = isLeft
       ? -roundedTotalDeltaX
       : roundedTotalDeltaX;
@@ -202,14 +202,12 @@ export default class InstancesResizer {
       (initialSelectionAABB.height() + flippedTotalDeltaY) /
       initialSelectionAABB.height();
 
+    const hasRotatedInstance = areAnyInstancesNotStraight(instances);
+
     // Applying a rotation then a scaling can result to
-    // an affine transformation with a shear composite.
-    // So, keeping the aspect ratio ensures a transformation without any shear.
-    let hasRotatedInstance = false;
-    for (let i = 0; i < instances.length && !hasRotatedInstance; i++) {
-      // It only applies to instances that are not straight.
-      hasRotatedInstance = instances[i].getAngle() % 90 !== 0;
-    }
+    // an affine transformation with a shear transformation - which we don't want.
+    // If any instance is rotated, we keep the aspect ratio (i.e: force proportional resizing)
+    // to ensure a transformation without any shear.
     if (proportional || hasRotatedInstance) {
       // Choose the axis where the selection is the biggest.
       // That way the cursor is always on one edge.
@@ -269,7 +267,7 @@ export default class InstancesResizer {
         );
         selectedInstance.setHasCustomSize(true);
 
-        // these 4 variable are the positions and vector after the scaling
+        // These 4 variables are the positions and vector after the scaling.
         // It's easier to scale the instance center
         // because it's not affected by the instance rotation.
         const centerX =

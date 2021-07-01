@@ -3,19 +3,22 @@ import Rectangle from '../Utils/Rectangle';
 
 export default class InstancesRotator {
   _instanceMeasurer: any;
-  // initial state of the instance
-  // from which the rotation is calculated
+
+  // Initial state of the instances
+  // from which the rotation is calculated.
   _instanceAngles: { [number]: number } = {};
-  _instancePositions: { [number]: { x: number, y: number } } = {};
+  _instancePositions: { [number]: {| x: number, y: number |} } = {};
   _instanceAABBs: { [number]: Rectangle } = {};
 
   totalDeltaX: number = 0;
   totalDeltaY: number = 0;
+
   /**
    * The fixed point is invalidated when the rotation end.
    */
   _fixedPointIsUpToDate: boolean = false;
-  //TODO the fixed point could be made draggable
+
+  // TODO: the fixed point could be made draggable.
   /**
    * The fixed point is the center of the selection
    */
@@ -26,9 +29,9 @@ export default class InstancesRotator {
   }
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
-    // The grabbale node for rotation is on top.
+    // The grabbable handle for rotation is on top.
     // Initially totalDelta = (0 , selectionAABB.height() / 2)
-    // (see the affectation of totalDeltaY in the rotateBy method)
+    // (see the affectation of totalDeltaY in the rotateBy method).
     // So the initial angle given by atan2 is -90.
     // 90 is added to start with a angle delta of 0.
     const angle =
@@ -39,26 +42,29 @@ export default class InstancesRotator {
   }
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
-    let initialAABB = this._instanceAABBs[instance.ptr];
-    if (initialAABB) {
-      return initialAABB;
-    }
-    initialAABB = new Rectangle();
-    initialAABB = this._instanceMeasurer.getInstanceAABB(instance, initialAABB);
-    this._instanceAABBs[instance.ptr] = initialAABB;
-    return initialAABB;
+    const initialAABB = this._instanceAABBs[instance.ptr];
+    if (initialAABB) return initialAABB;
+
+    return (this._instanceAABBs[
+      instance.ptr
+    ] = this._instanceMeasurer.getInstanceAABB(instance, new Rectangle()));
   }
 
   _getOrCreateInstanceOriginPosition(instance: gdInitialInstance) {
-    let initialPosition = this._instancePositions[instance.ptr];
-    if (initialPosition) {
-      return initialPosition;
-    }
-    initialPosition = this._instancePositions[instance.ptr] = {
+    const initialPosition = this._instancePositions[instance.ptr];
+    if (initialPosition) return initialPosition;
+
+    return (this._instancePositions[instance.ptr] = {
       x: instance.getX(),
       y: instance.getY(),
-    };
-    return initialPosition;
+    });
+  }
+
+  _getOrCreateInstanceAngle(instance: gdInitialInstance) {
+    const initialAngle = this._instanceAngles[instance.ptr];
+    if (initialAngle !== undefined) return initialAngle;
+
+    return (this._instanceAngles[instance.ptr] = instance.getAngle());
   }
 
   rotateBy(
@@ -76,6 +82,7 @@ export default class InstancesRotator {
       }
       this._fixedPoint[0] = selectionAABB.centerX();
       this._fixedPoint[1] = selectionAABB.centerY();
+
       // Because the button is on top.
       this.totalDeltaY -= selectionAABB.height() / 2;
     }
@@ -87,14 +94,7 @@ export default class InstancesRotator {
       const selectedInstance = instances[i];
 
       const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
-
-      let initialAngle = this._instanceAngles[selectedInstance.ptr];
-      if (initialAngle === undefined) {
-        initialAngle = this._instanceAngles[
-          selectedInstance.ptr
-        ] = selectedInstance.getAngle();
-      }
-
+      const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);
       const initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(
         selectedInstance
       );

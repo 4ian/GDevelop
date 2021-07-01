@@ -9,7 +9,7 @@ import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
 import Rectangle from '../../Utils/Rectangle';
-import rotatePolygon, { type Polygon } from '../../Utils/PolygonHelper';
+import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -298,8 +298,7 @@ export default class LayerRenderer {
   /**
    * This returns true if an instance is visible according to the viewPosition.
    * The approach is a naive bounding box testing but save rendering time on large
-   * levels.
-   * @param {*} instance
+   * levels (though this could be improved with spatial partitioning).
    */
   _isInstanceVisible(instance: gdInitialInstance) {
     const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);

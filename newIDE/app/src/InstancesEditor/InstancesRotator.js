@@ -30,7 +30,7 @@ export default class InstancesRotator {
 
   _getNewAngle(proportional: boolean, initialAngle: number) {
     // The grabbable handle for rotation is on top.
-    // Initially totalDelta = (0 , selectionAABB.height() / 2)
+    // Initially, totalDelta = (0 , selectionAABB.height() / 2)
     // (see the affectation of totalDeltaY in the rotateBy method).
     // So the initial angle given by atan2 is -90.
     // 90 is added to start with a angle delta of 0.
@@ -83,7 +83,8 @@ export default class InstancesRotator {
       this._fixedPoint[0] = selectionAABB.centerX();
       this._fixedPoint[1] = selectionAABB.centerY();
 
-      // Because the button is on top.
+      // Because the button is on top, consider the initial rotation vector to
+      // be directed to the top.
       this.totalDeltaY -= selectionAABB.height() / 2;
     }
 

@@ -3,16 +3,18 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include <iostream>
 #include "EffectsCodeGenerator.h"
+
+#include <iostream>
+
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Project/Effect.h"
-#include "GDCore/Project/Layer.h"
 #include "GDCore/Project/EffectsContainer.h"
+#include "GDCore/Project/Layer.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Project/Project.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/Project.h"
 
 namespace gd {
 
@@ -34,9 +36,18 @@ void ExposeProjectEffects(
         worker(effect);
       }
     }
+
+    for (std::size_t i; i < layout.GetObjectsCount(); i++) {
+      auto& object = layout.GetObject(i);
+      auto& effects = object.GetEffects();
+      for (std::size_t e = 0; e < effects.GetEffectsCount(); e++) {
+        auto& effect = effects.GetEffect(e);
+        worker(effect);
+      }
+    }
   }
 
-  // Add object effects
+  // Add global object effects
   for (std::size_t s = 0; s < project.GetObjectsCount(); s++) {
     auto& effects = project.GetObject(s).GetEffects();
     for (std::size_t e = 0; e < effects.GetEffectsCount(); e++) {

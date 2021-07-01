@@ -2,6 +2,7 @@
 import LayerRenderer from './LayerRenderer';
 import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
+import Rectangle from '../../Utils/Rectangle';
 
 export default class InstancesRenderer {
   project: gdProject;
@@ -14,12 +15,13 @@ export default class InstancesRenderer {
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
-  onDownInstance: gdInitialInstance => void;
+  onDownInstance: (gdInitialInstance, number, number) => void;
 
   layersRenderers: { [string]: LayerRenderer };
 
   pixiContainer: PIXI.Container;
 
+  temporaryRectangle: Rectangle;
   instanceMeasurer: any;
 
   constructor({
@@ -45,7 +47,7 @@ export default class InstancesRenderer {
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
-    onDownInstance: gdInitialInstance => void,
+    onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
     this.instances = instances;
@@ -62,46 +64,47 @@ export default class InstancesRenderer {
     this.layersRenderers = {};
 
     this.pixiContainer = new PIXI.Container();
+
+    this.temporaryRectangle = new Rectangle();
+    //TODO extract this to a class to have type checking (maybe rethink it)
     this.instanceMeasurer = {
-      getInstanceLeft: (instance: gdInitialInstance) => {
+      getInstanceAABB: (instance, bounds) => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
-        if (!layerRenderer) return instance.getX();
+        if (!layerRenderer) {
+          bounds.left = instance.getX();
+          bounds.top = instance.getY();
+          bounds.right = instance.getX();
+          bounds.bottom = instance.getY();
+          return bounds;
+        }
 
-        return layerRenderer.getInstanceLeft(instance);
+        return layerRenderer.getInstanceAABB(instance, bounds);
       },
-      getInstanceTop: (instance: gdInitialInstance) => {
+      getUnrotatedInstanceAABB: (instance, bounds) => {
         const layerName = instance.getLayer();
         const layerRenderer = this.layersRenderers[layerName];
-        if (!layerRenderer) return instance.getY();
+        if (!layerRenderer) {
+          bounds.left = instance.getX();
+          bounds.top = instance.getY();
+          bounds.right = instance.getX();
+          bounds.bottom = instance.getY();
+          return bounds;
+        }
 
-        return layerRenderer.getInstanceTop(instance);
+        return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
-      getInstanceWidth: (instance: gdInitialInstance) => {
-        if (instance.hasCustomSize()) return instance.getCustomWidth();
-
-        const layerName = instance.getLayer();
-        const layerRenderer = this.layersRenderers[layerName];
-        if (!layerRenderer) return 0;
-
-        return layerRenderer.getInstanceWidth(instance);
-      },
-
-      getInstanceHeight: (instance: gdInitialInstance) => {
-        if (instance.hasCustomSize()) return instance.getCustomHeight();
-
-        const layerName = instance.getLayer();
-        const layerRenderer = this.layersRenderers[layerName];
-        if (!layerRenderer) return 0;
-
-        return layerRenderer.getInstanceHeight(instance);
-      },
-      getInstanceRect: (instance: gdInitialInstance) => {
+      //TODO Replace by getInstanceAABB (make TransformRect uses Rectangle)
+      getInstanceRect: instance => {
+        const aabb = this.instanceMeasurer.getInstanceAABB(
+          instance,
+          this.temporaryRectangle
+        );
         return {
-          x: this.instanceMeasurer.getInstanceLeft(instance),
-          y: this.instanceMeasurer.getInstanceTop(instance),
-          width: this.instanceMeasurer.getInstanceWidth(instance),
-          height: this.instanceMeasurer.getInstanceHeight(instance),
+          x: aabb.left,
+          y: aabb.top,
+          width: aabb.width(),
+          height: aabb.height(),
         };
       },
     };

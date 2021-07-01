@@ -54,7 +54,7 @@ export const roundPosition = (
       pos[0] = Math.round(pos[0]);
     } else {
       pos[0] =
-        Math.floor((pos[0] - gridOffsetX) / gridWidth) * gridWidth +
+        Math.round((pos[0] - gridOffsetX) / gridWidth) * gridWidth +
         gridOffsetX;
     }
 
@@ -62,8 +62,38 @@ export const roundPosition = (
       pos[1] = Math.round(pos[1]);
     } else {
       pos[1] =
-        Math.floor((pos[1] - gridOffsetY) / gridHeight) * gridHeight +
+        Math.round((pos[1] - gridOffsetY) / gridHeight) * gridHeight +
         gridOffsetY;
     }
   }
+};
+
+export const roundPositionForResizing = (
+  pos: [number, number],
+  gridWidth: number,
+  gridHeight: number,
+  gridOffsetX: number,
+  gridOffsetY: number,
+  gridType: string
+) => {
+  if (gridType === 'isometric') {
+    // There is no point to align on the isometric grid when resizing.
+    // Use half cells to give a bit more of freedom than for positioning.
+    return roundPosition(
+      pos,
+      gridWidth / 2,
+      gridHeight / 2,
+      gridOffsetX,
+      gridOffsetY,
+      'rectangular'
+    );
+  }
+  return roundPosition(
+    pos,
+    gridWidth,
+    gridHeight,
+    gridOffsetX,
+    gridOffsetY,
+    gridType
+  );
 };

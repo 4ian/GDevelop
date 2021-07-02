@@ -13,7 +13,7 @@ namespace gdjs {
       this._filters = new Hashtable();
     }
 
-    update(runtimeObject: RuntimeObject) {
+    update(runtimeObject: RuntimeObject, layer: Layer) {
       const filters: Hashtable<
         PixiFiltersTools.Filter
       > | void = this._filters.get(runtimeObject.getName());
@@ -21,17 +21,21 @@ namespace gdjs {
       const filterValues: PixiFiltersTools.Filter[] = [];
       filters.values(filterValues);
       for (const filter of filterValues) {
-        filter.update(filter.pixiFilter, runtimeObject);
+        filter.update(filter.pixiFilter, layer);
       }
     }
 
     /**
-     * Add a new effect on a runtime object, or replace the one 
+     * Add a new effect on a runtime object, or replace the one
      * with the same name.
      * @param runtimeObject The runtime object
      * @param effectData The data of the effect to add.
      */
-    addEffect(runtimeObject: RuntimeObject, effectData: EffectData) {
+    addEffect(
+      runtimeObject: RuntimeObject,
+      effectData: EffectData,
+      layer: Layer
+    ) {
       const filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
         effectData.effectType
       );
@@ -47,7 +51,7 @@ namespace gdjs {
       }
 
       const filter: PixiFiltersTools.Filter = {
-        pixiFilter: filterCreator.makePIXIFilter(runtimeObject, effectData),
+        pixiFilter: filterCreator.makePIXIFilter(layer, effectData),
         updateDoubleParameter: filterCreator.updateDoubleParameter,
         updateStringParameter: filterCreator.updateStringParameter,
         updateBooleanParameter: filterCreator.updateBooleanParameter,

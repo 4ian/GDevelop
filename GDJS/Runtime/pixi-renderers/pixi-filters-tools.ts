@@ -89,9 +89,9 @@ namespace gdjs {
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
     export type FilterCreator = {
       /** Function to call to create the filter */
-      makePIXIFilter: (layer: gdjs.Layer | gdjs.RuntimeObject, effectData: EffectData) => any;
+      makePIXIFilter: (layer: gdjs.Layer, effectData: EffectData) => any;
       /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer | gdjs.RuntimeObject) => any;
+      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,
@@ -117,7 +117,7 @@ namespace gdjs {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
       /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer | gdjs.RuntimeObject) => any;
+      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,

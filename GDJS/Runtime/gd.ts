@@ -9,6 +9,8 @@
  * @namespace gdjs
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Engine runtime');
+
   /**
    * Contains functions used by events (this is a convention only, functions can actually
    * be anywhere).
@@ -311,7 +313,7 @@ namespace gdjs {
    * @private
    */
   export const registerGlobalCallbacks = function (): void {
-    gdjs.runtimeLog(
+    logger.warn(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
   };
@@ -344,7 +346,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.objectsTypes.containsKey(name))
       return gdjs.objectsTypes.get(name);
 
-    gdjs.runtimeLog('Object type "' + name + '" was not found.', 'warning');
+    logger.warn('Object type "' + name + '" was not found.');
     return gdjs.objectsTypes.get(''); //Create a base empty runtime object.
   };
 
@@ -359,7 +361,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
       return gdjs.behaviorsTypes.get(name);
 
-    gdjs.runtimeLog('Behavior type "' + name + '" was not found.', 'warning');
+    logger.warn('Behavior type "' + name + '" was not found.');
     return gdjs.behaviorsTypes.get(''); //Create a base empty runtime behavior.
   };
 
@@ -486,33 +488,6 @@ namespace gdjs {
       hex[r[15]]
     );
   };
-
-  const _console = {
-    info: console.log,
-    warning: console.warn,
-    error: console.error,
-  };
-
-  /**
-   * Internal method for logging messages to the JS console or the Debugger if available.
-   * Should be used in engine code or extensions, console.log is fine for JS events.
-   */
-  export let log = (
-    group: string,
-    message: string,
-    type: 'info' | 'warning' | 'error' = 'info'
-  ) => {
-    const logger = _console[type] || _console.info;
-    logger(`[${group}] ${message}`);
-  };
-
-  /**
-   * Shortcut loggin function for the runtime engine code.
-   */
-  export const runtimeLog = (
-    message: string,
-    type: 'info' | 'warning' | 'error' = 'info'
-  ) => log('Engine runtime', message, type);
 }
 
 //Make sure console.warn and console.error are available.

@@ -9,12 +9,10 @@ namespace gdjs {
      * @param additionalData - Additional data about the log.
      */
     log(
+      group: string,
       message: string,
-      additionalData?: {
-        type?: 'info' | 'warning' | 'error';
-        group?: string;
-        internal?: boolean;
-      }
+      type: 'info' | 'warning' | 'error',
+      internal: boolean
     ): void;
 
     /**
@@ -171,10 +169,20 @@ namespace gdjs {
         }
       };
 
-      ((log, warn, error, gdjsLog) => {
+      ((log, info, debug, warn, error, gdjsLog) => {
         // Hook the console logging functions to log to the Debugger as well
         console.log = (...messages) => {
           log(...messages);
+          this._consoleLogHook('info', ...messages);
+        };
+
+        console.debug = (...messages) => {
+          debug(...messages);
+          this._consoleLogHook('info', ...messages);
+        };
+
+        console.info = (...messages) => {
+          info(...messages);
           this._consoleLogHook('info', ...messages);
         };
 
@@ -194,28 +202,35 @@ namespace gdjs {
           type: 'info' | 'warning' | 'error' = 'info'
         ) => {
           gdjsLog(group, message, type);
-          this.log(message, { internal: true, type, group });
+          this.log(group, message, type, true);
         };
-      })(console.log, console.warn, console.error, gdjs.log);
+      })(
+        console.log,
+        console.info,
+        console.debug,
+        console.warn,
+        console.error,
+        gdjs.log
+      );
     }
 
     _consoleLogHook(type: 'info' | 'warning' | 'error', ...messages) {
       this.log(
+        'JavaScript',
         messages.reduce(
           (accumulator, value) => accumulator + value.toString(),
           ''
         ),
-        { group: 'JavaScript', type }
+        type,
+        false
       );
     }
 
     log(
+      group: string,
       message: string,
-      additionalData?: {
-        type?: 'info' | 'warning' | 'error';
-        group?: string;
-        internal?: boolean;
-      }
+      type: 'info' | 'warning' | 'error',
+      internal: boolean
     ) {
       if (!this._ws) {
         console.warn('No connection to debugger opened to send logs');
@@ -227,10 +242,9 @@ namespace gdjs {
             command: 'console.log',
             payload: {
               message,
-              type: 'log',
-              group: 'Default',
-              internal: false,
-              ...(additionalData || {}),
+              type,
+              group,
+              internal,
             },
           })
         );

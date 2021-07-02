@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Game manager');
+
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
     /** The path for this script file. */
@@ -225,10 +227,7 @@ namespace gdjs {
         }
       }
       if (scene === null) {
-        gdjs.runtimeLog(
-          'The game has no scene called "' + sceneName + '"',
-          'warning'
-        );
+        logger.error('The game has no scene called "' + sceneName + '"');
       }
       return scene;
     }
@@ -525,7 +524,7 @@ namespace gdjs {
     startGameLoop() {
       try {
         if (!this.hasScene()) {
-          gdjs.runtimeLog('The game has no scene.', 'warning');
+          logger.error('The game has no scene.');
           return;
         }
         this._forceGameResolutionUpdate();
@@ -592,7 +591,7 @@ namespace gdjs {
           this._setupSessionMetrics();
         }, 10000);
       } catch (e) {
-        gdjs.log('Internal crash', '' + e, 'error');
+        logger.error('Internal crash: ' + e);
       }
     }
 

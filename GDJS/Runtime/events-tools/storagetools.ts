@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Storage');
   export namespace evtTools {
     /**
      * Functions to store and load basic values (strings or numbers), organized
@@ -30,17 +31,11 @@ namespace gdjs {
           }
         }
       } catch (error) {
-        gdjs.log(
-          'Storage extension',
-          'Unable to get access to the localStorage: ' + error,
-          'error'
-        );
+        logger.error('Unable to get access to the localStorage: ' + error);
       }
       if (!localStorage) {
-        gdjs.log(
-          'Storage extension',
-          "Storage actions won't work as no localStorage was found.",
-          'warning'
+        logger.error(
+          "Storage actions won't work as no localStorage was found."
         );
       }
 
@@ -70,13 +65,8 @@ namespace gdjs {
             serializedString = localStorage.getItem('GDJS_' + name);
           }
         } catch (error) {
-          gdjs.log(
-            'Storage extension',
-            'Unable to load data from localStorage for "' +
-              name +
-              '": ' +
-              error,
-            'warning'
+          logger.error(
+            'Unable to load data from localStorage for "' + name + '": ' + error
           );
         }
         let jsObject = {};
@@ -85,13 +75,11 @@ namespace gdjs {
             jsObject = JSON.parse(serializedString);
           }
         } catch (error) {
-          gdjs.log(
-            'Storage extension',
+          logger.error(
             'Unable to load data from "' +
               name +
               '" - data is not valid JSON: ' +
-              error,
-            'warning'
+              error
           );
         }
         loadedObjects.put(name, jsObject);
@@ -121,10 +109,8 @@ namespace gdjs {
             localStorage.setItem('GDJS_' + name, serializedString);
           }
         } catch (error) {
-          gdjs.log(
-            'Storage extension',
-            'Unable to save data to localStorage for "' + name + '": ' + error,
-            'warning'
+          logger.error(
+            'Unable to save data to localStorage for "' + name + '": ' + error
           );
         }
         loadedObjects.remove(name);

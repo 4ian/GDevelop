@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Scene stack');
+
   /**
    * Hold the stack of scenes ({@link gdjs.RuntimeScene}) being played.
    */
@@ -49,10 +51,7 @@ namespace gdjs {
         } else if (request === gdjs.SceneChangeRequest.CLEAR_SCENES) {
           this.replace(currentScene.getRequestedScene(), true);
         } else {
-          gdjs.runtimeLog(
-            'Unrecognized change in scene stack: ' + request,
-            'error'
-          );
+          logger.error('Unrecognized change in scene stack: ' + request);
           return false;
         }
       }

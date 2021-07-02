@@ -15,10 +15,9 @@ namespace gdjs {
 
       /**
        * Logs a message to the console.
-       * @param runtimeScene - The current scene.
        * @param message - The message to log.
-       * @param group - The group of messages it belongs to.
        * @param type - The type of log (info, warning or error).
+       * @param group - The group of messages it belongs to.
        */
       export const log = function (
         message: string,

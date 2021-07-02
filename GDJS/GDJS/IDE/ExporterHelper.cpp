@@ -602,6 +602,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
+  InsertUnique(includesFiles, "logger.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "gd-splash-image.js");
   InsertUnique(includesFiles, "libs/rbush.js");

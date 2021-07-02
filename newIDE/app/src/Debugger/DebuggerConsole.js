@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 
 import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';

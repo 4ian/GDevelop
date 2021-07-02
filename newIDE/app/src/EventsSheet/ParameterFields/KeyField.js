@@ -119,6 +119,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
       isInline,
       parameterMetadata,
       onRequestClose,
+      onApply,
     } = this.props;
 
     return (
@@ -139,6 +140,7 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
         }))}
         openOnFocus={!isInline}
         onRequestClose={onRequestClose}
+        onApply={onApply}
         ref={field => (this._field = field)}
         errorText={
           !value ? (

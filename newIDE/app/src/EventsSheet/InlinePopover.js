@@ -8,6 +8,7 @@ import {
   shouldCloseOrCancel,
   shouldFocusNextField,
   shouldFocusPreviousField,
+  shouldSubmit,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
 
 const styles = {
@@ -36,6 +37,7 @@ type Props = {|
   anchorEl: ?HTMLElement,
   open: boolean,
   onRequestClose: () => void,
+  onApply: () => void,
 |};
 
 /**
@@ -51,13 +53,17 @@ export default function InlinePopover(props: Props) {
   return (
     <ClickAwayListener
       onClickAway={event => {
+        // For a popover, clicking/touching away means validating,
+        // as it's very easy to do it and almost the only way to do it on a touch screen.
+        // The user can cancel with Escape.
+
         if (event instanceof MouseEvent) {
           // onClickAway is triggered on a "click" (which can actually happen
           // on a touchscreen too!).
           // The click already gave the opportunity to the popover content to
           // get blurred (allowing "semi controlled" text fields
           // to apply their changes). We can close now.
-          props.onRequestClose();
+          props.onApply();
         } else {
           // Give a bit of time to the popover content to be blurred
           // (useful for the "semi controlled" text fields for example)
@@ -67,7 +73,7 @@ export default function InlinePopover(props: Props) {
           // blur events for GenericExpressionField are not triggered on iOS.
           // There might be a better way to do this without waiting this much time.
           setTimeout(() => {
-            props.onRequestClose();
+            props.onApply();
           }, 50);
         }
       }}
@@ -85,6 +91,8 @@ export default function InlinePopover(props: Props) {
           // when showing autocompletion), which is fine.
           if (shouldCloseOrCancel(event)) {
             props.onRequestClose();
+          } else if (shouldSubmit(event)) {
+            props.onApply();
           }
 
           // Also like a dialog, add a "focus trap". If the user keeps pressing tab

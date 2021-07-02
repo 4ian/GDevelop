@@ -8,6 +8,8 @@ import ViewPosition from '../ViewPosition';
 import * as PIXI from 'pixi.js-legacy';
 import { shouldBeHandledByPinch } from '../PinchHandler';
 import { makeDoubleClickable } from './PixiDoubleClickEvent';
+import Rectangle from '../../Utils/Rectangle';
+import { rotatePolygon, type Polygon } from '../../Utils/PolygonHelper';
 const gd: libGDevelop = global.gd;
 
 export default class LayerRenderer {
@@ -25,19 +27,22 @@ export default class LayerRenderer {
   onOutInstance: gdInitialInstance => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
   onMoveInstanceEnd: void => void;
-  onDownInstance: gdInitialInstance => void;
+  onDownInstance: (gdInitialInstance, number, number) => void;
   /**Used for instances culling on rendering */
   viewTopLeft: [number, number];
   /** Used for instances culling on rendering */
   viewBottomRight: [number, number];
 
-  renderedInstances: { [number]: RenderedInstance };
+  renderedInstances: { [number]: RenderedInstance } = {};
   pixiContainer: PIXI.Container;
 
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;
 
   wasUsed: boolean = false;
+
+  _temporaryRectangle: Rectangle = new Rectangle();
+  _temporaryRectanglePath: Polygon = [[0, 0], [0, 0], [0, 0], [0, 0]];
 
   constructor({
     project,
@@ -64,7 +69,7 @@ export default class LayerRenderer {
     onOutInstance: gdInitialInstance => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
-    onDownInstance: gdInitialInstance => void,
+    onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
     this.instances = instances;
@@ -83,7 +88,6 @@ export default class LayerRenderer {
     this.viewTopLeft = [0, 0]; // Used for instances culling on rendering
     this.viewBottomRight = [0, 0]; // Used for instances culling on rendering
 
-    this.renderedInstances = {};
     this.pixiContainer = new PIXI.Container();
 
     // Functor used to render an instance
@@ -116,7 +120,7 @@ export default class LayerRenderer {
     return this.pixiContainer;
   }
 
-  getInstanceLeft = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceLeft = (instance: gdInitialInstance) => {
     return (
       instance.getX() -
       (this.renderedInstances[instance.ptr]
@@ -125,7 +129,7 @@ export default class LayerRenderer {
     );
   };
 
-  getInstanceTop = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceTop = (instance: gdInitialInstance) => {
     return (
       instance.getY() -
       (this.renderedInstances[instance.ptr]
@@ -134,7 +138,7 @@ export default class LayerRenderer {
     );
   };
 
-  getInstanceWidth = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceWidth = (instance: gdInitialInstance) => {
     if (instance.hasCustomSize()) return instance.getCustomWidth();
 
     return this.renderedInstances[instance.ptr]
@@ -142,13 +146,81 @@ export default class LayerRenderer {
       : 0;
   };
 
-  getInstanceHeight = (instance: gdInitialInstance) => {
+  getUnrotatedInstanceHeight = (instance: gdInitialInstance) => {
     if (instance.hasCustomSize()) return instance.getCustomHeight();
 
     return this.renderedInstances[instance.ptr]
       ? this.renderedInstances[instance.ptr].getDefaultHeight()
       : 0;
   };
+
+  getUnrotatedInstanceAABB(
+    instance: gdInitialInstance,
+    bounds: Rectangle
+  ): Rectangle {
+    const left = this.getUnrotatedInstanceLeft(instance);
+    const top = this.getUnrotatedInstanceTop(instance);
+    const right = left + this.getUnrotatedInstanceWidth(instance);
+    const bottom = top + this.getUnrotatedInstanceHeight(instance);
+
+    bounds.left = left;
+    bounds.right = right;
+    bounds.top = top;
+    bounds.bottom = bottom;
+    return bounds;
+  }
+
+  _getInstanceRotatedRectangle(instance: gdInitialInstance): Polygon {
+    const left = this.getUnrotatedInstanceLeft(instance);
+    const top = this.getUnrotatedInstanceTop(instance);
+    const right = left + this.getUnrotatedInstanceWidth(instance);
+    const bottom = top + this.getUnrotatedInstanceHeight(instance);
+
+    const rectangle = this._temporaryRectanglePath;
+
+    rectangle[0][0] = left;
+    rectangle[0][1] = top;
+
+    rectangle[1][0] = left;
+    rectangle[1][1] = bottom;
+
+    rectangle[2][0] = right;
+    rectangle[2][1] = bottom;
+
+    rectangle[3][0] = right;
+    rectangle[3][1] = top;
+
+    const centerX = (rectangle[0][0] + rectangle[2][0]) / 2;
+    const centerY = (rectangle[0][1] + rectangle[2][1]) / 2;
+    const angle = (instance.getAngle() * Math.PI) / 180;
+    rotatePolygon(rectangle, centerX, centerY, angle);
+    return rectangle;
+  }
+
+  getInstanceAABB(instance: gdInitialInstance, bounds: Rectangle): Rectangle {
+    const angle = (instance.getAngle() * Math.PI) / 180;
+    if (angle === 0) {
+      return this.getUnrotatedInstanceAABB(instance, bounds);
+    }
+
+    const rotatedRectangle = this._getInstanceRotatedRectangle(instance);
+
+    let left = Number.MAX_VALUE;
+    let right = -Number.MAX_VALUE;
+    let top = Number.MAX_VALUE;
+    let bottom = -Number.MAX_VALUE;
+    for (let i = 0, len = rotatedRectangle.length; i < len; ++i) {
+      left = Math.min(left, rotatedRectangle[i][0]);
+      right = Math.max(right, rotatedRectangle[i][0]);
+      top = Math.min(top, rotatedRectangle[i][1]);
+      bottom = Math.max(bottom, rotatedRectangle[i][1]);
+    }
+    bounds.left = left;
+    bounds.right = right;
+    bounds.top = top;
+    bounds.bottom = bottom;
+    return bounds;
+  }
 
   getRendererOfInstance = (instance: gdInitialInstance) => {
     var renderedInstance = this.renderedInstances[instance.ptr];
@@ -185,15 +257,25 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on('mousedown', () => {
-        this.onDownInstance(instance);
+      renderedInstance._pixiObject.on('mousedown', event => {
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.on('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
 
-        this.onDownInstance(instance);
+        const viewPoint = event.data.global;
+        const scenePoint = this.viewPosition.toSceneCoordinates(
+          viewPoint.x,
+          viewPoint.y
+        );
+        this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
       });
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);
@@ -216,18 +298,15 @@ export default class LayerRenderer {
   /**
    * This returns true if an instance is visible according to the viewPosition.
    * The approach is a naive bounding box testing but save rendering time on large
-   * levels.
-   * @param {*} instance
+   * levels (though this could be improved with spatial partitioning).
    */
   _isInstanceVisible(instance: gdInitialInstance) {
-    //TODO: Properly handle rotation
-    const left = this.getInstanceLeft(instance);
-    const top = this.getInstanceTop(instance);
+    const aabb = this.getInstanceAABB(instance, this._temporaryRectangle);
     if (
-      left + this.getInstanceWidth(instance) < this.viewTopLeft[0] ||
-      top + this.getInstanceHeight(instance) < this.viewTopLeft[1] ||
-      left > this.viewBottomRight[0] ||
-      top > this.viewBottomRight[1]
+      aabb.left + aabb.width() < this.viewTopLeft[0] ||
+      aabb.top + aabb.height() < this.viewTopLeft[1] ||
+      aabb.left > this.viewBottomRight[0] ||
+      aabb.top > this.viewBottomRight[1]
     )
       return false;
 
@@ -320,7 +399,7 @@ export default class LayerRenderer {
     // Destroy the container
     this.pixiContainer.destroy();
 
-    // Destroy the object iterating on isntances
+    // Destroy the object iterating on instances
     this.instancesRenderer.delete();
   }
 }

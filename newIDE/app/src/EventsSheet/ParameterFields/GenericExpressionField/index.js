@@ -36,7 +36,10 @@ import {
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { shouldCloseOrCancel } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldSubmit,
+} from '../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -459,11 +462,13 @@ export default class ExpressionField extends React.Component<Props, State> {
                     );
                     this.setState({ autocompletions });
 
-                    // If the user pressed the key to close, there is a chance
-                    // that this will trigger the closing of the dialog/popover
-                    // containing the expression field. Apply the changes now
-                    // as otherwise the onBlur handler has a risk not to be called.
-                    if (shouldCloseOrCancel(event)) {
+                    // If the user pressed the key to close (or to submit),
+                    // there is a chance that this will trigger the closing
+                    // of the dialog/popover containing the expression field.
+                    // Apply the changes now as otherwise the onBlur handler
+                    // has a risk not to be called (as the component will be
+                    // unmounted).
+                    if (shouldCloseOrCancel(event) || shouldSubmit(event)) {
                       const value = event.currentTarget.value;
                       if (this.props.onChange) this.props.onChange(value);
                     }

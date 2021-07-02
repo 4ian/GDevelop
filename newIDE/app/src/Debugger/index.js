@@ -134,8 +134,8 @@ export default class Debugger extends React.Component<Props, State> {
             profilerOutputs,
             profilingInProgress,
           }) => {
-            // Remove any data bound to the instance that might have been stored
-            // Otherwise it would be a data leak
+            // Remove any data bound to the instance that might have been stored.
+            // Otherwise this would be a memory leak.
             if (logs[id]) delete logs[id];
             if (debuggerGameData[id]) delete debuggerGameData[id];
             if (profilerOutputs[id]) delete profilerOutputs[id];

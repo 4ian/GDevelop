@@ -209,7 +209,8 @@ namespace gdjs {
      * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
      */
     update(runtimeScene: gdjs.RuntimeScene): void {
-      this._runtimeScene.getGame().getObjectEffectsManager().update(this);
+      const layer = this._runtimeScene.getLayer(this.layer)
+      this._runtimeScene.getGame().getObjectEffectsManager().update(this, layer);
     }
 
     /**
@@ -748,7 +749,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .addEffect(this, effectData);
+        .addEffect(this, effectData, this._runtimeScene.getLayer(this.layer));
       for (let name in effectData.doubleParameters) {
         this.setEffectDoubleParameter(
           effectData.name,

@@ -1,7 +1,7 @@
 // @ts-nocheck - Weird usage of `this` in this file. Should be refactored.
 
 namespace gdjs {
-  const logger = new Logger('Dialogue tree');
+  const logger = new gdjs.Logger('Dialogue tree');
 
   gdjs.dialogueTree = {};
   gdjs.dialogueTree.runner = new bondage.Runner();

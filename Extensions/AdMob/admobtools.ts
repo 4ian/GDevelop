@@ -2,7 +2,7 @@ namespace gdjs {
   declare var admob: any;
 
   export namespace adMob {
-    const logger = new Logger('AdMob');
+    const logger = new gdjs.Logger('AdMob');
 
     export enum AdSizeType {
       BANNER,

@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('Example extension');
+  const logger = new gdjs.Logger('Example extension');
 
   export namespace evtTools {
     /**

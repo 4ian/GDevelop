@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('Dummy object');
+  const logger = new gdjs.Logger('Dummy object');
 
   /**
    * A dummy object doing showing a text on screen.

@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('Dummy behavior');
+  const logger = new gdjs.Logger('Dummy behavior');
 
   /**
    * The DummyRuntimeBehavior changes a variable in the object that is owning

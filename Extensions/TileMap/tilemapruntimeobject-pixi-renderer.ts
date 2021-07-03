@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('Tilemap object');
+  const logger = new gdjs.Logger('Tilemap object');
 
   /**
    * The PIXI.js renderer for the Tile map runtime object.

@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new Logger('PIXI game renderer');
+
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -139,7 +141,7 @@ namespace gdjs {
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
-        console.error('Unexpected error while setting up orientation: ', error);
+        logger.error('Unexpected error while setting up orientation: ', error);
       }
     }
 
@@ -255,7 +257,7 @@ namespace gdjs {
           browserWindow.setContentSize(width, height);
         }
       } else {
-        console.warn("Window size can't be changed on this platform.");
+        logger.warn("Window size can't be changed on this platform.");
       }
     }
 

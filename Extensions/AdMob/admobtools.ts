@@ -2,6 +2,8 @@ namespace gdjs {
   declare var admob: any;
 
   export namespace adMob {
+    const logger = new Logger('AdMob');
+
     export enum AdSizeType {
       BANNER,
       LARGE_BANNER,
@@ -127,13 +129,13 @@ namespace gdjs {
           () => {
             bannerShowing = true;
             bannerLoading = false;
-            console.info('AdMob banner successfully shown.');
+            logger.info('AdMob banner successfully shown.');
           },
           (error) => {
             bannerShowing = false;
             bannerLoading = false;
             bannerErrored = true;
-            console.error('Error while showing an AdMob banner:', error);
+            logger.error('Error while showing an AdMob banner:', error);
           }
         );
     };
@@ -190,14 +192,14 @@ namespace gdjs {
         })
         .then(
           () => {
-            console.info('AdMob interstitial successfully loaded.');
+            logger.info('AdMob interstitial successfully loaded.');
             if (displayWhenLoaded) showInterstitial();
           },
           (error) => {
             interstitialLoading = false;
             interstitialReady = false;
             interstitialErrored = true;
-            console.error('Error while loading a interstitial:', error);
+            logger.error('Error while loading a interstitial:', error);
           }
         );
     };
@@ -216,7 +218,7 @@ namespace gdjs {
         (error) => {
           interstitialShowing = false;
           interstitialErrored = true;
-          console.error('Error while trying to show an interstitial:', error);
+          logger.error('Error while trying to show an interstitial:', error);
         }
       );
     };
@@ -270,7 +272,7 @@ namespace gdjs {
         })
         .then(
           () => {
-            console.info('AdMob reward video successfully loaded.');
+            logger.info('AdMob reward video successfully loaded.');
 
             if (displayWhenLoaded) showVideo();
           },
@@ -278,7 +280,7 @@ namespace gdjs {
             videoLoading = false;
             videoReady = false;
             videoErrored = true;
-            console.error('Error while loading a reward video:', error);
+            logger.error('Error while loading a reward video:', error);
           }
         );
     };
@@ -298,7 +300,7 @@ namespace gdjs {
         (error) => {
           videoShowing = false;
           videoErrored = true;
-          console.error('Error while trying to show a reward video:', error);
+          logger.error('Error while trying to show a reward video:', error);
         }
       );
     };

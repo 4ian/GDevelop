@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new Logger('Example extension');
+
   export namespace evtTools {
     /**
      * This is an example of some functions that can be used through events.
@@ -23,7 +25,7 @@ namespace gdjs {
        * that will be called at this moment.
        */
       gdjs.registerRuntimeSceneLoadedCallback(function (runtimeScene) {
-        console.log('A gdjs.RuntimeScene was loaded:', runtimeScene);
+        logger.log('A gdjs.RuntimeScene was loaded:', runtimeScene);
       });
 
       /**
@@ -31,7 +33,7 @@ namespace gdjs {
        * that will be called at this moment.
        */
       gdjs.registerRuntimeSceneUnloadedCallback(function (runtimeScene) {
-        console.log('A gdjs.RuntimeScene was unloaded:', runtimeScene);
+        logger.log('A gdjs.RuntimeScene was unloaded:', runtimeScene);
       });
 
       /**
@@ -41,7 +43,7 @@ namespace gdjs {
         runtimeScene,
         runtimeObject
       ) {
-        console.log(
+        logger.log(
           'A gdjs.RuntimeObject was deleted from a gdjs.RuntimeScene:',
           runtimeScene,
           runtimeObject
@@ -49,7 +51,7 @@ namespace gdjs {
       });
 
       // Finally, note that you can also simply run code here. Most of the time you shouldn't need it though.
-      console.log(
+      logger.log(
         'gdjs.exampleJsExtension was created, with myGlobalString containing:' +
           myGlobalString
       );

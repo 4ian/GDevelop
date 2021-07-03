@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger("Filesystem")
   export namespace fileSystem {
     // The Node.js path module, or null if it can't be loaded.
     export let _path: any = null;
@@ -200,7 +201,7 @@ namespace gdjs {
           fileSystem.mkdirSync(directory);
           result = 'ok';
         } catch (err) {
-          console.error(
+          logger.error(
             "Unable to create directory at: '" + directory + "': ",
             err
           );
@@ -225,7 +226,7 @@ namespace gdjs {
         fileSystem.writeFile(savePath, text, 'utf8', (err) => {
           resultVar.setString('ok');
           if (err) {
-            console.error(
+            logger.error(
               "Unable to save the text to path: '" + savePath + "': ",
               err
             );
@@ -253,7 +254,7 @@ namespace gdjs {
           fileSystem.writeFileSync(savePath, text, 'utf8');
           result = 'ok';
         } catch (err) {
-          console.error(
+          logger.error(
             "Unable to save the text to path: '" + savePath + "': ",
             err
           );
@@ -280,7 +281,7 @@ namespace gdjs {
           fileSystem.writeFileSync(savePath, variable.toJSON(), 'utf8');
           result = 'ok';
         } catch (err) {
-          console.error(
+          logger.error(
             "Unable to save the variable to path: '" + savePath + "': ",
             err
           );
@@ -305,7 +306,7 @@ namespace gdjs {
         fileSystem.writeFile(savePath, variable.toJSON(), 'utf8', (err) => {
           resultVar.setString('ok');
           if (err) {
-            console.error(
+            logger.error(
               "Unable to save the variable to path: '" + savePath + "': ",
               err
             );
@@ -336,7 +337,7 @@ namespace gdjs {
             result = 'ok';
           }
         } catch (err) {
-          console.error(
+          logger.error(
             "Unable to load the file at path: '" + loadPath + "': ",
             err
           );
@@ -366,7 +367,7 @@ namespace gdjs {
             result = 'ok';
           }
         } catch (err) {
-          console.error(
+          logger.error(
             "Unable to load variable from the file at path: '" +
               loadPath +
               "': ",
@@ -396,7 +397,7 @@ namespace gdjs {
             resultVar.setString('ok');
           }
           if (err) {
-            console.error(
+            logger.error(
               "Unable to load variable from the file at path: '" +
                 loadPath +
                 "': ",
@@ -427,7 +428,7 @@ namespace gdjs {
             resultVar.setString('ok');
           }
           if (err) {
-            console.error(
+            logger.error(
               "Unable to load the file at path: '" + loadPath + "': ",
               err
             );
@@ -453,7 +454,7 @@ namespace gdjs {
           fileSystem.unlinkSync(filePath);
           result = 'ok';
         } catch (err) {
-          console.error("Unable to delete the file: '" + filePath + "': ", err);
+          logger.error("Unable to delete the file: '" + filePath + "': ", err);
           result = 'error';
         }
       }
@@ -474,7 +475,7 @@ namespace gdjs {
         fileSystem.unlink(filePath, (err) => {
           resultVar.setString('ok');
           if (err) {
-            console.error(
+            logger.error(
               "Unable to delete the file: '" + filePath + "': ",
               err
             );

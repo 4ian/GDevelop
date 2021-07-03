@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new Logger('Dummy object');
+
   /**
    * A dummy object doing showing a text on screen.
    * @ignore
@@ -126,9 +128,9 @@ namespace gdjs {
      * A dummy method that can be called from events
      */
     myMethod(number1: float, text1: string) {
-      console.log('Congrats, this method was called on a DummyRuntimeObject');
-      console.log('Here is the object:', this);
-      console.log('Here are the arguments passed from events:', number1, text1);
+      logger.log('Congrats, this method was called on a DummyRuntimeObject');
+      logger.log('Here is the object:', this);
+      logger.log('Here are the arguments passed from events:', number1, text1);
     }
   }
   gdjs.registerObject(

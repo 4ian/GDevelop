@@ -548,7 +548,7 @@ namespace gdjs {
         // }
         // console.profileEnd();
         // var time = Date.now() - startTime;
-        // console.log("Took", time, "ms");
+        // logger.log("Took", time, "ms");
         // return;
 
         //The standard game loop

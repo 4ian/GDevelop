@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Debugger client');
   /**
    * An client side implementation of the Debugger
    */
@@ -91,7 +92,7 @@ namespace gdjs {
       this._hotReloader = new gdjs.HotReloader(runtimeGame);
       this._ws = null;
       if (typeof WebSocket === 'undefined') {
-        console.log("WebSocket is not defined, debugger won't work");
+        logger.log("WebSocket is not defined, debugger won't work");
         return;
       }
       const that = this;
@@ -109,26 +110,26 @@ namespace gdjs {
           '3030';
         this._ws = new WebSocket('ws://' + address + ':' + port + '/');
       } catch (e) {
-        console.log(
+        logger.log(
           "WebSocket could not initialize, debugger/hot-reload won't work (might be because of preview inside web browser)."
         );
         return;
       }
       this._ws.onopen = function open() {
-        console.info('Debugger connection open');
+        logger.info('Debugger connection open');
       };
       this._ws.onclose = function close() {
-        console.info('Debugger connection closed');
+        logger.info('Debugger connection closed');
       };
       this._ws.onerror = function errored(error) {
-        console.warn('Debugger client error:', error);
+        logger.warn('Debugger client error:', error);
       };
       this._ws.onmessage = function incoming(message) {
         let data: any = null;
         try {
           data = JSON.parse(message.data);
         } catch (e) {
-          console.info('Debugger received a badly formatted message');
+          logger.info('Debugger received a badly formatted message');
         }
         if (data && data.command) {
           if (data.command === 'play') {
@@ -158,12 +159,12 @@ namespace gdjs {
               that.sendHotReloaderLogs(logs);
             });
           } else {
-            console.info(
+            logger.info(
               'Unknown command "' + data.command + '" received by the debugger.'
             );
           }
         } else {
-          console.info(
+          logger.info(
             'Debugger received a message with badly formatted data.'
           );
         }
@@ -233,7 +234,7 @@ namespace gdjs {
       internal: boolean
     ) {
       if (!this._ws) {
-        console.warn('No connection to debugger opened to send logs');
+        logger.warn('No connection to debugger opened to send logs');
         return;
       }
       if (this._ws.readyState === 1)
@@ -252,7 +253,7 @@ namespace gdjs {
 
     set(path: string[], newValue: any): boolean {
       if (!path || !path.length) {
-        console.warn('No path specified, set operation from debugger aborted');
+        logger.warn('No path specified, set operation from debugger aborted');
         return false;
       }
       let object = this._runtimegame;
@@ -260,7 +261,7 @@ namespace gdjs {
       while (currentIndex < path.length - 1) {
         const key = path[currentIndex];
         if (!object || !object[key]) {
-          console.error('Incorrect path specified. No ' + key + ' in ', object);
+          logger.error('Incorrect path specified. No ' + key + ' in ', object);
           return false;
         }
         object = object[key];
@@ -277,14 +278,14 @@ namespace gdjs {
           newValue = '' + newValue;
         }
       }
-      console.log('Updating', path, 'to', newValue);
+      logger.log('Updating', path, 'to', newValue);
       object[path[currentIndex]] = newValue;
       return true;
     }
 
     call(path: string[], args: any[]): boolean {
       if (!path || !path.length) {
-        console.warn('No path specified, call operation from debugger aborted');
+        logger.warn('No path specified, call operation from debugger aborted');
         return false;
       }
       let object = this._runtimegame;
@@ -292,24 +293,24 @@ namespace gdjs {
       while (currentIndex < path.length - 1) {
         const key = path[currentIndex];
         if (!object || !object[key]) {
-          console.error('Incorrect path specified. No ' + key + ' in ', object);
+          logger.error('Incorrect path specified. No ' + key + ' in ', object);
           return false;
         }
         object = object[key];
         currentIndex++;
       }
       if (!object[path[currentIndex]]) {
-        console.error('Unable to call', path);
+        logger.error('Unable to call', path);
         return false;
       }
-      console.log('Calling', path, 'with', args);
+      logger.log('Calling', path, 'with', args);
       object[path[currentIndex]].apply(object, args);
       return true;
     }
 
     sendRuntimeGameDump(): void {
       if (!this._ws) {
-        console.warn(
+        logger.warn(
           'No connection to debugger opened to send RuntimeGame dump'
         );
         return;
@@ -369,11 +370,11 @@ namespace gdjs {
         18
       );
       const serializationDuration = Date.now() - serializationStartTime;
-      console.log(
+      logger.log(
         'RuntimeGame serialization took ' + serializationDuration + 'ms'
       );
       if (serializationDuration > 500) {
-        console.warn(
+        logger.warn(
           'Serialization took a long time: please check if there is a need to remove some objects from serialization'
         );
       }
@@ -382,7 +383,7 @@ namespace gdjs {
 
     sendHotReloaderLogs(logs: HotReloaderLog[]): void {
       if (!this._ws) {
-        console.warn('No connection to debugger opened');
+        logger.warn('No connection to debugger opened');
         return;
       }
       this._ws.send(
@@ -395,7 +396,7 @@ namespace gdjs {
 
     sendProfilerStarted(): void {
       if (!this._ws) {
-        console.warn('No connection to debugger opened');
+        logger.warn('No connection to debugger opened');
         return;
       }
       this._ws.send(
@@ -408,7 +409,7 @@ namespace gdjs {
 
     sendProfilerStopped(): void {
       if (!this._ws) {
-        console.warn('No connection to debugger opened');
+        logger.warn('No connection to debugger opened');
         return;
       }
       this._ws.send(
@@ -424,7 +425,7 @@ namespace gdjs {
       stats: ProfilerStats
     ): void {
       if (!this._ws) {
-        console.warn(
+        logger.warn(
           'No connection to debugger opened to send profiler measures'
         );
         return;

@@ -1,5 +1,6 @@
 //A simple PIXI filter doing some color changes
 namespace gdjs {
+  const logger = new Logger('Dummy effect');
   import PIXI = GlobalPIXIModule.PIXI;
 
   const DummyPixiFilter = function () {
@@ -46,14 +47,14 @@ namespace gdjs {
       // `effectData.stringParameters.someImage`
       // `effectData.stringParameters.someColor`
       // `effectData.booleanParameters.someBoolean`
-      console.info(
+      logger.info(
         'The PIXI texture found for the Dummy Effect (not actually used):',
-        (layer
-          .getRuntimeScene()
-          .getGame()
-          .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-          effectData.stringParameters.someImage
-        )
+        (
+          layer
+            .getRuntimeScene()
+            .getGame()
+            .getImageManager() as gdjs.PixiImageManager
+        ).getPIXITexture(effectData.stringParameters.someImage)
       );
       return filter;
     },

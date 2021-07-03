@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new Logger('Video object PIXI renderer');
+
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -81,7 +83,8 @@ namespace gdjs {
     }
 
     updateLoop(): void {
-      this._pixiObject._texture.baseTexture.resource.source.loop = this._object._loop;
+      this._pixiObject._texture.baseTexture.resource.source.loop =
+        this._object._loop;
     }
 
     updateVolume(): void {
@@ -160,7 +163,7 @@ namespace gdjs {
           .then(() => {})
           .catch(() => {
             // Autoplay was prevented.
-            console.warn(
+            logger.warn(
               'The video did not start because: video is invalid or no interaction with the game has been captured before (this is blocked by the navigator: https://goo.gl/xX8pDD)'
             );
           });

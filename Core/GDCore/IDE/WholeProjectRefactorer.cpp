@@ -115,7 +115,7 @@ void WholeProjectRefactorer::ExposeProjectEvents(
     for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
       gd::ObjectsContainer globalObjectsAndGroups;
       gd::ObjectsContainer objectsAndGroups;
-      gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
+      gd::EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
           project, *eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
       worker.Launch(eventsFunction->GetEvents(),
@@ -132,8 +132,12 @@ void WholeProjectRefactorer::ExposeProjectEvents(
            behaviorEventsFunctions.GetInternalVector()) {
         gd::ObjectsContainer globalObjectsAndGroups;
         gd::ObjectsContainer objectsAndGroups;
-        gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
-            project, *eventsFunction, globalObjectsAndGroups, objectsAndGroups);
+        gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
+            project,
+            *eventsBasedBehavior,
+            *eventsFunction,
+            globalObjectsAndGroups,
+            objectsAndGroups);
 
         worker.Launch(eventsFunction->GetEvents(),
                       globalObjectsAndGroups,

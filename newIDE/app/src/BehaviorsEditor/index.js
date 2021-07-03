@@ -234,6 +234,7 @@ const BehaviorsEditor = (props: Props) => {
                         behavior={behavior}
                         behaviorContent={behaviorContent}
                         project={project}
+                        object={object}
                         resourceSources={props.resourceSources}
                         onChooseResource={props.onChooseResource}
                         resourceExternalEditors={props.resourceExternalEditors}

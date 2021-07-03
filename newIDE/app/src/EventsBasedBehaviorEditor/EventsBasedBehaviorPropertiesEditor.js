@@ -24,6 +24,7 @@ import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
+import BehaviorTypeSelector from '../BehaviorTypeSelector';
 
 const gd: libGDevelop = global.gd;
 
@@ -247,6 +248,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Color"
                                 primaryText={t`Color (text)`}
                               />
+                              <SelectOption
+                                value="Behavior"
+                                primaryText={t`Required behavior`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -291,6 +296,35 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                   primaryText={t`False (not checked)`}
                                 />
                               </SelectField>
+                            )}
+                            {property.getType() === 'Behavior' && (
+                              <BehaviorTypeSelector
+                                project={this.props.project}
+                                objectType={this.props.eventsBasedBehavior.getObjectType()}
+                                value={
+                                  property.getExtraInfo().size() === 0
+                                    ? ''
+                                    : property.getExtraInfo().at(0)
+                                }
+                                onChange={(newValue: string) => {
+                                  if (property.getExtraInfo().size() === 0) {
+                                    property.addExtraInfo(newValue);
+                                  } else {
+                                    //TODO This doesn't work because extraInfo is constant.
+                                    // Maybe this is a hack and the behavior type must be set somewhere else?
+                                    // Should a method be added to replace a value?
+                                    console.log('newValue: ' + newValue);
+                                    property.getExtraInfo().clear();
+                                    property.addExtraInfo(newValue);
+                                    console.log(
+                                      'get: ' + property.getExtraInfo().at(0)
+                                    );
+                                  }
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                disabled={false}
+                              />
                             )}
                           </ResponsiveLineStackLayout>
                           {property.getType() === 'Choice' && (

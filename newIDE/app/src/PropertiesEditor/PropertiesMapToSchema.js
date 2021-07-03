@@ -17,7 +17,8 @@ export default (
     instance: Instance,
     propertyName: string,
     newValue: string
-  ) => void
+  ) => void,
+  object: ?gdObject
 ): Schema => {
   const propertyNames = properties.keys();
   const propertyFields = mapFor(0, propertyNames.size(), i => {
@@ -99,6 +100,36 @@ export default (
         .getExtraInfo()
         .toJSArray()
         .map(value => ({ value, label: value }));
+      return {
+        name,
+        valueType: 'string',
+        getChoices: () => choices,
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+        getDescription,
+      };
+    } else if (valueType === 'behavior') {
+      let choices = [];
+      if (object && property.getExtraInfo().size() > 0) {
+        const behaviorType = property.getExtraInfo().at(0);
+        choices = object
+          .getAllBehaviorNames()
+          .toJSArray()
+          .map(name =>
+            object.getBehavior(name).getTypeName() === behaviorType
+              ? name
+              : null
+          )
+          .filter(Boolean)
+          .map(value => ({ value, label: value }));
+      }
       return {
         name,
         valueType: 'string',

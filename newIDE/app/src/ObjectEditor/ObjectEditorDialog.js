@@ -124,7 +124,16 @@ const InnerDialog = (props: InnerDialogProps) => {
       }
     >
       {currentTab === 'properties' && EditorComponent && (
-        <Column noMargin expand useFullHeight>
+        <Column
+          noMargin
+          expand
+          useFullHeight={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
+          }
+          noOverflowParent={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
+          }
+        >
           <Line>
             <Column expand>
               <SemiControlledTextField

@@ -33,7 +33,7 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
-import { Column, Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 
@@ -331,7 +331,10 @@ class AnimationsListContainer extends React.Component<
           </ScrollView>
         )}
         <Column>
-          <Line justifyContent="space-between">
+          <ResponsiveLineStackLayout
+            justifyContent="space-between"
+            noColumnMargin
+          >
             {this.props.extraBottomTools}
             <RaisedButton
               label={<Trans>Add an animation</Trans>}
@@ -339,7 +342,7 @@ class AnimationsListContainer extends React.Component<
               onClick={this.addAnimation}
               icon={<Add />}
             />
-          </Line>
+          </ResponsiveLineStackLayout>
         </Column>
         <ContextMenu
           ref={spriteContextMenu =>
@@ -416,7 +419,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
-            <ResponsiveLineStackLayout noMargin>
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
               <RaisedButton
                 label={<Trans>Edit collision masks</Trans>}
                 primary={false}

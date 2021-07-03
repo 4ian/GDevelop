@@ -744,6 +744,7 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetDescription();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
+    [Ref] PropertyDescriptor ClearExtraInfo();
     [Value] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
     boolean IsHidden();

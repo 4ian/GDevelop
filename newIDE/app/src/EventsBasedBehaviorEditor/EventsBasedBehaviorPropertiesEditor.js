@@ -307,19 +307,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                     : property.getExtraInfo().at(0)
                                 }
                                 onChange={(newValue: string) => {
-                                  if (property.getExtraInfo().size() === 0) {
-                                    property.addExtraInfo(newValue);
-                                  } else {
-                                    //TODO This doesn't work because extraInfo is constant.
-                                    // Maybe this is a hack and the behavior type must be set somewhere else?
-                                    // Should a method be added to replace a value?
-                                    console.log('newValue: ' + newValue);
-                                    property.getExtraInfo().clear();
-                                    property.addExtraInfo(newValue);
-                                    console.log(
-                                      'get: ' + property.getExtraInfo().at(0)
-                                    );
+                                  if (property.getExtraInfo().size() !== 0) {
+                                    property.clearExtraInfo();
                                   }
+                                  property.addExtraInfo(newValue);
                                   this.forceUpdate();
                                   this.props.onPropertiesUpdated();
                                 }}

@@ -116,24 +116,28 @@ export default (
         getDescription,
       };
     } else if (valueType === 'behavior') {
-      let choices = [];
-      if (object && property.getExtraInfo().size() > 0) {
-        const behaviorType = property.getExtraInfo().at(0);
-        choices = object
-          .getAllBehaviorNames()
-          .toJSArray()
-          .map(name =>
-            object.getBehavior(name).getTypeName() === behaviorType
-              ? name
-              : null
-          )
-          .filter(Boolean)
-          .map(value => ({ value, label: value }));
-      }
+      console.log("property: " + property + " property.getExtraInfo(): " + property.getExtraInfo());
+      const behaviorType =
+        property.getExtraInfo().size() > 0
+          ? property.getExtraInfo().at(0)
+          : '';
       return {
         name,
         valueType: 'string',
-        getChoices: () => choices,
+        getChoices: () => {
+          return !object || behaviorType === ''
+            ? []
+            : object
+                .getAllBehaviorNames()
+                .toJSArray()
+                .map(name =>
+                  object.getBehavior(name).getTypeName() === behaviorType
+                    ? name
+                    : null
+                )
+                .filter(Boolean)
+                .map(value => ({ value, label: value }));
+        },
         getValue: (instance: Instance): string => {
           return getProperties(instance)
             .get(name)

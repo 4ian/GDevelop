@@ -93,7 +93,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     _("Object _PARAM0_ is of type _PARAM1_"), _("Other"),
                     "res/function24.png", "res/function16.png")
       .AddParameter("object", "The object to check the type from")
-      .AddParameter("string", "Type to check for")
+      .AddParameter("objectType", "Type to check for")
       .MarkAsAdvanced();
 #endif
 }

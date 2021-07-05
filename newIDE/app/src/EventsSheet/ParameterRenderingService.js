@@ -49,6 +49,9 @@ import SceneNameField from './ParameterFields/SceneNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import ObjectTypeField, {
+  renderInlineObjectType,
+} from './ParameterFields/ObjectTypeField';
 const gd: libGDevelop = global.gd;
 
 const components = {
@@ -81,6 +84,7 @@ const components = {
   sceneName: SceneNameField,
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
+  objectType: ObjectTypeField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -95,6 +99,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
+  objectType: renderInlineObjectType,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,

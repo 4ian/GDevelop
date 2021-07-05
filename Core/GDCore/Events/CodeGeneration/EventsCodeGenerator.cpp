@@ -605,13 +605,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = "\"" + argOutput + "\"";
   } else if (ParameterMetadata::IsBehavior(metadata.type)) {
     argOutput = GenerateGetBehaviorNameCode(parameter);
-  } else if (metadata.type == "key") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "password" || metadata.type == "musicfile" ||
-             metadata.type == "soundfile" || metadata.type == "police") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+             metadata.type == "soundfile" || metadata.type == "police" ||
+             metadata.type == "key" || metadata.type == "mouse" ||
+             metadata.type == "objectType") {
+    argOutput = ConvertToStringExplicit(parameter);
   } else if (metadata.type == "yesorno") {
     argOutput += (parameter == "yes" || parameter == "oui") ? GenerateTrue()
                                                             : GenerateFalse();

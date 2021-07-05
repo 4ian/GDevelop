@@ -116,11 +116,8 @@ export default (
         getDescription,
       };
     } else if (valueType === 'behavior') {
-      console.log("property: " + property + " property.getExtraInfo(): " + property.getExtraInfo());
       const behaviorType =
-        property.getExtraInfo().size() > 0
-          ? property.getExtraInfo().at(0)
-          : '';
+        property.getExtraInfo().size() > 0 ? property.getExtraInfo().at(0) : '';
       return {
         name,
         valueType: 'string',

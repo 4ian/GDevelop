@@ -213,6 +213,40 @@ module.exports = {
       .getCodeExtraInformation()
         .setFunctionName("getNodeCount");
 
+
+        pathfindingBehaviorDeclaration.addExpression("GetNodeX",
+        _("Get a waypoint X position"),
+        _("Get next waypoint X position"),
+        _("Movement on the path"),
+        "CppPlatform/Extensions/AStaricon16.png")
+        .addParameter('object', _('Object'), '', false)
+        .addParameter(
+          'behavior',
+          _('Behavior'),
+          'NavMeshPathfindingBehavior',
+          false
+        )
+.addParameter("expression", _("Node index (start at 0!)"), '', false)
+.getCodeExtraInformation()
+.setFunctionName("getNodeX");
+
+pathfindingBehaviorDeclaration.addExpression("GetNodeY",
+        _("Get a waypoint Y position"),
+        _("Get next waypoint Y position"),
+        _("Movement on the path"),
+        "CppPlatform/Extensions/AStaricon16.png")
+        .addParameter('object', _('Object'), '', false)
+        .addParameter(
+          'behavior',
+          _('Behavior'),
+          'NavMeshPathfindingBehavior',
+          false
+        )
+.addParameter("expression", _("Node index (start at 0!)"), '', false)
+.getCodeExtraInformation()
+.setFunctionName("getNodeY");
+
+
     pathfindingBehaviorDeclaration
     .addExpression("NextNodeX",
                       _("Get next waypoint X position"),

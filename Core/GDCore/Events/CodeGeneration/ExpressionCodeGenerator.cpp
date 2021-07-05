@@ -214,7 +214,7 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
   for (std::size_t i = 0; i < realObjects.size(); ++i) {
     context.ObjectsListNeeded(realObjects[i]);
 
-    gd::String objectType = gd::GetTypeOfObject(
+    gd::String objectType = context.GetTypeOfObject(
         globalObjectsAndGroups, objectsAndGroups, realObjects[i]);
     const ObjectMetadata& objInfo = MetadataProvider::GetObjectMetadata(
         codeGenerator.GetPlatform(), objectType);

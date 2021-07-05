@@ -39,7 +39,7 @@ void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
-  // The context is build the same way as free fuction...
+  // The context is build the same way as free function...
   FreeEventsFunctionToObjectsContainer(
       project,
       eventsFunction,

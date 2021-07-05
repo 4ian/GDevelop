@@ -38,8 +38,9 @@ class GD_CORE_API EventsFunctionTools {
       gd::ObjectsContainer& outputObjectsContainer);
   /**
    * \brief Given a behavior events function, initialize the given objects container
-   * with objects described in the events function parameters and in
-   * the events function groups.
+   * with objects described in the events function parameters, in
+   * the events function groups and in the behavior properties (for additional
+   * required behaviors on the object).
    *
    * This is useful to create the "context" of a function, before code
    * generation for example.

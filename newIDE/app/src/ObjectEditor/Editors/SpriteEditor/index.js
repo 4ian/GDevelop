@@ -148,31 +148,38 @@ const SortableAnimationsList = SortableContainer(
     onSelectSprite,
     onReplaceDirection,
   }) => {
-    return mapFor(0, spriteObject.getAnimationsCount(), i => {
-      const animation = spriteObject.getAnimation(i);
-      return (
-        <SortableAnimation
-          key={i}
-          index={i}
-          id={i}
-          animation={animation}
-          project={project}
-          resourcesLoader={resourcesLoader}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
-          onRemove={() => onRemoveAnimation(i)}
-          onChangeName={newName => onChangeAnimationName(i, newName)}
-          onSpriteContextMenu={onSpriteContextMenu}
-          selectedSprites={selectedSprites}
-          onSelectSprite={onSelectSprite}
-          onReplaceDirection={(directionId, newDirection) =>
-            onReplaceDirection(i, directionId, newDirection)
-          }
-          objectName={objectName}
-        />
-      );
-    });
+    // Note that it's important to have <ScrollView> *inside* this
+    // component, otherwise the sortable list won't work (because the
+    // SortableContainer would not find a root div to use).
+    return (
+      <ScrollView>
+        {mapFor(0, spriteObject.getAnimationsCount(), i => {
+          const animation = spriteObject.getAnimation(i);
+          return (
+            <SortableAnimation
+              key={i}
+              index={i}
+              id={i}
+              animation={animation}
+              project={project}
+              resourcesLoader={resourcesLoader}
+              resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+              onRemove={() => onRemoveAnimation(i)}
+              onChangeName={newName => onChangeAnimationName(i, newName)}
+              onSpriteContextMenu={onSpriteContextMenu}
+              selectedSprites={selectedSprites}
+              onSelectSprite={onSelectSprite}
+              onReplaceDirection={(directionId, newDirection) =>
+                onReplaceDirection(i, directionId, newDirection)
+              }
+              objectName={objectName}
+            />
+          );
+        })}
+      </ScrollView>
+    );
   }
 );
 
@@ -307,28 +314,26 @@ class AnimationsListContainer extends React.Component<
             </Trans>
           </EmptyMessage>
         ) : (
-          <ScrollView>
-            <SortableAnimationsList
-              spriteObject={this.props.spriteObject}
-              objectName={this.props.objectName}
-              helperClass="sortable-helper"
-              project={this.props.project}
-              onSortEnd={this.onSortEnd}
-              onChangeAnimationName={this.changeAnimationName}
-              onRemoveAnimation={this.removeAnimation}
-              onReplaceDirection={this.replaceDirection}
-              onSpriteContextMenu={this.openSpriteContextMenu}
-              selectedSprites={this.state.selectedSprites}
-              onSelectSprite={this.selectSprite}
-              resourcesLoader={this.props.resourcesLoader}
-              resourceSources={this.props.resourceSources}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              onChooseResource={this.props.onChooseResource}
-              useDragHandle
-              lockAxis="y"
-              axis="y"
-            />
-          </ScrollView>
+          <SortableAnimationsList
+            spriteObject={this.props.spriteObject}
+            objectName={this.props.objectName}
+            helperClass="sortable-helper"
+            project={this.props.project}
+            onSortEnd={this.onSortEnd}
+            onChangeAnimationName={this.changeAnimationName}
+            onRemoveAnimation={this.removeAnimation}
+            onReplaceDirection={this.replaceDirection}
+            onSpriteContextMenu={this.openSpriteContextMenu}
+            selectedSprites={this.state.selectedSprites}
+            onSelectSprite={this.selectSprite}
+            resourcesLoader={this.props.resourcesLoader}
+            resourceSources={this.props.resourceSources}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            onChooseResource={this.props.onChooseResource}
+            useDragHandle
+            lockAxis="y"
+            axis="y"
+          />
         )}
         <Column>
           <ResponsiveLineStackLayout

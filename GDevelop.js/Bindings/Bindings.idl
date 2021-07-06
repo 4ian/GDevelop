@@ -126,7 +126,7 @@ interface EventsVariablesFinder {
     [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
     [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
     [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
-    
+
     //Inherited from ExpressionParser2NodeWorker:
 };
 
@@ -667,7 +667,7 @@ interface Effect {
 
 interface EffectsContainer {
   void EffectsContainer();
-  
+
   boolean HasEffectNamed([Const] DOMString name);
   [Ref] Effect GetEffect([Const] DOMString name);
   [Ref] Effect GetEffectAt(unsigned long index);
@@ -1028,21 +1028,12 @@ interface VectorPairStringTextFormatting {
 };
 
 interface TextFormatting {
-    boolean IsBold();
-    boolean IsItalic();
-    unsigned long GetColorRed();
-    unsigned long GetColorGreen();
-    unsigned long GetColorBlue();
     unsigned long GetUserData();
 };
 
 interface InstructionSentenceFormatter {
     InstructionSentenceFormatter STATIC_Get();
-    [Const, Value] DOMString Translate([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
     [Value] VectorPairStringTextFormatting GetAsFormattedText([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
-    [Value] TextFormatting GetFormattingFromType([Const] DOMString type);
-    [Const, Value] DOMString LabelFromType([Const] DOMString type);
-    void LoadTypesFormattingFromConfig();
 };
 
 //TODO: This should be renamed to InstructionCodeGenerationInformation

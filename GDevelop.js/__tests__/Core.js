@@ -1936,12 +1936,6 @@ describe('libGD.js', function () {
       action.setParametersCount(2);
       action.setParameter(0, 'MyCharacter');
 
-      var actionSentenceInEnglish = gd.InstructionSentenceFormatter.get().translate(
-        action,
-        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
-      );
-      expect(actionSentenceInEnglish).toBe('Delete MyCharacter');
-
       var formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
         action,
         gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')

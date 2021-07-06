@@ -4,9 +4,9 @@ echo "ℹ️ Listing all GDCore, GDCpp, GDJS and Extensions sources files to tra
 
 find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.cpp' | grep -v '/Dialogs/' | grep -v '/AdvancedXML/' | grep -v '/Function/' | grep -v '/TimedEvent/' | grep -v '/PathBehavior/' | grep -v '/Light/' | grep -v '/TileMapObject/' | grep -v '/Box3DObject/' | grep -v '/AES/' | grep -v 'Editor.cpp' | grep -v 'Dialog.cpp' | grep -v 'EditorDlg.cpp' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' | grep -v '/AdvancedXML/' | grep -v '/Function/' | grep -v '/TimedEvent/' | grep -v '/PathBehavior/' | grep -v '/Light/' | grep -v '/TileMapObject/' | grep -v '/Box3DObject/' | grep -v '/AES/' | grep -v 'Editor.cpp' | grep -v 'Dialog.cpp' | grep -v 'EditorDlg.cpp' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.js' | grep -v 'box2d.js' | grep -v '/bondage.js' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.cpp' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
+find ../Extensions/ -name '*.js' | grep -v 'box2d.js' | grep -v '/bondage.js' | grep -v '/ExampleJsExtension' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
 

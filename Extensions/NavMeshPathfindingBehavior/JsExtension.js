@@ -130,9 +130,8 @@ module.exports = {
         pathfindingBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile(
-        'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingruntimebehavior.js'
-      );
+      .setIncludeFile('Extensions/NavMeshPathfindingBehavior/navmeshpathfindingruntimebehavior.js')
+      .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js');
 
     // Declare a behavior.
     // Create a new gd.BehaviorJsImplementation object and implement the methods

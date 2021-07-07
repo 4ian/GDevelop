@@ -82,23 +82,21 @@ export default class InstancesMover {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    let roundedTotalDeltaX;
-    let roundedTotalDeltaY;
-    if (this.options.snap && this.options.grid && !noGridSnap) {
-      // It will magnet the corner nearest to the grabbing position
-      const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
-      const magnetLeft = this._startX < initialSelectionAABB.centerX();
-      const magnetTop = this._startY < initialSelectionAABB.centerY();
+    // It will magnet the corner nearest to the grabbing position
+    const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    const magnetLeft = this._startX < initialSelectionAABB.centerX();
+    const magnetTop = this._startY < initialSelectionAABB.centerY();
 
-      const initialMagnetX = magnetLeft
-        ? initialSelectionAABB.left
-        : initialSelectionAABB.right;
-      const initialMagnetY = magnetTop
-        ? initialSelectionAABB.top
-        : initialSelectionAABB.bottom;
-      const magnetPosition = this._temporaryPoint;
-      magnetPosition[0] = initialMagnetX + this.totalDeltaX;
-      magnetPosition[1] = initialMagnetY + this.totalDeltaY;
+    const initialMagnetX = magnetLeft
+      ? initialSelectionAABB.left
+      : initialSelectionAABB.right;
+    const initialMagnetY = magnetTop
+      ? initialSelectionAABB.top
+      : initialSelectionAABB.bottom;
+    const magnetPosition = this._temporaryPoint;
+    magnetPosition[0] = initialMagnetX + this.totalDeltaX;
+    magnetPosition[1] = initialMagnetY + this.totalDeltaY;
+    if (this.options.snap && this.options.grid && !noGridSnap) {
       roundPosition(
         magnetPosition,
         this.options.gridWidth,
@@ -107,12 +105,15 @@ export default class InstancesMover {
         this.options.gridOffsetY,
         this.options.gridType
       );
-      roundedTotalDeltaX = magnetPosition[0] - initialMagnetX;
-      roundedTotalDeltaY = magnetPosition[1] - initialMagnetY;
     } else {
-      roundedTotalDeltaX = this.totalDeltaX;
-      roundedTotalDeltaY = this.totalDeltaY;
+      // Without a grid, it's rounded to the nearest pixel
+      // the size might not be round
+      // so the magnet corner is still relevent
+      magnetPosition[0] = Math.round(magnetPosition[0]);
+      magnetPosition[1] = Math.round(magnetPosition[1]);
     }
+    const roundedTotalDeltaX = magnetPosition[0] - initialMagnetX;
+    const roundedTotalDeltaY = magnetPosition[1] - initialMagnetY;
 
     for (var i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];

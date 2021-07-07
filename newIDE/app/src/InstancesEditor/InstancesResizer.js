@@ -142,21 +142,19 @@ export default class InstancesResizer {
 
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
 
-    let roundedTotalDeltaX;
-    let roundedTotalDeltaY;
+    // Round the grabbed handle position on the grid.
+    const grabbingRelativePosition =
+      resizeGrabbingRelativePositions[grabbingLocation];
+    const initialGrabbingX =
+      initialSelectionAABB.left +
+      initialSelectionAABB.width() * grabbingRelativePosition[0];
+    const initialGrabbingY =
+      initialSelectionAABB.top +
+      initialSelectionAABB.height() * grabbingRelativePosition[1];
+    const grabbingPosition = this._temporaryGrabbingPosition;
+    grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
+    grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
     if (this.options.snap && this.options.grid) {
-      // Round the grabbed handle position on the grid.
-      const grabbingRelativePosition =
-        resizeGrabbingRelativePositions[grabbingLocation];
-      const initialGrabbingX =
-        initialSelectionAABB.left +
-        initialSelectionAABB.width() * grabbingRelativePosition[0];
-      const initialGrabbingY =
-        initialSelectionAABB.top +
-        initialSelectionAABB.height() * grabbingRelativePosition[1];
-      const grabbingPosition = this._temporaryGrabbingPosition;
-      grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
-      grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
       roundPositionForResizing(
         grabbingPosition,
         this.options.gridWidth,
@@ -165,12 +163,14 @@ export default class InstancesResizer {
         this.options.gridOffsetY,
         this.options.gridType
       );
-      roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
-      roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
     } else {
-      roundedTotalDeltaX = this.totalDeltaX;
-      roundedTotalDeltaY = this.totalDeltaY;
+      // Without a grid, the position is still rounded to the nearest pixel.
+      grabbingPosition[0] = Math.round(grabbingPosition[0]);
+      grabbingPosition[1] = Math.round(grabbingPosition[1]);
     }
+    let roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
+    let roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
+
     if (!canMoveOnX(grabbingLocation)) {
       roundedTotalDeltaX = 0;
     }

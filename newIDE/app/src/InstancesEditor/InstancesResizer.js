@@ -168,8 +168,8 @@ export default class InstancesResizer {
       grabbingPosition[0] = Math.round(grabbingPosition[0]);
       grabbingPosition[1] = Math.round(grabbingPosition[1]);
     }
-    const roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
-    const roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
+    let roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
+    let roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
 
     if (!canMoveOnX(grabbingLocation)) {
       roundedTotalDeltaX = 0;

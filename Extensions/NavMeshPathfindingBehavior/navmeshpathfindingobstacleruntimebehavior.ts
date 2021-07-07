@@ -14,6 +14,7 @@ namespace gdjs {
    */
   export class NavMeshPathfindingObstaclesManager {
     _obstaclesRBush: any;
+    _obstacles: Set<NavMeshPathfindingObstacleRuntimeBehavior>;
 
     /**
      * @param object The object
@@ -25,6 +26,7 @@ namespace gdjs {
         '.owner.getAABB().max[0]',
         '.owner.getAABB().max[1]',
       ]);
+      this._obstacles = new Set();
     }
 
     /**
@@ -33,7 +35,7 @@ namespace gdjs {
     static getManager(runtimeScene) {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
-        runtimeScene.pathfindingObstaclesManager = new gdjs.PathfindingObstaclesManager(
+        runtimeScene.pathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
           runtimeScene
         );
       }
@@ -47,6 +49,7 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstaclesRBush.insert(pathfindingObstacleBehavior);
+      this._obstacles.add(pathfindingObstacleBehavior);
     }
 
     /**
@@ -57,6 +60,7 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstaclesRBush.remove(pathfindingObstacleBehavior);
+      this._obstacles.delete(pathfindingObstacleBehavior);
     }
 
     /**

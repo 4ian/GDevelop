@@ -106,9 +106,9 @@ export default class InstancesMover {
         this.options.gridType
       );
     } else {
-      // Without a grid, it's rounded to the nearest pixel
-      // the size might not be round
-      // so the magnet corner is still relevent
+      // Without a grid, the position is still rounded to the nearest pixel.
+      // The size of the instance (or selection of instances) might not be round,
+      // so the magnet corner is still relevant.
       magnetPosition[0] = Math.round(magnetPosition[0]);
       magnetPosition[1] = Math.round(magnetPosition[1]);
     }

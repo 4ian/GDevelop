@@ -164,7 +164,7 @@ export default class InstancesResizer {
         this.options.gridType
       );
     } else {
-      // Without a grid, it's rounded to the nearest pixel
+      // Without a grid, the position is still rounded to the nearest pixel.
       grabbingPosition[0] = Math.round(grabbingPosition[0]);
       grabbingPosition[1] = Math.round(grabbingPosition[1]);
     }

@@ -142,8 +142,6 @@ export default class InstancesResizer {
 
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
 
-    let roundedTotalDeltaX;
-    let roundedTotalDeltaY;
     // Round the grabbed handle position on the grid.
     const grabbingRelativePosition =
       resizeGrabbingRelativePositions[grabbingLocation];
@@ -170,8 +168,8 @@ export default class InstancesResizer {
       grabbingPosition[0] = Math.round(grabbingPosition[0]);
       grabbingPosition[1] = Math.round(grabbingPosition[1]);
     }
-    roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
-    roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
+    const roundedTotalDeltaX = grabbingPosition[0] - initialGrabbingX;
+    const roundedTotalDeltaY = grabbingPosition[1] - initialGrabbingY;
 
     if (!canMoveOnX(grabbingLocation)) {
       roundedTotalDeltaX = 0;

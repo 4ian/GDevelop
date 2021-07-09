@@ -360,8 +360,11 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
   if (gd::ParameterMetadata::IsObject(type)) {
     return codeGenerator.GenerateBadObject();
   }
+  if (gd::ParameterMetadata::IsExpression("string", type)) {
+    return "\"\"";
+  }
 
-  return (type == "string") ? "\"\"" : "0";
+  return "0";
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {

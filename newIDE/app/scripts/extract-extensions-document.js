@@ -7,15 +7,20 @@ const fs = require('fs').promises;
 const { default: axios } = require('axios');
 const path = require('path');
 
-const extensionsRegistoryURL =
-  'https://raw.githubusercontent.com/4ian/GDevelop-extensions/master/extensions-registry.json';
+const extensionsUrl =
+  'https://api.gdevelop-app.com/asset/extension';
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const outputFilePath = path.join(outputRootPath, 'extensions.txt');
 
 (async () => {
   try {
-    const response = await axios.get(extensionsRegistoryURL);
+    const response = await axios.get(extensionsUrl);
+    if (!response.data.databaseUrl) {
+      throw new Error('Unexpected response from the extension endpoint.');
+    }
+
+    const databaseResponse = await axios.get(response.data.databaseUrl);
     let texts = `# Extensions
 
 GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|core features]], new capabilities are provided by extensions. Extensions can contain objects, behaviors, actions, conditions, expressions or events.
@@ -24,7 +29,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    response.data.extensionShortHeaders.forEach(element => {
+    databaseResponse.data.extensionShortHeaders.forEach(element => {
       // TODO: link to help
       texts +=
         '## ' +

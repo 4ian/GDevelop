@@ -28,12 +28,14 @@ const generateSvgImageIcon = iconUrl => {
 };
 
 /** @returns {string} */
-const generateExtensionFooterText = (fullName) => {
-  return `
+const generateExtensionFooterText = fullName => {
+  return (
+    `
 ---
 *This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop-app.com/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
-      ' ' +
-      'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].';
+    ' ' +
+    'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
+  );
 };
 
 const getAllExtensions = async () => {
@@ -86,9 +88,12 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         '\n\n' +
         generateSvgImageIcon(extension.previewIconUrl) +
         '\n' +
-        extension.shortDescription +
-        '\n\n' +
-        `**Authors and contributors** to this community extension: ${extension.author}.\n` +
+        `${extension.shortDescription}\n` +
+        '\n' +
+        `**Authors and contributors** to this community extension: ${
+          extension.author
+        }.\n` +
+        '\n' +
         '---\n' +
         '\n' +
         convertMarkdownToDokuWikiMarkdown(extension.description) +

@@ -1,3 +1,5 @@
+// Strongly inspired from http://www.critterai.org/projects/nmgen_study/
+
 namespace gdjs {
   export class RasterizationCell {
     static NULL_REGION_ID = 0;
@@ -8,6 +10,7 @@ namespace gdjs {
     distanceToObstacle: integer = Number.MAX_VALUE;
     regionID: integer = RasterizationCell.NULL_REGION_ID;
     distanceToRegionCore: integer = 0;
+    contourFlags: integer = 0;
 
     constructor(x: integer, y: integer) {
       this.x = x;
@@ -84,7 +87,396 @@ namespace gdjs {
     }
   }
 
+  export type ContourPoint = { x: integer; y: integer; region: integer };
+
   export class NavMeshGenerator {
+
+    static buildContours(grid: RasterizationGrid): ContourPoint[][] {
+      const contours = new Array<ContourPoint[]>();
+
+      for (let y = 1; y < grid.dimY() - 1; y++) {
+        for (let x = 1; x < grid.dimX() - 1; x++) {
+          const cell = grid.get(x, y);
+
+          cell.contourFlags = 0;
+          if (!cell.hasRegion())
+            // Don't care about spans in the null region.
+            continue;
+
+          for (
+            let direction = 0;
+            direction < NavMeshGenerator.neighbor4Deltas.length;
+            direction++
+          ) {
+            const delta = NavMeshGenerator.neighbor4Deltas[direction];
+
+            const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
+            if (cell.regionID === neighbor.regionID) {
+              cell.contourFlags |= 1 << direction;
+            }
+          }
+          cell.contourFlags ^= 0xf;
+          if (cell.contourFlags === 0xf) {
+            cell.contourFlags = 0;
+            console.warn(
+              "Discarded contour: Island span. Can't form  a contour. Region: " +
+                cell.regionID
+            );
+          }
+        }
+      }
+
+      const workingRawVerts = new Array<ContourPoint>();
+      const workingSimplifiedVerts = new Array<ContourPoint>();
+
+      for (let y = 1; y < grid.dimY() - 1; y++) {
+        for (let x = 1; x < grid.dimX() - 1; x++) {
+          const cell = grid.get(x, y);
+
+          if (!cell.hasRegion() || cell.contourFlags === 0) continue;
+
+          workingRawVerts.length = 0;
+          workingSimplifiedVerts.length = 0;
+
+          let startDir = 0;
+          while ((cell.contourFlags & (1 << startDir)) === 0)
+            // This is not an edge direction.  Try the next one.
+            startDir++;
+          // We now have a span that is part of a contour and a direction
+          // that points to a different region (null or real).
+          // Build the contour.
+          NavMeshGenerator.buildRawContours(grid, cell, startDir, workingRawVerts);
+          console.log(
+            workingRawVerts
+                  .map((point) => '(' + point.x + ' ' + point.y + ')')
+                  .join(', ')
+          );
+          // Perform post processing on the contour in order to
+          // create the final, simplified contour.
+          NavMeshGenerator.generateSimplifiedContour(
+            cell.regionID,
+            workingRawVerts,
+            workingSimplifiedVerts
+          );
+          console.log(
+            workingSimplifiedVerts
+                  .map((point) => '(' + point.x + ' ' + point.y + ')')
+                  .join(', ')
+          );
+
+          if (workingSimplifiedVerts.length < 3) {
+            console.warn(
+              "Discarded contour: Can't form enough valid" +
+                'edges from the vertices.' +
+                ' Region: ' +
+                cell.regionID
+            );
+          } else {
+            contours.push(Array.from(workingSimplifiedVerts));
+          }
+        }
+      }
+
+      //TODO Detect and report anomalies
+
+      return contours;
+    }
+
+    private static leftVertexOfFacingCellBorderDeltas = [
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+      { x: 1, y: 0 },
+      { x: 0, y: 0 },
+    ];
+
+    private static buildRawContours(
+      grid: RasterizationGrid,
+      startCell: RasterizationCell,
+      startDirection: number,
+      outContourVerts: ContourPoint[]
+    ) {
+        console.log("buildRawContours x:" + startCell.x + " y: " + startCell.y);
+      let cell = startCell;
+      let direction = startDirection;
+
+      let loopCount = 0;
+      do {
+        // Note: The design of this loop is such that the span variable
+        // will always reference an edge span from the same region as
+        // the start span.
+
+        if ((cell.contourFlags & (1 << direction)) != 0) {
+          // The current direction is pointing toward an edge.
+          // Get this edge's vertex.
+          const delta =
+            NavMeshGenerator.leftVertexOfFacingCellBorderDeltas[direction];
+
+          const neighbor = grid.get(
+            cell.x + NavMeshGenerator.neighbor4Deltas[direction].x,
+            cell.y + NavMeshGenerator.neighbor4Deltas[direction].y
+          );
+          outContourVerts.push({
+            x: cell.x + delta.x,
+            y: cell.y + delta.y,
+            region: neighbor.regionID,
+          });
+
+          // Remove the flag for this edge.  We never need to consider
+          // it again since we have a vertex for this edge.
+          cell.contourFlags &= ~(1 << direction);
+          direction = (direction + 1) & 0x3; // Rotate in clockwise direction.
+        } else {
+          /*
+           * The current direction does not point to an edge.  So it
+           * must point to a neighbor span in the same region as the
+           * current span. Move to the neighbor and swing the search
+           * direction back one increment (counterclockwise).
+           * By moving the direction back one increment we guarantee we
+           * don't miss any edges.
+           */
+          const neighbor = grid.get(
+            cell.x + NavMeshGenerator.neighbor4Deltas[direction].x,
+            cell.y + NavMeshGenerator.neighbor4Deltas[direction].y
+          );
+          cell = neighbor;
+
+          direction = (direction + 3) & 0x3; // Rotate counterclockwise.
+        }
+      } while (
+        !(cell === startCell && direction === startDirection) &&
+        ++loopCount < 65535
+      );
+      return outContourVerts;
+    }
+
+    private static generateSimplifiedContour(
+      regionID: number,
+      sourceVerts: ContourPoint[],
+      outVerts: ContourPoint[]
+    ) {
+      let noConnections = true;
+      for (const sourceVert of sourceVerts) {
+        if (sourceVert.region != RasterizationCell.NULL_REGION_ID) {
+          noConnections = false;
+          break;
+        }
+      }
+
+      // Seed the simplified contour with the mandatory edges.
+      // (At least one edge.)
+      if (noConnections) {
+        /*
+         * This contour represents an island region surrounded only by the
+         * null region. Seed the simplified contour with the source's
+         * lower left (ll) and upper right (ur) vertices.
+         */
+        let lowerLeftX = sourceVerts[0].x;
+        let lowerLeftY = sourceVerts[0].y;
+        let lowerLeftIndex = 0;
+        let upperRightX = sourceVerts[0].x;
+        let upperRightY = sourceVerts[0].y;
+        let upperRightIndex = 0;
+        for (let index = 0; index < sourceVerts.length; index++) {
+          const sourceVert = sourceVerts[index];
+          const x = sourceVert.x;
+          const y = sourceVert.y;
+
+          if (x < lowerLeftX || (x == lowerLeftX && y < lowerLeftY)) {
+            lowerLeftX = x;
+            lowerLeftY = y;
+            lowerLeftIndex = index;
+          }
+          if (x >= upperRightX || (x == upperRightX && y > upperRightY)) {
+            upperRightX = x;
+            upperRightY = y;
+            upperRightIndex = index;
+          }
+        }
+        // Seed the simplified contour with this edge.
+        outVerts.push({ x: lowerLeftX, y: lowerLeftY, region: lowerLeftIndex });
+        outVerts.push({
+          x: upperRightX,
+          y: upperRightY,
+          region: upperRightIndex,
+        });
+      } else {
+        /*
+         * The contour shares edges with other non-null regions.
+         * Seed the simplified contour with a new vertex for every
+         * location where the region connection changes.  These are
+         * vertices that are important because they represent portals
+         * to other regions.
+         */
+        for (let index = 0; index < sourceVerts.length; index++) {
+          const sourceVert = sourceVerts[index];
+
+          if (
+            sourceVert.region !==
+            sourceVerts[(index + 1) % sourceVerts.length].region
+          ) {
+            // The current vertex has a different region than the
+            // next vertex.  So there is a change in vertex region.
+            outVerts.push({ x: sourceVert.x, y: sourceVert.y, region: index });
+          }
+        }
+      }
+
+      NavMeshGenerator.matchObstacleRegionEdges(sourceVerts, outVerts);
+
+      //TODO Check if the less than 3 vertices case must be handle.
+
+      // Replace the index pointers in the output list with region IDs.
+      for (const outVert of outVerts) {
+        outVert.region = sourceVerts[outVert.region].region;
+      }
+    }
+
+    private static matchObstacleRegionEdges(
+      sourceVerts: ContourPoint[],
+      inoutResultVerts: ContourPoint[]
+    ) {
+        /*
+        * Loop through all edges in this contour.
+        *
+        * NOTE: The simplifiedVertCount in the loop condition
+        * increases over iterations.  That is what keeps the loop going beyond
+        * the initial vertex count.
+        */
+      let iResultVertA = 0;
+      while (iResultVertA < inoutResultVerts.length) {
+        const iResultVertB = (iResultVertA + 1) % inoutResultVerts.length;
+
+        // The line segment's beginning vertex.
+        const ax = inoutResultVerts[iResultVertA].x;
+        const az = inoutResultVerts[iResultVertA].y;
+        const iVertASource = inoutResultVerts[iResultVertA].region;
+
+        // The line segment's ending vertex.
+        const bx = inoutResultVerts[iResultVertB].x;
+        const bz = inoutResultVerts[iResultVertB].y;
+        const iVertBSource = inoutResultVerts[iResultVertB].region;
+
+        // The source index of the next vertex to test.  (The vertex just
+        // after the current vertex in the source vertex list.)
+        let iTestVert = (iVertASource + 1) % sourceVerts.length;
+        let maxDeviation = 0;
+
+        // Default to no index.  No new vert to add.
+        let iVertToInsert = -1;
+
+        if (
+          sourceVerts[iTestVert].region === RasterizationCell.NULL_REGION_ID
+        ) {
+          /*
+           * This test vertex is part of a null region edge.
+           * Loop through the source vertices until the end vertex
+           * is found, searching for the vertex that is farthest from
+           * the line segment formed by the begin/end vertices.
+           *
+           * Visualizations:
+           * http://www.critterai.org/nmgen_contourgen#nulledgesimple
+           */
+          while (iTestVert !== iVertBSource) {
+            const deviation = NavMeshGenerator.getPointSegmentDistanceSq(
+              sourceVerts[iTestVert].x,
+              sourceVerts[iTestVert].y,
+              ax,
+              az,
+              bx,
+              bz
+            );
+            if (deviation > maxDeviation) {
+              // A new maximum deviation was detected.
+              maxDeviation = deviation;
+              iVertToInsert = iTestVert;
+            }
+            // Move to the next vertex.
+            iTestVert = (iTestVert + 1) % sourceVerts.length;
+          }
+        }
+
+        //TODO make mThreshold configurable ?
+        const mThreshold = 1;
+        if (iVertToInsert !== -1 && maxDeviation > mThreshold * mThreshold) {
+          // A vertex was found that is further than allowed from the
+          // current edge. Add this vertex to the contour.
+          inoutResultVerts.splice(iResultVertA + 1, 0, {
+            x: sourceVerts[iVertToInsert].x,
+            y: sourceVerts[iVertToInsert].y,
+            region: iVertToInsert,
+          });
+          // Not incrementing the vertex since we need to test the edge
+          // formed by vertA  and this this new vertex on the next
+          // iteration of the loop.
+        }
+        // This edge segment does not need to be altered.  Move to
+        // the next vertex.
+        else iResultVertA++;
+      }
+    }
+
+    /**
+     * Returns the distance squared from the point to the line segment.
+     * <p>Behavior is undefined if the the closest distance is outside the
+     * line segment.</p>
+     * @param px The x-value of point (px, py).
+     * @param py The y-value of point (px, py)
+     * @param ax The x-value of the line segment's vertex A.
+     * @param ay The y-value of the line segment's vertex A.
+     * @param bx The x-value of the line segment's vertex B.
+     * @param by The y-value of the line segment's vertex B.
+     * @return The distance squared from the point (px, py) to line segment AB.
+     */
+    private static getPointSegmentDistanceSq(
+      px: float,
+      py: float,
+      ax: float,
+      ay: float,
+      bx: float,
+      by: float
+    ): float {
+      /*
+       * Reference: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
+       *
+       * The goal of the algorithm is to find the point on line segment AB
+       * that is closest to P and then calculate the distance between P
+       * and that point.
+       */
+
+      const deltaABx = bx - ax;
+      const deltaABy = by - ay;
+      const deltaAPx = px - ax;
+      const deltaAPy = py - ay;
+
+      const segmentABLengthSq = deltaABx * deltaABx + deltaABy * deltaABy;
+
+      if (segmentABLengthSq == 0)
+        // AB is not a line segment.  So just return
+        // distanceSq from P to A
+        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
+
+      const u = (deltaAPx * deltaABx + deltaAPy * deltaABy) / segmentABLengthSq;
+
+      if (u < 0)
+        // Closest point on line AB is outside outside segment AB and
+        // closer to A. So return distanceSq from P to A.
+        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
+      else if (u > 1)
+        // Closest point on line AB is outside segment AB and closer to B.
+        // So return distanceSq from P to B.
+        return (px - bx) * (px - bx) + (py - by) * (py - by);
+
+      // Closest point on lineAB is inside segment AB.  So find the exact
+      // point on AB and calculate the distanceSq from it to P.
+
+      // The calculation in parenthesis is the location of the point on
+      // the line segment.
+      const deltaX = ax + u * deltaABx - px;
+      const deltaY = ay + u * deltaABy - py;
+
+      return deltaX * deltaX + deltaY * deltaY;
+    }
+
     static generateRegions(grid: RasterizationGrid) {
       const expandIterations: integer = 4;
 
@@ -142,9 +534,9 @@ namespace gdjs {
     }
 
     private static neighbor4Deltas = [
-      { x: 1, y: 0 },
-      { x: 0, y: 1 },
       { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 0 },
       { x: 0, y: -1 },
     ];
 
@@ -193,9 +585,9 @@ namespace gdjs {
     }
 
     private static neighbor8Deltas = [
-      { x: 1, y: 0 },
-      { x: 0, y: 1 },
       { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 0 },
       { x: 0, y: -1 },
       { x: 1, y: 1 },
       { x: -1, y: 1 },

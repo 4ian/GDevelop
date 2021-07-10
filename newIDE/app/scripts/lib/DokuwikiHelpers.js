@@ -12,7 +12,7 @@ const convertMarkdownToDokuWikiMarkdown = markdownText => {
     .replace(/\!\[(.*?)\]\((.*?)\)/g, (match, linkText, linkUrl) => {
       const url = linkUrl.replace(/^\/+/, '');
       const title = linkText.replace(/^\[(.*?)\]/, '$1');
-      return `{{${url}?nolink |}}`;
+      return `{{ ${url}?nolink |}}`;
     })
     // Replace links (`[text](url)`)
     .replace(/\[(.*?)\]\((.*?)\)/g, (match, linkText, linkUrl) => {

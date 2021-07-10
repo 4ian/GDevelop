@@ -73,7 +73,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
         )
         .join('\n') + '\n';
     console.log('\n' + actualGridString);
-    //expect(expectedGridString).to.be(actualGridString);
+    expect(expectedGridString).to.be(actualGridString);
   };
 
   const checkDistanceField = (grid, expectedGridString) => {
@@ -88,7 +88,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
         )
         .join('\n') + '\n';
     console.log('\n' + actualGridString);
-    //expect(expectedGridString).to.be(actualGridString);
+    expect(expectedGridString).to.be(actualGridString);
   };
 
   const checkRegions = (grid, expectedGridString) => {
@@ -101,7 +101,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
         )
         .join('\n') + '\n';
     console.log('\n' + actualGridString);
-    //expect(expectedGridString).to.be(actualGridString);
+    expect(expectedGridString).to.be(actualGridString);
   };
 
   describe('Diamond at the center', function () {
@@ -185,6 +185,52 @@ describe.only('gdjs.NavMeshGeneration', function () {
           '.33333333344444444.\n' +
           '...................\n'
       );
+
+      const contours = gdjs.NavMeshGenerator.buildContours(grid);
+      console.log(
+        contours
+          .map((contour) =>
+            contour
+              .map((point) => '(' + point.x + ' ' + point.y + ')')
+              .join(', ')
+          )
+          .join('\n')
+      );
+      const points = contours.map((contour) =>
+        contour.map((point) => [point.x, point.y])
+      );
+      expect(points[0]).to.eql([
+        [1, 11],
+        [5, 10],
+        [10, 5],
+        [11, 1],
+        [1, 1],
+      ]);
+
+      expect(points[1]).to.eql([
+        [10, 5],
+        [14, 10],
+        [18, 10],
+        [18, 1],
+        [11, 1],
+      ]);
+
+      expect(points[2]).to.eql([
+        [1, 11],
+        [1, 18],
+        [10, 18],
+        [10, 14],
+        [5, 10],
+      ]);
+
+      
+      expect(points[3]).to.eql([
+        [10, 14],
+        [10, 18],
+        [18, 18],
+        [18, 10],
+        [14, 10],
+      ]);
     });
   });
 });

@@ -8,18 +8,17 @@ const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const fs = require('fs').promises;
 const path = require('path');
 const shell = require('shelljs');
+const {
+  gdevelopWikiUrlRoot,
+  getHelpLink,
+  generateReadMoreLink,
+  improperlyFormattedHelpPaths,
+  getExtensionFolderName,
+} = require('./lib/WikiHelpLink');
 
 shell.exec('node import-GDJS-Runtime.js');
 
 const ignoredExtensionNames = ['BuiltinJoystick'];
-const renamedExtensionNames = {
-  AdMob: 'Admob',
-  BuiltinFile: 'Storage',
-  FileSystem: 'Filesystem',
-  TileMap: 'Tilemap',
-  BuiltinMouse: 'MouseTouch',
-};
-const gdevelopWikiUrlRoot = 'http://wiki.compilgames.net/doku.php/gdevelop5';
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const allFeaturesRootPath = path.join(outputRootPath, 'all-features');
@@ -28,7 +27,6 @@ const expressionsFilePath = path.join(
   allFeaturesRootPath,
   'expressions-reference.txt'
 );
-const improperlyFormattedHelpPaths = new Set();
 
 // Types definitions used in this script:
 
@@ -68,14 +66,6 @@ const improperlyFormattedHelpPaths = new Set();
  * @prop {Array<ObjectReference>} objectReferences Reference of all extension objects.
  * @prop {Array<BehaviorReference>} behaviorReferences Reference of all extension behaviors.
  */
-
-/** @param {string} str */
-const toKebabCase = str => {
-  return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2') // get all lowercase letters that are near to uppercase ones
-    .replace(/[\s_]+/g, '-') // replace all spaces and low dash
-    .toLowerCase(); // convert to lower case
-};
 
 const sanitizeExpressionDescription = str => {
   return (
@@ -144,47 +134,6 @@ const generateExtensionSeparatorText = () => {
   return {
     text: '\n---\n\n',
   };
-};
-
-/**
- * @param {string} path
- * @returns {string}
- */
-const getHelpLink = path => {
-  if (!path) return '';
-
-  /**
-   * @param {string} path
-   */
-  const isRelativePathToDocumentationRoot = path => {
-    return path.startsWith('/');
-  };
-
-  /**
-   * @param {string} path
-   */
-  const isDocumentationAbsoluteUrl = path => {
-    return path.startsWith('http://') || path.startsWith('https://');
-  };
-
-  if (isRelativePathToDocumentationRoot(path))
-    return `http://wiki.compilgames.net/doku.php/gdevelop5${path}`;
-
-  if (isDocumentationAbsoluteUrl(path)) return path;
-
-  improperlyFormattedHelpPaths.add(path);
-  return '';
-};
-
-/**
- * @param {string} helpPagePath
- * @returns {string}
- */
-const generateReadMoreLink = helpPagePath => {
-  const url = getHelpLink(helpPagePath);
-  if (!url) return '';
-
-  return `[[${url}|Read more explanations about it.]]`;
 };
 
 /** @returns {RawText} */
@@ -284,17 +233,6 @@ const generateHeader = ({ headerName, depth }) => {
   return {
     text: `${markdownHeaderMark} ${headerName}\n`,
   };
-};
-
-/**
- * @param {any} extension
- * @returns {string}
- */
-const getExtensionFolderName = extension => {
-  const originalName = extension.getName();
-  return toKebabCase(
-    renamedExtensionNames[originalName] || originalName.replace(/^Builtin/, '')
-  );
 };
 
 /** @returns {ReferenceText} */
@@ -625,7 +563,7 @@ Remember that you can also [[gdevelop5:extensions|search for new features in the
       })
       .flatMap(extensionReferences => {
         const folderName = getExtensionFolderName(
-          extensionReferences.extension
+          extensionReferences.extension.getName()
         );
         const helpPagePath = extensionReferences.extension.getHelpPath();
         const referencePageUrl = `${gdevelopWikiUrlRoot}/all-features/${folderName}/reference`;
@@ -675,7 +613,9 @@ const generateExtensionRawTexts = extensionReferences => {
       };
 
       return {
-        folderName: getExtensionFolderName(extensionReference.extension),
+        folderName: getExtensionFolderName(
+          extensionReference.extension.getName()
+        ),
         texts: [
           generateExtensionHeaderText({ extension, depth: 1 }),
           ...withHeaderIfNotEmpty(freeActionsReferenceTexts, {

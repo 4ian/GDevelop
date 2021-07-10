@@ -19,6 +19,7 @@ export type ExtensionShortHeader = {|
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
+  helpPath: string,
   description: string,
   iconUrl: string,
 |};

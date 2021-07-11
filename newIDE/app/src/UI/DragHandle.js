@@ -4,9 +4,11 @@ import { SortableHandle } from 'react-sortable-hoc';
 
 const styles = {
   handle: {
+    display: 'flex',
     cursor: 'move',
   },
   disabledHandle: {
+    display: 'flex',
     opacity: 0.4,
   },
   handleColor: '#DDD',

@@ -321,7 +321,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                   (parameter: gdParameterMetadata, i: number) => (
                     <React.Fragment key={i}>
                       <MiniToolbar>
-                        <MiniToolbarText>
+                        <MiniToolbarText firstChild>
                           <Trans>Parameter #{i + parametersIndexOffset}:</Trans>
                         </MiniToolbarText>
                         <Column expand noMargin>

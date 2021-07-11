@@ -382,7 +382,7 @@ storiesOf('UI Building Blocks/Buttons', module)
       </Line>
       <Line>
         <MiniToolbar>
-          <MiniToolbarText>Some text:</MiniToolbarText>
+          <MiniToolbarText firstChild>Some text:</MiniToolbarText>
           <IconButton>
             <Brush />
           </IconButton>
@@ -541,7 +541,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
     return (
       <React.Fragment>
         <MiniToolbar>
-          <MiniToolbarText>Please enter something:</MiniToolbarText>
+          <MiniToolbarText firstChild>Please enter something:</MiniToolbarText>
           <SemiControlledTextField
             margin="none"
             value={value}
@@ -728,7 +728,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       render={(value, onChange) => (
         <React.Fragment>
           <MiniToolbar>
-            <MiniToolbarText>Please make a choice:</MiniToolbarText>
+            <MiniToolbarText firstChild>Please make a choice:</MiniToolbarText>
             <SemiControlledAutoComplete
               margin="none"
               value={value}

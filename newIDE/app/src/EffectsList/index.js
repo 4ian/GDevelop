@@ -151,7 +151,7 @@ export default function EffectsList(props: Props) {
               return (
                 <React.Fragment key={i}>
                   <MiniToolbar>
-                    <MiniToolbarText>
+                    <MiniToolbarText firstChild>
                       <Trans>Effect name:</Trans>
                     </MiniToolbarText>
                     <SemiControlledTextField

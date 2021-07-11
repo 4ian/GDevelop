@@ -164,7 +164,7 @@ const EventTextDialog = (props: Props) => {
     >
       <Column noMargin>
         <MiniToolbar>
-          <MiniToolbarText>
+          <MiniToolbarText firstChild>
             <Trans>Background color:</Trans>
           </MiniToolbarText>
           <ColorPicker

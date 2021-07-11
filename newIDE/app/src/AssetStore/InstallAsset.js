@@ -5,7 +5,6 @@ import {
   getAsset,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { isNullPtr } from '../Utils/IsNullPtr';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';

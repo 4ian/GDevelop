@@ -11,9 +11,7 @@ import { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
-import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
-import { isNullPtr } from '../Utils/IsNullPtr';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -30,6 +28,7 @@ import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
+import { IconContainer } from '../UI/IconContainer';
 
 const gd: libGDevelop = global.gd;
 
@@ -142,7 +141,7 @@ const BehaviorsEditor = (props: Props) => {
                     </IconButton>,
                   ]}
                 >
-                  <MiniToolbarText>
+                  <MiniToolbarText firstChild>
                     <Trans>Unknown behavior</Trans>{' '}
                   </MiniToolbarText>
                   <Column noMargin expand>
@@ -170,6 +169,7 @@ const BehaviorsEditor = (props: Props) => {
           const enabledTutorialHints = tutorialHints.filter(
             hint => !values.hiddenTutorialHints[hint.identifier]
           );
+          const iconUrl = behaviorMetadata.getIconFilename();
 
           return (
             <Accordion key={behaviorName} defaultExpanded>
@@ -188,11 +188,18 @@ const BehaviorsEditor = (props: Props) => {
                   <HelpIcon
                     key="help"
                     size="small"
-                    helpPagePath={getBehaviorHelpPagePath(behavior)}
+                    helpPagePath={behaviorMetadata.getHelpPath()}
                   />,
                 ]}
               >
-                <MiniToolbarText>
+                {iconUrl ? (
+                  <IconContainer
+                    src={iconUrl}
+                    alt={behaviorMetadata.getFullName()}
+                    size={20}
+                  />
+                ) : null}
+                <MiniToolbarText firstChild={!iconUrl}>
                   <Trans>Behavior</Trans>{' '}
                 </MiniToolbarText>
                 <Column noMargin expand>

@@ -168,9 +168,6 @@ interface JsPlatform {
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
 
-    Behavior GetBehavior([Const] DOMString type);
-    BehaviorsSharedData GetBehaviorSharedDatas([Const] DOMString type);
-
     [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
 
@@ -366,9 +363,6 @@ interface Project {
 
     [Ref] PlatformSpecificAssets GetPlatformSpecificAssets();
     [Ref] LoadingScreen GetLoadingScreen();
-
-    //createObject
-    //createEvent
 
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);
@@ -1936,6 +1930,9 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetObjectStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
+
+    boolean STATIC_IsBadExpressionMetadata([Const, Ref] ExpressionMetadata metadata);
+    boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
 };
 
 interface ExpressionParserDiagnostic {

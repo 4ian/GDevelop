@@ -20,6 +20,10 @@ type Props = {|
   size: number,
 |};
 
+/**
+ * Display the specified icon with a background so that it's suitable
+ * for display anywhere with a consistent style.
+ */
 export const IconContainer = ({ src, alt, size }: Props) => {
   const padding = size > 24 ? 4 : 2;
   return (

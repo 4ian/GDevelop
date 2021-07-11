@@ -390,37 +390,6 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& name,
                                            const gd::String& platformName = "");
 
-  /**
-   * Get the behavior of the given type.
-   *
-   * \note A project can use more than one platform. In this case, the first
-   * platform supporting the behavior is used, unless \a platformName argument
-   * is not empty.
-   * It is assumed that each platform provides an equivalent
-   * behavior.
-   *
-   * \param type The type of the behavior
-   * \param platformName The name of the platform to be used. If empty, the
-   * first platform supporting the object is used.
-   */
-  gd::Behavior* GetBehavior(const gd::String& type,
-                            const gd::String& platformName = "");
-
-  /**
-   * Get the behavior shared data of the given type.
-   *
-   * \note A project can use more than one platform. In this case, the first
-   * platform supporting the behavior shared data is used, unless \a
-   * platformName argument is not empty.
-   * It is assumed that each platform provides equivalent behavior shared data.
-   *
-   * \param type The type of behavior
-   * \param platformName The name of the platform to be used. If empty, the
-   * first platform supporting the object is used.
-   */
-  gd::BehaviorsSharedData* GetBehaviorSharedDatas(
-      const gd::String& type, const gd::String& platformName = "");
-
 #if defined(GD_IDE_ONLY)
   /**
    * Create an event of the given type.

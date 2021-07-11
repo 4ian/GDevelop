@@ -245,13 +245,17 @@ class GD_CORE_API MetadataProvider {
     return &metadata == &badExpressionMetadata;
   }
 
+  static bool IsBadBehaviorMetadata(const gd::BehaviorMetadata& metadata) {
+    return &metadata == &badBehaviorMetadata;
+  }
+
   virtual ~MetadataProvider();
 
  private:
   MetadataProvider();
 
   static PlatformExtension badExtension;
-  static BehaviorMetadata badBehaviorInfo;
+  static BehaviorMetadata badBehaviorMetadata;
   static ObjectMetadata badObjectInfo;
   static EffectMetadata badEffectMetadata;
   static gd::InstructionMetadata badInstructionMetadata;

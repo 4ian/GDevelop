@@ -74,7 +74,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "highly recommended."))
       .AddParameter("string", _("Request body content"))
       .AddParameter("stringWithSelector",
-                    _("Resize mode"),
+                    _("Request method"),
                     "[\"GET\", \"POST\", \"PUT\", \"HEAD\", \"DELETE\", "
                     "\"PATCH\", \"OPTIONS\"]",
                     false)

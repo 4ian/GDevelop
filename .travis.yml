@@ -1,7 +1,6 @@
 language: cpp
 sudo: false
 compiler:
-  - gcc
   - clang
 
 # Cache .npm folder for faster npm install

@@ -52,6 +52,7 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { IconContainer } from '../UI/IconContainer';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -128,6 +129,7 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
 type ItemProps = {|
   primaryText: string,
   editingName: boolean,
+  leftIcon?: ?React.Node,
   onEdit: () => void,
   onDelete: () => void,
   addLabel: string,
@@ -189,6 +191,7 @@ class Item extends React.Component<ItemProps, {||}> {
                   ...this.props.style,
                 }}
                 primaryText={label}
+                leftIcon={this.props.leftIcon}
                 displayMenuButton
                 buildMenuTemplate={(i18n: I18nType) => [
                   {
@@ -1037,9 +1040,19 @@ export default class ProjectManager extends React.Component<Props, State> {
               )
                 .map((eventsFunctionsExtension, i) => {
                   const name = eventsFunctionsExtension.getName();
+                  const iconUrl = eventsFunctionsExtension.getIconUrl();
                   return (
                     <Item
                       key={i}
+                      leftIcon={
+                        iconUrl ? (
+                          <IconContainer
+                            size={24}
+                            alt={eventsFunctionsExtension.getFullName()}
+                            src={iconUrl}
+                          />
+                        ) : null
+                      }
                       primaryText={name}
                       editingName={
                         renamedItemKind === 'events-functions-extension' &&

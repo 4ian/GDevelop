@@ -109,33 +109,6 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   return nullptr;
 }
 
-gd::Behavior* Project::GetBehavior(const gd::String& type,
-                                   const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
-
-    gd::Behavior* behavior = platforms[i]->GetBehavior(type);
-    if (behavior) return behavior;
-  }
-
-  return nullptr;
-}
-
-gd::BehaviorsSharedData* Project::GetBehaviorSharedDatas(
-    const gd::String& type, const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
-
-    gd::BehaviorsSharedData* behaviorSharedData =
-        platforms[i]->GetBehaviorSharedDatas(type);
-    if (behaviorSharedData) return behaviorSharedData;
-  }
-
-  return nullptr;
-}
-
 #if defined(GD_IDE_ONLY)
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
     const gd::String& type, const gd::String& platformName) {

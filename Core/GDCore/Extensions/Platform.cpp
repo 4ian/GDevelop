@@ -100,26 +100,6 @@ std::unique_ptr<gd::Object> Platform::CreateObject(
   return std::unique_ptr<gd::Object>(std::move(object));
 }
 
-gd::Behavior* Platform::GetBehavior(const gd::String& behaviorType) const {
-  for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
-    gd::Behavior* behavior = extensionsLoaded[i]->GetBehavior(behaviorType);
-    if (behavior) return behavior;
-  }
-
-  return nullptr;
-}
-
-gd::BehaviorsSharedData* Platform::GetBehaviorSharedDatas(
-    const gd::String& behaviorType) const {
-  for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
-    gd::BehaviorsSharedData* behaviorSharedData =
-        extensionsLoaded[i]->GetBehaviorSharedDatas(behaviorType);
-    if (behaviorSharedData) return behaviorSharedData;
-  }
-
-  return nullptr;
-}
-
 #if defined(GD_IDE_ONLY)
 std::shared_ptr<gd::BaseEvent> Platform::CreateEvent(
     const gd::String& eventType) const {

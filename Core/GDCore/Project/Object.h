@@ -200,12 +200,12 @@ class GD_CORE_API Object {
   std::vector<gd::String> GetAllBehaviorNames() const;
 
   /**
-   * \brief Return a reference to the behavior called \a name.
+   * \brief Return a reference to the content of the behavior called \a name.
    */
   BehaviorContent& GetBehavior(const gd::String& name);
 
   /**
-   * \brief Return a reference to the behavior called \a name.
+   * \brief Return a reference to the content of the behavior called \a name.
    */
   const BehaviorContent& GetBehavior(const gd::String& name) const;
 

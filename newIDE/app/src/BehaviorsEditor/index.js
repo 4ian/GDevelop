@@ -121,8 +121,12 @@ const BehaviorsEditor = (props: Props) => {
         {allBehaviorNames.map((behaviorName, index) => {
           const behaviorContent = object.getBehavior(behaviorName);
           const behaviorTypeName = behaviorContent.getTypeName();
-          const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
-          if (isNullPtr(gd, behavior)) {
+
+          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            gd.JsPlatform.get(),
+            behaviorTypeName
+          );
+          if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
             return (
               <Accordion key={behaviorName} defaultExpanded>
                 <AccordionHeader
@@ -158,6 +162,7 @@ const BehaviorsEditor = (props: Props) => {
             );
           }
 
+          const behavior = behaviorMetadata.get();
           const BehaviorComponent = BehaviorsEditorService.getEditor(
             behaviorTypeName
           );

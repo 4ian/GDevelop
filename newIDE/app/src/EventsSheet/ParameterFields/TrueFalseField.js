@@ -10,6 +10,8 @@ import {
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import { MarkdownText } from '../../UI/MarkdownText';
 
 const styles = {
   button: {
@@ -35,31 +37,41 @@ export default class TrueFalseField extends Component<
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+    const longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
+      : null;
     const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
 
     return (
-      <Line>
-        <Text style={styles.description} displayInlineAsSpan>
-          {description}
-        </Text>
-        <Column noMargin>
-          <RaisedButton
-            style={styles.button}
-            label={<Trans>True</Trans>}
-            primary={effectiveValue === 'True'}
-            onClick={() => this.props.onChange('True')}
-            ref={this._trueButton}
-          />
-        </Column>
-        <Column noMargin>
-          <RaisedButton
-            style={styles.button}
-            label={<Trans>False</Trans>}
-            primary={effectiveValue !== 'True'}
-            onClick={() => this.props.onChange('False')}
-          />
-        </Column>
-      </Line>
+      <Column noMargin>
+        <Line>
+          <Text style={styles.description} displayInlineAsSpan>
+            {description}
+          </Text>
+          <Column noMargin>
+            <RaisedButton
+              style={styles.button}
+              label={<Trans>True</Trans>}
+              primary={effectiveValue === 'True'}
+              onClick={() => this.props.onChange('True')}
+              ref={this._trueButton}
+            />
+          </Column>
+          <Column noMargin>
+            <RaisedButton
+              style={styles.button}
+              label={<Trans>False</Trans>}
+              primary={effectiveValue !== 'True'}
+              onClick={() => this.props.onChange('False')}
+            />
+          </Column>
+        </Line>
+        {longDescription ? (
+          <FormHelperText variant="filled" margin="dense">
+            <MarkdownText source={longDescription} />
+          </FormHelperText>
+        ) : null}
+      </Column>
     );
   }
 }

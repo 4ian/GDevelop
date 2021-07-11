@@ -10,6 +10,8 @@ import {
 } from './ParameterFieldCommons';
 import { focusButton } from '../../UI/Button';
 import Text from '../../UI/Text';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import { MarkdownText } from '../../UI/MarkdownText';
 
 const styles = {
   button: {
@@ -31,32 +33,42 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
     const { parameterMetadata, value } = this.props;
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
-      : undefined;
+      : null;
+    const longDescription = parameterMetadata
+      ? parameterMetadata.getLongDescription()
+      : null;
     const effectiveValue = getParameterValueOrDefault(value, parameterMetadata);
 
     return (
-      <Line>
-        <Text style={styles.description} displayInlineAsSpan>
-          {description}
-        </Text>
-        <Column noMargin>
-          <RaisedButton
-            style={styles.button}
-            label={<Trans>Yes</Trans>}
-            primary={effectiveValue === 'yes'}
-            onClick={() => this.props.onChange('yes')}
-            ref={this._yesButton}
-          />
-        </Column>
-        <Column noMargin>
-          <RaisedButton
-            style={styles.button}
-            label={<Trans>No</Trans>}
-            primary={effectiveValue !== 'yes'}
-            onClick={() => this.props.onChange('no')}
-          />
-        </Column>
-      </Line>
+      <Column noMargin>
+        <Line>
+          <Text style={styles.description} displayInlineAsSpan>
+            {description}
+          </Text>
+          <Column noMargin>
+            <RaisedButton
+              style={styles.button}
+              label={<Trans>Yes</Trans>}
+              primary={effectiveValue === 'yes'}
+              onClick={() => this.props.onChange('yes')}
+              ref={this._yesButton}
+            />
+          </Column>
+          <Column noMargin>
+            <RaisedButton
+              style={styles.button}
+              label={<Trans>No</Trans>}
+              primary={effectiveValue !== 'yes'}
+              onClick={() => this.props.onChange('no')}
+            />
+          </Column>
+        </Line>
+        {longDescription ? (
+          <FormHelperText variant="filled" margin="dense">
+            <MarkdownText source={longDescription} />
+          </FormHelperText>
+        ) : null}
+      </Column>
     );
   }
 }

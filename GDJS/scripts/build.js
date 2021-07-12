@@ -4,8 +4,10 @@ const shell = require('shelljs');
 const {
   getAllInOutFilePaths,
   isUntransformedFile,
-  getOutRootPath,
 } = require('./lib/runtime-files-list');
+const args = require('minimist')(process.argv.slice(2), {
+  string: ['out'],
+});
 const fs = require('fs').promises;
 
 /** @param {string} outPath */
@@ -13,7 +15,15 @@ const renameBuiltFile = (outPath) => {
   return outPath.replace(/\.ts$/, '.js');
 };
 
-shell.mkdir('-p', getOutRootPath());
+const bundledOutPath = args.out;
+if (!bundledOutPath) {
+  shell.echo(
+    `❌ --out (path where to build GDJS Runtime and Extensions) is required.`
+  );
+  shell.exit(1);
+}
+
+shell.mkdir('-p', bundledOutPath);
 
 (async () => {
   const esbuildService = await esbuild.startService();
@@ -22,7 +32,7 @@ shell.mkdir('-p', getOutRootPath());
   const {
     allGDJSInOutFilePaths,
     allExtensionsInOutFilePaths,
-  } = await getAllInOutFilePaths();
+  } = await getAllInOutFilePaths({ bundledOutPath });
 
   // Build (or copy) all the files
   let errored = false;

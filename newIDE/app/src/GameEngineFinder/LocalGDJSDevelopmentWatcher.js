@@ -13,7 +13,7 @@ const chokidar = optionalRequire('chokidar');
  * Returns the folder corresponding to newIDE/app in **development**. Works
  * only when running in Electron.
  */
-const findDevelopmentNewIdeAppPath = () /*: string */ => {
+const findDevelopmentNewIdeAppPath = (): string => {
   if (!electron) return '';
 
   const developmentElectronAppFolder = process.cwd();
@@ -22,6 +22,8 @@ const findDevelopmentNewIdeAppPath = () /*: string */ => {
 
 /**
  * Launch the newIDE script `import-GDJS-Runtime`.
+ * Cleaning the GDJS output folder and copying sources are both
+ * skipped to speed up the build.
  */
 const importGDJSRuntime = (): Promise<void> => {
   if (!child_process || !path) return Promise.reject(new Error('Unsupported'));
@@ -32,7 +34,7 @@ const importGDJSRuntime = (): Promise<void> => {
       `node "${path.join(
         findDevelopmentNewIdeAppPath(),
         'scripts/import-GDJS-Runtime.js'
-      )}"`,
+      )}" --skip-clean --skip-sources`,
       (error, stdout, stderr) => {
         if (error) {
           console.error(`GDJS Runtime update error:\n${error}`);
@@ -94,20 +96,22 @@ export const LocalGDJSDevelopmentWatcher = () => {
         return;
       }
 
-      const gdjsSourcesRuntimePath = path.join(
-        findDevelopmentNewIdeAppPath(),
-        '../../GDJS/Runtime/**/*'
-      );
-      const extensionsSourcesPath = path.join(
-        findDevelopmentNewIdeAppPath(),
-        '../../Extensions/**/*'
+      const relativeWatchPaths = [
+        // Watch all files in GDJS Runtime:
+        '../../GDJS/Runtime/**/*',
+        // Watch only JS/TS source files in extensions:
+        '../../Extensions/**/*.ts',
+        '../../Extensions/**/*.js',
+      ];
+      const watchPaths = relativeWatchPaths.map(watchPath =>
+        path.join(findDevelopmentNewIdeAppPath(), watchPath)
       );
 
       // Reload extensions when the component is first mounted
       importGDJSRuntime().catch(() => {});
 
       const watcher = chokidar
-        .watch([gdjsSourcesRuntimePath, extensionsSourcesPath], {
+        .watch(watchPaths, {
           awaitWriteFinish: true,
           ignoreInitial: true,
         })

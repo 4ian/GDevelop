@@ -208,7 +208,6 @@ namespace gdjs {
        */
       const globalVerts = new Array<Point>(sourceVertCount);
       globalVerts.length = 0;
-      let globalVertCount = 0;
 
       /*
        * Holds polygon indices.
@@ -244,7 +243,6 @@ namespace gdjs {
        * current iteration.)
        */
       const contourToGlobalIndicesMap = new Array<integer>(maxVertsPerContour);
-      contourToGlobalIndicesMap.length = 0;
 
       /*
        * Key = Hash representing a unique vertex location.
@@ -269,7 +267,6 @@ namespace gdjs {
       // (Values are meaningless outside of the iteration.)
       const workingPolys = new Array<integer[]>(maxVertsPerContour + 1);
       workingPolys.length = 0;
-      let workingPolyCount = 0;
       const mergeInfo: PolyMergeResult = {
         lengthSq: -1,
         indexA: -1,
@@ -279,8 +276,9 @@ namespace gdjs {
       mergedPoly.length = 0;
 
       // Process all contours.
-
-      for (const contour of contours) {
+      //const contour = contours[0];
+      for (const contour of contours)
+      {
         if (contour.length < 3) {
           // This indicates a problem with contour creation
           // since the contour builder should detect for this.
@@ -288,7 +286,7 @@ namespace gdjs {
             'Polygon generation failure: Contour has ' +
               'too few vertices. Bad input data.'
           );
-          continue;
+          //continue;
         }
 
         // Create working indices for the contour vertices.
@@ -316,7 +314,7 @@ namespace gdjs {
           console.error(
             'Polygon generation failure: Could not triangulate contour.'
           );
-          continue;
+          //continue;
         }
 
         /*
@@ -329,16 +327,19 @@ namespace gdjs {
           iContourVert < contour.length;
           iContourVert++
         ) {
-          const pContourVert = iContourVert;
-          const vertHash = NavMeshGenerator.getHashCode(contour[pContourVert]);
+          const contourVert = contour[iContourVert];
+          const vertHash = NavMeshGenerator.getHashCode(contourVert);
           let iGlobalVert = vertIndices.get(vertHash);
           if (iGlobalVert == null) {
             // This is the first time this vertex has been seen.
             // Assign it an index and add it to the vertex array.
-            iGlobalVert = globalVertCount;
-            globalVertCount++;
+            iGlobalVert = globalVerts.length;
             vertIndices.set(vertHash, iGlobalVert);
-            globalVerts[iGlobalVert] = contour[pContourVert];
+            globalVerts.push(contourVert);
+            console.log("new: " + contourVert.x + " " + contourVert.y);
+          }
+          else {
+            console.log("exist: " + contourVert.x + " " + contourVert.y);
           }
           // Creat the map entry.  Contour vertex index -> global
           // vertex index.
@@ -350,7 +351,6 @@ namespace gdjs {
 
         // Load the triangles into to the working polygon array, updating
         // indices in the process.
-        workingPolyCount = 0;
         for (let i = 0; i < triangleCount; i++) {
           /*
            * The working triangles list contains vertex index data
@@ -360,11 +360,10 @@ namespace gdjs {
            */
           const workingPoly = new Array<integer>(mMaxVertsPerPoly);
           workingPoly.length = 0;
-          workingPoly.push(workingTriangles[i * 3]);
-          workingPoly.push(workingTriangles[i * 3 + 1]);
-          workingPoly.push(workingTriangles[i * 3 + 2]);
+          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3]]);
+          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3 + 1]]);
+          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3 + 2]]);
           workingPolys.push(workingPoly);
-          workingPolyCount++;
         }
 
         if (mMaxVertsPerPoly > 3) {
@@ -380,10 +379,10 @@ namespace gdjs {
 
             // Loop through all but the last polygon looking for the
             // best polygons to merge in this iteration.
-            for (let iPolyA = 0; iPolyA < workingPolyCount - 1; iPolyA++) {
+            for (let iPolyA = 0; iPolyA < workingPolys.length - 1; iPolyA++) {
               for (
                 let iPolyB = iPolyA + 1;
-                iPolyB < workingPolyCount;
+                iPolyB < workingPolys.length;
                 iPolyB++
               ) {
                 // Can polyB merge with polyA?
@@ -395,18 +394,20 @@ namespace gdjs {
                   mMaxVertsPerPoly,
                   mergeInfo
                 );
-                if (mergeInfo[0] > longestMergeEdge) {
+                if (mergeInfo.lengthSq > longestMergeEdge) {
                   // polyB has the longest shared edge with
                   // polyA found so far. Save the merge
                   // information.
-                  longestMergeEdge = mergeInfo[0];
+                  longestMergeEdge = mergeInfo.lengthSq;
                   pBestPolyA = iPolyA;
-                  iPolyAVert = mergeInfo[1];
+                  iPolyAVert = mergeInfo.indexA;
                   pBestPolyB = iPolyB;
-                  iPolyBVert = mergeInfo[2];
+                  iPolyBVert = mergeInfo.indexB;
                 }
               }
             }
+
+            console.log("longestMergeEdge: " + longestMergeEdge);
 
             if (longestMergeEdge <= 0)
               // No valid merges found during this iteration.
@@ -443,13 +444,14 @@ namespace gdjs {
               mergedPoly[position++] =
                 workingPolys[pBestPolyB][(iPolyBVert + 1 + i) % vertCountB];
 
+console.log("mergedPoly.length: " + mergedPoly.length);
+
             // Copy the merged polygon over the top of polygon A.
             workingPolys[pBestPolyA].length = 0;
             Array.prototype.push.apply(workingPolys[pBestPolyA], mergedPoly);
             // Remove polygon B by shifting all information to the
             // left by one polygon,  starting at polygon B.
             workingPolys.splice(pBestPolyB, 1);
-            workingPolyCount--;
           }
         }
 
@@ -467,7 +469,7 @@ namespace gdjs {
        */
 
       // Transfer vertex data.
-      const resultVerts = new Array<Point>(globalVertCount);
+      const resultVerts = new Array<Point>(globalVerts.length);
       resultVerts.length = 0;
       Array.prototype.push.apply(resultVerts, globalVerts);
 
@@ -1361,7 +1363,6 @@ namespace gdjs {
       startDirection: number,
       outContourVerts: ContourPoint[]
     ) {
-      console.log('buildRawContours x:' + startCell.x + ' y: ' + startCell.y);
       let cell = startCell;
       let direction = startDirection;
 
@@ -1887,6 +1888,7 @@ namespace gdjs {
           // used to fill after outline
           let upperX = Math.round(lineEnd[0]);
           let upperY = Math.round(lineEnd[1]);
+          let lowerX = Math.round(lineEnd[0]);
           let lowerY = Math.round(lineEnd[1]);
 
           // outline the polygon
@@ -1909,24 +1911,31 @@ namespace gdjs {
               (x: integer, y: integer) => grid.get(x, y).setObstacle()
             );
             if (lineEndY < upperY) {
-              upperX = lineEndX;
               upperY = lineEndY;
             }
             if (lineEndY > lowerY) {
               lowerY = lineEndY;
             }
+            if (lineEndX > upperX) {
+              upperX = lineEndX;
+            }
+            if (lineEndX < lowerX) {
+              lowerX = lineEndX;
+            }
           }
           // fill the polygon
+          //TODO this is broken, triangulate the polygon
+          const middleX = Math.floor((lowerX + upperX) / 2);
           for (let y = upperY + 1; y < lowerY; y++) {
-            const cell = grid.get(upperX, y);
+            const cell = grid.get(middleX, y);
             if (cell.isObstacle) continue;
             cell.setObstacle();
-            for (let x = upperX - 1; !grid.get(x, y).isObstacle; x--) {
+            for (let x = middleX - 1; !grid.get(x, y).isObstacle; x--) {
               
                 console.log(x + " " + y);
                 grid.get(x, y).setObstacle();
             }
-            for (let x = upperX + 1; !grid.get(x, y).isObstacle; x++) {
+            for (let x = middleX + 1; !grid.get(x, y).isObstacle; x++) {
               
                 console.log(x + " " + y);
                 grid.get(x, y).setObstacle();

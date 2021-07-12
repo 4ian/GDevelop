@@ -6,7 +6,6 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 //import {NavMesh} from "./navmesh";
 
 namespace gdjs {
-  
   /**
    * NavMeshPathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
@@ -56,7 +55,9 @@ namespace gdjs {
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
-      this._manager = gdjs.NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      this._manager = gdjs.NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -289,23 +290,20 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
-      console.log("moveTo");
+      console.log('moveTo');
 
+      // // The mesh is represented as an array where each element contains the points for an individual
+      // // polygon within the mesh.
+      // const meshPolygonPoints = [
+      //   [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }], // Polygon 1
+      //   [{ x: 10, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 10 }, { x: 10, y: 10 }], // Polygon 2
+      //   [{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 20 }, { x: 10, y: 20 }] // Polygon 3
+      // ];
+      // const navMesh = new gdjs.NavMesh(meshPolygonPoints);
 
-
-// // The mesh is represented as an array where each element contains the points for an individual
-// // polygon within the mesh.
-// const meshPolygonPoints = [
-//   [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }], // Polygon 1
-//   [{ x: 10, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 10 }, { x: 10, y: 10 }], // Polygon 2
-//   [{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 20 }, { x: 10, y: 20 }] // Polygon 3
-// ];
-// const navMesh = new gdjs.NavMesh(meshPolygonPoints);
-
-// // Find a path from the top left of room 1 to the bottom left of room 3
-// const path = navMesh.findPath({ x: 0, y: 0 }, { x: 10, y: 20 });
-// // ⮡  [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 10, y: 20 }]
-
+      // // Find a path from the top left of room 1 to the bottom left of room 3
+      // const path = navMesh.findPath({ x: 0, y: 0 }, { x: 10, y: 20 });
+      // // ⮡  [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 10, y: 20 }]
 
       // this._manager._obstacles.forEach(obstacle => {
       //   for (const hitBox of obstacle.owner.getHitBoxes()) {
@@ -315,28 +313,86 @@ namespace gdjs {
       //   }
       // });
 
-// TODO generate the polygons for the NavMesh
-
-      const meshPolygonPoints: PolyPoints[] = [];
-      console.log("meshPolygonPoints.length: " + meshPolygonPoints.length);
-      const navMesh = new gdjs.NavMesh(meshPolygonPoints);
+      // TODO generate the polygons for the NavMesh
+      const cellSize = 10;
+      const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
+      console.log("grid: " + grid.dimX() + " " + grid.dimY());
+      const objects = Array.from(this._manager._obstacles).map(obstacle => obstacle.owner);
+      gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
+    console.log('\n' + grid.cells
+    .map((cellRow) =>
+      cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
+    )
+    .join('\n') + '\n');
+      gdjs.NavMeshGenerator.generateDistanceField(grid);
+      gdjs.NavMeshGenerator.generateRegions(grid);
+      const contours = gdjs.NavMeshGenerator.buildContours(grid);
+      //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
+      const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 8);
+      const polygons = polyMeshField.polys.map(polygon => polygon.map(index => ({x: cellSize * polyMeshField.verts[index].x + grid.originX, y: cellSize * polyMeshField.verts[index].y + grid.originY})));
+      this.meshPolygons = polygons;
+      console.log('polygons.length: ' + polygons.length);
+      console.log(
+        polygons
+          .map((polygon) =>
+          polygon
+              .map((point) => '(' + point.x + ' ' + point.y + ')')
+              .join(', ')
+          )
+          .join('\n')
+      );
+      const navMesh = new gdjs.NavMesh(polygons);
 
       // Find a path from the top left of room 1 to the bottom left of room 3
-      const path = navMesh.findPath({ x: this.owner.getX(), y: this.owner.getY() }, { x: x, y: y });
+      const path = navMesh.findPath(
+        { x: this.owner.getX(), y: this.owner.getY() },
+        { x: x, y: y }
+      );
       // ⮡  [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 10, y: 20 }]
       console.log(path);
       if (path) {
         this._pathFound = true;
-        this._path = path.map(({x, y}) => [x, y]);
+        this._path = path.map(({ x, y }) => [x, y]);
         this._enterSegment(0);
 
-        console.log("Path found");
+        console.log('Path found');
         return;
       }
 
-      console.log("No path found");
+      console.log('No path found');
       // No path found
       this._pathFound = false;
+    }
+
+    meshPolygons: Point[][] = [];
+
+    drawCells(runtimeScene: gdjs.RuntimeScene, shapePainter: gdjs.ShapePainterRuntimeObject) {
+      console.log(runtimeScene);
+      console.log(shapePainter);
+      shapePainter = runtimeScene.getObjects("Grid")[0] as gdjs.ShapePainterRuntimeObject;
+      console.log(shapePainter);
+      console.log("this.meshPolygons.length: " + this.meshPolygons.length);
+      
+      // for (const polygon of this.meshPolygons) {
+      //   shapePainter.beginFillPath(polygon[0].x, polygon[0].y);
+      //   for (let index = 1; index < polygon.length; index++) {
+      //     shapePainter.drawPathLineTo(polygon[index].x, polygon[index].y);
+      //   }
+      //   shapePainter.closePath();
+      //   shapePainter.endFillPath();
+      // }
+      // for (const polygon of this.meshPolygons) {
+      //   shapePainter.drawPathMoveTo(polygon[0].x, polygon[0].y);
+      //   for (let index = 1; index < polygon.length; index++) {
+      //     shapePainter.drawPathLineTo(polygon[index].x, polygon[index].y);
+      //   }
+      //   shapePainter.closePath();
+      // }
+      for (const polygon of this.meshPolygons) {
+        for (let index = 0; index < polygon.length; index++) {
+      shapePainter.drawLine(polygon[index].x, polygon[index].y, polygon[(index + 1) % polygon.length].x, polygon[(index + 1) % polygon.length].y, 1);
+        }
+      }
     }
 
     _enterSegment(segmentNumber: integer) {

@@ -173,7 +173,7 @@ module.exports = {
         'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
       );
 
-    pathfindingBehaviorDeclaration
+      pathfindingBehaviorDeclaration
       .addAction(
         'SetDestination',
         _('Move to a position'),
@@ -195,6 +195,28 @@ module.exports = {
       .addParameter('expression', _('Destination Y position'))
       .getCodeExtraInformation()
       .setFunctionName('moveTo');
+
+      pathfindingBehaviorDeclaration
+        .addAction(
+          'DrawCells',
+          _('Draw cells'),
+          _('Draw cells'),
+          _('Draw cells on _PARAM3_'),
+          'Movement on the path (NavMesh)',
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addParameter('object', _('Object'), '', false)
+        .addParameter(
+          'behavior',
+          _('Behavior'),
+          'NavMeshPathfindingBehavior',
+          false
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('object', _('Shape painter'), '', false)
+        .getCodeExtraInformation()
+        .setFunctionName('drawCells');
       
 
     pathfindingBehaviorDeclaration

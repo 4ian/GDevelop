@@ -133,9 +133,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .MarkAsSimple();
 
   obj.AddAction("TourneVersPos",
-                _("Rotate an object toward a position"),
-                _("Rotate an object towards a position."),
-                _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
+                "Rotate an object toward a position",
+                "Rotate an object towards a position.",
+                "Rotate _PARAM0_ towards _PARAM1_;_PARAM2_",
                 _("Direction"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")
@@ -249,7 +249,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("Sprite",
                    _("Current frame"),
-                   _("Compare the index of the current frame in the animation displayed by the specified object. The first frame in an animation starts at index 0."),
+                   _("Compare the index of the current frame in the animation "
+                     "displayed by the specified object. The first frame in an "
+                     "animation starts at index 0."),
                    _("the animation frame"),
                    _("Animations and images"),
                    "res/conditions/sprite24.png",
@@ -365,14 +367,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("color", _("Color to make transparent"));
 
-  obj.AddAction(
-         "ChangeColor",
-         _("Tint color"),
-         _("Change the tint of an object. The default color is white."),
-         _("Change tint of _PARAM0_ to _PARAM1_"),
-         _("Effects"),
-         "res/actions/color24.png",
-         "res/actions/color.png")
+  obj.AddAction("ChangeColor",
+                _("Tint color"),
+                _("Change the tint of an object. The default color is white."),
+                _("Change tint of _PARAM0_ to _PARAM1_"),
+                _("Effects"),
+                "res/actions/color24.png",
+                "res/actions/color.png")
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("color", _("Tint"));
@@ -436,15 +437,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("object", _("Object"), "Sprite");
 
   obj.AddAction("TourneVers",
-                _("Rotate an object toward another"),
-                _("Rotate an object towards another."),
-                _("Rotate _PARAM0_ towards _PARAM1_"),
+                "Rotate an object toward another",
+                "Rotate an object towards another.",
+                "Rotate _PARAM0_ towards _PARAM1_",
                 _("Direction"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")
 
-      .AddParameter("object", _("Object to be rotated"), "Sprite")
-      .AddParameter("objectPtr", _("Rotate toward this object"))
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("objectPtr", "Rotate toward this object")
       .AddCodeOnlyParameter("currentScene", "")
       .SetHidden();  // Deprecated
 

@@ -475,9 +475,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddCondition("Invisible",
-                   _("Invisibility of an object"),
-                   _("Check if an object is hidden."),
-                   _("_PARAM0_ is hidden"),
+                   "Invisibility of an object",
+                   "Check if an object is hidden.",
+                   "_PARAM0_ is hidden",
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
                    "res/conditions/visibilite.png")

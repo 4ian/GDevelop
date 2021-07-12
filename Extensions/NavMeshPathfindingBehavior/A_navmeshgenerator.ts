@@ -166,9 +166,39 @@ namespace gdjs {
     indexB: integer;
   };
 
-  export type PolyMeshField = { verts: Point[]; polys: integer[][] };
-
   export class NavMeshGenerator {
+
+    public static makeVerticesUniq(contours: Point[][]) {
+      /*
+       * Key = Hash representing a unique vertex location.
+       * Value = The index of the vertex in the global vertices array.
+       * When a new vertex is found, it is added to the vertices array and
+       * its global index stored in this hash table.  If a duplicate is
+       * found, the value from this table is used.
+       * There will always be duplicate vertices since different contours
+       * are connected by these duplicate vertices.
+       */
+      const uniqVertices = new Map<integer, Point>();
+      for (const contour of contours) {
+        for (let index = 0; index < contour.length; index++) {
+          const vertex = contour[index];
+
+          const vertexHash = NavMeshGenerator.getHashCode(vertex);
+          let uniqVertex = uniqVertices.get(vertexHash);
+          if (uniqVertex) {
+            contour[index] = uniqVertex;
+          }
+          else {
+            // This is the first time this vertex has been seen.
+            // Assign it an index and add it to the vertex array.
+            uniqVertices.set(vertexHash, vertex);
+          }
+          // Creat the map entry.  Contour vertex index -> global
+          // vertex index.
+        }
+      }
+    }
+
     /**
      * Builds a convex polygon mesh from the provided contour set.
      * <p>This build algorithm will fail and return null if the
@@ -180,7 +210,10 @@ namespace gdjs {
     public static buildMesh(
       contours: ContourPoint[][],
       mMaxVertsPerPoly: integer
-    ): PolyMeshField {
+    ): Point[][] {
+
+      NavMeshGenerator.makeVerticesUniq(contours);
+
       // Number of vertices found in the source.
       let sourceVertCount = 0;
 
@@ -201,15 +234,6 @@ namespace gdjs {
       }
 
       /*
-       * Holds the unique vertices found during triangulation.
-       * This array is sized to hold the maximum possible vertices.
-       * The actual number of vertices will be smaller due to duplication
-       * in the source contours.
-       */
-      const globalVerts = new Array<Point>(sourceVertCount);
-      globalVerts.length = 0;
-
-      /*
        * Holds polygon indices.
        *
        * The array is sized to hold the maximum possible polygons.
@@ -225,54 +249,27 @@ namespace gdjs {
        * (1, 3, 4, 8, NULL_INDEX, NULL_INDEX)
        * then (1, 3, 4, 8) defines the polygon.
        */
-      const globalPolys = new Array<integer[]>(maxPossiblePolygons);
+      const globalPolys = new Array<Point[]>(maxPossiblePolygons);
       globalPolys.length = 0;
 
-      /*
-       * Holds information that allows mapping of contour vertex indices to
-       * shared vertex indices.  (i.e. Index of vertex in contour.verts[]
-       * to index of vertex in within this operation.)
-       *
-       * index (key): The original vertex index of the contour.
-       * value in array: The vertex index in the shared vertex array.
-       *
-       * This is a working variable whose content is meaningless between
-       * iterations. It will contain cross-iteration trash.  But that is
-       * OK because of the way the array is used.  (I.e. Trash data left
-       * over from a previous iteration  will never be accessed in the
-       * current iteration.)
-       */
-      const contourToGlobalIndicesMap = new Array<integer>(maxVertsPerContour);
-
-      /*
-       * Key = Hash representing a unique vertex location.
-       * Value = The index of the vertex in the global vertices array.
-       * When a new vertex is found, it is added to the vertices array and
-       * its global index stored in this hash table.  If a duplicate is
-       * found, the value from this table is used.
-       * There will always be duplicate vertices since different contours
-       * are connected by these duplicate vertices.
-       */
-      const vertIndices = new Map<integer, integer>();
-
       // Each list is initialized to a size that will minimize resizing.
-      const workingIndices = new Array<integer>(maxVertsPerContour);
+      const workingIndices = new Array<Point>(maxVertsPerContour);
       workingIndices.length = 0;
       const workingIndiceFlags = new Array<boolean>(maxVertsPerContour);
       workingIndiceFlags.length = 0;
-      const workingTriangles = new Array<integer>(maxVertsPerContour);
+      const workingTriangles = new Array<Point>(maxVertsPerContour);
       workingTriangles.length = 0;
 
       // Various working variables.
       // (Values are meaningless outside of the iteration.)
-      const workingPolys = new Array<integer[]>(maxVertsPerContour + 1);
+      const workingPolys = new Array<Point[]>(maxVertsPerContour + 1);
       workingPolys.length = 0;
       const mergeInfo: PolyMergeResult = {
         lengthSq: -1,
         indexA: -1,
         indexB: -1,
       };
-      const mergedPoly = new Array<integer>(mMaxVertsPerPoly);
+      const mergedPoly = new Array<Point>(mMaxVertsPerPoly);
       mergedPoly.length = 0;
 
       // Process all contours.
@@ -291,13 +288,10 @@ namespace gdjs {
 
         // Create working indices for the contour vertices.
         workingIndices.length = 0;
-        for (let index = 0; index < contour.length; index++) {
-          workingIndices.push(index);
-        }
+        Array.prototype.push.apply(workingIndices, contour);
 
         // Triangulate the contour.
         const triangleCount = NavMeshGenerator.triangulate(
-          contour,
           workingIndices,
           workingIndiceFlags,
           workingTriangles
@@ -317,35 +311,6 @@ namespace gdjs {
           //continue;
         }
 
-        /*
-         * Loop through the vertices in this contour.
-         * For new vertices (not seen in previous contours) get a new
-         * index and add it to the global vertices array.
-         */
-        for (
-          let iContourVert = 0;
-          iContourVert < contour.length;
-          iContourVert++
-        ) {
-          const contourVert = contour[iContourVert];
-          const vertHash = NavMeshGenerator.getHashCode(contourVert);
-          let iGlobalVert = vertIndices.get(vertHash);
-          if (iGlobalVert == null) {
-            // This is the first time this vertex has been seen.
-            // Assign it an index and add it to the vertex array.
-            iGlobalVert = globalVerts.length;
-            vertIndices.set(vertHash, iGlobalVert);
-            globalVerts.push(contourVert);
-            console.log("new: " + contourVert.x + " " + contourVert.y);
-          }
-          else {
-            console.log("exist: " + contourVert.x + " " + contourVert.y);
-          }
-          // Creat the map entry.  Contour vertex index -> global
-          // vertex index.
-          contourToGlobalIndicesMap[iContourVert] = iGlobalVert;
-        }
-
         // Initialize the working polygon array.
         workingPolys.length = 0;
 
@@ -358,11 +323,11 @@ namespace gdjs {
            * global vertex index. So the indices mapping array created
            * above is used to do  the conversion.
            */
-          const workingPoly = new Array<integer>(mMaxVertsPerPoly);
+          const workingPoly = new Array<Point>(mMaxVertsPerPoly);
           workingPoly.length = 0;
-          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3]]);
-          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3 + 1]]);
-          workingPoly.push(contourToGlobalIndicesMap[workingTriangles[i * 3 + 2]]);
+          workingPoly.push(workingTriangles[i * 3]);
+          workingPoly.push(workingTriangles[i * 3 + 1]);
+          workingPoly.push(workingTriangles[i * 3 + 2]);
           workingPolys.push(workingPoly);
         }
 
@@ -390,7 +355,6 @@ namespace gdjs {
                   iPolyA,
                   iPolyB,
                   workingPolys,
-                  globalVerts,
                   mMaxVertsPerPoly,
                   mergeInfo
                 );
@@ -467,12 +431,6 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        * processing cost.  But this method has memory benefits since it is
        * not necessary to oversize the instance arrays.
        */
-
-      // Transfer vertex data.
-      const resultVerts = new Array<Point>(globalVerts.length);
-      resultVerts.length = 0;
-      Array.prototype.push.apply(resultVerts, globalVerts);
-
       /*
        * Transfer polygon indices data.
        *
@@ -484,17 +442,14 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        * array in blocks and initialize the instance polygon array's
        * adjacency information.
        */
-      const resultPolys = new Array<integer[]>(globalPolys.length);
+      const resultPolys = new Array<Point[]>(globalPolys.length);
       resultPolys.length = 0;
       Array.prototype.push.apply(resultPolys, globalPolys);
-
-      // Construct the result object.
-      const result: PolyMeshField = { verts: resultVerts, polys: resultPolys };
 
       // Build polygon adjacency information.
       //TODO buildAdjacencyData(result);
 
-      return result;
+      return resultPolys;
     }
 
     /**
@@ -549,8 +504,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
       // TODO get ride of the indexes and use Point references directly
       polyAPointer: integer,
       polyBPointer: integer,
-      polys: integer[][],
-      verts: Point[],
+      polys: Point[][],
       maxVertsPerPoly: integer,
       outResult: PolyMergeResult
     ): void {
@@ -606,13 +560,10 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        * wrapped convex polygons.
        */
 
-      let sharedVertMinus =
-        verts[
-          polys[polyAPointer][(outResult.indexA - 1 + vertCountA) % vertCountA]
-        ];
-      let sharedVert = verts[polys[polyAPointer][outResult.indexA]];
+      let sharedVertMinus = polys[polyAPointer][(outResult.indexA - 1 + vertCountA) % vertCountA];
+      let sharedVert = polys[polyAPointer][outResult.indexA];
       let sharedVertPlus =
-        verts[polys[polyBPointer][(outResult.indexB + 2) % vertCountB]];
+        polys[polyBPointer][(outResult.indexB + 2) % vertCountB];
       if (
         !NavMeshGenerator.isLeft(
           sharedVert.x,
@@ -631,13 +582,9 @@ console.log("mergedPoly.length: " + mergedPoly.length);
          */
         return;
 
-      sharedVertMinus =
-        verts[
-          polys[polyBPointer][(outResult.indexB - 1 + vertCountB) % vertCountB]
-        ];
-      sharedVert = verts[polys[polyBPointer][outResult.indexB]];
-      sharedVertPlus =
-        verts[polys[polyAPointer][(outResult.indexA + 2) % vertCountA]];
+      sharedVertMinus = polys[polyBPointer][(outResult.indexB - 1 + vertCountB) % vertCountB];
+      sharedVert = polys[polyBPointer][outResult.indexB];
+      sharedVertPlus = polys[polyAPointer][(outResult.indexA + 2) % vertCountA];
       if (
         !NavMeshGenerator.isLeft(
           sharedVert.x,
@@ -657,9 +604,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
         return;
 
       // Get the vertex indices that form the shared edge.
-      sharedVertMinus = verts[polys[polyAPointer][outResult.indexA]];
-      sharedVert =
-        verts[polys[polyAPointer][(outResult.indexA + 1) % vertCountA]];
+      sharedVertMinus = polys[polyAPointer][outResult.indexA];
+      sharedVert = polys[polyAPointer][(outResult.indexA + 1) % vertCountA];
 
       // Store the lengthSq of the shared edge.
       const deltaX = sharedVertMinus.x - sharedVert.x;
@@ -687,10 +633,9 @@ console.log("mergedPoly.length: " + mergedPoly.length);
      * failed, a negative number.
      */
     private static triangulate(
-      verts: Point[],
-      inoutIndices: Array<integer>,
-      inoutIndiceFlags: Array<boolean>,
-      outTriangles: Array<integer>
+      verts: Array<Point>,
+      vertexFlags: Array<boolean>,
+      outTriangles: Array<Point>
     ): integer {
       outTriangles.length = 0;
 
@@ -730,18 +675,17 @@ console.log("mergedPoly.length: " + mergedPoly.length);
 
       // Loop through all vertices, flagging all indices that represent
       // a center vertex of a valid new triangle.
-      for (let i = 0; i < inoutIndices.length; i++) {
-        const iPlus1 = (i + 1) % inoutIndices.length;
-        const iPlus2 = (i + 2) % inoutIndices.length;
+      for (let i = 0; i < verts.length; i++) {
+        const iPlus1 = (i + 1) % verts.length;
+        const iPlus2 = (i + 2) % verts.length;
         // A triangle formed by i, iPlus1, and iPlus2 will result
         // in a valid internal triangle.
         // Flag the center vertex (iPlus1) to indicate a valid triangle
         // location.
-        inoutIndiceFlags[iPlus1] = NavMeshGenerator.isValidPartition(
+        vertexFlags[iPlus1] = NavMeshGenerator.isValidPartition(
           i,
           iPlus2,
-          verts,
-          inoutIndices
+          verts
         );
       }
 
@@ -758,7 +702,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        *   portion of the original polygon.
        * - All valid center vertices are flagged.
        */
-      while (inoutIndices.length > 3) {
+      while (verts.length > 3) {
         // Find the shortest new valid edge.
 
         // The minimum length found.
@@ -770,17 +714,17 @@ console.log("mergedPoly.length: " + mergedPoly.length);
         // this section. So be careful.
 
         // Loop through all indices in the remaining polygon.
-        for (let i = 0; i < inoutIndices.length; i++) {
-          if (inoutIndiceFlags[(i + 1) % inoutIndices.length]) {
+        for (let i = 0; i < verts.length; i++) {
+          if (vertexFlags[(i + 1) % verts.length]) {
             // Indices i, iPlus1, and iPlus2 are known to form a
             // valid triangle.
-            const vert = inoutIndices[i];
-            const vertPlus2 = inoutIndices[(i + 2) % inoutIndices.length];
+            const vert = verts[i];
+            const vertPlus2 = verts[(i + 2) % verts.length];
 
             // Determine the length of the partition edge.
             // (i -> iPlus2)
-            const deltaX = verts[vertPlus2].x - verts[vert].x;
-            const deltaZ = verts[vertPlus2].y - verts[vert].y;
+            const deltaX = vertPlus2.x - vert.x;
+            const deltaZ = vertPlus2.y - vert.y;
             const lengthSq = deltaX * deltaX + deltaZ * deltaZ;
 
             if (lengthSq < minLengthSq) {
@@ -803,12 +747,12 @@ console.log("mergedPoly.length: " + mergedPoly.length);
           return -outTriangles.length / 3;
 
         let i = iMinLengthSqVert;
-        let iPlus1 = (i + 1) % inoutIndices.length;
+        let iPlus1 = (i + 1) % verts.length;
 
         // Add the new triangle to the output.
-        outTriangles.push(inoutIndices[i]);
-        outTriangles.push(inoutIndices[iPlus1]);
-        outTriangles.push(inoutIndices[(i + 2) % inoutIndices.length]);
+        outTriangles.push(verts[i]);
+        outTriangles.push(verts[iPlus1]);
+        outTriangles.push(verts[(i + 2) % verts.length]);
 
         /*
          * iPlus1, the "center" vert in the new triangle, is now external
@@ -816,9 +760,9 @@ console.log("mergedPoly.length: " + mergedPoly.length);
          * the indices list since it cannot be a member of any new
          * triangles.
          */
-        inoutIndices.splice(iPlus1, 1);
+        verts.splice(iPlus1, 1);
 
-        if (iPlus1 == 0 || iPlus1 >= inoutIndices.length) {
+        if (iPlus1 == 0 || iPlus1 >= verts.length) {
           /*
            * The vertex removal has invalidated iPlus1 and/or i.  So
            * force a wrap, fixing the indices so they reference the
@@ -827,7 +771,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
            * Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
            * Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
            */
-          i = inoutIndices.length - 1;
+          i = verts.length - 1;
           iPlus1 = 0;
         }
 
@@ -837,25 +781,23 @@ console.log("mergedPoly.length: " + mergedPoly.length);
          * triangle.  We now need to re-check these indices to see if they
          * can now be the center index in a potential new partition.
          */
-        inoutIndiceFlags[i] = NavMeshGenerator.isValidPartition(
-          (i - 1 + inoutIndices.length) % inoutIndices.length,
+        vertexFlags[i] = NavMeshGenerator.isValidPartition(
+          (i - 1 + verts.length) % verts.length,
           iPlus1,
-          verts,
-          inoutIndices
+          verts
         );
-        inoutIndiceFlags[iPlus1] = NavMeshGenerator.isValidPartition(
+        vertexFlags[iPlus1] = NavMeshGenerator.isValidPartition(
           i,
-          (i + 2) % inoutIndices.length,
-          verts,
-          inoutIndices
+          (i + 2) % verts.length,
+          verts
         );
       }
 
       // Only 3 vertices remain.
       // Add their triangle to the output list.
-      outTriangles.push(inoutIndices[0]);
-      outTriangles.push(inoutIndices[1]);
-      outTriangles.push(inoutIndices[2]);
+      outTriangles.push(verts[0]);
+      outTriangles.push(verts[1]);
+      outTriangles.push(verts[2]);
 
       return outTriangles.length / 3;
     }
@@ -885,8 +827,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
     private static isValidPartition(
       indexA: integer,
       indexB: integer,
-      verts: Point[],
-      indices: Array<integer>
+      verts: Point[]
     ): boolean {
       /*
        *  First check whether the segment AB lies within the internal
@@ -897,14 +838,12 @@ console.log("mergedPoly.length: " + mergedPoly.length);
         NavMeshGenerator.liesWithinInternalAngle(
           indexA,
           indexB,
-          verts,
-          indices
+          verts
         ) &&
         !NavMeshGenerator.hasIllegalEdgeIntersection(
           indexA,
           indexB,
-          verts,
-          indices
+          verts
         )
       );
     }
@@ -946,17 +885,16 @@ console.log("mergedPoly.length: " + mergedPoly.length);
     private static liesWithinInternalAngle(
       indexA: integer,
       indexB: integer,
-      verts: Point[],
-      indices: Array<integer>
+      verts: Point[]
     ): boolean {
       // Get pointers to the main vertices being tested.
-      const vertA = verts[indices[indexA]];
-      const vertB = verts[indices[indexB]];
+      const vertA = verts[indexA];
+      const vertB = verts[indexB];
 
       // Get pointers to the vertices just before and just after vertA.
       const vertAMinus =
-        verts[indices[(indexA - 1 + indices.length) % indices.length]];
-      const vertAPlus = verts[indices[(indexA + 1) % indices.length]];
+        verts[(indexA - 1 + verts.length) % verts.length];
+      const vertAPlus = verts[(indexA + 1) % verts.length];
 
       /*
        * First, find which of the two angles formed by the line segments
@@ -1052,20 +990,19 @@ console.log("mergedPoly.length: " + mergedPoly.length);
     private static hasIllegalEdgeIntersection(
       indexA: integer,
       indexB: integer,
-      verts: Point[],
-      indices: Array<integer>
+      verts: Point[]
     ): boolean {
       // Get pointers to the primary vertices being tested.
-      const vertA = verts[indices[indexA]];
-      const vertB = verts[indices[indexB]];
+      const vertA = verts[indexA];
+      const vertB = verts[indexB];
 
       // Loop through the polygon edges.
       for (
         let iPolyEdgeBegin = 0;
-        iPolyEdgeBegin < indices.length;
+        iPolyEdgeBegin < verts.length;
         iPolyEdgeBegin++
       ) {
-        const iPolyEdgeEnd = (iPolyEdgeBegin + 1) % indices.length;
+        const iPolyEdgeEnd = (iPolyEdgeBegin + 1) % verts.length;
         if (
           !(
             iPolyEdgeBegin === indexA ||
@@ -1076,8 +1013,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
         ) {
           // Neither of the test indices are endpoints of this edge.
           // Get pointers for this edge's verts.
-          const edgeVertBegin = verts[indices[iPolyEdgeBegin]];
-          const edgeVertEnd = verts[indices[iPolyEdgeEnd]];
+          const edgeVertBegin = verts[iPolyEdgeBegin];
+          const edgeVertEnd = verts[iPolyEdgeEnd];
           if (
             (edgeVertBegin.x === vertA.x && edgeVertBegin.y === vertA.y) ||
             (edgeVertBegin.x === vertB.x && edgeVertBegin.y === vertB.y) ||

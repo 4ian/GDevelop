@@ -329,7 +329,7 @@ namespace gdjs {
       const contours = gdjs.NavMeshGenerator.buildContours(grid);
       //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
       const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 8);
-      const polygons = polyMeshField.polys.map(polygon => polygon.map(index => ({x: cellSize * polyMeshField.verts[index].x + grid.originX, y: cellSize * polyMeshField.verts[index].y + grid.originY})));
+      const polygons = polyMeshField.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
       this.meshPolygons = polygons;
       console.log('polygons.length: ' + polygons.length);
       console.log(

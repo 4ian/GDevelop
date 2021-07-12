@@ -87,9 +87,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarSceneDef",
-                    _("Test if a scene variable is defined"),
-                    _("Test if the scene variable exists."),
-                    _("Scene variable _PARAM0_ is defined"),
+                    "Test if a scene variable is defined",
+                    "Test if the scene variable exists.",
+                    "Scene variable _PARAM0_ is defined",
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -136,9 +136,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarGlobalDef",
-                    _("Test if a global variable is defined"),
-                    _("Test if a global variable exists"),
-                    _("Global variable _PARAM0_ is defined"),
+                    "Test if a global variable is defined",
+                    "Test if a global variable exists",
+                    "Global variable _PARAM0_ is defined",
                     _("Variables/Global variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")

@@ -251,23 +251,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction(
          "AddForceTournePos",
-         _("Add a force to move around a position"),
-         _("Add a force to an object to make it rotate around a "
+         "Add a force to move around a position",
+         "Add a force to an object to make it rotate around a "
            "position.\nNote that the movement is not precise, especially if "
            "the speed is high.\nTo position an object around a position more "
-           "precisely, use the actions in the category \"Position\"."),
-         _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ at _PARAM3_ deg/sec and "
-           "_PARAM4_ pixels away"),
+           "precisely, use the actions in the category \"Position\".",
+         "Rotate _PARAM0_ around _PARAM1_;_PARAM2_ at _PARAM3_ deg/sec and "
+           "_PARAM4_ pixels away",
          _("Movement using forces"),
          "res/actions/forceTourne24.png",
          "res/actions/forceTourne.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("expression", _("X position of the center"))
-      .AddParameter("expression", _("Y position of the center"))
-      .AddParameter("expression", _("Speed (in Degrees per seconds)"))
-      .AddParameter("expression", _("Distance (in pixels)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("expression", "X position of the center")
+      .AddParameter("expression", "Y position of the center")
+      .AddParameter("expression", "Speed (in Degrees per seconds)")
+      .AddParameter("expression", "Distance (in pixels)")
+      .AddParameter("forceMultiplier", "Force multiplier")
       .SetHidden();
 
   obj.AddAction("Arreter",
@@ -560,9 +560,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .SetDefaultValue("true");
 
   obj.AddCondition("VarObjetDef",
-                   _("Variable defined"),
-                   _("Check if the variable is defined."),
-                   _("Variable _PARAM1 of _PARAM0_ is defined"),
+                   "Variable defined",
+                   "Check if the variable is defined.",
+                   "Variable _PARAM1 of _PARAM0_ is defined",
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
@@ -720,29 +720,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   // Deprecated action
   obj.AddAction("Rebondir",
-                _("Move an object away from another"),
-                _("Move an object away from another, using forces."),
-                _("Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)"),
+                "Move an object away from another",
+                "Move an object away from another, using forces.",
+                "Move _PARAM0_ away from _PARAM1_ (only _PARAM0_ will move)",
                 _("Movement using forces"),
                 "res/actions/ecarter24.png",
                 "res/actions/ecarter.png")
 
       .SetHidden()
       .AddParameter("object", _("Object"))
-      .AddParameter("objectList", _("Object 2 (won't move)"));
+      .AddParameter("objectList", "Object 2 (won't move)");
 
   // Deprecated action
   obj.AddAction("Ecarter",
-                _("Move an object away from another"),
-                _("Move an object away from another without using forces."),
-                _("Move _PARAM0_ away from _PARAM2_ (only _PARAM0_ will move)"),
+                "Move an object away from another",
+                "Move an object away from another without using forces.",
+                "Move _PARAM0_ away from _PARAM2_ (only _PARAM0_ will move)",
                 _("Position"),
                 "res/actions/ecarter24.png",
                 "res/actions/ecarter.png")
 
       .SetHidden()
       .AddParameter("object", _("Object"))
-      .AddParameter("objectList", _("Object 2 (won't move)"));
+      .AddParameter("objectList", "Object 2 (won't move)");
 
   obj.AddAction("SeparateFromObjects",
                 _("Separate objects"),

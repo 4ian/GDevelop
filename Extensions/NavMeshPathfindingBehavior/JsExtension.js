@@ -131,7 +131,7 @@ module.exports = {
         new gd.BehaviorsSharedData()
       )
       .setIncludeFile('Extensions/NavMeshPathfindingBehavior/navmeshpathfindingruntimebehavior.js')
-      .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js');
+      .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js')
       .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js');
 
     // Declare a behavior.

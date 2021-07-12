@@ -206,7 +206,6 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [11, 1],
         [1, 1],
       ]);
-
       expect(points[1]).to.eql([
         [10, 5],
         [14, 10],
@@ -214,7 +213,6 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [18, 1],
         [11, 1],
       ]);
-
       expect(points[2]).to.eql([
         [1, 11],
         [1, 18],
@@ -222,8 +220,6 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [10, 14],
         [5, 10],
       ]);
-
-      
       expect(points[3]).to.eql([
         [10, 14],
         [10, 18],
@@ -231,6 +227,19 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [18, 10],
         [14, 10],
       ]);
+
+      const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 8);
+      const polygons = polyMeshField.polys.map(polygon => polygon.map(index => polyMeshField.verts[index]));
+      console.log('polygons.length: ' + polygons.length);
+      console.log(
+        polygons
+          .map((polygon) =>
+          "p: " + polygon
+              .map((point) => '(' + point.x + ' ' + point.y + ')')
+              .join(', ')
+          )
+          .join('\n')
+      );
     });
   });
 });

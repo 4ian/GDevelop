@@ -175,6 +175,11 @@ const BehaviorsEditor = (props: Props) => {
             <Accordion key={behaviorName} defaultExpanded>
               <AccordionHeader
                 actions={[
+                  <HelpIcon
+                    key="help"
+                    size="small"
+                    helpPagePath={behaviorMetadata.getHelpPath()}
+                  />,
                   <IconButton
                     key="delete"
                     size="small"
@@ -185,11 +190,6 @@ const BehaviorsEditor = (props: Props) => {
                   >
                     <Delete />
                   </IconButton>,
-                  <HelpIcon
-                    key="help"
-                    size="small"
-                    helpPagePath={behaviorMetadata.getHelpPath()}
-                  />,
                 ]}
               >
                 {iconUrl ? (

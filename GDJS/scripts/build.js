@@ -15,12 +15,12 @@ const renameBuiltFile = (outPath) => {
   return outPath.replace(/\.ts$/, '.js');
 };
 
-const bundledOutPath = args.out;
-if (!bundledOutPath) {
+const bundledOutPath =
+  args.out || path.join(__dirname, '../../newIDE/app/resources/GDJS/Runtime');
+if (!args.out) {
   shell.echo(
-    `❌ --out (path where to build GDJS Runtime and Extensions) is required.`
+    `ℹ️  --out (path where to build GDJS Runtime and Extensions) not specified. Using "../../newIDE/app/resources/GDJS/Runtime" by default (used by electron-app and GDJS tests).`
   );
-  shell.exit(1);
 }
 
 shell.mkdir('-p', bundledOutPath);

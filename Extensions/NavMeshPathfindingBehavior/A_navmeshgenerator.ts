@@ -271,7 +271,8 @@ namespace gdjs {
 
       // Process all contours.
       //const contour = contours[0];
-      for (const contour of contours) {
+      for (const contour of contours)
+      {
         if (contour.length < 3) {
           // This indicates a problem with contour creation
           // since the contour builder should detect for this.
@@ -675,6 +676,7 @@ namespace gdjs {
           iPlus2,
           verts
         );
+        console.log("isValidPartition: " + iPlus1 + " " + vertexFlags[iPlus1]+ " " + verts[iPlus1].x + " " + verts[iPlus1].y);
       }
 
       /*
@@ -712,8 +714,10 @@ namespace gdjs {
             // Determine the length of the partition edge.
             // (i -> iPlus2)
             const deltaX = vertPlus2.x - vert.x;
-            const deltaZ = vertPlus2.y - vert.y;
-            const lengthSq = deltaX * deltaX + deltaZ * deltaZ;
+            const deltaY = vertPlus2.y - vert.y;
+            const lengthSq = deltaX * deltaX + deltaY * deltaY;
+
+            console.log("lengthSq: " + i + " " + lengthSq);
 
             if (lengthSq < minLengthSq) {
               // This is either the first valid new edge, or an edge
@@ -747,8 +751,9 @@ namespace gdjs {
          * triangles.
          */
         verts.splice(iPlus1, 1);
+        vertexFlags.splice(iPlus1, 1);
 
-        if (iPlus1 == 0 || iPlus1 >= verts.length) {
+        if (iPlus1 === 0 || iPlus1 >= verts.length) {
           /*
            * The vertex removal has invalidated iPlus1 and/or i.  So
            * force a wrap, fixing the indices so they reference the
@@ -777,6 +782,9 @@ namespace gdjs {
           (i + 2) % verts.length,
           verts
         );
+        console.log("vertexFlags: " + i + " " + vertexFlags[i]);
+        console.log("vertexFlags: " + iPlus1 + " " + vertexFlags[iPlus1]);
+        console.log("");
       }
 
       // Only 3 vertices remain.

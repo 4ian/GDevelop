@@ -88,9 +88,6 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["IsEffectEnabled"]
       .SetFunctionName("isEffectEnabled")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["HasEffect"]
-      .SetFunctionName("hasEffect")
-      .SetIncludeFile("runtimeobject.js");
   objectActions["Delete"].SetFunctionName("deleteFromScene");
   objectActions["MettreAutourPos"].SetFunctionName("putAround");
   objectActions["MettreAutour"]
@@ -178,9 +175,6 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetIncludeFile("runtimeobject.js");
   objectActions["RemoveObjectTimer"]
       .SetFunctionName("removeTimer")
-      .SetIncludeFile("runtimeobject.js");
-  objectActions["RemoveEffect"]
-      .SetFunctionName("removeEffect")
       .SetIncludeFile("runtimeobject.js");
   objectActions["EnableEffect"]
       .SetFunctionName("enableEffect")

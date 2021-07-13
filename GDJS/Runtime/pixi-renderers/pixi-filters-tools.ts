@@ -15,7 +15,7 @@ namespace gdjs {
       return arr.indexOf(value) !== -1 ? value : min;
     };
 
-    export const _filterCreators: {
+    const _filterCreators: {
       [filterName: string]: FilterCreator;
     } = {};
 

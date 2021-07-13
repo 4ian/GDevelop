@@ -199,10 +199,7 @@ const BehaviorsEditor = (props: Props) => {
                     size={20}
                   />
                 ) : null}
-                <MiniToolbarText firstChild={!iconUrl}>
-                  <Trans>Behavior</Trans>{' '}
-                </MiniToolbarText>
-                <Column noMargin expand>
+                <Column expand>
                   <TextField
                     value={behaviorName}
                     hintText={t`Behavior name`}

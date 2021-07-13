@@ -56,9 +56,9 @@ namespace gdjs {
       }
     }
 
-    convertToGridBasis(position: FloatPoint, gridPosition: FloatPoint) {
-      gridPosition[0] = (position[0] - this.originX) / this.cellSize;
-      gridPosition[1] = (position[1] - this.originY) / this.cellSize;
+    convertToGridBasis(position: Point, gridPosition: Point) {
+      gridPosition.x = (position.x - this.originX) / this.cellSize;
+      gridPosition.y = (position.y - this.originY) / this.cellSize;
       return gridPosition;
     }
 
@@ -167,7 +167,6 @@ namespace gdjs {
   };
 
   export class NavMeshGenerator {
-
     public static makeVerticesUniq(contours: Point[][]) {
       /*
        * Key = Hash representing a unique vertex location.
@@ -187,8 +186,7 @@ namespace gdjs {
           let uniqVertex = uniqVertices.get(vertexHash);
           if (uniqVertex) {
             contour[index] = uniqVertex;
-          }
-          else {
+          } else {
             // This is the first time this vertex has been seen.
             // Assign it an index and add it to the vertex array.
             uniqVertices.set(vertexHash, vertex);
@@ -211,7 +209,6 @@ namespace gdjs {
       contours: ContourPoint[][],
       mMaxVertsPerPoly: integer
     ): Point[][] {
-
       NavMeshGenerator.makeVerticesUniq(contours);
 
       // Number of vertices found in the source.
@@ -274,8 +271,7 @@ namespace gdjs {
 
       // Process all contours.
       //const contour = contours[0];
-      for (const contour of contours)
-      {
+      for (const contour of contours) {
         if (contour.length < 3) {
           // This indicates a problem with contour creation
           // since the contour builder should detect for this.
@@ -283,21 +279,33 @@ namespace gdjs {
             'Polygon generation failure: Contour has ' +
               'too few vertices. Bad input data.'
           );
-          //continue;
+          continue;
         }
 
         // Create working indices for the contour vertices.
         workingIndices.length = 0;
         Array.prototype.push.apply(workingIndices, contour);
 
+        // Initialize the working polygon array.
+        workingPolys.length = 0;
+
         // Triangulate the contour.
-        const triangleCount = NavMeshGenerator.triangulate(
+        let foundAnyTriangle = false;
+        NavMeshGenerator.triangulate(
           workingIndices,
           workingIndiceFlags,
-          workingTriangles
+          (p1: Point, p2: Point, p3: Point) => {
+            const workingPoly = new Array<Point>(mMaxVertsPerPoly);
+            workingPoly.length = 0;
+            workingPoly.push(p1);
+            workingPoly.push(p2);
+            workingPoly.push(p3);
+            workingPolys.push(workingPoly);
+            foundAnyTriangle = true;
+          }
         );
 
-        if (triangleCount <= 0) {
+        if (!foundAnyTriangle) {
           /*
            * Failure of the triangulation.
            * This is known to occur if the source polygon is
@@ -308,27 +316,7 @@ namespace gdjs {
           console.error(
             'Polygon generation failure: Could not triangulate contour.'
           );
-          //continue;
-        }
-
-        // Initialize the working polygon array.
-        workingPolys.length = 0;
-
-        // Load the triangles into to the working polygon array, updating
-        // indices in the process.
-        for (let i = 0; i < triangleCount; i++) {
-          /*
-           * The working triangles list contains vertex index data
-           * from the contour. The working polygon array needs the
-           * global vertex index. So the indices mapping array created
-           * above is used to do  the conversion.
-           */
-          const workingPoly = new Array<Point>(mMaxVertsPerPoly);
-          workingPoly.length = 0;
-          workingPoly.push(workingTriangles[i * 3]);
-          workingPoly.push(workingTriangles[i * 3 + 1]);
-          workingPoly.push(workingTriangles[i * 3 + 2]);
-          workingPolys.push(workingPoly);
+          continue;
         }
 
         if (mMaxVertsPerPoly > 3) {
@@ -371,7 +359,7 @@ namespace gdjs {
               }
             }
 
-            console.log("longestMergeEdge: " + longestMergeEdge);
+            console.log('longestMergeEdge: ' + longestMergeEdge);
 
             if (longestMergeEdge <= 0)
               // No valid merges found during this iteration.
@@ -408,7 +396,7 @@ namespace gdjs {
               mergedPoly[position++] =
                 workingPolys[pBestPolyB][(iPolyBVert + 1 + i) % vertCountB];
 
-console.log("mergedPoly.length: " + mergedPoly.length);
+            console.log('mergedPoly.length: ' + mergedPoly.length);
 
             // Copy the merged polygon over the top of polygon A.
             workingPolys[pBestPolyA].length = 0;
@@ -560,7 +548,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        * wrapped convex polygons.
        */
 
-      let sharedVertMinus = polys[polyAPointer][(outResult.indexA - 1 + vertCountA) % vertCountA];
+      let sharedVertMinus =
+        polys[polyAPointer][(outResult.indexA - 1 + vertCountA) % vertCountA];
       let sharedVert = polys[polyAPointer][outResult.indexA];
       let sharedVertPlus =
         polys[polyBPointer][(outResult.indexB + 2) % vertCountB];
@@ -582,7 +571,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
          */
         return;
 
-      sharedVertMinus = polys[polyBPointer][(outResult.indexB - 1 + vertCountB) % vertCountB];
+      sharedVertMinus =
+        polys[polyBPointer][(outResult.indexB - 1 + vertCountB) % vertCountB];
       sharedVert = polys[polyBPointer][outResult.indexB];
       sharedVertPlus = polys[polyAPointer][(outResult.indexA + 2) % vertCountA];
       if (
@@ -635,10 +625,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
     private static triangulate(
       verts: Array<Point>,
       vertexFlags: Array<boolean>,
-      outTriangles: Array<Point>
-    ): integer {
-      outTriangles.length = 0;
-
+      outTriangles: (p1: Point, p2: Point, p3: Point) => void
+    ): void {
       /*
        * Terminology, concepts and such:
        *
@@ -744,15 +732,13 @@ console.log("mergedPoly.length: " + mergedPoly.length);
            * left, but none of them are flagged as being a
            * potential center vertex.
            */
-          return -outTriangles.length / 3;
+          return;
 
         let i = iMinLengthSqVert;
         let iPlus1 = (i + 1) % verts.length;
 
         // Add the new triangle to the output.
-        outTriangles.push(verts[i]);
-        outTriangles.push(verts[iPlus1]);
-        outTriangles.push(verts[(i + 2) % verts.length]);
+        outTriangles(verts[i], verts[iPlus1], verts[(i + 2) % verts.length]);
 
         /*
          * iPlus1, the "center" vert in the new triangle, is now external
@@ -795,11 +781,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
 
       // Only 3 vertices remain.
       // Add their triangle to the output list.
-      outTriangles.push(verts[0]);
-      outTriangles.push(verts[1]);
-      outTriangles.push(verts[2]);
-
-      return outTriangles.length / 3;
+      outTriangles(verts[0], verts[1], verts[2]);
     }
 
     /**
@@ -835,16 +817,8 @@ console.log("mergedPoly.length: " + mergedPoly.length);
        *  If it does, then perform the more costly check.
        */
       return (
-        NavMeshGenerator.liesWithinInternalAngle(
-          indexA,
-          indexB,
-          verts
-        ) &&
-        !NavMeshGenerator.hasIllegalEdgeIntersection(
-          indexA,
-          indexB,
-          verts
-        )
+        NavMeshGenerator.liesWithinInternalAngle(indexA, indexB, verts) &&
+        !NavMeshGenerator.hasIllegalEdgeIntersection(indexA, indexB, verts)
       );
     }
 
@@ -892,8 +866,7 @@ console.log("mergedPoly.length: " + mergedPoly.length);
       const vertB = verts[indexB];
 
       // Get pointers to the vertices just before and just after vertA.
-      const vertAMinus =
-        verts[(indexA - 1 + verts.length) % verts.length];
+      const vertAMinus = verts[(indexA - 1 + verts.length) % verts.length];
       const vertAPlus = verts[(indexA + 1) % verts.length];
 
       /*
@@ -1815,113 +1788,108 @@ console.log("mergedPoly.length: " + mergedPoly.length);
       grid: RasterizationGrid,
       obstacles: RuntimeObject[]
     ) {
+      const workingNodes: number[] = [];
       //TODO check the accuracy. Is a grid alined rectangle overstepped?
-      let lineStart: FloatPoint = [0, 0];
-      let lineEnd: FloatPoint = [0, 0];
       for (const obstacle of obstacles) {
         for (const polygon of obstacle.getHitBoxes()) {
-          lineEnd = grid.convertToGridBasis(polygon.vertices[0], lineEnd);
-
-          // used to fill after outline
-          let upperX = Math.round(lineEnd[0]);
-          let upperY = Math.round(lineEnd[1]);
-          let lowerX = Math.round(lineEnd[0]);
-          let lowerY = Math.round(lineEnd[1]);
-
-          // outline the polygon
-          for (let index = 1; index < polygon.vertices.length + 1; index++) {
-            const swap = lineStart;
-            lineStart = lineEnd;
-            lineEnd = grid.convertToGridBasis(
-              polygon.vertices[index % polygon.vertices.length],
-              swap
-            );
-            const lineStartX = Math.round(lineStart[0]);
-            const lineStartY = Math.round(lineStart[1]);
-            const lineEndX = Math.round(lineEnd[0]);
-            const lineEndY = Math.round(lineEnd[1]);
-            NavMeshGenerator.rasterizeLine(
-              lineStartX,
-              lineStartY,
-              lineEndX,
-              lineEndY,
-              (x: integer, y: integer) => grid.get(x, y).setObstacle()
-            );
-            if (lineEndY < upperY) {
-              upperY = lineEndY;
-            }
-            if (lineEndY > lowerY) {
-              lowerY = lineEndY;
-            }
-            if (lineEndX > upperX) {
-              upperX = lineEndX;
-            }
-            if (lineEndX < lowerX) {
-              lowerX = lineEndX;
-            }
+          const vertices = polygon.vertices.map((vertex) => {
+            const point = { x: vertex[0], y: vertex[1] };
+            grid.convertToGridBasis(point, point);
+            return point;
+          });
+          let minX = Number.MAX_VALUE;
+          let maxX = -Number.MAX_VALUE;
+          let minY = Number.MAX_VALUE;
+          let maxY = -Number.MAX_VALUE;
+          for (const vertex of vertices) {
+            minX = Math.min(minX, vertex.x);
+            maxX = Math.max(maxX, vertex.x);
+            minY = Math.min(minY, vertex.y);
+            maxY = Math.max(maxY, vertex.y);
           }
-          // fill the polygon
-          //TODO this is broken, triangulate the polygon
-          const middleX = Math.floor((lowerX + upperX) / 2);
-          for (let y = upperY + 1; y < lowerY; y++) {
-            const cell = grid.get(middleX, y);
-            if (cell.isObstacle) continue;
-            cell.setObstacle();
-            for (let x = middleX - 1; !grid.get(x, y).isObstacle; x--) {
-              
-                console.log(x + " " + y);
-                grid.get(x, y).setObstacle();
-            }
-            for (let x = middleX + 1; !grid.get(x, y).isObstacle; x++) {
-              
-                console.log(x + " " + y);
-                grid.get(x, y).setObstacle();
-            }
-          }
+          minX = Math.max(minX, 0);
+          maxX = Math.min(maxX, grid.dimX());
+          minY = Math.max(minY, 0);
+          maxY = Math.min(maxY, grid.dimY());
+          NavMeshGenerator.fillPolygon(
+            vertices,
+            minX,
+            maxX,
+            minY,
+            maxY,
+            workingNodes,
+            (x: integer, y: integer) => grid.get(x, y).setObstacle()
+          );
         }
       }
     }
 
-    /**
-     * https://github.com/madbence/node-bresenham
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param fn
-     * @returns
-     */
-    private static rasterizeLine(
-      x0: number,
-      y0: number,
-      x1: number,
-      y1: number,
-      fn: (x: number, y: number) => void
+    static fillPolygon(
+      vertices: Point[],
+      mixX: integer,
+      maxX: integer,
+      minY: integer,
+      maxY: integer,
+      workingNodes: number[],
+      fill: (x: number, y: number) => void
     ) {
-      console.log(x0 + ' ' + y0 + ' -> ' + x1 + ' ' + y1);
-      var dx = x1 - x0;
-      var dy = y1 - y0;
-      var adx = Math.abs(dx);
-      var ady = Math.abs(dy);
-      var eps = 0;
-      var sx = dx > 0 ? 1 : -1;
-      var sy = dy > 0 ? 1 : -1;
-      if (adx > ady) {
-        for (var x = x0, y = y0; sx < 0 ? x >= x1 : x <= x1; x += sx) {
-          fn(x, y);
-          eps += ady;
-          if (eps << 1 >= adx) {
-            y += sy;
-            eps -= adx;
+      // Scan-line polygon fill algorithm
+      // strongly inspired from:
+      // http://alienryderflex.com/polygon_fill/
+      console.log('fillPolygon: ' + minY + ' -> ' + maxY);
+
+      //  Loop through the rows of the image.
+      for (let pixelY = minY; pixelY < maxY; pixelY++) {
+        //  Build a list of nodes.
+        workingNodes.length = 0;
+        let j = vertices.length - 1;
+        for (let i = 0; i < vertices.length; i++) {
+          if (
+            (vertices[i].y < pixelY && vertices[j].y >= pixelY) ||
+            (vertices[j].y < pixelY && vertices[i].y >= pixelY)
+          ) {
+            workingNodes.push(
+              Math.floor(
+                vertices[i].x +
+                  ((pixelY - vertices[i].y) / (vertices[j].y - vertices[i].y)) *
+                    (vertices[j].x - vertices[i].x)
+              )
+            );
+          }
+          j = i;
+        }
+
+        //  Sort the nodes, via a simple “Bubble” sort.
+        {
+          let i = 0;
+          while (i < workingNodes.length - 1) {
+            if (workingNodes[i] > workingNodes[i + 1]) {
+              const swap = workingNodes[i];
+              workingNodes[i] = workingNodes[i + 1];
+              workingNodes[i + 1] = swap;
+              if (i > 0) i--;
+            } else {
+              i++;
+            }
           }
         }
-      } else {
-        for (var x = x0, y = y0; sy < 0 ? y >= y1 : y <= y1; y += sy) {
-          fn(x, y);
-          eps += adx;
-          if (eps << 1 >= ady) {
-            x += sx;
-            eps -= ady;
+
+        //  Fill the pixels between node pairs.
+        for (let i = 0; i < workingNodes.length; i += 2) {
+          if (workingNodes[i] >= maxX) break;
+          if (workingNodes[i + 1] > mixX) {
+            if (workingNodes[i] < mixX) {
+              workingNodes[i] = mixX;
+            }
+            if (workingNodes[i + 1] > maxX) {
+              workingNodes[i + 1] = maxX;
+            }
+            for (
+              let pixelX = workingNodes[i];
+              pixelX < workingNodes[i + 1];
+              pixelX++
+            )
+              fill(Math.floor(pixelX), Math.floor(pixelY));
           }
         }
       }

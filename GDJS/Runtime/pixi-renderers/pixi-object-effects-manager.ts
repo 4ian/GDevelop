@@ -7,20 +7,11 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
   class PixiObjectEffectsManager {
-    protected _filters: Hashtable<Hashtable<PixiFiltersTools.Filter>>;
-
-    constructor() {
-      this._filters = new Hashtable();
-    }
 
     update(runtimeObject: RuntimeObject, layer: Layer) {
-      const filters: Hashtable<
-        PixiFiltersTools.Filter
-      > | void = this._filters.get(runtimeObject.getName());
-      if (!filters) return;
-      const filterValues: PixiFiltersTools.Filter[] = [];
-      filters.values(filterValues);
-      for (const filter of filterValues) {
+      const filters = runtimeObject.getFilters();
+      for (const filterName in filters) {
+        const filter = filters[filterName];
         filter.update(filter.pixiFilter, layer);
       }
     }
@@ -61,12 +52,8 @@ namespace gdjs {
       const renderer = runtimeObject.getRendererObject();
       renderer.filters = (renderer.filters || []).concat(filter.pixiFilter);
 
-      if (!this._filters.containsKey(runtimeObject.getName())) {
-        this._filters.put(runtimeObject.getName(), new Hashtable());
-      }
-
-      const filtersHashtable = this._filters.get(runtimeObject.getName());
-      filtersHashtable.put(effectData.name, filter);
+      const filters = runtimeObject.getFilters();
+      filters[effectData.name] = filter;
     }
 
     /**
@@ -75,17 +62,13 @@ namespace gdjs {
      * @param effectName The name of the effect.
      */
     removeEffect(runtimeObject: RuntimeObject, effectName: string) {
-      const filters: Hashtable<
-        PixiFiltersTools.Filter
-      > | void = this._filters.get(runtimeObject.getName());
-      if (!filters) return;
-      if (!filters.containsKey(effectName)) return;
-      const filter = filters.get(effectName);
+      const filter = runtimeObject.getFilters()[effectName];
+      if (!filter) return;
       const renderer: PIXI.DisplayObject = runtimeObject.getRendererObject();
       renderer.filters = (renderer.filters || []).filter(
         (pixiFilter) => pixiFilter !== filter.pixiFilter
       );
-      filters.remove(effectName);
+      delete filter[effectName];
     }
 
     /**
@@ -101,12 +84,8 @@ namespace gdjs {
       parameterName: string,
       value: float
     ): void {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) {
-        return;
-      }
-      if (!filters.containsKey(name)) return;
-      const filter = filters.get(name);
+      const filter = runtimeObject.getFilters()[name];
+      if (!filter) return;
       filter.updateDoubleParameter(filter.pixiFilter, parameterName, value);
     }
 
@@ -123,12 +102,8 @@ namespace gdjs {
       parameterName: string,
       value: string
     ): void {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) {
-        return;
-      }
-      if (!filters.containsKey(name)) return;
-      const filter = filters.get(name);
+      const filter = runtimeObject.getFilters()[name];
+      if (!filter) return;
       filter.updateStringParameter(filter.pixiFilter, parameterName, value);
     }
 
@@ -145,12 +120,8 @@ namespace gdjs {
       parameterName: string,
       value: boolean
     ): void {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) {
-        return;
-      }
-      if (!filters.containsKey(name)) return;
-      const filter = filters.get(name);
+      const filter = runtimeObject.getFilters()[name];
+      if (!filter) return;
       filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
     }
 
@@ -161,9 +132,7 @@ namespace gdjs {
      * @returns True if the effect exists, false otherwise
      */
     hasEffect(runtimeObject: RuntimeObject, name: string): boolean {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) return false;
-      return !!filters.get(name);
+      return !!runtimeObject.getFilters()[name];
     }
 
     /**
@@ -177,12 +146,8 @@ namespace gdjs {
       name: string,
       value: boolean
     ): void {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) {
-        return;
-      }
-      if (!filters.containsKey(name)) return;
-      const filter = filters.get(name);
+      const filter = runtimeObject.getFilters()[name];
+      if (!filter) return;
       gdjs.PixiFiltersTools.enableEffect(filter, value);
     }
 
@@ -193,12 +158,8 @@ namespace gdjs {
      * @return true if the filter is enabled
      */
     isEffectEnabled(runtimeObject: RuntimeObject, name: string): boolean {
-      const filters = this._filters.get(runtimeObject.getName());
-      if (!filters) {
-        return false;
-      }
-      if (!filters.containsKey(name)) return false;
-      const filter = filters.get(name);
+      const filter = runtimeObject.getFilters()[name];
+      if (!filter) return false;
       return gdjs.PixiFiltersTools.isEffectEnabled(filter);
     }
   }

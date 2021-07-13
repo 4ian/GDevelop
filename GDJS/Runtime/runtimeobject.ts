@@ -72,6 +72,7 @@ namespace gdjs {
 
     //Effects:
     protected _effects: EffectData[];
+    protected _filters: Record<string, PixiFiltersTools.Filter> = {}; 
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
@@ -736,6 +737,10 @@ namespace gdjs {
      */
     hasVariable(name: string): boolean {
       return this._variables.has(name);
+    }
+
+    getFilters() {
+      return this._filters;
     }
 
     /**

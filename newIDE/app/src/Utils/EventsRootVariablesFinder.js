@@ -1,3 +1,4 @@
+// @flow
 const gd: libGDevelop = global.gd;
 
 /** Naive way to check if a variable expression is not using a structure/array. */

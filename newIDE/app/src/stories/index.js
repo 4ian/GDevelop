@@ -2104,6 +2104,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <MouseField
           project={testProject.project}
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}

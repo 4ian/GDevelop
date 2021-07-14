@@ -201,8 +201,8 @@ module.exports = {
           'DrawCells',
           _('Draw cells'),
           _('Draw cells'),
-          _('Draw cells on _PARAM3_'),
-          'Movement on the path (NavMesh)',
+          _('Draw cells on _PARAM2_'),
+          'Debug (NavMesh)',
           'CppPlatform/Extensions/AStaricon24.png',
           'CppPlatform/Extensions/AStaricon16.png'
         )
@@ -213,11 +213,9 @@ module.exports = {
           'NavMeshPathfindingBehavior',
           false
         )
-        .addCodeOnlyParameter('currentScene', '')
-        .addParameter('object', _('Shape painter'), '', false)
+        .addParameter('objectPtr', _('Shape painter'), '', false)
         .getCodeExtraInformation()
         .setFunctionName('drawCells');
-      
 
     pathfindingBehaviorDeclaration
     .addExpression("NodeCount",

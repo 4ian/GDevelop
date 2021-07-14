@@ -17,6 +17,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Tools/UUID/UUID.h"
 
 using namespace std;
 
@@ -623,6 +624,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   else if (metadata.type == "inlineCode") {
     argOutput += metadata.supplementaryInformation;
+  } else if(metadata.type == "uid") {
+    // GenerateSingleUsageUniqueIdFor would be better, but wouldn't work with expressions.
+    argOutput += ConvertToStringExplicit(gd::UUID::MakeUuid4());
   } else {
     // Try supplementary types if provided
     if (supplementaryParametersTypes) {

@@ -20,6 +20,7 @@ import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader'
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import { isCodeOnlyType } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -58,9 +59,11 @@ const getSentenceErrorText = (
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
     (parameter, index) => {
-      if (gd.ParameterMetadata.isBehavior(parameter.getType())) {
-        return null; // Behaviors are usually not shown in sentences.
-      }
+      if (
+        gd.ParameterMetadata.isBehavior(parameter.getType()) ||
+        isCodeOnlyType(parameter.getType())
+      )
+        return null; // Behaviors and code only parameters are usually not shown in sentences.
 
       const expectedString = `_PARAM${index + parametersIndexOffset}_`;
       if (sentence.indexOf(expectedString) === -1) return expectedString;

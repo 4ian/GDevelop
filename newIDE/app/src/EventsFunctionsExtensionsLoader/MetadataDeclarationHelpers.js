@@ -493,6 +493,8 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
   });
 };
 
+export const isCodeOnlyType = (type: string) => type === 'uid';
+
 /**
  * Add to the instruction (action/condition) or expression the parameters
  * expected by the events function.
@@ -504,7 +506,7 @@ export const declareEventsFunctionParameters = (
   mapVector(
     eventsFunction.getParameters(),
     (parameter: gdParameterMetadata) => {
-      if (!parameter.isCodeOnly()) {
+      if (!parameter.isCodeOnly() && !isCodeOnlyType(parameter.getType())) {
         instructionOrExpression.addParameter(
           parameter.getType(),
           parameter.getDescription(),

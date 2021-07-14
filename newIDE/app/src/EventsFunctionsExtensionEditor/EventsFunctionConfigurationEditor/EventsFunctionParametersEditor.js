@@ -29,6 +29,7 @@ import Delete from '@material-ui/icons/Delete';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
+import { isCodeOnlyType } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 
 const gd: libGDevelop = global.gd;
 
@@ -306,6 +307,12 @@ export default class EventsFunctionParametersEditor extends React.Component<
         !!this.state.longDescriptionShownIndexes[index]
       );
     };
+    const isParameterLabelShown = (parameter, index): boolean => {
+      if (!isParameterDescriptionAndTypeShown(index)) return false;
+
+      // Code only parameter aren't displayed, they don't have a label.
+      return !isCodeOnlyType(parameter.getType());
+    };
     const parametersIndexOffset = getParametersIndexOffset(
       !!eventsBasedBehavior
     );
@@ -462,6 +469,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                   value="objectAnimationName"
                                   primaryText={t`Object animation (text)`}
                                 />
+                                <SelectOption
+                                  value="uid"
+                                  primaryText={t`Unique event ID (text)`}
+                                />
                               </SelectField>
                             )}
                             {gd.ParameterMetadata.isObject(
@@ -504,7 +515,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               }}
                             />
                           )}
-                          {isParameterDescriptionAndTypeShown(i) && (
+                          {isParameterLabelShown(parameter, i) && (
                             <SemiControlledTextField
                               commitOnBlur
                               floatingLabelText={<Trans>Label</Trans>}

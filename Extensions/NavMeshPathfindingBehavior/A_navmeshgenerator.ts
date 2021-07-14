@@ -271,8 +271,7 @@ namespace gdjs {
 
       // Process all contours.
       //const contour = contours[0];
-      for (const contour of contours)
-      {
+      for (const contour of contours) {
         if (contour.length < 3) {
           // This indicates a problem with contour creation
           // since the contour builder should detect for this.
@@ -676,7 +675,16 @@ namespace gdjs {
           iPlus2,
           verts
         );
-        console.log("isValidPartition: " + iPlus1 + " " + vertexFlags[iPlus1]+ " " + verts[iPlus1].x + " " + verts[iPlus1].y);
+        console.log(
+          'isValidPartition: ' +
+            iPlus1 +
+            ' ' +
+            vertexFlags[iPlus1] +
+            ' ' +
+            verts[iPlus1].x +
+            ' ' +
+            verts[iPlus1].y
+        );
       }
 
       /*
@@ -717,7 +725,7 @@ namespace gdjs {
             const deltaY = vertPlus2.y - vert.y;
             const lengthSq = deltaX * deltaX + deltaY * deltaY;
 
-            console.log("lengthSq: " + i + " " + lengthSq);
+            console.log('lengthSq: ' + i + ' ' + lengthSq);
 
             if (lengthSq < minLengthSq) {
               // This is either the first valid new edge, or an edge
@@ -782,9 +790,9 @@ namespace gdjs {
           (i + 2) % verts.length,
           verts
         );
-        console.log("vertexFlags: " + i + " " + vertexFlags[i]);
-        console.log("vertexFlags: " + iPlus1 + " " + vertexFlags[iPlus1]);
-        console.log("");
+        console.log('vertexFlags: ' + i + ' ' + vertexFlags[i]);
+        console.log('vertexFlags: ' + iPlus1 + ' ' + vertexFlags[iPlus1]);
+        console.log('');
       }
 
       // Only 3 vertices remain.
@@ -1562,8 +1570,9 @@ namespace gdjs {
       return deltaX * deltaX + deltaY * deltaY;
     }
 
-    static generateRegions(grid: RasterizationGrid) {
-      const expandIterations: integer = 4;
+    static generateRegions(grid: RasterizationGrid, obstacleCellPadding: integer) {
+      const distanceMin = obstacleCellPadding * 2;
+      const expandIterations: integer = 4 + distanceMin * 2;
 
       let floodedCells = new Array<RasterizationCell | null>(1024);
       let workingStack = new Array<RasterizationCell>(1024);
@@ -1572,7 +1581,7 @@ namespace gdjs {
 
       for (
         let distance = grid.obstacleDistanceMax();
-        distance > 0;
+        distance > distanceMin;
         distance = Math.max(distance - 2, 0)
       ) {
         floodedCells.length = 0;
@@ -1600,7 +1609,7 @@ namespace gdjs {
         for (const floodedCell of floodedCells) {
           if (!floodedCell || floodedCell.hasRegion()) continue;
 
-          const fillTo = Math.max(distance - 2, 0);
+          const fillTo = Math.max(distance - 2, distanceMin);
           if (
             NavMeshGenerator.floodNewRegion(
               grid,
@@ -1614,7 +1623,33 @@ namespace gdjs {
           }
         }
       }
-      //TODO check if cell without region remains or not
+
+      // Find all spans that haven't been assigned regions by the main loop.
+      // (Up to the minimum distance.)
+      floodedCells.length = 0;
+      for (let y = 1; y < grid.dimY() - 1; y++) {
+        for (let x = 1; x < grid.dimX() - 1; x++) {
+          const cell = grid.get(x, y);
+
+          if (cell.distanceToObstacle >= distanceMin && !cell.hasRegion()) {
+            // Not a border or null region span.  Should be in a region.
+            floodedCells.push(cell);
+          }
+        }
+      }
+
+      // Perform a final expansion of existing regions.
+      // Allow more iterations than normal for this last expansion.
+      if (distanceMin > 0) {
+        NavMeshGenerator.expandRegions(
+          grid,
+          floodedCells,
+          expandIterations * 8
+        );
+      } else {
+        NavMeshGenerator.expandRegions(grid, floodedCells, -1);
+      }
+
       //TODO check if post processing algorithms are necessary
     }
 
@@ -1715,7 +1750,7 @@ namespace gdjs {
           if (
             neighbor != null &&
             neighbor.distanceToObstacle >= fillToDist &&
-            neighbor.regionID == 0
+            neighbor.regionID === 0
           ) {
             neighbor.regionID = regionID;
             neighbor.distanceToRegionCore = 0;

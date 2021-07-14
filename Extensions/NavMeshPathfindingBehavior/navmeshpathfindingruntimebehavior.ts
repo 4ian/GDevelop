@@ -35,8 +35,12 @@ namespace gdjs {
     _currentSegment: integer = 0;
     _reachedEnd: boolean = false;
     _manager: NavMeshPathfindingObstaclesManager;
-
     _movementAngle: float = 0;
+
+    // for path finding algorithm
+    _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
+    /** Used to draw traces for debugging */
+    meshPolygons: Point[][] = [];
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -292,63 +296,71 @@ namespace gdjs {
     moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
       console.log('moveTo');
 
-      // // The mesh is represented as an array where each element contains the points for an individual
-      // // polygon within the mesh.
-      // const meshPolygonPoints = [
-      //   [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }], // Polygon 1
-      //   [{ x: 10, y: 0 }, { x: 20, y: 0 }, { x: 20, y: 10 }, { x: 10, y: 10 }], // Polygon 2
-      //   [{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 20 }, { x: 10, y: 20 }] // Polygon 3
-      // ];
-      // const navMesh = new gdjs.NavMesh(meshPolygonPoints);
+      //TODO Add a non-blocking padding property to make the path farer from the obstacle if possible?
+      // It may need to have several contour lines with a one cell increment
+      // and do a dichotomy like this:
+      // * find path with obstacleCellPaddingMax (infinity if not found)
+      // * find path with obstacleCellPaddingMin
+      // * path length delta < detourMax ?
+      //   * yes: take PaddingMax path
+      //   * no: do the dichotomy
+      // The contour lines may be needed if there is objects of different size anyway.
 
-      // // Find a path from the top left of room 1 to the bottom left of room 3
-      // const path = navMesh.findPath({ x: 0, y: 0 }, { x: 10, y: 20 });
-      // // ⮡  [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 10, y: 20 }]
-
-      // this._manager._obstacles.forEach(obstacle => {
-      //   for (const hitBox of obstacle.owner.getHitBoxes()) {
-      //     const points = hitBox.vertices.map(point => ({x: point[0], y: point[1]}));
-      //     console.log(points.map(point => '(' + point.x + ' ' + point.y + ')').join(' '));
-      //     obstaclePoints.push(points);
-      //   }
-      // });
-
-      // TODO generate the polygons for the NavMesh
+      let radiusSqMax = 0;
+      const centerX = this.owner.getCenterXInScene();
+      const centerY = this.owner.getCenterYInScene();
+      for (const hitBox of this.owner.getHitBoxes()) {
+        for (const vertex of hitBox.vertices) {
+          const deltaX = vertex[0] - centerX;
+          const deltaY = vertex[1] - centerY;
+          const radiusSq = deltaX * deltaX + deltaY * deltaY;
+          console.log(vertex[0] + " - " +  centerX + "   " + vertex[1] + " - " +  centerY);
+          radiusSqMax = Math.max(radiusSq, radiusSqMax);
+        }
+      }
+      const radiusMax = Math.sqrt(radiusSqMax);
       const cellSize = 10;
-      const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
-      console.log("grid: " + grid.dimX() + " " + grid.dimY());
-      const objects = Array.from(this._manager._obstacles).map(obstacle => obstacle.owner);
-      gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
-    console.log('\n' + grid.cells
-    .map((cellRow) =>
-      cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
-    )
-    .join('\n') + '\n');
-      gdjs.NavMeshGenerator.generateDistanceField(grid);
-      gdjs.NavMeshGenerator.generateRegions(grid);
-      const contours = gdjs.NavMeshGenerator.buildContours(grid);
-      //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
-      const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 8);
-      const polygons = polyMeshField.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
-      this.meshPolygons = polygons;
-      console.log('polygons.length: ' + polygons.length);
-      console.log(
-        polygons
-          .map((polygon) =>
-          polygon
-              .map((point) => '(' + point.x + ' ' + point.y + ')')
-              .join(', ')
-          )
-          .join('\n')
-      );
-      const navMesh = new gdjs.NavMesh(polygons);
+      //TODO make it configurable
+      const obstacleCellPadding = Math.ceil(radiusMax / cellSize);
 
-      // Find a path from the top left of room 1 to the bottom left of room 3
+      let navMesh = this._navMeshes.get(obstacleCellPadding);
+      if (!navMesh) {
+        const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
+        console.log("grid: " + grid.dimX() + " " + grid.dimY());
+        const objects = Array.from(this._manager._obstacles).map(obstacle => obstacle.owner);
+        gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
+      console.log('\n' + grid.cells
+      .map((cellRow) =>
+        cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
+      )
+      .join('\n') + '\n');
+        gdjs.NavMeshGenerator.generateDistanceField(grid);
+        gdjs.NavMeshGenerator.generateRegions(grid, obstacleCellPadding);
+        const contours = gdjs.NavMeshGenerator.buildContours(grid);
+        //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
+        const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
+        const polygons = polyMeshField.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
+        this.meshPolygons = polygons;
+        console.log('polygons.length: ' + polygons.length);
+        console.log(
+          polygons
+            .map((polygon) =>
+            polygon
+                .map((point) => '(' + point.x + ' ' + point.y + ')')
+                .join(', ')
+            )
+            .join('\n')
+        );
+        navMesh = new gdjs.NavMesh(polygons);
+        this._navMeshes.set(obstacleCellPadding, navMesh);
+      }
+
+      //TODO if the target is not on the mesh, find the nearest position
+      // maybe the same with the origin to avoid to be stuck.
       const path = navMesh.findPath(
         { x: this.owner.getX(), y: this.owner.getY() },
         { x: x, y: y }
       );
-      // ⮡  [{ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 10, y: 20 }]
       console.log(path);
       if (path) {
         this._pathFound = true;
@@ -364,14 +376,7 @@ namespace gdjs {
       this._pathFound = false;
     }
 
-    meshPolygons: Point[][] = [];
-
-    drawCells(runtimeScene: gdjs.RuntimeScene, shapePainter: gdjs.ShapePainterRuntimeObject) {
-      console.log(runtimeScene);
-      console.log(shapePainter);
-      shapePainter = runtimeScene.getObjects("Grid")[0] as gdjs.ShapePainterRuntimeObject;
-      console.log(shapePainter);
-      console.log("this.meshPolygons.length: " + this.meshPolygons.length);
+    drawCells(shapePainter: gdjs.ShapePainterRuntimeObject) {
       
       // for (const polygon of this.meshPolygons) {
       //   shapePainter.beginFillPath(polygon[0].x, polygon[0].y);
@@ -388,9 +393,13 @@ namespace gdjs {
       //   }
       //   shapePainter.closePath();
       // }
+      shapePainter._renderer.clear();
       for (const polygon of this.meshPolygons) {
+        const last = polygon.length - 1;
+        //shapePainter.drawRectangle(polygon[last].x - 8, polygon[last].y - 8, polygon[last].x + 8, polygon[last].y + 8);
+        //shapePainter.drawCircle(polygon[0].x, polygon[0].y, 8);
         for (let index = 0; index < polygon.length; index++) {
-      shapePainter.drawLine(polygon[index].x, polygon[index].y, polygon[(index + 1) % polygon.length].x, polygon[(index + 1) % polygon.length].y, 1);
+          shapePainter.drawLine(polygon[index].x, polygon[index].y, polygon[(index + 1) % polygon.length].x, polygon[(index + 1) % polygon.length].y, 1);
         }
       }
     }

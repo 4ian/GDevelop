@@ -318,7 +318,7 @@ namespace gdjs {
         eventName: string,
         variable: gdjs.Variable
       ) => {
-        sendDataTo(id, eventName, variable.toJSON());
+        sendDataTo(id, eventName, JSON.stringify(variable.toJSObject()));
       };
 
       /**
@@ -330,7 +330,7 @@ namespace gdjs {
         eventName: string,
         variable: gdjs.Variable
       ) => {
-        sendDataToAll(eventName, variable.toJSON());
+        sendDataToAll(eventName, JSON.stringify(variable.toJSObject()));
       };
 
       /**

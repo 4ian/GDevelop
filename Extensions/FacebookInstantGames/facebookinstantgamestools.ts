@@ -61,7 +61,7 @@ namespace gdjs {
         errorVariable.setString('');
         successVariable.setString('');
         const data = {};
-        data[key] = variable.toJSON();
+        data[key] = JSON.stringify(variable.toJSObject());
         FBInstant.player
           .setDataAsync(data)
           .then(function () {
@@ -83,7 +83,7 @@ namespace gdjs {
         }
         errorVariable.setString('');
         successVariable.setString('');
-        const data = extraDataVariable.toJSON();
+        const data = JSON.stringify(extraDataVariable.toJSObject());
         FBInstant.getLeaderboardAsync(leaderboardName)
           .then(function (leaderboard) {
             return leaderboard.setScoreAsync(score, data);

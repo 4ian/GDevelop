@@ -20,8 +20,7 @@ namespace gdjs {
     _angularMaxSpeed: float;
     _rotateObject: boolean;
     _angleOffset: float;
-    _cellWidth: float = 20;
-    _cellHeight: float = 20;
+    _cellSize: float = 10;
     _gridOffsetX: float = 0;
     _gridOffsetY: float = 0;
     _extraBorder: float = 0;
@@ -36,11 +35,6 @@ namespace gdjs {
     _reachedEnd: boolean = false;
     _manager: NavMeshPathfindingObstaclesManager;
     _movementAngle: float = 0;
-
-    // for path finding algorithm
-    _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
-    /** Used to draw traces for debugging */
-    meshPolygons: Point[][] = [];
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -59,9 +53,9 @@ namespace gdjs {
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
-      this._manager = gdjs.NavMeshPathfindingObstaclesManager.getManager(
-        runtimeScene
-      );
+      this._cellSize = behaviorData.cellSize;
+      this._manager =
+        gdjs.NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -80,23 +74,18 @@ namespace gdjs {
       if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
         this.setAngleOffset(newBehaviorData.angleOffset);
       }
+      if (oldBehaviorData.cellSize !== newBehaviorData.cellSize) {
+        this.setCellSize(newBehaviorData.cellSize);
+      }
       return true;
     }
 
-    setCellWidth(width: float): void {
-      this._cellWidth = width;
+    setCellSize(cellSize: float): void {
+      this._cellSize = cellSize;
     }
 
-    getCellWidth(): float {
-      return this._cellWidth;
-    }
-
-    setCellHeight(height: float): void {
-      this._cellHeight = height;
-    }
-
-    getCellHeight(): float {
-      return this._cellHeight;
+    getCellSize(): float {
+      return this._cellSize;
     }
 
     setGridOffsetX(gridOffsetX: float): void {
@@ -314,46 +303,20 @@ namespace gdjs {
           const deltaX = vertex[0] - centerX;
           const deltaY = vertex[1] - centerY;
           const radiusSq = deltaX * deltaX + deltaY * deltaY;
-          console.log(vertex[0] + " - " +  centerX + "   " + vertex[1] + " - " +  centerY);
+          console.log(
+            vertex[0] + ' - ' + centerX + '   ' + vertex[1] + ' - ' + centerY
+          );
           radiusSqMax = Math.max(radiusSq, radiusSqMax);
         }
       }
       const radiusMax = Math.sqrt(radiusSqMax);
-      const cellSize = 10;
       //TODO make it configurable
-      const obstacleCellPadding = Math.ceil(radiusMax / cellSize);
+      const obstacleCellPadding = Math.ceil(radiusMax / this._cellSize);
 
-      let navMesh = this._navMeshes.get(obstacleCellPadding);
-      if (!navMesh) {
-        const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
-        console.log("grid: " + grid.dimX() + " " + grid.dimY());
-        const objects = Array.from(this._manager._obstacles).map(obstacle => obstacle.owner);
-        gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
-      console.log('\n' + grid.cells
-      .map((cellRow) =>
-        cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
-      )
-      .join('\n') + '\n');
-        gdjs.NavMeshGenerator.generateDistanceField(grid);
-        gdjs.NavMeshGenerator.generateRegions(grid, obstacleCellPadding);
-        const contours = gdjs.NavMeshGenerator.buildContours(grid);
-        //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
-        const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
-        const polygons = polyMeshField.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
-        this.meshPolygons = polygons;
-        console.log('polygons.length: ' + polygons.length);
-        console.log(
-          polygons
-            .map((polygon) =>
-            polygon
-                .map((point) => '(' + point.x + ' ' + point.y + ')')
-                .join(', ')
-            )
-            .join('\n')
-        );
-        navMesh = new gdjs.NavMesh(polygons);
-        this._navMeshes.set(obstacleCellPadding, navMesh);
-      }
+      const navMesh = this._manager.getNavMesh(
+        obstacleCellPadding,
+        this._cellSize
+      );
 
       //TODO if the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
@@ -377,7 +340,6 @@ namespace gdjs {
     }
 
     drawCells(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      
       // for (const polygon of this.meshPolygons) {
       //   shapePainter.beginFillPath(polygon[0].x, polygon[0].y);
       //   for (let index = 1; index < polygon.length; index++) {
@@ -394,12 +356,18 @@ namespace gdjs {
       //   shapePainter.closePath();
       // }
       shapePainter._renderer.clear();
-      for (const polygon of this.meshPolygons) {
+      for (const polygon of this._manager.meshPolygons) {
         const last = polygon.length - 1;
         //shapePainter.drawRectangle(polygon[last].x - 8, polygon[last].y - 8, polygon[last].x + 8, polygon[last].y + 8);
         //shapePainter.drawCircle(polygon[0].x, polygon[0].y, 8);
         for (let index = 0; index < polygon.length; index++) {
-          shapePainter.drawLine(polygon[index].x, polygon[index].y, polygon[(index + 1) % polygon.length].x, polygon[(index + 1) % polygon.length].y, 1);
+          shapePainter.drawLine(
+            polygon[index].x,
+            polygon[index].y,
+            polygon[(index + 1) % polygon.length].x,
+            polygon[(index + 1) % polygon.length].y,
+            1
+          );
         }
       }
     }
@@ -425,6 +393,10 @@ namespace gdjs {
         this._reachedEnd = true;
         this._speed = 0;
       }
+    }
+
+    isMoving() {
+      return !(this._path.length === 0 || this._reachedEnd);
     }
 
     doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {

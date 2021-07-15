@@ -6,26 +6,20 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
-  class PixiObjectEffectsManager {
-    update(runtimeObject: RuntimeObject, layer: Layer) {
-      const filters = runtimeObject.getRendererEffects();
-      for (const filterName in filters) {
-        const filter = filters[filterName];
-        filter.update(filter.pixiFilter, layer);
-      }
-    }
+  type RendererEffects = Record<string, PixiFiltersTools.Filter>;
 
+  class PixiObjectEffectsManager {
     /**
-     * Add a new effect on a runtime object, or replace the one
-     * with the same name.
-     * @param runtimeObject The runtime object
-     * @param effectData The data of the effect to add.
+     * Initialize the renderer effects from the effect data.
+     * @param effectData The effect data
+     * @param rendererEffects The renderer effects collection
+     * @param layer The layer
      */
-    addEffect(
-      runtimeObject: RuntimeObject,
+    initializeEffect(
       effectData: EffectData,
+      rendererEffects: RendererEffects,
       layer: Layer
-    ) {
+    ): boolean {
       const filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
         effectData.effectType
       );
@@ -37,7 +31,7 @@ namespace gdjs {
             effectData.effectType +
             '". Was it registered properly? Is the effect type correct?'
         );
-        return;
+        return false;
       }
 
       const filter: PixiFiltersTools.Filter = {
@@ -48,116 +42,218 @@ namespace gdjs {
         update: filterCreator.update,
       };
 
-      const renderer = runtimeObject.getRendererObject();
-      renderer.filters = (renderer.filters || []).concat(filter.pixiFilter);
+      rendererEffects[effectData.name] = filter;
+      return true;
+    }
 
-      const filters = runtimeObject.getRendererEffects();
-      filters[effectData.name] = filter;
+    /**
+     * Apply the effect on the renderer object.
+     * @param rendererObject The renderer object
+     * @param effect The effect to be applied.
+     */
+    applyEffect(
+      rendererObject: PIXI.DisplayObject,
+      effect: PixiFiltersTools.Filter
+    ): boolean {
+      rendererObject.filters = (rendererObject.filters || []).concat(
+        effect.pixiFilter
+      );
+      return true;
+    }
+
+    /**
+     * Update the filters applied on an object.
+     * @param runtimeObject
+     * @param layer
+     */
+    update(rendererEffects: RendererEffects, layer: Layer) {
+      for (const filterName in rendererEffects) {
+        const filter = rendererEffects[filterName];
+        filter.update(filter.pixiFilter, layer);
+      }
+    }
+
+    /**
+     * Add a new effect on a runtime object, or replace the one
+     * with the same name.
+     * @param effectData The effect data
+     * @param rendererEffects The renderer effects
+     * @param rendererObject The renderer object
+     * @param layer The Layer
+     */
+    addEffect(
+      effectData: EffectData,
+      rendererEffects: RendererEffects,
+      rendererObject: PIXI.DisplayObject,
+      layer: Layer
+    ): boolean {
+      let effectAdded = true;
+      effectAdded =
+        this.initializeEffect(effectData, rendererEffects, layer) &&
+        effectAdded;
+      effectAdded =
+        this.updateAllEffectParameters(rendererEffects, effectData) &&
+        effectAdded;
+      effectAdded =
+        this.applyEffect(rendererObject, rendererEffects[effectData.name]) &&
+        effectAdded;
+      return effectAdded;
     }
 
     /**
      * Remove the effect from a runtime object with the specified name
-     * @param runtimeObject The runtime object.
+     * @param rendererEffects The renderer effects of the object.
+     * @param rendererObject The renderer object.
      * @param effectName The name of the effect.
      */
-    removeEffect(runtimeObject: RuntimeObject, effectName: string) {
-      const filter = runtimeObject.getRendererEffects()[effectName];
-      if (!filter) return;
-      const renderer: PIXI.DisplayObject = runtimeObject.getRendererObject();
-      renderer.filters = (renderer.filters || []).filter(
+    removeEffect(
+      rendererEffects: RendererEffects,
+      rendererObject: PIXI.DisplayObject,
+      effectName: string
+    ): boolean {
+      const filter = rendererEffects[effectName];
+      if (!filter) return false;
+      rendererObject.filters = (rendererObject.filters || []).filter(
         (pixiFilter) => pixiFilter !== filter.pixiFilter
       );
-      delete runtimeObject.getRendererEffects()[effectName];
+      delete rendererEffects[effectName];
+      return true;
     }
 
     /**
      * Update the parameter of an effect (with a number).
-     * @param runtimeObject The runtime object
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
      */
     setEffectDoubleParameter(
-      runtimeObject: RuntimeObject,
+      rendererEffects: RendererEffects,
       name: string,
       parameterName: string,
       value: float
-    ): void {
-      const filter = runtimeObject.getRendererEffects()[name];
-      if (!filter) return;
+    ): boolean {
+      const filter = rendererEffects[name];
+      if (!filter) return false;
       filter.updateDoubleParameter(filter.pixiFilter, parameterName, value);
+      return true;
     }
 
     /**
      * Update the parameter of an effect (with a string).
-     * @param runtimeObject The runtime object
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
      */
     setEffectStringParameter(
-      runtimeObject: RuntimeObject,
+      rendererEffects: RendererEffects,
       name: string,
       parameterName: string,
       value: string
-    ): void {
-      const filter = runtimeObject.getRendererEffects()[name];
-      if (!filter) return;
+    ): boolean {
+      const filter = rendererEffects[name];
+      if (!filter) return false;
       filter.updateStringParameter(filter.pixiFilter, parameterName, value);
+      return true;
     }
 
     /**
      * Enable or disable the parameter of an effect (boolean).
-     * @param runtimeObject The runtime object
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
      */
     setEffectBooleanParameter(
-      runtimeObject: RuntimeObject,
+      rendererEffects: RendererEffects,
       name: string,
       parameterName: string,
       value: boolean
-    ): void {
-      const filter = runtimeObject.getRendererEffects()[name];
-      if (!filter) return;
+    ): boolean {
+      const filter = rendererEffects[name];
+      if (!filter) return false;
       filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
+      return true;
+    }
+
+    /**
+     * Updates all the effect parameters.
+     * @param rendererEffects
+     * @param effectData
+     */
+    updateAllEffectParameters(
+      rendererEffects: RendererEffects,
+      effectData: EffectData
+    ): boolean {
+      let updatedDoubles = true;
+      let updatedStrings = true;
+      let updatedBooleans = true;
+      for (let name in effectData.doubleParameters) {
+        updatedDoubles =
+          this.setEffectDoubleParameter(
+            rendererEffects,
+            effectData.name,
+            name,
+            effectData.doubleParameters[name]
+          ) && updatedDoubles;
+      }
+      for (let name in effectData.stringParameters) {
+        updatedStrings =
+          this.setEffectStringParameter(
+            rendererEffects,
+            effectData.name,
+            name,
+            effectData.stringParameters[name]
+          ) && updatedStrings;
+      }
+      for (let name in effectData.booleanParameters) {
+        updatedBooleans =
+          this.setEffectBooleanParameter(
+            rendererEffects,
+            effectData.name,
+            name,
+            effectData.booleanParameters[name]
+          ) && updatedBooleans;
+      }
+
+      return updatedDoubles && updatedStrings && updatedBooleans;
     }
 
     /**
      * Check if an effect exists.
-     * @param runtimeObject
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @returns True if the effect exists, false otherwise
      */
-    hasEffect(runtimeObject: RuntimeObject, name: string): boolean {
-      return !!runtimeObject.getRendererEffects()[name];
+    hasEffect(rendererEffects: RendererEffects, name: string): boolean {
+      return !!rendererEffects[name];
     }
 
     /**
      * Enable an effect.
-     * @param runtimeObject The runtime object.
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @param value Set to true to enable, false to disable
      */
     enableEffect(
-      runtimeObject: RuntimeObject,
+      rendererEffects: RendererEffects,
       name: string,
       value: boolean
     ): void {
-      const filter = runtimeObject.getRendererEffects()[name];
+      const filter = rendererEffects[name];
       if (!filter) return;
       gdjs.PixiFiltersTools.enableEffect(filter, value);
     }
 
     /**
      * Check if an effect is enabled.
-     * @param runtimeObject The runtime object
+     * @param rendererEffects The renderer effects of the object.
      * @param name The effect name
      * @return true if the filter is enabled
      */
-    isEffectEnabled(runtimeObject: RuntimeObject, name: string): boolean {
-      const filter = runtimeObject.getRendererEffects()[name];
+    isEffectEnabled(rendererEffects: RendererEffects, name: string): boolean {
+      const filter = rendererEffects[name];
       if (!filter) return false;
       return gdjs.PixiFiltersTools.isEffectEnabled(filter);
     }

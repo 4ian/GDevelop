@@ -71,7 +71,6 @@ namespace gdjs {
     protected _variables: gdjs.VariablesContainer;
 
     //Effects:
-    protected _effects: EffectData[];
     protected _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
 
     //Forces:
@@ -102,7 +101,10 @@ namespace gdjs {
       );
       this._averageForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
-      this._effects = objectData.effects;
+      for (let i = 0; i < objectData.effects.length; ++i) {
+        this.initializeEffect(objectData.effects[i]);
+        this.updateAllEffectParameters(objectData.effects[i]);
+      }
 
       //Also contains the behaviors: Used when a behavior is accessed by its name ( see getBehavior ).
       for (let i = 0, len = objectData.behaviors.length; i < len; ++i) {
@@ -129,8 +131,14 @@ namespace gdjs {
         this._behaviors[i].onCreated();
       }
 
-      for (let i = 0; i < this._effects.length; i++) {
-        this.addEffect(this._effects[i]);
+      const objectEffectsManager = this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager();
+      for (const filterName in this._rendererEffects) {
+        objectEffectsManager.applyEffect(
+          this.getRendererObject(),
+          this._rendererEffects[filterName]
+        );
       }
     }
 
@@ -214,7 +222,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .update(this, layer);
+        .update(this._rendererEffects, layer);
     }
 
     /**
@@ -234,6 +242,25 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ): void {}
 
+    /**
+     * Update the effects during hot-reload
+     * @param oldEffectData Old effect data
+     * @param newEffectData New effect data
+     * @returns
+     */
+    _hotReloadRuntimeObjectEffects(
+      oldEffectData: EffectData[],
+      newEffectData: EffectData[]
+    ): boolean {
+      for (let i = 0; i < oldEffectData.length; ++i) {
+        this.removeEffect(oldEffectData[i].name);
+      }
+      for (let i = 0; i < newEffectData.length; ++i) {
+        this.addEffect(newEffectData[i]);
+      }
+      return true;
+    }
+
     //Nothing to do.
     /**
      * Called when the object must be updated using the specified objectData. This is the
@@ -247,8 +274,10 @@ namespace gdjs {
       oldObjectData: ObjectData,
       newObjectData: ObjectData
     ): boolean {
-      // If not redefined, mark by default the hot-reload as failed.
-      return false;
+      return this._hotReloadRuntimeObjectEffects(
+        oldObjectData.effects,
+        newObjectData.effects
+      );
     }
 
     /**
@@ -754,47 +783,44 @@ namespace gdjs {
       return this._rendererEffects;
     }
 
+    initializeEffect(effectsData: EffectData) {
+      const layer = this._runtimeScene.getLayer(this.layer);
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .initializeEffect(effectsData, this._rendererEffects, layer);
+    }
+
     /**
      * Add a new effect, or replace the one with the same name.
      * @param effectData The data of the effect to add.
      */
-    addEffect(effectData) {
-      this._runtimeScene
+    addEffect(effectData: EffectData): boolean {
+      const layer = this._runtimeScene.getLayer(this.layer);
+      return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .addEffect(this, effectData, this._runtimeScene.getLayer(this.layer));
-      for (let name in effectData.doubleParameters) {
-        this.setEffectDoubleParameter(
-          effectData.name,
-          name,
-          effectData.doubleParameters[name]
+        .addEffect(
+          effectData,
+          this._rendererEffects,
+          this.getRendererObject(),
+          layer
         );
-      }
-      for (let name in effectData.stringParameters) {
-        this.setEffectStringParameter(
-          effectData.name,
-          name,
-          effectData.stringParameters[name]
-        );
-      }
-      for (let name in effectData.booleanParameters) {
-        this.setEffectBooleanParameter(
-          effectData.name,
-          name,
-          effectData.booleanParameters[name]
-        );
-      }
     }
 
     /**
      * Remove the effect with the specified name
      * @param effectName The name of the effect.
      */
-    removeEffect(effectName) {
-      this._runtimeScene
+    removeEffect(effectName: string): boolean {
+      return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .removeEffect(this, effectName);
+        .removeEffect(
+          this._rendererEffects,
+          this.getRendererObject(),
+          effectName
+        );
     }
 
     /**
@@ -807,11 +833,16 @@ namespace gdjs {
       name: string,
       parameterName: string,
       value: float
-    ) {
+    ): boolean {
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .setEffectDoubleParameter(this, name, parameterName, value);
+        .setEffectDoubleParameter(
+          this._rendererEffects,
+          name,
+          parameterName,
+          value
+        );
     }
 
     /**
@@ -824,11 +855,16 @@ namespace gdjs {
       name: string,
       parameterName: string,
       value: string
-    ) {
+    ): boolean {
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .setEffectStringParameter(this, name, parameterName, value);
+        .setEffectStringParameter(
+          this._rendererEffects,
+          name,
+          parameterName,
+          value
+        );
     }
 
     /**
@@ -841,11 +877,27 @@ namespace gdjs {
       name: string,
       parameterName: string,
       value: boolean
-    ): void {
+    ): boolean {
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .setEffectBooleanParameter(this, name, parameterName, value);
+        .setEffectBooleanParameter(
+          this._rendererEffects,
+          name,
+          parameterName,
+          value
+        );
+    }
+
+    /**
+     * Updates all the effect parameters.
+     * @param effectData
+     */
+    updateAllEffectParameters(effectData: EffectData): boolean {
+      return this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .updateAllEffectParameters(this._rendererEffects, effectData);
     }
 
     /**
@@ -857,7 +909,7 @@ namespace gdjs {
       this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .enableEffect(this, name, enable);
+        .enableEffect(this._rendererEffects, name, enable);
     }
 
     /**
@@ -869,7 +921,7 @@ namespace gdjs {
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .isEffectEnabled(this, name);
+        .isEffectEnabled(this._rendererEffects, name);
     }
 
     /**
@@ -881,7 +933,7 @@ namespace gdjs {
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .hasEffect(this, name);
+        .hasEffect(this._rendererEffects, name);
     }
 
     /**

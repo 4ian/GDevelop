@@ -72,7 +72,7 @@ namespace gdjs {
 
     //Effects:
     protected _effects: EffectData[];
-    protected _filters: Record<string, PixiFiltersTools.Filter> = {}; 
+    protected _renderEffects: Record<string, PixiFiltersTools.Filter> = {};
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
@@ -210,8 +210,11 @@ namespace gdjs {
      * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
      */
     update(runtimeScene: gdjs.RuntimeScene): void {
-      const layer = this._runtimeScene.getLayer(this.layer)
-      this._runtimeScene.getGame().getObjectEffectsManager().update(this, layer);
+      const layer = this._runtimeScene.getLayer(this.layer);
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .update(this, layer);
     }
 
     /**
@@ -742,8 +745,13 @@ namespace gdjs {
       return this._variables.has(name);
     }
 
-    getFilters() {
-      return this._filters;
+    /**
+     * Returns the collection of effects to be rendered
+     * by the underlying renderer.
+     * @returns The render effects.
+     */
+    getRenderEffects() {
+      return this._renderEffects;
     }
 
     /**

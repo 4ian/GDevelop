@@ -16,6 +16,11 @@ namespace gdjs {
     _obstaclesRBush: any;
     _obstacles: Set<NavMeshPathfindingObstacleRuntimeBehavior>;
 
+    // for the path finding algorithm
+    _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
+    /** Used to draw traces for debugging */
+    meshPolygons: Point[][] = [];
+
     /**
      * @param object The object
      */
@@ -35,9 +40,8 @@ namespace gdjs {
     static getManager(runtimeScene) {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
-        runtimeScene.pathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
-          runtimeScene
-        );
+        runtimeScene.pathfindingObstaclesManager =
+          new gdjs.NavMeshPathfindingObstaclesManager(runtimeScene);
       }
       return runtimeScene.pathfindingObstaclesManager;
     }
@@ -61,6 +65,52 @@ namespace gdjs {
     ) {
       this._obstaclesRBush.remove(pathfindingObstacleBehavior);
       this._obstacles.delete(pathfindingObstacleBehavior);
+    }
+
+    getNavMesh(obstacleCellPadding: integer, cellSize: integer): NavMesh {
+      let navMesh = this._navMeshes.get(obstacleCellPadding);
+      if (!navMesh) {
+        const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
+        console.log('grid: ' + grid.dimX() + ' ' + grid.dimY());
+        const objects = Array.from(this._obstacles).map(
+          (obstacle) => obstacle.owner
+        );
+        gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
+        console.log(
+          '\n' +
+            grid.cells
+              .map((cellRow) =>
+                cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
+              )
+              .join('\n') +
+            '\n'
+        );
+        gdjs.NavMeshGenerator.generateDistanceField(grid);
+        gdjs.NavMeshGenerator.generateRegions(grid, obstacleCellPadding);
+        const contours = gdjs.NavMeshGenerator.buildContours(grid);
+        //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
+        const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
+        const polygons = polyMeshField.map((polygon) =>
+          polygon.map((point) => ({
+            x: cellSize * point.x + grid.originX,
+            y: cellSize * point.y + grid.originY,
+          }))
+        );
+        this.meshPolygons = polygons;
+        console.log('polygons.length: ' + polygons.length);
+        console.log(
+          polygons
+            .map((polygon) =>
+              polygon
+                .map((point) => '(' + point.x + ' ' + point.y + ')')
+                .join(', ')
+            )
+            .join('\n')
+        );
+        navMesh = new gdjs.NavMesh(polygons);
+        this._navMeshes.set(obstacleCellPadding, navMesh);
+      }
+      return navMesh;
     }
 
     /**
@@ -111,7 +161,8 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
-      this._manager = NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      this._manager =
+        NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
 
       //Note that we can't use getX(), getWidth()... of owner here:
       //The owner is not yet fully constructed.

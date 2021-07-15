@@ -72,7 +72,7 @@ namespace gdjs {
 
     //Effects:
     protected _effects: EffectData[];
-    protected _renderEffects: Record<string, PixiFiltersTools.Filter> = {};
+    protected _rendererEffects: Record<string, PixiFiltersTools.Filter> = {};
 
     //Forces:
     protected _forces: gdjs.Force[] = [];
@@ -750,8 +750,8 @@ namespace gdjs {
      * by the underlying renderer.
      * @returns The render effects.
      */
-    getRenderEffects() {
-      return this._renderEffects;
+    getRendererEffects() {
+      return this._rendererEffects;
     }
 
     /**

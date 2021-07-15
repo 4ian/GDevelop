@@ -152,13 +152,14 @@ module.exports = {
     // that are called to get and set the properties of the behavior.
     // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
     // saved/loaded to JSON.
-    var dummyBehavior = new gd.BehaviorJsImplementation();
+    const dummyBehavior = new gd.BehaviorJsImplementation();
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.updateProperty = function (
       behaviorContent,
       propertyName,
       newValue
     ) {
+      console.log("updateProperty: " + propertyName);
       if (propertyName === 'My first property') {
         behaviorContent.setStringAttribute('property1', newValue);
         return true;
@@ -172,7 +173,7 @@ module.exports = {
     };
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     dummyBehavior.getProperties = function (behaviorContent) {
-      var behaviorProperties = new gd.MapStringPropertyDescriptor();
+      const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties
         .getOrCreate('My first property')

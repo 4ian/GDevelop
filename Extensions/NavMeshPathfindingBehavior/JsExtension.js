@@ -35,14 +35,6 @@ module.exports = {
       'MIT'
     );
 
-    // Register Cordova/NPM dependencies
-    extension
-      .addDependency()
-      .setName('NavMesh')
-      .setDependencyType('npm')
-      .setExportName('navmesh')
-      .setVersion('2.3.0');
-
     // Declare a behavior.
     // Create a new gd.BehaviorJsImplementation object and implement the methods
     // that are called to get and set the properties of the behavior.
@@ -55,6 +47,7 @@ module.exports = {
       propertyName,
       newValue
     ) {
+      console.log("updateProperty: " + propertyName);
       if (propertyName === 'Acceleration') {
         behaviorContent.setDoubleAttribute('acceleration', newValue);
         return true;
@@ -113,6 +106,7 @@ module.exports = {
         .getOrCreate('Angle offset')
         .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString());
 
+        //TODO make it an extension property
       behaviorProperties
         .getOrCreate('Cell size')
         .setValue(behaviorContent.getDoubleAttribute('cellSize').toString());

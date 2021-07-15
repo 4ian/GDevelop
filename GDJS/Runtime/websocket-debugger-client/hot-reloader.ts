@@ -935,9 +935,15 @@ namespace gdjs {
           if (!HotReloader.deepEqual(oldEffectData, newEffectData)) {
             let hotReloadSucceeded = true;
             runtimeObjects.forEach((runtimeObject) => {
-              hotReloadSucceeded =
-                runtimeObject.updateAllEffectParameters(newEffectData) &&
-                hotReloadSucceeded;
+              if (oldEffectData.effectType === newEffectData.effectType) {
+                hotReloadSucceeded =
+                  runtimeObject.updateAllEffectParameters(newEffectData) &&
+                  hotReloadSucceeded;
+              } else {
+                // Another effect type was applied
+                runtimeObject.removeEffect(oldEffectData.name);
+                runtimeObject.addEffect(newEffectData);
+              }
             });
             if (!hotReloadSucceeded) {
               this._logs.push({

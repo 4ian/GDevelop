@@ -39,9 +39,9 @@ module.exports = {
     extension
       .addDependency()
       .setName('NavMesh')
-       .setDependencyType('npm')
-       .setExportName('navmesh')
-       .setVersion('2.3.0');
+      .setDependencyType('npm')
+      .setExportName('navmesh')
+      .setVersion('2.3.0');
 
     // Declare a behavior.
     // Create a new gd.BehaviorJsImplementation object and implement the methods
@@ -56,15 +56,15 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'Acceleration') {
-        behaviorContent.setStringAttribute('acceleration', newValue);
+        behaviorContent.setDoubleAttribute('acceleration', newValue);
         return true;
       }
       if (propertyName === 'Max. speed') {
-        behaviorContent.setStringAttribute('maxSpeed', newValue);
+        behaviorContent.setDoubleAttribute('maxSpeed', newValue);
         return true;
       }
       if (propertyName === 'Rotate speed') {
-        behaviorContent.setStringAttribute('angularMaxSpeed', newValue);
+        behaviorContent.setDoubleAttribute('angularMaxSpeed', newValue);
         return true;
       }
       if (propertyName === 'Rotate object') {
@@ -72,7 +72,11 @@ module.exports = {
         return true;
       }
       if (propertyName === 'Angle offset') {
-        behaviorContent.setStringAttribute('angleOffset', newValue);
+        behaviorContent.setDoubleAttribute('angleOffset', newValue);
+        return true;
+      }
+      if (propertyName === 'Cell size') {
+        behaviorContent.setDoubleAttribute('cellSize', newValue);
         return true;
       }
 
@@ -84,15 +88,19 @@ module.exports = {
 
       behaviorProperties
         .getOrCreate('Acceleration')
-        .setValue(behaviorContent.getStringAttribute('acceleration'));
+        .setValue(
+          behaviorContent.getDoubleAttribute('acceleration').toString()
+        );
 
       behaviorProperties
         .getOrCreate('Max. speed')
-        .setValue(behaviorContent.getStringAttribute('maxSpeed'));
+        .setValue(behaviorContent.getDoubleAttribute('maxSpeed').toString());
 
       behaviorProperties
         .getOrCreate('Rotate speed')
-        .setValue(behaviorContent.getStringAttribute('angularMaxSpeed'));
+        .setValue(
+          behaviorContent.getDoubleAttribute('angularMaxSpeed').toString()
+        );
 
       behaviorProperties
         .getOrCreate('Rotate object')
@@ -103,7 +111,11 @@ module.exports = {
 
       behaviorProperties
         .getOrCreate('Angle offset')
-        .setValue(behaviorContent.getStringAttribute('angleOffset'));
+        .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString());
+
+      behaviorProperties
+        .getOrCreate('Cell size')
+        .setValue(behaviorContent.getDoubleAttribute('cellSize').toString());
 
       return behaviorProperties;
     };
@@ -114,6 +126,7 @@ module.exports = {
       behaviorContent.setDoubleAttribute('angularMaxSpeed', 180);
       behaviorContent.setBoolAttribute('rotateObject', true);
       behaviorContent.setDoubleAttribute('angleOffset', 0);
+      behaviorContent.setDoubleAttribute('cellSize', 20);
     };
     const pathfindingBehaviorDeclaration = extension
       .addBehavior(
@@ -130,9 +143,13 @@ module.exports = {
         pathfindingBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile('Extensions/NavMeshPathfindingBehavior/navmeshpathfindingruntimebehavior.js')
+      .setIncludeFile(
+        'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingruntimebehavior.js'
+      )
       .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js')
-      .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js');
+      .addIncludeFile(
+        'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
+      );
 
     // Declare a behavior.
     // Create a new gd.BehaviorJsImplementation object and implement the methods
@@ -173,7 +190,7 @@ module.exports = {
         'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
       );
 
-      pathfindingBehaviorDeclaration
+    pathfindingBehaviorDeclaration
       .addAction(
         'SetDestination',
         _('Move to a position'),
@@ -196,33 +213,37 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('moveTo');
 
-      pathfindingBehaviorDeclaration
-        .addAction(
-          'DrawCells',
-          _('Draw cells'),
-          _('Draw cells'),
-          _('Draw cells on _PARAM2_'),
-          'Debug (NavMesh)',
-          'CppPlatform/Extensions/AStaricon24.png',
-          'CppPlatform/Extensions/AStaricon16.png'
-        )
-        .addParameter('object', _('Object'), '', false)
-        .addParameter(
-          'behavior',
-          _('Behavior'),
-          'NavMeshPathfindingBehavior',
-          false
-        )
-        .addParameter('objectPtr', _('Shape painter'), '', false)
-        .getCodeExtraInformation()
-        .setFunctionName('drawCells');
+    pathfindingBehaviorDeclaration
+      .addAction(
+        'DrawCells',
+        _('Draw cells'),
+        _('Draw cells'),
+        _('Draw cells on _PARAM2_'),
+        'Debug (NavMesh)',
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .addParameter('objectPtr', _('Shape painter'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('drawCells');
 
     pathfindingBehaviorDeclaration
-    .addExpression("NodeCount",
-                      _("Waypoint count"),
-                      _("Get the number of waypoints on the path"),
-                      _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+      .addCondition(
+        'IsMoving',
+        _('Is moving'),
+        _('Check if the object is moving on a path.'),
+        _('_PARAM0_ is moving on a path'),
+        _('Movement on the path (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
       .addParameter('object', _('Object'), '', false)
       .addParameter(
         'behavior',
@@ -231,48 +252,18 @@ module.exports = {
         false
       )
       .getCodeExtraInformation()
-        .setFunctionName("getNodeCount");
-
-
-        pathfindingBehaviorDeclaration.addExpression("GetNodeX",
-        _("Get a waypoint X position"),
-        _("Get next waypoint X position"),
-        _("Movement on the path"),
-        "CppPlatform/Extensions/AStaricon16.png")
-        .addParameter('object', _('Object'), '', false)
-        .addParameter(
-          'behavior',
-          _('Behavior'),
-          'NavMeshPathfindingBehavior',
-          false
-        )
-.addParameter("expression", _("Node index (start at 0!)"), '', false)
-.getCodeExtraInformation()
-.setFunctionName("getNodeX");
-
-pathfindingBehaviorDeclaration.addExpression("GetNodeY",
-        _("Get a waypoint Y position"),
-        _("Get next waypoint Y position"),
-        _("Movement on the path"),
-        "CppPlatform/Extensions/AStaricon16.png")
-        .addParameter('object', _('Object'), '', false)
-        .addParameter(
-          'behavior',
-          _('Behavior'),
-          'NavMeshPathfindingBehavior',
-          false
-        )
-.addParameter("expression", _("Node index (start at 0!)"), '', false)
-.getCodeExtraInformation()
-.setFunctionName("getNodeY");
-
+      .setFunctionName('isMoving');
 
     pathfindingBehaviorDeclaration
-    .addExpression("NextNodeX",
-                      _("Get next waypoint X position"),
-                      _("Get next waypoint X position"),
-                      _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+      .addCondition(
+        'PathFound',
+        _('Path found'),
+        _('Check if a path has been found.'),
+        _('A path has been found for _PARAM0_'),
+        _('Movement on the path (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
       .addParameter('object', _('Object'), '', false)
       .addParameter(
         'behavior',
@@ -281,14 +272,18 @@ pathfindingBehaviorDeclaration.addExpression("GetNodeY",
         false
       )
       .getCodeExtraInformation()
-        .setFunctionName("getNextNodeX");
+      .setFunctionName('pathFound');
 
     pathfindingBehaviorDeclaration
-    .addExpression("NextNodeY",
-                      _("Get next waypoint Y position"),
-                      _("Get next waypoint Y position"),
-                      _("Movement on the path"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+      .addCondition(
+        'DestinationReached',
+        _('Destination reached'),
+        _('Check if the destination was reached.'),
+        _('_PARAM0_ reached its destination'),
+        _('Movement on the path (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
       .addParameter('object', _('Object'), '', false)
       .addParameter(
         'behavior',
@@ -297,8 +292,119 @@ pathfindingBehaviorDeclaration.addExpression("GetNodeY",
         false
       )
       .getCodeExtraInformation()
-        .setFunctionName("getNextNodeY");
+      .setFunctionName('pathFound');
 
+    pathfindingBehaviorDeclaration
+      .addExpressionAndConditionAndAction(
+        'number',
+        'CellSize',
+        _('Cell size'),
+        _('Size of the cells used to build the navigation mesh'),
+        _('Size of the cells used to build the navigation mesh'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .useStandardParameters('number');
+
+    pathfindingBehaviorDeclaration
+      .addExpression(
+        'NodeCount',
+        _('Waypoint count'),
+        _('Get the number of waypoints on the path'),
+        _('Movement on the path'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('getNodeCount');
+
+    pathfindingBehaviorDeclaration
+      .addExpression(
+        'GetNodeX',
+        _('Get a waypoint X position'),
+        _('Get next waypoint X position'),
+        _('Movement on the path'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .addParameter('expression', _('Node index (start at 0!)'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getNodeX');
+
+    pathfindingBehaviorDeclaration
+      .addExpression(
+        'GetNodeY',
+        _('Get a waypoint Y position'),
+        _('Get next waypoint Y position'),
+        _('Movement on the path'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .addParameter('expression', _('Node index (start at 0!)'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getNodeY');
+
+    pathfindingBehaviorDeclaration
+      .addExpression(
+        'NextNodeX',
+        _('Get next waypoint X position'),
+        _('Get next waypoint X position'),
+        _('Movement on the path'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('getNextNodeX');
+
+    pathfindingBehaviorDeclaration
+      .addExpression(
+        'NextNodeY',
+        _('Get next waypoint Y position'),
+        _('Get next waypoint Y position'),
+        _('Movement on the path'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter(
+        'behavior',
+        _('Behavior'),
+        'NavMeshPathfindingBehavior',
+        false
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('getNextNodeY');
 
     return extension;
   },

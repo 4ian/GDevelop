@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import { Line, Spacer } from '../../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import PlayArrow from '@material-ui/icons/PlayArrow';
@@ -46,6 +46,7 @@ export default class AnimationPreview extends Component<Props, State> {
   };
 
   nextUpdate = null;
+  previousUpdateTimeInMs = 0;
 
   componentDidMount() {
     this.nextUpdate = requestAnimationFrame(this._updateAnimation);
@@ -72,16 +73,17 @@ export default class AnimationPreview extends Component<Props, State> {
       paused: true,
     });
 
-  _updateAnimation = () => {
-    const animationSpeedScale = 1;
+  _updateAnimation = (updateTimeInMs: number) => {
+    const elapsedTime = this.previousUpdateTimeInMs
+      ? (updateTimeInMs - this.previousUpdateTimeInMs) / 1000
+      : 0;
 
     const { spritesContainer, timeBetweenFrames } = this.props;
     const { currentFrameIndex, currentFrameElapsedTime, paused } = this.state;
 
-    const elapsedTime = 1 / 60;
     let newFrameIndex = currentFrameIndex;
     let newFrameElapsedTime = currentFrameElapsedTime;
-    newFrameElapsedTime += paused ? 0 : elapsedTime * animationSpeedScale;
+    newFrameElapsedTime += paused ? 0 : elapsedTime;
 
     if (newFrameElapsedTime > timeBetweenFrames) {
       const count = Math.floor(newFrameElapsedTime / timeBetweenFrames);
@@ -102,6 +104,7 @@ export default class AnimationPreview extends Component<Props, State> {
       currentFrameElapsedTime: newFrameElapsedTime,
     });
     this.nextUpdate = requestAnimationFrame(this._updateAnimation);
+    this.previousUpdateTimeInMs = updateTimeInMs;
   };
 
   render() {
@@ -121,7 +124,7 @@ export default class AnimationPreview extends Component<Props, State> {
       : null;
 
     return (
-      <div>
+      <Column expand noOverflowParent>
         <ImagePreview
           resourceName={sprite ? sprite.getImageName() : ''}
           resourcesLoader={resourcesLoader}
@@ -182,7 +185,7 @@ export default class AnimationPreview extends Component<Props, State> {
             onClick={paused ? this.play : this.pause}
           />
         </Line>
-      </div>
+      </Column>
     );
   }
 }

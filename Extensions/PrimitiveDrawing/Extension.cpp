@@ -64,10 +64,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Line",
                 _("Line"),
-                _("Draw a line on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness: _PARAM5_) "
-                  "with _PARAM0_"),
+                "Draw a line on screen",
+                "Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
+                "(thickness: _PARAM5_) "
+                "with _PARAM0_",
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")

@@ -88,6 +88,7 @@ export const setupAutocompletions = (monaco: any) => {
           folderName =>
             !folderName.endsWith('.txt') &&
             !folderName.endsWith('.md') &&
+            !folderName.endsWith('.flow.js') &&
             !folderName.endsWith('.gitignore')
         )
         .forEach(folderName =>

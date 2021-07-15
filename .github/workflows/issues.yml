@@ -4,13 +4,6 @@ jobs:
   autoclose:
     runs-on: ubuntu-latest
     steps:
-    - name: Autoclose issues about adding a new example without providing anything
-      uses: arkon/issue-closer-action@v1.1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        type: "body"
-        regex: ".*INSERT the link to your game here, or add it as an attachment.*"
-        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any example.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop-app.com/), the Discord chat or [read the documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) to learn more about GDevelop. Thanks!"
     - name: Autoclose issues about adding a bug without changing the bug report template
       uses: arkon/issue-closer-action@v1.1
       with:

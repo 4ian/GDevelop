@@ -1,11 +1,12 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import { ListItem } from './List';
 import BackgroundText from './BackgroundText';
 // No i18n in this file
 
 type Props = {|
   onClick?: () => void,
-  primaryText: React.Node,
+  primaryText: ?React.Node,
 |};
 
 export const AddListItem = (props: Props) => {

@@ -1,3 +1,4 @@
+// @flow
 import optionalRequire from './OptionalRequire.js';
 const electron = optionalRequire('electron');
 const process = optionalRequire('process');

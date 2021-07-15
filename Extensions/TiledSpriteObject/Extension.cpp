@@ -147,9 +147,9 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
   obj.AddCondition("Angle",
-                   _("Angle"),
-                   _("Test the angle of a Tiled Sprite."),
-                   _("the angle"),
+                   "Angle",
+                   "Test the angle of a Tiled Sprite.",
+                   "the angle",
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")

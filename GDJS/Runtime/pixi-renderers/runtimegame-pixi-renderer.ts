@@ -41,6 +41,8 @@ namespace gdjs {
     _marginBottom: any;
     _notifySceneForResize: any;
 
+    _nextFrameId: integer = 0;
+
     /**
      * @param game The game that is being rendered
      * @param forceFullscreen If fullscreen should be always activated
@@ -535,16 +537,21 @@ namespace gdjs {
     }
 
     startGameLoop(fn) {
-      requestAnimationFrame(gameLoop);
       let oldTime = 0;
+      const gameLoop = (time: float) => {
+        // Schedule the next frame now to be sure it's called as soon
+        // as possible after this one is finished.
+        this._nextFrameId = requestAnimationFrame(gameLoop);
 
-      function gameLoop(time) {
         const dt = oldTime ? time - oldTime : 0;
         oldTime = time;
-        if (fn(dt)) {
-          requestAnimationFrame(gameLoop);
+        if (!fn(dt)) {
+          // Stop the game loop if requested.
+          cancelAnimationFrame(this._nextFrameId);
         }
-      }
+      };
+
+      requestAnimationFrame(gameLoop);
     }
 
     getPIXIRenderer() {

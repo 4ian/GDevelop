@@ -34,8 +34,12 @@ const buildTypesConfig = {
 
 const buttons = [
   {
-    displayName: t`Download`,
+    displayName: t`Download (APK)`,
     key: 'apkKey',
+  },
+  {
+    displayName: t`Download (Android App Bundle)`,
+    key: 'aabKey',
   },
   {
     displayName: t`Windows (zip)`,

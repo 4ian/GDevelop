@@ -11,9 +11,7 @@ import { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
-import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
-import { isNullPtr } from '../Utils/IsNullPtr';
 import Window from '../Utils/Window';
 import { Column, Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -30,6 +28,7 @@ import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
+import { IconContainer } from '../UI/IconContainer';
 
 const gd: libGDevelop = global.gd;
 
@@ -121,8 +120,12 @@ const BehaviorsEditor = (props: Props) => {
         {allBehaviorNames.map((behaviorName, index) => {
           const behaviorContent = object.getBehavior(behaviorName);
           const behaviorTypeName = behaviorContent.getTypeName();
-          const behavior = gd.JsPlatform.get().getBehavior(behaviorTypeName);
-          if (isNullPtr(gd, behavior)) {
+
+          const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+            gd.JsPlatform.get(),
+            behaviorTypeName
+          );
+          if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
             return (
               <Accordion key={behaviorName} defaultExpanded>
                 <AccordionHeader
@@ -138,7 +141,7 @@ const BehaviorsEditor = (props: Props) => {
                     </IconButton>,
                   ]}
                 >
-                  <MiniToolbarText>
+                  <MiniToolbarText firstChild>
                     <Trans>Unknown behavior</Trans>{' '}
                   </MiniToolbarText>
                   <Column noMargin expand>
@@ -158,6 +161,7 @@ const BehaviorsEditor = (props: Props) => {
             );
           }
 
+          const behavior = behaviorMetadata.get();
           const BehaviorComponent = BehaviorsEditorService.getEditor(
             behaviorTypeName
           );
@@ -165,11 +169,17 @@ const BehaviorsEditor = (props: Props) => {
           const enabledTutorialHints = tutorialHints.filter(
             hint => !values.hiddenTutorialHints[hint.identifier]
           );
+          const iconUrl = behaviorMetadata.getIconFilename();
 
           return (
             <Accordion key={behaviorName} defaultExpanded>
               <AccordionHeader
                 actions={[
+                  <HelpIcon
+                    key="help"
+                    size="small"
+                    helpPagePath={behaviorMetadata.getHelpPath()}
+                  />,
                   <IconButton
                     key="delete"
                     size="small"
@@ -180,17 +190,16 @@ const BehaviorsEditor = (props: Props) => {
                   >
                     <Delete />
                   </IconButton>,
-                  <HelpIcon
-                    key="help"
-                    size="small"
-                    helpPagePath={getBehaviorHelpPagePath(behavior)}
-                  />,
                 ]}
               >
-                <MiniToolbarText>
-                  <Trans>Behavior</Trans>{' '}
-                </MiniToolbarText>
-                <Column noMargin expand>
+                {iconUrl ? (
+                  <IconContainer
+                    src={iconUrl}
+                    alt={behaviorMetadata.getFullName()}
+                    size={20}
+                  />
+                ) : null}
+                <Column expand>
                   <TextField
                     value={behaviorName}
                     hintText={t`Behavior name`}

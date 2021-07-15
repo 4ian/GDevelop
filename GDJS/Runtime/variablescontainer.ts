@@ -223,7 +223,6 @@ namespace gdjs {
       _str: '',
       _undefinedInContainer: true,
       _value: 0,
-      toJSON: () => '0',
       fromJSON: () => gdjs.VariablesContainer.badVariable,
       toJSObject: () => 0,
       fromJSObject: () => gdjs.VariablesContainer.badVariable,

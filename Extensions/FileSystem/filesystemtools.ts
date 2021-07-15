@@ -278,7 +278,11 @@ namespace gdjs {
       let result = 'error';
       if (fileSystem) {
         try {
-          fileSystem.writeFileSync(savePath, variable.toJSON(), 'utf8');
+          fileSystem.writeFileSync(
+            savePath,
+            JSON.stringify(variable.toJSObject()),
+            'utf8'
+          );
           result = 'ok';
         } catch (err) {
           logger.error(
@@ -303,16 +307,21 @@ namespace gdjs {
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
       if (fileSystem) {
-        fileSystem.writeFile(savePath, variable.toJSON(), 'utf8', (err) => {
-          resultVar.setString('ok');
-          if (err) {
-            logger.error(
-              "Unable to save the variable to path: '" + savePath + "': ",
-              err
-            );
-            resultVar.setString('error');
+        fileSystem.writeFile(
+          savePath,
+          JSON.stringify(variable.toJSObject()),
+          'utf8',
+          (err) => {
+            resultVar.setString('ok');
+            if (err) {
+              logger.error(
+                "Unable to save the variable to path: '" + savePath + "': ",
+                err
+              );
+              resultVar.setString('error');
+            }
           }
-        });
+        );
       }
     };
 

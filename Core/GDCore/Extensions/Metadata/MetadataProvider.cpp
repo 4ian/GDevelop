@@ -19,7 +19,7 @@ using namespace std;
 
 namespace gd {
 
-gd::BehaviorMetadata MetadataProvider::badBehaviorInfo;
+gd::BehaviorMetadata MetadataProvider::badBehaviorMetadata;
 gd::ObjectMetadata MetadataProvider::badObjectInfo;
 gd::EffectMetadata MetadataProvider::badEffectMetadata;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
@@ -38,7 +38,7 @@ MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
     }
   }
 
-  return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorInfo);
+  return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
 }
 
 const BehaviorMetadata& MetadataProvider::GetBehaviorMetadata(

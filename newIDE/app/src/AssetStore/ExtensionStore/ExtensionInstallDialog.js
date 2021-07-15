@@ -17,9 +17,9 @@ import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
 import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
-import { ExtensionIcon } from './ExtensionIcon';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
+import { IconContainer } from '../../UI/IconContainer';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -133,9 +133,10 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             </AlertMessage>
           )}
           <Line alignItems="center" noMargin>
-            <ExtensionIcon
-              extensionShortHeader={extensionShortHeader}
-              size={40}
+            <IconContainer
+              alt={extensionShortHeader.fullName}
+              src={extensionShortHeader.previewIconUrl}
+              size={48}
             />
             <Column expand>
               <Text noMargin size="title">

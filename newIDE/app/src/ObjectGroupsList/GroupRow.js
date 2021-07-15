@@ -1,3 +1,4 @@
+// @flow
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
@@ -13,13 +14,14 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 type Props = {|
   group: gdObjectGroup,
   style: Object,
-  onEdit: ?(gdObjectGroup) => void,
+  onEdit: gdObjectGroup => void,
   onEditName: () => void,
   onDelete: () => void,
   onRename: string => void,
   editingName: boolean,
   isGlobalGroup: boolean,
-  canSetAsGlobalGroup?: boolean,
+  canSetAsGlobalGroup: boolean,
+  onSetAsGlobalGroup: () => void,
 |};
 
 const styles = {
@@ -34,7 +36,9 @@ const styles = {
 };
 
 export default class GroupRow extends React.Component<Props, {||}> {
-  componentDidUpdate(prevProps) {
+  textField: ?TextField;
+
+  componentDidUpdate(prevProps: Props) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
         if (this.textField) this.textField.focus();
@@ -52,10 +56,10 @@ export default class GroupRow extends React.Component<Props, {||}> {
         margin="none"
         ref={textField => (this.textField = textField)}
         defaultValue={groupName}
-        onBlur={e => this.props.onRename(e.target.value)}
+        onBlur={e => this.props.onRename(e.currentTarget.value)}
         onKeyPress={event => {
           if (shouldValidate(event)) {
-            this.textField.blur();
+            if (this.textField) this.textField.blur();
           }
         }}
         fullWidth

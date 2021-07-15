@@ -109,33 +109,6 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   return nullptr;
 }
 
-gd::Behavior* Project::GetBehavior(const gd::String& type,
-                                   const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
-
-    gd::Behavior* behavior = platforms[i]->GetBehavior(type);
-    if (behavior) return behavior;
-  }
-
-  return nullptr;
-}
-
-gd::BehaviorsSharedData* Project::GetBehaviorSharedDatas(
-    const gd::String& type, const gd::String& platformName) {
-  for (std::size_t i = 0; i < platforms.size(); ++i) {
-    if (!platformName.empty() && platforms[i]->GetName() != platformName)
-      continue;
-
-    gd::BehaviorsSharedData* behaviorSharedData =
-        platforms[i]->GetBehaviorSharedDatas(type);
-    if (behaviorSharedData) return behaviorSharedData;
-  }
-
-  return nullptr;
-}
-
 #if defined(GD_IDE_ONLY)
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
     const gd::String& type, const gd::String& platformName) {
@@ -515,8 +488,6 @@ void Project::ClearEventsFunctionsExtensions() {
 void Project::UnserializeFrom(const SerializerElement& element) {
 // Checking version
 #if defined(GD_IDE_ONLY)
-  gd::String updateText;
-
   const SerializerElement& gdVersionElement =
       element.GetChild("gdVersion", 0, "GDVersion");
   gdMajorVersion =
@@ -528,10 +499,10 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   if (gdMajorVersion > gd::VersionWrapper::Major())
     gd::LogWarning(
-        _("The version of GDevelop used to create this game seems to be a new "
-          "version.\nGDevelop may fail to open the game, or data may be "
-          "missing.\nYou should check if a new version of GDevelop is "
-          "available."));
+        "The version of GDevelop used to create this game seems to be a new "
+        "version.\nGDevelop may fail to open the game, or data may be "
+        "missing.\nYou should check if a new version of GDevelop is "
+        "available.");
   else {
     if ((gdMajorVersion == gd::VersionWrapper::Major() &&
          gdMinorVersion > gd::VersionWrapper::Minor()) ||
@@ -543,22 +514,12 @@ void Project::UnserializeFrom(const SerializerElement& element) {
          gdBuildVersion == gd::VersionWrapper::Build() &&
          revision > gd::VersionWrapper::Revision())) {
       gd::LogWarning(
-          _("The version of GDevelop used to create this game seems to be "
-            "greater.\nGDevelop may fail to open the game, or data may be "
-            "missing.\nYou should check if a new version of GDevelop is "
-            "available."));
+          "The version of GDevelop used to create this game seems to be "
+          "greater.\nGDevelop may fail to open the game, or data may be "
+          "missing.\nYou should check if a new version of GDevelop is "
+          "available.");
     }
   }
-
-  // Compatibility code
-  if (gdMajorVersion <= 1) {
-    gd::LogError(_(
-        "The game was saved with version of GDevelop which is too old. Please "
-        "open and save the game with one of the first version of GDevelop 2. "
-        "You will then be able to open your game with this GDevelop version."));
-    return;
-  }
-// End of Compatibility code
 #endif
 
   const SerializerElement& propElement =
@@ -681,21 +642,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
 #endif
-
-// Compatibility code
-#if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlder(gdMajorVersion, 0, 0, 0, 3, 0, 0, 0)) {
-    updateText +=
-        _("Sprite scaling has changed since GD 2: The resizing is made so that "
-          "the origin point of the object won't move whatever the scale of the "
-          "object.\n");
-    updateText +=
-        _("You may have to slightly change the position of some objects if you "
-          "have changed their size.\n\n");
-    updateText += _("Thank you for your understanding.\n");
-  }
-#endif
-// End of Compatibility code
 
 #if defined(GD_IDE_ONLY)
   GetObjectGroups().UnserializeFrom(

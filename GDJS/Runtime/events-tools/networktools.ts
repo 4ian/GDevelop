@@ -116,22 +116,22 @@ namespace gdjs {
        * @param variable The variable to convert to JSON
        * @returns The JSON string representing the variable
        *
-       * @deprecated Use `variable.toJSON` instead.
+       * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
        */
       export const variableStructureToJSON = function (
         variable: gdjs.Variable
       ): string {
-        return variable.toJSON();
+        return JSON.stringify(variable.toJSObject());
       };
 
       /**
-       * @deprecated Use `variable.toJSON` instead.
+       * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
        */
       export const objectVariableStructureToJSON = function (
         object: gdjs.RuntimeObject,
         variable: gdjs.Variable
       ): string {
-        return variable.toJSON();
+        return JSON.stringify(variable.toJSObject());
       };
 
       /**

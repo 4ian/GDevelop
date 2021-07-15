@@ -158,7 +158,10 @@ namespace gdjs {
     }
 
     /**
-     * Unserialize JSON into this variable.
+     * Unserialize a JSON string into this variable.
+     *
+     * This just logs an error if the JSON is invalid.
+     *
      * @param json - A JSON string.
      */
     fromJSON(json: string): this {
@@ -194,14 +197,6 @@ namespace gdjs {
           for (const item of this._childrenArray) arr.push(item.toJSObject());
           return arr;
       }
-    }
-
-    /**
-     * Converts this variable to JSON.
-     * @returns A JSON representation of the variable.
-     */
-    toJSON(): string {
-      return JSON.stringify(this.toJSObject());
     }
 
     /**
@@ -541,7 +536,9 @@ namespace gdjs {
      * @private
      * @alias concatenateString
      */
-    concatenate = gdjs.Variable.prototype.concatenateString;
+    concatenate(str: string) {
+      this.setString(this.getAsString() + str);
+    }
 
     /**
      * Get a variable at a given index of the array.

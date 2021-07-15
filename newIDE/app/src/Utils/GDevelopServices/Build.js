@@ -9,6 +9,8 @@ export type TargetName =
   | 'winZip'
   | 'macZip'
   | 'linuxAppImage'
+  | 'androidApk'
+  | 'androidAppBundle'
   | 's3';
 
 export type Build = {
@@ -17,6 +19,7 @@ export type Build = {
   bucket?: string,
   logsKey?: string,
   apkKey?: string,
+  aabKey?: string,
   windowsExeKey?: string,
   windowsZipKey?: string,
   macosZipKey?: string,
@@ -31,6 +34,7 @@ export type Build = {
 
 export type BuildArtifactKeyName =
   | 'apkKey'
+  | 'aabKey'
   | 'windowsExeKey'
   | 'windowsZipKey'
   | 'macosZipKey'
@@ -130,14 +134,17 @@ export const buildWeb = (
 export const buildCordovaAndroid = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  key: string
+  key: string,
+  targets: Array<TargetName>
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
           userId
-        )}&key=${encodeURIComponent(key)}&type=cordova-build`,
+        )}&key=${encodeURIComponent(
+          key
+        )}&type=cordova-build&targets=${encodeURIComponent(targets.join(','))}`,
         null,
         {
           params: {},

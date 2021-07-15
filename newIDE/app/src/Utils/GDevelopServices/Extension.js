@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import { GDevelopExtensionApi } from './ApiConfigs';
+import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 
 export type ExtensionShortHeader = {|
@@ -19,6 +19,7 @@ export type ExtensionShortHeader = {|
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
+  helpPath: string,
   description: string,
   iconUrl: string,
 |};
@@ -101,20 +102,17 @@ export const isCompatibleWithExtension = (
       })
     : true;
 
-// Handle urls to extension header or file. If the URL is not absolute and HTTPS,
-// it is assumed to be relative to the registry base url.
-const resolveExtensionUrl = (url: string): string => {
-  const trimmedUrl = url.trim();
-  if (trimmedUrl.indexOf('https://') === 0) {
-    return trimmedUrl;
-  }
-
-  return `${GDevelopExtensionApi.baseUrl}/${trimmedUrl}`;
-};
-
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
-    .get(`${GDevelopExtensionApi.baseUrl}/extensions-registry.json`)
+    .get(`${GDevelopAssetApi.baseUrl}/extension`)
+    .then(response => response.data)
+    .then(({ databaseUrl }) => {
+      if (!databaseUrl) {
+        throw new Error('Unexpected response from the extension endpoint.');
+      }
+
+      return axios.get(databaseUrl);
+    })
     .then(response => {
       const data: ExtensionsRegistryWithTagsAsString = response.data;
 
@@ -130,21 +128,19 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
 export const getExtensionHeader = (
   extensionShortHeader: ExtensionShortHeader
 ): Promise<ExtensionHeader> => {
-  return axios
-    .get(resolveExtensionUrl(extensionShortHeader.headerUrl))
-    .then(response => {
-      const data: ExtensionHeaderWithTagsAsString = response.data;
-      const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
-        data
-      );
-      return transformedData;
-    });
+  return axios.get(extensionShortHeader.headerUrl).then(response => {
+    const data: ExtensionHeaderWithTagsAsString = response.data;
+    const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
+      data
+    );
+    return transformedData;
+  });
 };
 
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | ExtensionHeader
 ): Promise<SerializedExtension> => {
-  return axios.get(resolveExtensionUrl(extensionHeader.url)).then(response => {
+  return axios.get(extensionHeader.url).then(response => {
     const data: SerializedExtensionWithTagsAsString = response.data;
     const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
       data

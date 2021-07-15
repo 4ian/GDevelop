@@ -32,12 +32,19 @@ class MiniToolbar extends Component {
   }
 }
 
+const firstChildToolbarTextStyle = {
+  marginRight: 4,
+};
 const toolbarTextStyle = {
-  marginRight: 5,
+  marginLeft: 4,
+  marginRight: 4,
 };
 
-export const MiniToolbarText = ({ children }) => (
-  <Text noShrink style={toolbarTextStyle}>
+export const MiniToolbarText = ({ children, firstChild }) => (
+  <Text
+    noShrink
+    style={firstChild ? firstChildToolbarTextStyle : toolbarTextStyle}
+  >
     {children}
   </Text>
 );

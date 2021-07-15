@@ -126,7 +126,7 @@ interface EventsVariablesFinder {
     [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
     [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
     [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
-    
+
     //Inherited from ExpressionParser2NodeWorker:
 };
 
@@ -167,9 +167,6 @@ interface JsPlatform {
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
-
-    Behavior GetBehavior([Const] DOMString type);
-    BehaviorsSharedData GetBehaviorSharedDatas([Const] DOMString type);
 
     [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
@@ -366,9 +363,6 @@ interface Project {
 
     [Ref] PlatformSpecificAssets GetPlatformSpecificAssets();
     [Ref] LoadingScreen GetLoadingScreen();
-
-    //createObject
-    //createEvent
 
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);
@@ -667,7 +661,7 @@ interface Effect {
 
 interface EffectsContainer {
   void EffectsContainer();
-  
+
   boolean HasEffectNamed([Const] DOMString name);
   [Ref] Effect GetEffect([Const] DOMString name);
   [Ref] Effect GetEffectAt(unsigned long index);
@@ -1028,21 +1022,12 @@ interface VectorPairStringTextFormatting {
 };
 
 interface TextFormatting {
-    boolean IsBold();
-    boolean IsItalic();
-    unsigned long GetColorRed();
-    unsigned long GetColorGreen();
-    unsigned long GetColorBlue();
     unsigned long GetUserData();
 };
 
 interface InstructionSentenceFormatter {
     InstructionSentenceFormatter STATIC_Get();
-    [Const, Value] DOMString Translate([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
     [Value] VectorPairStringTextFormatting GetAsFormattedText([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
-    [Value] TextFormatting GetFormattingFromType([Const] DOMString type);
-    [Const, Value] DOMString LabelFromType([Const] DOMString type);
-    void LoadTypesFormattingFromConfig();
 };
 
 //TODO: This should be renamed to InstructionCodeGenerationInformation
@@ -1945,6 +1930,9 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetObjectStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
+
+    boolean STATIC_IsBadExpressionMetadata([Const, Ref] ExpressionMetadata metadata);
+    boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
 };
 
 interface ExpressionParserDiagnostic {

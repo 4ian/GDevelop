@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('PIXI game renderer');
+  const logger = new gdjs.Logger('PIXI game renderer');
 
   import PIXI = GlobalPIXIModule.PIXI;
 

@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new Logger('Hot reloader');
+  const logger = new gdjs.Logger('Hot reloader');
   export type HotReloaderLog = {
     message: string;
     kind: 'fatal' | 'error' | 'warning' | 'info';

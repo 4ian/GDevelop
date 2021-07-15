@@ -40,7 +40,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
-    _objectEffectsManager: ObjectEffectsManager
+    _objectEffectsManager: ObjectEffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;

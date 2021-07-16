@@ -26,12 +26,12 @@ namespace gdjs {
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
     _pixiRenderer: PIXI.Renderer | null = null;
-    _canvasWidth: float = 0;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
+    _canvasWidth: float = 0;
+    // Current height of the canvas (might be scaled down/up compared to renderer)
     _canvasHeight: float = 0;
 
-    // Current height of the canvas (might be scaled down/up compared to renderer)
     _keepRatio: boolean = true;
     _marginLeft: any;
     _marginTop: any;
@@ -72,9 +72,9 @@ namespace gdjs {
         this._pixiRenderer.view
       );
       this._pixiRenderer.view.style['position'] = 'absolute';
+      //Ensure that the canvas has the focus.
       this._pixiRenderer.view.tabIndex = 1;
 
-      //Ensure that the canvas has the focus.
       this._resizeCanvas();
 
       // Handle scale mode

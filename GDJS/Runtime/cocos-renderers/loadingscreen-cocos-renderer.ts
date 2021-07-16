@@ -5,11 +5,13 @@
  */
 namespace gdjs {
   export class LoadingScreenCocosRenderer {
-    render(percent) {
+    setPercent(percent) {
       console.log('Loading ' + percent + '%');
     }
 
-    unload() {}
+    unload() {
+      return Promise.resolve();
+    }
   }
 
   // Nothing to do

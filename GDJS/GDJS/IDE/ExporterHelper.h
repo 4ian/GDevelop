@@ -158,6 +158,7 @@ class ExporterHelper {
   void AddLibsInclude(bool pixiRenderers,
                       bool cocosRenderers,
                       bool websocketDebuggerClient,
+                      gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 
   /**

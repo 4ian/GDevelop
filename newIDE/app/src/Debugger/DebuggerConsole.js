@@ -2,6 +2,8 @@
 import React from 'react';
 
 import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import useForceUpdate from '../Utils/UseForceUpdate';
+
 import MUIList from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -27,14 +29,24 @@ const iconMap = {
 };
 
 export const DebuggerConsole = ({ logs }: { logs: Array<Logs> }) => {
-  const sizeMeasurer = React.useRef(null);
-  const cache = React.useRef(
-    new CellMeasurerCache({
-      defaultHeight: 45,
-      minHeight: 30,
-      fixedWidth: true,
-    })
-  ).current;
+  const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
+  const cache = React.useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultHeight: 45,
+        minHeight: 30,
+        fixedWidth: true,
+      }),
+    []
+  );
+
+  // If tabs are switched, the element is not visible and its height is 0 when rendered again.
+  // If this is the case, trigger a rerender after rendering has finished (thanks to useEffect).
+  const rerenderNeeded = sizeMeasurer && sizeMeasurer.offsetHeight === 0;
+  const forceUpdate = useForceUpdate();
+  React.useEffect(() => {
+    if(rerenderNeeded) forceUpdate();
+  })
 
   const [showGroup, _setShowGroup] = React.useState(true);
   const setShowGroup = (show: boolean) => {
@@ -58,43 +70,43 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Logs> }) => {
           bottom: 0,
           width: '100%',
         }}
-        ref={sizeMeasurer}
+        ref={setSizeMeasurer}
       >
-        <MUIList dense={true} style={{ padding: 0 }}>
-          <List
-            autoContainerWidth
-            deferredMeasurementCache={cache}
-            height={
-              sizeMeasurer.current ? sizeMeasurer.current.offsetHeight : 0
-            }
-            width={sizeMeasurer.current ? sizeMeasurer.current.offsetWidth : 0}
-            rowCount={logs.length}
-            rowHeight={cache.rowHeight}
-            rowRenderer={({ index, key, parent, style }) => (
-              <CellMeasurer
-                cache={cache}
-                columnIndex={0}
-                key={key}
-                parent={parent}
-                rowIndex={index}
-              >
-                {({ registerChild }) => (
-                  <ListItem key={key} style={style} ref={registerChild}>
-                    <ListItemIcon>
-                      {iconMap[logs[index].type] || iconMap['info']}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={logs[index].message}
-                      secondary={
-                        showGroup ? logs[index].group || 'Default' : undefined
-                      }
-                    />
-                  </ListItem>
-                )}
-              </CellMeasurer>
-            )}
-          />
-        </MUIList>
+        {sizeMeasurer && (
+          <MUIList dense={true} style={{ padding: 0 }}>
+            <List
+              autoContainerWidth
+              deferredMeasurementCache={cache}
+              height={sizeMeasurer.offsetHeight}
+              width={sizeMeasurer.offsetWidth}
+              rowCount={logs.length}
+              rowHeight={cache.rowHeight}
+              rowRenderer={({ index, key, parent, style }) => (
+                <CellMeasurer
+                  cache={cache}
+                  columnIndex={0}
+                  key={key}
+                  parent={parent}
+                  rowIndex={index}
+                >
+                  {({ registerChild }) => (
+                    <ListItem key={key} style={style} ref={registerChild}>
+                      <ListItemIcon>
+                        {iconMap[logs[index].type] || iconMap['info']}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={logs[index].message}
+                        secondary={
+                          showGroup ? logs[index].group || 'Default' : undefined
+                        }
+                      />
+                    </ListItem>
+                  )}
+                </CellMeasurer>
+              )}
+            />
+          </MUIList>
+        )}
       </div>
     </>
   );

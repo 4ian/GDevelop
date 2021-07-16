@@ -45,8 +45,8 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Logs> }) => {
   const rerenderNeeded = sizeMeasurer && sizeMeasurer.offsetHeight === 0;
   const forceUpdate = useForceUpdate();
   React.useEffect(() => {
-    if(rerenderNeeded) forceUpdate();
-  })
+    if (rerenderNeeded) forceUpdate();
+  });
 
   const [showGroup, _setShowGroup] = React.useState(true);
   const setShowGroup = (show: boolean) => {

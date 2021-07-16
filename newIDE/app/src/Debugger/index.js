@@ -82,6 +82,11 @@ export default class Debugger extends React.Component<Props, State> {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].openProfiler();
         }}
+        canOpenConsole={this._hasSelectedDebugger()}
+        onOpenConsole={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].openConsole();
+        }}
       />
     );
   }
@@ -214,9 +219,9 @@ export default class Debugger extends React.Component<Props, State> {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (
         data.payload.group === 'JavaScript' &&
-        (data.payload.message.contains('Electron Security Warning') ||
-          data.payload.message.contains(
-            'This is a browser-targeted Firebase bundle but it appears it is being run in a Node environment'
+        (data.payload.message.includes('Electron Security Warning') ||
+          data.payload.message.includes(
+            'Warning: This is a browser-targeted Firebase bundle'
           ))
       )
         return;

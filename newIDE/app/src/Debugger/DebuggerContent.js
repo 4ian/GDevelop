@@ -81,6 +81,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.openEditor('profiler', 'end', 75, 'row');
   };
 
+  openConsole = () => {
+    if (this._editors) this._editors.openEditor('console', 'start', 40, 'row');
+  };
+
   render() {
     const {
       gameData,

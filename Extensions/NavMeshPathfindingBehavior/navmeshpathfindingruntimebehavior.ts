@@ -20,9 +20,6 @@ namespace gdjs {
     _angularMaxSpeed: float;
     _rotateObject: boolean;
     _angleOffset: float;
-    _cellSize: float = 10;
-    _gridOffsetX: float = 0;
-    _gridOffsetY: float = 0;
     _extraBorder: float = 0;
 
     //Attributes used for traveling on the path:
@@ -43,17 +40,11 @@ namespace gdjs {
     ) {
       super(runtimeScene, behaviorData, owner);
 
-      //The path computed and followed by the object (Array of arrays containing x and y position)
-      if (this._path === undefined) {
-      } else {
-        this._path.length = 0;
-      }
       this._acceleration = behaviorData.acceleration;
       this._maxSpeed = behaviorData.maxSpeed;
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
-      this._cellSize = behaviorData.cellSize;
       this._manager =
         gdjs.NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
     }
@@ -74,34 +65,7 @@ namespace gdjs {
       if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
         this.setAngleOffset(newBehaviorData.angleOffset);
       }
-      if (oldBehaviorData.cellSize !== newBehaviorData.cellSize) {
-        this.setCellSize(newBehaviorData.cellSize);
-      }
       return true;
-    }
-
-    setCellSize(cellSize: float): void {
-      this._cellSize = cellSize;
-    }
-
-    getCellSize(): float {
-      return this._cellSize;
-    }
-
-    setGridOffsetX(gridOffsetX: float): void {
-      this._gridOffsetX = gridOffsetX;
-    }
-
-    getGridOffsetX(): float {
-      return this._gridOffsetX;
-    }
-
-    setGridOffsetY(gridOffsetY: float): void {
-      this._gridOffsetY = gridOffsetY;
-    }
-
-    getGridOffsetY(): float {
-      return this._gridOffsetY;
     }
 
     setAcceleration(acceleration: float): void {
@@ -303,19 +267,14 @@ namespace gdjs {
           const deltaX = vertex[0] - centerX;
           const deltaY = vertex[1] - centerY;
           const radiusSq = deltaX * deltaX + deltaY * deltaY;
-          console.log(
-            vertex[0] + ' - ' + centerX + '   ' + vertex[1] + ' - ' + centerY
-          );
           radiusSqMax = Math.max(radiusSq, radiusSqMax);
         }
       }
       const radiusMax = Math.sqrt(radiusSqMax);
-      //TODO make it configurable
-      const obstacleCellPadding = Math.ceil(radiusMax / this._cellSize);
 
       const navMesh = this._manager.getNavMesh(
-        obstacleCellPadding,
-        this._cellSize
+        runtimeScene,
+        radiusMax + this._extraBorder
       );
 
       //TODO if the target is not on the mesh, find the nearest position

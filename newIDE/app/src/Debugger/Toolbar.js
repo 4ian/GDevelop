@@ -12,8 +12,8 @@ type Props = {|
   canPause: boolean,
   onOpenProfiler: () => void,
   canOpenProfiler: boolean,
-  onOpenProfiler: () => void,
-  canOpenProfiler: boolean,
+  onOpenConsole: () => void,
+  canOpenConsole: boolean,
 |};
 
 export class Toolbar extends React.PureComponent<Props> {

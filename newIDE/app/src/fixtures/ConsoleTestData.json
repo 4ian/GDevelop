@@ -1,0 +1,21 @@
+[
+  {
+    "message": "Only a message"
+  },
+  {
+    "message": "A warning!",
+    "type": "warning"
+  },
+  {
+    "message": "An internal and",
+    "group": "Grouped error",
+    "type": "error",
+    "internal": true
+  },
+  {
+    "message": "A regular message",
+    "group": "Regular group",
+    "internal": false,
+    "type": "info"
+  }
+]

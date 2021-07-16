@@ -102,9 +102,7 @@ module.exports = {
         '["info", "warning", "error"]',
         true
       )
-      .setDefaultValue('info')
       .addParameter('string', 'Group of messages', '', true)
-      .setDefaultValue('"Default"')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.log');

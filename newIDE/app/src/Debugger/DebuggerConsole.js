@@ -48,20 +48,33 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
     if (rerenderNeeded) forceUpdate();
   });
 
+  const [hideInternal, setHideInternal] = React.useState(false);
   const [showGroup, _setShowGroup] = React.useState(true);
   const setShowGroup = (show: boolean) => {
     _setShowGroup(show);
     cache.clearAll();
   };
 
+  const filteredLogs = logs.filter(
+    ({ internal }) => !(hideInternal && internal)
+  );
+
   return (
     <>
-      <Checkbox
-        style={{ margin: 10 }}
-        checked={showGroup}
-        label="Show group names"
-        onCheck={(_, value) => setShowGroup(value)}
-      />
+      <div style={{ display: 'flex', flexFlow: 'row' }}>
+        <Checkbox
+          style={{ margin: 10 }}
+          checked={showGroup}
+          label="Show group names"
+          onCheck={(_, value) => setShowGroup(value)}
+        />
+        <Checkbox
+          style={{ margin: 10 }}
+          checked={!hideInternal}
+          label="Show internal logs"
+          onCheck={(_, value) => setHideInternal(!value)}
+        />
+      </div>
 
       <div
         style={{
@@ -79,7 +92,7 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
               deferredMeasurementCache={cache}
               height={sizeMeasurer.offsetHeight}
               width={sizeMeasurer.offsetWidth}
-              rowCount={logs.length}
+              rowCount={filteredLogs.length}
               rowHeight={cache.rowHeight}
               rowRenderer={({ index, key, parent, style }) => (
                 <CellMeasurer
@@ -92,12 +105,14 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
                   {({ registerChild }) => (
                     <ListItem key={key} style={style} ref={registerChild}>
                       <ListItemIcon>
-                        {iconMap[logs[index].type] || iconMap['info']}
+                        {iconMap[filteredLogs[index].type] || iconMap['info']}
                       </ListItemIcon>
                       <ListItemText
-                        primary={logs[index].message}
+                        primary={filteredLogs[index].message}
                         secondary={
-                          showGroup ? logs[index].group || 'Default' : undefined
+                          showGroup
+                            ? filteredLogs[index].group || 'Default'
+                            : undefined
                         }
                       />
                     </ListItem>

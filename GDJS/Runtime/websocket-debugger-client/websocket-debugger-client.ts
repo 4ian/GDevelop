@@ -198,10 +198,11 @@ namespace gdjs {
         gdjs.log = (
           group: string,
           message: string,
-          type: 'info' | 'warning' | 'error' = 'info'
+          type: 'info' | 'warning' | 'error' = 'info',
+          internal = true
         ) => {
           gdjsLog(group, message, type);
-          this.log(group, message, type, true);
+          this.log(group, message, type, internal);
         };
       })(
         console.log,

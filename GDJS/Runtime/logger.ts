@@ -12,7 +12,8 @@ namespace gdjs {
   export let log = (
     group: string,
     message: string,
-    type: 'info' | 'warning' | 'error' = 'info'
+    type: 'info' | 'warning' | 'error' = 'info',
+    internal = true
   ) => {
     const logger = _console[type] || _console.info;
     logger(`[${group}] ${message}`);

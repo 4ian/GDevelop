@@ -24,7 +24,7 @@ namespace gdjs {
         type: 'info' | 'warning' | 'error',
         group: string
       ) {
-        gdjs.log(group, message, type);
+        gdjs.log(group, message, type, false);
       };
 
       /**

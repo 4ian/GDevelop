@@ -15,6 +15,11 @@ namespace gdjs {
   export class NavMeshPathfindingObstaclesManager {
     _obstaclesRBush: any;
     _obstacles: Set<NavMeshPathfindingObstacleRuntimeBehavior>;
+    _cellSize: integer;
+    _areaLeftBound: integer;
+    _areaTopBound: integer;
+    _areaRightBound: integer;
+    _areaBottomBound: integer;
 
     // for the path finding algorithm
     _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
@@ -32,6 +37,24 @@ namespace gdjs {
         '.owner.getAABB().max[1]',
       ]);
       this._obstacles = new Set();
+      const game = runtimeScene.getGame();
+      this._cellSize = Number.parseInt(
+        game.getExtensionProperty('NavMeshPathfinding', 'CellSize') || '10'
+      );
+      this._areaLeftBound = Number.parseInt(
+        game.getExtensionProperty('NavMeshPathfinding', 'AreaLeftBound') || '0'
+      );
+      this._areaTopBound = Number.parseInt(
+        game.getExtensionProperty('NavMeshPathfinding', 'AreaTopBound') || '0'
+      );
+      this._areaRightBound = Number.parseInt(
+        game.getExtensionProperty('NavMeshPathfinding', 'AreaRightBound') ||
+          game.getGameResolutionWidth().toString()
+      );
+      this._areaBottomBound = Number.parseInt(
+        game.getExtensionProperty('NavMeshPathfinding', 'AreaBottomBound') ||
+          game.getGameResolutionHeight().toString()
+      );
     }
 
     /**
@@ -67,10 +90,22 @@ namespace gdjs {
       this._obstacles.delete(pathfindingObstacleBehavior);
     }
 
-    getNavMesh(obstacleCellPadding: integer, cellSize: integer): NavMesh {
+    getNavMesh(
+      runtimeScene: gdjs.RuntimeScene,
+      obstaclePadding: integer
+    ): NavMesh {
+      // Round the padding on cellSize to avoid almost identical NavMesh
+      const obstacleCellPadding = Math.ceil(obstaclePadding / this._cellSize);
+
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {
-        const grid = new gdjs.RasterizationGrid(0, 0, 800, 600, cellSize);
+        const grid = new gdjs.RasterizationGrid(
+          this._areaLeftBound,
+          this._areaTopBound,
+          this._areaRightBound,
+          this._areaBottomBound,
+          this._cellSize
+        );
         console.log('grid: ' + grid.dimX() + ' ' + grid.dimY());
         const objects = Array.from(this._obstacles).map(
           (obstacle) => obstacle.owner
@@ -92,8 +127,8 @@ namespace gdjs {
         const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
         const polygons = polyMeshField.map((polygon) =>
           polygon.map((point) => ({
-            x: cellSize * point.x + grid.originX,
-            y: cellSize * point.y + grid.originY,
+            x: this._cellSize * point.x + grid.originX,
+            y: this._cellSize * point.y + grid.originY,
           }))
         );
         this.meshPolygons = polygons;

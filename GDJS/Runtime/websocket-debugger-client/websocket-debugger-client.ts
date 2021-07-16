@@ -164,9 +164,7 @@ namespace gdjs {
             );
           }
         } else {
-          logger.info(
-            'Debugger received a message with badly formatted data.'
-          );
+          logger.info('Debugger received a message with badly formatted data.');
         }
       };
 

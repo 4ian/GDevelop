@@ -28,7 +28,7 @@ const iconMap = {
   error: <ErrorIcon color="error" />,
 };
 
-export const DebuggerConsole = ({ logs }: { logs: Array<Logs> }) => {
+export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
   const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
   const cache = React.useMemo(
     () =>

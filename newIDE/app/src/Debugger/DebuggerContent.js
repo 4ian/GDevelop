@@ -22,7 +22,7 @@ import Flash from '@material-ui/icons/FlashOn';
 import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
-import { DebuggerConsole } from './DebuggerConsole';
+import { DebuggerConsole, type Log } from './DebuggerConsole';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
@@ -39,6 +39,7 @@ type Props = {|
   onStopProfiler: () => void,
   profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
+  logs: Array<Log>,
 |};
 
 type State = {|

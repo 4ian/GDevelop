@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new gdjs.Logger("Facebook instant games")
+  const logger = new gdjs.Logger('Facebook instant games');
   export namespace evtTools {
     export namespace facebookInstantGames {
       export let _preloadedInterstitial: any = null;

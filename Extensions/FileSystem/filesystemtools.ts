@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new gdjs.Logger("Filesystem")
+  const logger = new gdjs.Logger('Filesystem');
   export namespace fileSystem {
     // The Node.js path module, or null if it can't be loaded.
     export let _path: any = null;

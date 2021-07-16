@@ -60,7 +60,7 @@ namespace gdjs {
     /**
      * Get the obstacles manager of a scene.
      */
-    static getManager(runtimeScene) {
+    static getManager(runtimeScene): NavMeshPathfindingObstaclesManager {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
         runtimeScene.pathfindingObstaclesManager =
@@ -88,6 +88,12 @@ namespace gdjs {
     ) {
       this._obstaclesRBush.remove(pathfindingObstacleBehavior);
       this._obstacles.delete(pathfindingObstacleBehavior);
+    }
+
+    public static invalidateNavMesh(runtimeScene) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      console.log("invalidateNavMesh: " + manager);
+      manager._navMeshes.clear();
     }
 
     getNavMesh(

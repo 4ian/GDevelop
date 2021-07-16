@@ -24,11 +24,6 @@ const declarePathfindingBehavior = function (
   gd /*: libGDevelop */,
   extension /*: PlatformExtension */
 ) {
-  // Declare a behavior.
-  // Create a new gd.BehaviorJsImplementation object and implement the methods
-  // that are called to get and set the properties of the behavior.
-  // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
-  // saved/loaded to JSON.
   const pathfindingBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingBehavior.updateProperty = function (
@@ -36,7 +31,6 @@ const declarePathfindingBehavior = function (
     propertyName,
     newValue
   ) {
-    console.log('updateProperty: ' + propertyName);
     if (propertyName === 'Acceleration') {
       behaviorContent.setDoubleAttribute('acceleration', newValue);
       return true;
@@ -62,7 +56,6 @@ const declarePathfindingBehavior = function (
   };
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingBehavior.getProperties = function (behaviorContent) {
-    console.log('getProperties: NavMesh');
     const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
     behaviorProperties
@@ -94,7 +87,6 @@ const declarePathfindingBehavior = function (
   };
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingBehavior.initializeContent = function (behaviorContent) {
-    console.log('initializeContent: NavMesh');
     behaviorContent.setDoubleAttribute('acceleration', 400);
     behaviorContent.setDoubleAttribute('maxSpeed', 200);
     behaviorContent.setDoubleAttribute('angularMaxSpeed', 180);
@@ -124,7 +116,7 @@ const declarePathfindingBehavior = function (
       'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
     );
 
-  pathfindingBehaviorDeclaration
+    pathfindingBehaviorDeclaration
     .addScopedAction(
       'SetDestination',
       _('Move to a position'),
@@ -166,6 +158,7 @@ const declarePathfindingBehavior = function (
     )
     //TODO tried Drawer, PrimitiveDrawing::Drawer, ShapePainterObject
     .addParameter('objectPtr', _('Shape painter'), '', false)
+    .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('drawCells');
 
@@ -604,11 +597,7 @@ const declareObstacleBehavior = function (
   gd /*: libGDevelop */,
   extension /*: PlatformExtension */
 ) {
-  // Declare a behavior.
-  // Create a new gd.BehaviorJsImplementation object and implement the methods
-  // that are called to get and set the properties of the behavior.
-  // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
-  // saved/loaded to JSON.
+  //TODO Add some kind of layer to select the obstacles for an object?
   const pathfindingObstacleBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingObstacleBehavior.updateProperty = function (
@@ -687,6 +676,22 @@ module.exports = {
       .setLabel(_('Area bottom bound'))
       .setDescription('The bottom bound of the area where object can go.')
       .setType('number');
+
+
+      extension
+      .addAction(
+        'InvalidateNavMesh',
+        _('Invalidate the navigation mesh'),
+        _('Invalidate the navigation mesh'),
+        _('Invalidate the navigation mesh'),
+        '',
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.invalidateNavMesh');
+  
 
     declarePathfindingBehavior(_, gd, extension);
     declareObstacleBehavior(_, gd, extension);

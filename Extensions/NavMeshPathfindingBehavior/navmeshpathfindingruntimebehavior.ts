@@ -247,8 +247,6 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
-      console.log('moveTo');
-
       //TODO Add a non-blocking padding property to make the path farer from the obstacle if possible?
       // It may need to have several contour lines with a one cell increment
       // and do a dichotomy like this:
@@ -283,17 +281,12 @@ namespace gdjs {
         { x: this.owner.getX(), y: this.owner.getY() },
         { x: x, y: y }
       );
-      console.log(path);
       if (path) {
         this._pathFound = true;
         this._path = path.map(({ x, y }) => [x, y]);
         this._enterSegment(0);
-
-        console.log('Path found');
         return;
       }
-
-      console.log('No path found');
       // No path found
       this._pathFound = false;
     }

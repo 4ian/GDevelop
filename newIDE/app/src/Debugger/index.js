@@ -211,6 +211,16 @@ export default class Debugger extends React.Component<Props, State> {
     } else if (data.command === 'hotReloader.logs') {
       // Nothing to do.
     } else if (data.command === 'console.log') {
+      // Filter out unavoidable warnings that do not concern non-engine devs.
+      if (
+        data.payload.group === 'JavaScript' &&
+        (data.payload.message.contains('Electron Security Warning') ||
+          data.payload.message.contains(
+            'This is a browser-targeted Firebase bundle but it appears it is being run in a Node environment'
+          ))
+      )
+        return;
+
       this.setState(state => ({
         logs: {
           ...state.logs,

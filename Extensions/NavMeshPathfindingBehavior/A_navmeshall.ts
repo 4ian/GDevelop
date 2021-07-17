@@ -873,11 +873,7 @@ namespace gdjs {
       this.meshShrinkAmount = meshShrinkAmount;
 
       // Convert the PolyPoints[] into NavPoly instances.
-      const newPolys = meshPolygonPoints.map((polyPoints) => {
-        const vectors = polyPoints.map((p) => new Vector2(p.x, p.y));
-        return new Polygon2(vectors);
-      });
-      this.navPolygons = newPolys.map((polygon, i) => new NavPoly(i, polygon));
+      this.navPolygons = meshPolygonPoints.map((polyPoints, i) => new NavPoly(i, new Polygon2(polyPoints)));
 
       this.calculateNeighbors();
 

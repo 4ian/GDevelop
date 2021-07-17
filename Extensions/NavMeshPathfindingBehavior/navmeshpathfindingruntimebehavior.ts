@@ -33,6 +33,9 @@ namespace gdjs {
     _manager: NavMeshPathfindingObstaclesManager;
     _movementAngle: float = 0;
 
+    /** Used to draw traces for debugging */
+    _lastUsedNavMesh: gdjs.NavMesh | null = null;
+
     constructor(
       runtimeScene: gdjs.RuntimeScene,
       behaviorData,
@@ -268,12 +271,15 @@ namespace gdjs {
           radiusSqMax = Math.max(radiusSq, radiusSqMax);
         }
       }
-      const radiusMax = Math.sqrt(radiusSqMax);
+      // Round to avoid to flicker between 2 NavMesh
+      // because of trigonometry rounding errors.
+      const radiusMax = Math.round(Math.sqrt(radiusSqMax));
 
       const navMesh = this._manager.getNavMesh(
         runtimeScene,
         radiusMax + this._extraBorder
       );
+      this._lastUsedNavMesh = this._manager.lastUsedNavMesh;
 
       //TODO if the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
@@ -291,7 +297,7 @@ namespace gdjs {
       this._pathFound = false;
     }
 
-    drawCells(shapePainter: gdjs.ShapePainterRuntimeObject) {
+    drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
       // for (const polygon of this.meshPolygons) {
       //   shapePainter.beginFillPath(polygon[0].x, polygon[0].y);
       //   for (let index = 1; index < polygon.length; index++) {
@@ -308,8 +314,9 @@ namespace gdjs {
       //   shapePainter.closePath();
       // }
       shapePainter._renderer.clear();
-      for (const polygon of this._manager.meshPolygons) {
-        const last = polygon.length - 1;
+      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
+        const polygon = navPoly.getPoints()
+        //const last = polygon.length - 1;
         //shapePainter.drawRectangle(polygon[last].x - 8, polygon[last].y - 8, polygon[last].x + 8, polygon[last].y + 8);
         //shapePainter.drawCircle(polygon[0].x, polygon[0].y, 8);
         for (let index = 0; index < polygon.length; index++) {

@@ -139,12 +139,12 @@ const declarePathfindingBehavior = function (
     .getCodeExtraInformation()
     .setFunctionName('moveTo');
 
-  pathfindingBehaviorDeclaration
+    pathfindingBehaviorDeclaration
     .addScopedAction(
-      'DrawCells',
-      _('Draw cells'),
-      _('Draw cells'),
-      _('Draw cells on _PARAM2_'),
+      'DrawNavMesh',
+      _('Draw navigation mesh'),
+      _('Draw navigation mesh'),
+      _('Draw navigation mesh used for _PARAM0_ on _PARAM2_'),
       'Debug (NavMesh)',
       'CppPlatform/Extensions/AStaricon24.png',
       'CppPlatform/Extensions/AStaricon16.png'
@@ -160,7 +160,7 @@ const declarePathfindingBehavior = function (
     .addParameter('objectPtr', _('Shape painter'), '', false)
     .markAsAdvanced()
     .getCodeExtraInformation()
-    .setFunctionName('drawCells');
+    .setFunctionName('drawNavMesh');
 
   pathfindingBehaviorDeclaration
     .addScopedCondition(

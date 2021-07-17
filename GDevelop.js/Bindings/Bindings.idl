@@ -694,6 +694,11 @@ interface Layer {
 
     [Ref] EffectsContainer GetEffects();
 
+    // Note that for now, cameras are not used in the editor (and not supported in the game engine).
+    // Just exposing the count to ensure we can test it.
+    unsigned long GetCameraCount();
+    void SetCameraCount(unsigned long cameraCount);
+
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 };

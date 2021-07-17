@@ -34,7 +34,7 @@ namespace gdjs {
     originY: float;
     cellSize: float;
     cells: RasterizationCell[][];
-    
+
     public static neighbor4Deltas = [
       { x: -1, y: 0 },
       { x: 0, y: 1 },
@@ -82,6 +82,12 @@ namespace gdjs {
       return gridPosition;
     }
 
+    convertFromGridBasis(gridPosition: Point, position: Point) {
+      position.x = gridPosition.x * this.cellSize + this.originX;
+      position.y = gridPosition.y * this.cellSize + this.originY;
+      return position;
+    }
+
     get(x: integer, y: integer) {
       return this.cells[y][x];
     }
@@ -107,77 +113,6 @@ namespace gdjs {
     }
   }
 
-  class Geometry {
-    /**
-     * Returns TRUE if line segment AB intersects with line segment CD in any
-     * manner. Either collinear or at a single point.
-     * @param ax The x-value for point (ax, ay) in line segment AB.
-     * @param ay The y-value for point (ax, ay) in line segment AB.
-     * @param bx The x-value for point (bx, by) in line segment AB.
-     * @param by The y-value for point (bx, by) in line segment AB.
-     * @param cx The x-value for point (cx, cy) in line segment CD.
-     * @param cy The y-value for point (cx, cy) in line segment CD.
-     * @param dx The x-value for point (dx, dy) in line segment CD.
-     * @param dy The y-value for point (dx, dy) in line segment CD.
-     * @return TRUE if line segment AB intersects with line segment CD in any
-     * manner.
-     */
-    public static segmentsIntersect(
-      ax: integer,
-      ay: integer,
-      bx: integer,
-      by: integer,
-      cx: integer,
-      cy: integer,
-      dx: integer,
-      dy: integer
-    ): boolean {
-      /*
-       * This is modified 2D line-line intersection/segment-segment
-       * intersection test.
-       */
-
-      const deltaABx = bx - ax;
-      const deltaABy = by - ay;
-      const deltaCAx = ax - cx;
-      const deltaCAy = ay - cy;
-      const deltaCDx = dx - cx;
-      const deltaCDy = dy - cy;
-
-      const numerator = deltaCAy * deltaCDx - deltaCAx * deltaCDy;
-      const denominator = deltaABx * deltaCDy - deltaABy * deltaCDx;
-
-      // Perform early exit tests.
-      if (denominator == 0 && numerator != 0) {
-        // If numerator is zero, then the lines are colinear.
-        // Since it isn't, then the lines must be parallel.
-        return false;
-      }
-
-      // Lines intersect.  But do the segments intersect?
-
-      // Forcing float division on both of these via casting of the
-      // denominator.
-      const factorAB = numerator / denominator;
-      const factorCD =
-        (deltaCAy * deltaABx - deltaCAx * deltaABy) / denominator;
-
-      // Determine the type of intersection
-      if (
-        factorAB >= 0.0 &&
-        factorAB <= 1.0 &&
-        factorCD >= 0.0 &&
-        factorCD <= 1.0
-      ) {
-        return true; // The two segments intersect.
-      }
-
-      // The lines intersect, but segments to not.
-
-      return false;
-    }
-  }
-
   export type ContourPoint = { x: integer; y: integer; region: integer };
 
   type PolyMergeResult = {
@@ -186,38 +121,48 @@ namespace gdjs {
     indexB: integer;
   };
 
+export class NavMeshGenerator {
+  public static buildMesh(
+    areaLeftBound: float,
+    areaTopBound: float,
+    areaRightBound: float,
+    areaBottomBound: float,
+    cellSize: float,
+    obstacles: RuntimeObject[],
+    obstacleCellPadding: integer) {
+    const grid = new gdjs.RasterizationGrid(
+      areaLeftBound,
+      areaTopBound,
+      areaRightBound,
+      areaBottomBound,
+      cellSize
+    );
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, obstacles);
+    //console.log(
+    //  '\n' +
+    //    grid.cells
+    //      .map((cellRow) =>
+    //        cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
+    //      )
+    //      .join('\n') +
+    //    '\n'
+    //);
+    gdjs.RegionGenerator.generateDistanceField(grid);
+    gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
+    const contours = gdjs.ContourBuilder.buildContours(grid);
+    const meshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 16);
+    // point can be shared so them must be copied to be scaled.
+    const scaledMeshField = meshField.map((polygon) =>
+      polygon.map((point) =>
+        grid.convertFromGridBasis(point, { x: 0, y: 0 })
+      )
+    );
+    return scaledMeshField;
+  }
+}
+
+
   export class ConvexPolygonGenerator {
-    public static makeVerticesUniq(contours: Point[][]): Map<integer, Point> {
-      /*
-       * Key = Hash representing a unique vertex location.
-       * Value = The index of the vertex in the global vertices array.
-       * When a new vertex is found, it is added to the vertices array and
-       * its global index stored in this hash table.  If a duplicate is
-       * found, the value from this table is used.
-       * There will always be duplicate vertices since different contours
-       * are connected by these duplicate vertices.
-       */
-      const uniqVertices = new Map<integer, Point>();
-      for (const contour of contours) {
-        for (let index = 0; index < contour.length; index++) {
-          const vertex = contour[index];
-
-          const vertexHash = ConvexPolygonGenerator.getHashCode(vertex);
-          let uniqVertex = uniqVertices.get(vertexHash);
-          if (uniqVertex) {
-            contour[index] = uniqVertex;
-          } else {
-            // This is the first time this vertex has been seen.
-            // Assign it an index and add it to the vertex array.
-            uniqVertices.set(vertexHash, vertex);
-          }
-          // Creat the map entry.  Contour vertex index -> global
-          // vertex index.
-        }
-      }
-      return uniqVertices;
-    }
-
     /**
      * Builds a convex polygon mesh from the provided contour set.
      * <p>This build algorithm will fail and return null if the
@@ -230,8 +175,6 @@ namespace gdjs {
       contours: Point[][],
       mMaxVertsPerPoly: integer
     ): Point[][] {
-      const vertices = ConvexPolygonGenerator.makeVerticesUniq(contours);
-
       // Number of vertices found in the source.
       let sourceVertCount = 0;
 
@@ -361,9 +304,8 @@ namespace gdjs {
               ) {
                 // Can polyB merge with polyA?
                 ConvexPolygonGenerator.getPolyMergeInfo(
-                  iPolyA,
-                  iPolyB,
-                  workingPolys,
+                  workingPolys[iPolyA],
+                  workingPolys[iPolyB],
                   mMaxVertsPerPoly,
                   mergeInfo
                 );
@@ -379,8 +321,6 @@ namespace gdjs {
                 }
               }
             }
-
-            console.log('longestMergeEdge: ' + longestMergeEdge);
 
             if (longestMergeEdge <= 0)
               // No valid merges found during this iteration.
@@ -416,8 +356,6 @@ namespace gdjs {
             for (let i = 0; i < vertCountB - 1; i++)
               mergedPoly[position++] =
                 workingPolys[pBestPolyB][(iPolyBVert + 1 + i) % vertCountB];
-
-            console.log('mergedPoly.length: ' + mergedPoly.length);
 
             // Copy the merged polygon over the top of polygon A.
             workingPolys[pBestPolyA].length = 0;
@@ -462,23 +400,6 @@ namespace gdjs {
     }
 
     /**
-     * Provides a hash value unique to the combination of values.
-     * @param x  The vertices x-value. (x, y, z)
-     * @param y  The vertices y-value. (x, y, z)
-     * @param z  The vertices z-value. (x, y, z)
-     * @return A hash that is unique to the vertex.
-     */
-    private static getHashCode(point: Point): integer {
-      /*
-       * Note: Tried the standard eclipse hash generation method.  But
-       * it resulted in non-unique hash values during testing.  Switched
-       * to this method.
-       * Hex values are arbitrary prime numbers.
-       */
-      return 0x8da6b343 * point.x + 0xd8163841 * point.y;
-    }
-
-    /**
      * Checks two polygons to see if they can be merged.  If a merge is
      * allowed, provides data via the outResult argument.
      * <p>outResult will be an array of size 3 with the following
@@ -510,10 +431,8 @@ namespace gdjs {
      * @param outResult An array of size three which contains merge information.
      */
     private static getPolyMergeInfo(
-      // TODO get ride of the indexes and use Point references directly
-      polyAPointer: integer,
-      polyBPointer: integer,
-      polys: Point[][],
+      polyA: Point[],
+      polyB: Point[],
       maxVertsPerPoly: integer,
       outResult: PolyMergeResult
     ): void {
@@ -521,8 +440,8 @@ namespace gdjs {
       outResult.indexA = -1;
       outResult.indexB = -1;
 
-      const vertCountA = polys[polyAPointer].length;
-      const vertCountB = polys[polyBPointer].length;
+      const vertCountA = polyA.length;
+      const vertCountB = polyB.length;
 
       // If the merged polygon would would have to many vertices, do not
       // merge. Subtracting two since to take into account the effect of
@@ -539,13 +458,13 @@ namespace gdjs {
        */
       for (let iPolyVertA = 0; iPolyVertA < vertCountA; iPolyVertA++) {
         // Get the vertex indices for the polygonA edge
-        const iVertA = polys[polyAPointer][iPolyVertA];
-        const iVertANext = polys[polyAPointer][(iPolyVertA + 1) % vertCountA];
+        const iVertA = polyA[iPolyVertA];
+        const iVertANext = polyA[(iPolyVertA + 1) % vertCountA];
         // Search polygonB for matches.
         for (let iPolyVertB = 0; iPolyVertB < vertCountB; iPolyVertB++) {
           // Get the vertex indices for the polygonB edge.
-          const iVertB = polys[polyBPointer][iPolyVertB];
-          const iVertBNext = polys[polyBPointer][(iPolyVertB + 1) % vertCountB];
+          const iVertB = polyB[iPolyVertB];
+          const iVertBNext = polyB[(iPolyVertB + 1) % vertCountB];
           if (iVertA === iVertBNext && iVertANext === iVertB) {
             // The vertex indices for this edge are the same and
             // sequenced in opposite order.  So the edge is shared.
@@ -570,10 +489,10 @@ namespace gdjs {
        */
 
       let sharedVertMinus =
-        polys[polyAPointer][(outResult.indexA - 1 + vertCountA) % vertCountA];
-      let sharedVert = polys[polyAPointer][outResult.indexA];
+        polyA[(outResult.indexA - 1 + vertCountA) % vertCountA];
+      let sharedVert = polyA[outResult.indexA];
       let sharedVertPlus =
-        polys[polyBPointer][(outResult.indexB + 2) % vertCountB];
+        polyB[(outResult.indexB + 2) % vertCountB];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -593,9 +512,9 @@ namespace gdjs {
         return;
 
       sharedVertMinus =
-        polys[polyBPointer][(outResult.indexB - 1 + vertCountB) % vertCountB];
-      sharedVert = polys[polyBPointer][outResult.indexB];
-      sharedVertPlus = polys[polyAPointer][(outResult.indexA + 2) % vertCountA];
+        polyB[(outResult.indexB - 1 + vertCountB) % vertCountB];
+      sharedVert = polyB[outResult.indexB];
+      sharedVertPlus = polyA[(outResult.indexA + 2) % vertCountA];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -615,8 +534,8 @@ namespace gdjs {
         return;
 
       // Get the vertex indices that form the shared edge.
-      sharedVertMinus = polys[polyAPointer][outResult.indexA];
-      sharedVert = polys[polyAPointer][(outResult.indexA + 1) % vertCountA];
+      sharedVertMinus = polyA[outResult.indexA];
+      sharedVert = polyA[(outResult.indexA + 1) % vertCountA];
 
       // Store the lengthSq of the shared edge.
       const deltaX = sharedVertMinus.x - sharedVert.x;
@@ -696,16 +615,6 @@ namespace gdjs {
           iPlus2,
           verts
         );
-        console.log(
-          'isValidPartition: ' +
-            iPlus1 +
-            ' ' +
-            vertexFlags[iPlus1] +
-            ' ' +
-            verts[iPlus1].x +
-            ' ' +
-            verts[iPlus1].y
-        );
       }
 
       /*
@@ -745,8 +654,6 @@ namespace gdjs {
             const deltaX = vertPlus2.x - vert.x;
             const deltaY = vertPlus2.y - vert.y;
             const lengthSq = deltaX * deltaX + deltaY * deltaY;
-
-            console.log('lengthSq: ' + i + ' ' + lengthSq);
 
             if (lengthSq < minLengthSq) {
               // This is either the first valid new edge, or an edge
@@ -811,9 +718,6 @@ namespace gdjs {
           (i + 2) % verts.length,
           verts
         );
-        console.log('vertexFlags: ' + i + ' ' + vertexFlags[i]);
-        console.log('vertexFlags: ' + iPlus1 + ' ' + vertexFlags[iPlus1]);
-        console.log('');
       }
 
       // Only 3 vertices remain.
@@ -855,7 +759,11 @@ namespace gdjs {
        */
       return (
         ConvexPolygonGenerator.liesWithinInternalAngle(indexA, indexB, verts) &&
-        !ConvexPolygonGenerator.hasIllegalEdgeIntersection(indexA, indexB, verts)
+        !ConvexPolygonGenerator.hasIllegalEdgeIntersection(
+          indexA,
+          indexB,
+          verts
+        )
       );
     }
 
@@ -1108,7 +1016,9 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) <= 0;
+      return (
+        ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) <= 0
+      );
     }
 
     /**
@@ -1154,7 +1064,9 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) >= 0;
+      return (
+        ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) >= 0
+      );
     }
 
     /**
@@ -1263,22 +1175,12 @@ namespace gdjs {
             startDir,
             workingRawVerts
           );
-          console.log(
-            workingRawVerts
-              .map((point) => '(' + point.x + ' ' + point.y + ')')
-              .join(', ')
-          );
           // Perform post processing on the contour in order to
           // create the final, simplified contour.
           ContourBuilder.generateSimplifiedContour(
             cell.regionID,
             workingRawVerts,
             workingSimplifiedVerts
-          );
-          console.log(
-            workingSimplifiedVerts
-              .map((point) => '(' + point.x + ' ' + point.y + ')')
-              .join(', ')
           );
 
           if (workingSimplifiedVerts.length < 3) {
@@ -1325,7 +1227,7 @@ namespace gdjs {
           // The current direction is pointing toward an edge.
           // Get this edge's vertex.
           const delta =
-          ContourBuilder.leftVertexOfFacingCellBorderDeltas[direction];
+            ContourBuilder.leftVertexOfFacingCellBorderDeltas[direction];
 
           const neighbor = grid.get(
             cell.x + RasterizationGrid.neighbor4Deltas[direction].x,
@@ -1493,7 +1395,7 @@ namespace gdjs {
            * http://www.critterai.org/nmgen_contourgen#nulledgesimple
            */
           while (iTestVert !== iVertBSource) {
-            const deviation = ContourBuilder.getPointSegmentDistanceSq(
+            const deviation = Geometry.getPointSegmentDistanceSq(
               sourceVerts[iTestVert].x,
               sourceVerts[iTestVert].y,
               ax,
@@ -1530,73 +1432,13 @@ namespace gdjs {
         else iResultVertA++;
       }
     }
-
-    /**
-     * Returns the distance squared from the point to the line segment.
-     * <p>Behavior is undefined if the the closest distance is outside the
-     * line segment.</p>
-     * @param px The x-value of point (px, py).
-     * @param py The y-value of point (px, py)
-     * @param ax The x-value of the line segment's vertex A.
-     * @param ay The y-value of the line segment's vertex A.
-     * @param bx The x-value of the line segment's vertex B.
-     * @param by The y-value of the line segment's vertex B.
-     * @return The distance squared from the point (px, py) to line segment AB.
-     */
-    private static getPointSegmentDistanceSq(
-      px: float,
-      py: float,
-      ax: float,
-      ay: float,
-      bx: float,
-      by: float
-    ): float {
-      /*
-       * Reference: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
-       *
-       * The goal of the algorithm is to find the point on line segment AB
-       * that is closest to P and then calculate the distance between P
-       * and that point.
-       */
-
-      const deltaABx = bx - ax;
-      const deltaABy = by - ay;
-      const deltaAPx = px - ax;
-      const deltaAPy = py - ay;
-
-      const segmentABLengthSq = deltaABx * deltaABx + deltaABy * deltaABy;
-
-      if (segmentABLengthSq == 0)
-        // AB is not a line segment.  So just return
-        // distanceSq from P to A
-        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
-
-      const u = (deltaAPx * deltaABx + deltaAPy * deltaABy) / segmentABLengthSq;
-
-      if (u < 0)
-        // Closest point on line AB is outside outside segment AB and
-        // closer to A. So return distanceSq from P to A.
-        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
-      else if (u > 1)
-        // Closest point on line AB is outside segment AB and closer to B.
-        // So return distanceSq from P to B.
-        return (px - bx) * (px - bx) + (py - by) * (py - by);
-
-      // Closest point on lineAB is inside segment AB.  So find the exact
-      // point on AB and calculate the distanceSq from it to P.
-
-      // The calculation in parenthesis is the location of the point on
-      // the line segment.
-      const deltaX = ax + u * deltaABx - px;
-      const deltaY = ay + u * deltaABy - py;
-
-      return deltaX * deltaX + deltaY * deltaY;
-    }
   }
 
   export class RegionGenerator {
-
-    static generateRegions(grid: RasterizationGrid, obstacleCellPadding: integer) {
+    static generateRegions(
+      grid: RasterizationGrid,
+      obstacleCellPadding: integer
+    ) {
       const distanceMin = obstacleCellPadding * 2;
       const expandIterations: integer = 4 + distanceMin * 2;
 
@@ -1622,11 +1464,7 @@ namespace gdjs {
 
         if (nextRegionID > 1) {
           if (distance > 0) {
-            RegionGenerator.expandRegions(
-              grid,
-              floodedCells,
-              expandIterations
-            );
+            RegionGenerator.expandRegions(grid, floodedCells, expandIterations);
           } else {
             RegionGenerator.expandRegions(grid, floodedCells, -1);
           }
@@ -1667,11 +1505,7 @@ namespace gdjs {
       // Perform a final expansion of existing regions.
       // Allow more iterations than normal for this last expansion.
       if (distanceMin > 0) {
-        RegionGenerator.expandRegions(
-          grid,
-          floodedCells,
-          expandIterations * 8
-        );
+        RegionGenerator.expandRegions(grid, floodedCells, expandIterations * 8);
       } else {
         RegionGenerator.expandRegions(grid, floodedCells, -1);
       }
@@ -1889,7 +1723,6 @@ namespace gdjs {
       // Scan-line polygon fill algorithm
       // strongly inspired from:
       // http://alienryderflex.com/polygon_fill/
-      console.log('fillPolygon: ' + minY + ' -> ' + maxY);
 
       //  Loop through the rows of the image.
       for (let pixelY = minY; pixelY < maxY; pixelY++) {
@@ -1946,6 +1779,139 @@ namespace gdjs {
           }
         }
       }
+    }
+  }
+
+  class Geometry {
+    /**
+     * Returns TRUE if line segment AB intersects with line segment CD in any
+     * manner. Either collinear or at a single point.
+     * @param ax The x-value for point (ax, ay) in line segment AB.
+     * @param ay The y-value for point (ax, ay) in line segment AB.
+     * @param bx The x-value for point (bx, by) in line segment AB.
+     * @param by The y-value for point (bx, by) in line segment AB.
+     * @param cx The x-value for point (cx, cy) in line segment CD.
+     * @param cy The y-value for point (cx, cy) in line segment CD.
+     * @param dx The x-value for point (dx, dy) in line segment CD.
+     * @param dy The y-value for point (dx, dy) in line segment CD.
+     * @return TRUE if line segment AB intersects with line segment CD in any
+     * manner.
+     */
+    public static segmentsIntersect(
+      ax: integer,
+      ay: integer,
+      bx: integer,
+      by: integer,
+      cx: integer,
+      cy: integer,
+      dx: integer,
+      dy: integer
+    ): boolean {
+      /*
+       * This is modified 2D line-line intersection/segment-segment
+       * intersection test.
+       */
+
+      const deltaABx = bx - ax;
+      const deltaABy = by - ay;
+      const deltaCAx = ax - cx;
+      const deltaCAy = ay - cy;
+      const deltaCDx = dx - cx;
+      const deltaCDy = dy - cy;
+
+      const numerator = deltaCAy * deltaCDx - deltaCAx * deltaCDy;
+      const denominator = deltaABx * deltaCDy - deltaABy * deltaCDx;
+
+      // Perform early exit tests.
+      if (denominator == 0 && numerator != 0) {
+        // If numerator is zero, then the lines are colinear.
+        // Since it isn't, then the lines must be parallel.
+        return false;
+      }
+
+      // Lines intersect.  But do the segments intersect?
+
+      // Forcing float division on both of these via casting of the
+      // denominator.
+      const factorAB = numerator / denominator;
+      const factorCD =
+        (deltaCAy * deltaABx - deltaCAx * deltaABy) / denominator;
+
+      // Determine the type of intersection
+      if (
+        factorAB >= 0.0 &&
+        factorAB <= 1.0 &&
+        factorCD >= 0.0 &&
+        factorCD <= 1.0
+      ) {
+        return true; // The two segments intersect.
+      }
+
+      // The lines intersect, but segments to not.
+
+      return false;
+    }
+
+    /**
+     * Returns the distance squared from the point to the line segment.
+     * <p>Behavior is undefined if the the closest distance is outside the
+     * line segment.</p>
+     * @param px The x-value of point (px, py).
+     * @param py The y-value of point (px, py)
+     * @param ax The x-value of the line segment's vertex A.
+     * @param ay The y-value of the line segment's vertex A.
+     * @param bx The x-value of the line segment's vertex B.
+     * @param by The y-value of the line segment's vertex B.
+     * @return The distance squared from the point (px, py) to line segment AB.
+     */
+    public static getPointSegmentDistanceSq(
+      px: float,
+      py: float,
+      ax: float,
+      ay: float,
+      bx: float,
+      by: float
+    ): float {
+      /*
+       * Reference: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
+       *
+       * The goal of the algorithm is to find the point on line segment AB
+       * that is closest to P and then calculate the distance between P
+       * and that point.
+       */
+
+      const deltaABx = bx - ax;
+      const deltaABy = by - ay;
+      const deltaAPx = px - ax;
+      const deltaAPy = py - ay;
+
+      const segmentABLengthSq = deltaABx * deltaABx + deltaABy * deltaABy;
+
+      if (segmentABLengthSq == 0)
+        // AB is not a line segment.  So just return
+        // distanceSq from P to A
+        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
+
+      const u = (deltaAPx * deltaABx + deltaAPy * deltaABy) / segmentABLengthSq;
+
+      if (u < 0)
+        // Closest point on line AB is outside outside segment AB and
+        // closer to A. So return distanceSq from P to A.
+        return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
+      else if (u > 1)
+        // Closest point on line AB is outside segment AB and closer to B.
+        // So return distanceSq from P to B.
+        return (px - bx) * (px - bx) + (py - by) * (py - by);
+
+      // Closest point on lineAB is inside segment AB.  So find the exact
+      // point on AB and calculate the distanceSq from it to P.
+
+      // The calculation in parenthesis is the location of the point on
+      // the line segment.
+      const deltaX = ax + u * deltaABx - px;
+      const deltaY = ay + u * deltaABy - py;
+
+      return deltaX * deltaX + deltaY * deltaY;
     }
   }
 }

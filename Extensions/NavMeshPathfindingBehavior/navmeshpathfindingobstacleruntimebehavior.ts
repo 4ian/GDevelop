@@ -14,7 +14,7 @@ namespace gdjs {
    */
   export class NavMeshPathfindingObstaclesManager {
     _obstaclesRBush: any;
-    _obstacles: Set<NavMeshPathfindingObstacleRuntimeBehavior>;
+    _obstacles: Set<RuntimeObject>;
     _cellSize: integer;
     _areaLeftBound: integer;
     _areaTopBound: integer;
@@ -76,7 +76,7 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstaclesRBush.insert(pathfindingObstacleBehavior);
-      this._obstacles.add(pathfindingObstacleBehavior);
+      this._obstacles.add(pathfindingObstacleBehavior.owner);
     }
 
     /**
@@ -87,60 +87,38 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstaclesRBush.remove(pathfindingObstacleBehavior);
-      this._obstacles.delete(pathfindingObstacleBehavior);
+      this._obstacles.delete(pathfindingObstacleBehavior.owner);
     }
 
     public static invalidateNavMesh(runtimeScene) {
       const manager =
         NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
-      console.log('invalidateNavMesh: ' + manager);
-      manager._navMeshes.clear();
+      manager.invalidateNavMesh();
     }
 
-    getNavMesh(
-      runtimeScene: gdjs.RuntimeScene,
-      obstaclePadding: integer
-    ): NavMesh {
+    public invalidateNavMesh() {
+      this._navMeshes.clear();
+    }
+
+    getNavMesh(obstaclePadding: integer): NavMesh {
       // Round the padding on cellSize to avoid almost identical NavMesh
       const obstacleCellPadding = Math.ceil(obstaclePadding / this._cellSize);
 
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {
-        const grid = new gdjs.RasterizationGrid(
+        const meshField = gdjs.NavMeshGenerator.buildMesh(
           this._areaLeftBound,
           this._areaTopBound,
           this._areaRightBound,
           this._areaBottomBound,
-          this._cellSize
+          this._cellSize,
+          Array.from(this._obstacles),
+          obstacleCellPadding
         );
-        console.log('grid: ' + grid.dimX() + ' ' + grid.dimY());
-        const objects = Array.from(this._obstacles).map(
-          (obstacle) => obstacle.owner
-        );
-        gdjs.ObstacleRasterizer.rasterizeObstacles(grid, objects);
-        console.log(
-          '\n' +
-            grid.cells
-              .map((cellRow) =>
-                cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
-              )
-              .join('\n') +
-            '\n'
-        );
-        gdjs.RegionGenerator.generateDistanceField(grid);
-        gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
-        const contours = gdjs.ContourBuilder.buildContours(grid);
-        const meshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 16);
-        const scaledMeshField = meshField.map((polygon) =>
-          polygon.map((point) => ({
-            x: this._cellSize * point.x + grid.originX,
-            y: this._cellSize * point.y + grid.originY,
-          }))
-        );
-        navMesh = new gdjs.NavMesh(scaledMeshField);
+        navMesh = new gdjs.NavMesh(meshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
 
-        // // Uncomment this to see regions instead of the NavMesh 
+        // // Uncomment this to see regions instead of the NavMesh
         // const lastUsedRegions = contours.map((polygon) =>
         //   polygon.map((point) => ({
         //     x: this._cellSize * point.x + grid.originX,

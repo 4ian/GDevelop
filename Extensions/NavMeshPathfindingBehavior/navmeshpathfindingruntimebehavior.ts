@@ -275,10 +275,7 @@ namespace gdjs {
       // because of trigonometry rounding errors.
       const radiusMax = Math.round(Math.sqrt(radiusSqMax));
 
-      const navMesh = this._manager.getNavMesh(
-        runtimeScene,
-        radiusMax + this._extraBorder
-      );
+      const navMesh = this._manager.getNavMesh(radiusMax + this._extraBorder);
       this._lastUsedNavMesh = this._manager.lastUsedNavMesh;
 
       //TODO if the target is not on the mesh, find the nearest position
@@ -315,7 +312,7 @@ namespace gdjs {
       // }
       shapePainter._renderer.clear();
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
-        const polygon = navPoly.getPoints()
+        const polygon = navPoly.getPoints();
         //const last = polygon.length - 1;
         //shapePainter.drawRectangle(polygon[last].x - 8, polygon[last].y - 8, polygon[last].x + 8, polygon[last].y + 8);
         //shapePainter.drawCircle(polygon[0].x, polygon[0].y, 8);

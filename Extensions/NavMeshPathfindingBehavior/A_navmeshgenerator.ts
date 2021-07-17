@@ -6,7 +6,6 @@ namespace gdjs {
 
     x: integer;
     y: integer;
-    isObstacle: boolean = false;
     distanceToObstacle: integer = Number.MAX_VALUE;
     regionID: integer = RasterizationCell.NULL_REGION_ID;
     distanceToRegionCore: integer = 0;
@@ -18,8 +17,11 @@ namespace gdjs {
     }
 
     setObstacle() {
-      this.isObstacle = true;
       this.distanceToObstacle = 0;
+    }
+
+    isObstacle() {
+      return this.distanceToObstacle === 0;
     }
 
     hasRegion() {
@@ -32,6 +34,24 @@ namespace gdjs {
     originY: float;
     cellSize: float;
     cells: RasterizationCell[][];
+    
+    public static neighbor4Deltas = [
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 0 },
+      { x: 0, y: -1 },
+    ];
+
+    public static neighbor8Deltas = [
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 1, y: 0 },
+      { x: 0, y: -1 },
+      { x: 1, y: 1 },
+      { x: -1, y: 1 },
+      { x: -1, y: -1 },
+      { x: 1, y: -1 },
+    ];
 
     constructor(
       left: float,
@@ -166,7 +186,7 @@ namespace gdjs {
     indexB: integer;
   };
 
-  export class NavMeshGenerator {
+  export class ConvexPolygonGenerator {
     public static makeVerticesUniq(contours: Point[][]): Map<integer, Point> {
       /*
        * Key = Hash representing a unique vertex location.
@@ -182,7 +202,7 @@ namespace gdjs {
         for (let index = 0; index < contour.length; index++) {
           const vertex = contour[index];
 
-          const vertexHash = NavMeshGenerator.getHashCode(vertex);
+          const vertexHash = ConvexPolygonGenerator.getHashCode(vertex);
           let uniqVertex = uniqVertices.get(vertexHash);
           if (uniqVertex) {
             contour[index] = uniqVertex;
@@ -207,10 +227,10 @@ namespace gdjs {
      * @return The result of the build operation.
      */
     public static buildMesh(
-      contours: ContourPoint[][],
+      contours: Point[][],
       mMaxVertsPerPoly: integer
     ): Point[][] {
-      const vertices = NavMeshGenerator.makeVerticesUniq(contours);
+      const vertices = ConvexPolygonGenerator.makeVerticesUniq(contours);
 
       // Number of vertices found in the source.
       let sourceVertCount = 0;
@@ -292,7 +312,7 @@ namespace gdjs {
 
         // Triangulate the contour.
         let foundAnyTriangle = false;
-        NavMeshGenerator.triangulate(
+        ConvexPolygonGenerator.triangulate(
           workingIndices,
           workingIndiceFlags,
           (p1: Point, p2: Point, p3: Point) => {
@@ -340,7 +360,7 @@ namespace gdjs {
                 iPolyB++
               ) {
                 // Can polyB merge with polyA?
-                NavMeshGenerator.getPolyMergeInfo(
+                ConvexPolygonGenerator.getPolyMergeInfo(
                   iPolyA,
                   iPolyB,
                   workingPolys,
@@ -555,7 +575,7 @@ namespace gdjs {
       let sharedVertPlus =
         polys[polyBPointer][(outResult.indexB + 2) % vertCountB];
       if (
-        !NavMeshGenerator.isLeft(
+        !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
           sharedVert.y,
           sharedVertMinus.x,
@@ -577,7 +597,7 @@ namespace gdjs {
       sharedVert = polys[polyBPointer][outResult.indexB];
       sharedVertPlus = polys[polyAPointer][(outResult.indexA + 2) % vertCountA];
       if (
-        !NavMeshGenerator.isLeft(
+        !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
           sharedVert.y,
           sharedVertMinus.x,
@@ -671,7 +691,7 @@ namespace gdjs {
         // in a valid internal triangle.
         // Flag the center vertex (iPlus1) to indicate a valid triangle
         // location.
-        vertexFlags[iPlus1] = NavMeshGenerator.isValidPartition(
+        vertexFlags[iPlus1] = ConvexPolygonGenerator.isValidPartition(
           i,
           iPlus2,
           verts
@@ -781,12 +801,12 @@ namespace gdjs {
          * triangle.  We now need to re-check these indices to see if they
          * can now be the center index in a potential new partition.
          */
-        vertexFlags[i] = NavMeshGenerator.isValidPartition(
+        vertexFlags[i] = ConvexPolygonGenerator.isValidPartition(
           (i - 1 + verts.length) % verts.length,
           iPlus1,
           verts
         );
-        vertexFlags[iPlus1] = NavMeshGenerator.isValidPartition(
+        vertexFlags[iPlus1] = ConvexPolygonGenerator.isValidPartition(
           i,
           (i + 2) % verts.length,
           verts
@@ -834,8 +854,8 @@ namespace gdjs {
        *  If it does, then perform the more costly check.
        */
       return (
-        NavMeshGenerator.liesWithinInternalAngle(indexA, indexB, verts) &&
-        !NavMeshGenerator.hasIllegalEdgeIntersection(indexA, indexB, verts)
+        ConvexPolygonGenerator.liesWithinInternalAngle(indexA, indexB, verts) &&
+        !ConvexPolygonGenerator.hasIllegalEdgeIntersection(indexA, indexB, verts)
       );
     }
 
@@ -894,7 +914,7 @@ namespace gdjs {
 
       // TRUE if A is left of or on line AMinus->APlus
       if (
-        NavMeshGenerator.isLeftOrCollinear(
+        ConvexPolygonGenerator.isLeftOrCollinear(
           vertA.x,
           vertA.y,
           vertAMinus.x,
@@ -907,7 +927,7 @@ namespace gdjs {
         // (non-reflex angle).
         // Test to see if B lies within this angle.
         return (
-          NavMeshGenerator.isLeft(
+          ConvexPolygonGenerator.isLeft(
             // TRUE if B is left of line A->AMinus
             vertB.x,
             vertB.y,
@@ -917,7 +937,7 @@ namespace gdjs {
             vertAMinus.y
           ) &&
           // TRUE if B is right of line A->APlus
-          NavMeshGenerator.isRight(
+          ConvexPolygonGenerator.isRight(
             vertB.x,
             vertB.y,
             vertA.x,
@@ -936,7 +956,7 @@ namespace gdjs {
       return !(
         // TRUE if B is left of or on line A->APlus
         (
-          NavMeshGenerator.isLeftOrCollinear(
+          ConvexPolygonGenerator.isLeftOrCollinear(
             vertB.x,
             vertB.y,
             vertA.x,
@@ -945,7 +965,7 @@ namespace gdjs {
             vertAPlus.y
           ) &&
           // TRUE if B is right of or on line A->AMinus
-          NavMeshGenerator.isRightOrCollinear(
+          ConvexPolygonGenerator.isRightOrCollinear(
             vertB.x,
             vertB.y,
             vertA.x,
@@ -1065,7 +1085,7 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return NavMeshGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) < 0;
+      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) < 0;
     }
 
     /**
@@ -1088,7 +1108,7 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return NavMeshGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) <= 0;
+      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) <= 0;
     }
 
     /**
@@ -1111,7 +1131,7 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return NavMeshGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) > 0;
+      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) > 0;
     }
 
     /**
@@ -1134,7 +1154,7 @@ namespace gdjs {
       bx: integer,
       by: integer
     ): boolean {
-      return NavMeshGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) >= 0;
+      return ConvexPolygonGenerator.getSignedAreaX2(ax, ay, px, py, bx, by) >= 0;
     }
 
     /**
@@ -1180,7 +1200,9 @@ namespace gdjs {
        */
       return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
     }
+  }
 
+  export class ContourBuilder {
     static buildContours(grid: RasterizationGrid): ContourPoint[][] {
       const contours = new Array<ContourPoint[]>();
 
@@ -1195,10 +1217,10 @@ namespace gdjs {
 
           for (
             let direction = 0;
-            direction < NavMeshGenerator.neighbor4Deltas.length;
+            direction < RasterizationGrid.neighbor4Deltas.length;
             direction++
           ) {
-            const delta = NavMeshGenerator.neighbor4Deltas[direction];
+            const delta = RasterizationGrid.neighbor4Deltas[direction];
 
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (cell.regionID === neighbor.regionID) {
@@ -1235,7 +1257,7 @@ namespace gdjs {
           // We now have a span that is part of a contour and a direction
           // that points to a different region (null or real).
           // Build the contour.
-          NavMeshGenerator.buildRawContours(
+          ContourBuilder.buildRawContours(
             grid,
             cell,
             startDir,
@@ -1248,7 +1270,7 @@ namespace gdjs {
           );
           // Perform post processing on the contour in order to
           // create the final, simplified contour.
-          NavMeshGenerator.generateSimplifiedContour(
+          ContourBuilder.generateSimplifiedContour(
             cell.regionID,
             workingRawVerts,
             workingSimplifiedVerts
@@ -1303,11 +1325,11 @@ namespace gdjs {
           // The current direction is pointing toward an edge.
           // Get this edge's vertex.
           const delta =
-            NavMeshGenerator.leftVertexOfFacingCellBorderDeltas[direction];
+          ContourBuilder.leftVertexOfFacingCellBorderDeltas[direction];
 
           const neighbor = grid.get(
-            cell.x + NavMeshGenerator.neighbor4Deltas[direction].x,
-            cell.y + NavMeshGenerator.neighbor4Deltas[direction].y
+            cell.x + RasterizationGrid.neighbor4Deltas[direction].x,
+            cell.y + RasterizationGrid.neighbor4Deltas[direction].y
           );
           outContourVerts.push({
             x: cell.x + delta.x,
@@ -1329,8 +1351,8 @@ namespace gdjs {
            * don't miss any edges.
            */
           const neighbor = grid.get(
-            cell.x + NavMeshGenerator.neighbor4Deltas[direction].x,
-            cell.y + NavMeshGenerator.neighbor4Deltas[direction].y
+            cell.x + RasterizationGrid.neighbor4Deltas[direction].x,
+            cell.y + RasterizationGrid.neighbor4Deltas[direction].y
           );
           cell = neighbor;
 
@@ -1415,7 +1437,7 @@ namespace gdjs {
         }
       }
 
-      NavMeshGenerator.matchObstacleRegionEdges(sourceVerts, outVerts);
+      ContourBuilder.matchObstacleRegionEdges(sourceVerts, outVerts);
 
       //TODO Check if the less than 3 vertices case must be handle.
 
@@ -1471,7 +1493,7 @@ namespace gdjs {
            * http://www.critterai.org/nmgen_contourgen#nulledgesimple
            */
           while (iTestVert !== iVertBSource) {
-            const deviation = NavMeshGenerator.getPointSegmentDistanceSq(
+            const deviation = ContourBuilder.getPointSegmentDistanceSq(
               sourceVerts[iTestVert].x,
               sourceVerts[iTestVert].y,
               ax,
@@ -1570,6 +1592,9 @@ namespace gdjs {
 
       return deltaX * deltaX + deltaY * deltaY;
     }
+  }
+
+  export class RegionGenerator {
 
     static generateRegions(grid: RasterizationGrid, obstacleCellPadding: integer) {
       const distanceMin = obstacleCellPadding * 2;
@@ -1597,13 +1622,13 @@ namespace gdjs {
 
         if (nextRegionID > 1) {
           if (distance > 0) {
-            NavMeshGenerator.expandRegions(
+            RegionGenerator.expandRegions(
               grid,
               floodedCells,
               expandIterations
             );
           } else {
-            NavMeshGenerator.expandRegions(grid, floodedCells, -1);
+            RegionGenerator.expandRegions(grid, floodedCells, -1);
           }
         }
 
@@ -1612,7 +1637,7 @@ namespace gdjs {
 
           const fillTo = Math.max(distance - 2, distanceMin);
           if (
-            NavMeshGenerator.floodNewRegion(
+            RegionGenerator.floodNewRegion(
               grid,
               floodedCell,
               fillTo,
@@ -1642,24 +1667,17 @@ namespace gdjs {
       // Perform a final expansion of existing regions.
       // Allow more iterations than normal for this last expansion.
       if (distanceMin > 0) {
-        NavMeshGenerator.expandRegions(
+        RegionGenerator.expandRegions(
           grid,
           floodedCells,
           expandIterations * 8
         );
       } else {
-        NavMeshGenerator.expandRegions(grid, floodedCells, -1);
+        RegionGenerator.expandRegions(grid, floodedCells, -1);
       }
 
       //TODO check if post processing algorithms are necessary
     }
-
-    private static neighbor4Deltas = [
-      { x: -1, y: 0 },
-      { x: 0, y: 1 },
-      { x: 1, y: 0 },
-      { x: 0, y: -1 },
-    ];
 
     private static expandRegions(
       grid: RasterizationGrid,
@@ -1684,7 +1702,7 @@ namespace gdjs {
           }
           let cellRegion = RasterizationCell.NULL_REGION_ID;
           let regionCenterDist = Number.MAX_VALUE;
-          for (const delta of NavMeshGenerator.neighbor4Deltas) {
+          for (const delta of RasterizationGrid.neighbor4Deltas) {
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (neighbor.hasRegion()) {
               if (neighbor.distanceToObstacle + 2 < regionCenterDist) {
@@ -1705,17 +1723,6 @@ namespace gdjs {
       }
     }
 
-    private static neighbor8Deltas = [
-      { x: -1, y: 0 },
-      { x: 0, y: 1 },
-      { x: 1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 1, y: 1 },
-      { x: -1, y: 1 },
-      { x: -1, y: -1 },
-      { x: 1, y: -1 },
-    ];
-
     private static floodNewRegion(
       grid: RasterizationGrid,
       rootCell: RasterizationCell,
@@ -1732,7 +1739,7 @@ namespace gdjs {
       let cell: RasterizationCell | undefined;
       while ((cell = workingStack.pop())) {
         let isOnRegionBorder = false;
-        for (const delta of NavMeshGenerator.neighbor8Deltas) {
+        for (const delta of RasterizationGrid.neighbor8Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
           isOnRegionBorder =
             neighbor.regionID !== RasterizationCell.NULL_REGION_ID &&
@@ -1745,7 +1752,7 @@ namespace gdjs {
         }
         regionSize++;
 
-        for (const delta of NavMeshGenerator.neighbor4Deltas) {
+        for (const delta of RasterizationGrid.neighbor4Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
 
           if (
@@ -1780,21 +1787,21 @@ namespace gdjs {
       // close borders
       for (let x = 0; x < grid.dimX(); x++) {
         const leftCell = grid.get(x, 0);
-        if (!leftCell.isObstacle) {
+        if (!leftCell.isObstacle()) {
           grid.get(x, 0).setObstacle();
         }
         const rightCell = grid.get(x, grid.dimY() - 1);
-        if (!rightCell.isObstacle) {
+        if (!rightCell.isObstacle()) {
           rightCell.setObstacle();
         }
       }
       for (let y = 1; y < grid.dimY() - 1; y++) {
         const topCell = grid.get(0, y);
-        if (!topCell.isObstacle) {
+        if (!topCell.isObstacle()) {
           topCell.setObstacle();
         }
         const bottomCell = grid.get(grid.dimX() - 1, y);
-        if (!bottomCell.isObstacle) {
+        if (!bottomCell.isObstacle()) {
           bottomCell.setObstacle();
         }
       }
@@ -1802,7 +1809,7 @@ namespace gdjs {
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
-          for (const delta of NavMeshGenerator.firstPassDeltas) {
+          for (const delta of RegionGenerator.firstPassDeltas) {
             const distanceByNeighbor =
               grid.get(x + delta.x, y + delta.y).distanceToObstacle +
               delta.distance;
@@ -1816,7 +1823,7 @@ namespace gdjs {
       for (let y = grid.dimY() - 2; y >= 1; y--) {
         for (let x = grid.dimX() - 2; x >= 1; x--) {
           const cell = grid.get(x, y);
-          for (const delta of NavMeshGenerator.secondPassDeltas) {
+          for (const delta of RegionGenerator.secondPassDeltas) {
             const distanceByNeighbor =
               grid.get(x + delta.x, y + delta.y).distanceToObstacle +
               delta.distance;
@@ -1827,7 +1834,9 @@ namespace gdjs {
         }
       }
     }
+  }
 
+  export class ObstacleRasterizer {
     static rasterizeObstacles(
       grid: RasterizationGrid,
       obstacles: RuntimeObject[]
@@ -1855,7 +1864,7 @@ namespace gdjs {
           maxX = Math.min(maxX, grid.dimX());
           minY = Math.max(minY, 0);
           maxY = Math.min(maxY, grid.dimY());
-          NavMeshGenerator.fillPolygon(
+          ObstacleRasterizer.fillPolygon(
             vertices,
             minX,
             maxX,
@@ -1868,7 +1877,7 @@ namespace gdjs {
       }
     }
 
-    static fillPolygon(
+    private static fillPolygon(
       vertices: Point[],
       mixX: integer,
       maxX: integer,

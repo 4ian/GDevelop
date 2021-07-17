@@ -80,7 +80,12 @@ bool Exporter::ExportWholePixiProject(
     // end of compatibility code
 
     // Export engine libraries
-    helper.AddLibsInclude(true, false, false, includesFiles);
+    helper.AddLibsInclude(
+        /*pixiRenderers=*/true,
+        /*cocosRenderers=*/false,
+        /*websocketDebuggerClient=*/false,
+        exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+        includesFiles);
 
     // Export files for object and behaviors
     helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
@@ -191,7 +196,12 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project &project,
   // end of compatibility code
 
   // Export engine libraries
-  helper.AddLibsInclude(false, true, false, includesFiles);
+  helper.AddLibsInclude(
+      /*pixiRenderers=*/false,
+      /*cocosRenderers=*/true,
+      /*websocketDebuggerClient=*/false,
+      exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+      includesFiles);
 
   // Export files for object and behaviors
   helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);

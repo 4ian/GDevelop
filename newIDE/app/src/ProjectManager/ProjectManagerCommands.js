@@ -4,6 +4,7 @@ import { useCommand } from '../CommandPalette/CommandHooks';
 type Props = {|
   project: ?gdProject,
   onOpenProjectProperties: () => void,
+  onOpenProjectLoadingScreen: () => void,
   onOpenProjectVariables: () => void,
   onOpenResourcesDialog: () => void,
   onOpenPlatformSpecificAssetsDialog: () => void,
@@ -12,6 +13,9 @@ type Props = {|
 const ProjectManagerCommands = (props: Props) => {
   useCommand('OPEN_PROJECT_PROPERTIES', !!props.project, {
     handler: props.onOpenProjectProperties,
+  });
+  useCommand('OPEN_PROJECT_LOADING_SCREEN', !!props.project, {
+    handler: props.onOpenProjectLoadingScreen,
   });
 
   useCommand('OPEN_PROJECT_VARIABLES', !!props.project, {

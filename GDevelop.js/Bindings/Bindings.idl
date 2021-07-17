@@ -293,8 +293,31 @@ interface PlatformSpecificAssets {
 interface LoadingScreen {
     void LoadingScreen();
 
-    void ShowGDevelopSplash(boolean show);
     boolean IsGDevelopSplashShown();
+    void ShowGDevelopSplash(boolean show);
+    [Const, Ref] DOMString GetGDevelopLogoStyle();
+    [Ref] LoadingScreen SetGDevelopLogoStyle([Const] DOMString value);
+    [Const, Ref] DOMString GetBackgroundImageResourceName();
+    [Ref] LoadingScreen SetBackgroundImageResourceName([Const] DOMString value);
+    long GetBackgroundColor();
+    [Ref] LoadingScreen SetBackgroundColor(long value);
+    double GetBackgroundFadeInDuration();
+    [Ref] LoadingScreen SetBackgroundFadeInDuration(double value);
+    double GetMinDuration();
+    [Ref] LoadingScreen SetMinDuration(double value);
+    double GetLogoAndProgressFadeInDuration();
+    [Ref] LoadingScreen SetLogoAndProgressFadeInDuration(double value);
+    double GetLogoAndProgressLogoFadeInDelay();
+    [Ref] LoadingScreen SetLogoAndProgressLogoFadeInDelay(double value);
+    boolean GetShowProgressBar();
+    [Ref] LoadingScreen SetShowProgressBar(boolean value);
+    double GetProgressBarWidth();
+    [Ref] LoadingScreen SetProgressBarWidth(double value);
+    double GetProgressBarHeight();
+    [Ref] LoadingScreen SetProgressBarHeight(double value);
+    long GetProgressBarColor();
+    [Ref] LoadingScreen SetProgressBarColor(long value);
+
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

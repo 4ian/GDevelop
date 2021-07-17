@@ -27,12 +27,19 @@ export const rgbToHexNumber = (r: number, g: number, b: number) =>
 /**
  * Convert a hex color value to an rgb object value.
  */
-export const hexToRGBColor = (hex: string) => {
-  const hexNumber = parseInt(hex.replace('#', ''), 16);
+export const hexNumberToRGBColor = (hexNumber: number) => {
   return {
     r: (hexNumber >> 16) & 0xff,
     g: (hexNumber >> 8) & 0xff,
     b: hexNumber & 0xff,
     a: 255,
   };
+};
+
+/**
+ * Convert a hex color string to an rgb object value.
+ */
+export const hexToRGBColor = (hex: string) => {
+  const hexNumber = parseInt(hex.replace('#', ''), 16);
+  return hexNumberToRGBColor(hexNumber);
 };

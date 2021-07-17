@@ -117,20 +117,20 @@ namespace gdjs {
         const objects = Array.from(this._obstacles).map(
           (obstacle) => obstacle.owner
         );
-        gdjs.NavMeshGenerator.rasterizeObstacles(grid, objects);
+        gdjs.ObstacleRasterizer.rasterizeObstacles(grid, objects);
         console.log(
           '\n' +
             grid.cells
               .map((cellRow) =>
-                cellRow.map((cell) => (cell.isObstacle ? '#' : '.')).join('')
+                cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
               )
               .join('\n') +
             '\n'
         );
-        gdjs.NavMeshGenerator.generateDistanceField(grid);
-        gdjs.NavMeshGenerator.generateRegions(grid, obstacleCellPadding);
-        const contours = gdjs.NavMeshGenerator.buildContours(grid);
-        const meshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
+        gdjs.RegionGenerator.generateDistanceField(grid);
+        gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
+        const contours = gdjs.ContourBuilder.buildContours(grid);
+        const meshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 16);
         const scaledMeshField = meshField.map((polygon) =>
           polygon.map((point) => ({
             x: this._cellSize * point.x + grid.originX,

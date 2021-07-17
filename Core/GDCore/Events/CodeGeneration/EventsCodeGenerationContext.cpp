@@ -4,17 +4,18 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
-#include <set>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Project/Layout.h"
+#include <set>
 
 using namespace std;
 
 namespace gd {
 
 void EventsCodeGenerationContext::InheritsFrom(
-    const EventsCodeGenerationContext& parent_) {
+    const EventsCodeGenerationContext &parent_) {
   parent = &parent_;
 
   // Objects lists declared by parent became "already declared" in the child
@@ -32,6 +33,10 @@ void EventsCodeGenerationContext::InheritsFrom(
             parent_.emptyObjectsListsToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
+  std::copy(parent_.castedObjects.begin(),
+            parent_.castedObjects.end(),
+            std::inserter(castedObjects,
+                          castedObjects.begin()));
 
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -43,14 +48,14 @@ void EventsCodeGenerationContext::InheritsFrom(
 }
 
 void EventsCodeGenerationContext::Reuse(
-    const EventsCodeGenerationContext& parent_) {
+    const EventsCodeGenerationContext &parent_) {
   InheritsFrom(parent_);
   if (parent_.CanReuse())
-    contextDepth = parent_.GetContextDepth();  // Keep same context depth
+    contextDepth = parent_.GetContextDepth(); // Keep same context depth
 }
 
 void EventsCodeGenerationContext::ObjectsListNeeded(
-    const gd::String& objectName) {
+    const gd::String &objectName) {
   if (!IsToBeDeclared(objectName))
     objectsListsToBeDeclared.insert(objectName);
 
@@ -58,7 +63,7 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
 }
 
 void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
-    const gd::String& objectName) {
+    const gd::String &objectName) {
   if (!IsToBeDeclared(objectName))
     objectsListsWithoutPickingToBeDeclared.insert(objectName);
 
@@ -66,19 +71,20 @@ void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
 }
 
 void EventsCodeGenerationContext::EmptyObjectsListNeeded(
-    const gd::String& objectName) {
+    const gd::String &objectName) {
   if (!IsToBeDeclared(objectName))
     emptyObjectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
 
-std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
-    const {
+std::set<gd::String>
+EventsCodeGenerationContext::GetAllObjectsToBeDeclared() const {
   std::set<gd::String> allObjectListsToBeDeclared(
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
-  allObjectListsToBeDeclared.insert(objectsListsWithoutPickingToBeDeclared.begin(),
-                                    objectsListsWithoutPickingToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(
+      objectsListsWithoutPickingToBeDeclared.begin(),
+      objectsListsWithoutPickingToBeDeclared.end());
   allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
                                     emptyObjectsListsToBeDeclared.end());
 
@@ -86,8 +92,9 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
 }
 
 unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(
-    const gd::String& name) const {
-  if (depthOfLastUse.count(name) != 0) return depthOfLastUse.find(name)->second;
+    const gd::String &name) const {
+  if (depthOfLastUse.count(name) != 0)
+    return depthOfLastUse.find(name)->second;
 
   std::cout << "WARNING: During code generation, the last depth of an object "
                "list was 0."
@@ -96,10 +103,19 @@ unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(
 }
 
 bool EventsCodeGenerationContext::IsSameObjectsList(
-    const gd::String& objectName,
-    const EventsCodeGenerationContext& otherContext) const {
+    const gd::String &objectName,
+    const EventsCodeGenerationContext &otherContext) const {
   return GetLastDepthObjectListWasNeeded(objectName) ==
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
 
-}  // namespace gd
+gd::String EventsCodeGenerationContext::GetTypeOfObject(
+    const gd::ObjectsContainer &project, const gd::ObjectsContainer &layout,
+    const gd::String &objectName) {
+  if (castedObjects.find(objectName) != castedObjects.end())
+    return castedObjects[objectName];
+  else
+    return gd::GetTypeOfObject(project, layout, objectName);
+};
+
+} // namespace gd

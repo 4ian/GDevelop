@@ -22,14 +22,12 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllActions()["SetReturnNumber"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](gd::Instruction& instruction,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "number",
+                codeGenerator, context, "number",
                 instruction.GetParameter(0).GetPlainString());
 
         return "if (typeof eventsFunctionContext !== 'undefined') { "
@@ -39,14 +37,12 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllActions()["SetReturnString"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](gd::Instruction& instruction,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         gd::String expressionCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "string",
+                codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
 
         return "if (typeof eventsFunctionContext !== 'undefined') { "
@@ -56,9 +52,9 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllActions()["SetReturnBoolean"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](gd::Instruction& instruction,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         // This is duplicated from EventsCodeGenerator::GenerateParameterCodes
         gd::String parameter = instruction.GetParameter(0).GetPlainString();
         gd::String booleanCode =
@@ -71,14 +67,12 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllConditions()["GetArgumentAsBoolean"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](gd::Instruction& instruction,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](gd::Instruction &instruction,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "string",
+                codeGenerator, context, "string",
                 instruction.GetParameter(0).GetPlainString());
         gd::String valueCode =
             gd::String(instruction.IsInverted() ? "!" : "") +
@@ -93,14 +87,12 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllExpressions()["GetArgumentAsNumber"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](const std::vector<gd::Expression> &parameters,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "string",
+                codeGenerator, context, "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
         return "(typeof eventsFunctionContext !== 'undefined' ? "
@@ -110,20 +102,51 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllStrExpressions()["GetArgumentAsString"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
-                                 gd::EventsCodeGenerator& codeGenerator,
-                                 gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](const std::vector<gd::Expression> &parameters,
+                                 gd::EventsCodeGenerator &codeGenerator,
+                                 gd::EventsCodeGenerationContext &context) {
         gd::String parameterNameCode =
             gd::ExpressionCodeGenerator::GenerateExpressionCode(
-                codeGenerator,
-                context,
-                "string",
+                codeGenerator, context, "string",
                 !parameters.empty() ? parameters[0].GetPlainString() : "");
 
         return "(typeof eventsFunctionContext !== 'undefined' ? \"\" + "
                "eventsFunctionContext.getArgument(" +
                parameterNameCode + ") : \"\")";
       });
+
+  GetAllConditions()["CastTo"].GetCodeExtraInformation().SetCustomCodeGenerator(
+      [](gd::Instruction &instruction, gd::EventsCodeGenerator &codeGenerator,
+         gd::EventsCodeGenerationContext &context) {
+        const gd::String &newType =
+            instruction.GetParameter(1).GetPlainString();
+        context.CastObjectTo(instruction.GetParameter(0).GetPlainString(),
+                             newType);
+
+        gd::String conditionCode = "{";
+
+        for (gd::String objectName : codeGenerator.ExpandObjectsName(
+                 instruction.GetParameter(0).GetPlainString(), context)) {
+          context.SetCurrentObject(objectName);
+          context.ObjectsListNeeded(objectName);
+          // clang-format off
+          gd::String objectListName = codeGenerator.GetObjectListName(objectName, context);
+
+          // If the object has a picked instance of the required type...
+          conditionCode += "if (" + objectListName + ".length !== 0 && " + objectListName + "[0] instanceof gdjs.getObjectConstructor(" + codeGenerator.ConvertToStringExplicit(newType) + ")) {\n";
+          // Set the return value to true
+          conditionCode += "    " + codeGenerator.GenerateBooleanFullName("conditionTrue", context) + ".val = true;\n";
+          // Otherwise unpick all objects.
+          conditionCode += "} else { " + objectListName + ".length = 0; }\n";
+
+          // clang-format on
+          context.SetNoCurrentObject();
+        };
+
+        conditionCode += "}";
+
+        return conditionCode;
+      });
 }
 
-}  // namespace gdjs
+} // namespace gdjs

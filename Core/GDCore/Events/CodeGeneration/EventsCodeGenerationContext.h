@@ -5,10 +5,12 @@
  */
 #ifndef EVENTSCODEGENERATIONCONTEXT_H
 #define EVENTSCODEGENERATIONCONTEXT_H
+#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/String.h"
 #include <map>
 #include <memory>
 #include <set>
-#include "GDCore/String.h"
+
 
 namespace gd {
 
@@ -26,18 +28,15 @@ namespace gd {
 class GD_CORE_API EventsCodeGenerationContext {
   friend class EventsCodeGenerator;
 
- public:
+public:
   /**
    * Default constructor. You may want to call InheritsFrom just after.
    * \param maxDepthLevel Optional pointer to an unsigned integer that will be
    * updated to contain the maximal scope depth reached.
    */
-  EventsCodeGenerationContext(unsigned int* maxDepthLevel_ = nullptr)
-      : contextDepth(0),
-        customConditionDepth(0),
-        maxDepthLevel(maxDepthLevel_),
-        parent(NULL),
-        reuseExplicitlyForbidden(false){};
+  EventsCodeGenerationContext(unsigned int *maxDepthLevel_ = nullptr)
+      : contextDepth(0), customConditionDepth(0), maxDepthLevel(maxDepthLevel_),
+        parent(NULL), reuseExplicitlyForbidden(false){};
   virtual ~EventsCodeGenerationContext(){};
 
   /**
@@ -45,7 +44,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * another one. The child will then for example not declare again objects
    * already declared by its parent.
    */
-  void InheritsFrom(const EventsCodeGenerationContext& parent);
+  void InheritsFrom(const EventsCodeGenerationContext &parent);
 
   /**
    * \brief As InheritsFrom, mark the context as being the child of another one,
@@ -53,7 +52,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    *
    * Used for example for optimizing the last event of a list.
    */
-  void Reuse(const EventsCodeGenerationContext& parent);
+  void Reuse(const EventsCodeGenerationContext &parent);
 
   /**
    * \brief Forbid any optimization that would reuse and modify the object list
@@ -85,12 +84,12 @@ class GD_CORE_API EventsCodeGenerationContext {
    * \return A pointer to the parent context, or NULL if the context has no
    * parent.
    */
-  const EventsCodeGenerationContext* GetParentContext() const { return parent; }
+  const EventsCodeGenerationContext *GetParentContext() const { return parent; }
 
   /**
    * Mark the object has being the object being handled by the instruction
    */
-  void SetCurrentObject(const gd::String& objectName) {
+  void SetCurrentObject(const gd::String &objectName) {
     currentObject = objectName;
   };
 
@@ -102,7 +101,7 @@ class GD_CORE_API EventsCodeGenerationContext {
   /**
    * Get the object being handled by the instruction
    */
-  const gd::String& GetCurrentObject() const { return currentObject; };
+  const gd::String &GetCurrentObject() const { return currentObject; };
 
   /**
    * \brief Call this when an instruction in the event needs an objects list.
@@ -111,7 +110,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * it is requested, unless there is already an object list with this name
    * (i.e. `ObjectAlreadyDeclared(objectName)` returns true).
    */
-  void ObjectsListNeeded(const gd::String& objectName);
+  void ObjectsListNeeded(const gd::String &objectName);
 
   /**
    * Call this when an instruction in the event needs an empty objects list
@@ -121,7 +120,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * from the scene. If there is already an objects list with this name, no new
    * list will be declared again.
    */
-  void ObjectsListWithoutPickingNeeded(const gd::String& objectName);
+  void ObjectsListWithoutPickingNeeded(const gd::String &objectName);
 
   /**
    * Call this when an instruction in the event needs an empty object list,
@@ -131,13 +130,13 @@ class GD_CORE_API EventsCodeGenerationContext {
    * from the scene. If there is already an object list with this name, it won't
    * be used to initialize the new list, which will remain empty.
    */
-  void EmptyObjectsListNeeded(const gd::String& objectName);
+  void EmptyObjectsListNeeded(const gd::String &objectName);
 
   /**
    * Return true if an object list has already been declared (or is going to be
    * declared).
    */
-  bool ObjectAlreadyDeclared(const gd::String& objectName) const {
+  bool ObjectAlreadyDeclared(const gd::String &objectName) const {
     return (alreadyDeclaredObjectsLists.find(objectName) !=
             alreadyDeclaredObjectsLists.end());
   };
@@ -145,7 +144,7 @@ class GD_CORE_API EventsCodeGenerationContext {
   /**
    * \brief Consider that \a objectName is now declared in the context.
    */
-  void SetObjectDeclared(const gd::String& objectName) {
+  void SetObjectDeclared(const gd::String &objectName) {
     alreadyDeclaredObjectsLists.insert(objectName);
   }
 
@@ -158,7 +157,7 @@ class GD_CORE_API EventsCodeGenerationContext {
   /**
    * Return the objects lists which will be declared by the current context
    */
-  const std::set<gd::String>& GetObjectsListsToBeDeclared() const {
+  const std::set<gd::String> &GetObjectsListsToBeDeclared() const {
     return objectsListsToBeDeclared;
   };
 
@@ -166,8 +165,8 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Return the objects lists which will be will be declared, without filling
    * them with objects from the scene.
    */
-  const std::set<gd::String>& GetObjectsListsToBeDeclaredWithoutPicking()
-      const {
+  const std::set<gd::String> &
+  GetObjectsListsToBeDeclaredWithoutPicking() const {
     return objectsListsWithoutPickingToBeDeclared;
   };
 
@@ -176,7 +175,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * filling them with objects from the scene and without copying any previously
    * declared objects list.
    */
-  const std::set<gd::String>& GetObjectsListsToBeDeclaredEmpty() const {
+  const std::set<gd::String> &GetObjectsListsToBeDeclaredEmpty() const {
     return emptyObjectsListsToBeDeclared;
   };
 
@@ -184,7 +183,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Return the objects lists which are already declared and can be used in the
    * current context without declaration.
    */
-  const std::set<gd::String>& GetObjectsListsAlreadyDeclared() const {
+  const std::set<gd::String> &GetObjectsListsAlreadyDeclared() const {
     return alreadyDeclaredObjectsLists;
   };
 
@@ -195,8 +194,8 @@ class GD_CORE_API EventsCodeGenerationContext {
    * If \a objectName is needed in this context, it will return the depth of
    * this context.
    */
-  unsigned int GetLastDepthObjectListWasNeeded(
-      const gd::String& objectName) const;
+  unsigned int
+  GetLastDepthObjectListWasNeeded(const gd::String &objectName) const;
 
   /**
    * \brief Check if twos context have the same list for an object.
@@ -204,8 +203,8 @@ class GD_CORE_API EventsCodeGenerationContext {
    * This can be the case when a context is reusing the lists of another (see
    * gd::EventsCodeGenerationContext::Reuse).
    */
-  bool IsSameObjectsList(const gd::String& objectName,
-                         const EventsCodeGenerationContext& otherContext) const;
+  bool IsSameObjectsList(const gd::String &objectName,
+                         const EventsCodeGenerationContext &otherContext) const;
 
   /**
    * \brief Called when a custom condition code is generated.
@@ -227,14 +226,31 @@ class GD_CORE_API EventsCodeGenerationContext {
    */
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
- private:
+  /**
+   * \brief Get the type of an object.
+   *
+   * This will return the casted type if the type was casted.
+   */
+  gd::String GetTypeOfObject(const gd::ObjectsContainer &project,
+                                    const gd::ObjectsContainer &layout,
+                                    const gd::String &objectName);
+
+  /**
+   * \brief Marks an object as of a specified type for the current context and
+   * child contexts.
+   */
+  void CastObjectTo(const gd::String &objectName, const gd::String &type) {
+    castedObjects[objectName] = type;
+  };
+
+private:
   /**
    * \brief Returns true if the given object is already going to be declared
    * (either as a traditional objects list, or one without picking, or one
    * empty).
    *
    */
-  bool IsToBeDeclared(const gd::String& objectName) {
+  bool IsToBeDeclared(const gd::String &objectName) {
     return objectsListsToBeDeclared.find(objectName) !=
                objectsListsToBeDeclared.end() ||
            objectsListsWithoutPickingToBeDeclared.find(objectName) !=
@@ -244,38 +260,39 @@ class GD_CORE_API EventsCodeGenerationContext {
   };
 
   std::set<gd::String>
-      alreadyDeclaredObjectsLists;  ///< Objects lists already needed in a
-                                    ///< parent context.
+      alreadyDeclaredObjectsLists; ///< Objects lists already needed in a
+                                   ///< parent context.
+  std::set<gd::String> objectsListsToBeDeclared; ///< Objects lists that will be
+                                                 ///< declared in this context.
   std::set<gd::String>
-      objectsListsToBeDeclared;  ///< Objects lists that will be declared in
-                                 ///< this context.
+      objectsListsWithoutPickingToBeDeclared; ///< Objects lists that will be
+                                              ///< declared in this context,
+                                              ///< but not filled with scene's
+                                              ///< objects.
   std::set<gd::String>
-      objectsListsWithoutPickingToBeDeclared;  ///< Objects lists that will be
-                                               ///< declared in this context,
-                                               ///< but not filled with scene's
-                                               ///< objects.
-  std::set<gd::String>
-      emptyObjectsListsToBeDeclared;  ///< Objects lists that will be
-                                      ///< declared in this context,
-                                      ///< but not filled with scene's
-                                      ///< objects and not filled with any
-                                      ///< previously existing objects list.
+      emptyObjectsListsToBeDeclared; ///< Objects lists that will be
+                                     ///< declared in this context,
+                                     ///< but not filled with scene's
+                                     ///< objects and not filled with any
+                                     ///< previously existing objects list.
   std::map<gd::String, unsigned int>
-      depthOfLastUse;  ///< The context depth when an object was last used.
+      depthOfLastUse; ///< The context depth when an object was last used.
+  std::map<gd::String, gd::String>
+      castedObjects; ///< The casted objects and their new type.
   gd::String
-      currentObject;  ///< The object being used by an action or condition.
-  unsigned int contextDepth;  ///< The depth of the context : 0 for a newly
-                              ///< created context, n+1 for any context
-                              ///< inheriting from context with depth n.
+      currentObject; ///< The object being used by an action or condition.
+  unsigned int contextDepth; ///< The depth of the context : 0 for a newly
+                             ///< created context, n+1 for any context
+                             ///< inheriting from context with depth n.
   unsigned int
-      customConditionDepth;  ///< The depth of the conditions being generated.
-  unsigned int* maxDepthLevel;  ///< A pointer to a unsigned int updated with
-                                ///< the maximum depth reached.
-  const EventsCodeGenerationContext*
-      parent;  ///< The parent of the current context. Can be NULL.
-  bool reuseExplicitlyForbidden;  ///< If set to true, forbid children context
-                                  ///< to reuse this one without inheriting.
+      customConditionDepth;    ///< The depth of the conditions being generated.
+  unsigned int *maxDepthLevel; ///< A pointer to a unsigned int updated with
+                               ///< the maximum depth reached.
+  const EventsCodeGenerationContext
+      *parent; ///< The parent of the current context. Can be NULL.
+  bool reuseExplicitlyForbidden; ///< If set to true, forbid children context
+                                 ///< to reuse this one without inheriting.
 };
 
-}  // namespace gd
-#endif  // EVENTSCODEGENERATIONCONTEXT_H
+} // namespace gd
+#endif // EVENTSCODEGENERATIONCONTEXT_H

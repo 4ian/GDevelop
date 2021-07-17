@@ -302,7 +302,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
         condition.SetParameter(pNb, gd::Expression(""));
         condition.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                 context.GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
@@ -314,7 +314,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
+    gd::String objectType = context.GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
     if (!objectName.empty() && !instrInfos.parameters.empty()) {
       std::vector<gd::String> realObjects =
@@ -469,7 +469,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                 context.GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
@@ -482,7 +482,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   // Call free function first if available
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
+    gd::String objectType = context.GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
 
     if (!instrInfos.parameters.empty()) {
@@ -605,13 +605,11 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = "\"" + argOutput + "\"";
   } else if (ParameterMetadata::IsBehavior(metadata.type)) {
     argOutput = GenerateGetBehaviorNameCode(parameter);
-  } else if (metadata.type == "key") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "password" || metadata.type == "musicfile" ||
-             metadata.type == "soundfile" || metadata.type == "police") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+             metadata.type == "soundfile" || metadata.type == "police" ||
+             metadata.type == "key" || metadata.type == "mouse" ||
+             metadata.type == "objectType") {
+    argOutput = ConvertToStringExplicit(parameter);
   } else if (metadata.type == "yesorno") {
     argOutput += (parameter == "yes" || parameter == "oui") ? GenerateTrue()
                                                             : GenerateFalse();

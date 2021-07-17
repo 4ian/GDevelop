@@ -167,7 +167,7 @@ namespace gdjs {
   };
 
   export class NavMeshGenerator {
-    public static makeVerticesUniq(contours: Point[][]) {
+    public static makeVerticesUniq(contours: Point[][]): Map<integer, Point> {
       /*
        * Key = Hash representing a unique vertex location.
        * Value = The index of the vertex in the global vertices array.
@@ -195,6 +195,7 @@ namespace gdjs {
           // vertex index.
         }
       }
+      return uniqVertices;
     }
 
     /**
@@ -209,7 +210,7 @@ namespace gdjs {
       contours: ContourPoint[][],
       mMaxVertsPerPoly: integer
     ): Point[][] {
-      NavMeshGenerator.makeVerticesUniq(contours);
+      const vertices = NavMeshGenerator.makeVerticesUniq(contours);
 
       // Number of vertices found in the source.
       let sourceVertCount = 0;

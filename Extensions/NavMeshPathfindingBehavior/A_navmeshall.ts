@@ -641,7 +641,7 @@ namespace gdjs {
      * calculation for a polygon. This is just the average of the vertices - proper centroid of a
      * polygon factors in the area.
      */
-    public calculateCentroid() {
+    private calculateCentroid() {
       const centroid = new Vector2(0, 0);
       const length = this.polygon.points.length;
       this.polygon.points.forEach((p) => centroid.add(p));
@@ -653,7 +653,7 @@ namespace gdjs {
     /**
      * Calculate the radius of a circle that circumscribes the polygon.
      */
-    public calculateRadius() {
+    private calculateRadius() {
       let boundingRadius = 0;
       for (const point of this.polygon.points) {
         const d = this.centroid.distance(point);
@@ -684,7 +684,7 @@ namespace gdjs {
     }
 
     public isWall() {
-      return this.weight === 0;
+      return false;
     }
 
     public centroidDistance(navPolygon: NavPoly) {
@@ -1003,9 +1003,9 @@ namespace gdjs {
       // No matching polygons locations for the end, so no path found
       // because start point is valid normally, check end point first
       if (!endPoly) {
-        console.log(
-          'No matching polygons locations for the end, so no path found'
-        );
+        //console.log(
+        //  'No matching polygons locations for the end, so no path found'
+        //);
         return null;
       }
 
@@ -1032,9 +1032,9 @@ namespace gdjs {
 
       // No matching polygons locations for the start, so no path found
       if (!startPoly) {
-        console.log(
-          'No matching polygons locations for the start, so no path found'
-        );
+        //console.log(
+        //  'No matching polygons locations for the start, so no path found'
+        //);
         return null;
       }
 

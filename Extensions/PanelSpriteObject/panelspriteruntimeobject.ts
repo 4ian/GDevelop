@@ -121,7 +121,8 @@ namespace gdjs {
       }
     }
 
-    update(): void {
+    update(runtimeScene: gdjs.RuntimeScene): void {
+      super.update(runtimeScene);
       this._renderer.ensureUpToDate();
     }
 

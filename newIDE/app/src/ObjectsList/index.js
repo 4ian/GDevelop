@@ -106,7 +106,7 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
-  onEditObject: gdObject => void,
+  onEditObject: (object: gdObject, initialTab: ?string) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
@@ -465,6 +465,14 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Edit object variables`),
         click: () => this._editVariables(object),
+      },
+      {
+        label: i18n._(t`Edit behaviors`),
+        click: () => this.props.onEditObject(object, 'behaviors'),
+      },
+      {
+        label: i18n._(t`Edit effects`),
+        click: () => this.props.onEditObject(object, 'effects'),
       },
       { type: 'separator' },
       {

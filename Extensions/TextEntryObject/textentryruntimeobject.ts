@@ -38,7 +38,8 @@ namespace gdjs {
       }
     }
 
-    update(): void {
+    update(runtimeScene: gdjs.RuntimeScene): void {
+      super.update(runtimeScene);
       if ((this._renderer as any).getString) {
         this._str = (this._renderer as any).getString();
       }

@@ -114,7 +114,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
 
       const grid = new gdjs.RasterizationGrid(0, 0, 340, 340, 20);
 
-      gdjs.NavMeshGenerator.rasterizeObstacles(grid, [diamond]);
+      gdjs.ConvexPolygonGenerator.rasterizeObstacles(grid, [diamond]);
       checkObstacles(
         grid, //
         '...................\n' +
@@ -138,7 +138,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
           '...................\n'
       );
 
-      gdjs.NavMeshGenerator.generateDistanceField(grid);
+      gdjs.ConvexPolygonGenerator.generateDistanceField(grid);
       checkDistanceField(
         grid, //
         '...................\n' +
@@ -162,7 +162,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
           '...................\n'
       );
 
-      gdjs.NavMeshGenerator.generateRegions(grid);
+      gdjs.ConvexPolygonGenerator.generateRegions(grid);
       checkRegions(
         grid, //
         '...................\n' +
@@ -186,7 +186,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
           '...................\n'
       );
 
-      const contours = gdjs.NavMeshGenerator.buildContours(grid);
+      const contours = gdjs.ConvexPolygonGenerator.buildContours(grid);
       console.log(
         contours
           .map((contour) =>
@@ -228,7 +228,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [14, 10],
       ]);
 
-      const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 8);
+      const polyMeshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 8);
       const polygons = polyMeshField.polys.map(polygon => polygon.map(index => polyMeshField.verts[index]));
       console.log('polygons.length: ' + polygons.length);
       console.log(

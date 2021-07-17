@@ -24,7 +24,7 @@ namespace gdjs {
     // for the path finding algorithm
     _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
     /** Used to draw traces for debugging */
-    meshPolygons: Point[][] = [];
+    lastUsedNavMesh: gdjs.NavMesh | null = null;
 
     /**
      * @param object The object
@@ -91,8 +91,9 @@ namespace gdjs {
     }
 
     public static invalidateNavMesh(runtimeScene) {
-      const manager = NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
-      console.log("invalidateNavMesh: " + manager);
+      const manager =
+        NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      console.log('invalidateNavMesh: ' + manager);
       manager._navMeshes.clear();
     }
 
@@ -129,28 +130,26 @@ namespace gdjs {
         gdjs.NavMeshGenerator.generateDistanceField(grid);
         gdjs.NavMeshGenerator.generateRegions(grid, obstacleCellPadding);
         const contours = gdjs.NavMeshGenerator.buildContours(grid);
-        //this.meshPolygons = contours.map(polygon => polygon.map(point => ({x: cellSize * point.x + grid.originX, y: cellSize * point.y + grid.originY})));
-        const polyMeshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
-        const polygons = polyMeshField.map((polygon) =>
+        const meshField = gdjs.NavMeshGenerator.buildMesh(contours, 16);
+        const scaledMeshField = meshField.map((polygon) =>
           polygon.map((point) => ({
             x: this._cellSize * point.x + grid.originX,
             y: this._cellSize * point.y + grid.originY,
           }))
         );
-        this.meshPolygons = polygons;
-        console.log('polygons.length: ' + polygons.length);
-        console.log(
-          polygons
-            .map((polygon) =>
-              polygon
-                .map((point) => '(' + point.x + ' ' + point.y + ')')
-                .join(', ')
-            )
-            .join('\n')
-        );
-        navMesh = new gdjs.NavMesh(polygons);
+        navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
+
+        // // Uncomment this to see regions instead of the NavMesh 
+        // const lastUsedRegions = contours.map((polygon) =>
+        //   polygon.map((point) => ({
+        //     x: this._cellSize * point.x + grid.originX,
+        //     y: this._cellSize * point.y + grid.originY,
+        //   }))
+        // );
+        // this.lastUsedMeshField = lastUsedRegions;
       }
+      this.lastUsedNavMesh = navMesh;
       return navMesh;
     }
 

@@ -176,6 +176,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,
+      std::function<gd::String()> uidGenerator,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 

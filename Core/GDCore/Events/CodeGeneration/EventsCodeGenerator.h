@@ -127,6 +127,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::Expression>& parameters,
       const std::vector<gd::ParameterMetadata>& parametersInfo,
       EventsCodeGenerationContext& context,
+      std::function<gd::String()> uidGenerator,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes = 0);
 
@@ -487,6 +488,7 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,
+      std::function<gd::String()> uidGenerator,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 

@@ -328,6 +328,8 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
                                                parameterMetadata,
                                                context,
                                                "",
+                                               // UIDs are not supported by expressions
+                                               []() { return "Unsupported by expressions"; },
                                                nullptr);
     }
   }

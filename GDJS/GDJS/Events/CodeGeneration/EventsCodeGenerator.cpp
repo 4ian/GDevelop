@@ -878,6 +878,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
     const gd::String& lastObjectName,
+    std::function<gd::String()> uidGenerator,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
   gd::String argOutput;
@@ -903,6 +904,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         metadata,
         context,
         lastObjectName,
+        uidGenerator,
         supplementaryParametersTypes);
 
   return argOutput;

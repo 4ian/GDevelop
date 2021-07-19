@@ -117,12 +117,12 @@ namespace gdjs {
 
   /**
    * Result of {@link ConvexPolygonGenerator.getPolyMergeInfo}
-   * 
-    * A value of -1 at lengthSq indicates one of the following:
-    * - The polygons cannot be merged because they would contain too
-    * many vertices.
-    * - The polygons do not have a shared edge.
-    * - Merging the polygons would result in a concave polygon.
+   *
+   * A value of -1 at lengthSq indicates one of the following:
+   * - The polygons cannot be merged because they would contain too
+   * many vertices.
+   * - The polygons do not have a shared edge.
+   * - Merging the polygons would result in a concave polygon.
    */
   type PolyMergeResult = {
     /** The lengthSq of the edge shared between the polygons.*/
@@ -133,52 +133,54 @@ namespace gdjs {
     polygonBVertexIndex: integer;
   };
 
-export class NavMeshGenerator {
-  public static buildMesh(
-    areaLeftBound: float,
-    areaTopBound: float,
-    areaRightBound: float,
-    areaBottomBound: float,
-    cellSize: float,
-    obstacles: RuntimeObject[],
-    obstacleCellPadding: integer) {
-    const grid = new gdjs.RasterizationGrid(
-      areaLeftBound,
-      areaTopBound,
-      areaRightBound,
-      areaBottomBound,
-      cellSize
-    );
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, obstacles);
-    //console.log(
-    //  '\n' +
-    //    grid.cells
-    //      .map((cellRow) =>
-    //        cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
-    //      )
-    //      .join('\n') +
-    //    '\n'
-    //);
-    gdjs.RegionGenerator.generateDistanceField(grid);
-    gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
-    const contours = gdjs.ContourBuilder.buildContours(grid);
-    const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(contours, 16);
-    // point can be shared so them must be copied to be scaled.
-    const scaledMeshField = meshField.map((polygon) =>
-      polygon.map((point) =>
-        grid.convertFromGridBasis(point, { x: 0, y: 0 })
-      )
-    );
-    return scaledMeshField;
+  export class NavMeshGenerator {
+    public static buildMesh(
+      areaLeftBound: float,
+      areaTopBound: float,
+      areaRightBound: float,
+      areaBottomBound: float,
+      cellSize: float,
+      obstacles: RuntimeObject[],
+      obstacleCellPadding: integer
+    ) {
+      const grid = new gdjs.RasterizationGrid(
+        areaLeftBound,
+        areaTopBound,
+        areaRightBound,
+        areaBottomBound,
+        cellSize
+      );
+      gdjs.ObstacleRasterizer.rasterizeObstacles(grid, obstacles);
+      //console.log(
+      //  '\n' +
+      //    grid.cells
+      //      .map((cellRow) =>
+      //        cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
+      //      )
+      //      .join('\n') +
+      //    '\n'
+      //);
+      gdjs.RegionGenerator.generateDistanceField(grid);
+      gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
+      const contours = gdjs.ContourBuilder.buildContours(grid);
+      const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
+        contours,
+        16
+      );
+      // point can be shared so them must be copied to be scaled.
+      const scaledMeshField = meshField.map((polygon) =>
+        polygon.map((point) => grid.convertFromGridBasis(point, { x: 0, y: 0 }))
+      );
+      return scaledMeshField;
+    }
   }
-}
 
-/**
- * Builds convex polygons from the provided polygons.
- * 
- * This implementation is greatly inspired from CritterAI class "PolyMeshFieldBuilder".
- * http://www.critterai.org/projects/nmgen_study/polygen.html
- */
+  /**
+   * Builds convex polygons from the provided polygons.
+   *
+   * This implementation is greatly inspired from CritterAI class "PolyMeshFieldBuilder".
+   * http://www.critterai.org/projects/nmgen_study/polygen.html
+   */
   export class ConvexPolygonGenerator {
     /**
      * Builds convex polygons from the provided polygons.
@@ -192,7 +194,6 @@ export class NavMeshGenerator {
       concavePolygons: Point[][],
       maxVerticesPerPolygon: integer
     ): Point[][] {
-
       // The maximum possible number of polygons assuming that all will
       // be triangles.
       let maxPossiblePolygons = 0;
@@ -278,11 +279,15 @@ export class NavMeshGenerator {
             let polygonAVertexIndex = -1; // Start of the shared edge.
             let bestPolygonB: Point[] = [];
             let polygonBVertexIndex = -1; // Start of the shared edge.
-            let bestPolygonBIndex = - 1;
+            let bestPolygonBIndex = -1;
 
             // Loop through all but the last polygon looking for the
             // best polygons to merge in this iteration.
-            for (let indexA = 0; indexA < workingPolygons.length - 1; indexA++) {
+            for (
+              let indexA = 0;
+              indexA < workingPolygons.length - 1;
+              indexA++
+            ) {
               const polygonA = workingPolygons[indexA];
               for (
                 let indexB = indexA + 1;
@@ -335,9 +340,13 @@ export class NavMeshGenerator {
             const vertCountB = bestPolygonB.length;
             workingMergedPolygon.length = 0;
             for (let i = 0; i < vertCountA - 1; i++)
-              workingMergedPolygon.push(bestPolygonA[(polygonAVertexIndex + 1 + i) % vertCountA]);
+              workingMergedPolygon.push(
+                bestPolygonA[(polygonAVertexIndex + 1 + i) % vertCountA]
+              );
             for (let i = 0; i < vertCountB - 1; i++)
-              workingMergedPolygon.push(bestPolygonB[(polygonBVertexIndex + 1 + i) % vertCountB]);
+              workingMergedPolygon.push(
+                bestPolygonB[(polygonBVertexIndex + 1 + i) % vertCountB]
+              );
 
             // Copy the merged polygon over the top of polygon A.
             bestPolygonA.length = 0;
@@ -359,12 +368,10 @@ export class NavMeshGenerator {
       return convexPolygons;
     }
 
-
-
     /**
      * Checks two polygons to see if they can be merged.  If a merge is
      * allowed, provides data via the outResult argument (see {@link PolyMergeResult}).
-     * 
+     *
      * @param polygonA The polygon A
      * @param polygonB The polygon B
      * @param maxVerticesPerPolygon cap the vertex number in return polygons.
@@ -420,7 +427,9 @@ export class NavMeshGenerator {
       // Note that the following algorithm is only valid for clockwise
       // wrapped convex polygons.
       let sharedVertMinus =
-        polygonA[(outResult.polygonAVertexIndex - 1 + vertexCountA) % vertexCountA];
+        polygonA[
+          (outResult.polygonAVertexIndex - 1 + vertexCountA) % vertexCountA
+        ];
       let sharedVert = polygonA[outResult.polygonAVertexIndex];
       let sharedVertPlus =
         polygonB[(outResult.polygonBVertexIndex + 2) % vertexCountB];
@@ -442,9 +451,12 @@ export class NavMeshGenerator {
       }
 
       sharedVertMinus =
-        polygonB[(outResult.polygonBVertexIndex - 1 + vertexCountB) % vertexCountB];
+        polygonB[
+          (outResult.polygonBVertexIndex - 1 + vertexCountB) % vertexCountB
+        ];
       sharedVert = polygonB[outResult.polygonBVertexIndex];
-      sharedVertPlus = polygonA[(outResult.polygonAVertexIndex + 2) % vertexCountA];
+      sharedVertPlus =
+        polygonA[(outResult.polygonAVertexIndex + 2) % vertexCountA];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -474,7 +486,7 @@ export class NavMeshGenerator {
 
     /**
      * Attempts to triangulate a polygon.
-     * 
+     *
      * @param vertices the polygon to be triangulate.
      * The content is manipulated during the operation
      * and it will be left in an undefined state at the end of
@@ -490,37 +502,37 @@ export class NavMeshGenerator {
       vertexFlags: Array<boolean>,
       outTriangles: (p1: Point, p2: Point, p3: Point) => void
     ): void {
-       // Terminology, concepts and such:
-       //
-       // This algorithm loops around the edges of a polygon looking for
-       // new internal edges to add that will partition the polygon into a
-       // new valid triangle internal to the starting polygon. During each
-       // iteration the shortest potential new edge is selected to form that
-       // iteration's new triangle.
-       //
-       // Triangles will only be formed if a single new edge will create
-       // a triangle. Two new edges will never be added during a single
-       // iteration. This means that the triangulated portions of the
-       // original polygon will only contain triangles and the only
-       // non-triangle polygon will exist in the untriangulated portion
-       // of the original polygon.
-       //
-       // "Partition edge" refers to a potential new edge that will form a
-       // new valid triangle.
-       //
-       // "Center" vertex refers to the vertex in a potential new triangle
-       // which, if the triangle is formed, will be external to the
-       // remaining untriangulated portion of the polygon.  Since it
-       // is now external to the polygon, it can't be used to form any
-       // new triangles.
-       //
-       // Some documentation refers to "iPlus2" even though the variable is
-       // not in scope or does not exist for that section of code. For
-       // documentation purposes, iPlus2 refers to the 2nd vertex after the
-       // primary vertex.
-       // E.g.: i, iPlus1, and iPlus2.
-       //
-       // Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#triangulation
+      // Terminology, concepts and such:
+      //
+      // This algorithm loops around the edges of a polygon looking for
+      // new internal edges to add that will partition the polygon into a
+      // new valid triangle internal to the starting polygon. During each
+      // iteration the shortest potential new edge is selected to form that
+      // iteration's new triangle.
+      //
+      // Triangles will only be formed if a single new edge will create
+      // a triangle. Two new edges will never be added during a single
+      // iteration. This means that the triangulated portions of the
+      // original polygon will only contain triangles and the only
+      // non-triangle polygon will exist in the untriangulated portion
+      // of the original polygon.
+      //
+      // "Partition edge" refers to a potential new edge that will form a
+      // new valid triangle.
+      //
+      // "Center" vertex refers to the vertex in a potential new triangle
+      // which, if the triangle is formed, will be external to the
+      // remaining untriangulated portion of the polygon.  Since it
+      // is now external to the polygon, it can't be used to form any
+      // new triangles.
+      //
+      // Some documentation refers to "iPlus2" even though the variable is
+      // not in scope or does not exist for that section of code. For
+      // documentation purposes, iPlus2 refers to the 2nd vertex after the
+      // primary vertex.
+      // E.g.: i, iPlus1, and iPlus2.
+      //
+      // Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#triangulation
 
       // Loop through all vertices, flagging all indices that represent
       // a center vertex of a valid new triangle.
@@ -539,17 +551,17 @@ export class NavMeshGenerator {
         );
       }
 
-       // Loop through the vertices creating triangles. When there is only a
-       // single triangle left,  the operation is complete.
-       //
-       // When a valid triangle is formed, remove its center vertex.  So for
-       // each loop, a single vertex will be removed.
-       //
-       // At the start of each iteration the indices list is in the following
-       // state:
-       // - Represents a simple polygon representing the un-triangulated
-       //   portion of the original polygon.
-       // - All valid center vertices are flagged.
+      // Loop through the vertices creating triangles. When there is only a
+      // single triangle left,  the operation is complete.
+      //
+      // When a valid triangle is formed, remove its center vertex.  So for
+      // each loop, a single vertex will be removed.
+      //
+      // At the start of each iteration the indices list is in the following
+      // state:
+      // - Represents a simple polygon representing the un-triangulated
+      //   portion of the original polygon.
+      // - All valid center vertices are flagged.
       while (vertices.length > 3) {
         // Find the shortest new valid edge.
 
@@ -580,40 +592,44 @@ export class NavMeshGenerator {
         }
 
         if (minLengthSqVertexIndex === -1)
-           // Could not find a new triangle.  Triangulation failed.
-           // This happens if there are three or more vertices
-           // left, but none of them are flagged as being a
-           // potential center vertex.
+          // Could not find a new triangle.  Triangulation failed.
+          // This happens if there are three or more vertices
+          // left, but none of them are flagged as being a
+          // potential center vertex.
           return;
 
         let i = minLengthSqVertexIndex;
         let iPlus1 = (i + 1) % vertices.length;
 
         // Add the new triangle to the output.
-        outTriangles(vertices[i], vertices[iPlus1], vertices[(i + 2) % vertices.length]);
+        outTriangles(
+          vertices[i],
+          vertices[iPlus1],
+          vertices[(i + 2) % vertices.length]
+        );
 
-         // iPlus1, the "center" vert in the new triangle, is now external
-         // to the untriangulated portion of the polygon.  Remove it from
-         // the vertices list since it cannot be a member of any new
-         // triangles.
+        // iPlus1, the "center" vert in the new triangle, is now external
+        // to the untriangulated portion of the polygon.  Remove it from
+        // the vertices list since it cannot be a member of any new
+        // triangles.
         vertices.splice(iPlus1, 1);
         vertexFlags.splice(iPlus1, 1);
 
         if (iPlus1 === 0 || iPlus1 >= vertices.length) {
-           // The vertex removal has invalidated iPlus1 and/or i.  So
-           // force a wrap, fixing the indices so they reference the
-           // correct indices again. This only occurs when the new
-           // triangle is formed across the wrap location of the polygon.
-           // Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
-           // Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
+          // The vertex removal has invalidated iPlus1 and/or i.  So
+          // force a wrap, fixing the indices so they reference the
+          // correct indices again. This only occurs when the new
+          // triangle is formed across the wrap location of the polygon.
+          // Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
+          // Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
           i = vertices.length - 1;
           iPlus1 = 0;
         }
 
-         // At this point i and iPlus1 refer to the two indices from a
-         // successful triangulation that will be part of another new
-         // triangle.  We now need to re-check these indices to see if they
-         // can now be the center index in a potential new partition.
+        // At this point i and iPlus1 refer to the two indices from a
+        // successful triangulation that will be part of another new
+        // triangle.  We now need to re-check these indices to see if they
+        // can now be the center index in a potential new partition.
         vertexFlags[i] = ConvexPolygonGenerator.isValidPartition(
           (i - 1 + vertices.length) % vertices.length,
           iPlus1,
@@ -634,18 +650,18 @@ export class NavMeshGenerator {
     /**
      * Check if the line segment formed by vertex A and vertex B will
      * form a valid partition of the polygon.
-     * 
+     *
      * I.e. the line segment AB is internal to the polygon and will not
      * cross existing line segments.
-     * 
+     *
      * Assumptions:
      * - The vertices arguments define a valid simple polygon
      * with vertices wrapped clockwise.
      * - indexA != indexB
-     * 
+     *
      * Behavior is undefined if the arguments to not meet these
      * assumptions
-     * 
+     *
      * @param indexA the index of the vertex that will form the segment AB.
      * @param indexB the index of the vertex that will form the segment AB.
      * @param vertices a polygon wrapped clockwise.
@@ -661,7 +677,11 @@ export class NavMeshGenerator {
       //  angle formed at A (this is the faster check).
       //  If it does, then perform the more costly check.
       return (
-        ConvexPolygonGenerator.liesWithinInternalAngle(indexA, indexB, vertices) &&
+        ConvexPolygonGenerator.liesWithinInternalAngle(
+          indexA,
+          indexB,
+          vertices
+        ) &&
         !ConvexPolygonGenerator.hasIllegalEdgeIntersection(
           indexA,
           indexB,
@@ -681,22 +701,22 @@ export class NavMeshGenerator {
      * This operation is a fast way of determining whether a line segment
      * can possibly form a valid polygon partition. If this test returns
      * FALSE, then more expensive checks can be skipped.
-     * 
+     *
      * Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#anglecheck
-     * 
+     *
      * Special case:
      * FALSE is returned if vertex B lies directly on either of the rays
      * cast from vertex A along its associated polygon edges. So the test
      * on vertex B is exclusive of the polygon edges.
-     * 
+     *
      * Assumptions:
      * - The vertices and indices arguments define a valid simple polygon
      * with vertices wrapped clockwise.
      * -indexA != indexB
-     * 
+     *
      * Behavior is undefined if the arguments to not meet these
      * assumptions
-     * 
+     *
      * @param indexA the index of the vertex that will form the segment AB.
      * @param indexB the index of the vertex that will form the segment AB.
      * @param vertices a polygon wrapped clockwise.
@@ -713,12 +733,13 @@ export class NavMeshGenerator {
       const vertexB = vertices[indexB];
 
       // Get pointers to the vertices just before and just after vertA.
-      const vertexAMinus = vertices[(indexA - 1 + vertices.length) % vertices.length];
+      const vertexAMinus =
+        vertices[(indexA - 1 + vertices.length) % vertices.length];
       const vertexAPlus = vertices[(indexA + 1) % vertices.length];
 
-       // First, find which of the two angles formed by the line segments
-       //  AMinus->A->APlus is internal to (pointing towards) the polygon.
-       // Then test to see if B lies within the area formed by that angle.
+      // First, find which of the two angles formed by the line segments
+      //  AMinus->A->APlus is internal to (pointing towards) the polygon.
+      // Then test to see if B lies within the area formed by that angle.
 
       // TRUE if A is left of or on line AMinus->APlus
       if (
@@ -755,10 +776,10 @@ export class NavMeshGenerator {
           )
         );
 
-       // The angle internal to the polygon is > 180 degrees (reflex angle).
-       // Test to see if B lies within the external (<= 180 degree) angle and
-       // flip the result.  (If B lies within the external angle, it can't
-       // lie within the internal angle.)
+      // The angle internal to the polygon is > 180 degrees (reflex angle).
+      // Test to see if B lies within the external (<= 180 degree) angle and
+      // flip the result.  (If B lies within the external angle, it can't
+      // lie within the internal angle.)
       return !(
         // TRUE if B is left of or on line A->APlus
         (
@@ -786,15 +807,15 @@ export class NavMeshGenerator {
     /**
      * Check if the line segment AB intersects any edges not already
      * connected to one of the two vertices.
-     * 
+     *
      * Assumptions:
      * - The vertices and indices arguments define a valid simple polygon
      * with vertices wrapped clockwise.
      * - indexA != indexB
-     * 
+     *
      * Behavior is undefined if the arguments to not meet these
      * assumptions
-     * 
+     *
      * @param indexA the index of the vertex that will form the segment AB.
      * @param indexB the index of the vertex that will form the segment AB.
      * @param vertices a polygon wrapped clockwise.
@@ -818,10 +839,10 @@ export class NavMeshGenerator {
       ) {
         const edgeEndIndex = (edgeBeginIndex + 1) % vertices.length;
         if (
-            edgeBeginIndex === indexA ||
-            edgeBeginIndex === indexB ||
-            edgeEndIndex === indexA ||
-            edgeEndIndex === indexB
+          edgeBeginIndex === indexA ||
+          edgeBeginIndex === indexB ||
+          edgeEndIndex === indexA ||
+          edgeEndIndex === indexB
         ) {
           continue;
         }
@@ -835,17 +856,17 @@ export class NavMeshGenerator {
           (edgeEnd.x === vertexA.x && edgeEnd.y === vertexA.y) ||
           (edgeEnd.x === vertexB.x && edgeEnd.y === vertexB.y)
         ) {
-            // One of the test vertices is co-located
-            // with one of the endpoints of this edge. (This is a
-            // test of the actual position of the vertices rather than
-            // simply the index check performed earlier.)
-            // Skip this edge.
+          // One of the test vertices is co-located
+          // with one of the endpoints of this edge. (This is a
+          // test of the actual position of the vertices rather than
+          // simply the index check performed earlier.)
+          // Skip this edge.
           continue;
         }
-          // This edge is not connected to either of the test vertices.
-          // If line segment AB intersects  with this edge, then the
-          // intersection is illegal.
-          // I.e. New edges cannot cross existing edges.
+        // This edge is not connected to either of the test vertices.
+        // If line segment AB intersects  with this edge, then the
+        // intersection is illegal.
+        // I.e. New edges cannot cross existing edges.
         if (
           Geometry.segmentsIntersect(
             vertexA.x,
@@ -963,20 +984,20 @@ export class NavMeshGenerator {
     /**
      * The absolute value of the returned value is two times the area of the
      * triangle defined by points (A, B, C).
-     * 
+     *
      * A positive value indicates:
      * - Counterclockwise wrapping of the points.
      * - Point B lies to the right of line AC, looking from A to C.
-     * 
+     *
      * A negative value indicates:
      * - Clockwise wrapping of the points.<
      * - Point B lies to the left of line AC, looking from A to C.
-     * 
+     *
      * A value of zero indicates that all points are collinear or
      * represent the same point.
-     * 
+     *
      * This is a fast operation.
-     * 
+     *
      * @param ax The x-value for point (ax, ay) for vertex A of the triangle.
      * @param ay The y-value for point (ax, ay) for vertex A of the triangle.
      * @param bx The x-value for point (bx, by) for vertex B of the triangle.
@@ -994,9 +1015,9 @@ export class NavMeshGenerator {
       cx: integer,
       cy: integer
     ): integer {
-       // References:
-       // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Modern%20Triangles
-       // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed".)
+      // References:
+      // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Modern%20Triangles
+      // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed".)
       return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
     }
   }

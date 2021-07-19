@@ -22,36 +22,151 @@ namespace gd {
  */
 class GD_CORE_API LoadingScreen {
  public:
-  LoadingScreen(){};
+  LoadingScreen();
   virtual ~LoadingScreen(){};
 
   /**
-   * \brief Set if the GDevelop splash should be shown while loading assets.
-   */
-  void ShowGDevelopSplash(bool show) { showGDevelopSplash = show; };
-
-  /**
-   * \brief Return true if the GDevelop splash should be shown while loading
+   * \brief Return true if the GDevelop logo should be shown while loading
    * assets.
    */
   bool IsGDevelopSplashShown() const { return showGDevelopSplash; };
+
+  /**
+   * \brief Set if the GDevelop logo should be shown while loading assets.
+   */
+  LoadingScreen& ShowGDevelopSplash(bool show) {
+    showGDevelopSplash = show;
+    return *this;
+  };
+
+  const gd::String& GetGDevelopLogoStyle() const { return gdevelopLogoStyle; };
+
+  LoadingScreen& SetGDevelopLogoStyle(const gd::String& value) {
+    gdevelopLogoStyle = value;
+    return *this;
+  }
+
+  const gd::String& GetBackgroundImageResourceName() const {
+    return backgroundImageResourceName;
+  };
+
+  LoadingScreen& SetBackgroundImageResourceName(const gd::String& value) {
+    backgroundImageResourceName = value;
+    return *this;
+  }
+
+  int GetBackgroundColor() const { return backgroundColor; };
+
+  LoadingScreen& SetBackgroundColor(int value) {
+    backgroundColor = value;
+    return *this;
+  }
+
+  double GetBackgroundFadeInDuration() const {
+    return backgroundFadeInDuration;
+  };
+
+  LoadingScreen& SetBackgroundFadeInDuration(double value) {
+    backgroundFadeInDuration = value;
+    return *this;
+  }
+
+  double GetMinDuration() const { return minDuration; };
+
+  LoadingScreen& SetMinDuration(double value) {
+    minDuration = value;
+    return *this;
+  }
+
+  double GetLogoAndProgressFadeInDuration() const {
+    return logoAndProgressFadeInDuration;
+  }
+
+  LoadingScreen& SetLogoAndProgressFadeInDuration(double value) {
+    logoAndProgressFadeInDuration = value;
+    return *this;
+  }
+
+  double GetLogoAndProgressLogoFadeInDelay() const {
+    return logoAndProgressLogoFadeInDelay;
+  }
+
+  LoadingScreen& SetLogoAndProgressLogoFadeInDelay(double value) {
+    logoAndProgressLogoFadeInDelay = value;
+    return *this;
+  }
+
+  bool GetShowProgressBar() const { return showProgressBar; }
+
+  LoadingScreen& SetShowProgressBar(bool value) {
+    showProgressBar = value;
+    return *this;
+  }
+
+  double GetProgressBarMinWidth() const { return progressBarMinWidth; }
+
+  LoadingScreen& SetProgressBarMinWidth(double value) {
+    progressBarMinWidth = value;
+    return *this;
+  }
+
+  double GetProgressBarMaxWidth() const { return progressBarMaxWidth; }
+
+  LoadingScreen& SetProgressBarMaxWidth(double value) {
+    progressBarMaxWidth = value;
+    return *this;
+  }
+
+  double GetProgressBarWidthPercent() const { return progressBarWidthPercent; }
+
+  LoadingScreen& SetProgressBarWidthPercent(double value) {
+    progressBarWidthPercent = value;
+    return *this;
+  }
+
+  double GetProgressBarHeight() const { return progressBarHeight; }
+
+  LoadingScreen& SetProgressBarHeight(double value) {
+    progressBarHeight = value;
+    return *this;
+  }
+
+  int GetProgressBarColor() const { return progressBarColor; }
+
+  LoadingScreen& SetProgressBarColor(int value) {
+    progressBarColor = value;
+    return *this;
+  }
 
   /** \name Saving and loading
    */
   ///@{
   /**
-   * \brief Serialize objects groups container.
+   * \brief Serialize the loading screen setup.
    */
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Unserialize the objects groups container.
+   * \brief Unserialize the loading screen setup.
    */
   void UnserializeFrom(const SerializerElement& element);
   ///@}
 
  private:
   bool showGDevelopSplash;
+  gd::String gdevelopLogoStyle;
+  gd::String backgroundImageResourceName;
+  int backgroundColor;
+  double backgroundFadeInDuration; // In seconds.
+  double minDuration; // In seconds.
+  double logoAndProgressFadeInDuration; // In seconds.
+  double logoAndProgressLogoFadeInDelay; // In seconds.
+  bool showProgressBar;
+  double progressBarMinWidth; // In pixels.
+  double progressBarMaxWidth; // In pixels.
+  double progressBarWidthPercent;
+  double progressBarHeight; // In pixels.
+  int progressBarColor;
 };
 }  // namespace gd
 

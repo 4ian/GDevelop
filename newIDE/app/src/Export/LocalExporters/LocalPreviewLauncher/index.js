@@ -217,6 +217,10 @@ export default class LocalPreviewLauncher extends React.Component<
               shouldHotReload && previewOptions.projectDataOnlyExport
             );
 
+            previewExportOptions.setFullLoadingScreen(
+              previewOptions.fullLoadingScreen
+            );
+
             exporter.exportProjectForPixiPreview(previewExportOptions);
             previewExportOptions.delete();
             exporter.delete();

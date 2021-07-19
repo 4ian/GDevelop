@@ -242,6 +242,8 @@ import {
   AccordionHeader,
   AccordionBody,
 } from '../UI/Accordion';
+import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
+import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
 
 configureActions({
   depth: 2,
@@ -269,6 +271,9 @@ const buildFakeMenuTemplate = () => [
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+  launchProjectWithLoadingScreenPreview: action(
+    'launchProjectWithLoadingScreenPreview'
+  ),
 };
 
 storiesOf('Welcome', module)
@@ -4351,6 +4356,9 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ))
   .add('Error in functions', () => (
@@ -4395,6 +4403,9 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ));
 
@@ -4639,12 +4650,14 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
       launchProjectDataOnlyPreview={() => {}}
+      launchProjectWithLoadingScreenPreview={() => {}}
     />
   ))
   .add('with preview(s) running', () => (
     <HotReloadPreviewButton
       hasPreviewsRunning={true}
       launchProjectDataOnlyPreview={() => {}}
+      launchProjectWithLoadingScreenPreview={() => {}}
     />
   ));
 
@@ -5101,5 +5114,34 @@ storiesOf('GamesShowcase/ShowcasedGameListItem', module)
     <ShowcasedGameListItem
       onHeightComputed={() => {}}
       showcasedGame={showcasedGame1}
+    />
+  ));
+
+storiesOf('ProjectPropertiesDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ProjectPropertiesDialog
+      open
+      initialTab="properties"
+      project={testProject.project}
+      onClose={action('onClose')}
+      onApply={action('onApply')}
+      onChangeSubscription={action('onChangeSubscription')}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+    />
+  ));
+
+storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LoadingScreenEditor
+      loadingScreen={testProject.project.getLoadingScreen()}
+      onChangeSubscription={action('onChangeSubscription')}
+      project={testProject.project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ));

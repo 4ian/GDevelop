@@ -117,8 +117,8 @@ namespace gdjs {
 
   type PolyMergeResult = {
     lengthSq: integer;
-    indexA: integer;
-    indexB: integer;
+    polygonAVertexIndex: integer;
+    polygonBVertexIndex: integer;
   };
 
 export class NavMeshGenerator {
@@ -173,25 +173,22 @@ export class NavMeshGenerator {
      */
     public static buildMesh(
       contours: Point[][],
-      mMaxVertsPerPoly: integer
+      maxVerticesPerPolygon: integer
     ): Point[][] {
-      // Number of vertices found in the source.
-      let sourceVertCount = 0;
 
       // The maximum possible number of polygons assuming that all will
       // be triangles.
       let maxPossiblePolygons = 0;
 
       // The maximum vertices found in a single contour.
-      let maxVertsPerContour = 0;
+      let maxVerticesPerContour = 0;
 
       // Loop through all contours.  Determine the values for the
       // variables above.
       for (const contour of contours) {
         const count = contour.length;
-        sourceVertCount += count;
         maxPossiblePolygons += count - 2;
-        maxVertsPerContour = Math.max(maxVertsPerContour, count);
+        maxVerticesPerContour = Math.max(maxVerticesPerContour, count);
       }
 
       /*
@@ -210,28 +207,24 @@ export class NavMeshGenerator {
        * (1, 3, 4, 8, NULL_INDEX, NULL_INDEX)
        * then (1, 3, 4, 8) defines the polygon.
        */
-      const globalPolys = new Array<Point[]>(maxPossiblePolygons);
-      globalPolys.length = 0;
+      const convexPolygons = new Array<Point[]>(maxPossiblePolygons);
+      convexPolygons.length = 0;
 
       // Each list is initialized to a size that will minimize resizing.
-      const workingIndices = new Array<Point>(maxVertsPerContour);
-      workingIndices.length = 0;
-      const workingIndiceFlags = new Array<boolean>(maxVertsPerContour);
-      workingIndiceFlags.length = 0;
-      const workingTriangles = new Array<Point>(maxVertsPerContour);
-      workingTriangles.length = 0;
+      const workingContourFlags = new Array<boolean>(maxVerticesPerContour);
+      workingContourFlags.length = 0;
 
       // Various working variables.
       // (Values are meaningless outside of the iteration.)
-      const workingPolys = new Array<Point[]>(maxVertsPerContour + 1);
-      workingPolys.length = 0;
-      const mergeInfo: PolyMergeResult = {
+      const workingPolygons = new Array<Point[]>(maxVerticesPerContour + 1);
+      workingPolygons.length = 0;
+      const workingMergeInfo: PolyMergeResult = {
         lengthSq: -1,
-        indexA: -1,
-        indexB: -1,
+        polygonAVertexIndex: -1,
+        polygonBVertexIndex: -1,
       };
-      const mergedPoly = new Array<Point>(mMaxVertsPerPoly);
-      mergedPoly.length = 0;
+      const workingMergedPolygon = new Array<Point>(maxVerticesPerPolygon);
+      workingMergedPolygon.length = 0;
 
       // Process all contours.
       //const contour = contours[0];
@@ -246,25 +239,21 @@ export class NavMeshGenerator {
           continue;
         }
 
-        // Create working indices for the contour vertices.
-        workingIndices.length = 0;
-        Array.prototype.push.apply(workingIndices, contour);
-
         // Initialize the working polygon array.
-        workingPolys.length = 0;
+        workingPolygons.length = 0;
 
         // Triangulate the contour.
         let foundAnyTriangle = false;
         ConvexPolygonGenerator.triangulate(
-          workingIndices,
-          workingIndiceFlags,
+          contour,
+          workingContourFlags,
           (p1: Point, p2: Point, p3: Point) => {
-            const workingPoly = new Array<Point>(mMaxVertsPerPoly);
-            workingPoly.length = 0;
-            workingPoly.push(p1);
-            workingPoly.push(p2);
-            workingPoly.push(p3);
-            workingPolys.push(workingPoly);
+            const workingPolygon = new Array<Point>(maxVerticesPerPolygon);
+            workingPolygon.length = 0;
+            workingPolygon.push(p1);
+            workingPolygon.push(p2);
+            workingPolygon.push(p3);
+            workingPolygons.push(workingPolygon);
             foundAnyTriangle = true;
           }
         );
@@ -283,41 +272,45 @@ export class NavMeshGenerator {
           continue;
         }
 
-        if (mMaxVertsPerPoly > 3) {
+        if (maxVerticesPerPolygon > 3) {
           // Merging of triangles into larger polygons is permitted.
           // Continue until no polygons can be found to merge.
           // http://www.critterai.org/nmgen_polygen#mergepolys
           while (true) {
             let longestMergeEdge = -1;
-            let pBestPolyA = -1;
-            let iPolyAVert = -1; // Start of the shared edge.
-            let pBestPolyB = -1;
-            let iPolyBVert = -1; // Start of the shared edge.
+            let bestPolygonA: Point[] = [];
+            let polygonAVertexIndex = -1; // Start of the shared edge.
+            let bestPolygonB: Point[] = [];
+            let polygonBVertexIndex = -1; // Start of the shared edge.
+            let bestPolygonBIndex = - 1;
 
             // Loop through all but the last polygon looking for the
             // best polygons to merge in this iteration.
-            for (let iPolyA = 0; iPolyA < workingPolys.length - 1; iPolyA++) {
+            for (let indexA = 0; indexA < workingPolygons.length - 1; indexA++) {
+              const polygonA = workingPolygons[indexA];
               for (
-                let iPolyB = iPolyA + 1;
-                iPolyB < workingPolys.length;
-                iPolyB++
+                let indexB = indexA + 1;
+                indexB < workingPolygons.length;
+                indexB++
               ) {
+                const polygonB = workingPolygons[indexB];
                 // Can polyB merge with polyA?
                 ConvexPolygonGenerator.getPolyMergeInfo(
-                  workingPolys[iPolyA],
-                  workingPolys[iPolyB],
-                  mMaxVertsPerPoly,
-                  mergeInfo
+                  polygonA,
+                  polygonB,
+                  maxVerticesPerPolygon,
+                  workingMergeInfo
                 );
-                if (mergeInfo.lengthSq > longestMergeEdge) {
+                if (workingMergeInfo.lengthSq > longestMergeEdge) {
                   // polyB has the longest shared edge with
                   // polyA found so far. Save the merge
                   // information.
-                  longestMergeEdge = mergeInfo.lengthSq;
-                  pBestPolyA = iPolyA;
-                  iPolyAVert = mergeInfo.indexA;
-                  pBestPolyB = iPolyB;
-                  iPolyBVert = mergeInfo.indexB;
+                  longestMergeEdge = workingMergeInfo.lengthSq;
+                  bestPolygonA = polygonA;
+                  polygonAVertexIndex = workingMergeInfo.polygonAVertexIndex;
+                  bestPolygonB = polygonB;
+                  polygonBVertexIndex = workingMergeInfo.polygonBVertexIndex;
+                  bestPolygonBIndex = indexB;
                 }
               }
             }
@@ -327,14 +320,6 @@ export class NavMeshGenerator {
               break;
 
             // Found polygons to merge.  Perform the merge.
-
-            // Prepare the merged polygon array.
-            mergedPoly.length = 0;
-
-            // Get the size of each polygon.
-            const vertCountA = workingPolys[pBestPolyA].length;
-            const vertCountB = workingPolys[pBestPolyB].length;
-            let position = 0;
 
             /*
              * Fill the mergedPoly array.
@@ -350,53 +335,34 @@ export class NavMeshGenerator {
              * PolyAStartVert == PolyBEndVert and
              * PolyAEndVert == PolyBStartVert.
              */
+            const vertCountA = bestPolygonA.length;
+            const vertCountB = bestPolygonB.length;
+            workingMergedPolygon.length = 0;
             for (let i = 0; i < vertCountA - 1; i++)
-              mergedPoly[position++] =
-                workingPolys[pBestPolyA][(iPolyAVert + 1 + i) % vertCountA];
+              workingMergedPolygon.push(bestPolygonA[(polygonAVertexIndex + 1 + i) % vertCountA]);
             for (let i = 0; i < vertCountB - 1; i++)
-              mergedPoly[position++] =
-                workingPolys[pBestPolyB][(iPolyBVert + 1 + i) % vertCountB];
+              workingMergedPolygon.push(bestPolygonB[(polygonBVertexIndex + 1 + i) % vertCountB]);
 
             // Copy the merged polygon over the top of polygon A.
-            workingPolys[pBestPolyA].length = 0;
-            Array.prototype.push.apply(workingPolys[pBestPolyA], mergedPoly);
+            bestPolygonA.length = 0;
+            Array.prototype.push.apply(bestPolygonA, workingMergedPolygon);
             // Remove polygon B by shifting all information to the
             // left by one polygon,  starting at polygon B.
-            workingPolys.splice(pBestPolyB, 1);
+            workingPolygons.splice(bestPolygonBIndex, 1);
           }
         }
 
         // Polygon creation for this contour is complete.
         // Add polygons to the global polygon array and store region
         // information.
-        Array.prototype.push.apply(globalPolys, workingPolys);
+        Array.prototype.push.apply(convexPolygons, workingPolygons);
       }
 
-      /*
-       * Transfer global array information into instance fields.
-       * Could have loaded data directly into instance fields and saved this
-       * processing cost.  But this method has memory benefits since it is
-       * not necessary to oversize the instance arrays.
-       */
-      /*
-       * Transfer polygon indices data.
-       *
-       * The global polygon array is half the size of the instance polygon
-       * array since the instance polygon array also contains edge adjacency
-       * information. So array copy can't be used.
-       *
-       * Instead, copy the global polygon array over to instance polygon
-       * array in blocks and initialize the instance polygon array's
-       * adjacency information.
-       */
-      const resultPolys = new Array<Point[]>(globalPolys.length);
-      resultPolys.length = 0;
-      Array.prototype.push.apply(resultPolys, globalPolys);
-
       // Build polygon adjacency information.
-      //TODO buildAdjacencyData(result);
+      //TODO migrate buildAdjacencyData(result);
+      // or just use the one from the pathfinding lib?
 
-      return resultPolys;
+      return convexPolygons;
     }
 
     /**
@@ -437,8 +403,8 @@ export class NavMeshGenerator {
       outResult: PolyMergeResult
     ): void {
       outResult.lengthSq = -1; // Default to invalid merge
-      outResult.indexA = -1;
-      outResult.indexB = -1;
+      outResult.polygonAVertexIndex = -1;
+      outResult.polygonBVertexIndex = -1;
 
       const vertCountA = polyA.length;
       const vertCountB = polyB.length;
@@ -468,13 +434,13 @@ export class NavMeshGenerator {
           if (iVertA === iVertBNext && iVertANext === iVertB) {
             // The vertex indices for this edge are the same and
             // sequenced in opposite order.  So the edge is shared.
-            outResult.indexA = iPolyVertA;
-            outResult.indexB = iPolyVertB;
+            outResult.polygonAVertexIndex = iPolyVertA;
+            outResult.polygonBVertexIndex = iPolyVertB;
           }
         }
       }
 
-      if (outResult.indexA == -1)
+      if (outResult.polygonAVertexIndex == -1)
         // No common edge, cannot merge.
         return;
 
@@ -489,10 +455,10 @@ export class NavMeshGenerator {
        */
 
       let sharedVertMinus =
-        polyA[(outResult.indexA - 1 + vertCountA) % vertCountA];
-      let sharedVert = polyA[outResult.indexA];
+        polyA[(outResult.polygonAVertexIndex - 1 + vertCountA) % vertCountA];
+      let sharedVert = polyA[outResult.polygonAVertexIndex];
       let sharedVertPlus =
-        polyB[(outResult.indexB + 2) % vertCountB];
+        polyB[(outResult.polygonBVertexIndex + 2) % vertCountB];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -512,9 +478,9 @@ export class NavMeshGenerator {
         return;
 
       sharedVertMinus =
-        polyB[(outResult.indexB - 1 + vertCountB) % vertCountB];
-      sharedVert = polyB[outResult.indexB];
-      sharedVertPlus = polyA[(outResult.indexA + 2) % vertCountA];
+        polyB[(outResult.polygonBVertexIndex - 1 + vertCountB) % vertCountB];
+      sharedVert = polyB[outResult.polygonBVertexIndex];
+      sharedVertPlus = polyA[(outResult.polygonAVertexIndex + 2) % vertCountA];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -534,8 +500,8 @@ export class NavMeshGenerator {
         return;
 
       // Get the vertex indices that form the shared edge.
-      sharedVertMinus = polyA[outResult.indexA];
-      sharedVert = polyA[(outResult.indexA + 1) % vertCountA];
+      sharedVertMinus = polyA[outResult.polygonAVertexIndex];
+      sharedVert = polyA[(outResult.polygonAVertexIndex + 1) % vertCountA];
 
       // Store the lengthSq of the shared edge.
       const deltaX = sharedVertMinus.x - sharedVert.x;
@@ -548,7 +514,7 @@ export class NavMeshGenerator {
      * <p>Assumes the verts and indices arguments define a valid simple
      * (concave or convex) polygon
      * with vertices wrapped clockwise. Otherwise behavior is undefined.</p>
-     * @param verts The vertices that make up the polygon in the format
+     * @param vertices The vertices that make up the polygon in the format
      * (x, y, z, id).  The value stored at the id position is not relevant to
      * this operation.
      * @param inoutIndices    A working array of indices that define the
@@ -563,7 +529,7 @@ export class NavMeshGenerator {
      * failed, a negative number.
      */
     private static triangulate(
-      verts: Array<Point>,
+      vertices: Array<Point>,
       vertexFlags: Array<boolean>,
       outTriangles: (p1: Point, p2: Point, p3: Point) => void
     ): void {
@@ -603,9 +569,10 @@ export class NavMeshGenerator {
 
       // Loop through all vertices, flagging all indices that represent
       // a center vertex of a valid new triangle.
-      for (let i = 0; i < verts.length; i++) {
-        const iPlus1 = (i + 1) % verts.length;
-        const iPlus2 = (i + 2) % verts.length;
+      vertexFlags.length = vertices.length;
+      for (let i = 0; i < vertices.length; i++) {
+        const iPlus1 = (i + 1) % vertices.length;
+        const iPlus2 = (i + 2) % vertices.length;
         // A triangle formed by i, iPlus1, and iPlus2 will result
         // in a valid internal triangle.
         // Flag the center vertex (iPlus1) to indicate a valid triangle
@@ -613,7 +580,7 @@ export class NavMeshGenerator {
         vertexFlags[iPlus1] = ConvexPolygonGenerator.isValidPartition(
           i,
           iPlus2,
-          verts
+          vertices
         );
       }
 
@@ -630,7 +597,7 @@ export class NavMeshGenerator {
        *   portion of the original polygon.
        * - All valid center vertices are flagged.
        */
-      while (verts.length > 3) {
+      while (vertices.length > 3) {
         // Find the shortest new valid edge.
 
         // The minimum length found.
@@ -642,12 +609,12 @@ export class NavMeshGenerator {
         // this section. So be careful.
 
         // Loop through all indices in the remaining polygon.
-        for (let i = 0; i < verts.length; i++) {
-          if (vertexFlags[(i + 1) % verts.length]) {
+        for (let i = 0; i < vertices.length; i++) {
+          if (vertexFlags[(i + 1) % vertices.length]) {
             // Indices i, iPlus1, and iPlus2 are known to form a
             // valid triangle.
-            const vert = verts[i];
-            const vertPlus2 = verts[(i + 2) % verts.length];
+            const vert = vertices[i];
+            const vertPlus2 = vertices[(i + 2) % vertices.length];
 
             // Determine the length of the partition edge.
             // (i -> iPlus2)
@@ -675,10 +642,10 @@ export class NavMeshGenerator {
           return;
 
         let i = iMinLengthSqVert;
-        let iPlus1 = (i + 1) % verts.length;
+        let iPlus1 = (i + 1) % vertices.length;
 
         // Add the new triangle to the output.
-        outTriangles(verts[i], verts[iPlus1], verts[(i + 2) % verts.length]);
+        outTriangles(vertices[i], vertices[iPlus1], vertices[(i + 2) % vertices.length]);
 
         /*
          * iPlus1, the "center" vert in the new triangle, is now external
@@ -686,10 +653,10 @@ export class NavMeshGenerator {
          * the indices list since it cannot be a member of any new
          * triangles.
          */
-        verts.splice(iPlus1, 1);
+        vertices.splice(iPlus1, 1);
         vertexFlags.splice(iPlus1, 1);
 
-        if (iPlus1 === 0 || iPlus1 >= verts.length) {
+        if (iPlus1 === 0 || iPlus1 >= vertices.length) {
           /*
            * The vertex removal has invalidated iPlus1 and/or i.  So
            * force a wrap, fixing the indices so they reference the
@@ -698,7 +665,7 @@ export class NavMeshGenerator {
            * Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
            * Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
            */
-          i = verts.length - 1;
+          i = vertices.length - 1;
           iPlus1 = 0;
         }
 
@@ -709,20 +676,20 @@ export class NavMeshGenerator {
          * can now be the center index in a potential new partition.
          */
         vertexFlags[i] = ConvexPolygonGenerator.isValidPartition(
-          (i - 1 + verts.length) % verts.length,
+          (i - 1 + vertices.length) % vertices.length,
           iPlus1,
-          verts
+          vertices
         );
         vertexFlags[iPlus1] = ConvexPolygonGenerator.isValidPartition(
           i,
-          (i + 2) % verts.length,
-          verts
+          (i + 2) % vertices.length,
+          vertices
         );
       }
 
       // Only 3 vertices remain.
       // Add their triangle to the output list.
-      outTriangles(verts[0], verts[1], verts[2]);
+      outTriangles(vertices[0], vertices[1], vertices[2]);
     }
 
     /**

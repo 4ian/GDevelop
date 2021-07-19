@@ -115,9 +115,21 @@ namespace gdjs {
 
   export type ContourPoint = { x: integer; y: integer; region: integer };
 
+  /**
+   * Result of {@link ConvexPolygonGenerator.getPolyMergeInfo}
+   * 
+    * A value of -1 at lengthSq indicates one of the following:
+    * - The polygons cannot be merged because they would contain too
+    * many vertices.
+    * - The polygons do not have a shared edge.
+    * - Merging the polygons would result in a concave polygon.
+   */
   type PolyMergeResult = {
+    /** The lengthSq of the edge shared between the polygons.*/
     lengthSq: integer;
+    /** The index of the start of the shared edge in polygon A. */
     polygonAVertexIndex: integer;
+    /** The index of the start of the shared edge in polygon B. */
     polygonBVertexIndex: integer;
   };
 
@@ -150,7 +162,7 @@ export class NavMeshGenerator {
     gdjs.RegionGenerator.generateDistanceField(grid);
     gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
     const contours = gdjs.ContourBuilder.buildContours(grid);
-    const meshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 16);
+    const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(contours, 16);
     // point can be shared so them must be copied to be scaled.
     const scaledMeshField = meshField.map((polygon) =>
       polygon.map((point) =>
@@ -161,61 +173,46 @@ export class NavMeshGenerator {
   }
 }
 
-
+/**
+ * Builds convex polygons from the provided polygons.
+ * 
+ * This implementation is greatly inspired from CritterAI class "PolyMeshFieldBuilder".
+ * http://www.critterai.org/projects/nmgen_study/polygen.html
+ */
   export class ConvexPolygonGenerator {
     /**
-     * Builds a convex polygon mesh from the provided contour set.
-     * <p>This build algorithm will fail and return null if the
-     * ContourSet contains any single contour with more than
-     * 0x0fffffff vertices.
-     * @param contours A properly populated contour set.
-     * @return The result of the build operation.
+     * Builds convex polygons from the provided polygons.
+     * @param concavePolygons The content is manipulated during the operation
+     * and it will be left in an undefined state at the end of
+     * the operation.
+     * @param maxVerticesPerPolygon cap the vertex number in return polygons.
+     * @return convex polygons.
      */
-    public static buildMesh(
-      contours: Point[][],
+    public static splitToConvexPolygons(
+      concavePolygons: Point[][],
       maxVerticesPerPolygon: integer
     ): Point[][] {
 
       // The maximum possible number of polygons assuming that all will
       // be triangles.
       let maxPossiblePolygons = 0;
-
       // The maximum vertices found in a single contour.
       let maxVerticesPerContour = 0;
-
-      // Loop through all contours.  Determine the values for the
-      // variables above.
-      for (const contour of contours) {
+      for (const contour of concavePolygons) {
         const count = contour.length;
         maxPossiblePolygons += count - 2;
         maxVerticesPerContour = Math.max(maxVerticesPerContour, count);
       }
 
-      /*
-       * Holds polygon indices.
-       *
-       * The array is sized to hold the maximum possible polygons.
-       * The actual number will be significantly smaller once polygons
-       * are merged.
-       *
-       * Where mvpp = maximum vertices per polygon:
-       *
-       * Each polygon entry is mvpp. The first instance of NULL_INDEX means
-       * the end of poly indices.
-       *
-       * Example: If nvp = 6 and the the polygon has 4 vertices ->
-       * (1, 3, 4, 8, NULL_INDEX, NULL_INDEX)
-       * then (1, 3, 4, 8) defines the polygon.
-       */
+      // Each list is initialized to a size that will minimize resizing.
+
       const convexPolygons = new Array<Point[]>(maxPossiblePolygons);
       convexPolygons.length = 0;
 
-      // Each list is initialized to a size that will minimize resizing.
-      const workingContourFlags = new Array<boolean>(maxVerticesPerContour);
-      workingContourFlags.length = 0;
-
       // Various working variables.
       // (Values are meaningless outside of the iteration.)
+      const workingContourFlags = new Array<boolean>(maxVerticesPerContour);
+      workingContourFlags.length = 0;
       const workingPolygons = new Array<Point[]>(maxVerticesPerContour + 1);
       workingPolygons.length = 0;
       const workingMergeInfo: PolyMergeResult = {
@@ -226,9 +223,8 @@ export class NavMeshGenerator {
       const workingMergedPolygon = new Array<Point>(maxVerticesPerPolygon);
       workingMergedPolygon.length = 0;
 
-      // Process all contours.
-      //const contour = contours[0];
-      for (const contour of contours) {
+      // Split every concave polygon into convex polygons.
+      for (const contour of concavePolygons) {
         if (contour.length < 3) {
           // This indicates a problem with contour creation
           // since the contour builder should detect for this.
@@ -346,15 +342,13 @@ export class NavMeshGenerator {
             // Copy the merged polygon over the top of polygon A.
             bestPolygonA.length = 0;
             Array.prototype.push.apply(bestPolygonA, workingMergedPolygon);
-            // Remove polygon B by shifting all information to the
-            // left by one polygon,  starting at polygon B.
+            // Remove polygon B
             workingPolygons.splice(bestPolygonBIndex, 1);
           }
         }
 
         // Polygon creation for this contour is complete.
-        // Add polygons to the global polygon array and store region
-        // information.
+        // Add polygons to the global polygon array
         Array.prototype.push.apply(convexPolygons, workingPolygons);
       }
 
@@ -365,100 +359,71 @@ export class NavMeshGenerator {
       return convexPolygons;
     }
 
+
+
     /**
      * Checks two polygons to see if they can be merged.  If a merge is
-     * allowed, provides data via the outResult argument.
-     * <p>outResult will be an array of size 3 with the following
-     * information:</p>
-     * <p>0: The lengthSq of the edge shared between the polygons.<br/>
-     * 1: The index (not pointer) of the start of the shared edge in
-     *    polygon A.<br/>
-     * 2: The index (not pointer) of the start of the shared edge in
-     *    polygon B.<br/>
-     * </p>
-     * <p>A value of -1 at index zero indicates one of the following:</p>
-     * <ul>
-     * <li>The polygons cannot be merged because they would contain too
-     * many vertices.</li>
-     * <li>The polygons do not have a shared edge.</li>
-     * <li>Merging the polygons would result in a concave polygon.</li>
-     * </ul>
-     * <p>To convert the values at indices 1 and 2 to pointers:
-     * (polyPointer + value)</p>
-     * @param polyAPointer The pointer to the start of polygon A in the
-     * polys argument.
-     * @param polyBPointer The pointer to the start of polygon B in the
-     * polys argument.
-     * @param polys An array of polygons in the form:
-     * (vert1, vert2, vert3, ..., vertN, NULL_INDEX).
-     * The null index terminates every polygon.  This permits polygons
-     * with different vertex counts.
-     * @param verts  The vertex data associated with the polygons.
-     * @param outResult An array of size three which contains merge information.
+     * allowed, provides data via the outResult argument (see {@link PolyMergeResult}).
+     * 
+     * @param polygonA The polygon A
+     * @param polygonB The polygon B
+     * @param maxVerticesPerPolygon cap the vertex number in return polygons.
+     * @param outResult contains merge information.
      */
     private static getPolyMergeInfo(
-      polyA: Point[],
-      polyB: Point[],
-      maxVertsPerPoly: integer,
+      polygonA: Point[],
+      polygonB: Point[],
+      maxVerticesPerPolygon: integer,
       outResult: PolyMergeResult
     ): void {
       outResult.lengthSq = -1; // Default to invalid merge
       outResult.polygonAVertexIndex = -1;
       outResult.polygonBVertexIndex = -1;
 
-      const vertCountA = polyA.length;
-      const vertCountB = polyB.length;
+      const vertexCountA = polygonA.length;
+      const vertexCountB = polygonB.length;
 
       // If the merged polygon would would have to many vertices, do not
       // merge. Subtracting two since to take into account the effect of
       // a merge.
-      if (vertCountA + vertCountB - 2 > maxVertsPerPoly) return;
+      if (vertexCountA + vertexCountB - 2 > maxVerticesPerPolygon) return;
 
-      /*
-       * Check if the polygons share an edge.
-       *
-       * Loop through all of vertices for polygonA and extract its edge.
-       * (vertA -> vertANext) Then loop through all vertices for polygonB
-       * and check to see if any of its edges use the same vertices as
-       * polygonA.
-       */
-      for (let iPolyVertA = 0; iPolyVertA < vertCountA; iPolyVertA++) {
+      // Check if the polygons share an edge.
+      for (let indexA = 0; indexA < vertexCountA; indexA++) {
         // Get the vertex indices for the polygonA edge
-        const iVertA = polyA[iPolyVertA];
-        const iVertANext = polyA[(iPolyVertA + 1) % vertCountA];
+        const vertexA = polygonA[indexA];
+        const nextVertexA = polygonA[(indexA + 1) % vertexCountA];
         // Search polygonB for matches.
-        for (let iPolyVertB = 0; iPolyVertB < vertCountB; iPolyVertB++) {
+        for (let indexB = 0; indexB < vertexCountB; indexB++) {
           // Get the vertex indices for the polygonB edge.
-          const iVertB = polyB[iPolyVertB];
-          const iVertBNext = polyB[(iPolyVertB + 1) % vertCountB];
-          if (iVertA === iVertBNext && iVertANext === iVertB) {
+          const vertexB = polygonB[indexB];
+          const nextVertexB = polygonB[(indexB + 1) % vertexCountB];
+          // === can be used because vertices comme from the same concave polygon.
+          if (vertexA === nextVertexB && nextVertexA === vertexB) {
             // The vertex indices for this edge are the same and
             // sequenced in opposite order.  So the edge is shared.
-            outResult.polygonAVertexIndex = iPolyVertA;
-            outResult.polygonBVertexIndex = iPolyVertB;
+            outResult.polygonAVertexIndex = indexA;
+            outResult.polygonBVertexIndex = indexB;
           }
         }
       }
 
-      if (outResult.polygonAVertexIndex == -1)
+      if (outResult.polygonAVertexIndex === -1)
         // No common edge, cannot merge.
         return;
 
-      /*
-       * Check to see if the merged polygon would be convex.
-       *
-       * Gets the vertices near the section where the merge would occur.
-       * Do they form a concave section?  If so, the merge is invalid.
-       *
-       * Note that the following algorithm is only valid for clockwise
-       * wrapped convex polygons.
-       */
-
+      // Check to see if the merged polygon would be convex.
+      //
+      // Gets the vertices near the section where the merge would occur.
+      // Do they form a concave section?  If so, the merge is invalid.
+      //
+      // Note that the following algorithm is only valid for clockwise
+      // wrapped convex polygons.
       let sharedVertMinus =
-        polyA[(outResult.polygonAVertexIndex - 1 + vertCountA) % vertCountA];
-      let sharedVert = polyA[outResult.polygonAVertexIndex];
+        polygonA[(outResult.polygonAVertexIndex - 1 + vertexCountA) % vertexCountA];
+      let sharedVert = polygonA[outResult.polygonAVertexIndex];
       let sharedVertPlus =
-        polyB[(outResult.polygonBVertexIndex + 2) % vertCountB];
+        polygonB[(outResult.polygonBVertexIndex + 2) % vertexCountB];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -468,19 +433,18 @@ export class NavMeshGenerator {
           sharedVertPlus.x,
           sharedVertPlus.y
         )
-      )
-        /*
-         * The shared vertex (center) is not to the left of segment
-         * vertMinus->vertPlus.  For a clockwise wrapped polygon, this
-         * indicates a concave section.  Merged polygon would be concave.
-         * Invalid merge.
-         */
+      ) {
+        // The shared vertex (center) is not to the left of segment
+        // vertMinus->vertPlus. For a clockwise wrapped polygon, this
+        // indicates a concave section. Merged polygon would be concave.
+        // Invalid merge.
         return;
+      }
 
       sharedVertMinus =
-        polyB[(outResult.polygonBVertexIndex - 1 + vertCountB) % vertCountB];
-      sharedVert = polyB[outResult.polygonBVertexIndex];
-      sharedVertPlus = polyA[(outResult.polygonAVertexIndex + 2) % vertCountA];
+        polygonB[(outResult.polygonBVertexIndex - 1 + vertexCountB) % vertexCountB];
+      sharedVert = polygonB[outResult.polygonBVertexIndex];
+      sharedVertPlus = polygonA[(outResult.polygonAVertexIndex + 2) % vertexCountA];
       if (
         !ConvexPolygonGenerator.isLeft(
           sharedVert.x,
@@ -490,18 +454,17 @@ export class NavMeshGenerator {
           sharedVertPlus.x,
           sharedVertPlus.y
         )
-      )
-        /*
-         * The shared vertex (center) is not to the left of segment
-         * vertMinus->vertPlus.  For a clockwise wrapped polygon, this
-         * indicates a concave section.  Merged polygon would be concave.
-         * Invalid merge.
-         */
+      ) {
+        // The shared vertex (center) is not to the left of segment
+        // vertMinus->vertPlus. For a clockwise wrapped polygon, this
+        // indicates a concave section. Merged polygon would be concave.
+        // Invalid merge.
         return;
+      }
 
       // Get the vertex indices that form the shared edge.
-      sharedVertMinus = polyA[outResult.polygonAVertexIndex];
-      sharedVert = polyA[(outResult.polygonAVertexIndex + 1) % vertCountA];
+      sharedVertMinus = polygonA[outResult.polygonAVertexIndex];
+      sharedVert = polygonA[(outResult.polygonAVertexIndex + 1) % vertexCountA];
 
       // Store the lengthSq of the shared edge.
       const deltaX = sharedVertMinus.x - sharedVert.x;
@@ -510,22 +473,16 @@ export class NavMeshGenerator {
     }
 
     /**
-     * Attempts to triangluate a polygon.
-     * <p>Assumes the verts and indices arguments define a valid simple
-     * (concave or convex) polygon
-     * with vertices wrapped clockwise. Otherwise behavior is undefined.</p>
-     * @param vertices The vertices that make up the polygon in the format
-     * (x, y, z, id).  The value stored at the id position is not relevant to
-     * this operation.
-     * @param inoutIndices    A working array of indices that define the
-     * polygon to be triangluated.  The content is manipulated during the
-     * operation and it will be left in an undefined state at the end of
-     * the operation. (I.e. Its content will no longer be of any use.)
-     * @param outTriangles  The indices which define the triangles derived
-     * from the original polygon in the form
-     * (t1a, t1b, t1c, t2a, t2b, t2c, ..., tna, tnb, tnc).  The original
-     * content of this argument is discarded prior to use.
-     * @return The number of triangles generated.  Or, if triangluation
+     * Attempts to triangulate a polygon.
+     * 
+     * @param vertices the polygon to be triangulate.
+     * The content is manipulated during the operation
+     * and it will be left in an undefined state at the end of
+     * the operation.
+     * @param vertexFlags only used internally
+     * @param outTriangles is called for each triangle derived
+     * from the original polygon.
+     * @return The number of triangles generated. Or, if triangulation
      * failed, a negative number.
      */
     private static triangulate(
@@ -533,39 +490,37 @@ export class NavMeshGenerator {
       vertexFlags: Array<boolean>,
       outTriangles: (p1: Point, p2: Point, p3: Point) => void
     ): void {
-      /*
-       * Terminology, concepts and such:
-       *
-       * This algorithm loops around the edges of a polygon looking for
-       * new internal edges to add that will partition the polygon into a
-       * new valid triangle internal to the starting polygon. During each
-       * iteration the shortest potential new edge is selected to form that
-       * iteration's new triangle.
-       *
-       * Triangles will only be formed if a single new edge will create
-       * a triangle.  Two new edges will never be added during a single
-       * iteration.  This means that the triangulated portions of the
-       * original polygon will only contain triangles and the only
-       * non-triangle polygon will exist in the untrianglulated portion
-       * of the original polygon.
-       *
-       * "Partition edge" refers to a potential new edge that will form a
-       * new valid triangle.
-       *
-       * "Center" vertex refers to the vertex in a potential new triangle
-       * which, if the triangle is formed, will be external to the
-       * remaining untriangulated portion of the polygon.  Since it
-       * is now external to the polygon, it can't be used to form any
-       * new triangles.
-       *
-       * Some documentation refers to "iPlus2" even though the variable is
-       * not in scope or does not exist for that section of code. For
-       * documentation purposes, iPlus2 refers to the 2nd vertex after the
-       * primary vertex.
-       * E.g.: i, iPlus1, and iPlus2.
-       *
-       * Visualizations: http://www.critterai.org/nmgen_polygen#triangulation
-       */
+       // Terminology, concepts and such:
+       //
+       // This algorithm loops around the edges of a polygon looking for
+       // new internal edges to add that will partition the polygon into a
+       // new valid triangle internal to the starting polygon. During each
+       // iteration the shortest potential new edge is selected to form that
+       // iteration's new triangle.
+       //
+       // Triangles will only be formed if a single new edge will create
+       // a triangle. Two new edges will never be added during a single
+       // iteration. This means that the triangulated portions of the
+       // original polygon will only contain triangles and the only
+       // non-triangle polygon will exist in the untriangulated portion
+       // of the original polygon.
+       //
+       // "Partition edge" refers to a potential new edge that will form a
+       // new valid triangle.
+       //
+       // "Center" vertex refers to the vertex in a potential new triangle
+       // which, if the triangle is formed, will be external to the
+       // remaining untriangulated portion of the polygon.  Since it
+       // is now external to the polygon, it can't be used to form any
+       // new triangles.
+       //
+       // Some documentation refers to "iPlus2" even though the variable is
+       // not in scope or does not exist for that section of code. For
+       // documentation purposes, iPlus2 refers to the 2nd vertex after the
+       // primary vertex.
+       // E.g.: i, iPlus1, and iPlus2.
+       //
+       // Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#triangulation
 
       // Loop through all vertices, flagging all indices that represent
       // a center vertex of a valid new triangle.
@@ -584,31 +539,26 @@ export class NavMeshGenerator {
         );
       }
 
-      /*
-       * Loop through the vertices creating triangles. When there is only a
-       * single triangle left,  the operation is complete.
-       *
-       * When a valid triangle is formed, remove its center vertex.  So for
-       * each loop, a single vertex will be removed.
-       *
-       * At the start of each iteration the indices list is in the following
-       * state:
-       * - Represents a simple polygon representing the un-triangulated
-       *   portion of the original polygon.
-       * - All valid center vertices are flagged.
-       */
+       // Loop through the vertices creating triangles. When there is only a
+       // single triangle left,  the operation is complete.
+       //
+       // When a valid triangle is formed, remove its center vertex.  So for
+       // each loop, a single vertex will be removed.
+       //
+       // At the start of each iteration the indices list is in the following
+       // state:
+       // - Represents a simple polygon representing the un-triangulated
+       //   portion of the original polygon.
+       // - All valid center vertices are flagged.
       while (vertices.length > 3) {
         // Find the shortest new valid edge.
-
-        // The minimum length found.
-        let minLengthSq = Number.MAX_VALUE;
-        // The index for the start of the minimum length edge.
-        let iMinLengthSqVert = -1;
 
         // NOTE: i and iPlus1 are defined in two different scopes in
         // this section. So be careful.
 
         // Loop through all indices in the remaining polygon.
+        let minLengthSq = Number.MAX_VALUE;
+        let minLengthSqVertexIndex = -1;
         for (let i = 0; i < vertices.length; i++) {
           if (vertexFlags[(i + 1) % vertices.length]) {
             // Indices i, iPlus1, and iPlus2 are known to form a
@@ -623,58 +573,47 @@ export class NavMeshGenerator {
             const lengthSq = deltaX * deltaX + deltaY * deltaY;
 
             if (lengthSq < minLengthSq) {
-              // This is either the first valid new edge, or an edge
-              // that is shorter than others previously found.
-              // Select it.
               minLengthSq = lengthSq;
-              iMinLengthSqVert = i;
+              minLengthSqVertexIndex = i;
             }
           }
         }
 
-        if (iMinLengthSqVert === -1)
-          /*
-           * Could not find a new triangle.  Triangulation failed.
-           * This happens if there are three or more vertices
-           * left, but none of them are flagged as being a
-           * potential center vertex.
-           */
+        if (minLengthSqVertexIndex === -1)
+           // Could not find a new triangle.  Triangulation failed.
+           // This happens if there are three or more vertices
+           // left, but none of them are flagged as being a
+           // potential center vertex.
           return;
 
-        let i = iMinLengthSqVert;
+        let i = minLengthSqVertexIndex;
         let iPlus1 = (i + 1) % vertices.length;
 
         // Add the new triangle to the output.
         outTriangles(vertices[i], vertices[iPlus1], vertices[(i + 2) % vertices.length]);
 
-        /*
-         * iPlus1, the "center" vert in the new triangle, is now external
-         * to the untriangulated portion of the polygon.  Remove it from
-         * the indices list since it cannot be a member of any new
-         * triangles.
-         */
+         // iPlus1, the "center" vert in the new triangle, is now external
+         // to the untriangulated portion of the polygon.  Remove it from
+         // the vertices list since it cannot be a member of any new
+         // triangles.
         vertices.splice(iPlus1, 1);
         vertexFlags.splice(iPlus1, 1);
 
         if (iPlus1 === 0 || iPlus1 >= vertices.length) {
-          /*
-           * The vertex removal has invalidated iPlus1 and/or i.  So
-           * force a wrap, fixing the indices so they reference the
-           * correct indices again. This only occurs when the new
-           * triangle is formed across the wrap location of the polygon.
-           * Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
-           * Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
-           */
+           // The vertex removal has invalidated iPlus1 and/or i.  So
+           // force a wrap, fixing the indices so they reference the
+           // correct indices again. This only occurs when the new
+           // triangle is formed across the wrap location of the polygon.
+           // Case 1: i = 14, iPlus1 = 15, iPlus2 = 0
+           // Case 2: i = 15, iPlus1 = 0, iPlus2 = 1;
           i = vertices.length - 1;
           iPlus1 = 0;
         }
 
-        /*
-         *  At this point i and iPlus1 refer to the two indices from a
-         * successful triangluation that will be part of another new
-         * triangle.  We now need to re-check these indices to see if they
-         * can now be the center index in a potential new partition.
-         */
+         // At this point i and iPlus1 refer to the two indices from a
+         // successful triangulation that will be part of another new
+         // triangle.  We now need to re-check these indices to see if they
+         // can now be the center index in a potential new partition.
         vertexFlags[i] = ConvexPolygonGenerator.isValidPartition(
           (i - 1 + vertices.length) % vertices.length,
           iPlus1,
@@ -693,109 +632,103 @@ export class NavMeshGenerator {
     }
 
     /**
-     * Returns TRUE if the line segment formed by vertex A and vertex B will
+     * Check if the line segment formed by vertex A and vertex B will
      * form a valid partition of the polygon.
-     * <p>I.e. New line segment AB is internal to the polygon and will not
-     * cross existing line segments.</p>
-     * <p>The test is only performed on the xz-plane.</p>
-     * <p>Assumptions:</p>
-     * <ul>
-     * <li>The vertices and indices arguments define a valid simple polygon
-     * with vertices wrapped clockwise.</li>
-     * <li>indexA != indexB</li>
-     * </ul>
-     * <p>Behavior is undefined if the arguments to not meet these
-     * assumptions</p>
-     * @param indexA A polygon index of a vertex that will form segment AB.
-     * @param indexB A polygon index of a vertex that will form segment AB.
-     * @param verts The vertices array in the form (x, y, z, id).  The value
-     * stored at the id position is not relevant to this operation.
-     * @param indices A simple polygon wrapped clockwise.
-     * @return TRUE if the line segment formed by vertex A and vertex B will
-     * form a valid partition of the polygon.  Otherwise false.
+     * 
+     * I.e. the line segment AB is internal to the polygon and will not
+     * cross existing line segments.
+     * 
+     * Assumptions:
+     * - The vertices arguments define a valid simple polygon
+     * with vertices wrapped clockwise.
+     * - indexA != indexB
+     * 
+     * Behavior is undefined if the arguments to not meet these
+     * assumptions
+     * 
+     * @param indexA the index of the vertex that will form the segment AB.
+     * @param indexB the index of the vertex that will form the segment AB.
+     * @param vertices a polygon wrapped clockwise.
+     * @return true if the line segment formed by vertex A and vertex B will
+     * form a valid partition of the polygon.
      */
     private static isValidPartition(
       indexA: integer,
       indexB: integer,
-      verts: Point[]
+      vertices: Point[]
     ): boolean {
-      /*
-       *  First check whether the segment AB lies within the internal
-       *  angle formed at A. (This is the faster check.)
-       *  If it does, then perform the more costly check.
-       */
+      //  First check whether the segment AB lies within the internal
+      //  angle formed at A (this is the faster check).
+      //  If it does, then perform the more costly check.
       return (
-        ConvexPolygonGenerator.liesWithinInternalAngle(indexA, indexB, verts) &&
+        ConvexPolygonGenerator.liesWithinInternalAngle(indexA, indexB, vertices) &&
         !ConvexPolygonGenerator.hasIllegalEdgeIntersection(
           indexA,
           indexB,
-          verts
+          vertices
         )
       );
     }
 
     /**
-     * Returns TRUE if vertex B lies within the internal angle of the polygon
+     * Check if vertex B lies within the internal angle of the polygon
      * at vertex A.
      *
-     * <p>Vertex B does not have to be within the polygon border.  It just has
+     * Vertex B does not have to be within the polygon border.  It just has
      * be be within the area encompassed by the internal angle formed at
-     * vertex A.</p>
+     * vertex A.
      *
-     * <p>This operation is a fast way of determining whether a line segment
-     * can possibly form a valid polygon partition.  If this test returns
-     * FALSE, then more expensive checks can be skipped.</p>
-     * <a href="http://www.critterai.org/nmgen_polygen#anglecheck"
-     * >Visualizations</a>
-     * <p>Special case:
+     * This operation is a fast way of determining whether a line segment
+     * can possibly form a valid polygon partition. If this test returns
+     * FALSE, then more expensive checks can be skipped.
+     * 
+     * Visualizations: http://www.critterai.org/projects/nmgen_study/polygen.html#anglecheck
+     * 
+     * Special case:
      * FALSE is returned if vertex B lies directly on either of the rays
-     * cast from vertex A along its associated polygon edges.  So the test
-     * on vertex B is exclusive of the polygon edges.</p>
-     * <p>The test is only performed on the xz-plane.</p>
-     * <p>Assumptions:</p>
-     * <ul>
-     * <li>The vertices and indices arguments define a valid simple polygon
-     * with vertices wrapped clockwise.</li>
-     * <li>indexA != indexB</li>
-     * </ul>
-     * <p>Behavior is undefined if the arguments to not meet these
-     * assumptions</p>
-     * @param indexA An polygon index of a vertex that will form segment AB.
-     * @param indexB An polygon index of a vertex that will form segment AB.
-     * @param verts The vertices array in the form (x, y, z, id).  The value
-     * stored at the id position is not relevant to this operation.
-     * @param indices A simple polygon wrapped clockwise.
-     * @return Returns TRUE if vertex B lies within the internal angle of
+     * cast from vertex A along its associated polygon edges. So the test
+     * on vertex B is exclusive of the polygon edges.
+     * 
+     * Assumptions:
+     * - The vertices and indices arguments define a valid simple polygon
+     * with vertices wrapped clockwise.
+     * -indexA != indexB
+     * 
+     * Behavior is undefined if the arguments to not meet these
+     * assumptions
+     * 
+     * @param indexA the index of the vertex that will form the segment AB.
+     * @param indexB the index of the vertex that will form the segment AB.
+     * @param vertices a polygon wrapped clockwise.
+     * @return true if vertex B lies within the internal angle of
      * the polygon at vertex A.
      */
     private static liesWithinInternalAngle(
       indexA: integer,
       indexB: integer,
-      verts: Point[]
+      vertices: Point[]
     ): boolean {
       // Get pointers to the main vertices being tested.
-      const vertA = verts[indexA];
-      const vertB = verts[indexB];
+      const vertexA = vertices[indexA];
+      const vertexB = vertices[indexB];
 
       // Get pointers to the vertices just before and just after vertA.
-      const vertAMinus = verts[(indexA - 1 + verts.length) % verts.length];
-      const vertAPlus = verts[(indexA + 1) % verts.length];
+      const vertexAMinus = vertices[(indexA - 1 + vertices.length) % vertices.length];
+      const vertexAPlus = vertices[(indexA + 1) % vertices.length];
 
-      /*
-       * First, find which of the two angles formed by the line segments
-       *  AMinus->A->APlus is internal to (pointing towards) the polygon.
-       * Then test to see if B lies within the area formed by that angle.
-       */
+       // First, find which of the two angles formed by the line segments
+       //  AMinus->A->APlus is internal to (pointing towards) the polygon.
+       // Then test to see if B lies within the area formed by that angle.
 
       // TRUE if A is left of or on line AMinus->APlus
       if (
         ConvexPolygonGenerator.isLeftOrCollinear(
-          vertA.x,
-          vertA.y,
-          vertAMinus.x,
-          vertAMinus.y,
-          vertAPlus.x,
-          vertAPlus.y
+          vertexA.x,
+          vertexA.y,
+          vertexAMinus.x,
+          vertexAMinus.y,
+          vertexAPlus.x,
+          vertexAPlus.y
         )
       )
         // The angle internal to the polygon is <= 180 degrees
@@ -804,144 +737,135 @@ export class NavMeshGenerator {
         return (
           ConvexPolygonGenerator.isLeft(
             // TRUE if B is left of line A->AMinus
-            vertB.x,
-            vertB.y,
-            vertA.x,
-            vertA.y,
-            vertAMinus.x,
-            vertAMinus.y
+            vertexB.x,
+            vertexB.y,
+            vertexA.x,
+            vertexA.y,
+            vertexAMinus.x,
+            vertexAMinus.y
           ) &&
           // TRUE if B is right of line A->APlus
           ConvexPolygonGenerator.isRight(
-            vertB.x,
-            vertB.y,
-            vertA.x,
-            vertA.y,
-            vertAPlus.x,
-            vertAPlus.y
+            vertexB.x,
+            vertexB.y,
+            vertexA.x,
+            vertexA.y,
+            vertexAPlus.x,
+            vertexAPlus.y
           )
         );
 
-      /*
-       * The angle internal to the polygon is > 180 degrees (reflex angle).
-       * Test to see if B lies within the external (<= 180 degree) angle and
-       * flip the result.  (If B lies within the external angle, it can't
-       * lie within the internal angle.)
-       */
+       // The angle internal to the polygon is > 180 degrees (reflex angle).
+       // Test to see if B lies within the external (<= 180 degree) angle and
+       // flip the result.  (If B lies within the external angle, it can't
+       // lie within the internal angle.)
       return !(
         // TRUE if B is left of or on line A->APlus
         (
           ConvexPolygonGenerator.isLeftOrCollinear(
-            vertB.x,
-            vertB.y,
-            vertA.x,
-            vertA.y,
-            vertAPlus.x,
-            vertAPlus.y
+            vertexB.x,
+            vertexB.y,
+            vertexA.x,
+            vertexA.y,
+            vertexAPlus.x,
+            vertexAPlus.y
           ) &&
           // TRUE if B is right of or on line A->AMinus
           ConvexPolygonGenerator.isRightOrCollinear(
-            vertB.x,
-            vertB.y,
-            vertA.x,
-            vertA.y,
-            vertAMinus.x,
-            vertAMinus.y
+            vertexB.x,
+            vertexB.y,
+            vertexA.x,
+            vertexA.y,
+            vertexAMinus.x,
+            vertexAMinus.y
           )
         )
       );
     }
 
     /**
-     * Returns TRUE if the line segment AB intersects any edges not already
+     * Check if the line segment AB intersects any edges not already
      * connected to one of the two vertices.
-     * <p>The test is only performed on the xz-plane.</p>
-     * <p>Assumptions:</p>
-     * <ul>
-     * <li>The vertices and indices arguments define a valid simple polygon
-     * with vertices wrapped clockwise.</li>
-     * <li>indexA != indexB</li>
-     * </ul>
-     * <p>Behavior is undefined if the arguments to not meet these
-     * assumptions</p>
-     * @param indexA An polygon index of a vertex that will form segment AB.
-     * @param indexB An polygon index of a vertex that will form segment AB.
-     * @param verts The vertices array in the form (x, y, z, id).  The value
-     * stored at the id position is not relevant to this operation.
-     * @param indices A simplpe polygon wrapped clockwise.
-     * @return TRUE if the line segment AB intersects any edges not already
+     * 
+     * Assumptions:
+     * - The vertices and indices arguments define a valid simple polygon
+     * with vertices wrapped clockwise.
+     * - indexA != indexB
+     * 
+     * Behavior is undefined if the arguments to not meet these
+     * assumptions
+     * 
+     * @param indexA the index of the vertex that will form the segment AB.
+     * @param indexB the index of the vertex that will form the segment AB.
+     * @param vertices a polygon wrapped clockwise.
+     * @return true if the line segment AB intersects any edges not already
      * connected to one of the two vertices.  Otherwise FALSE.
      */
     private static hasIllegalEdgeIntersection(
       indexA: integer,
       indexB: integer,
-      verts: Point[]
+      vertices: Point[]
     ): boolean {
       // Get pointers to the primary vertices being tested.
-      const vertA = verts[indexA];
-      const vertB = verts[indexB];
+      const vertexA = vertices[indexA];
+      const vertexB = vertices[indexB];
 
       // Loop through the polygon edges.
       for (
-        let iPolyEdgeBegin = 0;
-        iPolyEdgeBegin < verts.length;
-        iPolyEdgeBegin++
+        let edgeBeginIndex = 0;
+        edgeBeginIndex < vertices.length;
+        edgeBeginIndex++
       ) {
-        const iPolyEdgeEnd = (iPolyEdgeBegin + 1) % verts.length;
+        const edgeEndIndex = (edgeBeginIndex + 1) % vertices.length;
         if (
-          !(
-            iPolyEdgeBegin === indexA ||
-            iPolyEdgeBegin === indexB ||
-            iPolyEdgeEnd === indexA ||
-            iPolyEdgeEnd === indexB
+            edgeBeginIndex === indexA ||
+            edgeBeginIndex === indexB ||
+            edgeEndIndex === indexA ||
+            edgeEndIndex === indexB
+        ) {
+          continue;
+        }
+        // Neither of the test indices are endpoints of this edge.
+        // Get this edge's vertices.
+        const edgeBegin = vertices[edgeBeginIndex];
+        const edgeEnd = vertices[edgeEndIndex];
+        if (
+          (edgeBegin.x === vertexA.x && edgeBegin.y === vertexA.y) ||
+          (edgeBegin.x === vertexB.x && edgeBegin.y === vertexB.y) ||
+          (edgeEnd.x === vertexA.x && edgeEnd.y === vertexA.y) ||
+          (edgeEnd.x === vertexB.x && edgeEnd.y === vertexB.y)
+        ) {
+            // One of the test vertices is co-located
+            // with one of the endpoints of this edge. (This is a
+            // test of the actual position of the vertices rather than
+            // simply the index check performed earlier.)
+            // Skip this edge.
+          continue;
+        }
+          // This edge is not connected to either of the test vertices.
+          // If line segment AB intersects  with this edge, then the
+          // intersection is illegal.
+          // I.e. New edges cannot cross existing edges.
+        if (
+          Geometry.segmentsIntersect(
+            vertexA.x,
+            vertexA.y,
+            vertexB.x,
+            vertexB.y,
+            edgeBegin.x,
+            edgeBegin.y,
+            edgeEnd.x,
+            edgeEnd.y
           )
         ) {
-          // Neither of the test indices are endpoints of this edge.
-          // Get pointers for this edge's verts.
-          const edgeVertBegin = verts[iPolyEdgeBegin];
-          const edgeVertEnd = verts[iPolyEdgeEnd];
-          if (
-            (edgeVertBegin.x === vertA.x && edgeVertBegin.y === vertA.y) ||
-            (edgeVertBegin.x === vertB.x && edgeVertBegin.y === vertB.y) ||
-            (edgeVertEnd.x === vertA.x && edgeVertEnd.y === vertA.y) ||
-            (edgeVertEnd.x === vertB.x && edgeVertEnd.y === vertB.y)
-          )
-            /*
-             * One of the test vertices is co-located on the xz plane
-             * with one of the endpoints of this edge.  (This is a
-             * test of the actual position of the verts rather than
-             * simply the index check performed earlier.)
-             * Skip this edge.
-             */
-            continue;
-
-          /*
-           * This edge is not connected to either of the test vertices.
-           * If line segment AB intersects  with this edge, then the
-           * intersection is illegal.
-           * I.e. New edges cannot cross existing edges.
-           */
-          if (
-            Geometry.segmentsIntersect(
-              vertA.x,
-              vertA.y,
-              vertB.x,
-              vertB.y,
-              edgeVertBegin.x,
-              edgeVertBegin.y,
-              edgeVertEnd.x,
-              edgeVertEnd.y
-            )
-          )
-            return true;
+          return true;
         }
       }
-
       return false;
     }
 
     /**
-     * Returns TRUE if point P is to the left of line AB when looking
+     * Check if point P is to the left of line AB when looking
      * from A to B.
      * @param px The x-value of the point to test.
      * @param py The y-value of the point to test.
@@ -950,7 +874,7 @@ export class NavMeshGenerator {
      * @param bx The x-value of the point (bx, by) that is point B on line AB.
      * @param by The y-value of the point (bx, by) that is point B on line AB.
      * @return TRUE if point P is to the left of line AB when looking
-     * from A to B.  Otherwise FALSE.
+     * from A to B.
      */
     private static isLeft(
       px: integer,
@@ -964,7 +888,7 @@ export class NavMeshGenerator {
     }
 
     /**
-     * Returns TRUE if point P is to the left of line AB when looking
+     * Check if point P is to the left of line AB when looking
      * from A to B or is collinear with line AB.
      * @param px The x-value of the point to test.
      * @param py The y-value of the point to test.
@@ -989,7 +913,7 @@ export class NavMeshGenerator {
     }
 
     /**
-     * Returns TRUE if point P is to the right of line AB when looking
+     * Check if point P is to the right of line AB when looking
      * from A to B.
      * @param px The x-value of the point to test.
      * @param py The y-value of the point to test.
@@ -1012,7 +936,7 @@ export class NavMeshGenerator {
     }
 
     /**
-     * Returns TRUE if point P is to the right of or on line AB when looking
+     * Check if point P is to the right of or on line AB when looking
      * from A to B.
      * @param px The x-value of the point to test.
      * @param py The y-value of the point to test.
@@ -1039,19 +963,20 @@ export class NavMeshGenerator {
     /**
      * The absolute value of the returned value is two times the area of the
      * triangle defined by points (A, B, C).
-     * <p>A positive value indicates:</p>
-     * <ul>
-     * <li>Counterclockwise wrapping of the points.</li>
-     * <li>Point B lies to the right of line AC, looking from A to C.</li>
-     * </ul>
-     * <p>A negative value indicates:</p>
-     * <ul>
-     * <li>Clockwise wrapping of the points.</li>
-     * <li>Point B lies to the left of line AC, looking from A to C.</li>
-     * </ul>
-     * <p>A value of zero indicates that all points are collinear or
-     * represent the same point.</p>
-     * <p>This is a fast operation.<p>
+     * 
+     * A positive value indicates:
+     * - Counterclockwise wrapping of the points.
+     * - Point B lies to the right of line AC, looking from A to C.
+     * 
+     * A negative value indicates:
+     * - Clockwise wrapping of the points.<
+     * - Point B lies to the left of line AC, looking from A to C.
+     * 
+     * A value of zero indicates that all points are collinear or
+     * represent the same point.
+     * 
+     * This is a fast operation.
+     * 
      * @param ax The x-value for point (ax, ay) for vertex A of the triangle.
      * @param ay The y-value for point (ax, ay) for vertex A of the triangle.
      * @param bx The x-value for point (bx, by) for vertex B of the triangle.
@@ -1069,14 +994,9 @@ export class NavMeshGenerator {
       cx: integer,
       cy: integer
     ): integer {
-      /*
-       * References:
-       *
-       * http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm
-       *                                                  #Modern%20Triangles
-       * http://mathworld.wolfram.com/TriangleArea.html (Search for "signed".)
-       *
-       */
+       // References:
+       // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Modern%20Triangles
+       // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed".)
       return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
     }
   }

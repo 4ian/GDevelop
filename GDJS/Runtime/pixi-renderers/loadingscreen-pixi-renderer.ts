@@ -156,27 +156,25 @@ namespace gdjs {
           if (!this._backgroundReadyTimeInMs)
             this._backgroundReadyTimeInMs = timeInMs;
 
-          if (this._gdevelopLogoSprite) {
-            const logoAndProgressFadeInDuration = this._loadingScreenData
-              .logoAndProgressFadeInDuration;
-            const logoAndProgressLogoFadeInDelay = this._loadingScreenData
-              .logoAndProgressLogoFadeInDelay;
+          const logoAndProgressFadeInDuration = this._loadingScreenData
+            .logoAndProgressFadeInDuration;
+          const logoAndProgressLogoFadeInDelay = this._loadingScreenData
+            .logoAndProgressLogoFadeInDelay;
 
-            if (
-              timeInMs - this._backgroundReadyTimeInMs >
-              logoAndProgressLogoFadeInDelay * 1000
-            ) {
-              fadeIn(
-                this._gdevelopLogoSprite,
-                logoAndProgressFadeInDuration,
-                deltaTimeInMs
-              );
-              fadeIn(
-                this._progressBarGraphics,
-                logoAndProgressFadeInDuration,
-                deltaTimeInMs
-              );
-            }
+          if (
+            timeInMs - this._backgroundReadyTimeInMs >
+            logoAndProgressLogoFadeInDelay * 1000
+          ) {
+            fadeIn(
+              this._gdevelopLogoSprite,
+              logoAndProgressFadeInDuration,
+              deltaTimeInMs
+            );
+            fadeIn(
+              this._progressBarGraphics,
+              logoAndProgressFadeInDuration,
+              deltaTimeInMs
+            );
           }
         }
 

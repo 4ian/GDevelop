@@ -228,7 +228,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
         [14, 10],
       ]);
 
-      const polyMeshField = gdjs.ConvexPolygonGenerator.buildMesh(contours, 8);
+      const polyMeshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(contours, 8);
       const polygons = polyMeshField.polys.map(polygon => polygon.map(index => polyMeshField.verts[index]));
       console.log('polygons.length: ' + polygons.length);
       console.log(

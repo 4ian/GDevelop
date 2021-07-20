@@ -2,6 +2,7 @@
 
 namespace gdjs {
   export class RasterizationCell {
+    //TODO sometimes used as unasigned or obstacle
     static NULL_REGION_ID = 0;
 
     x: integer;
@@ -178,7 +179,7 @@ namespace gdjs {
   /**
    * Builds convex polygons from the provided polygons.
    *
-   * This implementation is greatly inspired from CritterAI class "PolyMeshFieldBuilder".
+   * This implementation is strongly inspired from CritterAI class "PolyMeshFieldBuilder".
    * http://www.critterai.org/projects/nmgen_study/polygen.html
    */
   export class ConvexPolygonGenerator {
@@ -260,7 +261,7 @@ namespace gdjs {
            * Failure of the triangulation.
            * This is known to occur if the source polygon is
            * self-intersecting or the source region contains internal
-           * holes.  In both cases, the problem is likely due to bad
+           * holes. In both cases, the problem is likely due to bad
            * region formation.
            */
           console.error(
@@ -320,7 +321,7 @@ namespace gdjs {
               // No valid merges found during this iteration.
               break;
 
-            // Found polygons to merge.  Perform the merge.
+            // Found polygons to merge. Perform the merge.
 
             /*
              * Fill the mergedPoly array.
@@ -369,7 +370,7 @@ namespace gdjs {
     }
 
     /**
-     * Checks two polygons to see if they can be merged.  If a merge is
+     * Checks two polygons to see if they can be merged. If a merge is
      * allowed, provides data via the outResult argument (see {@link PolyMergeResult}).
      *
      * @param polygonA The polygon A
@@ -408,7 +409,7 @@ namespace gdjs {
           // === can be used because vertices comme from the same concave polygon.
           if (vertexA === nextVertexB && nextVertexA === vertexB) {
             // The vertex indices for this edge are the same and
-            // sequenced in opposite order.  So the edge is shared.
+            // sequenced in opposite order. So the edge is shared.
             outResult.polygonAVertexIndex = indexA;
             outResult.polygonBVertexIndex = indexB;
           }
@@ -522,7 +523,7 @@ namespace gdjs {
       //
       // "Center" vertex refers to the vertex in a potential new triangle
       // which, if the triangle is formed, will be external to the
-      // remaining untriangulated portion of the polygon.  Since it
+      // remaining untriangulated portion of the polygon. Since it
       // is now external to the polygon, it can't be used to form any
       // new triangles.
       //
@@ -554,7 +555,7 @@ namespace gdjs {
       // Loop through the vertices creating triangles. When there is only a
       // single triangle left,  the operation is complete.
       //
-      // When a valid triangle is formed, remove its center vertex.  So for
+      // When a valid triangle is formed, remove its center vertex. So for
       // each loop, a single vertex will be removed.
       //
       // At the start of each iteration the indices list is in the following
@@ -592,7 +593,7 @@ namespace gdjs {
         }
 
         if (minLengthSqVertexIndex === -1)
-          // Could not find a new triangle.  Triangulation failed.
+          // Could not find a new triangle. Triangulation failed.
           // This happens if there are three or more vertices
           // left, but none of them are flagged as being a
           // potential center vertex.
@@ -609,14 +610,14 @@ namespace gdjs {
         );
 
         // iPlus1, the "center" vert in the new triangle, is now external
-        // to the untriangulated portion of the polygon.  Remove it from
+        // to the untriangulated portion of the polygon. Remove it from
         // the vertices list since it cannot be a member of any new
         // triangles.
         vertices.splice(iPlus1, 1);
         vertexFlags.splice(iPlus1, 1);
 
         if (iPlus1 === 0 || iPlus1 >= vertices.length) {
-          // The vertex removal has invalidated iPlus1 and/or i.  So
+          // The vertex removal has invalidated iPlus1 and/or i. So
           // force a wrap, fixing the indices so they reference the
           // correct indices again. This only occurs when the new
           // triangle is formed across the wrap location of the polygon.
@@ -628,7 +629,7 @@ namespace gdjs {
 
         // At this point i and iPlus1 refer to the two indices from a
         // successful triangulation that will be part of another new
-        // triangle.  We now need to re-check these indices to see if they
+        // triangle. We now need to re-check these indices to see if they
         // can now be the center index in a potential new partition.
         vertexFlags[i] = ConvexPolygonGenerator.isValidPartition(
           (i - 1 + vertices.length) % vertices.length,
@@ -694,7 +695,7 @@ namespace gdjs {
      * Check if vertex B lies within the internal angle of the polygon
      * at vertex A.
      *
-     * Vertex B does not have to be within the polygon border.  It just has
+     * Vertex B does not have to be within the polygon border. It just has
      * be be within the area encompassed by the internal angle formed at
      * vertex A.
      *
@@ -778,7 +779,7 @@ namespace gdjs {
 
       // The angle internal to the polygon is > 180 degrees (reflex angle).
       // Test to see if B lies within the external (<= 180 degree) angle and
-      // flip the result.  (If B lies within the external angle, it can't
+      // flip the result. (If B lies within the external angle, it can't
       // lie within the internal angle.)
       return !(
         // TRUE if B is left of or on line A->APlus
@@ -820,7 +821,7 @@ namespace gdjs {
      * @param indexB the index of the vertex that will form the segment AB.
      * @param vertices a polygon wrapped clockwise.
      * @return true if the line segment AB intersects any edges not already
-     * connected to one of the two vertices.  Otherwise FALSE.
+     * connected to one of the two vertices.
      */
     private static hasIllegalEdgeIntersection(
       indexA: integer,
@@ -918,7 +919,7 @@ namespace gdjs {
      * @param bx The x-value of the point (bx, by) that is point B on line AB.
      * @param by The y-value of the point (bx, by) that is point B on line AB.
      * @return TRUE if point P is to the left of line AB when looking
-     * from A to B, or is collinear with line AB.  Otherwise FALSE.
+     * from A to B, or is collinear with line AB.
      */
     private static isLeftOrCollinear(
       px: integer,
@@ -1022,17 +1023,63 @@ namespace gdjs {
     }
   }
 
+  /**
+   * Builds a set of contours from the region information contained in
+   * {@link RasterizationCell}. It does this by locating and "walking" the edges.
+   *
+   * This implementation is strongly inspired from CritterAI class "ContourSetBuilder".
+   * http://www.critterai.org/projects/nmgen_study/contourgen.html
+   */
   export class ContourBuilder {
+    /**
+     * Generates a contour set from the provided {@link RasterizationGrid}
+     *
+     * The provided field is expected to contain region information.
+     * Behavior is undefined if the provided field is malformed or incomplete.
+     *
+     * This operation overwrites the flag fields for all cells in the
+     * provided field. So the flags must be saved and restored if they are
+     * important.
+     *
+     * @param grid A fully generated field.
+     * @return The contours generated from the field.
+     */
     static buildContours(grid: RasterizationGrid): ContourPoint[][] {
       const contours = new Array<ContourPoint[]>();
 
+      //  Set the flags on all cells in non-null regions to indicate which
+      //  edges are connected to external regions.
+      //
+      //  Reference: Neighbor search and nomenclature.
+      //  http://www.critterai.org/projects/nmgen_study/heightfields.html#nsearch
+      //
+      //  If a cell has no connections to external regions or is
+      //  completely surrounded by other regions (a single cell island),
+      //  its flag will be zero.
+      //
+      //  If a cell is connected to one or more external regions then the
+      //  flag will be a 4 bit value where connections are recorded as
+      //  follows:
+      //      bit1 = neighbor0
+      //      bit2 = neighbor1
+      //      bit3 = neighbor2
+      //      bit4 = neighbor3
+      //  With the meaning of the bits as follows:
+      //      0 = neighbor in same region.
+      //      1 = neighbor not in same region. (Neighbor may be the null
+      //      region or a real region.)
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
+          // Note:  This algorithm first sets the flag bits such that
+          // 1 = "neighbor is in the same region".  At the end it inverts
+          // the bits so flags are as expected.
+
+          // Default to "not connected to any external region".
           cell.contourFlags = 0;
           if (!cell.hasRegion())
-            // Don't care about spans in the null region.
+            // Don't care about cells in the null region.
             continue;
 
           for (
@@ -1044,54 +1091,79 @@ namespace gdjs {
 
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (cell.regionID === neighbor.regionID) {
+              // Neighbor is in same region as this cell.
+              // Set the bit for this neighbor to 1 (Will be inverted later).
               cell.contourFlags |= 1 << direction;
             }
           }
+          // Invert the bits so a bit value of 1 indicates neighbor NOT in
+          // same region.
           cell.contourFlags ^= 0xf;
           if (cell.contourFlags === 0xf) {
+            // This is an island cell (All neighbors are from other regions)
+            // Get rid of flags.
             cell.contourFlags = 0;
             console.warn(
-              "Discarded contour: Island span. Can't form  a contour. Region: " +
+              "Discarded contour: Island cell. Can't form  a contour. Region: " +
                 cell.regionID
             );
           }
         }
       }
 
-      const workingRawVerts = new Array<ContourPoint>();
-      const workingSimplifiedVerts = new Array<ContourPoint>();
+      // These are working lists whose content changes with each iteration
+      // of the up coming loop. They represent the detailed and simple
+      // contour vertices.
+      // Initial sizing is arbitrary.
+      const workingRawVertices = new Array<ContourPoint>();
+      const workingSimplifiedVertices = new Array<ContourPoint>();
 
+      // Loop through all cells looking for cells on the edge of a region.
+      //
+      // At this point, only cells with flags != 0 are edge cells that
+      // are part of a region contour.
+      //
+      // The process of building a contour will clear the flags on all cells
+      // that make up the contour to ensure they are only processed once.
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
-          if (!cell.hasRegion() || cell.contourFlags === 0) continue;
+          if (!cell.hasRegion() || cell.contourFlags === 0) {
+            // cell is either: Part of the null region, does not
+            // represent an edge cell, or was already processed during
+            // an earlier iteration.
+            continue;
+          }
 
-          workingRawVerts.length = 0;
-          workingSimplifiedVerts.length = 0;
+          workingRawVertices.length = 0;
+          workingSimplifiedVertices.length = 0;
 
-          let startDir = 0;
-          while ((cell.contourFlags & (1 << startDir)) === 0)
-            // This is not an edge direction.  Try the next one.
-            startDir++;
-          // We now have a span that is part of a contour and a direction
+          // The cell is part of an unprocessed region's contour.
+          // Locate a direction of the cell's edge which points toward
+          // another region (there is at least one).
+          let startDirection = 0;
+          while ((cell.contourFlags & (1 << startDirection)) === 0) {
+            startDirection++;
+          }
+          // We now have a cell that is part of a contour and a direction
           // that points to a different region (null or real).
           // Build the contour.
           ContourBuilder.buildRawContours(
             grid,
             cell,
-            startDir,
-            workingRawVerts
+            startDirection,
+            workingRawVertices
           );
           // Perform post processing on the contour in order to
           // create the final, simplified contour.
           ContourBuilder.generateSimplifiedContour(
             cell.regionID,
-            workingRawVerts,
-            workingSimplifiedVerts
+            workingRawVertices,
+            workingSimplifiedVertices
           );
 
-          if (workingSimplifiedVerts.length < 3) {
+          if (workingSimplifiedVertices.length < 3) {
             console.warn(
               "Discarded contour: Can't form enough valid" +
                 'edges from the vertices.' +
@@ -1099,7 +1171,7 @@ namespace gdjs {
                 cell.regionID
             );
           } else {
-            contours.push(Array.from(workingSimplifiedVerts));
+            contours.push(Array.from(workingSimplifiedVertices));
           }
         }
       }
@@ -1116,20 +1188,77 @@ namespace gdjs {
       { x: 0, y: 0 },
     ];
 
+    /**
+     * Walk around the edge of this cell's region gathering vertices that
+     * represent the corners of each cell on the sides that are external facing.
+     *
+     * There will be two or three vertices for each edge cell:
+     * Two for cells that don't represent a change in edge direction. Three
+     * for cells that represent a change in edge direction.
+     *
+     * The output array will contain vertices ordered as follows:
+     * (x, y, z, regionID) where regionID is the region (null or real) that
+     * this vertex is considered to be connected to.
+     *
+     * WARNING: Only run this operation on cells that are already known
+     * to be on a region edge. The direction must also be pointing to a
+     * valid edge. Otherwise behavior will be undefined.
+     *
+     * @param grid the grid of cells
+     * @param startCell A cell that is known to be on the edge of a region.
+     * (Part of a region contour.)
+     * @param startDirection The direction of the edge of the cell that is
+     * known to point
+     * across the region edge.
+     * @param outContourVertices The list of vertices that represent the edge
+     * of the region. (Plus region information.)
+     */
     private static buildRawContours(
       grid: RasterizationGrid,
       startCell: RasterizationCell,
       startDirection: number,
-      outContourVerts: ContourPoint[]
+      outContourVertices: ContourPoint[]
     ) {
+      // Flaw in Algorithm:
+      //
+      // This method of contour generation can result in an inappropriate
+      // impassable seam between two adjacent regions in the following case:
+      //
+      // 1. One region connects to another region on two sides in an
+      // uninterrupted manner.  (Visualize one region wrapping in an L
+      // shape around the corner of another.)
+      // 2. At the corner shared by the two regions, a change in height
+      // occurs.
+      //
+      // In this case, the two regions should share a corner vertex.
+      // (An obtuse corner vertex for one region and an acute corner
+      // vertex for the other region.)
+      //
+      // In reality, though this algorithm will select the same (x, z)
+      // coordinates for each region's corner vertex, the vertex heights
+      // may differ, eventually resulting in an impassable seam.
+
+      // It is a bit hard to describe the stepping portion of this algorithm.
+      // One way to visualize it is to think of a robot sitting on the
+      // floor facing a known wall.  It then does the following to skirt
+      // the wall:
+      // 1. If there is a wall in front of it, turn clockwise in 90 degrees
+      //    increments until it finds the wall is gone.
+      // 2. Move forward one step.
+      // 3. Turn counter-clockwise by 90 degrees.
+      // 4. Repeat from step 1 until it finds itself at its original
+      //    location facing its original direction.
+      //
+      // See also: http://www.critterai.org/projects/nmgen_study/contourgen.html#robotwalk
+
       let cell = startCell;
       let direction = startDirection;
 
       let loopCount = 0;
       do {
-        // Note: The design of this loop is such that the span variable
-        // will always reference an edge span from the same region as
-        // the start span.
+        // Note: The design of this loop is such that the cell variable
+        // will always reference an edge cell from the same region as
+        // the start cell.
 
         if ((cell.contourFlags & (1 << direction)) != 0) {
           // The current direction is pointing toward an edge.
@@ -1141,25 +1270,24 @@ namespace gdjs {
             cell.x + RasterizationGrid.neighbor4Deltas[direction].x,
             cell.y + RasterizationGrid.neighbor4Deltas[direction].y
           );
-          outContourVerts.push({
+          outContourVertices.push({
             x: cell.x + delta.x,
             y: cell.y + delta.y,
             region: neighbor.regionID,
           });
 
-          // Remove the flag for this edge.  We never need to consider
+          // Remove the flag for this edge. We never need to consider
           // it again since we have a vertex for this edge.
           cell.contourFlags &= ~(1 << direction);
-          direction = (direction + 1) & 0x3; // Rotate in clockwise direction.
+          // Rotate in clockwise direction.
+          direction = (direction + 1) & 0x3;
         } else {
-          /*
-           * The current direction does not point to an edge.  So it
-           * must point to a neighbor span in the same region as the
-           * current span. Move to the neighbor and swing the search
-           * direction back one increment (counterclockwise).
-           * By moving the direction back one increment we guarantee we
-           * don't miss any edges.
-           */
+          // The current direction does not point to an edge.  So it
+          // must point to a neighbor cell in the same region as the
+          // current cell. Move to the neighbor and swing the search
+          // direction back one increment (counterclockwise).
+          // By moving the direction back one increment we guarantee we
+          // don't miss any edges.
           const neighbor = grid.get(
             cell.x + RasterizationGrid.neighbor4Deltas[direction].x,
             cell.y + RasterizationGrid.neighbor4Deltas[direction].y
@@ -1168,21 +1296,41 @@ namespace gdjs {
 
           direction = (direction + 3) & 0x3; // Rotate counterclockwise.
         }
+
+        // The loop limit is arbitrary. It exists only to guarantee that
+        // bad input data doesn't result in an infinite loop.
+        // The only down side of this loop limit is that it limits the
+        // number of detectable edge vertices. (The longer the region edge
+        // and the higher the number of "turns" in a region's edge, the less
+        // edge vertices can be detected for that region.)
       } while (
         !(cell === startCell && direction === startDirection) &&
         ++loopCount < 65535
       );
-      return outContourVerts;
+      return outContourVertices;
     }
 
+    /**
+     * Takes a group of vertices that represent a region contour and changes
+     * it in the following manner:
+     * - For any edges that connect to non-null regions, remove all
+     * vertices except the start and end vertices for that edge (this
+     * smooths the edges between non-null regions into a straight line).
+     * - Runs an algorithm's against the contour to follow the edge more closely.
+     *
+     * @param regionID The region the contour was derived from.
+     * @param sourceVertices  The source vertices that represent the complex
+     * contour.
+     * @param outVertices The simplified contour vertices.
+     */
     private static generateSimplifiedContour(
       regionID: number,
-      sourceVerts: ContourPoint[],
-      outVerts: ContourPoint[]
+      sourceVertices: ContourPoint[],
+      outVertices: ContourPoint[]
     ) {
       let noConnections = true;
-      for (const sourceVert of sourceVerts) {
-        if (sourceVert.region != RasterizationCell.NULL_REGION_ID) {
+      for (const sourceVertex of sourceVertices) {
+        if (sourceVertex.region !== RasterizationCell.NULL_REGION_ID) {
           noConnections = false;
           break;
         }
@@ -1191,121 +1339,144 @@ namespace gdjs {
       // Seed the simplified contour with the mandatory edges.
       // (At least one edge.)
       if (noConnections) {
-        /*
-         * This contour represents an island region surrounded only by the
-         * null region. Seed the simplified contour with the source's
-         * lower left (ll) and upper right (ur) vertices.
-         */
-        let lowerLeftX = sourceVerts[0].x;
-        let lowerLeftY = sourceVerts[0].y;
+        // This contour represents an island region surrounded only by the
+        // null region. Seed the simplified contour with the source's
+        // lower left (ll) and upper right (ur) vertices.
+        let lowerLeftX = sourceVertices[0].x;
+        let lowerLeftY = sourceVertices[0].y;
         let lowerLeftIndex = 0;
-        let upperRightX = sourceVerts[0].x;
-        let upperRightY = sourceVerts[0].y;
+        let upperRightX = sourceVertices[0].x;
+        let upperRightY = sourceVertices[0].y;
         let upperRightIndex = 0;
-        for (let index = 0; index < sourceVerts.length; index++) {
-          const sourceVert = sourceVerts[index];
-          const x = sourceVert.x;
-          const y = sourceVert.y;
+        for (let index = 0; index < sourceVertices.length; index++) {
+          const sourceVertex = sourceVertices[index];
+          const x = sourceVertex.x;
+          const y = sourceVertex.y;
 
-          if (x < lowerLeftX || (x == lowerLeftX && y < lowerLeftY)) {
+          if (x < lowerLeftX || (x === lowerLeftX && y < lowerLeftY)) {
             lowerLeftX = x;
             lowerLeftY = y;
             lowerLeftIndex = index;
           }
-          if (x >= upperRightX || (x == upperRightX && y > upperRightY)) {
+          if (x >= upperRightX || (x === upperRightX && y > upperRightY)) {
             upperRightX = x;
             upperRightY = y;
             upperRightIndex = index;
           }
         }
+        // TODO region attribute is used to set an index
         // Seed the simplified contour with this edge.
-        outVerts.push({ x: lowerLeftX, y: lowerLeftY, region: lowerLeftIndex });
-        outVerts.push({
+        outVertices.push({
+          x: lowerLeftX,
+          y: lowerLeftY,
+          region: lowerLeftIndex,
+        });
+        outVertices.push({
           x: upperRightX,
           y: upperRightY,
           region: upperRightIndex,
         });
       } else {
-        /*
-         * The contour shares edges with other non-null regions.
-         * Seed the simplified contour with a new vertex for every
-         * location where the region connection changes.  These are
-         * vertices that are important because they represent portals
-         * to other regions.
-         */
-        for (let index = 0; index < sourceVerts.length; index++) {
-          const sourceVert = sourceVerts[index];
+        // The contour shares edges with other non-null regions.
+        // Seed the simplified contour with a new vertex for every
+        // location where the region connection changes.  These are
+        // vertices that are important because they represent portals
+        // to other regions.
+        for (let index = 0; index < sourceVertices.length; index++) {
+          const sourceVert = sourceVertices[index];
 
           if (
             sourceVert.region !==
-            sourceVerts[(index + 1) % sourceVerts.length].region
+            sourceVertices[(index + 1) % sourceVertices.length].region
           ) {
             // The current vertex has a different region than the
             // next vertex.  So there is a change in vertex region.
-            outVerts.push({ x: sourceVert.x, y: sourceVert.y, region: index });
+            outVertices.push({
+              x: sourceVert.x,
+              y: sourceVert.y,
+              region: index,
+            });
           }
         }
       }
 
-      ContourBuilder.matchObstacleRegionEdges(sourceVerts, outVerts);
+      ContourBuilder.matchObstacleRegionEdges(sourceVertices, outVertices);
 
       //TODO Check if the less than 3 vertices case must be handle.
 
       // Replace the index pointers in the output list with region IDs.
-      for (const outVert of outVerts) {
-        outVert.region = sourceVerts[outVert.region].region;
+      for (const outVertex of outVertices) {
+        outVertex.region = sourceVertices[outVertex.region].region;
       }
     }
 
+    /**
+     * Applies an algorithm to contours which results in obstacle-region edges
+     * following the original detail source geometry edge more closely.
+     * http://www.critterai.org/projects/nmgen_study/contourgen.html#nulledgesimple
+     *
+     * Adds vertices from the source list to the result list such that
+     * if any obstacle region vertices are compared against the result list,
+     * none of the vertices will be further from the obstacle region edges than
+     * the allowed threshold.
+     *
+     * Only obstacle-region edges are operated on. All other edges are
+     * ignored.
+     *
+     * The result vertices is expected to be seeded with at least two
+     * source vertices.
+     *
+     * @param sourceVertices
+     * @param inoutResultVertices
+     */
     private static matchObstacleRegionEdges(
-      sourceVerts: ContourPoint[],
-      inoutResultVerts: ContourPoint[]
+      sourceVertices: ContourPoint[],
+      inoutResultVertices: ContourPoint[]
     ) {
-      /*
-       * Loop through all edges in this contour.
-       *
-       * NOTE: The simplifiedVertCount in the loop condition
-       * increases over iterations.  That is what keeps the loop going beyond
-       * the initial vertex count.
-       */
-      let iResultVertA = 0;
-      while (iResultVertA < inoutResultVerts.length) {
-        const iResultVertB = (iResultVertA + 1) % inoutResultVerts.length;
+      // This implementation is strongly inspired from CritterAI class "MatchNullRegionEdges".
+
+      // Loop through all edges in this contour.
+      //
+      // NOTE: The simplifiedVertCount in the loop condition
+      // increases over iterations.  That is what keeps the loop going beyond
+      // the initial vertex count.
+      let resultIndexA = 0;
+      while (resultIndexA < inoutResultVertices.length) {
+        const resultIndexB = (resultIndexA + 1) % inoutResultVertices.length;
 
         // The line segment's beginning vertex.
-        const ax = inoutResultVerts[iResultVertA].x;
-        const az = inoutResultVerts[iResultVertA].y;
-        const iVertASource = inoutResultVerts[iResultVertA].region;
+        const ax = inoutResultVertices[resultIndexA].x;
+        const az = inoutResultVertices[resultIndexA].y;
+        const sourceIndexA = inoutResultVertices[resultIndexA].region;
 
         // The line segment's ending vertex.
-        const bx = inoutResultVerts[iResultVertB].x;
-        const bz = inoutResultVerts[iResultVertB].y;
-        const iVertBSource = inoutResultVerts[iResultVertB].region;
+        const bx = inoutResultVertices[resultIndexB].x;
+        const bz = inoutResultVertices[resultIndexB].y;
+        const sourceIndexB = inoutResultVertices[resultIndexB].region;
 
         // The source index of the next vertex to test.  (The vertex just
         // after the current vertex in the source vertex list.)
-        let iTestVert = (iVertASource + 1) % sourceVerts.length;
+        let testedSourceIndex = (sourceIndexA + 1) % sourceVertices.length;
         let maxDeviation = 0;
 
         // Default to no index.  No new vert to add.
-        let iVertToInsert = -1;
+        let toInsertSourceIndex = -1;
 
         if (
-          sourceVerts[iTestVert].region === RasterizationCell.NULL_REGION_ID
+          sourceVertices[testedSourceIndex].region ===
+          RasterizationCell.NULL_REGION_ID
         ) {
-          /*
-           * This test vertex is part of a null region edge.
-           * Loop through the source vertices until the end vertex
-           * is found, searching for the vertex that is farthest from
-           * the line segment formed by the begin/end vertices.
-           *
-           * Visualizations:
-           * http://www.critterai.org/nmgen_contourgen#nulledgesimple
-           */
-          while (iTestVert !== iVertBSource) {
+          // This test vertex is part of a null region edge.
+          // Loop through the source vertices until the end vertex
+          // is found, searching for the vertex that is farthest from
+          // the line segment formed by the begin/end vertices.
+          //
+          // Visualizations:
+          // http://www.critterai.org/projects/nmgen_study/contourgen.html#nulledgesimple
+          while (testedSourceIndex !== sourceIndexB) {
             const deviation = Geometry.getPointSegmentDistanceSq(
-              sourceVerts[iTestVert].x,
-              sourceVerts[iTestVert].y,
+              sourceVertices[testedSourceIndex].x,
+              sourceVertices[testedSourceIndex].y,
               ax,
               az,
               bx,
@@ -1314,22 +1485,25 @@ namespace gdjs {
             if (deviation > maxDeviation) {
               // A new maximum deviation was detected.
               maxDeviation = deviation;
-              iVertToInsert = iTestVert;
+              toInsertSourceIndex = testedSourceIndex;
             }
             // Move to the next vertex.
-            iTestVert = (iTestVert + 1) % sourceVerts.length;
+            testedSourceIndex = (testedSourceIndex + 1) % sourceVertices.length;
           }
         }
 
         //TODO make mThreshold configurable ?
-        const mThreshold = 1;
-        if (iVertToInsert !== -1 && maxDeviation > mThreshold * mThreshold) {
+        const threshold = 1;
+        if (
+          toInsertSourceIndex !== -1 &&
+          maxDeviation > threshold * threshold
+        ) {
           // A vertex was found that is further than allowed from the
           // current edge. Add this vertex to the contour.
-          inoutResultVerts.splice(iResultVertA + 1, 0, {
-            x: sourceVerts[iVertToInsert].x,
-            y: sourceVerts[iVertToInsert].y,
-            region: iVertToInsert,
+          inoutResultVertices.splice(resultIndexA + 1, 0, {
+            x: sourceVertices[toInsertSourceIndex].x,
+            y: sourceVertices[toInsertSourceIndex].y,
+            region: toInsertSourceIndex,
           });
           // Not incrementing the vertex since we need to test the edge
           // formed by vertA  and this this new vertex on the next
@@ -1337,40 +1511,136 @@ namespace gdjs {
         }
         // This edge segment does not need to be altered.  Move to
         // the next vertex.
-        else iResultVertA++;
+        else resultIndexA++;
       }
     }
   }
 
+  /**
+   * Build cohesive regions from the non-obstacle space. It uses the data
+   * from the obstacles rasterization {@link ObstacleRasterizer}.
+   *
+   * Introduction to Height Fields: http://www.critterai.org/projects/nmgen_study/heightfields.html
+   *
+   * Region Generation: http://www.critterai.org/projects/nmgen_study/regiongen.html
+   */
   export class RegionGenerator {
+    //TODO implement the smoothing pass on the distance field?
+
+    /**
+     * Groups cells into cohesive regions using an watershed based algorithm.
+     *
+     * This operation depends on neighbor and distance field information.
+     * So {@link RegionGenerator.generateDistanceField} operations must be
+     * run before this operation.
+     *
+     * @param grid A field with cell distance information fully generated.
+     * @param obstacleCellPadding a padding in cells to apply around the
+     * obstacles.
+     */
     static generateRegions(
       grid: RasterizationGrid,
       obstacleCellPadding: integer
     ) {
+      // Watershed Algorithm
+      //
+      // Reference: http://en.wikipedia.org/wiki/Watershed_%28algorithm%29
+      // A good visualization:
+      // http://artis.imag.fr/Publications/2003/HDS03/ (PDF)
+      //
+      // Summary:
+      //
+      // This algorithm utilizes the cell.distanceToObstacle value, which
+      // is generated by the generateDistanceField() operation.
+      //
+      // Using the watershed analogy, the cells which are furthest from
+      // a border (highest distance to border) represent the lowest points
+      // in the watershed. A border cell represents the highest possible
+      // water level.
+      //
+      // The main loop iterates, starting at the lowest point in the
+      // watershed, then incrementing with each loop until the highest
+      // allowed water level is reached. This slowly "floods" the cells
+      // starting at the lowest points.
+      //
+      // During each iteration of the loop, cells that are below the
+      // current water level are located and an attempt is made to either
+      // add them to exiting regions or create new regions from them.
+      //
+      // During the region expansion phase, if a newly flooded cell
+      // borders on an existing region, it is usually added to the region.
+      //
+      // Any newly flooded cell that survives the region expansion phase
+      // is used as a seed for a new region.
+      //
+      // At the end of the main loop, a final region expansion is
+      // performed which should catch any stray cells that escaped region
+      // assignment during the main loop.
+
+      // Represents the minimum distance to an obstacle that is considered
+      // traversable. I.e. Can't traverse cells closer than this distance
+      // to a border. This provides a way of artificially capping the
+      // height to which watershed flooding can occur.
+      // I.e. Don't let the algorithm flood all the way to the actual border.
+      //
+      // We add the minimum border distance to take into account the
+      // blurring algorithm which can result in a border cell having a
+      // border distance > 0.
       const distanceMin = obstacleCellPadding * 2;
+
+      // TODO: EVAL: Figure out why this iteration limit is needed
+      // (todo from the CritterAI sources).
       const expandIterations: integer = 4 + distanceMin * 2;
 
+      // Contains a list of cells that are considered to be flooded and
+      // therefore are ready to be processed. This list may contain nulls
+      // at certain points in the process. Nulls indicate cells that were
+      // initially in the list but have been successfully added to a region.
+      // The initial size is arbitrary.
       let floodedCells = new Array<RasterizationCell | null>(1024);
+      // A predefined stack for use in the flood operation. Its content
+      // has no meaning outside the new region flooding operation.
+      // (Saves on object creation time.)
       let workingStack = new Array<RasterizationCell>(1024);
 
+      // Zero is reserved for the obstacle-region. So initializing to 1.
       let nextRegionID = 1;
 
+      // Search until the current distance reaches the minimum allowed
+      // distance.
+      //
+      // Note: This loop will not necessarily complete all region
+      // assignments. This is OK since a final region assignment step
+      // occurs after the loop iteration is complete.
       for (
-        let distance = grid.obstacleDistanceMax();
+        // This value represents the current distance from the border which
+        // is to be searched. The search starts at the maximum distance then
+        // moves toward zero. (Toward borders.)
+        //
+        // This number will always be divisible by 2.
+        let distance = (grid.obstacleDistanceMax() - 1) & ~1;
         distance > distanceMin;
         distance = Math.max(distance - 2, 0)
       ) {
+        // Find all cells that are at or below the current "water level"
+        // and are not already assigned to a region. Add these cells to
+        // the flooded cell list for processing.
         floodedCells.length = 0;
         for (let y = 1; y < grid.dimY() - 1; y++) {
           for (let x = 1; x < grid.dimX() - 1; x++) {
             const cell = grid.get(x, y);
             if (!cell.hasRegion() && cell.distanceToObstacle >= distance) {
+              // The cell is not already assigned a region and is
+              // below the current "water level". So the cell can be
+              // considered for region assignment.
               floodedCells.push(cell);
             }
           }
         }
 
         if (nextRegionID > 1) {
+          // At least one region has already been created, so first
+          // try to  put the newly flooded cells into existing regions.
           if (distance > 0) {
             RegionGenerator.expandRegions(grid, floodedCells, expandIterations);
           } else {
@@ -1378,9 +1648,18 @@ namespace gdjs {
           }
         }
 
+        // Create new regions for all cells that could not be added to
+        // existing regions.
         for (const floodedCell of floodedCells) {
-          if (!floodedCell || floodedCell.hasRegion()) continue;
+          if (!floodedCell || floodedCell.hasRegion()) {
+            // This cell was assigned to a newly created region
+            // during an earlier iteration of this loop.
+            // So it can be skipped.
+            continue;
+          }
 
+          // Fill to slightly more than the current "water level".
+          // This improves efficiency of the algorithm.
           const fillTo = Math.max(distance - 2, distanceMin);
           if (
             RegionGenerator.floodNewRegion(
@@ -1396,7 +1675,7 @@ namespace gdjs {
         }
       }
 
-      // Find all spans that haven't been assigned regions by the main loop.
+      // Find all cells that haven't been assigned regions by the main loop.
       // (Up to the minimum distance.)
       floodedCells.length = 0;
       for (let y = 1; y < grid.dimY() - 1; y++) {
@@ -1404,7 +1683,7 @@ namespace gdjs {
           const cell = grid.get(x, y);
 
           if (cell.distanceToObstacle >= distanceMin && !cell.hasRegion()) {
-            // Not a border or null region span.  Should be in a region.
+            // Not a border or null region cell. Should be in a region.
             floodedCells.push(cell);
           }
         }
@@ -1418,30 +1697,53 @@ namespace gdjs {
         RegionGenerator.expandRegions(grid, floodedCells, -1);
       }
 
-      //TODO check if post processing algorithms are necessary
+      //TODO can the post processing algorithms be interesting?
     }
 
+    /**
+     * Attempts to find the most appropriate regions to attach cells to.
+     *
+     * Any cells successfully attached to a region will have their list
+     * entry set to null. So any non-null entries in the list will be cells
+     * for which a region could not be determined.
+     *
+     * @param grid
+     * @param inoutCells As input, the list of cells available for formation
+     * of new regions. As output, the cells that could not be assigned
+     * to new regions.
+     * @param maxIterations If set to -1, will iterate through completion.
+     */
     private static expandRegions(
       grid: RasterizationGrid,
-      cells: Array<RasterizationCell | null>,
+      inoutCells: Array<RasterizationCell | null>,
       iterationMax: integer
     ) {
-      if (cells.length === 0) return;
+      if (inoutCells.length === 0) return;
       let skipped = 0;
       for (
         let iteration = 0;
         (iteration < iterationMax || iterationMax == -1) &&
-        skipped < cells.length;
+        // All cells have either been processed or could not be
+        // processed during the last cycle.
+        skipped < inoutCells.length;
         iteration++
       ) {
+        // The number of cells in the working list that have been
+        // successfully processed or could not be processed successfully
+        // for some reason.
+        // This value controls when iteration ends.
         skipped = 0;
 
-        for (let index = 0; index < cells.length; index++) {
-          const cell = cells[index];
+        for (let index = 0; index < inoutCells.length; index++) {
+          const cell = inoutCells[index];
           if (cell === null) {
+            // The cell originally at this index location has
+            // already been successfully assigned a region. Nothing
+            // else to do with it.
             skipped++;
             continue;
           }
+          // Default to unassigned.
           let cellRegion = RasterizationCell.NULL_REGION_ID;
           let regionCenterDist = Number.MAX_VALUE;
           for (const delta of RasterizationGrid.neighbor4Deltas) {
@@ -1455,16 +1757,39 @@ namespace gdjs {
             }
           }
           if (cellRegion !== RasterizationCell.NULL_REGION_ID) {
-            cells[index] = null;
+            // Found a suitable region for this cell to belong to.
+            // Mark this index as having been processed.
+            inoutCells[index] = null;
             cell.regionID = cellRegion;
             cell.distanceToObstacle = regionCenterDist;
           } else {
+            // Could not find an existing region for this cell.
             skipped++;
           }
         }
       }
     }
 
+    /**
+     * Creates a new region surrounding a cell, adding neighbor cells to the
+     * new region as appropriate.
+     *
+     * The new region creation will fail if the root cell is on the
+     * border of an existing region.
+     *
+     * All cells added to the new region as part of this process become
+     * "core" cells with a distance to region core of zero.
+     *
+     * @param grid
+     * @param rootCell The cell used to seed the new region.
+     * @param fillToDist The watershed distance to flood to.
+     * @param regionID The region ID to use for the new region.
+     * (If creation is successful.)
+     * @param workingStack A stack used internally. The content is
+     * cleared before use. Its content has no meaning outside of
+     * this operation.
+     * @return true if a new region was created.
+     */
     private static floodNewRegion(
       grid: RasterizationGrid,
       rootCell: RasterizationCell,
@@ -1480,6 +1805,17 @@ namespace gdjs {
       let regionSize = 0;
       let cell: RasterizationCell | undefined;
       while ((cell = workingStack.pop())) {
+        // Check regions of neighbor cells.
+        //
+        // If any neighbor is found to have a region assigned, then
+        // the current cell can't be in the new region.
+        // (Want standard flooding algorithm to handle deciding which
+        // region this cell should go in.)
+        //
+        // Up to 8 neighbors are checked.
+        //
+        // Neighbor searches:
+        // http://www.critterai.org/projects/nmgen_study/heightfields.html#nsearch
         let isOnRegionBorder = false;
         for (const delta of RasterizationGrid.neighbor8Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
@@ -1494,13 +1830,15 @@ namespace gdjs {
         }
         regionSize++;
 
+        // If got this far, we know the current cell is part of the new
+        // region. Now check its neighbors to see if they should be
+        // assigned to this new region.
         for (const delta of RasterizationGrid.neighbor4Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
 
           if (
-            neighbor != null &&
             neighbor.distanceToObstacle >= fillToDist &&
-            neighbor.regionID === 0
+            neighbor.regionID === RasterizationCell.NULL_REGION_ID
           ) {
             neighbor.regionID = regionID;
             neighbor.distanceToRegionCore = 0;
@@ -1524,7 +1862,20 @@ namespace gdjs {
       { x: -1, y: 1, distance: 3 },
     ];
 
-    //TODO implement the smoothing pass on the distance field?
+    /**
+     * Generates distance field information.
+     * The {@link RasterizationCell.distanceToObstacle} information is generated
+     * for all cells in the field.
+     *
+     * All distance values are relative and do not represent explicit
+     * distance values (such as grid unit distance). The algorithm which is
+     * used results in an approximation only. It is not exhaustive.
+     * 
+     * The data generated by this operation is required by
+     * {@link RegionGenerator.generateRegions}.
+     *
+     * @param grid A field with cells obstacle information already generated.
+     */
     static generateDistanceField(grid: RasterizationGrid) {
       // close borders
       for (let x = 0; x < grid.dimX(); x++) {
@@ -1547,7 +1898,14 @@ namespace gdjs {
           bottomCell.setObstacle();
         }
       }
+      // The next two phases basically check the neighbors of a span and
+      // set the span's distance field to be slightly greater than the
+      // neighbor with the lowest border distance. Distance is increased
+      // slightly more for diagonal-neighbors than for axis-neighbors.
+
       // 1st pass
+      // During this pass, the following neighbors are checked:
+      // (-1, 0) (-1, -1) (0, -1) (1, -1)
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
@@ -1562,6 +1920,11 @@ namespace gdjs {
         }
       }
       // 2nd pass
+      // During this pass, the following neighbors are checked:
+      //   (1, 0) (1, 1) (0, 1) (-1, 1)
+      // 
+      // Besides checking different neighbors, this pass performs its
+      // grid search in reverse order.
       for (let y = grid.dimY() - 2; y >= 1; y--) {
         for (let x = grid.dimX() - 2; x >= 1; x--) {
           const cell = grid.get(x, y);
@@ -1578,7 +1941,14 @@ namespace gdjs {
     }
   }
 
+  /**
+   * 
+   */
   export class ObstacleRasterizer {
+  /**
+   * @param grid
+   * @param obstacles
+   */
     static rasterizeObstacles(
       grid: RasterizationGrid,
       obstacles: RuntimeObject[]
@@ -1715,10 +2085,8 @@ namespace gdjs {
       dx: integer,
       dy: integer
     ): boolean {
-      /*
-       * This is modified 2D line-line intersection/segment-segment
-       * intersection test.
-       */
+      // This is modified 2D line-line intersection/segment-segment
+      // intersection test.
 
       const deltaABx = bx - ax;
       const deltaABy = by - ay;
@@ -1737,7 +2105,7 @@ namespace gdjs {
         return false;
       }
 
-      // Lines intersect.  But do the segments intersect?
+      // Lines intersect. But do the segments intersect?
 
       // Forcing float division on both of these via casting of the
       // denominator.
@@ -1780,13 +2148,11 @@ namespace gdjs {
       bx: float,
       by: float
     ): float {
-      /*
-       * Reference: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
-       *
-       * The goal of the algorithm is to find the point on line segment AB
-       * that is closest to P and then calculate the distance between P
-       * and that point.
-       */
+      // Reference: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
+      //
+      // The goal of the algorithm is to find the point on line segment AB
+      // that is closest to P and then calculate the distance between P
+      // and that point.
 
       const deltaABx = bx - ax;
       const deltaABy = by - ay;
@@ -1794,24 +2160,24 @@ namespace gdjs {
       const deltaAPy = py - ay;
 
       const segmentABLengthSq = deltaABx * deltaABx + deltaABy * deltaABy;
-
-      if (segmentABLengthSq == 0)
-        // AB is not a line segment.  So just return
+      if (segmentABLengthSq == 0) {
+        // AB is not a line segment. So just return
         // distanceSq from P to A
         return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
+      }
 
       const u = (deltaAPx * deltaABx + deltaAPy * deltaABy) / segmentABLengthSq;
-
-      if (u < 0)
+      if (u < 0) {
         // Closest point on line AB is outside outside segment AB and
         // closer to A. So return distanceSq from P to A.
         return deltaAPx * deltaAPx + deltaAPy * deltaAPy;
-      else if (u > 1)
+      } else if (u > 1) {
         // Closest point on line AB is outside segment AB and closer to B.
         // So return distanceSq from P to B.
         return (px - bx) * (px - bx) + (py - by) * (py - by);
+      }
 
-      // Closest point on lineAB is inside segment AB.  So find the exact
+      // Closest point on lineAB is inside segment AB. So find the exact
       // point on AB and calculate the distanceSq from it to P.
 
       // The calculation in parenthesis is the location of the point on

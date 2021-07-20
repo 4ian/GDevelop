@@ -1,12 +1,12 @@
 # Nightly Builds and continuous deployment
 
-GDevelop is using CircleCI (a continous deployment/integration service) to automatically build new versions for **every commit on `master`** branch.
+GDevelop is using CircleCI (a continous deployment/integration service) and AppVeyor to automatically build new versions for **every commit on `master`** branch.
 
 You can download these here - **replace XX by the current beta version number**:
 
-- Windows: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup 5.0.0-betaXX.exe`
-- macOS: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-5.0.0-betaXX-mac.zip`
-- Linux: `https://gdevelop-releases.s3.amazonaws.com/master/latest/gdevelop-5.0.0-betaXX.tar.gz`
+- Windows: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5 Setup 5.0.0-betaXXX.exe`
+- macOS: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-5.0.0-betaXXX-mac.zip`
+- Linux: `https://gdevelop-releases.s3.amazonaws.com/master/latest/GDevelop 5-5.0.0-betaXXX.AppImage`
 
 > ⚠️ Be sure to check if the latest build was successfully done: [![Build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop). If this icon is not green, wait a bit before downloading the latest version.
 
@@ -27,6 +27,6 @@ You can download these here - **replace XX by the current beta version number**:
 2. Find the hash of the commit. Usually, click on a commit title (in a Pull Requests or in the list of commits of a branch) and read the _hash_ in the URL. For example, for https://github.com/4ian/GDevelop/commit/5c648e3f2b8c444bd99221cea56b92c00cdddddd, the hash is `5c648e3f2b8c444bd99221cea56b92c00cdddddd`.
 3. Download the version built for it (replace XX, THE_BRANCH and THE_COMMIT_HASH):
 
-- Windows: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5 Setup 5.0.0-betaXX.exe`
-- macOS: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5-5.0.0-betaXX-mac.zip`
-- Linux: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/gdevelop-5.0.0-betaXX.tar.gz`
+- Windows: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5 Setup 5.0.0-betaXXX.exe`
+- macOS: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5-5.0.0-betaXXX-mac.zip`
+- Linux: `https://gdevelop-releases.s3.amazonaws.com/THE_BRANCH/commit/THE_COMMIT_HASH/GDevelop 5-5.0.0-betaXXX.AppImage`

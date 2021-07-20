@@ -1,13 +1,22 @@
+# AppVeyor configuration to build GDevelop app running
+# on the Electron runtime (newIDE/electron-app) for Windows.
+# For macOS and Linux, see the config.yml file.
+
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 image: Visual Studio 2019
 clone_depth: 5
+# Only build
+branches:
+  only:
+    - master
+    - /experimental-build.*/
 init:
 - ps: ''
 install:
 - ps: Install-Product node 14
-build_script:
+# Build GDevelop.js (and run tests to ensure it works)
 - cmd: >-
     cd GDevelop.js
 
@@ -29,21 +38,34 @@ build_script:
 
     cd ..
 
+# Build GDevelop IDE
+- cmd: >-
     cd newIDE\app
 
     npm install
 
-    cd ..\..
-
-    cd GDJS
-
-    npm install
-
-    cd tests
+    cd ..\electron-app
 
     npm install
 
     cd ..\..
+
+# Package the app for Windows.
+build_script:
+- cmd: >-
+    cd newIDE\electron-app
+
+    node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
+
+    node scripts/build.js --skip-app-build --win nsis --publish=never
+
+    cd ..\..
+
+# Clean dist folder to keep only installers/binaries.
+- cmd: >-
+    DEL /F/Q/S newIDE\electron-app\dist\win-unpacked
+
+# Run a few tests on Windows.
 test_script:
 - cmd: >-
     cd GDevelop.js
@@ -57,5 +79,14 @@ test_script:
     npm test
 
     cd ..\..
-on_finish:
-- ps: ''
+
+artifacts:
+  - path: newIDE\electron-app\dist
+    name: GDevelopWindows
+
+# Upload artifacts (AWS) - configuration is stored on AppVeyor itself.
+deploy:
+  - provider: Environment
+    name: Amazon S3 releases
+  - provider: Environment
+    name: Amazon S3 latest releases

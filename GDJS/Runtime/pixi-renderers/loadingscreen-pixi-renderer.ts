@@ -114,7 +114,10 @@ namespace gdjs {
           this._pixiRenderer.width > 500
             ? 150
             : 35;
-        const desiredWidth = Math.max(1, this._pixiRenderer.width - border * 2);
+        const desiredWidth = Math.min(
+          logoWidth,
+          Math.max(1, this._pixiRenderer.width - border * 2)
+        );
         const scale = desiredWidth / logoWidth;
         this._gdevelopLogoSprite.scale.x = scale;
         this._gdevelopLogoSprite.scale.y = scale;

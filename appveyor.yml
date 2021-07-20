@@ -6,7 +6,7 @@ clone_depth: 5
 init:
 - ps: ''
 install:
-- ps: Install-Product node 10
+- ps: Install-Product node 14
 build_script:
 - cmd: >-
     cd GDevelop.js

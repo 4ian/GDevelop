@@ -572,9 +572,7 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new Tilemap.CompositeTilemap();
-      console.log("PIXI OBJ", this._pixiObject )
-
+      this._pixiObject = new Tilemap.CompositeRectTileLayer();
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
       // By default, this is not implemented in pixi-tilemap.

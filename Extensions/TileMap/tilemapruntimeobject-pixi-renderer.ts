@@ -44,7 +44,7 @@ namespace gdjs {
     }
 
     incrementAnimationFrameX(runtimeScene) {
-      this._pixiObject.tileAnim[0] += 1;
+      // this._pixiObject.tileAnim[0] += 1;
     }
 
     _loadTileMapWithTileset(tileMapJsonData, tilesetJsonData) {

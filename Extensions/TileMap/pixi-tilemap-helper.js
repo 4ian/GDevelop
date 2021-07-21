@@ -572,18 +572,20 @@
       else if (displayMode === 'visible' && !layer.visible) return;
 
 
+      console.log("PIXI TMAP", pixiTileMap)
       // Ldtk Types
       if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
 
         // @ts-ignore
         layer.autoLayerTiles.forEach(function (tile){
-          // console.log("render autotile >>>>>>", tile)
+          
           var texture = genericTileMapData.textureCache[index];
+          // console.log("render autotile >>>>>>", tile, texture[tile.t])
           if (texture){
             const [x,y] = tile.px;
-            pixiTileMap.addFrame(
+            pixiTileMap.tile(
                 // @ts-ignore
-                texture[tile.t] || "shit.png",
+                texture[tile.t],
                 x,
                 y
             )

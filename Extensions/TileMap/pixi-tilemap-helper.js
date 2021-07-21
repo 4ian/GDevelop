@@ -203,40 +203,9 @@
       }
 
 
-      console.log("LAYER::", ldtkLayer)
-      console.log("TEXTURE got:", layerAtlasTextureRelPath);
-
-      //generatedTiles have px[x,y] to place them and src[x,y] to detect uid. Src will need to become a uid?
-      //pass both to renderer's generic data, just in case
-      //ldtkLayer['__type'] === 'AutoLayer'
-
       console.log("IntGrid layer ", ldtkLayer, layerAtlasTextureRelPath, generatedTiles)
       console.log("autolayer ", ldtkLayer,layerAtlasTextureRelPath,generatedTiles)
       textureCache[layerIndex] = {};
-
-      // if (type === 'Entities'){
-      //   entities.forEach(entityInstance =>{
-      //     try {
-      //
-      //       console.log("ENT", entityInstance)
-      //       const tile = entityInstance['__tile']
-      //       const textureAtlas = tileSetAtlases[tile.tilesetUid]
-      //       const [x,y] = tile.srcRect;
-      //       const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
-      //       console.log("Entity rect>>", rect,tile,tile.tilesetUid, textureAtlas, tileSetAtlases)
-      //       // @ts-ignore - atlasTexture is never null here.
-      //       // const texture = new PIXI.Texture(textureAtlas, rect);
-      //
-      //
-      //       textureCache[layerIndex][tile.tilesetUid] = new PIXI.Texture(textureAtlas, rect);
-      //       console.log("entity texture",textureCache[layerIndex][tile.tilesetUid] ,layerIndex, tile.tilesetUid)
-      //     }catch(error){
-      //       console.error('Failed entity tile',error)
-      //     }
-      //   })
-      // } else{
-
-      // }
       const tileSet = tileSetAtlases[tilesetUid];
       console.log("Tileset to use",tileSet )
 
@@ -262,9 +231,6 @@
         }
       })
 
-
-
-
       layers.push(layer)
     })
 
@@ -280,93 +246,8 @@
     tiles: []
     };
     console.log("RESULT>>",tileMapData,textureCache)
-    // return null;
-
-    // const tileMapData = {
-      // width: atlasTexture.width,
-      // height: atlasTexture.height,
-      // tileWidth: tilewidth,
-      // tileHeight: tileheight,
-      // atlasTexture: atlasTexture,
-      // textureCache: textureCache,
-      // layers: tiledData.layers,
-      // tiles: tiles,
-    // };
+     
     return tileMapData;
-    ////////////////////////////////////////////////
-    //
-    // const {
-    //   tilewidth,
-    //   tileheight,
-    //   tilecount,
-    //   tiles,
-    //   image,
-    //   columns,
-    //   spacing,
-    //   margin,
-    // } = tiledData.tilesets[0];
-    // if (!atlasTexture) atlasTexture = getTexture(image);
-    //
-    // // We try to detect what size Tiled is expecting.
-    // const rows = tilecount / columns;
-    // const expectedAtlasWidth =
-    //     tilewidth * columns + spacing * (columns - 1) + margin * 2;
-    // const expectedAtlasHeight =
-    //     tileheight * rows + spacing * (rows - 1) + margin * 2;
-    // if (
-    //     (atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
-    //     (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)
-    // ) {
-    //   const expectedSize = expectedAtlasWidth + 'x' + expectedAtlasHeight;
-    //   const actualSize = atlasTexture.width + 'x' + atlasTexture.height;
-    //   console.warn(
-    //       'It seems the atlas file was resized, which is not supported. It should be ' +
-    //       expectedSize +
-    //       "px, but it's " +
-    //       actualSize +
-    //       ' px.'
-    //   );
-    //   return null;
-    // }
-    //
-    // // Prepare the textures pointing to the base "Atlas" Texture for each tile.
-    // // Note that this cache can be augmented later with rotated/flipped
-    // // versions of the tile textures.
-    // /** @type {Object<number, PIXI.Texture | null>} */
-    // const textureCache = {};
-    // for (let frame = 0; frame <= tilecount; frame++) {
-    //   const columnMultiplier = Math.floor((frame - 1) % columns);
-    //   const rowMultiplier = Math.floor((frame - 1) / columns);
-    //   const x = margin + columnMultiplier * (tilewidth + spacing);
-    //   const y = margin + rowMultiplier * (tileheight + spacing);
-    //
-    //   try {
-    //     const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-    //     // @ts-ignore - atlasTexture is never null here.
-    //     const texture = new PIXI.Texture(atlasTexture, rect);
-    //
-    //     textureCache[frame] = texture;
-    //   } catch (error) {
-    //     console.error(
-    //         'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
-    //         error
-    //     );
-    //     textureCache[frame] = null;
-    //   }
-    // }
-    //
-    // /** @type {GenericPixiTileMapData} */
-    // const tileMapData = {
-    //   width: atlasTexture.width,
-    //   height: atlasTexture.height,
-    //   tileWidth: tilewidth,
-    //   tileHeight: tileheight,
-    //   atlasTexture: atlasTexture,
-    //   textureCache: textureCache,
-    //   layers: tiledData.layers,
-    //   tiles: tiles,
-    // };
-    // return tileMapData;
   };
 
   /**
@@ -583,7 +464,7 @@
           // console.log("render autotile >>>>>>", tile, texture[tile.t])
           if (texture){
             const [x,y] = tile.px;
-            pixiTileMap.tile(
+            pixiTileMap.addFrame(
                 // @ts-ignore
                 texture[tile.t],
                 x,
@@ -592,18 +473,6 @@
           }
 
         })
-        // layer.entityInstances.forEach(function(entityInstance){
-        //   const tile = entityInstance['__tile']
-        //   if (!tile)return
-        //
-        //   const [x,y] = entityInstance.px;
-        //   console.log("render entity", entityInstance, x,y, tile.tilesetUid, genericTileMapData.textureCache[index][tile.tilesetUid])
-        //   pixiTileMap.addFrame(
-        //       genericTileMapData.textureCache[index][tile.tilesetUid],
-        //       x,
-        //       y
-        //   );
-        // })
       }
 
       // Tiled types
@@ -612,11 +481,11 @@
           const { gid, x, y, visible } = object;
           if (displayMode === 'visible' && !visible) return;
           if (genericTileMapData.textureCache[gid]) {
-            // pixiTileMap.addFrame(
-            //   genericTileMapData.textureCache[gid],
-            //   x,
-            //   y - genericTileMapData.tileHeight
-            // );
+            pixiTileMap.addFrame(
+              genericTileMapData.textureCache[gid],
+              x,
+              y - genericTileMapData.tileHeight
+            );
           }
         });
       } else if (layer.type === 'tilelayer') {
@@ -656,20 +525,20 @@
                   return tile.id === tileUid - 1;
                 });
 
-              // const pixiTilemapFrame = pixiTileMap.addFrame(
-              //   tileTexture,
-              //   xPos,
-              //   yPos
-              // );
+              const pixiTilemapFrame = pixiTileMap.addFrame(
+                tileTexture,
+                xPos,
+                yPos
+              );
 
               // Animated tiles have a limitation:
               // they are only able to use frames arranged horizontally one next
               // to each other on the atlas.
               if (tileData && tileData.animation) {
-                // pixiTilemapFrame.tileAnimX(
-                //   genericTileMapData.tileWidth,
-                //   tileData.animation.length
-                // );
+                pixiTilemapFrame.tileAnimX(
+                  genericTileMapData.tileWidth,
+                  tileData.animation.length
+                );
               }
             }
 

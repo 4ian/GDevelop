@@ -453,7 +453,7 @@
       else if (displayMode === 'visible' && !layer.visible) return;
 
 
-      console.log("PIXI TMAP", pixiTileMap)
+      console.log("PIXI TMAP layer opacity", layer.opacity)
       // Ldtk Types
       if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
 
@@ -461,14 +461,15 @@
         layer.autoLayerTiles.forEach(function (tile){
           
           var texture = genericTileMapData.textureCache[index];
-          // console.log("render autotile >>>>>>", tile, texture[tile.t])
+          console.log("render autotile >>>>>>", tile)
           if (texture){
             const [x,y] = tile.px;
-            pixiTileMap.addFrame(
+            pixiTileMap.tile(
                 // @ts-ignore
                 texture[tile.t],
                 x,
-                y
+                y,
+                { alpha: layer.opacity }
             )
           }
 

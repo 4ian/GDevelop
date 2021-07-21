@@ -9,7 +9,6 @@
   "scripts": {
     "build:app": "cd ../app && npm run build",
     "deploy:gdjs-runtime": "node scripts/deploy-GDJS-Runtime.js",
-    "deploy:examples-resources": "node scripts/deploy-examples-resources.js",
     "deploy:purge-cache": "node scripts/deploy-purge-cache.js",
     "deploy": "node scripts/deploy.js"
   },

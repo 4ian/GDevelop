@@ -35,6 +35,7 @@ namespace gdjs {
     originY: float;
     cellSize: float;
     cells: RasterizationCell[][];
+    regionCount: integer = 0;
 
     public static neighbor4Deltas = [
       { x: -1, y: 0 },
@@ -152,15 +153,6 @@ namespace gdjs {
         cellSize
       );
       gdjs.ObstacleRasterizer.rasterizeObstacles(grid, obstacles);
-      //console.log(
-      //  '\n' +
-      //    grid.cells
-      //      .map((cellRow) =>
-      //        cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
-      //      )
-      //      .join('\n') +
-      //    '\n'
-      //);
       gdjs.RegionGenerator.generateDistanceField(grid);
       gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
       const contours = gdjs.ContourBuilder.buildContours(grid);
@@ -168,11 +160,19 @@ namespace gdjs {
         contours,
         16
       );
+      return GridCoordinateConverter.convertFromGridBasis(grid, meshField);
+    }
+  }
+
+  export class GridCoordinateConverter {
+    public static convertFromGridBasis(
+      grid: RasterizationGrid,
+      polygons: Point[][]
+    ): Point[][] {
       // point can be shared so them must be copied to be scaled.
-      const scaledMeshField = meshField.map((polygon) =>
+      return polygons.map((polygon) =>
         polygon.map((point) => grid.convertFromGridBasis(point, { x: 0, y: 0 }))
       );
-      return scaledMeshField;
     }
   }
 
@@ -1045,7 +1045,8 @@ namespace gdjs {
      * @return The contours generated from the field.
      */
     static buildContours(grid: RasterizationGrid): ContourPoint[][] {
-      const contours = new Array<ContourPoint[]>();
+      const contours = new Array<ContourPoint[]>(grid.regionCount);
+      contours.length = 0;
 
       //  Set the flags on all cells in non-null regions to indicate which
       //  edges are connected to external regions.
@@ -1115,8 +1116,10 @@ namespace gdjs {
       // of the up coming loop. They represent the detailed and simple
       // contour vertices.
       // Initial sizing is arbitrary.
-      const workingRawVertices = new Array<ContourPoint>();
-      const workingSimplifiedVertices = new Array<ContourPoint>();
+      const workingRawVertices = new Array<ContourPoint>(256);
+      workingRawVertices.length = 0;
+      const workingSimplifiedVertices = new Array<ContourPoint>(64);
+      workingSimplifiedVertices.length = 0;
 
       // Loop through all cells looking for cells on the edge of a region.
       //
@@ -1620,7 +1623,7 @@ namespace gdjs {
         // moves toward zero. (Toward borders.)
         //
         // This number will always be divisible by 2.
-        let distance = (grid.obstacleDistanceMax() - 1) & ~1;
+        let distance = grid.obstacleDistanceMax() & ~1;
         distance > distanceMin;
         distance = Math.max(distance - 2, 0)
       ) {
@@ -1639,7 +1642,6 @@ namespace gdjs {
             }
           }
         }
-
         if (nextRegionID > 1) {
           // At least one region has already been created, so first
           // try to  put the newly flooded cells into existing regions.
@@ -1662,7 +1664,8 @@ namespace gdjs {
 
           // Fill to slightly more than the current "water level".
           // This improves efficiency of the algorithm.
-          const fillTo = Math.max(distance - 2, distanceMin);
+          // But it can't find small regions so it's disable.
+          const fillTo = distance; //Math.max(distance - 2, distanceMin);
           if (
             RegionGenerator.floodNewRegion(
               grid,
@@ -1684,7 +1687,7 @@ namespace gdjs {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
-          if (cell.distanceToObstacle >= distanceMin && !cell.hasRegion()) {
+          if (cell.distanceToObstacle > distanceMin && !cell.hasRegion()) {
             // Not a border or null region cell. Should be in a region.
             floodedCells.push(cell);
           }
@@ -1699,6 +1702,7 @@ namespace gdjs {
         RegionGenerator.expandRegions(grid, floodedCells, -1);
       }
 
+      grid.regionCount = nextRegionID - 1;
       //TODO can the post processing algorithms be interesting?
     }
 
@@ -1976,10 +1980,10 @@ namespace gdjs {
             minY = Math.min(minY, vertex.y);
             maxY = Math.max(maxY, vertex.y);
           }
-          minX = Math.max(minX, 0);
-          maxX = Math.min(maxX, grid.dimX());
-          minY = Math.max(minY, 0);
-          maxY = Math.min(maxY, grid.dimY());
+          minX = Math.max(Math.floor(minX), 0);
+          maxX = Math.min(Math.ceil(maxX), grid.dimX());
+          minY = Math.max(Math.floor(minY), 0);
+          maxY = Math.min(Math.ceil(maxY), grid.dimY());
           ObstacleRasterizer.fillPolygon(
             vertices,
             minX,
@@ -2008,18 +2012,20 @@ namespace gdjs {
 
       //  Loop through the rows of the image.
       for (let pixelY = minY; pixelY < maxY; pixelY++) {
+        const pixelCenterY = pixelY + 0.5;
         //  Build a list of nodes.
         workingNodes.length = 0;
         let j = vertices.length - 1;
         for (let i = 0; i < vertices.length; i++) {
           if (
-            (vertices[i].y < pixelY && vertices[j].y >= pixelY) ||
-            (vertices[j].y < pixelY && vertices[i].y >= pixelY)
+            (vertices[i].y < pixelCenterY && vertices[j].y >= pixelCenterY) ||
+            (vertices[j].y < pixelCenterY && vertices[i].y >= pixelCenterY)
           ) {
             workingNodes.push(
-              Math.floor(
+              Math.round(
                 vertices[i].x +
-                  ((pixelY - vertices[i].y) / (vertices[j].y - vertices[i].y)) *
+                  ((pixelCenterY - vertices[i].y) /
+                    (vertices[j].y - vertices[i].y)) *
                     (vertices[j].x - vertices[i].x)
               )
             );
@@ -2056,8 +2062,9 @@ namespace gdjs {
               let pixelX = workingNodes[i];
               pixelX < workingNodes[i + 1];
               pixelX++
-            )
-              fill(Math.floor(pixelX), Math.floor(pixelY));
+            ) {
+              fill(pixelX, pixelY);
+            }
           }
         }
       }

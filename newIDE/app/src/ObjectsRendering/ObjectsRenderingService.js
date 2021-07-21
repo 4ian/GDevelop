@@ -61,7 +61,8 @@ export default {
     layout: gdLayout,
     instance: gdInitialInstance,
     associatedObject: gdObject,
-    pixiContainer: any
+    pixiContainer: any,
+    pixiRenderer: any
   ) {
     var objectType = associatedObject.getType();
     if (this.renderers.hasOwnProperty(objectType))
@@ -71,7 +72,8 @@ export default {
         instance,
         associatedObject,
         pixiContainer,
-        PixiResourcesLoader
+        PixiResourcesLoader,
+        pixiRenderer
       );
     else {
       console.warn(
@@ -83,7 +85,8 @@ export default {
         instance,
         associatedObject,
         pixiContainer,
-        PixiResourcesLoader
+        PixiResourcesLoader,
+        pixiRenderer
       );
     }
   },

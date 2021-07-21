@@ -62,6 +62,10 @@ module.exports = {
         objectContent.layerIndex = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'levelIndex') {
+        objectContent.levelIndex = parseFloat(newValue);
+        return true;
+      }
       if (propertyName === 'animationSpeedScale') {
         objectContent.animationSpeedScale = parseFloat(newValue);
         return true;
@@ -81,10 +85,10 @@ module.exports = {
         'tilemapJsonFile',
         new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
           .setType('resource')
-          .addExtraInfo('json')
-          .setLabel(_('Tilemap JSON file'))
+          .addExtraInfo('tilemap')//
+          .setLabel(_('Tilemap tiled JSON or Ldtk file'))
           .setDescription(
-            _('This is the JSON file that was saved or exported from Tiled.')
+            _('This is the JSON/Ldtk file that was saved or exported from Tiled/Ldtk.')
           )
       );
       objectProperties.set(
@@ -127,6 +131,17 @@ module.exports = {
           )
       );
       objectProperties.set(
+          'levelIndex',
+          new gd.PropertyDescriptor(objectContent.levelIndex.toString())
+              .setType('number')
+              .setLabel(_('Level index to display'))
+              .setDescription(
+                  _(
+                      'Select which level to render via its index (Ldtk)'
+                  )
+              )
+      );
+      objectProperties.set(
         'animationSpeedScale',
         new gd.PropertyDescriptor(objectContent.animationSpeedScale.toString())
           .setType('number')
@@ -148,6 +163,7 @@ module.exports = {
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
+        levelIndex: 0,
         animationSpeedScale: 1,
         animationFps: 4,
       })
@@ -180,7 +196,7 @@ module.exports = {
         'TileMap',
         _('Tilemap'),
         _(
-          'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
+          'Displays a tiled-based map, made with the Tiled/Ldtk editor (download it separately on https://www.mapeditor.org/ or https://ldtk.io/).'
         ),
         'JsPlatform/Extensions/tile_map32.png',
         objectTileMap
@@ -206,7 +222,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tilemap JSON/Ldtk file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilemapJsonFile');
 
@@ -223,7 +239,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tilemap JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilemapJsonFile');
 
@@ -238,7 +254,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilesetJsonFile');
 
@@ -255,7 +271,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilesetJsonFile');
 
@@ -341,6 +357,49 @@ module.exports = {
       .addParameter('object', 'TileMap', 'TileMap', false)
       .getCodeExtraInformation()
       .setFunctionName('getLayerIndex');
+
+    object
+        .addCondition(
+            'LevelIndex',
+            _('Level index (ldtk)'),
+            _('Compare the value of the level index.'),
+            _('the level index'),
+            '',
+            'JsPlatform/Extensions/tile_map24.png',
+            'JsPlatform/Extensions/tile_map32.png'
+        )
+        .addParameter('object', 'TileMap', 'TileMap', false)
+        .useStandardRelationalOperatorParameters('number')
+        .getCodeExtraInformation()
+        .setFunctionName('getLevelIndex');
+
+    object
+        .addAction(
+            'SetLevelIndex',
+            _('Level index'),
+            _('Set the level index of the Tilemap.'),
+            _('the level index'),
+            '',
+            'JsPlatform/Extensions/tile_map24.png',
+            'JsPlatform/Extensions/tile_map32.png'
+        )
+        .addParameter('object', 'TileMap', 'TileMap', false)
+        .useStandardOperatorParameters('number')
+        .getCodeExtraInformation()
+        .setFunctionName('setLevelIndex')
+        .setGetter('getLevelIndex');
+
+    object
+        .addExpression(
+            'LevelIndex',
+            _('Level index'),
+            _('Get the level index being displayed'),
+            '',
+            'JsPlatform/Extensions/tile_map32.png'
+        )
+        .addParameter('object', 'TileMap', 'TileMap', false)
+        .getCodeExtraInformation()
+        .setFunctionName('getLevelndex');
 
     object
       .addCondition(
@@ -577,6 +636,13 @@ module.exports = {
           .getValue(),
         10
       );
+      const levelIndex = parseInt(
+          this._associatedObject
+              .getProperties(this.project)
+              .get('levelIndex')
+              .getValue(),
+          0
+      );
       const displayMode = this._associatedObject
         .getProperties(this.project)
         .get('displayMode')
@@ -587,14 +653,17 @@ module.exports = {
         .getValue();
 
       const pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
-        (textureName) =>
-          this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+        (textureName, relativeToPath) => {
+          if(relativeToPath) return this._pixiResourcesLoader.getPixiTextureRelativeToFile(this._project, textureName, relativeToPath)
+          return this._pixiResourcesLoader.getPIXITexture(this._project, textureName)
+        },
         tilesetJsonData
           ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
           : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
-        tilesetJsonFile
+        tilesetJsonFile,
+        levelIndex
       );
 
       if (pixiTileMapData) {
@@ -619,6 +688,7 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
+      console.log("json file", tilemapJsonFile)
       try {
         const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,

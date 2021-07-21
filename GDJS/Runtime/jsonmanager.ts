@@ -60,7 +60,7 @@ namespace gdjs {
     ): void {
       const resources = this._resources;
       const jsonResources = resources.filter(function (resource) {
-        return resource.kind === 'json' && !resource.disablePreload;
+        return (resource.kind === 'json' || resource.kind === 'tilemap') && !resource.disablePreload;
       });
       if (jsonResources.length === 0) {
         return onComplete(jsonResources.length);
@@ -93,7 +93,7 @@ namespace gdjs {
      */
     loadJson(resourceName: string, callback: JsonManagerRequestCallback): void {
       const resource = this._resources.find(function (resource) {
-        return resource.kind === 'json' && resource.name === resourceName;
+        return (resource.kind === 'json' || resource.kind === 'tilemap') && resource.name === resourceName;
       });
       if (!resource) {
         callback(

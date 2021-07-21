@@ -10,6 +10,7 @@ export type ResourceKind =
   | 'font'
   | 'video'
   | 'json'
+  | 'tilemap'
   | 'bitmapFont';
 
 export type ResourceSourceComponentProps = {|

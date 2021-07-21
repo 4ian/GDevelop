@@ -191,7 +191,7 @@ export default [
           multiSelections,
           title: i18n._(t`Choose a json file`),
           name: i18n._(t`JSON file`),
-          extensions: ['json'],
+          extensions: ['json', 'ldtk'],
         };
         return selectLocalResourcePath(
           i18n,
@@ -207,6 +207,51 @@ export default [
             jsonResource.setFile(path.relative(projectPath, resourcePath));
             jsonResource.setName(path.relative(projectPath, resourcePath));
 
+            return jsonResource;
+          });
+        });
+      };
+
+      render() {
+        return null;
+      }
+    },
+  },
+  {
+    name: 'localTilemapFileOpener',
+    displayName: 'Choose a new json or ldtk file',
+    kind: 'tilemap',
+    component: class localTilemapFileOpener extends Component<ResourceSourceComponentProps> {
+      chooseResources = (
+        project: gdProject,
+        multiSelections: boolean = true
+      ): Promise<Array<any>> => {
+        const { i18n, getLastUsedPath, setLastUsedPath } = this.props;
+        const options = {
+          multiSelections,
+          title: i18n._(t`Choose a tilemap file`),
+          name: i18n._(t`Tilemap file`),
+          extensions: ['ldtk', 'json'],
+        };
+        return selectLocalResourcePath(
+          i18n,
+          project,
+          options,
+          getLastUsedPath,
+          setLastUsedPath,
+          'tilemap'
+        ).then(resources => {
+          return resources.map(resourcePath => {
+            const jsonResource = new gd.TilemapResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            jsonResource.setFile(path.relative(projectPath, resourcePath));
+            jsonResource.setName(path.relative(projectPath, resourcePath));
+
+            console.log(
+              jsonResource,
+              jsonResource.getKind(),
+              jsonResource.getFile()
+            );
             return jsonResource;
           });
         });

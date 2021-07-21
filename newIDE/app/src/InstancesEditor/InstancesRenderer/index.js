@@ -36,6 +36,7 @@ export default class InstancesRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
+    pixiRenderer
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
@@ -48,6 +49,7 @@ export default class InstancesRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
+    pixiRenderer: any,
   }) {
     this.project = project;
     this.instances = instances;
@@ -60,6 +62,7 @@ export default class InstancesRenderer {
     this.onMoveInstance = onMoveInstance;
     this.onMoveInstanceEnd = onMoveInstanceEnd;
     this.onDownInstance = onDownInstance;
+    this.pixiRenderer = pixiRenderer;
 
     this.layersRenderers = {};
 
@@ -130,6 +133,7 @@ export default class InstancesRenderer {
           layout: this.layout,
           instances: this.instances,
           viewPosition: this.viewPosition,
+          pixiRenderer: this.pixiRenderer,
           layer: layer,
           onInstanceClicked: this.onInstanceClicked,
           onInstanceDoubleClicked: this.onInstanceDoubleClicked,

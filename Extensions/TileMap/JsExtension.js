@@ -532,6 +532,7 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
+    console.log("rendering serv", objectsRenderingService)
 
     const Tilemap = objectsRenderingService.requireModule(
       __dirname,
@@ -560,7 +561,8 @@ module.exports = {
       instance,
       associatedObject,
       pixiContainer,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      pixiRenderer
     ) {
       RenderedInstance.call(
         this,
@@ -569,10 +571,21 @@ module.exports = {
         instance,
         associatedObject,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        pixiRenderer
       );
 
-      this._pixiObject = new Tilemap.CompositeRectTileLayer();
+      
+      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any)
+      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any);
+
+      
+
+      pixiRenderer.plugins.tilemap = new Tilemap.TileRenderer();
+      console.log( ">> PIXI", {PIXI, pixiRenderer, project, layout,instance,pixiContainer,associatedObject})
+      this._pixiObject = new Tilemap.CompositeTilemap();
+      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any)
+
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
       // By default, this is not implemented in pixi-tilemap.

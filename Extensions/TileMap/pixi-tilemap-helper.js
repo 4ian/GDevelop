@@ -54,7 +54,7 @@
     height: number,
     tileWidth: number,
     tileHeight: number,
-    atlasTexture: PIXI.BaseTexture,
+    atlasTexture: PIXI.BaseTexture | null,
     textureCache: Object<number, PIXI.Texture | null>,
     layers: Array<TiledDataLayer>,
     tiles: Array<TiledDataTile>,
@@ -79,13 +79,6 @@
    * @returns {?GenericPixiTileMapData}
    */
   const parseTiledData = (tiledData, atlasTexture, getTexture) => {
-    if (!tiledData.tiledversion) {
-      console.warn(
-        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
-      );
-
-      return null;
-    }
 
     // We only handle tileset embedded in the tilemap. Warn if it's not the case.
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
@@ -167,6 +160,236 @@
       tiles: tiles,
     };
     return tileMapData;
+  };
+
+  /**
+   * Parse a Tiled map Ldtk file,
+   * exported from Ldtk (https://ldtk.io/json/)
+   * into a generic tile map data (`GenericPixiTileMapData`).
+   *
+   * @param {Object} tiledData A JS object representing a map exported from Tiled.
+   * @param {?PIXI.BaseTexture} atlasTexture
+   * @param {(textureName: string, relativeToPath: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
+   * @returns {?GenericPixiTileMapData}
+   */
+  const parseLDtkData = (tiledData, atlasTexture, getTexture, levelIndex, tilemapResourceName) => {
+    const tileSetAtlases = {};
+    tiledData.defs.tilesets.forEach(tileset=> {
+      console.log("tileset",tileset)
+      const texture = tileset.relPath ? getTexture(tileset.relPath , tilemapResourceName): null;
+      tileSetAtlases[tileset.uid] = { texture, ...tileset }
+    })
+
+    console.log("TILESETS", tileSetAtlases)
+    const selectedLevel = tiledData.levels[levelIndex];
+    console.log(tiledData,atlasTexture,getTexture, "level",levelIndex, selectedLevel)
+
+    const layers = [];
+    const textureCache = [];
+    selectedLevel.layerInstances.reverse().forEach((ldtkLayer, layerIndex) => {
+      // TODO - will need to somehow auto add these resources via resourcesManager and load them up for parsing, sight
+      const layerAtlasTextureRelPath = ldtkLayer['__tilesetRelPath'];
+      const gridSize = ldtkLayer['__gridSize'];
+      const type = ldtkLayer['__type'];
+      const tilesetUid = ldtkLayer['__tilesetDefUid'];
+      const generatedTiles = ldtkLayer.autoLayerTiles;
+      const entities = ldtkLayer.entityInstances || [];
+      const layer = {
+        type: type,
+        autoLayerTiles: generatedTiles,
+        entityInstances: entities,
+        visible: ldtkLayer.visible,
+        opacity: ldtkLayer['__opacity']
+      }
+
+
+      console.log("LAYER::", ldtkLayer)
+      console.log("TEXTURE got:", layerAtlasTextureRelPath);
+
+      //generatedTiles have px[x,y] to place them and src[x,y] to detect uid. Src will need to become a uid?
+      //pass both to renderer's generic data, just in case
+      //ldtkLayer['__type'] === 'AutoLayer'
+
+      console.log("IntGrid layer ", ldtkLayer, layerAtlasTextureRelPath, generatedTiles)
+      console.log("autolayer ", ldtkLayer,layerAtlasTextureRelPath,generatedTiles)
+      textureCache[layerIndex] = {};
+
+      // if (type === 'Entities'){
+      //   entities.forEach(entityInstance =>{
+      //     try {
+      //
+      //       console.log("ENT", entityInstance)
+      //       const tile = entityInstance['__tile']
+      //       const textureAtlas = tileSetAtlases[tile.tilesetUid]
+      //       const [x,y] = tile.srcRect;
+      //       const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
+      //       console.log("Entity rect>>", rect,tile,tile.tilesetUid, textureAtlas, tileSetAtlases)
+      //       // @ts-ignore - atlasTexture is never null here.
+      //       // const texture = new PIXI.Texture(textureAtlas, rect);
+      //
+      //
+      //       textureCache[layerIndex][tile.tilesetUid] = new PIXI.Texture(textureAtlas, rect);
+      //       console.log("entity texture",textureCache[layerIndex][tile.tilesetUid] ,layerIndex, tile.tilesetUid)
+      //     }catch(error){
+      //       console.error('Failed entity tile',error)
+      //     }
+      //   })
+      // } else{
+
+      // }
+      const tileSet = tileSetAtlases[tilesetUid];
+      console.log("Tileset to use",tileSet )
+
+      generatedTiles.forEach(generatedTile => {
+        if (generatedTile.t in textureCache[layerIndex]) return;
+
+        try {
+          const [x,y] = generatedTile.src;
+          //tileWidth,tileHeight
+          // console.log("RECT",x,y,generatedTile,ldtkLayer['__gridSize'])
+          const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
+          console.log("RECT", rect)
+          // @ts-ignore - atlasTexture is never null here.
+          const texture = new PIXI.Texture(tileSet.texture, rect);
+
+          textureCache[layerIndex][generatedTile.t] = texture;
+        } catch (error) {
+          console.error(
+              'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
+              error
+          );
+          textureCache[layerIndex] = null;
+        }
+      })
+
+
+
+
+      layers.push(layer)
+    })
+
+    /** @type {GenericPixiTileMapData} */
+    const tileMapData = {
+    width: 0,
+    height: 0,
+    tileWidth: 0, //not needed offset
+    tileHeight: 0,// not needed
+    atlasTexture, // oops, every layer can have a different one,, cant use this
+    textureCache,
+    layers,
+    tiles: []
+    };
+    console.log("RESULT>>",tileMapData,textureCache)
+    // return null;
+
+    // const tileMapData = {
+      // width: atlasTexture.width,
+      // height: atlasTexture.height,
+      // tileWidth: tilewidth,
+      // tileHeight: tileheight,
+      // atlasTexture: atlasTexture,
+      // textureCache: textureCache,
+      // layers: tiledData.layers,
+      // tiles: tiles,
+    // };
+    return tileMapData;
+    ////////////////////////////////////////////////
+    //
+    // const {
+    //   tilewidth,
+    //   tileheight,
+    //   tilecount,
+    //   tiles,
+    //   image,
+    //   columns,
+    //   spacing,
+    //   margin,
+    // } = tiledData.tilesets[0];
+    // if (!atlasTexture) atlasTexture = getTexture(image);
+    //
+    // // We try to detect what size Tiled is expecting.
+    // const rows = tilecount / columns;
+    // const expectedAtlasWidth =
+    //     tilewidth * columns + spacing * (columns - 1) + margin * 2;
+    // const expectedAtlasHeight =
+    //     tileheight * rows + spacing * (rows - 1) + margin * 2;
+    // if (
+    //     (atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
+    //     (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)
+    // ) {
+    //   const expectedSize = expectedAtlasWidth + 'x' + expectedAtlasHeight;
+    //   const actualSize = atlasTexture.width + 'x' + atlasTexture.height;
+    //   console.warn(
+    //       'It seems the atlas file was resized, which is not supported. It should be ' +
+    //       expectedSize +
+    //       "px, but it's " +
+    //       actualSize +
+    //       ' px.'
+    //   );
+    //   return null;
+    // }
+    //
+    // // Prepare the textures pointing to the base "Atlas" Texture for each tile.
+    // // Note that this cache can be augmented later with rotated/flipped
+    // // versions of the tile textures.
+    // /** @type {Object<number, PIXI.Texture | null>} */
+    // const textureCache = {};
+    // for (let frame = 0; frame <= tilecount; frame++) {
+    //   const columnMultiplier = Math.floor((frame - 1) % columns);
+    //   const rowMultiplier = Math.floor((frame - 1) / columns);
+    //   const x = margin + columnMultiplier * (tilewidth + spacing);
+    //   const y = margin + rowMultiplier * (tileheight + spacing);
+    //
+    //   try {
+    //     const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
+    //     // @ts-ignore - atlasTexture is never null here.
+    //     const texture = new PIXI.Texture(atlasTexture, rect);
+    //
+    //     textureCache[frame] = texture;
+    //   } catch (error) {
+    //     console.error(
+    //         'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
+    //         error
+    //     );
+    //     textureCache[frame] = null;
+    //   }
+    // }
+    //
+    // /** @type {GenericPixiTileMapData} */
+    // const tileMapData = {
+    //   width: atlasTexture.width,
+    //   height: atlasTexture.height,
+    //   tileWidth: tilewidth,
+    //   tileHeight: tileheight,
+    //   atlasTexture: atlasTexture,
+    //   textureCache: textureCache,
+    //   layers: tiledData.layers,
+    //   tiles: tiles,
+    // };
+    // return tileMapData;
+  };
+
+  /**
+   * Detects if the file was created in tiled or ldtk and creates a GenericPixiTileMapData with the appropriate method
+   * @param tiledData
+   * @param atlasTexture
+   * @param getTexture
+   * @returns {?GenericPixiTileMapData}
+   */
+  const parseTilemapData = (tiledData, atlasTexture, getTexture, levelIndex, tilemapResourceName) => {
+    if (tiledData.tiledversion) {
+      console.info('Detected the json file was created in Tiled, parsing the data...');
+      return parseTiledData(tiledData, atlasTexture, getTexture);
+    }
+    if (tiledData['__header__'] && tiledData['__header__'].app === 'LDtk'){
+      console.info('Detected the json/ldtk file was created in LDtk, parsing the data...');
+      return parseLDtkData(tiledData, atlasTexture, getTexture, levelIndex, tilemapResourceName);
+    }
+
+    console.warn(
+        "The loaded Tiled map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
+    );
+    return null;
   };
 
   /**
@@ -339,23 +562,59 @@
     layerIndex,
     pako
   ) => {
+    console.log("update pixi",pixiTileMap , genericTileMapData)
     if (!pixiTileMap || !genericTileMapData) return;
     pixiTileMap.clear();
 
+    console.log("GENERIC DATA>>> ", genericTileMapData)
     genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
-      if (layer.type === 'objectgroup') {
+
+      // Ldtk Types
+      if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
+
+        // @ts-ignore
+        layer.autoLayerTiles.forEach(function (tile){
+          // console.log("render autotile >>>>>>", tile)
+          var texture = genericTileMapData.textureCache[index];
+          if (texture){
+            const [x,y] = tile.px;
+            pixiTileMap.addFrame(
+                // @ts-ignore
+                texture[tile.t] || "shit.png",
+                x,
+                y
+            )
+          }
+
+        })
+        // layer.entityInstances.forEach(function(entityInstance){
+        //   const tile = entityInstance['__tile']
+        //   if (!tile)return
+        //
+        //   const [x,y] = entityInstance.px;
+        //   console.log("render entity", entityInstance, x,y, tile.tilesetUid, genericTileMapData.textureCache[index][tile.tilesetUid])
+        //   pixiTileMap.addFrame(
+        //       genericTileMapData.textureCache[index][tile.tilesetUid],
+        //       x,
+        //       y
+        //   );
+        // })
+      }
+
+      // Tiled types
+      else if (layer.type === 'objectgroup') {
         layer.objects.forEach(function (object) {
           const { gid, x, y, visible } = object;
           if (displayMode === 'visible' && !visible) return;
           if (genericTileMapData.textureCache[gid]) {
-            pixiTileMap.addFrame(
-              genericTileMapData.textureCache[gid],
-              x,
-              y - genericTileMapData.tileHeight
-            );
+            // pixiTileMap.addFrame(
+            //   genericTileMapData.textureCache[gid],
+            //   x,
+            //   y - genericTileMapData.tileHeight
+            // );
           }
         });
       } else if (layer.type === 'tilelayer') {
@@ -374,7 +633,7 @@
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
             const xPos = genericTileMapData.tileWidth * j;
-            const yPos = genericTileMapData.tileHeight * i;
+            const yPos = genericTileMapData.tileHeight * i;// these are stored in Ldtk, so no need to compute their positions
 
             // The "globalTileUid" is the tile UID with encoded
             // bits about the flipping/rotation of the tile.
@@ -395,20 +654,20 @@
                   return tile.id === tileUid - 1;
                 });
 
-              const pixiTilemapFrame = pixiTileMap.addFrame(
-                tileTexture,
-                xPos,
-                yPos
-              );
+              // const pixiTilemapFrame = pixiTileMap.addFrame(
+              //   tileTexture,
+              //   xPos,
+              //   yPos
+              // );
 
               // Animated tiles have a limitation:
               // they are only able to use frames arranged horizontally one next
               // to each other on the atlas.
               if (tileData && tileData.animation) {
-                pixiTilemapFrame.tileAnimX(
-                  genericTileMapData.tileWidth,
-                  tileData.animation.length
-                );
+                // pixiTilemapFrame.tileAnimX(
+                //   genericTileMapData.tileWidth,
+                //   tileData.animation.length
+                // );
               }
             }
 
@@ -438,16 +697,23 @@
     tiledData,
     atlasImageResourceName,
     tilemapResourceName,
-    tilesetResourceName
+    tilesetResourceName,
+    levelIndex
   ) => {
     const requestedTileMapDataId =
       tilemapResourceName +
       '@' +
       tilesetResourceName +
       '@' +
-      atlasImageResourceName;
+      atlasImageResourceName +
+      '@' +
+      levelIndex;
 
     // If the tilemap data is already in the cache, use it directly.
+    // For LDtk we do not need to generate a tileset
+
+    // TODO we will need to split the cache here - one for tilemaps and another for tilesets
+    // TODO this is because LDtk tilemaps can have different atlas per layer
     if (loadedGenericPixiTileMapData[requestedTileMapDataId]) {
       return loadedGenericPixiTileMapData[requestedTileMapDataId];
     }
@@ -455,10 +721,12 @@
     const atlasTexture = atlasImageResourceName
       ? getTexture(atlasImageResourceName)
       : null;
-    const genericPixiTileMapData = parseTiledData(
+    const genericPixiTileMapData = parseTilemapData(
       tiledData,
       atlasTexture,
-      getTexture
+      getTexture,
+      levelIndex,
+      tilemapResourceName
     );
 
     if (genericPixiTileMapData)

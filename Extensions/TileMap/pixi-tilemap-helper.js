@@ -61,6 +61,10 @@
    }} GenericPixiTileMapData
    */
 
+   // ldtk: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips)
+  const LdtkToPixiRotations = {
+    1:12, 2:8, 3:4, 0:0
+  }
   /**
    * The Tilesets that are ready to be used
    * with Pixi Tilemap, indexed by their id.
@@ -180,14 +184,12 @@
       tileSetAtlases[tileset.uid] = { texture, ...tileset }
     })
 
-    console.log("TILESETS", tileSetAtlases)
     const selectedLevel = tiledData.levels[levelIndex > -1 ? levelIndex : 0];
     console.log(tiledData,atlasTexture,getTexture, "level",levelIndex, selectedLevel)
 
     const layers = [];
-    const textureCache = [];
+    const textureCache = {};
     selectedLevel.layerInstances.reverse().forEach((ldtkLayer, layerIndex) => {
-      // TODO - will need to somehow auto add these resources via resourcesManager and load them up for parsing, sight
       const layerAtlasTextureRelPath = ldtkLayer['__tilesetRelPath'];
       const gridSize = ldtkLayer['__gridSize'];
       const type = ldtkLayer['__type'];
@@ -459,9 +461,7 @@
 
         // @ts-ignore
         layer.autoLayerTiles.forEach(function (tile){
-          
           var texture = genericTileMapData.textureCache[index];
-          console.log("render autotile >>>>>>", tile)
           if (texture){
             const [x,y] = tile.px;
             pixiTileMap.tile(
@@ -469,7 +469,7 @@
                 texture[tile.t],
                 x,
                 y,
-                { alpha: layer.opacity }
+                { alpha: layer.opacity, rotate: LdtkToPixiRotations[tile.f]}
             )
           }
 

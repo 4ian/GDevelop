@@ -181,7 +181,7 @@
     })
 
     console.log("TILESETS", tileSetAtlases)
-    const selectedLevel = tiledData.levels[levelIndex];
+    const selectedLevel = tiledData.levels[levelIndex > -1 ? levelIndex : 0];
     console.log(tiledData,atlasTexture,getTexture, "level",levelIndex, selectedLevel)
 
     const layers = [];

@@ -24,8 +24,15 @@ namespace gdjs {
 
       // Load (or reset)
       if (this._pixiObject === undefined) {
+        const pixiRenderer =  runtimeScene
+        .getGame()
+        .getRenderer()
+        .getPIXIRenderer();
+
         // @ts-ignore - pixi-tilemap types to be added.
-        this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
+        pixiRenderer.plugins.tilemap = new PIXI.tilemap.TileRenderer();
+        // @ts-ignore - pixi-tilemap types to be added.
+        this._pixiObject = new PIXI.tilemap.CompositeTilemap();
       }
       this._pixiObject.tileAnim = [0, 0];
 

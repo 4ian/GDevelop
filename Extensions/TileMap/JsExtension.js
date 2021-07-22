@@ -121,7 +121,7 @@ module.exports = {
       );
       objectProperties.set(
         'layerIndex',
-        new gd.PropertyDescriptor(objectContent.layerIndex?.toString() || 0)
+        new gd.PropertyDescriptor(objectContent.layerIndex.toString())
           .setType('number')
           .setLabel(_('Layer index to display'))
           .setDescription(
@@ -132,7 +132,7 @@ module.exports = {
       );
       objectProperties.set(
           'levelIndex',
-          new gd.PropertyDescriptor(objectContent.layerIndex?.toString() || 0)
+          new gd.PropertyDescriptor(objectContent.levelIndex?.toString() || 0)
               .setType('number')
               .setLabel(_('Level index to display'))
               .setDescription(

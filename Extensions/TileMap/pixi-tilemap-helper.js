@@ -453,7 +453,7 @@
       else if (displayMode === 'visible' && !layer.visible) return;
 
 
-      console.log("PIXI TMAP layer opacity", layer.opacity)
+      console.log("LAYER>>>", layer)
       // Ldtk Types
       if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
 
@@ -482,10 +482,11 @@
           const { gid, x, y, visible } = object;
           if (displayMode === 'visible' && !visible) return;
           if (genericTileMapData.textureCache[gid]) {
-            pixiTileMap.addFrame(
+            pixiTileMap.tile(
               genericTileMapData.textureCache[gid],
               x,
-              y - genericTileMapData.tileHeight
+              y - genericTileMapData.tileHeight,
+              { alpha: layer.opacity }
             );
           }
         });
@@ -526,10 +527,11 @@
                   return tile.id === tileUid - 1;
                 });
 
-              const pixiTilemapFrame = pixiTileMap.addFrame(
+              const pixiTilemapFrame = pixiTileMap.tile(
                 tileTexture,
                 xPos,
-                yPos
+                yPos,
+                { alpha: layer.opacity }
               );
 
               // Animated tiles have a limitation:

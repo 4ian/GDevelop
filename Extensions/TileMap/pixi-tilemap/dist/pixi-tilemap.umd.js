@@ -1825,7 +1825,8 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
 
             console.log("pixi utils exists?", utils)
     	    this.ibLen = totalIndices;
-    	    this.indexBuffer.update(utils.utils.createIndicesForQuads(size,
+            const createIndicesForQuads = utils.createIndicesForQuads || utils.utils.createIndicesForQuads;
+    	    this.indexBuffer.update(createIndicesForQuads(size,
     	        settings.use32bitIndex ? new Uint32Array(size * 6) : undefined));
 
     	    // 	TODO: create new index buffer instead?

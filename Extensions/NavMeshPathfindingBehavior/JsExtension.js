@@ -116,7 +116,7 @@ const declarePathfindingBehavior = function (
       'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
     );
 
-    pathfindingBehaviorDeclaration
+  pathfindingBehaviorDeclaration
     .addScopedAction(
       'SetDestination',
       _('Move to a position'),
@@ -139,7 +139,7 @@ const declarePathfindingBehavior = function (
     .getCodeExtraInformation()
     .setFunctionName('moveTo');
 
-    pathfindingBehaviorDeclaration
+  pathfindingBehaviorDeclaration
     .addScopedAction(
       'DrawNavMesh',
       _('Draw navigation mesh'),
@@ -244,7 +244,7 @@ const declarePathfindingBehavior = function (
     .addParameter('expression', _('Angle, in degrees'))
     .addParameter('expression', _('Tolerance, in degrees'))
     .getCodeExtraInformation()
-    .setFunctionName('pathFound');
+    .setFunctionName('movementAngleIsAround');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -589,7 +589,25 @@ const declarePathfindingBehavior = function (
       false
     )
     .getCodeExtraInformation()
-    .setFunctionName('GetDestinationY');
+    .setFunctionName('getDestinationY');
+
+  pathfindingBehaviorDeclaration
+    .addExpression(
+      'MovementAngle',
+      _('Angle of movement on its path'),
+      _('Angle of movement on its path'),
+      _('Movement on the path'),
+      'CppPlatform/Extensions/AStaricon16.png'
+    )
+    .addParameter('object', _('Object'), '', false)
+    .addParameter(
+      'behavior',
+      _('Behavior'),
+      'NavMeshPathfindingBehavior',
+      false
+    )
+    .getCodeExtraInformation()
+    .setFunctionName('getMovementAngle');
 };
 
 const declareObstacleBehavior = function (
@@ -648,37 +666,45 @@ module.exports = {
     );
 
     extension
+      .registerProperty('Viewpoint')
+      .setLabel(_('Viewpoint'))
+      .setDescription(_('Viewpoint of the game.'))
+      .setType('Choice')
+      .addExtraInfo(_('Top-Down'))
+      .addExtraInfo(_('Isometry 2:1 (26.565°)'))
+      .addExtraInfo(_('True Isometry (30°)'));
+
+    extension
       .registerProperty('CellSize')
       .setLabel(_('Cell size'))
-      .setDescription('Cell size for obstacle collision mask rasterization')
+      .setDescription(_('Cell size for obstacle collision mask rasterization.'))
       .setType('number');
 
     extension
       .registerProperty('AreaLeftBound')
       .setLabel(_('Area left bound'))
-      .setDescription('The left bound of the area where object can go.')
+      .setDescription(_('The left bound of the area where object can go.'))
       .setType('number');
 
     extension
       .registerProperty('AreaTopBound')
       .setLabel(_('Area top bound'))
-      .setDescription('The top bound of the area where object can go.')
+      .setDescription(_('The top bound of the area where object can go.'))
       .setType('number');
 
     extension
       .registerProperty('AreaRightBound')
       .setLabel(_('Area right bound'))
-      .setDescription('The right bound of the area where object can go.')
+      .setDescription(_('The right bound of the area where object can go.'))
       .setType('number');
 
     extension
       .registerProperty('AreaBottomBound')
       .setLabel(_('Area bottom bound'))
-      .setDescription('The bottom bound of the area where object can go.')
+      .setDescription(_('The bottom bound of the area where object can go.'))
       .setType('number');
 
-
-      extension
+    extension
       .addAction(
         'InvalidateNavMesh',
         _('Invalidate the navigation mesh'),
@@ -690,8 +716,9 @@ module.exports = {
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.invalidateNavMesh');
-  
+      .setFunctionName(
+        'gdjs.NavMeshPathfindingObstaclesManager.invalidateNavMesh'
+      );
 
     declarePathfindingBehavior(_, gd, extension);
     declareObstacleBehavior(_, gd, extension);

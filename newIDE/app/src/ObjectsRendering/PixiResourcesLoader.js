@@ -146,18 +146,33 @@ export default class PixiResourcesLoader {
     relativeToFile: string
   ) {
     if (!project.getResourcesManager().hasResource(resourceName)) {
-      const resourceRelativePath = path.join(
-        path.dirname(relativeToFile),
+      const projectPath = path.dirname(project.getProjectFile());
+      const fullPathRelativeFile = path.dirname(
+        path.join(
+          projectPath,
+          project
+            .getResourcesManager()
+            .getResource(relativeToFile)
+            .getFile()
+        )
+      );
+      const fullPathNewResource = path.resolve(
+        fullPathRelativeFile,
         resourceName
       );
+      const resourceRelativePath = path.relative(
+        projectPath,
+        fullPathNewResource
+      );
+
       const newResource = new gd.ImageResource();
       newResource.setName(resourceName);
       newResource.setFile(resourceRelativePath);
       project.getResourcesManager().addResource(newResource);
       console.log(
-        'ADDED RESOURCE:',
-        resourceName,
-        project.getResourcesManager().getAllResourceNames()
+        relativeToFile,
+        'file pulled a resource dependency:',
+        resourceName
       );
 
       return this.getPIXITexture(project, resourceName, true);

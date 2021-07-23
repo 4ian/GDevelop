@@ -521,9 +521,9 @@ const declarePathfindingBehavior = function (
 
   pathfindingBehaviorDeclaration
     .addExpression(
-      'LastNodeX',
-      _('Last waypoint X position'),
-      _('Last waypoint X position'),
+      'PreviousNodeX',
+      _('Previous waypoint X position'),
+      _('Previous waypoint X position'),
       _('Movement on the path'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
@@ -535,13 +535,13 @@ const declarePathfindingBehavior = function (
       false
     )
     .getCodeExtraInformation()
-    .setFunctionName('getLastNodeX');
+    .setFunctionName('getPreviousNodeX');
 
   pathfindingBehaviorDeclaration
     .addExpression(
-      'LastNodeY',
-      _('Last waypoint Y position'),
-      _('Last waypoint Y position'),
+      'PreviousNodeY',
+      _('Previous waypoint Y position'),
+      _('Previous waypoint Y position'),
       _('Movement on the path'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
@@ -553,7 +553,7 @@ const declarePathfindingBehavior = function (
       false
     )
     .getCodeExtraInformation()
-    .setFunctionName('getLastNodeY');
+    .setFunctionName('getPreviousNodeY');
 
   pathfindingBehaviorDeclaration
     .addExpression(

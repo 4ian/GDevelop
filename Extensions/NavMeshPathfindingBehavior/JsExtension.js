@@ -31,24 +31,28 @@ const declarePathfindingBehavior = function (
     propertyName,
     newValue
   ) {
-    if (propertyName === 'Acceleration') {
+    if (propertyName === _('Acceleration')) {
       behaviorContent.setDoubleAttribute('acceleration', newValue);
       return true;
     }
-    if (propertyName === 'Max. speed') {
+    if (propertyName === _('Max. speed')) {
       behaviorContent.setDoubleAttribute('maxSpeed', newValue);
       return true;
     }
-    if (propertyName === 'Rotate speed') {
+    if (propertyName === _('Rotate speed')) {
       behaviorContent.setDoubleAttribute('angularMaxSpeed', newValue);
       return true;
     }
-    if (propertyName === 'Rotate object') {
+    if (propertyName === _('Rotate object')) {
       behaviorContent.setBoolAttribute('rotateObject', newValue === '1');
       return true;
     }
-    if (propertyName === 'Angle offset') {
+    if (propertyName === _('Angle offset')) {
       behaviorContent.setDoubleAttribute('angleOffset', newValue);
+      return true;
+    }
+    if (propertyName === _('Extra border size')) {
+      behaviorContent.setDoubleAttribute('extraBorder', newValue);
       return true;
     }
 
@@ -59,29 +63,33 @@ const declarePathfindingBehavior = function (
     const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
     behaviorProperties
-      .getOrCreate('Acceleration')
+      .getOrCreate(_('Acceleration'))
       .setValue(behaviorContent.getDoubleAttribute('acceleration').toString());
 
     behaviorProperties
-      .getOrCreate('Max. speed')
+      .getOrCreate(_('Max. speed'))
       .setValue(behaviorContent.getDoubleAttribute('maxSpeed').toString());
 
     behaviorProperties
-      .getOrCreate('Rotate speed')
+      .getOrCreate(_('Rotate speed'))
       .setValue(
         behaviorContent.getDoubleAttribute('angularMaxSpeed').toString()
       );
 
     behaviorProperties
-      .getOrCreate('Rotate object')
+      .getOrCreate(_('Rotate object'))
       .setValue(
         behaviorContent.getBoolAttribute('rotateObject') ? 'true' : 'false'
       )
       .setType('Boolean');
 
     behaviorProperties
-      .getOrCreate('Angle offset')
+      .getOrCreate(_('Angle offset'))
       .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString());
+
+    behaviorProperties
+      .getOrCreate(_('Extra border size'))
+      .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString());
 
     return behaviorProperties;
   };
@@ -92,6 +100,7 @@ const declarePathfindingBehavior = function (
     behaviorContent.setDoubleAttribute('angularMaxSpeed', 180);
     behaviorContent.setBoolAttribute('rotateObject', true);
     behaviorContent.setDoubleAttribute('angleOffset', 0);
+    behaviorContent.setDoubleAttribute('extraBorder', 0);
   };
   const pathfindingBehaviorDeclaration = extension
     .addBehavior(

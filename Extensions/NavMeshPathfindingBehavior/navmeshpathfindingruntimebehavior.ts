@@ -173,7 +173,10 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      const nextIndex = Math.min(this._currentSegment + 1, this._path.length - 1);
+      const nextIndex = Math.min(
+        this._currentSegment + 1,
+        this._path.length - 1
+      );
       return this._path[nextIndex][0];
     }
 
@@ -181,7 +184,10 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      const nextIndex = Math.min(this._currentSegment + 1, this._path.length - 1);
+      const nextIndex = Math.min(
+        this._currentSegment + 1,
+        this._path.length - 1
+      );
       return this._path[nextIndex][1] / this._manager._isometricRatio;
     }
 
@@ -189,7 +195,10 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      const previousIndex = Math.min(this._currentSegment, this._path.length - 1);
+      const previousIndex = Math.min(
+        this._currentSegment,
+        this._path.length - 1
+      );
       return this._path[previousIndex][0];
     }
 
@@ -197,7 +206,10 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      const previousIndex = Math.min(this._currentSegment, this._path.length - 1);
+      const previousIndex = Math.min(
+        this._currentSegment,
+        this._path.length - 1
+      );
       return this._path[previousIndex][1] / this._manager._isometricRatio;
     }
 
@@ -212,7 +224,9 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path[this._path.length - 1][1] / this._manager._isometricRatio;
+      return (
+        this._path[this._path.length - 1][1] / this._manager._isometricRatio
+      );
     }
 
     /**
@@ -277,10 +291,7 @@ namespace gdjs {
       );
       if (path) {
         this._pathFound = true;
-        this._path = path.map(({ x, y }) => [
-          x,
-          y,
-        ]);
+        this._path = path.map(({ x, y }) => [x, y]);
         this._enterSegment(0);
         return;
       }

@@ -83,7 +83,6 @@
    * @returns {?GenericPixiTileMapData}
    */
   const parseTiledData = (tiledData, atlasTexture, getTexture) => {
-
     // We only handle tileset embedded in the tilemap. Warn if it's not the case.
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(

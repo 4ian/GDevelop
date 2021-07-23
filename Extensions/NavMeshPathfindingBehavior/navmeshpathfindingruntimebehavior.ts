@@ -273,8 +273,11 @@ namespace gdjs {
       // Round to avoid to flicker between 2 NavMesh
       // because of trigonometry rounding errors.
       // Round the padding on cellSize to avoid almost identical NavMesh
-      const obstacleCellPadding = Math.round(
-        (Math.sqrt(radiusSqMax) + this._extraBorder) / this._manager._cellSize
+      const obstacleCellPadding = Math.max(
+        0,
+        Math.round(
+          (Math.sqrt(radiusSqMax) + this._extraBorder) / this._manager._cellSize
+        )
       );
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
       this._lastUsedNavMesh = this._manager.lastUsedNavMesh;

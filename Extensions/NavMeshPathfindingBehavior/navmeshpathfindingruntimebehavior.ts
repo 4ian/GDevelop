@@ -101,9 +101,8 @@ namespace gdjs {
 
     movementAngleIsAround(degreeAngle: float, tolerance: float) {
       return (
-        gdjs.evtTools.common.angleDifference(
-          this._movementAngle,
-          degreeAngle
+        Math.abs(
+          gdjs.evtTools.common.angleDifference(this._movementAngle, degreeAngle)
         ) <= tolerance
       );
     }
@@ -261,32 +260,44 @@ namespace gdjs {
       // The contour lines may be needed if there is objects of different size anyway.
 
       let radiusSqMax = 0;
+      // TODO the center may not be the best thing to use if the object doesn't rotate
       const centerX = this.owner.getCenterXInScene();
       const centerY = this.owner.getCenterYInScene();
       for (const hitBox of this.owner.getHitBoxes()) {
         for (const vertex of hitBox.vertices) {
           const deltaX = vertex[0] - centerX;
-          const deltaY = vertex[1] - centerY;
+          // to have the same unit on x and y
+          const deltaY = (vertex[1] - centerY) * this._manager._isometricRatio;
           const radiusSq = deltaX * deltaX + deltaY * deltaY;
           radiusSqMax = Math.max(radiusSq, radiusSqMax);
         }
       }
       // Round to avoid to flicker between 2 NavMesh
       // because of trigonometry rounding errors.
-      const radiusMax = Math.round(Math.sqrt(radiusSqMax));
-
-      const navMesh = this._manager.getNavMesh(radiusMax + this._extraBorder);
+      // Round the padding on cellSize to avoid almost identical NavMesh
+      const obstacleCellPadding = Math.round(
+        (Math.sqrt(radiusSqMax) + this._extraBorder) / this._manager._cellSize
+      );
+      const navMesh = this._manager.getNavMesh(obstacleCellPadding);
       this._lastUsedNavMesh = this._manager.lastUsedNavMesh;
 
       //TODO if the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
       const path = navMesh.findPath(
-        { x: this.owner.getX(), y: this.owner.getY() },
-        { x: x, y: y }
+        //TODO convert coords in iso
+        {
+          x: this.owner.getX(),
+          y: this.owner.getY() * this._manager._isometricRatio,
+        },
+        { x: x, y: y * this._manager._isometricRatio }
       );
       if (path) {
         this._pathFound = true;
-        this._path = path.map(({ x, y }) => [x, y]);
+        // In case of isometry, convert coords back in screen.
+        this._path = path.map(({ x, y }) => [
+          x,
+          y / this._manager._isometricRatio,
+        ]);
         this._enterSegment(0);
         return;
       }
@@ -319,9 +330,10 @@ namespace gdjs {
         for (let index = 0; index < polygon.length; index++) {
           shapePainter.drawLine(
             polygon[index].x,
-            polygon[index].y,
+            polygon[index].y / this._manager._isometricRatio,
             polygon[(index + 1) % polygon.length].x,
-            polygon[(index + 1) % polygon.length].y,
+            polygon[(index + 1) % polygon.length].y /
+              this._manager._isometricRatio,
             1
           );
         }

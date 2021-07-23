@@ -15,7 +15,8 @@ namespace gdjs {
   export class NavMeshPathfindingObstaclesManager {
     _obstaclesRBush: any;
     _obstacles: Set<RuntimeObject>;
-    _cellSize: integer;
+    _isometricRatio: float;
+    _cellSize: float;
     _areaLeftBound: integer;
     _areaTopBound: integer;
     _areaRightBound: integer;
@@ -38,6 +39,19 @@ namespace gdjs {
       ]);
       this._obstacles = new Set();
       const game = runtimeScene.getGame();
+
+      const viewpoint = game.getExtensionProperty(
+        'NavMeshPathfinding',
+        'Viewpoint'
+      );
+      //TODO can an id be used instead of the name?
+      if (viewpoint === 'Isometry 2:1 (26.565°)') {
+        this._isometricRatio = 2;
+      } else if (viewpoint === 'True Isometry (30°)') {
+        this._isometricRatio = Math.sqrt(3);
+      } else {
+        this._isometricRatio = 1;
+      }
       this._cellSize = Number.parseInt(
         game.getExtensionProperty('NavMeshPathfinding', 'CellSize') || '10'
       );
@@ -100,22 +114,38 @@ namespace gdjs {
       this._navMeshes.clear();
     }
 
-    getNavMesh(obstaclePadding: integer): NavMesh {
-      // Round the padding on cellSize to avoid almost identical NavMesh
-      const obstacleCellPadding = Math.ceil(obstaclePadding / this._cellSize);
-
+    getNavMesh(obstacleCellPadding: integer): NavMesh {
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {
-        const meshField = gdjs.NavMeshGenerator.buildMesh(
+        const grid = new gdjs.RasterizationGrid(
           this._areaLeftBound,
           this._areaTopBound,
           this._areaRightBound,
           this._areaBottomBound,
           this._cellSize,
-          Array.from(this._obstacles),
-          obstacleCellPadding
+          // make cells square in the world
+          this._cellSize / this._isometricRatio
         );
-        navMesh = new gdjs.NavMesh(meshField);
+        gdjs.ObstacleRasterizer.rasterizeObstacles(
+          grid,
+          //TODO use the set directly
+          Array.from(this._obstacles)
+        );
+        gdjs.RegionGenerator.generateDistanceField(grid);
+        gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
+        const contours = gdjs.ContourBuilder.buildContours(grid);
+        const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
+          contours,
+          16
+        );
+        // scaleY = isometricRatio to keep the same unit length on the 2 axis for the pathfinding
+        const scaledMeshField =
+          gdjs.GridCoordinateConverter.convertFromGridBasis(
+            grid,
+            meshField,
+            this._isometricRatio
+          );
+        navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
 
         // // Uncomment this to see regions instead of the NavMesh

@@ -62,7 +62,7 @@ export default {
     instance: gdInitialInstance,
     associatedObject: gdObject,
     pixiContainer: any,
-    pixiRenderer: any
+    pixiRenderer: PIXI.Renderer
   ) {
     var objectType = associatedObject.getType();
     if (this.renderers.hasOwnProperty(objectType))

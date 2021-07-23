@@ -20,6 +20,7 @@ export default class InstancesRenderer {
   layersRenderers: { [string]: LayerRenderer };
 
   pixiContainer: PIXI.Container;
+  pixiRenderer: PIXI.Renderer;
 
   temporaryRectangle: Rectangle;
   instanceMeasurer: any;
@@ -49,7 +50,7 @@ export default class InstancesRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
-    pixiRenderer: any,
+    pixiRenderer: PIXI.Renderer,
   }) {
     this.project = project;
     this.instances = instances;

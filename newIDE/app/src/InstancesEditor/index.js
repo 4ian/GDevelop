@@ -79,7 +79,7 @@ export default class InstancesEditor extends Component<Props> {
   lastCursorY = 0;
   fpsLimiter = new FpsLimiter(28);
   canvasArea: ?HTMLDivElement;
-  pixiRenderer: any;
+  pixiRenderer: PIXI.Renderer;
   keyboardShortcuts: DeprecatedKeyboardShortcuts;
   pinchHandler: PinchHandler;
   canvasCursor: CanvasCursor;

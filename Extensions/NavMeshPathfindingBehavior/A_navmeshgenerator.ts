@@ -33,7 +33,8 @@ namespace gdjs {
   export class RasterizationGrid {
     originX: float;
     originY: float;
-    cellSize: float;
+    cellWidth: float;
+    cellHeight: float;
     cells: RasterizationCell[][];
     regionCount: integer = 0;
 
@@ -60,14 +61,16 @@ namespace gdjs {
       top: float,
       right: float,
       bottom: float,
-      cellSize: float
+      cellWidth: float,
+      cellHeight: float
     ) {
-      this.cellSize = cellSize;
-      this.originX = left - cellSize;
-      this.originY = top - cellSize;
+      this.cellWidth = cellWidth;
+      this.cellHeight = cellHeight;
+      this.originX = left - cellWidth;
+      this.originY = top - cellHeight;
 
-      const dimX = 2 + Math.ceil((right - left) / cellSize);
-      const dimY = 2 + Math.ceil((bottom - top) / cellSize);
+      const dimX = 2 + Math.ceil((right - left) / cellWidth);
+      const dimY = 2 + Math.ceil((bottom - top) / cellHeight);
       this.cells = [];
       for (var y = 0; y < dimY; y++) {
         this.cells[y] = [];
@@ -79,14 +82,21 @@ namespace gdjs {
     }
 
     convertToGridBasis(position: Point, gridPosition: Point) {
-      gridPosition.x = (position.x - this.originX) / this.cellSize;
-      gridPosition.y = (position.y - this.originY) / this.cellSize;
+      gridPosition.x = (position.x - this.originX) / this.cellWidth;
+      gridPosition.y = (position.y - this.originY) / this.cellHeight;
       return gridPosition;
     }
 
-    convertFromGridBasis(gridPosition: Point, position: Point) {
-      position.x = gridPosition.x * this.cellSize + this.originX;
-      position.y = gridPosition.y * this.cellSize + this.originY;
+    /**
+     *
+     * @param gridPosition
+     * @param position
+     * @param scaleY used for isometry
+     * @returns
+     */
+    convertFromGridBasis(gridPosition: Point, position: Point, scaleY: float) {
+      position.x = gridPosition.x * this.cellWidth + this.originX;
+      position.y = (gridPosition.y * this.cellHeight + this.originY) * scaleY;
       return position;
     }
 
@@ -135,43 +145,17 @@ namespace gdjs {
     polygonBVertexIndex: integer;
   };
 
-  export class NavMeshGenerator {
-    public static buildMesh(
-      areaLeftBound: float,
-      areaTopBound: float,
-      areaRightBound: float,
-      areaBottomBound: float,
-      cellSize: float,
-      obstacles: RuntimeObject[],
-      obstacleCellPadding: integer
-    ) {
-      const grid = new gdjs.RasterizationGrid(
-        areaLeftBound,
-        areaTopBound,
-        areaRightBound,
-        areaBottomBound,
-        cellSize
-      );
-      gdjs.ObstacleRasterizer.rasterizeObstacles(grid, obstacles);
-      gdjs.RegionGenerator.generateDistanceField(grid);
-      gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
-      const contours = gdjs.ContourBuilder.buildContours(grid);
-      const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
-        contours,
-        16
-      );
-      return GridCoordinateConverter.convertFromGridBasis(grid, meshField);
-    }
-  }
-
   export class GridCoordinateConverter {
     public static convertFromGridBasis(
       grid: RasterizationGrid,
-      polygons: Point[][]
+      polygons: Point[][],
+      scaleY: float
     ): Point[][] {
       // point can be shared so them must be copied to be scaled.
       return polygons.map((polygon) =>
-        polygon.map((point) => grid.convertFromGridBasis(point, { x: 0, y: 0 }))
+        polygon.map((point) =>
+          grid.convertFromGridBasis(point, { x: 0, y: 0 }, scaleY)
+        )
       );
     }
   }
@@ -1886,23 +1870,15 @@ namespace gdjs {
       // close borders
       for (let x = 0; x < grid.dimX(); x++) {
         const leftCell = grid.get(x, 0);
-        if (!leftCell.isObstacle()) {
-          grid.get(x, 0).setObstacle();
-        }
+        leftCell.setObstacle();
         const rightCell = grid.get(x, grid.dimY() - 1);
-        if (!rightCell.isObstacle()) {
-          rightCell.setObstacle();
-        }
+        rightCell.setObstacle();
       }
       for (let y = 1; y < grid.dimY() - 1; y++) {
         const topCell = grid.get(0, y);
-        if (!topCell.isObstacle()) {
-          topCell.setObstacle();
-        }
+        topCell.setObstacle();
         const bottomCell = grid.get(grid.dimX() - 1, y);
-        if (!bottomCell.isObstacle()) {
-          bottomCell.setObstacle();
-        }
+        bottomCell.setObstacle();
       }
       // The next two phases basically check the neighbors of a span and
       // set the span's distance field to be slightly greater than the

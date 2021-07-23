@@ -332,11 +332,14 @@
   };
 
   /**
-   * Extract information about the rotation of a tile from the tile id.
+   * Returns the tileUid and the pixi rotation of tiled tiles
+   * information about rotation in bits 32, 31 and 30
+   * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
+   *
    * @param {number} globalTileUid
-   * @returns {[number, boolean, boolean, boolean]}
+   * @returns {[number, number]}
    */
-  const extractTileUidFlippedStates = (globalTileUid) => {
+  const getTileUidWithRotation = (globalTileUid) => {
     const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     const FLIPPED_VERTICALLY_FLAG = 0x40000000;
     const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
@@ -352,51 +355,6 @@
         FLIPPED_DIAGONALLY_FLAG
       );
 
-    return [tileUid, !!flippedHorizontally, !!flippedVertically, !!flippedDiagonally];
-  };
-
-  /**
-   * Return the texture to use for the tile with the specified uid, which can contains
-   * information about rotation in bits 32, 31 and 30
-   * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
-   *
-   * @param {Object<number, PIXI.Texture | null>} textureCache
-   * @param {number} globalTileUid
-   * @returns {?PIXI.Texture}
-   */
-  const findTileTextureInCache = (textureCache, globalTileUid) => {
-    if (globalTileUid === 0) return null;
-
-    if (textureCache[globalTileUid]) {
-      return textureCache[globalTileUid];
-    }
-
-    // If the texture is not in the cache, it's potentially because its ID
-    // is a flipped/rotated version of another ID.
-    const flippedStates = extractTileUidFlippedStates(globalTileUid);
-    const tileUid = flippedStates[0];
-    const flippedHorizontally = flippedStates[1];
-    const flippedVertically = flippedStates[2];
-    const flippedDiagonally = flippedStates[3];
-
-    if (tileUid === 0) return null;
-
-    // If the tile still can't be found in the cache, it means the ID we got
-    // is invalid.
-    const unflippedTexture = textureCache[tileUid];
-    if (!unflippedTexture) return null;
-
-    // Clone the unflipped texture and save it in the cache
-    const frame = unflippedTexture.frame.clone();
-    const orig = unflippedTexture.orig.clone();
-    if (flippedDiagonally) {
-      const width = orig.width;
-      orig.width = orig.height;
-      orig.height = width;
-    }
-    const trim = orig.clone();
-
-    // Get the rotation "D8" number.
     // See https://pixijs.io/examples/#/textures/texture-rotate.js
     let rotate = 0;
     if (flippedDiagonally) {
@@ -418,17 +376,9 @@
         rotate = 4;
       }
     }
-
-    const flippedTexture = new PIXI.Texture(
-      unflippedTexture.baseTexture,
-      frame,
-      orig,
-      trim,
-      rotate
-    );
-    return (textureCache[globalTileUid] = flippedTexture);
-  };
-
+    return [tileUid, rotate];
+  }
+  
   /**
    * Re-renders the tilemap whenever its rendering settings have been changed
    *
@@ -508,30 +458,25 @@
             const xPos = genericTileMapData.tileWidth * j;
             const yPos = genericTileMapData.tileHeight * i;// these are stored in Ldtk, so no need to compute their positions
 
-            // The "globalTileUid" is the tile UID with encoded
-            // bits about the flipping/rotation of the tile.
             /** @type {number} */
             // @ts-ignore
             const globalTileUid = layerData[tileSlotIndex];
+            const [tileUid, rotate] = getTileUidWithRotation(globalTileUid);
+            const tileTexture = tileUid !== 0 ? genericTileMapData.textureCache[tileUid] : null;
 
-            // Extract the tile UID and the texture.
-            const tileUid = extractTileUidFlippedStates(globalTileUid)[0];
-            const tileTexture = findTileTextureInCache(
-              genericTileMapData.textureCache,
-              globalTileUid
-            );
             if (tileTexture) {
+              
               const tileData =
                 genericTileMapData.tiles &&
                 genericTileMapData.tiles.find(function (tile) {
-                  return tile.id === tileUid - 1;
+                  return tile.id === globalTileUid - 1;
                 });
 
               const pixiTilemapFrame = pixiTileMap.tile(
                 tileTexture,
                 xPos,
                 yPos,
-                { alpha: layer.opacity }
+                { alpha: layer.opacity, rotate }
               );
 
               // Animated tiles have a limitation:
@@ -544,7 +489,7 @@
                 );
               }
             }
-
+            
             tileSlotIndex += 1;
           }
         }

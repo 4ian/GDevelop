@@ -35,6 +35,7 @@ export default class LayerRenderer {
 
   renderedInstances: { [number]: RenderedInstance } = {};
   pixiContainer: PIXI.Container;
+  pixiRenderer: PIXI.Renderer;
 
   /** Functor used to render an instance */
   instancesRenderer: gdInitialInstanceJSFunctor;

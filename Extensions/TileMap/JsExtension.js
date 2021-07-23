@@ -85,7 +85,7 @@ module.exports = {
         'tilemapJsonFile',
         new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
           .setType('resource')
-          .addExtraInfo('tilemap')//
+          .addExtraInfo('tilemap')
           .setLabel(_('Tilemap tiled JSON or Ldtk file'))
           .setDescription(
             _('This is the JSON/Ldtk file that was saved or exported from Tiled/Ldtk.')
@@ -132,7 +132,7 @@ module.exports = {
       );
       objectProperties.set(
           'levelIndex',
-          new gd.PropertyDescriptor(objectContent.levelIndex?.toString() || 0)
+          new gd.PropertyDescriptor(objectContent.levelIndex.toString())
               .setType('number')
               .setLabel(_('Level index to display'))
               .setDescription(
@@ -574,15 +574,8 @@ module.exports = {
         pixiRenderer
       );
 
-      
-      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any)
-      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any);
-
-      
-
       pixiRenderer.plugins.tilemap = new Tilemap.TileRenderer();
       this._pixiObject = new Tilemap.CompositeTilemap();
-      // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any)
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.

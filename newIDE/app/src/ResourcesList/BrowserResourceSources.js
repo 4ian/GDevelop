@@ -211,7 +211,7 @@ export default [
     name: 'publicTilemapUrlChooser',
     displayName: 'Choose a tilemap file from library',
     kind: 'tilemap',
-    component: class JsonResourceChooser extends React.Component<ResourceSourceComponentProps>  {
+    component: class JsonResourceChooser extends React.Component<ResourceSourceComponentProps> {
       _chooser: ?GenericResourcesChooser;
       chooseResources = () => {
         if (this._chooser) return this._chooser.chooseResources();

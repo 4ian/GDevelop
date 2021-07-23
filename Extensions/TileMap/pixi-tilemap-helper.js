@@ -179,13 +179,10 @@
   const parseLDtkData = (tiledData, atlasTexture, getTexture, levelIndex, tilemapResourceName) => {
     const tileSetAtlases = {};
     tiledData.defs.tilesets.forEach(tileset=> {
-      console.log("tileset",tileset)
       const texture = tileset.relPath ? getTexture(tileset.relPath , tilemapResourceName): null;
       tileSetAtlases[tileset.uid] = { texture, ...tileset }
     })
-
     const selectedLevel = tiledData.levels[levelIndex > -1 ? levelIndex : 0];
-    console.log(tiledData,atlasTexture,getTexture, "level",levelIndex, selectedLevel)
 
     const layers = [];
     const textureCache = {};
@@ -203,23 +200,16 @@
         visible: ldtkLayer.visible,
         opacity: ldtkLayer['__opacity']
       }
-
-
-      console.log("IntGrid layer ", ldtkLayer, layerAtlasTextureRelPath, generatedTiles)
-      console.log("autolayer ", ldtkLayer,layerAtlasTextureRelPath,generatedTiles)
       textureCache[layerIndex] = {};
       const tileSet = tileSetAtlases[tilesetUid];
-      console.log("Tileset to use",tileSet )
 
       generatedTiles.forEach(generatedTile => {
         if (generatedTile.t in textureCache[layerIndex]) return;
 
         try {
           const [x,y] = generatedTile.src;
-          //tileWidth,tileHeight
-          // console.log("RECT",x,y,generatedTile,ldtkLayer['__gridSize'])
           const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
-          console.log("RECT", rect)
+
           // @ts-ignore - atlasTexture is never null here.
           const texture = new PIXI.Texture(tileSet.texture, rect);
 
@@ -247,7 +237,6 @@
     layers,
     tiles: []
     };
-    console.log("RESULT>>",tileMapData,textureCache)
      
     return tileMapData;
   };
@@ -378,7 +367,7 @@
     }
     return [tileUid, rotate];
   }
-  
+
   /**
    * Re-renders the tilemap whenever its rendering settings have been changed
    *
@@ -395,17 +384,13 @@
     layerIndex,
     pako
   ) => {
-    console.log("update pixi",pixiTileMap , genericTileMapData)
     if (!pixiTileMap || !genericTileMapData) return;
     pixiTileMap.clear();
 
-    console.log("GENERIC DATA>>> ", genericTileMapData)
     genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
-
-      console.log("LAYER>>>", layer)
       // Ldtk Types
       if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
 

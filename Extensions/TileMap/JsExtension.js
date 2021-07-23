@@ -532,7 +532,6 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
-    console.log("rendering serv", objectsRenderingService)
 
     const Tilemap = objectsRenderingService.requireModule(
       __dirname,
@@ -582,7 +581,6 @@ module.exports = {
       
 
       pixiRenderer.plugins.tilemap = new Tilemap.TileRenderer();
-      console.log( ">> PIXI", {PIXI, pixiRenderer, project, layout,instance,pixiContainer,associatedObject})
       this._pixiObject = new Tilemap.CompositeTilemap();
       // PIXI.Renderer.registerPlugin('tilemap', Tilemap.TileRenderer as any)
 
@@ -700,7 +698,6 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      console.log("json file", tilemapJsonFile)
       try {
         const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,

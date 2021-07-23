@@ -36,7 +36,7 @@ export default class InstancesRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
-    pixiRenderer
+    pixiRenderer,
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,

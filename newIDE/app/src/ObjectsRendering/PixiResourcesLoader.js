@@ -99,10 +99,10 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-   static getPIXITexture(
+  static getPIXITexture(
     project: gdProject,
     resourceName: string,
-    isNew = false
+    isNew: boolean = false
   ) {
     if (!isNew && loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
@@ -131,7 +131,7 @@ export default class PixiResourcesLoader {
     return loadedTextures[resourceName];
   }
 
-    /**
+  /**
    * Return the PIXI texture relative to a file.
    * If not loaded, it will load it.
    * @returns The PIXI.Texture to be used. It can be loading, so you
@@ -140,30 +140,30 @@ export default class PixiResourcesLoader {
    *
    * If the texture image resource is missing, GDevelop will try to add it
    */
-     static getPixiTextureRelativeToFile(
-      project: gdProject,
-      resourceName: string,
-      relativeToFile: string
-    ) {
-      if (!project.getResourcesManager().hasResource(resourceName)) {
-        const resourceRelativePath = path.join(
-          path.dirname(relativeToFile),
-          resourceName
-        );
-        const newResource = new gd.ImageResource();
-        newResource.setName(resourceName);
-        newResource.setFile(resourceRelativePath);
-        project.getResourcesManager().addResource(newResource);
-        console.log(
-          'ADDED RESOURCE:',
-          resourceName,
-          project.getResourcesManager().getAllResourceNames()
-        );
-  
-        return this.getPIXITexture(project, resourceName, true);
-      }
-      return this.getPIXITexture(project, resourceName);
+  static getPixiTextureRelativeToFile(
+    project: gdProject,
+    resourceName: string,
+    relativeToFile: string
+  ) {
+    if (!project.getResourcesManager().hasResource(resourceName)) {
+      const resourceRelativePath = path.join(
+        path.dirname(relativeToFile),
+        resourceName
+      );
+      const newResource = new gd.ImageResource();
+      newResource.setName(resourceName);
+      newResource.setFile(resourceRelativePath);
+      project.getResourcesManager().addResource(newResource);
+      console.log(
+        'ADDED RESOURCE:',
+        resourceName,
+        project.getResourcesManager().getAllResourceNames()
+      );
+
+      return this.getPIXITexture(project, resourceName, true);
     }
+    return this.getPIXITexture(project, resourceName);
+  }
 
   /**
    * Return the PIXI video texture represented by the given resource.

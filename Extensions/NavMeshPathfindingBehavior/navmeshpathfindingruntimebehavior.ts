@@ -156,17 +156,13 @@ namespace gdjs {
 
     getNodeY(index: integer): float {
       if (index < this._path.length) {
-        return this._path[index][1];
+        return this._path[index][1] / this._manager._isometricRatio;
       }
       return 0;
     }
 
     getNextNodeIndex() {
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._currentSegment + 1;
-      } else {
-        return this._path.length - 1;
-      }
+      return Math.min(this._currentSegment + 1, this._path.length - 1);
     }
 
     getNodeCount(): integer {
@@ -177,44 +173,32 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._path[this._currentSegment + 1][0];
-      } else {
-        return this._path[this._path.length - 1][0];
-      }
+      const nextIndex = Math.min(this._currentSegment + 1, this._path.length - 1);
+      return this._path[nextIndex][0];
     }
 
     getNextNodeY(): float {
       if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment + 1 < this._path.length) {
-        return this._path[this._currentSegment + 1][1];
-      } else {
-        return this._path[this._path.length - 1][1];
-      }
+      const nextIndex = Math.min(this._currentSegment + 1, this._path.length - 1);
+      return this._path[nextIndex][1] / this._manager._isometricRatio;
     }
 
-    getLastNodeX(): float {
-      if (this._path.length < 2) {
+    getPreviousNodeX(): float {
+      if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment < this._path.length - 1) {
-        return this._path[this._currentSegment][0];
-      } else {
-        return this._path[this._path.length - 1][0];
-      }
+      const previousIndex = Math.min(this._currentSegment, this._path.length - 1);
+      return this._path[previousIndex][0];
     }
 
-    getLastNodeY(): float {
-      if (this._path.length < 2) {
+    getPreviousNodeY(): float {
+      if (this._path.length === 0) {
         return 0;
       }
-      if (this._currentSegment < this._path.length - 1) {
-        return this._path[this._currentSegment][1];
-      } else {
-        return this._path[this._path.length - 1][1];
-      }
+      const previousIndex = Math.min(this._currentSegment, this._path.length - 1);
+      return this._path[previousIndex][1] / this._manager._isometricRatio;
     }
 
     getDestinationX(): float {
@@ -228,7 +212,7 @@ namespace gdjs {
       if (this._path.length === 0) {
         return 0;
       }
-      return this._path[this._path.length - 1][1];
+      return this._path[this._path.length - 1][1] / this._manager._isometricRatio;
     }
 
     /**
@@ -293,10 +277,9 @@ namespace gdjs {
       );
       if (path) {
         this._pathFound = true;
-        // In case of isometry, convert coords back in screen.
         this._path = path.map(({ x, y }) => [
           x,
-          y / this._manager._isometricRatio,
+          y,
         ]);
         this._enterSegment(0);
         return;
@@ -416,7 +399,8 @@ namespace gdjs {
         newPos = this._path[this._path.length - 1];
       }
       this.owner.setX(newPos[0]);
-      this.owner.setY(newPos[1]);
+      // In case of isometry, convert coords back in screen.
+      this.owner.setY(newPos[1] / this._manager._isometricRatio);
       if (this._rotateObject) {
         this.owner.rotateTowardAngle(
           pathAngle,

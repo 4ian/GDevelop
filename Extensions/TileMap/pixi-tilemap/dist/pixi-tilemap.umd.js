@@ -1823,7 +1823,6 @@ this.PIXI.tilemap = this.PIXI.tilemap || {};
     	        len <<= 1;
     	    }
 
-            console.log("pixi utils exists?", utils)
     	    this.ibLen = totalIndices;
             const createIndicesForQuads = utils.createIndicesForQuads || utils.utils.createIndicesForQuads;
     	    this.indexBuffer.update(createIndicesForQuads(size,

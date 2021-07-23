@@ -57,7 +57,7 @@ export default class LayerRenderer {
     onMoveInstance,
     onMoveInstanceEnd,
     onDownInstance,
-    pixiRenderer
+    pixiRenderer,
   }: {
     project: gdProject,
     instances: gdInitialInstancesContainer,
@@ -71,7 +71,7 @@ export default class LayerRenderer {
     onMoveInstance: (gdInitialInstance, number, number) => void,
     onMoveInstanceEnd: void => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
-    pixiRenderer: any
+    pixiRenderer: any,
   }) {
     this.pixiRenderer = pixiRenderer;
     this.project = project;

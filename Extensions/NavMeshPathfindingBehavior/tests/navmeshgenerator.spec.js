@@ -165,7 +165,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
     square.setPosition(160, 160);
     runtimeScene.renderAndStep(1000 / 60);
 
-    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20);
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
     gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [square]);
     checkObstacles(
@@ -317,7 +317,8 @@ describe.only('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons
+      convexPolygons,
+      1
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -369,7 +370,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
     diamond.setPosition(160, 160);
     runtimeScene.renderAndStep(1000 / 60);
 
-    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20);
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
     gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [diamond]);
     checkObstacles(
@@ -529,7 +530,8 @@ describe.only('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons
+      convexPolygons,
+      1
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -584,7 +586,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
     diamond.setPosition(160, 160);
     runtimeScene.renderAndStep(1000 / 60);
 
-    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20);
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
     gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [diamond]);
     checkObstacles(
@@ -744,7 +746,8 @@ describe.only('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons
+      convexPolygons,
+      1
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>

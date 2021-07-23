@@ -89,7 +89,7 @@ namespace gdjs {
         this.setLayerIndex(newObjectData.content.layerIndex);
       }
       if (
-          oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
+        oldObjectData.content.levelIndex !== newObjectData.content.levelIndex
       ) {
         this.setLevelIndex(newObjectData.content.levelIndex);
       }

@@ -24,10 +24,10 @@ namespace gdjs {
 
       // Load (or reset)
       if (this._pixiObject === undefined) {
-        const pixiRenderer =  runtimeScene
-        .getGame()
-        .getRenderer()
-        .getPIXIRenderer();
+        const pixiRenderer = runtimeScene
+          .getGame()
+          .getRenderer()
+          .getPIXIRenderer();
 
         // @ts-ignore - pixi-tilemap types to be added.
         pixiRenderer.plugins.tilemap = new PIXI.tilemap.TileRenderer();
@@ -163,5 +163,6 @@ namespace gdjs {
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;
-  export type TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
+  export type TileMapRuntimeObjectRenderer =
+    gdjs.TileMapRuntimeObjectPixiRenderer;
 }

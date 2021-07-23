@@ -406,7 +406,6 @@
                 { alpha: layer.opacity, rotate: LdtkToPixiRotations[tile.f]}
             )
           }
-
         })
       }
 

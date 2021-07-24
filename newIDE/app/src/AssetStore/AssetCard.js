@@ -19,6 +19,11 @@ const styles = {
     verticalAlign: 'middle',
     pointerEvents: 'none',
   },
+  previewImagePixelated: {
+    width: '-webkit-fill-available',
+    imageRendering: 'pixelated',
+    padding: 15,
+  },
   icon: {
     color: '#fff',
   },
@@ -51,6 +56,14 @@ type Props = {|
   onOpenDetails: () => void,
 |};
 
+const isPixelArt = assetShortHeader => {
+  let returnValue = false;
+  assetShortHeader.tags.map(tag => {
+    if (tag.toLowerCase() === 'pixel art') returnValue = true;
+  });
+  return returnValue;
+};
+
 export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
@@ -59,11 +72,20 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
           <CheckeredBackground />
           <CorsAwareImage
             key={assetShortHeader.previewImageUrls[0]}
-            style={{
-              ...styles.previewImage,
-              maxWidth: 128 - 2 * paddingSize,
-              maxHeight: 128 - 2 * paddingSize,
-            }}
+            style={
+              isPixelArt(assetShortHeader)
+                ? {
+                    ...styles.previewImage,
+                    ...styles.previewImagePixelated,
+                    maxWidth: 128 - 2 * paddingSize,
+                    maxHeight: 128 - 2 * paddingSize,
+                  }
+                : {
+                    ...styles.previewImage,
+                    maxWidth: 128 - 2 * paddingSize,
+                    maxHeight: 128 - 2 * paddingSize,
+                  }
+            }
             src={assetShortHeader.previewImageUrls[0]}
             alt={assetShortHeader.name}
           />

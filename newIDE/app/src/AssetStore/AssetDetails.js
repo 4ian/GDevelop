@@ -31,6 +31,11 @@ import Window from '../Utils/Window';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 
 const styles = {
+  previewImagePixelated: {
+    width: '-webkit-fill-available',
+    imageRendering: 'pixelated',
+    padding: 15,
+  },
   previewBackground: {
     position: 'relative',
     display: 'flex',
@@ -72,6 +77,14 @@ type Props = {|
   canInstall: boolean,
   isBeingInstalled: boolean,
 |};
+
+const isPixelArt = assetShortHeader => {
+  let returnValue = false;
+  assetShortHeader.tags.map(tag => {
+    if (tag.toLowerCase() === 'pixel art') returnValue = true;
+  });
+  return returnValue;
+};
 
 export const AssetDetails = ({
   project,
@@ -159,7 +172,16 @@ export const AssetDetails = ({
               >
                 <CheckeredBackground />
                 <CorsAwareImage
-                  style={styles.previewImage}
+                  style={
+                    isPixelArt(assetShortHeader)
+                      ? {
+                          ...styles.previewImage,
+                          ...styles.previewImagePixelated,
+                        }
+                      : {
+                          ...styles.previewImage,
+                        }
+                  }
                   src={assetShortHeader.previewImageUrls[0]}
                   alt={assetShortHeader.name}
                 />

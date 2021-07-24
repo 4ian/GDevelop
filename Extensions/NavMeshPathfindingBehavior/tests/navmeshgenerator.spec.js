@@ -364,7 +364,7 @@ describe('gdjs.NavMeshGeneration', function () {
     );
   });
 
-  it.only('can build a mesh for a plus', function () {
+  it('can build a mesh for a plus', function () {
     const runtimeScene = makeTestRuntimeScene();
     const horizontalRectangle = createRectangle(runtimeScene, 160, 80);
     horizontalRectangle.setPosition(160, 160);

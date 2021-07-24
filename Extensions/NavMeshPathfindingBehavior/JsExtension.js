@@ -749,6 +749,40 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    return [];
+    const dummyBehavior = extension
+      .getBehaviorMetadata('NavMeshPathfinding::NavMeshPathfindingBehavior')
+      .get();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Acceleration',
+        '1000'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Max. speed',
+        '1000'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Rotate speed',
+        '1000'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Rotate object',
+        'false'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Angle offset',
+        '45'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        'Extra border size',
+        '100'
+      ),
+    ];
   },
 };

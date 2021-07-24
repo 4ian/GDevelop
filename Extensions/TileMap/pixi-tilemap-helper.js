@@ -246,7 +246,10 @@
       if (selectedLevelBg in textureCache.levelBg) return;
       try {
         const levelBgTexture = getTexture(selectedLevelBg, tilemapResourceName);
-        textureCache.levelBg[selectedLevelBg] = levelBgTexture;
+        const rect = new PIXI.Rectangle(0, 0, selectedLevel.pxWid, selectedLevel.pxHei);
+        // // @ts-ignore - atlasTexture is never null here.
+        const texture = new PIXI.Texture(levelBgTexture, rect);
+        textureCache.levelBg[selectedLevelBg] = texture;
       } catch (error) {
         console.error(
           'An error occurred while creating a PIXI.Texture to be used in a TileMap:',

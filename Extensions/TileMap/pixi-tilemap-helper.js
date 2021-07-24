@@ -241,6 +241,21 @@
       layers.push(layer);
     });
 
+    const selectedLevelBg = selectedLevel.bgRelPath;
+    textureCache.levelBg = {};
+    if (selectedLevelBg) {
+      if (selectedLevelBg in textureCache.levelBg) return;
+      try {
+        const levelBgTexture = getTexture(selectedLevelBg, tilemapResourceName);
+        textureCache.levelBg[selectedLevelBg] = levelBgTexture;
+      } catch (error) {
+        console.error(
+          'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
+          error
+        );
+        textureCache.levelBg[selectedLevelBg] = null;
+      }
+    }
     /** @type {GenericPixiTileMapData} */
     const tileMapData = {
       width: 0,
@@ -251,6 +266,7 @@
       textureCache,
       layers,
       tiles: [],
+      selectedLevelBg,
     };
 
     return tileMapData;
@@ -418,6 +434,13 @@
     if (!pixiTileMap || !genericTileMapData) return;
     pixiTileMap.clear();
 
+    if (genericTileMapData.selectedLevelBg) {
+      const bgTexture =
+        genericTileMapData.textureCache.levelBg[
+          genericTileMapData.selectedLevelBg
+        ];
+      pixiTileMap.tile(bgTexture, 0, 0);
+    }
     genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;

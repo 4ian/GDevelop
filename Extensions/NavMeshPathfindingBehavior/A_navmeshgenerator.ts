@@ -1935,11 +1935,18 @@ namespace gdjs {
      */
     static rasterizeObstacles(
       grid: RasterizationGrid,
-      obstacles: RuntimeObject[]
+      obstacles: Set<RuntimeObject>
     ) {
       const workingNodes: number[] = [];
       //TODO check the accuracy. Is a grid alined rectangle overstepped?
-      for (const obstacle of obstacles) {
+      const obstaclesItr = obstacles.values();
+      for (
+        var element = obstaclesItr.next();
+        !element.done;
+        element = obstaclesItr.next()
+      ) {
+        const obstacle = element.value;
+
         for (const polygon of obstacle.getHitBoxes()) {
           const vertices = polygon.vertices.map((vertex) => {
             const point = { x: vertex[0], y: vertex[1] };

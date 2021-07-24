@@ -4,8 +4,6 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
-  declare var rbush: any;
-
   /**
    * PathfindingObstaclesManager manages the common objects shared by objects having a
    * pathfinding behavior: In particular, the obstacles behaviors are required to declare
@@ -13,7 +11,6 @@ namespace gdjs {
    * (see `gdjs.NavMeshPathfindingRuntimeBehavior.obstaclesManagers`).
    */
   export class NavMeshPathfindingObstaclesManager {
-    _obstaclesRBush: any;
     _obstacles: Set<RuntimeObject>;
     _isometricRatio: float;
     _cellSize: float;
@@ -31,12 +28,6 @@ namespace gdjs {
      * @param object The object
      */
     constructor(runtimeScene: gdjs.RuntimeScene) {
-      this._obstaclesRBush = new rbush(9, [
-        '.owner.getAABB().min[0]',
-        '.owner.getAABB().min[1]',
-        '.owner.getAABB().max[0]',
-        '.owner.getAABB().max[1]',
-      ]);
       this._obstacles = new Set();
       const game = runtimeScene.getGame();
 
@@ -89,7 +80,6 @@ namespace gdjs {
     addObstacle(
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesRBush.insert(pathfindingObstacleBehavior);
       this._obstacles.add(pathfindingObstacleBehavior.owner);
     }
 
@@ -100,7 +90,6 @@ namespace gdjs {
     removeObstacle(
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesRBush.remove(pathfindingObstacleBehavior);
       this._obstacles.delete(pathfindingObstacleBehavior.owner);
     }
 
@@ -126,11 +115,7 @@ namespace gdjs {
           // make cells square in the world
           this._cellSize / this._isometricRatio
         );
-        gdjs.ObstacleRasterizer.rasterizeObstacles(
-          grid,
-          //TODO use the set directly
-          Array.from(this._obstacles)
-        );
+        gdjs.ObstacleRasterizer.rasterizeObstacles(grid, this._obstacles);
         gdjs.RegionGenerator.generateDistanceField(grid);
         gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
         const contours = gdjs.ContourBuilder.buildContours(grid);
@@ -147,45 +132,9 @@ namespace gdjs {
           );
         navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
-
-        // // Uncomment this to see regions instead of the NavMesh
-        // const lastUsedRegions = contours.map((polygon) =>
-        //   polygon.map((point) => ({
-        //     x: this._cellSize * point.x + grid.originX,
-        //     y: this._cellSize * point.y + grid.originY,
-        //   }))
-        // );
-        // this.lastUsedMeshField = lastUsedRegions;
       }
       this.lastUsedNavMesh = navMesh;
       return navMesh;
-    }
-
-    /**
-     * Returns all the platforms around the specified object.
-     * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
-     * @return An array with all platforms near the object.
-     */
-    getAllObstaclesAround(
-      x: float,
-      y: float,
-      radius: float,
-      result: gdjs.NavMeshPathfindingObstacleRuntimeBehavior[]
-    ): any {
-      const searchArea = gdjs.staticObject(
-        PathfindingObstaclesManager.prototype.getAllObstaclesAround
-      );
-      // @ts-ignore
-      searchArea.minX = x - radius;
-      // @ts-ignore
-      searchArea.minY = y - radius;
-      // @ts-ignore
-      searchArea.maxX = x + radius;
-      // @ts-ignore
-      searchArea.maxY = y + radius;
-      const nearbyPlatforms = this._obstaclesRBush.search(searchArea);
-      result.length = 0;
-      result.push.apply(result, nearbyPlatforms);
     }
   }
 

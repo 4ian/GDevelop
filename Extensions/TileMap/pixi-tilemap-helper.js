@@ -201,11 +201,15 @@
       const gridSize = ldtkLayer['__gridSize'];
       const type = ldtkLayer['__type'];
       const tilesetUid = ldtkLayer['__tilesetDefUid'];
-      const generatedTiles = ldtkLayer.autoLayerTiles;
+      const autoLayerTiles = ldtkLayer.autoLayerTiles;
+      const gridTiles = ldtkLayer.gridTiles;
+      const ldtkTiles = [...autoLayerTiles, ...gridTiles];
       const entities = ldtkLayer.entityInstances || [];
       const layer = {
         type: type,
-        autoLayerTiles: generatedTiles,
+        autoLayerTiles,
+        ldtkTiles,
+        gridTiles,
         entityInstances: entities,
         visible: ldtkLayer.visible,
         opacity: ldtkLayer['__opacity'],
@@ -214,6 +218,7 @@
       const tileSet = tileSetAtlases[tilesetUid];
 
       generatedTiles.forEach((generatedTile) => {
+      ldtkTiles.forEach((generatedTile) => {
         if (generatedTile.t in textureCache[layerIndex]) return;
 
         try {
@@ -418,9 +423,9 @@
       else if (displayMode === 'visible' && !layer.visible) return;
 
       // Ldtk Types
-      if (layer.type === 'AutoLayer' || layer.type === 'IntGrid') {
+      if (layer.ldtkTiles) {
         // @ts-ignore
-        layer.autoLayerTiles.forEach(function (tile) {
+        layer.ldtkTiles.forEach(function (tile) {
           var texture = genericTileMapData.textureCache[index];
           if (texture) {
             const [x, y] = tile.px;

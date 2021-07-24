@@ -217,7 +217,6 @@
       textureCache[layerIndex] = {};
       const tileSet = tileSetAtlases[tilesetUid];
 
-      generatedTiles.forEach((generatedTile) => {
       ldtkTiles.forEach((generatedTile) => {
         if (generatedTile.t in textureCache[layerIndex]) return;
 

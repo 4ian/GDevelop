@@ -1938,7 +1938,6 @@ namespace gdjs {
       obstacles: Set<RuntimeObject>
     ) {
       const workingNodes: number[] = [];
-      //TODO check the accuracy. Is a grid alined rectangle overstepped?
       const obstaclesItr = obstacles.values();
       for (
         var element = obstaclesItr.next();

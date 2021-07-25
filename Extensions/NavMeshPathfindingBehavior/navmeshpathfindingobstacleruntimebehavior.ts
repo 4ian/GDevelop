@@ -12,6 +12,8 @@ namespace gdjs {
    */
   export class NavMeshPathfindingObstaclesManager {
     _obstacles: Set<RuntimeObject>;
+
+    // extension configuration
     _isometricRatio: float;
     _cellSize: float;
     _areaLeftBound: integer;
@@ -19,10 +21,11 @@ namespace gdjs {
     _areaRightBound: integer;
     _areaBottomBound: integer;
 
-    // for the path finding algorithm
+    /**
+     * The navigation meshes by moving object size
+     * (rounded on _cellSize)
+     */
     _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
-    /** Used to draw traces for debugging */
-    lastUsedNavMesh: gdjs.NavMesh | null = null;
 
     /**
      * @param object The object
@@ -65,7 +68,7 @@ namespace gdjs {
     /**
      * Get the obstacles manager of a scene.
      */
-    static getManager(runtimeScene): NavMeshPathfindingObstaclesManager {
+    static getManager(runtimeScene: any): NavMeshPathfindingObstaclesManager {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
         runtimeScene.pathfindingObstaclesManager =
@@ -93,7 +96,7 @@ namespace gdjs {
       this._obstacles.delete(pathfindingObstacleBehavior.owner);
     }
 
-    public static invalidateNavMesh(runtimeScene) {
+    public static invalidateNavMesh(runtimeScene: any) {
       const manager =
         NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
       manager.invalidateNavMesh();
@@ -133,7 +136,6 @@ namespace gdjs {
         navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
       }
-      this.lastUsedNavMesh = navMesh;
       return navMesh;
     }
   }
@@ -143,8 +145,6 @@ namespace gdjs {
    * considered as a obstacle by objects having Pathfinding Behavior.
    */
   export class NavMeshPathfindingObstacleRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _impassable: boolean = true;
-    _cost: float = 1;
     _oldX: float = 0;
     _oldY: float = 0;
     _oldWidth: float = 0;
@@ -154,7 +154,7 @@ namespace gdjs {
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      behaviorData,
+      behaviorData: any,
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
@@ -165,7 +165,7 @@ namespace gdjs {
       //The owner is not yet fully constructed.
     }
 
-    updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
+    updateFromBehaviorData(oldBehaviorData: any, newBehaviorData: any): boolean {
       return true;
     }
 
@@ -207,10 +207,6 @@ namespace gdjs {
 
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
-    getAABB() {
-      return this.owner.getAABB();
-    }
-
     onActivate() {
       if (this._registeredInManager) {
         return;
@@ -225,22 +221,6 @@ namespace gdjs {
       }
       this._manager.removeObstacle(this);
       this._registeredInManager = false;
-    }
-
-    getCost() {
-      return this._cost;
-    }
-
-    setCost(cost: float): void {
-      this._cost = cost;
-    }
-
-    isImpassable(): boolean {
-      return this._impassable;
-    }
-
-    setImpassable(impassable: boolean): void {
-      this._impassable = impassable;
     }
   }
   gdjs.registerBehavior(

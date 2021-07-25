@@ -165,7 +165,10 @@ namespace gdjs {
       //The owner is not yet fully constructed.
     }
 
-    updateFromBehaviorData(oldBehaviorData: any, newBehaviorData: any): boolean {
+    updateFromBehaviorData(
+      oldBehaviorData: any,
+      newBehaviorData: any
+    ): boolean {
       return true;
     }
 

@@ -1,276 +1,30 @@
-// MIT License
-
-// Copyright (c) 2017 Michael Hadley
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 namespace gdjs {
-  export interface Point {
-    x: number;
-    y: number;
-  }
+  // The following implementation of the A* algorithm is from:
+  // https://github.com/bgrins/javascript-astar
+  // and is under this license:
 
-  /** Lightweight representation of a Polygon2 as a series of points. */
-  export type PolyPoints = Point[];
+  // Copyright (c) Brian Grinstead, http://briangrinstead.com
+  //
+  // Permission is hereby granted, free of charge, to any person obtaining
+  // a copy of this software and associated documentation files (the
+  // "Software"), to deal in the Software without restriction, including
+  // without limitation the rights to use, copy, modify, merge, publish,
+  // distribute, sublicense, and/or sell copies of the Software, and to
+  // permit persons to whom the Software is furnished to do so, subject to
+  // the following conditions:
+  //
+  // The above copyright notice and this permission notice shall be
+  // included in all copies or substantial portions of the Software.
+  //
+  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-  type PointLike = Vector2 | Point;
-
-  /**
-   * Stripped down version of Phaser's Vector2 with just the functionality needed for navmeshes.
-   *
-   * @export
-   * @class Vector2
-   */
-  export class Vector2 {
-    public x: number;
-    public y: number;
-
-    constructor(x: number = 0, y: number = 0) {
-      this.x = x;
-      this.y = y;
-    }
-
-    public equals(v: PointLike) {
-      return this.x === v.x && this.y === v.y;
-    }
-
-    public angle(v: PointLike) {
-      return Math.atan2(v.y - this.y, v.x - this.x);
-    }
-
-    public distance(v: PointLike) {
-      const dx = v.x - this.x;
-      const dy = v.y - this.y;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    public add(v: PointLike) {
-      this.x += v.x;
-      this.y += v.y;
-    }
-
-    public subtract(v: PointLike) {
-      this.x -= v.x;
-      this.y -= v.y;
-    }
-
-    public clone() {
-      return new Vector2(this.x, this.y);
-    }
-  }
-
-  /**
-   * Stripped down version of Phaser's Line with just the functionality needed for navmeshes.
-   *
-   * @export
-   * @class Line
-   */
-  export class Line {
-    public start: Vector2;
-    public end: Vector2;
-    public left: number;
-    public right: number;
-    public top: number;
-    public bottom: number;
-
-    constructor(x1: number, y1: number, x2: number, y2: number) {
-      this.start = new Vector2(x1, y1);
-      this.end = new Vector2(x2, y2);
-
-      this.left = Math.min(x1, x2);
-      this.right = Math.max(x1, x2);
-      this.top = Math.min(y1, y2);
-      this.bottom = Math.max(y1, y2);
-    }
-
-    public pointOnSegment(x: number, y: number) {
-      return (
-        x >= this.left &&
-        x <= this.right &&
-        y >= this.top &&
-        y <= this.bottom &&
-        this.pointOnLine(x, y)
-      );
-    }
-
-    pointOnLine(x: number, y: number) {
-      // Compare slope of line start -> xy to line start -> line end
-      return (
-        (x - this.left) * (this.bottom - this.top) ===
-        (this.right - this.left) * (y - this.top)
-      );
-    }
-  }
-
-  /**
-   * Stripped down version of Phaser's Polygon2 with just the functionality needed for navmeshes.
-   *
-   * @export
-   * @class Polygon2
-   */
-  export class Polygon2 {
-    public edges: Line[];
-    public points: Point[];
-    private isClosed: boolean;
-
-    constructor(points: Point[], closed = true) {
-      this.isClosed = closed;
-      this.points = points;
-      this.edges = [];
-
-      for (let i = 1; i < points.length; i++) {
-        const p1 = points[i - 1];
-        const p2 = points[i];
-        this.edges.push(new Line(p1.x, p1.y, p2.x, p2.y));
-      }
-
-      if (this.isClosed) {
-        const first = points[0];
-        const last = points[points.length - 1];
-        this.edges.push(new Line(first.x, first.y, last.x, last.y));
-      }
-    }
-
-    public contains(x: number, y: number) {
-      let inside = false;
-
-      for (
-        let i = -1, j = this.points.length - 1;
-        ++i < this.points.length;
-        j = i
-      ) {
-        const ix = this.points[i].x;
-        const iy = this.points[i].y;
-
-        const jx = this.points[j].x;
-        const jy = this.points[j].y;
-
-        if (
-          ((iy <= y && y < jy) || (jy <= y && y < iy)) &&
-          x < ((jx - ix) * (y - iy)) / (jy - iy) + ix
-        ) {
-          inside = !inside;
-        }
-      }
-
-      return inside;
-    }
-  }
-
-  /**
-   * Calculate the distance squared between two points. This is an optimization to a square root when
-   * you just need to compare relative distances without needing to know the specific distance.
-   * @param a
-   * @param b
-   */
-  export function distanceSquared(a: Point, b: Point) {
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    return dx * dx + dy * dy;
-  }
-
-  /**
-   * Project a point onto a line segment.
-   * JS Source: http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-   * @param point
-   * @param line
-   */
-  export function projectPointToEdge(point: Point, line: Line) {
-    const a = line.start;
-    const b = line.end;
-    // Consider the parametric equation for the edge's line, p = a + t (b - a). We want to find
-    // where our point lies on the line by solving for t:
-    //  t = [(p-a) . (b-a)] / |b-a|^2
-    const l2 = distanceSquared(a, b);
-    let t =
-      ((point.x - a.x) * (b.x - a.x) + (point.y - a.y) * (b.y - a.y)) / l2;
-    // We clamp t from [0,1] to handle points outside the segment vw.
-    t = clamp(t, 0, 1);
-    // Project onto the segment
-    const p = new Vector2(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y));
-    return p;
-  }
-
-  /**
-   * Twice the area of the triangle formed by a, b and c.
-   */
-  export function triarea2(a: Point, b: Point, c: Point) {
-    const ax = b.x - a.x;
-    const ay = b.y - a.y;
-    const bx = c.x - a.x;
-    const by = c.y - a.y;
-    return bx * ay - ax * by;
-  }
-
-  /**
-   * Clamp the given value between min and max.
-   */
-  export function clamp(value: number, min: number, max: number) {
-    if (value < min) value = min;
-    if (value > max) value = max;
-    return value;
-  }
-
-  /**
-   * Check if two values are within a small margin of one another.
-   */
-  export function almostEqual(
-    value1: number,
-    value2: number,
-    errorMargin = 0.0001
-  ) {
-    if (Math.abs(value1 - value2) <= errorMargin) return true;
-    else return false;
-  }
-
-  /**
-   * Find the smallest angle difference between two angles
-   * https://gist.github.com/Aaronduino/4068b058f8dbc34b4d3a9eedc8b2cbe0
-   */
-  export function angleDifference(x: number, y: number) {
-    let a = x - y;
-    const i = a + Math.PI;
-    const j = Math.PI * 2;
-    a = i - Math.floor(i / j) * j; // (a+180) % 360; this ensures the correct sign
-    a -= Math.PI;
-    return a;
-  }
-
-  /**
-   * Check if two lines are collinear (within a small error margin).
-   */
-  export function areCollinear(line1: Line, line2: Line, errorMargin = 0.0001) {
-    // Figure out if the two lines are equal by looking at the area of the triangle formed
-    // by their points
-    const area1 = triarea2(line1.start, line1.end, line2.start);
-    const area2 = triarea2(line1.start, line1.end, line2.end);
-    if (
-      almostEqual(area1, 0, errorMargin) &&
-      almostEqual(area2, 0, errorMargin)
-    ) {
-      return true;
-    } else return false;
-  }
-
-  export function isTruthy<InputType>(input: InputType) {
-    return Boolean(input);
-  }
+  // The implementation was sightly modified to be TypeScript typed.
 
   export class AStar<NodeType extends GridNode> {
     /**
@@ -582,11 +336,284 @@ namespace gdjs {
       this.dirtyNodes = [];
     }
 
-    markDirty(node) {
+    markDirty(node: NodeType) {
       this.dirtyNodes.push(node);
     }
 
     abstract neighbors(node: NodeType): NodeType[];
+  }
+
+  // The following implementation of the NavMesh pathfinding algorithm is from:
+  // https://github.com/mikewesthad/navmesh
+  // and is under this license:
+
+  // MIT License
+
+  // Copyright (c) 2017 Michael Hadley
+
+  // Permission is hereby granted, free of charge, to any person obtaining a copy
+  // of this software and associated documentation files (the "Software"), to deal
+  // in the Software without restriction, including without limitation the rights
+  // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  // copies of the Software, and to permit persons to whom the Software is
+  // furnished to do so, subject to the following conditions:
+  //
+  // The above copyright notice and this permission notice shall be included in all
+  // copies or substantial portions of the Software.
+  //
+  // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  // SOFTWARE.
+
+  export interface Point {
+    x: number;
+    y: number;
+  }
+
+  /** Lightweight representation of a Polygon2 as a series of points. */
+  export type PolyPoints = Point[];
+
+  type PointLike = Vector2 | Point;
+
+  /**
+   * Stripped down version of Phaser's Vector2 with just the functionality needed for navmeshes.
+   *
+   * @export
+   * @class Vector2
+   */
+  export class Vector2 {
+    public x: number;
+    public y: number;
+
+    constructor(x: number = 0, y: number = 0) {
+      this.x = x;
+      this.y = y;
+    }
+
+    public equals(v: PointLike) {
+      return this.x === v.x && this.y === v.y;
+    }
+
+    public angle(v: PointLike) {
+      return Math.atan2(v.y - this.y, v.x - this.x);
+    }
+
+    public distance(v: PointLike) {
+      const dx = v.x - this.x;
+      const dy = v.y - this.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public add(v: PointLike) {
+      this.x += v.x;
+      this.y += v.y;
+    }
+
+    public subtract(v: PointLike) {
+      this.x -= v.x;
+      this.y -= v.y;
+    }
+
+    public clone() {
+      return new Vector2(this.x, this.y);
+    }
+  }
+
+  /**
+   * Stripped down version of Phaser's Line with just the functionality needed for navmeshes.
+   *
+   * @export
+   * @class Line
+   */
+  export class Line {
+    public start: Vector2;
+    public end: Vector2;
+    public left: number;
+    public right: number;
+    public top: number;
+    public bottom: number;
+
+    constructor(x1: number, y1: number, x2: number, y2: number) {
+      this.start = new Vector2(x1, y1);
+      this.end = new Vector2(x2, y2);
+
+      this.left = Math.min(x1, x2);
+      this.right = Math.max(x1, x2);
+      this.top = Math.min(y1, y2);
+      this.bottom = Math.max(y1, y2);
+    }
+
+    public pointOnSegment(x: number, y: number) {
+      return (
+        x >= this.left &&
+        x <= this.right &&
+        y >= this.top &&
+        y <= this.bottom &&
+        this.pointOnLine(x, y)
+      );
+    }
+
+    pointOnLine(x: number, y: number) {
+      // Compare slope of line start -> xy to line start -> line end
+      return (
+        (x - this.left) * (this.bottom - this.top) ===
+        (this.right - this.left) * (y - this.top)
+      );
+    }
+  }
+
+  /**
+   * Stripped down version of Phaser's Polygon2 with just the functionality needed for navmeshes.
+   *
+   * @export
+   * @class Polygon2
+   */
+  export class Polygon2 {
+    public edges: Line[];
+    public points: Point[];
+    private isClosed: boolean;
+
+    constructor(points: Point[], closed = true) {
+      this.isClosed = closed;
+      this.points = points;
+      this.edges = [];
+
+      for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1];
+        const p2 = points[i];
+        this.edges.push(new Line(p1.x, p1.y, p2.x, p2.y));
+      }
+
+      if (this.isClosed) {
+        const first = points[0];
+        const last = points[points.length - 1];
+        this.edges.push(new Line(first.x, first.y, last.x, last.y));
+      }
+    }
+
+    public contains(x: number, y: number) {
+      let inside = false;
+
+      for (
+        let i = -1, j = this.points.length - 1;
+        ++i < this.points.length;
+        j = i
+      ) {
+        const ix = this.points[i].x;
+        const iy = this.points[i].y;
+
+        const jx = this.points[j].x;
+        const jy = this.points[j].y;
+
+        if (
+          ((iy <= y && y < jy) || (jy <= y && y < iy)) &&
+          x < ((jx - ix) * (y - iy)) / (jy - iy) + ix
+        ) {
+          inside = !inside;
+        }
+      }
+
+      return inside;
+    }
+  }
+
+  /**
+   * Calculate the distance squared between two points. This is an optimization to a square root when
+   * you just need to compare relative distances without needing to know the specific distance.
+   * @param a
+   * @param b
+   */
+  export function distanceSquared(a: Point, b: Point) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
+   * Project a point onto a line segment.
+   * JS Source: http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+   * @param point
+   * @param line
+   */
+  export function projectPointToEdge(point: Point, line: Line) {
+    const a = line.start;
+    const b = line.end;
+    // Consider the parametric equation for the edge's line, p = a + t (b - a). We want to find
+    // where our point lies on the line by solving for t:
+    //  t = [(p-a) . (b-a)] / |b-a|^2
+    const l2 = distanceSquared(a, b);
+    let t =
+      ((point.x - a.x) * (b.x - a.x) + (point.y - a.y) * (b.y - a.y)) / l2;
+    // We clamp t from [0,1] to handle points outside the segment vw.
+    t = clamp(t, 0, 1);
+    // Project onto the segment
+    const p = new Vector2(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y));
+    return p;
+  }
+
+  /**
+   * Twice the area of the triangle formed by a, b and c.
+   */
+  export function triarea2(a: Point, b: Point, c: Point) {
+    const ax = b.x - a.x;
+    const ay = b.y - a.y;
+    const bx = c.x - a.x;
+    const by = c.y - a.y;
+    return bx * ay - ax * by;
+  }
+
+  /**
+   * Clamp the given value between min and max.
+   */
+  export function clamp(value: number, min: number, max: number) {
+    if (value < min) value = min;
+    if (value > max) value = max;
+    return value;
+  }
+
+  /**
+   * Check if two values are within a small margin of one another.
+   */
+  export function almostEqual(
+    value1: number,
+    value2: number,
+    errorMargin = 0.0001
+  ) {
+    if (Math.abs(value1 - value2) <= errorMargin) return true;
+    else return false;
+  }
+
+  /**
+   * Find the smallest angle difference between two angles
+   * https://gist.github.com/Aaronduino/4068b058f8dbc34b4d3a9eedc8b2cbe0
+   */
+  export function angleDifference(x: number, y: number) {
+    let a = x - y;
+    const i = a + Math.PI;
+    const j = Math.PI * 2;
+    a = i - Math.floor(i / j) * j; // (a+180) % 360; this ensures the correct sign
+    a -= Math.PI;
+    return a;
+  }
+
+  /**
+   * Check if two lines are collinear (within a small error margin).
+   */
+  export function areCollinear(line1: Line, line2: Line, errorMargin = 0.0001) {
+    // Figure out if the two lines are equal by looking at the area of the triangle formed
+    // by their points
+    const area1 = triarea2(line1.start, line1.end, line2.start);
+    const area2 = triarea2(line1.start, line1.end, line2.end);
+    if (
+      almostEqual(area1, 0, errorMargin) &&
+      almostEqual(area2, 0, errorMargin)
+    ) {
+      return true;
+    } else return false;
   }
 
   /**
@@ -873,7 +900,9 @@ namespace gdjs {
       this.meshShrinkAmount = meshShrinkAmount;
 
       // Convert the PolyPoints[] into NavPoly instances.
-      this.navPolygons = meshPolygonPoints.map((polyPoints, i) => new NavPoly(i, new Polygon2(polyPoints)));
+      this.navPolygons = meshPolygonPoints.map(
+        (polyPoints, i) => new NavPoly(i, new Polygon2(polyPoints))
+      );
 
       this.calculateNeighbors();
 

@@ -1,4 +1,16 @@
-// Strongly inspired from http://www.critterai.org/projects/nmgen_study/
+// This implementation is strongly inspired from a Java one
+// by Stephen A. Pratt:
+// http://www.critterai.org/projects/nmgen_study/
+//
+// Most of the comments were written by him and were adapted to fit this implementation.
+// This implementation differs a bit from the original:
+// - it's only 2D instead of 3D
+// - it uses objects for points instead of pointer like in array of numbers
+// - the rasterization comes from other sources because of the 2d focus
+// - it has less features and might have lesser performance
+//
+// The Java implementation was also inspired from Recast that can be found here:
+// https://github.com/recastnavigation/recastnavigation
 
 namespace gdjs {
   export class RasterizationCell {
@@ -1924,136 +1936,6 @@ namespace gdjs {
   }
 
   /**
-   * It rasterizes obstacle objects on a grid.
-   * It flags cells as obstacle to be used by {@link RegionGenerator}.
-   */
-  export class ObstacleRasterizer {
-    /**
-     * Rasterize obstacle objects on a grid.
-     * @param grid
-     * @param obstacles
-     */
-    static rasterizeObstacles(
-      grid: RasterizationGrid,
-      obstacles: Set<RuntimeObject>
-    ) {
-      const workingNodes: number[] = [];
-      const obstaclesItr = obstacles.values();
-      for (
-        var element = obstaclesItr.next();
-        !element.done;
-        element = obstaclesItr.next()
-      ) {
-        const obstacle = element.value;
-
-        for (const polygon of obstacle.getHitBoxes()) {
-          const vertices = polygon.vertices.map((vertex) => {
-            const point = { x: vertex[0], y: vertex[1] };
-            grid.convertToGridBasis(point, point);
-            return point;
-          });
-          let minX = Number.MAX_VALUE;
-          let maxX = -Number.MAX_VALUE;
-          let minY = Number.MAX_VALUE;
-          let maxY = -Number.MAX_VALUE;
-          for (const vertex of vertices) {
-            minX = Math.min(minX, vertex.x);
-            maxX = Math.max(maxX, vertex.x);
-            minY = Math.min(minY, vertex.y);
-            maxY = Math.max(maxY, vertex.y);
-          }
-          minX = Math.max(Math.floor(minX), 0);
-          maxX = Math.min(Math.ceil(maxX), grid.dimX());
-          minY = Math.max(Math.floor(minY), 0);
-          maxY = Math.min(Math.ceil(maxY), grid.dimY());
-          ObstacleRasterizer.fillPolygon(
-            vertices,
-            minX,
-            maxX,
-            minY,
-            maxY,
-            workingNodes,
-            (x: integer, y: integer) => grid.get(x, y).setObstacle()
-          );
-        }
-      }
-    }
-
-    private static fillPolygon(
-      vertices: Point[],
-      mixX: integer,
-      maxX: integer,
-      minY: integer,
-      maxY: integer,
-      workingNodes: number[],
-      fill: (x: number, y: number) => void
-    ) {
-      // Scan-line polygon fill algorithm
-      // strongly inspired from:
-      // http://alienryderflex.com/polygon_fill/
-
-      //  Loop through the rows of the image.
-      for (let pixelY = minY; pixelY < maxY; pixelY++) {
-        const pixelCenterY = pixelY + 0.5;
-        //  Build a list of nodes.
-        workingNodes.length = 0;
-        let j = vertices.length - 1;
-        for (let i = 0; i < vertices.length; i++) {
-          if (
-            (vertices[i].y < pixelCenterY && vertices[j].y >= pixelCenterY) ||
-            (vertices[j].y < pixelCenterY && vertices[i].y >= pixelCenterY)
-          ) {
-            workingNodes.push(
-              Math.round(
-                vertices[i].x +
-                  ((pixelCenterY - vertices[i].y) /
-                    (vertices[j].y - vertices[i].y)) *
-                    (vertices[j].x - vertices[i].x)
-              )
-            );
-          }
-          j = i;
-        }
-
-        //  Sort the nodes, via a simple “Bubble” sort.
-        {
-          let i = 0;
-          while (i < workingNodes.length - 1) {
-            if (workingNodes[i] > workingNodes[i + 1]) {
-              const swap = workingNodes[i];
-              workingNodes[i] = workingNodes[i + 1];
-              workingNodes[i + 1] = swap;
-              if (i > 0) i--;
-            } else {
-              i++;
-            }
-          }
-        }
-
-        //  Fill the pixels between node pairs.
-        for (let i = 0; i < workingNodes.length; i += 2) {
-          if (workingNodes[i] >= maxX) break;
-          if (workingNodes[i + 1] > mixX) {
-            if (workingNodes[i] < mixX) {
-              workingNodes[i] = mixX;
-            }
-            if (workingNodes[i + 1] > maxX) {
-              workingNodes[i + 1] = maxX;
-            }
-            for (
-              let pixelX = workingNodes[i];
-              pixelX < workingNodes[i + 1];
-              pixelX++
-            ) {
-              fill(pixelX, pixelY);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * This implementation is strongly inspired from CritterAI class "Geometry".
    */
   class Geometry {
@@ -2182,6 +2064,138 @@ namespace gdjs {
       const deltaY = ay + u * deltaABy - py;
 
       return deltaX * deltaX + deltaY * deltaY;
+    }
+  }
+
+  /**
+   * It rasterizes obstacle objects on a grid.
+   * It flags cells as obstacle to be used by {@link RegionGenerator}.
+   */
+  export class ObstacleRasterizer {
+    /**
+     * Rasterize obstacle objects on a grid.
+     * @param grid
+     * @param obstacles
+     */
+    static rasterizeObstacles(
+      grid: RasterizationGrid,
+      obstacles: Set<RuntimeObject>
+    ) {
+      const workingNodes: number[] = [];
+      const obstaclesItr = obstacles.values();
+      for (
+        var element = obstaclesItr.next();
+        !element.done;
+        element = obstaclesItr.next()
+      ) {
+        const obstacle = element.value;
+
+        for (const polygon of obstacle.getHitBoxes()) {
+          const vertices = polygon.vertices.map((vertex) => {
+            const point = { x: vertex[0], y: vertex[1] };
+            grid.convertToGridBasis(point, point);
+            return point;
+          });
+          let minX = Number.MAX_VALUE;
+          let maxX = -Number.MAX_VALUE;
+          let minY = Number.MAX_VALUE;
+          let maxY = -Number.MAX_VALUE;
+          for (const vertex of vertices) {
+            minX = Math.min(minX, vertex.x);
+            maxX = Math.max(maxX, vertex.x);
+            minY = Math.min(minY, vertex.y);
+            maxY = Math.max(maxY, vertex.y);
+          }
+          minX = Math.max(Math.floor(minX), 0);
+          maxX = Math.min(Math.ceil(maxX), grid.dimX());
+          minY = Math.max(Math.floor(minY), 0);
+          maxY = Math.min(Math.ceil(maxY), grid.dimY());
+          ObstacleRasterizer.fillPolygon(
+            vertices,
+            minX,
+            maxX,
+            minY,
+            maxY,
+            workingNodes,
+            (x: integer, y: integer) => grid.get(x, y).setObstacle()
+          );
+        }
+      }
+    }
+
+    private static fillPolygon(
+      vertices: Point[],
+      mixX: integer,
+      maxX: integer,
+      minY: integer,
+      maxY: integer,
+      workingNodes: number[],
+      fill: (x: number, y: number) => void
+    ) {
+      // The following implementation of the scan-line polygon fill algorithm
+      // is strongly inspired from:
+      // https://github.com/bgrins/javascript-astar
+      // The original implementation was under this license:
+      // public-domain code by Darel Rex Finley, 2007
+
+      //  Loop through the rows of the image.
+      for (let pixelY = minY; pixelY < maxY; pixelY++) {
+        const pixelCenterY = pixelY + 0.5;
+        //  Build a list of nodes.
+        workingNodes.length = 0;
+        let j = vertices.length - 1;
+        for (let i = 0; i < vertices.length; i++) {
+          if (
+            (vertices[i].y < pixelCenterY && vertices[j].y >= pixelCenterY) ||
+            (vertices[j].y < pixelCenterY && vertices[i].y >= pixelCenterY)
+          ) {
+            workingNodes.push(
+              Math.round(
+                vertices[i].x +
+                  ((pixelCenterY - vertices[i].y) /
+                    (vertices[j].y - vertices[i].y)) *
+                    (vertices[j].x - vertices[i].x)
+              )
+            );
+          }
+          j = i;
+        }
+
+        //  Sort the nodes, via a simple “Bubble” sort.
+        {
+          let i = 0;
+          while (i < workingNodes.length - 1) {
+            if (workingNodes[i] > workingNodes[i + 1]) {
+              const swap = workingNodes[i];
+              workingNodes[i] = workingNodes[i + 1];
+              workingNodes[i + 1] = swap;
+              if (i > 0) i--;
+            } else {
+              i++;
+            }
+          }
+        }
+
+        //  Fill the pixels between node pairs.
+        for (let i = 0; i < workingNodes.length; i += 2) {
+          if (workingNodes[i] >= maxX) break;
+          if (workingNodes[i + 1] > mixX) {
+            if (workingNodes[i] < mixX) {
+              workingNodes[i] = mixX;
+            }
+            if (workingNodes[i + 1] > maxX) {
+              workingNodes[i + 1] = maxX;
+            }
+            for (
+              let pixelX = workingNodes[i];
+              pixelX < workingNodes[i + 1];
+              pixelX++
+            ) {
+              fill(pixelX, pixelY);
+            }
+          }
+        }
+      }
     }
   }
 }

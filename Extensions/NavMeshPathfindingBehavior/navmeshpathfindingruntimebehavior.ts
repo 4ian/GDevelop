@@ -306,12 +306,16 @@ namespace gdjs {
       this._pathFound = false;
     }
 
+    /**
+     * Draw the navigation mesh on a shape painter object for debugging purpose
+     * @param shapePainter
+     */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      //TODO use the clear action function when it's added 
+      //TODO use the clear action function when it's added
       shapePainter._renderer.clear();
       //TODO Remove when the shape painter is fixed to update outline and fill at start.
       shapePainter._renderer.updateOutline();
-      
+
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
         shapePainter.drawPathMoveTo(

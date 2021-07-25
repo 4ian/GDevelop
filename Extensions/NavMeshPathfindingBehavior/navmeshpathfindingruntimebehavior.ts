@@ -11,18 +11,17 @@ namespace gdjs {
    * follow a path computed to avoid obstacles.
    */
   export class NavMeshPathfindingRuntimeBehavior extends gdjs.RuntimeBehavior {
-    _path: Array<FloatPoint> = [];
-
-    //Behavior configuration:
+    // Behavior configuration:
     _allowDiagonals: boolean = true;
     _acceleration: float;
     _maxSpeed: float;
     _angularMaxSpeed: float;
     _rotateObject: boolean;
     _angleOffset: float;
-    _extraBorder: float = 0;
+    _extraBorder: float;
 
-    //Attributes used for traveling on the path:
+    // Attributes used for traveling on the path:
+    _path: Array<FloatPoint> = [];
     _pathFound: boolean = false;
     _speed: float = 0;
     _angularSpeed: float = 0;
@@ -30,15 +29,16 @@ namespace gdjs {
     _totalSegmentTime: float = 0;
     _currentSegment: integer = 0;
     _reachedEnd: boolean = false;
-    _manager: NavMeshPathfindingObstaclesManager;
     _movementAngle: float = 0;
+
+    _manager: NavMeshPathfindingObstaclesManager;
 
     /** Used to draw traces for debugging */
     _lastUsedNavMesh: gdjs.NavMesh | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
-      behaviorData,
+      behaviorData: any,
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
@@ -48,6 +48,7 @@ namespace gdjs {
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
+      this._extraBorder = behaviorData.extraBorder;
       this._manager =
         gdjs.NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
     }
@@ -67,6 +68,9 @@ namespace gdjs {
       }
       if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
         this.setAngleOffset(newBehaviorData.angleOffset);
+      }
+      if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
+        this.setExtraBorder(newBehaviorData.extraBorder);
       }
       return true;
     }
@@ -123,7 +127,7 @@ namespace gdjs {
       return this._angleOffset;
     }
 
-    setExtraBorder(extraBorder): void {
+    setExtraBorder(extraBorder: float): void {
       this._extraBorder = extraBorder;
     }
 
@@ -280,7 +284,7 @@ namespace gdjs {
         )
       );
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
-      this._lastUsedNavMesh = this._manager.lastUsedNavMesh;
+      this._lastUsedNavMesh = navMesh;
 
       //TODO if the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
@@ -303,37 +307,25 @@ namespace gdjs {
     }
 
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      // for (const polygon of this.meshPolygons) {
-      //   shapePainter.beginFillPath(polygon[0].x, polygon[0].y);
-      //   for (let index = 1; index < polygon.length; index++) {
-      //     shapePainter.drawPathLineTo(polygon[index].x, polygon[index].y);
-      //   }
-      //   shapePainter.closePath();
-      //   shapePainter.endFillPath();
-      // }
-      // for (const polygon of this.meshPolygons) {
-      //   shapePainter.drawPathMoveTo(polygon[0].x, polygon[0].y);
-      //   for (let index = 1; index < polygon.length; index++) {
-      //     shapePainter.drawPathLineTo(polygon[index].x, polygon[index].y);
-      //   }
-      //   shapePainter.closePath();
-      // }
+      //TODO use the clear action function when it's added 
       shapePainter._renderer.clear();
+      //TODO Remove when the shape painter is fixed to update outline and fill at start.
+      shapePainter._renderer.updateOutline();
+      
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
-        //const last = polygon.length - 1;
-        //shapePainter.drawRectangle(polygon[last].x - 8, polygon[last].y - 8, polygon[last].x + 8, polygon[last].y + 8);
-        //shapePainter.drawCircle(polygon[0].x, polygon[0].y, 8);
-        for (let index = 0; index < polygon.length; index++) {
-          shapePainter.drawLine(
+        shapePainter.drawPathMoveTo(
+          polygon[0].x,
+          polygon[0].y / this._manager._isometricRatio
+        );
+        for (let index = 1; index < polygon.length; index++) {
+          shapePainter.drawPathLineTo(
             polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio,
-            polygon[(index + 1) % polygon.length].x,
-            polygon[(index + 1) % polygon.length].y /
-              this._manager._isometricRatio,
-            1
+            polygon[index].y / this._manager._isometricRatio
           );
         }
+        shapePainter.closePath();
+        shapePainter.endFillPath();
       }
     }
 

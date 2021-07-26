@@ -14,8 +14,16 @@
 
 namespace gdjs {
   export class RasterizationCell {
-    //TODO sometimes used as unasigned or obstacle
+    /** A cell that has not been assigned to any region yet */
     static NULL_REGION_ID = 0;
+    /**
+     * A cell that contains an obstacle.
+     *
+     * The value is the same as NULL_REGION_ID because the cells that are
+     * not assigned to any region at the end of the flooding algorithm are
+     * the obstacle cells.
+     */
+    static OBSTACLE_REGION_ID = 0;
 
     x: integer;
     y: integer;
@@ -27,18 +35,6 @@ namespace gdjs {
     constructor(x: integer, y: integer) {
       this.x = x;
       this.y = y;
-    }
-
-    setObstacle() {
-      this.distanceToObstacle = 0;
-    }
-
-    isObstacle() {
-      return this.distanceToObstacle === 0;
-    }
-
-    hasRegion() {
-      return this.regionID !== RasterizationCell.NULL_REGION_ID;
     }
   }
 
@@ -358,9 +354,8 @@ namespace gdjs {
         Array.prototype.push.apply(convexPolygons, workingPolygons);
       }
 
-      // Build polygon adjacency information.
-      //TODO migrate buildAdjacencyData(result);
-      // or just use the one from the pathfinding lib?
+      // The original implementation builds polygon adjacency information.
+      // but the library for the pathfinding already does it.
 
       return convexPolygons;
     }
@@ -1038,13 +1033,20 @@ namespace gdjs {
      * important.
      *
      * @param grid A fully generated field.
+     * @param threshold The maximum distance the edge of the contour may deviate
+     * from the source geometry.
      * @return The contours generated from the field.
      */
-    static buildContours(grid: RasterizationGrid): ContourPoint[][] {
+    static buildContours(
+      grid: RasterizationGrid,
+      threshold: float
+    ): ContourPoint[][] {
       const contours = new Array<ContourPoint[]>(grid.regionCount);
       contours.length = 0;
 
-      //  Set the flags on all cells in non-null regions to indicate which
+      let discardedContours = 0;
+
+      //  Set the flags on all cells in non-obstacle regions to indicate which
       //  edges are connected to external regions.
       //
       //  Reference: Neighbor search and nomenclature.
@@ -1063,7 +1065,7 @@ namespace gdjs {
       //      bit4 = neighbor3
       //  With the meaning of the bits as follows:
       //      0 = neighbor in same region.
-      //      1 = neighbor not in same region. (Neighbor may be the null
+      //      1 = neighbor not in same region. (Neighbor may be the obstacle
       //      region or a real region.)
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
@@ -1075,8 +1077,8 @@ namespace gdjs {
 
           // Default to "not connected to any external region".
           cell.contourFlags = 0;
-          if (!cell.hasRegion())
-            // Don't care about cells in the null region.
+          if (cell.regionID === RasterizationCell.OBSTACLE_REGION_ID)
+            // Don't care about cells in the obstacle region.
             continue;
 
           for (
@@ -1104,6 +1106,7 @@ namespace gdjs {
               "Discarded contour: Island cell. Can't form  a contour. Region: " +
                 cell.regionID
             );
+            discardedContours++;
           }
         }
       }
@@ -1128,8 +1131,11 @@ namespace gdjs {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
-          if (!cell.hasRegion() || cell.contourFlags === 0) {
-            // cell is either: Part of the null region, does not
+          if (
+            cell.regionID === RasterizationCell.OBSTACLE_REGION_ID ||
+            cell.contourFlags === 0
+          ) {
+            // cell is either: Part of the obstacle region, does not
             // represent an edge cell, or was already processed during
             // an earlier iteration.
             continue;
@@ -1146,7 +1152,7 @@ namespace gdjs {
             startDirection++;
           }
           // We now have a cell that is part of a contour and a direction
-          // that points to a different region (null or real).
+          // that points to a different region (obstacle or real).
           // Build the contour.
           ContourBuilder.buildRawContours(
             grid,
@@ -1159,7 +1165,8 @@ namespace gdjs {
           ContourBuilder.generateSimplifiedContour(
             cell.regionID,
             workingRawVertices,
-            workingSimplifiedVertices
+            workingSimplifiedVertices,
+            threshold
           );
 
           if (workingSimplifiedVertices.length < 3) {
@@ -1169,13 +1176,44 @@ namespace gdjs {
                 ' Region: ' +
                 cell.regionID
             );
+            discardedContours++;
           } else {
             contours.push(Array.from(workingSimplifiedVertices));
           }
         }
       }
 
-      //TODO Detect and report anomalies
+      if (contours.length + discardedContours != grid.regionCount - 1) {
+        // The only valid state is one contour per region.
+        //
+        // The only time this should occur is if an invalid contour
+        // was formed or if a region resulted in multiple
+        // contours (bad region data).
+        //
+        // IMPORTANT: While a mismatch may not be a fatal error,
+        // it should be addressed since it can result in odd,
+        // hard to spot anomalies later in the pipeline.
+        //
+        // A known cause is if a region fully encompasses another
+        // region. In such a case, two contours will be formed.
+        // The normal outer contour and an inner contour.
+        // The CleanNullRegionBorders algorithm protects
+        // against internal encompassed obstacle regions.
+        console.error(
+          'Contour generation failed: Detected contours does' +
+            ' not match the number of regions.  Regions: ' +
+            (grid.regionCount - 1) +
+            ', Detected contours: ' +
+            (contours.length + discardedContours) +
+            ' (Actual: ' +
+            contours.length +
+            ', Discarded: ' +
+            discardedContours +
+            ')'
+        );
+        // The CritterAI implementation has more detailed logs.
+        // They can be interesting for debugging.
+      }
 
       return contours;
     }
@@ -1196,7 +1234,7 @@ namespace gdjs {
      * for cells that represent a change in edge direction.
      *
      * The output array will contain vertices ordered as follows:
-     * (x, y, z, regionID) where regionID is the region (null or real) that
+     * (x, y, z, regionID) where regionID is the region (obstacle or real) that
      * this vertex is considered to be connected to.
      *
      * WARNING: Only run this operation on cells that are already known
@@ -1312,24 +1350,27 @@ namespace gdjs {
     /**
      * Takes a group of vertices that represent a region contour and changes
      * it in the following manner:
-     * - For any edges that connect to non-null regions, remove all
+     * - For any edges that connect to non-obstacle regions, remove all
      * vertices except the start and end vertices for that edge (this
-     * smooths the edges between non-null regions into a straight line).
+     * smooths the edges between non-obstacle regions into a straight line).
      * - Runs an algorithm's against the contour to follow the edge more closely.
      *
      * @param regionID The region the contour was derived from.
      * @param sourceVertices  The source vertices that represent the complex
      * contour.
      * @param outVertices The simplified contour vertices.
+     * @param threshold The maximum distance the edge of the contour may deviate
+     * from the source geometry.
      */
     private static generateSimplifiedContour(
       regionID: number,
       sourceVertices: ContourPoint[],
-      outVertices: ContourPoint[]
+      outVertices: ContourPoint[],
+      threshold: float
     ) {
       let noConnections = true;
       for (const sourceVertex of sourceVertices) {
-        if (sourceVertex.region !== RasterizationCell.NULL_REGION_ID) {
+        if (sourceVertex.region !== RasterizationCell.OBSTACLE_REGION_ID) {
           noConnections = false;
           break;
         }
@@ -1339,7 +1380,7 @@ namespace gdjs {
       // (At least one edge.)
       if (noConnections) {
         // This contour represents an island region surrounded only by the
-        // null region. Seed the simplified contour with the source's
+        // obstacle region. Seed the simplified contour with the source's
         // lower left (ll) and upper right (ur) vertices.
         let lowerLeftX = sourceVertices[0].x;
         let lowerLeftY = sourceVertices[0].y;
@@ -1363,7 +1404,9 @@ namespace gdjs {
             upperRightIndex = index;
           }
         }
-        // TODO region attribute is used to set an index
+        // The region attribute is used to store an index locally in this function.
+        // TODO Maybe there is a way to do this cleanly and keep no memory footprint.
+
         // Seed the simplified contour with this edge.
         outVertices.push({
           x: lowerLeftX,
@@ -1376,7 +1419,7 @@ namespace gdjs {
           region: upperRightIndex,
         });
       } else {
-        // The contour shares edges with other non-null regions.
+        // The contour shares edges with other non-obstacle regions.
         // Seed the simplified contour with a new vertex for every
         // location where the region connection changes.  These are
         // vertices that are important because they represent portals
@@ -1399,9 +1442,56 @@ namespace gdjs {
         }
       }
 
-      ContourBuilder.matchObstacleRegionEdges(sourceVertices, outVertices);
+      ContourBuilder.matchObstacleRegionEdges(
+        sourceVertices,
+        outVertices,
+        threshold
+      );
 
-      //TODO Check if the less than 3 vertices case must be handle.
+      if (outVertices.length < 3) {
+        // Less than 3 vertices.
+        //
+        // This can occur in only one known case:  The contour started
+        // with only two seed vertices and none of the algorithms added
+        // a vertex.
+        //
+        // This case is not completely unexpected.  At this time,
+        // the contour algorithms only add vertices back if a obstacle region
+        // edge is involved.  So if a region is only surrounded by two
+        // non-obstacle regions, it can end up in this situation.
+        //
+        // Find the vertex farthest from the current line segment
+        // and add it back to the contour.
+        let selectedVertex: ContourPoint | null = null;
+        let maxDistance = 0;
+        const vertex0 = outVertices[0];
+        const vertex1 = outVertices[1];
+        for (let sourceVertex of sourceVertices) {
+          const dist = Geometry.getPointSegmentDistanceSq(
+            sourceVertex.x,
+            sourceVertex.y,
+            vertex0.x,
+            vertex0.y,
+            vertex1.x,
+            vertex1.y
+          );
+          if (dist > maxDistance) {
+            maxDistance = dist;
+            selectedVertex = sourceVertex;
+          }
+        }
+        // As selected vertex such that the contour stays
+        // wrapped clockwise.
+        if (selectedVertex) {
+          if (selectedVertex.region < vertex0.region) {
+            outVertices.splice(0, 0, selectedVertex);
+          } else if (selectedVertex.region < vertex1.region) {
+            outVertices.splice(1, 0, selectedVertex);
+          } else {
+            outVertices.push(selectedVertex);
+          }
+        }
+      }
 
       // Replace the index pointers in the output list with region IDs.
       for (const outVertex of outVertices) {
@@ -1427,10 +1517,13 @@ namespace gdjs {
      *
      * @param sourceVertices
      * @param inoutResultVertices
+     * @param threshold The maximum distance the edge of the contour may deviate
+     * from the source geometry.
      */
     private static matchObstacleRegionEdges(
       sourceVertices: ContourPoint[],
-      inoutResultVertices: ContourPoint[]
+      inoutResultVertices: ContourPoint[],
+      threshold: float
     ) {
       // This implementation is strongly inspired from CritterAI class "MatchNullRegionEdges".
 
@@ -1463,9 +1556,9 @@ namespace gdjs {
 
         if (
           sourceVertices[testedSourceIndex].region ===
-          RasterizationCell.NULL_REGION_ID
+          RasterizationCell.OBSTACLE_REGION_ID
         ) {
-          // This test vertex is part of a null region edge.
+          // This test vertex is part of a obstacle region edge.
           // Loop through the source vertices until the end vertex
           // is found, searching for the vertex that is farthest from
           // the line segment formed by the begin/end vertices.
@@ -1491,8 +1584,6 @@ namespace gdjs {
           }
         }
 
-        //TODO make mThreshold configurable ?
-        const threshold = 1;
         if (
           toInsertSourceIndex !== -1 &&
           maxDeviation > threshold * threshold
@@ -1630,7 +1721,10 @@ namespace gdjs {
         for (let y = 1; y < grid.dimY() - 1; y++) {
           for (let x = 1; x < grid.dimX() - 1; x++) {
             const cell = grid.get(x, y);
-            if (!cell.hasRegion() && cell.distanceToObstacle >= distance) {
+            if (
+              cell.regionID === RasterizationCell.NULL_REGION_ID &&
+              cell.distanceToObstacle >= distance
+            ) {
               // The cell is not already assigned a region and is
               // below the current "water level". So the cell can be
               // considered for region assignment.
@@ -1651,7 +1745,10 @@ namespace gdjs {
         // Create new regions for all cells that could not be added to
         // existing regions.
         for (const floodedCell of floodedCells) {
-          if (!floodedCell || floodedCell.hasRegion()) {
+          if (
+            !floodedCell ||
+            floodedCell.regionID !== RasterizationCell.NULL_REGION_ID
+          ) {
             // This cell was assigned to a newly created region
             // during an earlier iteration of this loop.
             // So it can be skipped.
@@ -1683,7 +1780,10 @@ namespace gdjs {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
-          if (cell.distanceToObstacle > distanceMin && !cell.hasRegion()) {
+          if (
+            cell.distanceToObstacle > distanceMin &&
+            cell.regionID === RasterizationCell.NULL_REGION_ID
+          ) {
             // Not a border or null region cell. Should be in a region.
             floodedCells.push(cell);
           }
@@ -1699,7 +1799,8 @@ namespace gdjs {
       }
 
       grid.regionCount = nextRegionID - 1;
-      //TODO can the post processing algorithms be interesting?
+      //TODO Can the post processing algorithms CleanNullRegionBorders
+      // and FilterOutSmallRegions be interesting?
     }
 
     /**
@@ -1750,9 +1851,9 @@ namespace gdjs {
           let regionCenterDist = Number.MAX_VALUE;
           for (const delta of RasterizationGrid.neighbor4Deltas) {
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
-            if (neighbor.hasRegion()) {
+            if (neighbor.regionID !== RasterizationCell.NULL_REGION_ID) {
               if (neighbor.distanceToObstacle + 2 < regionCenterDist) {
-                //TODO check if conservative expansion is needed
+                //TODO Should conservative expansion be ported too?
                 cellRegion = neighbor.regionID;
                 regionCenterDist = neighbor.distanceToObstacle + 2;
               }
@@ -1822,12 +1923,12 @@ namespace gdjs {
         for (const delta of RasterizationGrid.neighbor8Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
           isOnRegionBorder =
-            neighbor.regionID !== RasterizationCell.NULL_REGION_ID &&
+            neighbor.regionID !== RasterizationCell.OBSTACLE_REGION_ID &&
             neighbor.regionID !== regionID;
           if (isOnRegionBorder) break;
         }
         if (isOnRegionBorder) {
-          cell.regionID = RasterizationCell.NULL_REGION_ID;
+          cell.regionID = RasterizationCell.OBSTACLE_REGION_ID;
           continue;
         }
         regionSize++;
@@ -1840,7 +1941,7 @@ namespace gdjs {
 
           if (
             neighbor.distanceToObstacle >= fillToDist &&
-            neighbor.regionID === RasterizationCell.NULL_REGION_ID
+            neighbor.regionID === RasterizationCell.OBSTACLE_REGION_ID
           ) {
             neighbor.regionID = regionID;
             neighbor.distanceToRegionCore = 0;
@@ -1882,15 +1983,15 @@ namespace gdjs {
       // close borders
       for (let x = 0; x < grid.dimX(); x++) {
         const leftCell = grid.get(x, 0);
-        leftCell.setObstacle();
+        leftCell.distanceToObstacle = 0;
         const rightCell = grid.get(x, grid.dimY() - 1);
-        rightCell.setObstacle();
+        rightCell.distanceToObstacle = 0;
       }
       for (let y = 1; y < grid.dimY() - 1; y++) {
         const topCell = grid.get(0, y);
-        topCell.setObstacle();
+        topCell.distanceToObstacle = 0;
         const bottomCell = grid.get(grid.dimX() - 1, y);
-        bottomCell.setObstacle();
+        bottomCell.distanceToObstacle = 0;
       }
       // The next two phases basically check the neighbors of a span and
       // set the span's distance field to be slightly greater than the
@@ -2117,7 +2218,7 @@ namespace gdjs {
             minY,
             maxY,
             workingNodes,
-            (x: integer, y: integer) => grid.get(x, y).setObstacle()
+            (x: integer, y: integer) => (grid.get(x, y).distanceToObstacle = 0)
           );
         }
       }
@@ -2142,7 +2243,7 @@ namespace gdjs {
       // - it handles float vertices
       //   so it focus on pixels center
       // - it's conservative for thin spikes
-      //   and scan on both axis for this 
+      //   and scan on both axis for this
 
       //  Loop through the rows of the image.
       for (let pixelY = minY; pixelY < maxY; pixelY++) {

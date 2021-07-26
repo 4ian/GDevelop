@@ -1,5 +1,10 @@
 // @ts-check
-describe('gdjs.NavMeshGeneration', function () {
+describe.only('gdjs.NavMeshGeneration', function () {
+  // When adding a new case, both can be invert to easily copy/paste results.
+  // It's also useful for debugging.
+  const logsResults = false;
+  const checksResults = true;
+
   let createDiamond = (runtimeScene) => {
     const diamond = new gdjs.SpriteRuntimeObject(runtimeScene, {
       name: 'diamond',
@@ -109,8 +114,12 @@ describe('gdjs.NavMeshGeneration', function () {
           cellRow.map((cell) => (cell.isObstacle() ? '#' : '.')).join('')
         )
         .join('\n') + '\n';
-    console.log('\n' + actualGridString);
-    expect(expectedGridString).to.be(actualGridString);
+    if (logsResults) {
+      console.log('\n' + actualGridString);
+    }
+    if (checksResults) {
+      expect(expectedGridString).to.be(actualGridString);
+    }
   };
 
   const checkDistanceField = (grid, expectedGridString) => {
@@ -124,8 +133,12 @@ describe('gdjs.NavMeshGeneration', function () {
             .join('')
         )
         .join('\n') + '\n';
-    console.log('\n' + actualGridString);
-    expect(expectedGridString).to.be(actualGridString);
+    if (logsResults) {
+      console.log('\n' + actualGridString);
+    }
+    if (checksResults) {
+      expect(expectedGridString).to.be(actualGridString);
+    }
   };
 
   const checkRegions = (grid, expectedGridString) => {
@@ -137,26 +150,34 @@ describe('gdjs.NavMeshGeneration', function () {
             .join('')
         )
         .join('\n') + '\n';
-    console.log('\n' + actualGridString);
-    expect(expectedGridString).to.be(actualGridString);
+    if (logsResults) {
+      console.log('\n' + actualGridString);
+    }
+    if (checksResults) {
+      expect(expectedGridString).to.be(actualGridString);
+    }
   };
 
   const checkPolygons = (actualPolygons, expectedPolygon) => {
-    console.log(
-      '[' +
-        actualPolygons
-          .map(
-            (polygon) =>
-              '[' +
-              polygon
-                .map((point) => '[' + point[0] + ', ' + point[1] + ']')
-                .join(', ') +
-              ',]'
-          )
-          .join(',\n') +
-        ',]'
-    );
-    expect(actualPolygons).to.eql(expectedPolygon);
+    if (logsResults) {
+      console.log(
+        '[' +
+          actualPolygons
+            .map(
+              (polygon) =>
+                '[' +
+                polygon
+                  .map((point) => '[' + point[0] + ', ' + point[1] + ']')
+                  .join(', ') +
+                ',]'
+            )
+            .join(',\n') +
+          ',]'
+      );
+    }
+    if (checksResults) {
+      expect(actualPolygons).to.eql(expectedPolygon);
+    }
   };
 
   it('keeps the vertices of a square aligned on the grid', function () {
@@ -638,6 +659,527 @@ describe('gdjs.NavMeshGeneration', function () {
           [200, 240],
           [200, 320],
           [320, 320],
+        ],
+      ]
+    );
+  });
+
+  it('can build a mesh for a plus thinner than the cell size', function () {
+    const runtimeScene = makeTestRuntimeScene();
+    const horizontalRectangle = createRectangle(runtimeScene, 160, 5);
+    horizontalRectangle.setPosition(160, 160);
+    const verticalRectangle = createRectangle(runtimeScene, 5, 160);
+    verticalRectangle.setPosition(160, 160);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
+
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
+    checkObstacles(
+      grid, //
+      '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '.........#........\n' +
+        '.........#........\n' +
+        '.........#........\n' +
+        '.........#........\n' +
+        '.....########.....\n' +
+        '.........#........\n' +
+        '.........#........\n' +
+        '.........#........\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n'
+    );
+
+    gdjs.RegionGenerator.generateDistanceField(grid);
+    checkDistanceField(
+      grid, //
+      '..................\n' +
+        '.2222222222222222.\n' +
+        '.2444444444444442.\n' +
+        '.2466666545666642.\n' +
+        '.2468875323578642.\n' +
+        '.24688642.2468642.\n' +
+        '.24676642.2467642.\n' +
+        '.24654442.2445642.\n' +
+        '.24532222.2223542.\n' +
+        '.2442........2442.\n' +
+        '.24532222.2223542.\n' +
+        '.24654442.2445642.\n' +
+        '.24676642.2467642.\n' +
+        '.2468875323578642.\n' +
+        '.2466666545666642.\n' +
+        '.2444444444444442.\n' +
+        '.2222222222222222.\n' +
+        '..................\n'
+    );
+
+    gdjs.RegionGenerator.generateRegions(grid, 0);
+    checkRegions(
+      grid, //
+      '..................\n' +
+        '.1111111111222222.\n' +
+        '.1111111111222222.\n' +
+        '.1111111112222222.\n' +
+        '.1111111112222222.\n' +
+        '.11111111.2222222.\n' +
+        '.11111111.2222222.\n' +
+        '.11111111.2222222.\n' +
+        '.11111111.2222222.\n' +
+        '.1111........2222.\n' +
+        '.11333333.4444444.\n' +
+        '.33333333.4444444.\n' +
+        '.33333333.4444444.\n' +
+        '.3333333334444444.\n' +
+        '.3333333334444444.\n' +
+        '.3333333334444444.\n' +
+        '.3333333334444444.\n' +
+        '..................\n'
+    );
+
+    const contours = gdjs.ContourBuilder.buildContours(grid);
+    checkPolygons(
+      contours.map((polygon) => polygon.map((point) => [point.x, point.y])),
+      [
+        [
+          [1, 11],
+          [5, 10],
+          [9, 9],
+          [10, 5],
+          [11, 1],
+          [1, 1],
+        ],
+        [
+          [10, 5],
+          [10, 9],
+          [13, 10],
+          [17, 10],
+          [17, 1],
+          [11, 1],
+        ],
+        [
+          [1, 11],
+          [1, 17],
+          [10, 17],
+          [10, 13],
+          [9, 10],
+          [5, 10],
+        ],
+        [
+          [10, 13],
+          [10, 17],
+          [17, 17],
+          [17, 10],
+          [13, 10],
+          [10, 10],
+        ],
+      ]
+    );
+
+    const convexPolygons = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
+      contours,
+      8
+    );
+    checkPolygons(
+      convexPolygons.map((polygon) =>
+        polygon.map((point) => [point.x, point.y])
+      ),
+      [
+        [
+          [5, 10],
+          [9, 9],
+          [10, 5],
+        ],
+        [
+          [5, 10],
+          [10, 5],
+          [11, 1],
+          [1, 1],
+          [1, 11],
+        ],
+        [
+          [10, 5],
+          [10, 9],
+          [13, 10],
+          [17, 10],
+          [17, 1],
+          [11, 1],
+        ],
+        [
+          [10, 13],
+          [9, 10],
+          [5, 10],
+          [1, 11],
+          [1, 17],
+          [10, 17],
+        ],
+        [
+          [13, 10],
+          [10, 10],
+          [10, 13],
+        ],
+        [
+          [17, 10],
+          [13, 10],
+          [10, 13],
+          [10, 17],
+          [17, 17],
+        ],
+      ]
+    );
+
+    const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
+      grid,
+      convexPolygons,
+      1
+    );
+    checkPolygons(
+      scaledPolygons.map((polygon) =>
+        polygon.map((point) => [point.x, point.y])
+      ),
+      [
+        [
+          [80, 180],
+          [160, 160],
+          [180, 80],
+        ],
+        [
+          [80, 180],
+          [180, 80],
+          [200, 0],
+          [0, 0],
+          [0, 200],
+        ],
+        [
+          [180, 80],
+          [180, 160],
+          [240, 180],
+          [320, 180],
+          [320, 0],
+          [200, 0],
+        ],
+        [
+          [180, 240],
+          [160, 180],
+          [80, 180],
+          [0, 200],
+          [0, 320],
+          [180, 320],
+        ],
+        [
+          [240, 180],
+          [180, 180],
+          [180, 240],
+        ],
+        [
+          [320, 180],
+          [240, 180],
+          [180, 240],
+          [180, 320],
+          [320, 320],
+        ],
+      ]
+    );
+  });
+
+  it('can build a mesh for a cross thinner than the cell size', function () {
+    const runtimeScene = makeTestRuntimeScene();
+    const horizontalRectangle = createRectangle(runtimeScene, 200, 5);
+    horizontalRectangle.setPosition(160, 160);
+    horizontalRectangle.setAngle(45);
+    const verticalRectangle = createRectangle(runtimeScene, 5, 200);
+    verticalRectangle.setPosition(160, 160);
+    verticalRectangle.setAngle(45);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
+
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
+    checkObstacles(
+      grid, //
+      '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '.....#......#.....\n' +
+        '......#....#......\n' +
+        '.......#..#.......\n' +
+        '........##........\n' +
+        '........##........\n' +
+        '.......#..#.......\n' +
+        '......#....#......\n' +
+        '.....#......#.....\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n' +
+        '..................\n'
+    );
+
+    gdjs.RegionGenerator.generateDistanceField(grid);
+    checkDistanceField(
+      grid, //
+      '..................\n' +
+        '.2222222222222222.\n' +
+        '.2444444444444442.\n' +
+        '.2465456666545642.\n' +
+        '.2453235665323542.\n' +
+        '.2442.235532.2442.\n' +
+        '.24532.2332.23542.\n' +
+        '.246532.22.235642.\n' +
+        '.2466532..2356642.\n' +
+        '.2466532..2356642.\n' +
+        '.246532.22.235642.\n' +
+        '.24532.2332.23542.\n' +
+        '.2442.235532.2442.\n' +
+        '.2453235665323542.\n' +
+        '.2465456666545642.\n' +
+        '.2444444444444442.\n' +
+        '.2222222222222222.\n' +
+        '..................\n'
+    );
+
+    gdjs.RegionGenerator.generateRegions(grid, 0);
+    checkRegions(
+      grid, //
+      '..................\n' +
+        '.1111112222222333.\n' +
+        '.1111112222222333.\n' +
+        '.1111122222223333.\n' +
+        '.1111122222223333.\n' +
+        '.1111.222222.3333.\n' +
+        '.11444.2222.55555.\n' +
+        '.444444.22.555555.\n' +
+        '.4444444..5555555.\n' +
+        '.4444444..5555555.\n' +
+        '.444444.66.555555.\n' +
+        '.44444.6666.55555.\n' +
+        '.4444.666666.5555.\n' +
+        '.4477766666668888.\n' +
+        '.7777766666668888.\n' +
+        '.7777766666668888.\n' +
+        '.7777766666668888.\n' +
+        '..................\n'
+    );
+
+    const contours = gdjs.ContourBuilder.buildContours(grid);
+    checkPolygons(
+      contours.map((polygon) => polygon.map((point) => [point.x, point.y])),
+      [
+        [
+          [1, 7],
+          [5, 6],
+          [6, 5],
+          [7, 1],
+          [1, 1],
+        ],
+        [
+          [6, 5],
+          [8, 8],
+          [10, 8],
+          [13, 5],
+          [14, 1],
+          [7, 1],
+        ],
+        [
+          [13, 5],
+          [13, 6],
+          [17, 6],
+          [17, 1],
+          [14, 1],
+        ],
+        [
+          [1, 7],
+          [1, 14],
+          [5, 13],
+          [8, 10],
+          [8, 8],
+          [5, 6],
+        ],
+        [
+          [13, 13],
+          [17, 13],
+          [17, 6],
+          [13, 6],
+          [10, 8],
+          [10, 10],
+        ],
+        [
+          [6, 13],
+          [6, 17],
+          [13, 17],
+          [13, 13],
+          [10, 10],
+          [8, 10],
+        ],
+        [
+          [1, 14],
+          [1, 17],
+          [6, 17],
+          [6, 13],
+          [5, 13],
+        ],
+        [
+          [13, 17],
+          [17, 17],
+          [17, 13],
+          [13, 13],
+        ],
+      ]
+    );
+
+    const convexPolygons = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
+      contours,
+      8
+    );
+    checkPolygons(
+      convexPolygons.map((polygon) =>
+        polygon.map((point) => [point.x, point.y])
+      ),
+      [
+        [
+          [1, 7],
+          [5, 6],
+          [6, 5],
+          [7, 1],
+          [1, 1],
+        ],
+        [
+          [6, 5],
+          [8, 8],
+          [10, 8],
+          [13, 5],
+          [14, 1],
+          [7, 1],
+        ],
+        [
+          [13, 5],
+          [13, 6],
+          [17, 6],
+          [17, 1],
+          [14, 1],
+        ],
+        [
+          [8, 10],
+          [8, 8],
+          [5, 6],
+          [1, 7],
+          [1, 14],
+          [5, 13],
+        ],
+        [
+          [13, 6],
+          [10, 8],
+          [10, 10],
+          [13, 13],
+          [17, 13],
+          [17, 6],
+        ],
+        [
+          [10, 10],
+          [8, 10],
+          [6, 13],
+          [6, 17],
+          [13, 17],
+          [13, 13],
+        ],
+        [
+          [6, 17],
+          [6, 13],
+          [5, 13],
+          [1, 14],
+          [1, 17],
+        ],
+        [
+          [13, 17],
+          [17, 17],
+          [17, 13],
+          [13, 13],
+        ],
+      ]
+    );
+
+    const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
+      grid,
+      convexPolygons,
+      1
+    );
+    checkPolygons(
+      scaledPolygons.map((polygon) =>
+        polygon.map((point) => [point.x, point.y])
+      ),
+      [
+        [
+          [0, 120],
+          [80, 100],
+          [100, 80],
+          [120, 0],
+          [0, 0],
+        ],
+        [
+          [100, 80],
+          [140, 140],
+          [180, 140],
+          [240, 80],
+          [260, 0],
+          [120, 0],
+        ],
+        [
+          [240, 80],
+          [240, 100],
+          [320, 100],
+          [320, 0],
+          [260, 0],
+        ],
+        [
+          [140, 180],
+          [140, 140],
+          [80, 100],
+          [0, 120],
+          [0, 260],
+          [80, 240],
+        ],
+        [
+          [240, 100],
+          [180, 140],
+          [180, 180],
+          [240, 240],
+          [320, 240],
+          [320, 100],
+        ],
+        [
+          [180, 180],
+          [140, 180],
+          [100, 240],
+          [100, 320],
+          [240, 320],
+          [240, 240],
+        ],
+        [
+          [100, 320],
+          [100, 240],
+          [80, 240],
+          [0, 260],
+          [0, 320],
+        ],
+        [
+          [240, 320],
+          [320, 320],
+          [320, 240],
+          [240, 240],
         ],
       ]
     );

@@ -121,7 +121,9 @@ namespace gdjs {
         gdjs.ObstacleRasterizer.rasterizeObstacles(grid, this._obstacles);
         gdjs.RegionGenerator.generateDistanceField(grid);
         gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
-        const contours = gdjs.ContourBuilder.buildContours(grid);
+        //TODO make threshold configurable ?
+        const threshold = 1;
+        const contours = gdjs.ContourBuilder.buildContours(grid, threshold);
         const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
           contours,
           16

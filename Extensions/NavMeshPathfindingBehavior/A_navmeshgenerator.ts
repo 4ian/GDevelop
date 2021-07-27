@@ -1463,9 +1463,11 @@ namespace gdjs {
         // Find the vertex farthest from the current line segment
         // and add it back to the contour.
         let selectedVertex: ContourPoint | null = null;
+        let selectedVertexIndex = -1;
         let maxDistance = 0;
         const vertex0 = outVertices[0];
         const vertex1 = outVertices[1];
+        let index = 0;
         for (let sourceVertex of sourceVertices) {
           const dist = Geometry.getPointSegmentDistanceSq(
             sourceVertex.x,
@@ -1478,17 +1480,24 @@ namespace gdjs {
           if (dist > maxDistance) {
             maxDistance = dist;
             selectedVertex = sourceVertex;
+            selectedVertexIndex = index;
           }
+          index++;
         }
         // As selected vertex such that the contour stays
         // wrapped clockwise.
         if (selectedVertex) {
+          const addedVertex: ContourPoint = {
+            x: selectedVertex.x,
+            y: selectedVertex.y,
+            region: selectedVertexIndex,
+          };
           if (selectedVertex.region < vertex0.region) {
-            outVertices.splice(0, 0, selectedVertex);
+            outVertices.splice(0, 0, addedVertex);
           } else if (selectedVertex.region < vertex1.region) {
-            outVertices.splice(1, 0, selectedVertex);
+            outVertices.splice(1, 0, addedVertex);
           } else {
-            outVertices.push(selectedVertex);
+            outVertices.push(addedVertex);
           }
         }
       }

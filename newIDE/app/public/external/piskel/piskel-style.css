@@ -36,7 +36,7 @@ body {
 #path-editor-header .rightButtons {
   display: flex;
   padding-bottom: 4px;
-  width: 170px;
+  width: 350px;
 }
 
 #path-editor-header .rightButtons > button {

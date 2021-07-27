@@ -232,3 +232,11 @@ export const listAllLicenses = (): Promise<Array<License>> => {
     })
     .then(response => response.data);
 };
+
+export const isPixelArt = (assetShortHeader: AssetShortHeader) => {
+  let returnValue = false;
+  assetShortHeader.tags.some(tag => {
+    if (tag.toLowerCase() === 'pixel art') returnValue = true;
+  });
+  return returnValue;
+};

@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  isPixelArt,
+} from '../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -20,7 +23,10 @@ const styles = {
     pointerEvents: 'none',
   },
   previewImagePixelated: {
-    width: '-webkit-fill-available',
+    width: '100%',
+    imageRendering: '-moz-crisp-edges',
+    imageRendering: '-webkit-optimize-contrast',
+    imageRendering: '-webkit-crisp-edges',
     imageRendering: 'pixelated',
     padding: 15,
   },
@@ -56,14 +62,6 @@ type Props = {|
   onOpenDetails: () => void,
 |};
 
-const isPixelArt = assetShortHeader => {
-  let returnValue = false;
-  assetShortHeader.tags.map(tag => {
-    if (tag.toLowerCase() === 'pixel art') returnValue = true;
-  });
-  return returnValue;
-};
-
 export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
   return (
     <ButtonBase onClick={onOpenDetails} focusRipple>
@@ -72,20 +70,14 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
           <CheckeredBackground />
           <CorsAwareImage
             key={assetShortHeader.previewImageUrls[0]}
-            style={
-              isPixelArt(assetShortHeader)
-                ? {
-                    ...styles.previewImage,
-                    ...styles.previewImagePixelated,
-                    maxWidth: 128 - 2 * paddingSize,
-                    maxHeight: 128 - 2 * paddingSize,
-                  }
-                : {
-                    ...styles.previewImage,
-                    maxWidth: 128 - 2 * paddingSize,
-                    maxHeight: 128 - 2 * paddingSize,
-                  }
-            }
+            style={{
+              maxWidth: 128 - 2 * paddingSize,
+              maxHeight: 128 - 2 * paddingSize,
+              ...styles.previewImage,
+              ...(isPixelArt(assetShortHeader)
+                ? styles.previewImagePixelated
+                : undefined),
+            }}
             src={assetShortHeader.previewImageUrls[0]}
             alt={assetShortHeader.name}
           />

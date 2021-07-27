@@ -32,7 +32,10 @@ import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 
 const styles = {
   previewImagePixelated: {
-    width: '-webkit-fill-available',
+    width: '100%',
+    imageRendering: '-moz-crisp-edges',
+    imageRendering: '-webkit-optimize-contrast',
+    imageRendering: '-webkit-crisp-edges',
     imageRendering: 'pixelated',
     padding: 15,
   },
@@ -172,16 +175,12 @@ export const AssetDetails = ({
               >
                 <CheckeredBackground />
                 <CorsAwareImage
-                  style={
-                    isPixelArt(assetShortHeader)
-                      ? {
-                          ...styles.previewImage,
-                          ...styles.previewImagePixelated,
-                        }
-                      : {
-                          ...styles.previewImage,
-                        }
-                  }
+                  style={{
+                    ...styles.previewImage,
+                    ...(isPixelArt(assetShortHeader)
+                      ? styles.previewImagePixelated
+                      : undefined),
+                  }}
                   src={assetShortHeader.previewImageUrls[0]}
                   alt={assetShortHeader.name}
                 />

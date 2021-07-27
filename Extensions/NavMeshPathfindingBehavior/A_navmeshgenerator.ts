@@ -2251,8 +2251,6 @@ namespace gdjs {
       // This implementation differ with the following:
       // - it handles float vertices
       //   so it focus on pixels center
-      // - it's conservative for thin spikes
-      //   and scan on both axis for this
 
       //  Loop through the rows of the image.
       for (let pixelY = minY; pixelY < maxY; pixelY++) {

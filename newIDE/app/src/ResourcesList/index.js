@@ -20,6 +20,7 @@ import {
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+import ResourcesLoader from '../ResourcesLoader';
 
 const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
@@ -158,7 +159,11 @@ export default class ResourcesList extends React.Component<Props, State> {
   _getResourceThumbnail = (resource: gdResource) => {
     switch (resource.getKind()) {
       case 'image':
-        return getLocalResourceFullPath(this.props.project, resource.getName());
+        return ResourcesLoader.getResourceFullUrl(
+          this.props.project,
+          resource.getName(),
+          {}
+        );
       case 'audio':
         return 'res/actions/music24.png';
       case 'json':
@@ -170,7 +175,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       case 'bitmapFont':
         return 'JsPlatform/Extensions/bitmapfont32.png';
       default:
-        return 'res/unknown32.png'; //Icon type inconnu
+        return 'res/unknown32.png';
     }
   };
 

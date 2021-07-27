@@ -2244,7 +2244,7 @@ namespace gdjs {
     ) {
       // The following implementation of the scan-line polygon fill algorithm
       // is strongly inspired from:
-      // https://github.com/bgrins/javascript-astar
+      // https://alienryderflex.com/polygon_fill/
       // The original implementation was under this license:
       // public-domain code by Darel Rex Finley, 2007
 
@@ -2262,8 +2262,8 @@ namespace gdjs {
         let j = vertices.length - 1;
         for (let i = 0; i < vertices.length; i++) {
           if (
-            (vertices[i].y < pixelCenterY && pixelCenterY < vertices[j].y) ||
-            (vertices[j].y < pixelCenterY && pixelCenterY < vertices[i].y)
+            (vertices[i].y <= pixelCenterY && pixelCenterY < vertices[j].y) ||
+            (vertices[j].y < pixelCenterY && pixelCenterY <= vertices[i].y)
           ) {
             workingNodes.push(
               Math.round(

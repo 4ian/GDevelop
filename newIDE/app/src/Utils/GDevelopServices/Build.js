@@ -135,7 +135,8 @@ export const buildCordovaAndroid = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   key: string,
-  targets: Array<TargetName>
+  targets: Array<TargetName>,
+  keystore: 'old' | 'new'
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -145,7 +146,11 @@ export const buildCordovaAndroid = (
         )}&key=${encodeURIComponent(
           key
         )}&type=cordova-build&targets=${encodeURIComponent(targets.join(','))}`,
-        null,
+        JSON.stringify({
+          signing: {
+            keystore,
+          },
+        }),
         {
           params: {},
           headers: {

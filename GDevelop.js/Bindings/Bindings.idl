@@ -293,8 +293,35 @@ interface PlatformSpecificAssets {
 interface LoadingScreen {
     void LoadingScreen();
 
-    void ShowGDevelopSplash(boolean show);
     boolean IsGDevelopSplashShown();
+    void ShowGDevelopSplash(boolean show);
+    [Const, Ref] DOMString GetGDevelopLogoStyle();
+    [Ref] LoadingScreen SetGDevelopLogoStyle([Const] DOMString value);
+    [Const, Ref] DOMString GetBackgroundImageResourceName();
+    [Ref] LoadingScreen SetBackgroundImageResourceName([Const] DOMString value);
+    long GetBackgroundColor();
+    [Ref] LoadingScreen SetBackgroundColor(long value);
+    double GetBackgroundFadeInDuration();
+    [Ref] LoadingScreen SetBackgroundFadeInDuration(double value);
+    double GetMinDuration();
+    [Ref] LoadingScreen SetMinDuration(double value);
+    double GetLogoAndProgressFadeInDuration();
+    [Ref] LoadingScreen SetLogoAndProgressFadeInDuration(double value);
+    double GetLogoAndProgressLogoFadeInDelay();
+    [Ref] LoadingScreen SetLogoAndProgressLogoFadeInDelay(double value);
+    boolean GetShowProgressBar();
+    [Ref] LoadingScreen SetShowProgressBar(boolean value);
+    double GetProgressBarMaxWidth();
+    [Ref] LoadingScreen SetProgressBarMaxWidth(double value);
+    double GetProgressBarMinWidth();
+    [Ref] LoadingScreen SetProgressBarMinWidth(double value);
+    double GetProgressBarWidthPercent();
+    [Ref] LoadingScreen SetProgressBarWidthPercent(double value);
+    double GetProgressBarHeight();
+    [Ref] LoadingScreen SetProgressBarHeight(double value);
+    long GetProgressBarColor();
+    [Ref] LoadingScreen SetProgressBarColor(long value);
+
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -693,6 +720,11 @@ interface Layer {
     unsigned long GetAmbientLightColorBlue();
 
     [Ref] EffectsContainer GetEffects();
+
+    // Note that for now, cameras are not used in the editor (and not supported in the game engine).
+    // Just exposing the count to ensure we can test it.
+    unsigned long GetCameraCount();
+    void SetCameraCount(unsigned long cameraCount);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -2646,6 +2678,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+    [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
 };
 

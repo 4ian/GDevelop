@@ -57,7 +57,11 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
   onlineBuildType: 'cordova-build',
   packageNameWarningType: 'mobile',
 
-  getInitialExportState: () => ({ targets: ['androidApk'] }),
+  getInitialExportState: () => ({
+    targets: ['androidApk'],
+    keystore: 'new',
+    signingDialogOpen: false,
+  }),
 
   canLaunchBuild: () => true,
 
@@ -157,7 +161,8 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
       getAuthorizationHeader,
       profile.uid,
       uploadBucketKey,
-      exportState.targets
+      exportState.targets,
+      exportState.keystore
     );
   },
 };

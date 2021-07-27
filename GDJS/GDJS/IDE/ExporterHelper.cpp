@@ -79,8 +79,12 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   gd::Project exportedProject = options.project;
 
-  // Always disable the splash for preview
-  exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+  if (!options.fullLoadingScreen) {
+    // Most of the time, we skip the logo and minimum duration so that
+    // the preview start as soon as possible.
+    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+    exportedProject.GetLoadingScreen().SetMinDuration(0);
+  }
 
   // Export resources (*before* generating events as some resources filenames
   // may be updated)
@@ -96,7 +100,11 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   // end of compatibility code
 
   // Export engine libraries
-  AddLibsInclude(true, false, true, includesFiles);
+  AddLibsInclude(/*pixiRenderers=*/true,
+                 /*cocosRenderers=*/false,
+                 /*websocketDebuggerClient=*/true,
+                 exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+                 includesFiles);
 
   // Export files for object and behaviors
   ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
@@ -598,13 +606,13 @@ bool ExporterHelper::CompleteIndexFile(
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     bool cocosRenderers,
                                     bool websocketDebuggerClient,
+                                    gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
   InsertUnique(includesFiles, "logger.js");
   InsertUnique(includesFiles, "gd.js");
-  InsertUnique(includesFiles, "gd-splash-image.js");
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
@@ -635,6 +643,16 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "events-tools/stringtools.js");
   InsertUnique(includesFiles, "events-tools/windowtools.js");
   InsertUnique(includesFiles, "events-tools/networktools.js");
+
+  if (gdevelopLogoStyle == "dark") {
+    InsertUnique(includesFiles, "splash/gd-logo-dark.js");
+  } else if (gdevelopLogoStyle == "dark-colored") {
+    InsertUnique(includesFiles, "splash/gd-logo-dark-colored.js");
+  } else if (gdevelopLogoStyle == "light-colored") {
+    InsertUnique(includesFiles, "splash/gd-logo-light-colored.js");
+  } else {
+    InsertUnique(includesFiles, "splash/gd-logo-light.js");
+  }
 
   if (websocketDebuggerClient) {
     InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");

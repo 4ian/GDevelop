@@ -134,7 +134,7 @@ cd newIDE/web-app
 yarn deploy # or npm run deploy
 ```
 
-> Note: this will also upload the game engine (GDJS) and extension sources, needed by the IDE and purge the CloudFlare cache. If examples have been added/changed, be also sure to run `newIDE/web-app/scripts/deploy-examples-resources.js`.
+> Note: this will also upload the game engine (GDJS) and extension sources, needed by the IDE and purge the CloudFlare cache.
 
 ### (Optional) Updating translations
 

@@ -433,6 +433,7 @@ namespace gdjs {
     loadAllAssets(callback: () => void, progressCallback?: (float) => void) {
       const loadingScreen = new gdjs.LoadingScreenRenderer(
         this.getRenderer(),
+        this._imageManager,
         this._data.properties.loadingScreen
       );
       const allAssetsTotal = this._data.resources.resources.length;
@@ -444,7 +445,7 @@ namespace gdjs {
       this._imageManager.loadTextures(
         function (count, total) {
           const percent = Math.floor((count / allAssetsTotal) * 100);
-          loadingScreen.render(percent);
+          loadingScreen.setPercent(percent);
           if (progressCallback) {
             progressCallback(percent);
           }
@@ -455,7 +456,7 @@ namespace gdjs {
               const percent = Math.floor(
                 ((texturesTotalCount + count) / allAssetsTotal) * 100
               );
-              loadingScreen.render(percent);
+              loadingScreen.setPercent(percent);
               if (progressCallback) {
                 progressCallback(percent);
               }
@@ -468,7 +469,7 @@ namespace gdjs {
                       allAssetsTotal) *
                       100
                   );
-                  loadingScreen.render(percent);
+                  loadingScreen.setPercent(percent);
                   if (progressCallback) {
                     progressCallback(percent);
                   }
@@ -484,7 +485,7 @@ namespace gdjs {
                           allAssetsTotal) *
                           100
                       );
-                      loadingScreen.render(percent);
+                      loadingScreen.setPercent(percent);
                       if (progressCallback) {
                         progressCallback(percent);
                       }
@@ -501,11 +502,11 @@ namespace gdjs {
                               allAssetsTotal) *
                               100
                           );
-                          loadingScreen.render(percent);
+                          loadingScreen.setPercent(percent);
                           if (progressCallback) progressCallback(percent);
                         })
+                        .then(() => loadingScreen.unload())
                         .then(() => {
-                          loadingScreen.unload();
                           callback();
                         });
                     }

@@ -235,15 +235,20 @@ describe('libGD.js', function () {
       layer.setName('GUI');
       layer.setVisibility(false);
       layer.getEffects().insertNewEffect('MyEffect', 0);
+      layer.setCameraCount(1);
 
       const element = new gd.SerializerElement();
       layer.serializeTo(element);
-      layer2.unserializeFrom(element);
 
-      expect(layer2.getName()).toBe('GUI');
-      expect(layer2.getVisibility()).toBe(false);
-      expect(layer2.getEffects().getEffectsCount()).toBe(1);
-      expect(layer2.getEffects().getEffectAt(0).getName()).toBe('MyEffect');
+      for (let i = 0; i < 5;++i) { // Repeat multiple time to check idempotency.
+        layer2.unserializeFrom(element);
+
+        expect(layer2.getName()).toBe('GUI');
+        expect(layer2.getVisibility()).toBe(false);
+        expect(layer2.getEffects().getEffectsCount()).toBe(1);
+        expect(layer2.getEffects().getEffectAt(0).getName()).toBe('MyEffect');
+        expect(layer2.getCameraCount()).toBe(1);
+      }
 
       layer.delete();
       layer2.delete();

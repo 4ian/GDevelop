@@ -40,6 +40,9 @@ namespace gdjs {
   export const callbacksRuntimeSceneUnloaded: Array<RuntimeSceneCallback> = [];
   export const callbacksObjectDeletedFromScene: Array<RuntimeSceneRuntimeObjectCallback> = [];
 
+  /** Base64 encoded logo of GDevelop for the splash screen. */
+  export let gdevelopLogo: string = '';
+
   /**
    * Convert a rgb color value to a hex string.
    *

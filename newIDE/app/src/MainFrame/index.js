@@ -184,6 +184,7 @@ type LaunchPreviewOptions = {
   networkPreview?: boolean,
   hotReload?: boolean,
   projectDataOnlyExport?: boolean,
+  fullLoadingScreen?: boolean,
 };
 
 export type Props = {
@@ -1177,6 +1178,7 @@ const MainFrame = (props: Props) => {
       networkPreview,
       hotReload,
       projectDataOnlyExport,
+      fullLoadingScreen,
     }: LaunchPreviewOptions) => {
       if (!currentProject) return;
       if (currentProject.getLayoutsCount() === 0) return;
@@ -1216,6 +1218,7 @@ const MainFrame = (props: Props) => {
             networkPreview: !!networkPreview,
             hotReload: !!hotReload,
             projectDataOnlyExport: !!projectDataOnlyExport,
+            fullLoadingScreen: !!fullLoadingScreen,
             getIsMenuBarHiddenInPreview:
               preferences.getIsMenuBarHiddenInPreview,
             getIsAlwaysOnTopInPreview: preferences.getIsAlwaysOnTopInPreview,
@@ -1260,6 +1263,8 @@ const MainFrame = (props: Props) => {
   const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = React.useMemo(
     () => ({
       hasPreviewsRunning,
+      launchProjectWithLoadingScreenPreview: () =>
+        launchPreview({ fullLoadingScreen: true }),
       launchProjectDataOnlyPreview: () =>
         launchPreview({ hotReload: true, projectDataOnlyExport: true }),
     }),
@@ -2066,6 +2071,9 @@ const MainFrame = (props: Props) => {
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+            resourceSources={props.resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
           />
         )}
         {!state.currentProject && (

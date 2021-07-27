@@ -8,6 +8,7 @@ export type PreviewOptions = {|
   networkPreview: boolean,
   hotReload: boolean,
   projectDataOnlyExport: boolean,
+  fullLoadingScreen: boolean,
   getIsMenuBarHiddenInPreview: () => boolean,
   getIsAlwaysOnTopInPreview: () => boolean,
 |};

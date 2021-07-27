@@ -2302,72 +2302,12 @@ namespace gdjs {
             if (workingNodes[i + 1] > maxX) {
               workingNodes[i + 1] = maxX;
             }
-            // conserve thin (less than one cell large) vertical spikes
-            if (workingNodes[i] === workingNodes[i + 1]) {
-              fill(workingNodes[i], pixelY);
-            }
             for (
               let pixelX = workingNodes[i];
               pixelX < workingNodes[i + 1];
               pixelX++
             ) {
               fill(pixelX, pixelY);
-            }
-          }
-        }
-      }
-
-      // scan X, but only to conserve thin spikes
-      for (let pixelX = minX; pixelX < maxX; pixelX++) {
-        const pixelCenterX = pixelX + 0.5;
-        //  Build a list of nodes.
-        workingNodes.length = 0;
-        let j = vertices.length - 1;
-        for (let i = 0; i < vertices.length; i++) {
-          if (
-            (vertices[i].x < pixelCenterX && pixelCenterX < vertices[j].x) ||
-            (vertices[j].x < pixelCenterX && pixelCenterX < vertices[i].x)
-          ) {
-            workingNodes.push(
-              Math.round(
-                vertices[i].y +
-                  ((pixelCenterX - vertices[i].x) /
-                    (vertices[j].x - vertices[i].x)) *
-                    (vertices[j].y - vertices[i].y)
-              )
-            );
-          }
-          j = i;
-        }
-
-        //  Sort the nodes, via a simple “Bubble” sort.
-        {
-          let i = 0;
-          while (i < workingNodes.length - 1) {
-            if (workingNodes[i] > workingNodes[i + 1]) {
-              const swap = workingNodes[i];
-              workingNodes[i] = workingNodes[i + 1];
-              workingNodes[i + 1] = swap;
-              if (i > 0) i--;
-            } else {
-              i++;
-            }
-          }
-        }
-
-        //  Fill the pixels between node pairs.
-        for (let i = 0; i < workingNodes.length; i += 2) {
-          if (workingNodes[i] >= maxY) break;
-          if (workingNodes[i + 1] > minY) {
-            if (workingNodes[i] < minY) {
-              workingNodes[i] = minY;
-            }
-            if (workingNodes[i + 1] > maxY) {
-              workingNodes[i + 1] = maxY;
-            }
-            // conserve thin (less than one cell large) horizontal spikes
-            if (workingNodes[i] === workingNodes[i + 1]) {
-              fill(pixelX, workingNodes[i]);
             }
           }
         }

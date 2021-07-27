@@ -20,6 +20,7 @@ import {
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
+import ResourcesLoader from '../ResourcesLoader';
 
 const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
@@ -153,6 +154,29 @@ export default class ResourcesList extends React.Component<Props, State> {
         if (this.sortableList) this.sortableList.forceUpdateGrid();
       }
     );
+  };
+
+  _getResourceThumbnail = (resource: gdResource) => {
+    switch (resource.getKind()) {
+      case 'image':
+        return ResourcesLoader.getResourceFullUrl(
+          this.props.project,
+          resource.getName(),
+          {}
+        );
+      case 'audio':
+        return 'res/actions/music24.png';
+      case 'json':
+        return 'res/actions/fichier24.png';
+      case 'video':
+        return 'JsPlatform/Extensions/videoicon24.png';
+      case 'font':
+        return 'res/actions/font24.png';
+      case 'bitmapFont':
+        return 'JsPlatform/Extensions/bitmapfont32.png';
+      default:
+        return 'res/unknown32.png';
+    }
   };
 
   _rename = (resource: gdResource, newName: string) => {
@@ -352,6 +376,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                     width={width}
                     height={height}
                     getItemName={getResourceName}
+                    getItemThumbnail={this._getResourceThumbnail}
                     selectedItems={selectedResource ? [selectedResource] : []}
                     onItemSelected={onSelectResource}
                     renamedItem={this.state.renamedResource}

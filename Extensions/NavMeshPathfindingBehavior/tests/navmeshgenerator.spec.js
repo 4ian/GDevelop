@@ -387,6 +387,69 @@ describe.only('gdjs.NavMeshGeneration', function () {
     );
   });
 
+  it('keep obstacles encompassed in cells of the same distance', function () {
+    const runtimeScene = makeTestRuntimeScene();
+    const square = createRectangle(runtimeScene, 160, 160);
+    square.setPosition(100, 100);
+    runtimeScene.renderAndStep(1000 / 60);
+
+    const grid = new gdjs.RasterizationGrid(0, 0, 200, 200, 20, 20);
+
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [square]);
+    checkObstacles(
+      grid, //
+      '............\n' +
+        '............\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '..########..\n' +
+        '............\n' +
+        '............\n'
+    );
+
+    gdjs.RegionGenerator.generateDistanceField(grid);
+    checkDistanceField(
+      grid, //
+      '............\n' +
+        '.2222222222.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2........2.\n' +
+        '.2222222222.\n' +
+        '............\n'
+    );
+
+    // a 2nd region is created by ObstacleRegionBordersCleaner
+    gdjs.RegionGenerator.generateRegions(grid, 0);
+    checkRegions(
+      grid, //
+      '............\n' +
+        '.2111111111.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2........1.\n' +
+        '.2111111111.\n' +
+        '............\n'
+    );
+
+    // No need to check the other steps as one line regions are not interesting.
+  });
+
   it('can build a mesh for a plus', function () {
     const runtimeScene = makeTestRuntimeScene();
     const horizontalRectangle = createRectangle(runtimeScene, 160, 80);

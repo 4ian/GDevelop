@@ -318,6 +318,22 @@ namespace gdjs {
 
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
+        //shapePainter.setFillColor(Math.floor(Math.random() * 256) + ";" + Math.floor(Math.random() * 256) + ";" + Math.floor(Math.random() * 256));
+        shapePainter.beginFillPath(
+          polygon[0].x,
+          polygon[0].y / this._manager._isometricRatio
+        );
+        for (let index = 1; index < polygon.length; index++) {
+          shapePainter.drawPathLineTo(
+            polygon[index].x,
+            polygon[index].y / this._manager._isometricRatio
+          );
+        }
+        shapePainter.closePath();
+        shapePainter.endFillPath();
+      }
+      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
+        const polygon = navPoly.getPoints();
         shapePainter.drawPathMoveTo(
           polygon[0].x,
           polygon[0].y / this._manager._isometricRatio

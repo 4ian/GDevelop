@@ -1775,8 +1775,7 @@ namespace gdjs {
 
           // Fill to slightly more than the current "water level".
           // This improves efficiency of the algorithm.
-          // But it can't find small regions so it's disable.
-          const fillTo = distance; //Math.max(distance - 2, distanceMin);
+          const fillTo = Math.max(distance - 2, distanceMin);
           if (
             RegionGenerator.floodNewRegion(
               grid,
@@ -1873,9 +1872,38 @@ namespace gdjs {
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (neighbor.regionID !== RasterizationCell.NULL_REGION_ID) {
               if (neighbor.distanceToObstacle + 2 < regionCenterDist) {
-                //TODO Should conservative expansion be ported too?
-                cellRegion = neighbor.regionID;
-                regionCenterDist = neighbor.distanceToObstacle + 2;
+                /*
+                 * This neighbor is closer to its region core
+                 * than previously detected neighbors.
+                 */
+                let sameRegionCount = 0;
+                /*
+                 * Check to ensure that this neighbor has
+                 * at least two other neighbors in its region.
+                 * This makes sure that adding this span to
+                 * this neighbor's  region will not result
+                 * in a single width line of voxels.
+                 */
+                for (let ndir = 0; ndir < 4; ndir++) {
+                  const nnSpan = grid.getNeighbor(neighbor, ndir);
+                  // There is a diagonal-neighbor
+                  if (nnSpan.regionID === neighbor.regionID)
+                    // This neighbor has a neighbor in
+                    // the same region.
+                    sameRegionCount++;
+                }
+                if (sameRegionCount > 1) {
+                  /*
+                   * Either conservative expansion is turned off,
+                   * or it is on and this neighbor's region is
+                   * acceptable for the current span.
+                   * Choose this neighbor's region.
+                   * Set the current distance to center as
+                   * slightly further than this neighbor.
+                   */
+                  cellRegion = neighbor.regionID;
+                  regionCenterDist = neighbor.distanceToObstacle + 2;
+                }
               }
             }
           }

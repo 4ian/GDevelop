@@ -1244,7 +1244,7 @@ namespace gdjs {
             vertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
             nextVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID
           ) {
-            console.error(
+            console.warn(
               'Vertex in the middle. contour:' +
                 vertexIndexC +
                 ' vertex: ' +
@@ -1254,6 +1254,15 @@ namespace gdjs {
             );
             const contourB = contoursByRegion[vertexC.region];
             const contourA = contoursByRegion[nextVertexC.region];
+
+            if (!contourA) {
+              console.warn("contour already discarded: " + vertexC.region);
+              continue;
+            }
+            if (!contourB) {
+              console.warn("contour already discarded: " + nextVertexC.region);
+              continue;
+            }
 
             let vertexIndexB = -1;
             for (let indexB = 0; indexB < contourB.length; indexB++) {

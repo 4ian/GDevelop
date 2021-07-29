@@ -138,7 +138,12 @@ namespace gdjs {
     }
   }
 
-  export type ContourPoint = { x: integer; y: integer; region: integer };
+  export type ContourPoint = {
+    x: integer;
+    y: integer;
+    /** Neighbor region */
+    region: integer;
+  };
 
   /**
    * Result of {@link ConvexPolygonGenerator.getPolyMergeInfo}
@@ -1052,6 +1057,7 @@ namespace gdjs {
     ): ContourPoint[][] {
       const contours = new Array<ContourPoint[]>(grid.regionCount);
       contours.length = 0;
+      const contoursByRegion = new Array<ContourPoint[]>(grid.regionCount);
 
       let discardedContours = 0;
 
@@ -1187,7 +1193,9 @@ namespace gdjs {
             );
             discardedContours++;
           } else {
-            contours.push(Array.from(workingSimplifiedVertices));
+            const contour = Array.from(workingSimplifiedVertices);
+            contours.push(contour);
+            contoursByRegion[cell.regionID] = contour;
           }
         }
       }
@@ -1222,6 +1230,149 @@ namespace gdjs {
         );
         // The CritterAI implementation has more detailed logs.
         // They can be interesting for debugging.
+      }
+
+      for (const contourC of contours) {
+        for (
+          let vertexIndexC = 0;
+          vertexIndexC < contourC.length;
+          vertexIndexC++
+        ) {
+          const vertexC = contourC[vertexIndexC];
+          const nextVertexC = contourC[(vertexIndexC + 1) % contourC.length];
+          if (
+            vertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
+            nextVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID
+          ) {
+            console.error(
+              'Vertex in the middle. contour:' +
+                vertexIndexC +
+                ' vertex: ' +
+                vertexC.x +
+                ' ' +
+                vertexC.y
+            );
+            const contourB = contoursByRegion[vertexC.region];
+            const contourA = contoursByRegion[nextVertexC.region];
+
+            let vertexIndexB = -1;
+            for (let indexB = 0; indexB < contourB.length; indexB++) {
+              const vertexB = contourB[indexB];
+              if (vertexB.x === vertexC.x && vertexB.y === vertexC.y) {
+                vertexIndexB = indexB;
+                break;
+              }
+            }
+            let vertexIndexA = -1;
+            for (let indexA = 0; indexA < contourA.length; indexA++) {
+              const vertexA = contourA[indexA];
+              if (vertexA.x === vertexC.x && vertexA.y === vertexC.y) {
+                vertexIndexA = indexA;
+                break;
+              }
+            }
+
+            if (vertexIndexB === -1 || vertexIndexA === -1) {
+              console.error('The vertex is not share by the 3 contours.');
+              continue;
+            }
+
+            const previousVertexC =
+              contourC[(vertexIndexC - 1 + contourC.length) % contourC.length];
+            const previousVertexB =
+              contourB[(vertexIndexB - 1 + contourB.length) % contourB.length];
+            const previousVertexA =
+              contourA[(vertexIndexA - 1 + contourA.length) % contourA.length];
+
+            if (
+              previousVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
+              previousVertexB.region !== RasterizationCell.OBSTACLE_REGION_ID &&
+              previousVertexA.region !== RasterizationCell.OBSTACLE_REGION_ID
+            ) {
+              console.error('A vertex has no neighbor on an obstacle.');
+              continue;
+            }
+
+            let expendedContour: ContourPoint[] | null = null;
+            let expendedVertexIndex: integer = -1;
+            let shrinkContourB: ContourPoint[] | null = null;
+            let shrinkVertexIndexB: integer = -1;
+            let shrinkContourA: ContourPoint[] | null = null;
+            let shrinkVertexIndexA: integer = -1;
+
+            let edgeLengthMin = Number.MAX_VALUE;
+            if (
+              previousVertexC.region === RasterizationCell.OBSTACLE_REGION_ID
+            ) {
+              const deltaX = previousVertexC.x - vertexC.x;
+              const deltaY = previousVertexC.y - vertexC.y;
+              const lengthSq = deltaX * deltaX + deltaY * deltaY;
+              if (lengthSq < edgeLengthMin) {
+                edgeLengthMin = lengthSq;
+
+                expendedContour = contourA;
+                shrinkContourB = contourC;
+                shrinkContourA = contourB;
+
+                expendedVertexIndex = vertexIndexA;
+                shrinkVertexIndexB = vertexIndexC;
+                shrinkVertexIndexA = vertexIndexB;
+              }
+            }
+            if (
+              previousVertexB.region === RasterizationCell.OBSTACLE_REGION_ID
+            ) {
+              const deltaX = previousVertexB.x - vertexC.x;
+              const deltaY = previousVertexB.y - vertexC.y;
+              const lengthSq = deltaX * deltaX + deltaY * deltaY;
+              if (lengthSq < edgeLengthMin) {
+                edgeLengthMin = lengthSq;
+
+                expendedContour = contourC;
+                shrinkContourB = contourB;
+                shrinkContourA = contourA;
+
+                expendedVertexIndex = vertexIndexC;
+                shrinkVertexIndexB = vertexIndexB;
+                shrinkVertexIndexA = vertexIndexA;
+              }
+            }
+            if (
+              previousVertexA.region === RasterizationCell.OBSTACLE_REGION_ID
+            ) {
+              const deltaX = previousVertexA.x - vertexC.x;
+              const deltaY = previousVertexA.y - vertexC.y;
+              const lengthSq = deltaX * deltaX + deltaY * deltaY;
+              if (lengthSq < edgeLengthMin) {
+                edgeLengthMin = lengthSq;
+
+                expendedContour = contourB;
+                shrinkContourB = contourA;
+                shrinkContourA = contourC;
+
+                expendedVertexIndex = vertexIndexB;
+                shrinkVertexIndexB = vertexIndexA;
+                shrinkVertexIndexA = vertexIndexC;
+              }
+            }
+
+            const shrinkPreviousVertexB =
+              shrinkContourB![
+                (shrinkVertexIndexB - 1 + shrinkContourB!.length) %
+                  shrinkContourB!.length
+              ];
+            expendedContour![expendedVertexIndex].x = shrinkPreviousVertexB.x;
+            expendedContour![expendedVertexIndex].y = shrinkPreviousVertexB.y;
+            expendedContour![expendedVertexIndex].region =
+              RasterizationCell.NULL_REGION_ID;
+
+            shrinkContourA![
+              (shrinkVertexIndexA + 1) % shrinkContourA!.length
+            ].region = shrinkContourA![shrinkVertexIndexA].region;
+            shrinkContourB!.splice(shrinkVertexIndexB, 1);
+            shrinkContourA!.splice(shrinkVertexIndexA, 1);
+          }
+        }
       }
 
       return contours;

@@ -2090,7 +2090,6 @@ namespace gdjs {
                     // This neighbor has a neighbor in
                     // the same region.
                     sameRegionCount++;
-                    break;
                   }
                 }
                 if (sameRegionCount > 1) {

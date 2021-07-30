@@ -1087,7 +1087,7 @@ namespace gdjs {
           const cell = grid.get(x, y);
 
           // Note:  This algorithm first sets the flag bits such that
-          // 1 = "neighbor is in the same region".  At the end it inverts
+          // 1 = "neighbor is in the same region". At the end it inverts
           // the bits so flags are as expected.
 
           // Default to "not connected to any external region".
@@ -1218,7 +1218,7 @@ namespace gdjs {
         // against internal encompassed obstacle regions.
         console.error(
           'Contour generation failed: Detected contours does' +
-            ' not match the number of regions.  Regions: ' +
+            ' not match the number of regions. Regions: ' +
             (grid.regionCount - 1) +
             ', Detected contours: ' +
             (contours.length + discardedContours) +
@@ -1232,6 +1232,14 @@ namespace gdjs {
         // They can be interesting for debugging.
       }
 
+      // Search vertices that are not shared with the obstacle region and
+      // remove them.
+      // It consider a vertex to be between only 3 regions.
+      // The removed vertex is merged on the nearest of 3 edges other extremity
+      // that is on an obstacle border. In case none of them are, the vertex
+      // will be kept.
+      // TODO If such a case happens, a loop should fix it but I'm not sure
+      // this can actually happen.
       const superposingContourIndexes = new Array<integer>();
       let contourCIndex = -1;
       for (const contourC of contours) {
@@ -1259,11 +1267,11 @@ namespace gdjs {
             const contourA = contoursByRegion[nextVertexC.region];
 
             if (!contourA) {
-              console.warn("contour already discarded: " + vertexC.region);
+              console.warn('contour already discarded: ' + vertexC.region);
               continue;
             }
             if (!contourB) {
-              console.warn("contour already discarded: " + nextVertexC.region);
+              console.warn('contour already discarded: ' + nextVertexC.region);
               continue;
             }
 
@@ -1287,7 +1295,9 @@ namespace gdjs {
             if (vertexIndexB === -1 || vertexIndexA === -1) {
               // The vertex is not shared by the 2 contours neighbors
               // This happens with small regions of 5 cells in the shape of a plus.
-              console.warn(`The contour (${contourCIndex}) is superposing other contours, it will be removed.`);
+              console.warn(
+                `The contour (${contourCIndex}) is superposing other contours, it will be removed.`
+              );
               superposingContourIndexes.push(contourCIndex);
               continue;
             }
@@ -1304,7 +1314,9 @@ namespace gdjs {
               previousVertexB.region !== RasterizationCell.OBSTACLE_REGION_ID &&
               previousVertexA.region !== RasterizationCell.OBSTACLE_REGION_ID
             ) {
-              console.error('A vertex has no neighbor on an obstacle.');
+              console.error(
+                "A vertex has no neighbor on an obstacle. Pathfinding won't work as expected. It needs a fix."
+              );
               continue;
             }
 
@@ -1370,26 +1382,43 @@ namespace gdjs {
                 shrinkVertexIndexA = vertexIndexC;
               }
             }
+            // Merge the vertex on the other extremity of the smallest of the 3 edges.
+            //
+            //   \ C /
+            //    \ /
+            //  A  |  B
+            //     |
+            //
+            // Imagine that the Y will become a V and the vertices are store clockwise.
 
+            // Move the shared vertex at the other extremity of the A-B border.
             const shrinkPreviousVertexB =
               shrinkContourB![
                 (shrinkVertexIndexB - 1 + shrinkContourB!.length) %
                   shrinkContourB!.length
               ];
-            expendedContour![expendedVertexIndex].x = shrinkPreviousVertexB.x;
-            expendedContour![expendedVertexIndex].y = shrinkPreviousVertexB.y;
-            expendedContour![expendedVertexIndex].region =
-              RasterizationCell.NULL_REGION_ID;
+            const movedVertex = expendedContour![expendedVertexIndex];
+            movedVertex.x = shrinkPreviousVertexB.x;
+            movedVertex.y = shrinkPreviousVertexB.y;
+            movedVertex.region = RasterizationCell.NULL_REGION_ID;
 
+            // There is no more border between A and B,
+            // update the region from B to C.
             shrinkContourA![
               (shrinkVertexIndexA + 1) % shrinkContourA!.length
             ].region = shrinkContourA![shrinkVertexIndexA].region;
+
+            // Remove in A and B the vertex that's been move in C.
             shrinkContourB!.splice(shrinkVertexIndexB, 1);
             shrinkContourA!.splice(shrinkVertexIndexA, 1);
           }
         }
       }
-      for (let index = superposingContourIndexes.length - 1; index >= 0; index--) {
+      for (
+        let index = superposingContourIndexes.length - 1;
+        index >= 0;
+        index--
+      ) {
         contours.splice(superposingContourIndexes[index], 1);
       }
 
@@ -1440,7 +1469,7 @@ namespace gdjs {
       // impassable seam between two adjacent regions in the following case:
       //
       // 1. One region connects to another region on two sides in an
-      // uninterrupted manner.  (Visualize one region wrapping in an L
+      // uninterrupted manner. (Visualize one region wrapping in an L
       // shape around the corner of another.)
       // 2. At the corner shared by the two regions, a change in height
       // occurs.
@@ -1455,7 +1484,7 @@ namespace gdjs {
 
       // It is a bit hard to describe the stepping portion of this algorithm.
       // One way to visualize it is to think of a robot sitting on the
-      // floor facing a known wall.  It then does the following to skirt
+      // floor facing a known wall. It then does the following to skirt
       // the wall:
       // 1. If there is a wall in front of it, turn clockwise in 90 degrees
       //    increments until it finds the wall is gone.
@@ -1497,7 +1526,7 @@ namespace gdjs {
           // Rotate in clockwise direction.
           direction = (direction + 1) & 0x3;
         } else {
-          // The current direction does not point to an edge.  So it
+          // The current direction does not point to an edge. So it
           // must point to a neighbor cell in the same region as the
           // current cell. Move to the neighbor and swing the search
           // direction back one increment (counterclockwise).
@@ -1599,7 +1628,7 @@ namespace gdjs {
       } else {
         // The contour shares edges with other non-obstacle regions.
         // Seed the simplified contour with a new vertex for every
-        // location where the region connection changes.  These are
+        // location where the region connection changes. These are
         // vertices that are important because they represent portals
         // to other regions.
         for (let index = 0; index < sourceVertices.length; index++) {
@@ -1610,7 +1639,7 @@ namespace gdjs {
             sourceVertices[(index + 1) % sourceVertices.length].region
           ) {
             // The current vertex has a different region than the
-            // next vertex.  So there is a change in vertex region.
+            // next vertex. So there is a change in vertex region.
             outVertices.push({
               x: sourceVert.x,
               y: sourceVert.y,
@@ -1633,9 +1662,9 @@ namespace gdjs {
         // with only two seed vertices and none of the algorithms added
         // a vertex.
         //
-        // This case is not completely unexpected.  At this time,
+        // This case is not completely unexpected. At this time,
         // the contour algorithms only add vertices back if a obstacle region
-        // edge is involved.  So if a region is only surrounded by two
+        // edge is involved. So if a region is only surrounded by two
         // non-obstacle regions, it can end up in this situation.
         //
         // Find the vertex farthest from the current line segment
@@ -1717,7 +1746,7 @@ namespace gdjs {
       // Loop through all edges in this contour.
       //
       // NOTE: The simplifiedVertCount in the loop condition
-      // increases over iterations.  That is what keeps the loop going beyond
+      // increases over iterations. That is what keeps the loop going beyond
       // the initial vertex count.
       let resultIndexA = 0;
       while (resultIndexA < inoutResultVertices.length) {
@@ -1733,12 +1762,12 @@ namespace gdjs {
         const bz = inoutResultVertices[resultIndexB].y;
         const sourceIndexB = inoutResultVertices[resultIndexB].region;
 
-        // The source index of the next vertex to test.  (The vertex just
+        // The source index of the next vertex to test. (The vertex just
         // after the current vertex in the source vertex list.)
         let testedSourceIndex = (sourceIndexA + 1) % sourceVertices.length;
         let maxDeviation = 0;
 
-        // Default to no index.  No new vert to add.
+        // Default to no index. No new vert to add.
         let toInsertSourceIndex = -1;
 
         if (
@@ -1786,7 +1815,7 @@ namespace gdjs {
           // formed by vertA  and this this new vertex on the next
           // iteration of the loop.
         }
-        // This edge segment does not need to be altered.  Move to
+        // This edge segment does not need to be altered. Move to
         // the next vertex.
         else resultIndexA++;
       }
@@ -1970,7 +1999,7 @@ namespace gdjs {
             cell.distanceToObstacle > distanceMin &&
             cell.regionID === RasterizationCell.NULL_REGION_ID
           ) {
-            // Not a border or null region cell. Should be in a region.
+            // Not a border or obstacle region cell. Should be in a region.
             floodedCells.push(cell);
           }
         }
@@ -1986,9 +2015,11 @@ namespace gdjs {
 
       grid.regionCount = nextRegionID;
 
-      ObstacleRegionBordersCleaner.apply(grid);
-      //TODO Can the post processing algorithm
-      // FilterOutSmallRegions be interesting too?
+      ObstacleRegionBordersCleaner.fixObstacleRegion(grid);
+      //TODO Also port FilterOutSmallRegions?
+      // The algorithm to remove vertices in the middle (added at the end of
+      // ContourBuilder.buildContours) may already filter them and contour are
+      // faster to process than cells.
     }
 
     /**
@@ -2041,35 +2072,29 @@ namespace gdjs {
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (neighbor.regionID !== RasterizationCell.NULL_REGION_ID) {
               if (neighbor.distanceToObstacle + 2 < regionCenterDist) {
-                /*
-                 * This neighbor is closer to its region core
-                 * than previously detected neighbors.
-                 */
+                // This neighbor is closer to its region core
+                // than previously detected neighbors.
                 let sameRegionCount = 0;
-                /*
-                 * Check to ensure that this neighbor has
-                 * at least two other neighbors in its region.
-                 * This makes sure that adding this span to
-                 * this neighbor's  region will not result
-                 * in a single width line of voxels.
-                 */
-                for (let ndir = 0; ndir < 4; ndir++) {
-                  const nnSpan = grid.getNeighbor(neighbor, ndir);
+                // Check to ensure that this neighbor has
+                // at least two other neighbors in its region.
+                // This makes sure that adding this cell to
+                // this neighbor's  region will not result
+                // in a single width line of cells.
+                for (
+                  let neighborDirection = 0;
+                  neighborDirection < 4;
+                  neighborDirection++
+                ) {
+                  const nnCell = grid.getNeighbor(neighbor, neighborDirection);
                   // There is a diagonal-neighbor
-                  if (nnSpan.regionID === neighbor.regionID)
+                  if (nnCell.regionID === neighbor.regionID) {
                     // This neighbor has a neighbor in
                     // the same region.
                     sameRegionCount++;
+                    break;
+                  }
                 }
                 if (sameRegionCount > 1) {
-                  /*
-                   * Either conservative expansion is turned off,
-                   * or it is on and this neighbor's region is
-                   * acceptable for the current span.
-                   * Choose this neighbor's region.
-                   * Set the current distance to center as
-                   * slightly further than this neighbor.
-                   */
                   cellRegion = neighbor.regionID;
                   regionCenterDist = neighbor.distanceToObstacle + 2;
                 }
@@ -2210,8 +2235,8 @@ namespace gdjs {
         const bottomCell = grid.get(grid.dimX() - 1, y);
         bottomCell.distanceToObstacle = 0;
       }
-      // The next two phases basically check the neighbors of a span and
-      // set the span's distance field to be slightly greater than the
+      // The next two phases basically check the neighbors of a cell and
+      // set the cell's distance field to be slightly greater than the
       // neighbor with the lowest border distance. Distance is increased
       // slightly more for diagonal-neighbors than for axis-neighbors.
 
@@ -2255,17 +2280,17 @@ namespace gdjs {
 
   /**
    * Implements three algorithms that clean up issues that can
-   * develop around null region boarders.
+   * develop around obstacle region boarders.
    *
-   * - Detect and fix encompassed null regions:
+   * - Detect and fix encompassed obstacle regions:
    *
-   * If a null region is found that is fully encompassed by a single
+   * If a obstacle region is found that is fully encompassed by a single
    * region, then the region will be split into two regions at the
-   * null region border.
+   * obstacle region border.
    *
-   * - Detect and fix "short wrapping" of null regions:
+   * - Detect and fix "short wrapping" of obstacle regions:
    *
-   * Regions can sometimes wrap slightly around the corner of a null region
+   * Regions can sometimes wrap slightly around the corner of a obstacle region
    * in a manner that eventually results in the formation of self-intersecting
    * polygons.
    *
@@ -2275,10 +2300,10 @@ namespace gdjs {
    * Example: After the algorithm is applied:
    * http://www.critterai.org/projects/nmgen_study/media/images/ohfg_09_cornerwrapafter.jpg
    *
-   * - Detect and fix incomplete null region connections:
+   * - Detect and fix incomplete obstacle region connections:
    *
-   * If a region touches null region only diagonally, then contour detection
-   * algorithms may not properly detect the null region connection. This can
+   * If a region touches obstacle region only diagonally, then contour detection
+   * algorithms may not properly detect the obstacle region connection. This can
    * adversely effect other algorithms in the pipeline.
    *
    * Example: Before algorithm is applied:
@@ -2291,7 +2316,7 @@ namespace gdjs {
    * Example: After algorithm is applied:
    *
    *     b b a a a a
-   *     b b b a a a <-- Span transferred to region B.
+   *     b b b a a a <-- Cell transferred to region B.
    *     a a x x x x
    *     a a x x x x
    *
@@ -2300,73 +2325,73 @@ namespace gdjs {
    */
   class ObstacleRegionBordersCleaner {
     /**
-     * This operation utilizes {@link OpenHeightSpan#flags}. It
+     * This operation utilizes {@link RasterizationCell.contourFlags}. It
      * expects the value to be zero on entry, and re-zero's the value
      * on exit.
      *
-     * Expects a heightfield with fully built regions.
+     * @param grid a grid with fully built regions.
      */
-    public static apply(grid: RasterizationGrid) {
-      const mwOpenSpans = new Array<RasterizationCell>(1024);
-      mwOpenSpans.length = 0;
-      const mwBorderDistance = new Array<integer>(1024);
-      mwBorderDistance.length = 0;
+    public static fixObstacleRegion(grid: RasterizationGrid) {
+      const workingOpenCells = new Array<RasterizationCell>(1024);
+      workingOpenCells.length = 0;
+      const workingBorderDistance = new Array<integer>(1024);
+      workingBorderDistance.length = 0;
 
       let nextRegionID = grid.regionCount;
 
-      // Iterate over the spans, trying to find null region borders.
+      // Iterate over the cells, trying to find obstacle region borders.
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
           if (cell.contourFlags != 0)
-            // Span was processed in a previous iteration.
+            // Cell was processed in a previous iteration.
             // Ignore it.
             continue;
 
           cell.contourFlags = 1;
 
-          let workingSpan: RasterizationCell | null = null;
+          let workingCell: RasterizationCell | null = null;
           let edgeDirection = -1;
 
           if (cell.regionID !== RasterizationCell.OBSTACLE_REGION_ID) {
-            // Not interested in this span.
+            // Not interested in this cell.
             continue;
           }
-          // This is a null region span.  See if it
-          // connects to a span in a non-null region.
+          // This is a obstacle region cell. See if it
+          // connects to a cell in a non-obstacle region.
           edgeDirection =
             ObstacleRegionBordersCleaner.getNonNullBorderDirection(grid, cell);
           if (edgeDirection == -1)
-            // This span is not a border span.  Ignore it.
+            // This cell is not a border cell. Ignore it.
             continue;
 
-          // This is a border span.  Step into the non-null
+          // This is a border cell. Step into the non-null
           // region and swing the direction around 180 degrees.
-          workingSpan = grid.getNeighbor(cell, edgeDirection);
+          workingCell = grid.getNeighbor(cell, edgeDirection);
           edgeDirection = (edgeDirection + 2) & 0x3;
 
-          // Process the null region contour.  Detect and fix
-          // local issues.  Determine if the region is
-          // fully encompassed by a single non-null region.
+          // Process the obstacle region contour. Detect and fix
+          // local issues. Determine if the region is
+          // fully encompassed by a single non-obstacle region.
           const isEncompassedNullRegion =
             ObstacleRegionBordersCleaner.processNullRegion(
               grid,
-              workingSpan,
+              workingCell,
               edgeDirection
             );
 
           if (isEncompassedNullRegion) {
-            // This span is part of a group of null region spans
-            // that is encompassed within a single non-null region.
-            // This is not permitted.  Need to fix it.
+            // This cell is part of a group of obstacle region cells
+            // that is encompassed within a single non-obstacle region.
+            // This is not permitted. Need to fix it.
             ObstacleRegionBordersCleaner.partialFloodRegion(
               grid,
-              workingSpan,
+              workingCell,
               edgeDirection,
               nextRegionID,
-              mwOpenSpans,
-              mwBorderDistance
+              workingOpenCells,
+              workingBorderDistance
             );
             nextRegionID++;
           }
@@ -2388,24 +2413,24 @@ namespace gdjs {
     /**
      * Partially flood a region away from the specified direction.
      * <p>{@link OpenHeightSpan#distanceToRegionCore()}
-     * is set to zero for all flooded spans.</p>
-     * @param startSpan The span to start the flood from.
-     * @param borderDirection  The hard border for flooding.  No
-     * spans in this direction from the startSpan will be flooded.
+     * is set to zero for all flooded cells.</p>
+     * @param startCell The cell to start the flood from.
+     * @param borderDirection  The hard border for flooding. No
+     * cells in this direction from the startCell will be flooded.
      * @param newRegionID The region id to assign the flooded
-     * spans to.
+     * cells to.
      */
     private static partialFloodRegion(
       grid: RasterizationGrid,
-      startSpan: RasterizationCell,
+      startCell: RasterizationCell,
       borderDirection: integer,
       newRegionID: integer,
-      mwOpenSpans: RasterizationCell[],
-      mwBorderDistance: integer[]
+      workingOpenCells: RasterizationCell[],
+      workingBorderDistance: integer[]
     ): void {
       // Gather some information.
       const antiBorderDirection = (borderDirection + 2) & 0x3;
-      const regionID = startSpan.regionID;
+      const regionID = startCell.regionID;
 
       if (regionID === newRegionID) {
         // avoid infinity loop
@@ -2415,96 +2440,94 @@ namespace gdjs {
         return;
       }
 
-      // Re-assign the start span and queue it for the neighbor search.
-      startSpan.regionID = newRegionID;
-      startSpan.distanceToRegionCore = 0; // This information is lost.
-      mwOpenSpans.push(startSpan);
-      mwBorderDistance.push(0);
+      // Re-assign the start cell and queue it for the neighbor search.
+      startCell.regionID = newRegionID;
+      startCell.distanceToRegionCore = 0; // This information is lost.
+      workingOpenCells.push(startCell);
+      workingBorderDistance.push(0);
 
-      // Search for new spans that can be assigned the new region.
+      // Search for new cells that can be assigned the new region.
       let iteration = 0;
-      while (mwOpenSpans.length !== 0) {
-        // Get the next span off the stack.
-        const span = mwOpenSpans.pop()!;
-        const distance = mwBorderDistance.pop()!;
+      while (workingOpenCells.length !== 0) {
+        // Get the next cell off the stack.
+        const cell = workingOpenCells.pop()!;
+        const distance = workingBorderDistance.pop()!;
 
         // Search in all directions for neighbors.
         for (let direction = 0; direction < 4; direction++) {
-          const nSpan = grid.getNeighbor(span, direction);
-          if (nSpan.regionID !== regionID) {
-            // No span in this direction, or the span
+          const neighbor = grid.getNeighbor(cell, direction);
+          if (neighbor.regionID !== regionID) {
+            // No cell in this direction, or the cell
             // is not in the region being processed.
             // Note: It may have already been transferred.
             continue;
           }
-          let nDistance = distance;
+          let neighborDistance = distance;
           if (direction === borderDirection) {
             // This neighbor is back toward the border.
             if (distance === 0) {
-              // The span is at the border.  Can't go
-              // further in this direction.  Ignore
+              // The cell is at the border. Can't go
+              // further in this direction. Ignore
               // this neighbor.
               continue;
             }
-            nDistance--;
+            neighborDistance--;
           } else if (direction === antiBorderDirection) {
             // This neighbor is further away from the border.
-            nDistance++;
+            neighborDistance++;
           }
           // Transfer the neighbor to the new region.
-          nSpan.regionID = newRegionID;
-          nSpan.distanceToRegionCore = 0; // This information is lost.
+          neighbor.regionID = newRegionID;
+          neighbor.distanceToRegionCore = 0; // This information is lost.
 
-          // Add the span to the stack to be processed.
-          mwOpenSpans.push(nSpan);
-          mwBorderDistance.push(nDistance);
+          // Add the cell to the stack to be processed.
+          workingOpenCells.push(neighbor);
+          workingBorderDistance.push(neighborDistance);
         }
       }
     }
 
     /**
-     * Detects and fixes bad span configurations in the vicinity of a
-     * null region contour.  (See class description for details.)
-     * @param startSpan A span in a non-null region that borders a null
+     * Detects and fixes bad cell configurations in the vicinity of a
+     * obstacle region contour. (See class description for details.)
+     * @param startCell A cell in a non-obstacle region that borders a null
      * region.
-     * @param startDirection The direction of the null region border.
-     * @return TRUE if the start span's region completely encompasses
-     * the null region.
+     * @param startDirection The direction of the obstacle region border.
+     * @return TRUE if the start cell's region completely encompasses
+     * the obstacle region.
      */
     private static processNullRegion(
       grid: RasterizationGrid,
-      startSpan: RasterizationCell,
+      startCell: RasterizationCell,
       startDirection: integer
     ): boolean {
-      /*
-       * This algorithm traverses the contour.  As it does so, it detects
-       * and fixes various known dangerous span configurations.
-       *
-       * Traversing the contour:  A good way to  visualize it is to think
-       * of a robot sitting on the floor facing  a known wall.  It then
-       * does the following to skirt the wall:
-       * 1. If there is a wall in front of it, turn clockwise in 90 degrees
-       *    increments until it finds the wall is gone.
-       * 2. Move forward one step.
-       * 3. Turn counter-clockwise by 90 degrees.
-       * 4. Repeat from step 1 until it finds itself at its original
-       *    location facing its original direction.
-       *
-       * See also: http://www.critterai.org/projects/nmgen_study/regiongen.html#robotwalk
-       *
-       * As the traversal occurs, the number of acute (90 degree) and
-       * obtuse (270 degree) corners are monitored.  If a complete contour is
-       * detected and (obtuse corners > acute corners), then the null
-       * region is inside the contour.  Otherwise the null region is
-       * outside the contour, which we don't care about.
-       */
+       // This algorithm traverses the contour. As it does so, it detects
+       // and fixes various known dangerous cell configurations.
+       //
+       // Traversing the contour:  A good way to  visualize it is to think
+       // of a robot sitting on the floor facing  a known wall. It then
+       // does the following to skirt the wall:
+       // 1. If there is a wall in front of it, turn clockwise in 90 degrees
+       //    increments until it finds the wall is gone.
+       // 2. Move forward one step.
+       // 3. Turn counter-clockwise by 90 degrees.
+       // 4. Repeat from step 1 until it finds itself at its original
+       //    location facing its original direction.
+       //
+       // See also: http://www.critterai.org/projects/nmgen_study/regiongen.html#robotwalk
+       //
+       // As the traversal occurs, the number of acute (90 degree) and
+       // obtuse (270 degree) corners are monitored. If a complete contour is
+       // detected and (obtuse corners > acute corners), then the null
+       // region is inside the contour. Otherwise the obstacle region is
+       // outside the contour, which we don't care about.
 
-      const borderRegionID = startSpan.regionID;
+      const borderRegionID = startCell.regionID;
 
       // Prepare for loop.
-      let span = startSpan;
-      let nSpan: RasterizationCell | null = null;
-      let dir = startDirection;
+      let cell = startCell;
+      let neighbor: RasterizationCell | null = null;
+      let direction = startDirection;
 
       // Initialize monitoring variables.
       let loopCount = 0;
@@ -2514,41 +2537,39 @@ namespace gdjs {
       let borderSeenLastLoop = false;
       let isBorder = true; // Initial value doesn't matter.
 
-      // Assume a single region is connected to the null region
+      // Assume a single region is connected to the obstacle region
       // until proven otherwise.
       let hasSingleConnection = true;
 
-      /*
-       * The loop limit exists for the sole reason of preventing
-       * an infinite loop in case of bad input data.
-       * It is set to a very high value because there is no way of
-       * definitively determining a safe smaller value.  Setting
-       * the value too low can result in rescanning a contour
-       * multiple times, killing performance.
-       */
+       // The loop limit exists for the sole reason of preventing
+       // an infinite loop in case of bad input data.
+       // It is set to a very high value because there is no way of
+       // definitively determining a safe smaller value. Setting
+       // the value too low can result in rescanning a contour
+       // multiple times, killing performance.
       while (++loopCount < 1 << 30) {
-        // Get the span across the border.
-        const delta = RasterizationGrid.neighbor4Deltas[dir];
-        nSpan = grid.get(span.x + delta.x, span.y + delta.y);
+        // Get the cell across the border.
+        const delta = RasterizationGrid.neighbor4Deltas[direction];
+        neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
 
         // Detect which type of edge this direction points across.
-        if (nSpan == null) {
-          // It points across a null region border edge.
+        if (neighbor == null) {
+          // It points across a obstacle region border edge.
           isBorder = true;
         } else {
           // We never need to perform contour detection
-          // on this span again.  So mark it as processed.
-          nSpan.contourFlags = 1;
-          if (nSpan.regionID === RasterizationCell.OBSTACLE_REGION_ID) {
-            // It points across a null region border edge.
+          // on this cell again. So mark it as processed.
+          neighbor.contourFlags = 1;
+          if (neighbor.regionID === RasterizationCell.OBSTACLE_REGION_ID) {
+            // It points across a obstacle region border edge.
             isBorder = true;
           } else {
-            // This isn't a null region border.
+            // This isn't a obstacle region border.
             isBorder = false;
-            if (nSpan.regionID !== borderRegionID)
-              // It points across a border to a non-null region.
+            if (neighbor.regionID !== borderRegionID)
+              // It points across a border to a non-obstacle region.
               // This means the current contour can't
-              // represent a fully encompassed null region.
+              // represent a fully encompassed obstacle region.
               hasSingleConnection = false;
           }
         }
@@ -2557,184 +2578,179 @@ namespace gdjs {
         if (isBorder) {
           // It is a border edge.
           if (borderSeenLastLoop) {
-            /*
-             * A border was detected during the last loop as well.
-             * Two detections in a row indicates we passed an acute
-             * (inner) corner.
-             *
-             *     a x
-             *     x x
-             */
+             // A border was detected during the last loop as well.
+             // Two detections in a row indicates we passed an acute
+             // (inner) corner.
+             //
+             //     a x
+             //     x x
             acuteCornerCount++;
           } else if (stepsWithoutBorder > 1) {
-            /*
-             * We have moved at least two spans before detecting
-             * a border.  This indicates we passed an obtuse
-             * (outer) corner.
-             *
-             *     a a
-             *     a x
-             */
+             // We have moved at least two cells before detecting
+             // a border. This indicates we passed an obtuse
+             // (outer) corner.
+             //
+             //     a a
+             //     a x
             obtuseCornerCount++;
             stepsWithoutBorder = 0;
-            // Detect and fix span configuration issue around this
+            // Detect and fix cell configuration issue around this
             // corner.
             if (
-              ObstacleRegionBordersCleaner.processOuterCorner(grid, span, dir)
+              ObstacleRegionBordersCleaner.processOuterCorner(
+                grid,
+                cell,
+                direction
+              )
             )
               // A change was made and it resulted in the
               // corner area having multiple region connections.
               hasSingleConnection = false;
           }
-          dir = (dir + 1) & 0x3; // Rotate in clockwise direction.
+          direction = (direction + 1) & 0x3; // Rotate in clockwise direction.
           borderSeenLastLoop = true;
           stepsWithoutBorder = 0;
         } else {
-          /*
-           * Not a null region border.
-           * Move to the neighbor and swing the search direction back
-           * one increment (counterclockwise).  By moving the direction
-           * back one increment we guarantee we don't miss any edges.
-           */
-          span = nSpan;
-          dir = (dir + 3) & 0x3; // Rotate counterclockwise direction.
+           // Not a obstacle region border.
+           // Move to the neighbor and swing the search direction back
+           // one increment (counterclockwise). By moving the direction
+           // back one increment we guarantee we don't miss any edges.
+          cell = neighbor;
+          direction = (direction + 3) & 0x3; // Rotate counterclockwise direction.
           borderSeenLastLoop = false;
           stepsWithoutBorder++;
         }
 
-        if (startSpan === span && startDirection === dir) {
-          // Have returned to the original span and direction.
+        if (startCell === cell && startDirection === direction) {
+          // Have returned to the original cell and direction.
           // The search is complete.
-          // Is the null region inside the contour?
+          // Is the obstacle region inside the contour?
           return hasSingleConnection && obtuseCornerCount > acuteCornerCount;
         }
       }
 
-      // If got here then the null region boarder is too large to be fully
-      // explored.  So it can't be encompassed.
+      // If got here then the obstacle region boarder is too large to be fully
+      // explored. So it can't be encompassed.
       return false;
     }
 
     /**
-     * Detects and fixes span configuration issues in the vicinity
-     * of obtuse (outer) null region corners.
-     * @param referenceSpan The span in a non-null region that is
+     * Detects and fixes cell configuration issues in the vicinity
+     * of obtuse (outer) obstacle region corners.
+     * @param grid
+     * @param referenceCell The cell in a non-obstacle region that is
      * just past the outer corner.
-     * @param borderDirection The direciton of the null region border.
-     * @return TRUE if more than one region connects to the null region
+     * @param borderDirection The direction of the obstacle region border.
+     * @return TRUE if more than one region connects to the obstacle region
      * in the vicinity of the corner. (This may or may not be due to
      * a change made by this operation.)
      */
     private static processOuterCorner(
       grid: RasterizationGrid,
-      referenceSpan: RasterizationCell,
+      referenceCell: RasterizationCell,
       borderDirection: integer
     ): boolean {
       let hasMultiRegions = false;
 
-      // Get the previous two spans along the border.
+      // Get the previous two cells along the border.
       let backOne = grid.getNeighbor(
-        referenceSpan,
+        referenceCell,
         (borderDirection + 3) & 0x3
       );
       let backTwo = grid.getNeighbor(backOne, borderDirection);
-      let testSpan: RasterizationCell;
+      let testCell: RasterizationCell;
 
       if (
-        backOne.regionID !== referenceSpan.regionID &&
-        backTwo.regionID === referenceSpan.regionID
+        backOne.regionID !== referenceCell.regionID &&
+        backTwo.regionID === referenceCell.regionID
       ) {
-        /*
-         * Dangerous corner configuration.
-         *
-         *     a x
-         *     b a
-         *
-         * Need to change to one of the following configurations:
-         *
-         *     b x        a x
-         *     b a        b b
-         *
-         * Reason: During contour detection this type of configuration can
-         * result in the region connection being detected as a
-         * region-region portal, when it is not.  The region connection
-         * is actually interrupted by the null region.
-         *
-         * This configuration has been demonstrated to result in
-         * two regions being improperly merged to encompass an
-         * internal null region.
-         *
-         * Example:
-         *
-         *     a a x x x a
-         *     a a x x a a
-         *     b b a a a a
-         *     b b a a a a
-         *
-         * During contour and connection detection for region b, at no
-         * point will the null region be detected.  It will appear
-         * as if a clean a-b portal exists.
-         *
-         * An investigation into fixing this issue via updates to the
-         * watershed or contour detection algorithms did not turn
-         * up a better way of resolving this issue.
-         */
+         // Dangerous corner configuration.
+         //
+         //     a x
+         //     b a
+         //
+         // Need to change to one of the following configurations:
+         //
+         //     b x        a x
+         //     b a        b b
+         //
+         // Reason: During contour detection this type of configuration can
+         // result in the region connection being detected as a
+         // region-region portal, when it is not. The region connection
+         // is actually interrupted by the obstacle region.
+         //
+         // This configuration has been demonstrated to result in
+         // two regions being improperly merged to encompass an
+         // internal obstacle region.
+         //
+         // Example:
+         //
+         //     a a x x x a
+         //     a a x x a a
+         //     b b a a a a
+         //     b b a a a a
+         //
+         // During contour and connection detection for region b, at no
+         // point will the obstacle region be detected. It will appear
+         // as if a clean a-b portal exists.
+         //
+         // An investigation into fixing this issue via updates to the
+         // watershed or contour detection algorithms did not turn
+         // up a better way of resolving this issue.
         hasMultiRegions = true;
         // Determine how many connections backTwo has to backOne's region.
-        testSpan = grid.getNeighbor(backOne, (borderDirection + 3) & 0x3);
+        testCell = grid.getNeighbor(backOne, (borderDirection + 3) & 0x3);
         let backTwoConnections = 0;
-        if (testSpan != null && testSpan.regionID === backOne.regionID) {
+        if (testCell != null && testCell.regionID === backOne.regionID) {
           backTwoConnections++;
-          testSpan = grid.getNeighbor(testSpan, borderDirection);
-          if (testSpan != null && testSpan.regionID === backOne.regionID)
+          testCell = grid.getNeighbor(testCell, borderDirection);
+          if (testCell != null && testCell.regionID === backOne.regionID)
             backTwoConnections++;
         }
-        // Determine how many connections the reference span has
+        // Determine how many connections the reference cell has
         // to backOne's region.
         let referenceConnections = 0;
-        testSpan = grid.getNeighbor(backOne, (borderDirection + 2) & 0x3);
-        if (testSpan != null && testSpan.regionID === backOne.regionID) {
+        testCell = grid.getNeighbor(backOne, (borderDirection + 2) & 0x3);
+        if (testCell != null && testCell.regionID === backOne.regionID) {
           referenceConnections++;
-          testSpan = grid.getNeighbor(testSpan, (borderDirection + 2) & 0x3);
-          if (testSpan != null && testSpan.regionID === backOne.regionID)
+          testCell = grid.getNeighbor(testCell, (borderDirection + 2) & 0x3);
+          if (testCell != null && testCell.regionID === backOne.regionID)
             backTwoConnections++;
         }
-        // Change the region of the span that has the most connections
+        // Change the region of the cell that has the most connections
         // to the target region.
         if (referenceConnections > backTwoConnections)
-          referenceSpan.regionID = backOne.regionID;
+          referenceCell.regionID = backOne.regionID;
         else backTwo.regionID = backOne.regionID;
       } else if (
-        backOne.regionID === referenceSpan.regionID &&
-        backTwo.regionID === referenceSpan.regionID
+        backOne.regionID === referenceCell.regionID &&
+        backTwo.regionID === referenceCell.regionID
       ) {
-        /*
-         * Potential dangerous short wrap.
-         *
-         *  a x
-         *  a a
-         *
-         *  Example of actual problem configuration:
-         *
-         *  b b x x
-         *  b a x x <- Short wrap.
-         *  b a a a
-         *
-         *  In the above case, the short wrap around the corner of the
-         *  null region has been demonstrated to cause self-intersecting
-         *  polygons during polygon formation.
-         *
-         *  This algorithm detects whether or not one (and only one)
-         *  of the axis neighbors of the corner should be re-assigned to
-         *  a more appropriate region.
-         *
-         *  In the above example, the following configuration is more
-         *  appropriate:
-         *
-         *  b b x x
-         *  b b x x <- Change to this row.
-         *  b a a a
-         */
+         // Potential dangerous short wrap.
+         //
+         //  a x
+         //  a a
+         //
+         //  Example of actual problem configuration:
+         //
+         //  b b x x
+         //  b a x x <- Short wrap.
+         //  b a a a
+         //
+         //  In the above case, the short wrap around the corner of the
+         //  obstacle region has been demonstrated to cause self-intersecting
+         //  polygons during polygon formation.
+         //
+         //  This algorithm detects whether or not one (and only one)
+         //  of the axis neighbors of the corner should be re-assigned to
+         //  a more appropriate region.
+         //
+         //  In the above example, the following configuration is more
+         //  appropriate:
+         //
+         //  b b x x
+         //  b b x x <- Change to this row.
+         //  b a a a
         // Check to see if backTwo should be in a different region.
         let selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
           grid,
@@ -2743,18 +2759,18 @@ namespace gdjs {
           (borderDirection + 2) & 0x3
         );
         if (selectedRegion == backTwo.regionID) {
-          // backTwo should not be re-assigned.  How about
-          // the reference span?
+          // backTwo should not be re-assigned. How about
+          // the reference cell?
           selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
             grid,
-            referenceSpan,
+            referenceCell,
             borderDirection,
             (borderDirection + 3) & 0x3
           );
-          if (selectedRegion != referenceSpan.regionID) {
-            // The reference span should be reassigned
+          if (selectedRegion != referenceCell.regionID) {
+            // The reference cell should be reassigned
             // to a new region.
-            referenceSpan.regionID = selectedRegion;
+            referenceCell.regionID = selectedRegion;
             hasMultiRegions = true;
           }
         } else {
@@ -2763,64 +2779,57 @@ namespace gdjs {
           hasMultiRegions = true;
         }
       } else hasMultiRegions = true;
-      /*
-       * No dangerous configurations detected.  But definitely
-       * has a change in regions at the corner. (We know this
-       * because one of the previous checks looked for a single
-       * region for all wrap spans.)
-       */
-
+       // No dangerous configurations detected. But definitely
+       // has a change in regions at the corner. (We know this
+       // because one of the previous checks looked for a single
+       // region for all wrap cells.)
       return hasMultiRegions;
     }
 
     /**
-     * Checks the span to see if it should be reassigned to a new region.
-     * @param referenceSpan A span on one side of an null region contour's
-     * outer corner.  It is expected that the all spans that wrap the
+     * Checks the cell to see if it should be reassigned to a new region.
+     * @param referenceCell A cell on one side of an obstacle region contour's
+     * outer corner. It is expected that the all cells that wrap the
      * corner are in the same region.
-     * @param borderDirection  The direction of the null region border.
+     * @param borderDirection  The direction of the obstacle region border.
      * @param cornerDirection The direction of the outer corner from the
-     * reference span.
-     * @return The region the span should be a member of.  May be the
-     * region the span is currently a member of.
+     * reference cell.
+     * @return The region the cell should be a member of. May be the
+     * region the cell is currently a member of.
      */
     private static selectedRegionID(
       grid: RasterizationGrid,
-      referenceSpan: RasterizationCell,
+      referenceCell: RasterizationCell,
       borderDirection: integer,
       cornerDirection: integer
     ): integer {
-      /*
-       * Initial example state:
-       *
-       * a - Known region.
-       * x - Null region.
-       * u - Unknown, not checked yet.
-       *
-       *     u u u
-       *     u a x
-       *     u a a
-       */
+       // Initial example state:
+       //
+       // a - Known region.
+       // x - Null region.
+       // u - Unknown, not checked yet.
+       //
+       //     u u u
+       //     u a x
+       //     u a a
 
       // The only possible alternate region id is from
-      // the span that is opposite the border.  So check it first.
+      // the cell that is opposite the border. So check it first.
       let regionID = grid.getNeighbor(
-        referenceSpan,
+        referenceCell,
         (borderDirection + 2) & 0x3
       ).regionID;
       if (
-        regionID === referenceSpan.regionID ||
+        regionID === referenceCell.regionID ||
         regionID === RasterizationCell.OBSTACLE_REGION_ID
       )
-        /*
-         * The region away from the border is either a null region
-         * or the same region.  So we keep the current region.
-         *
-         *     u u u      u u u
-         *     a a x  or  x a x  <-- Potentially bad, but stuck with it.
-         *     u a a      u a a
-         */
-        return referenceSpan.regionID;
+         // The region away from the border is either a obstacle region
+         // or the same region. So we keep the current region.
+         //
+         //     u u u      u u u
+         //     a a x  or  x a x  <-- Potentially bad, but stuck with it.
+         //     u a a      u a a
+        return referenceCell.regionID;
 
       // Candidate region for re-assignment.
       let potentialRegion = regionID;
@@ -2829,76 +2838,70 @@ namespace gdjs {
       // If it is the current region, then we definitely can't
       // change the region id without risk of splitting the region.
       regionID = grid.getNeighbor(
-        referenceSpan,
+        referenceCell,
         (cornerDirection + 2) & 0x3
       ).regionID;
       if (
-        regionID === referenceSpan.regionID ||
+        regionID === referenceCell.regionID ||
         regionID === RasterizationCell.OBSTACLE_REGION_ID
       )
-        /*
-         * The region opposite from the corner direction is
-         * either a null region or the same region.  So we
-         * keep the current region.
-         *
-         *     u a u      u x u
-         *     b a x  or  b a x
-         *     u a a      u a a
-         */
-        return referenceSpan.regionID;
+         // The region opposite from the corner direction is
+         // either a obstacle region or the same region. So we
+         // keep the current region.
+         //
+         //     u a u      u x u
+         //     b a x  or  b a x
+         //     u a a      u a a
+        return referenceCell.regionID;
 
-      /*
-       * We have checked the early exit special cases.  Now a generalized
-       * brute count is performed.
-       *
-       * Priority is given to the potential region.  Here is why:
-       * (Highly unlikely worst case scenario.)
-       *
-       *     c c c    c c c
-       *     b a x -> b b x  Select b even though b count == a count.
-       *     b a a    b a a
-       */
+       // We have checked the early exit special cases. Now a generalized
+       // brute count is performed.
+       //
+       // Priority is given to the potential region. Here is why:
+       // (Highly unlikely worst case scenario.)
+       //
+       //     c c c    c c c
+       //     b a x -> b b x  Select b even though b count == a count.
+       //     b a a    b a a
 
       // Neighbors in potential region.
       // We know this will have a minimum value of 1.
       let potentialCount = 0;
 
-      // Neighbors in the span's current region.
+      // Neighbors in the cell's current region.
       // We know this will have a minimum value of 2.
       let currentCount = 0;
 
-      /*
-       * Maximum edge case:
-       *
-       *     b b b
-       *     b a x
-       *     b a a
-       *
-       * The maximum edge case for region A can't exist.  It
-       * is filtered out during one of the earlier special cases
-       * handlers.
-       *
-       * Other cases may exist if more regions are involved.
-       * Such cases will tend to favor the current region.
-       */
+       // Maximum edge case:
+       //
+       //     b b b
+       //     b a x
+       //     b a a
+       //
+       // The maximum edge case for region A can't exist. It
+       // is filtered out during one of the earlier special cases
+       // handlers.
+       //
+       // Other cases may exist if more regions are involved.
+       // Such cases will tend to favor the current region.
 
       for (let direction = 0; direction < 8; direction++) {
-        let regionID = grid.getNeighbor(referenceSpan, direction).regionID;
-        if (regionID === referenceSpan.regionID) currentCount++;
+        let regionID = grid.getNeighbor(referenceCell, direction).regionID;
+        if (regionID === referenceCell.regionID) currentCount++;
         else if (regionID === potentialRegion) potentialCount++;
       }
 
       return potentialCount < currentCount
-        ? referenceSpan.regionID
+        ? referenceCell.regionID
         : potentialRegion;
     }
 
     /**
-     * Returns the direction of the first neighbor in a non-null region.
+     * Returns the direction of the first neighbor in a non-obstacle region.
      * @param grid
-     * @param cell The span to check.
-     * @return The direction of the first neighbor in a non-null region, or
-     * -1 if all neighbors are in the null region.
+     * @param cell The cell to check.
+     * @return The direction of the first neighbor in a non-obstacle region, or
+     * -1 if all neighbors are in the obstacle region.
      */
     private static getNonNullBorderDirection(
       grid: RasterizationGrid,
@@ -2914,10 +2917,10 @@ namespace gdjs {
 
         const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
         if (neighbor.regionID !== RasterizationCell.OBSTACLE_REGION_ID)
-          // The neighbor is a null region.
+          // The neighbor is a obstacle region.
           return direction;
       }
-      // All neighbors are in a non-null region.
+      // All neighbors are in a non-obstacle region.
       return -1;
     }
   }

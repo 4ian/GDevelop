@@ -214,7 +214,7 @@ namespace gdjs {
       convexPolygons.length = 0;
 
       // Various working variables.
-      // (Values are meaningless outside of the iteration.)
+      // (Values are meaningless outside of the iteration)
       const workingContourFlags = new Array<boolean>(maxVerticesPerContour);
       workingContourFlags.length = 0;
       const workingPolygons = new Array<Point[]>(maxVerticesPerContour + 1);
@@ -785,7 +785,7 @@ namespace gdjs {
       // The angle internal to the polygon is > 180 degrees (reflex angle).
       // Test to see if B lies within the external (<= 180 degree) angle and
       // flip the result. (If B lies within the external angle, it can't
-      // lie within the internal angle.)
+      // lie within the internal angle)
       return !(
         // TRUE if B is left of or on line A->APlus
         (
@@ -863,9 +863,9 @@ namespace gdjs {
           (edgeEnd.x === vertexB.x && edgeEnd.y === vertexB.y)
         ) {
           // One of the test vertices is co-located
-          // with one of the endpoints of this edge. (This is a
+          // with one of the endpoints of this edge (this is a
           // test of the actual position of the vertices rather than
-          // simply the index check performed earlier.)
+          // simply the index check performed earlier).
           // Skip this edge.
           continue;
         }
@@ -1023,7 +1023,7 @@ namespace gdjs {
     ): integer {
       // References:
       // http://softsurfer.com/Archive/algorithm_0101/algorithm_0101.htm#Modern%20Triangles
-      // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed".)
+      // http://mathworld.wolfram.com/TriangleArea.html (Search for "signed")
       return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
     }
   }
@@ -1080,8 +1080,8 @@ namespace gdjs {
       //      bit4 = neighbor3
       //  With the meaning of the bits as follows:
       //      0 = neighbor in same region.
-      //      1 = neighbor not in same region. (Neighbor may be the obstacle
-      //      region or a real region.)
+      //      1 = neighbor not in same region (neighbor may be the obstacle
+      //      region or a real region).
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
@@ -1200,7 +1200,7 @@ namespace gdjs {
         }
       }
 
-      if (contours.length + discardedContours != grid.regionCount - 1) {
+      if (contours.length + discardedContours !== grid.regionCount - 1) {
         // The only valid state is one contour per region.
         //
         // The only time this should occur is if an invalid contour
@@ -1449,13 +1449,13 @@ namespace gdjs {
      * valid edge. Otherwise behavior will be undefined.
      *
      * @param grid the grid of cells
-     * @param startCell A cell that is known to be on the edge of a region.
-     * (Part of a region contour.)
+     * @param startCell A cell that is known to be on the edge of a region
+     * (part of a region contour).
      * @param startDirection The direction of the edge of the cell that is
      * known to point
      * across the region edge.
      * @param outContourVertices The list of vertices that represent the edge
-     * of the region. (Plus region information.)
+     * of the region.
      */
     private static buildRawContours(
       grid: RasterizationGrid,
@@ -1469,14 +1469,14 @@ namespace gdjs {
       // impassable seam between two adjacent regions in the following case:
       //
       // 1. One region connects to another region on two sides in an
-      // uninterrupted manner. (Visualize one region wrapping in an L
-      // shape around the corner of another.)
+      // uninterrupted manner (visualize one region wrapping in an L
+      // shape around the corner of another).
       // 2. At the corner shared by the two regions, a change in height
       // occurs.
       //
-      // In this case, the two regions should share a corner vertex.
-      // (An obtuse corner vertex for one region and an acute corner
-      // vertex for the other region.)
+      // In this case, the two regions should share a corner vertex
+      // (an obtuse corner vertex for one region and an acute corner
+      // vertex for the other region).
       //
       // In reality, though this algorithm will select the same (x, z)
       // coordinates for each region's corner vertex, the vertex heights
@@ -1504,7 +1504,7 @@ namespace gdjs {
         // will always reference an edge cell from the same region as
         // the start cell.
 
-        if ((cell.contourFlags & (1 << direction)) != 0) {
+        if ((cell.contourFlags & (1 << direction)) !== 0) {
           // The current direction is pointing toward an edge.
           // Get this edge's vertex.
           const delta =
@@ -1544,9 +1544,9 @@ namespace gdjs {
         // The loop limit is arbitrary. It exists only to guarantee that
         // bad input data doesn't result in an infinite loop.
         // The only down side of this loop limit is that it limits the
-        // number of detectable edge vertices. (The longer the region edge
+        // number of detectable edge vertices (the longer the region edge
         // and the higher the number of "turns" in a region's edge, the less
-        // edge vertices can be detected for that region.)
+        // edge vertices can be detected for that region).
       } while (
         !(cell === startCell && direction === startDirection) &&
         ++loopCount < 65535
@@ -1583,8 +1583,8 @@ namespace gdjs {
         }
       }
 
-      // Seed the simplified contour with the mandatory edges.
-      // (At least one edge.)
+      // Seed the simplified contour with the mandatory edges
+      // (At least one edge).
       if (noConnections) {
         // This contour represents an island region surrounded only by the
         // obstacle region. Seed the simplified contour with the source's
@@ -1762,8 +1762,8 @@ namespace gdjs {
         const bz = inoutResultVertices[resultIndexB].y;
         const sourceIndexB = inoutResultVertices[resultIndexB].region;
 
-        // The source index of the next vertex to test. (The vertex just
-        // after the current vertex in the source vertex list.)
+        // The source index of the next vertex to test (the vertex just
+        // after the current vertex in the source vertex list).
         let testedSourceIndex = (sourceIndexA + 1) % sourceVertices.length;
         let maxDeviation = 0;
 
@@ -1908,7 +1908,6 @@ namespace gdjs {
       let floodedCells = new Array<RasterizationCell | null>(1024);
       // A predefined stack for use in the flood operation. Its content
       // has no meaning outside the new region flooding operation.
-      // (Saves on object creation time.)
       let workingStack = new Array<RasterizationCell>(1024);
 
       // Zero is reserved for the obstacle-region. So initializing to 1.
@@ -1923,7 +1922,7 @@ namespace gdjs {
       for (
         // This value represents the current distance from the border which
         // is to be searched. The search starts at the maximum distance then
-        // moves toward zero. (Toward borders.)
+        // moves toward zero (toward borders).
         //
         // This number will always be divisible by 2.
         let distance = grid.obstacleDistanceMax() & ~1;
@@ -1988,8 +1987,8 @@ namespace gdjs {
         }
       }
 
-      // Find all cells that haven't been assigned regions by the main loop.
-      // (Up to the minimum distance.)
+      // Find all cells that haven't been assigned regions by the main loop
+      // (up to the minimum distance).
       floodedCells.length = 0;
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
@@ -2044,7 +2043,7 @@ namespace gdjs {
       let skipped = 0;
       for (
         let iteration = 0;
-        (iteration < iterationMax || iterationMax == -1) &&
+        (iteration < iterationMax || iterationMax === -1) &&
         // All cells have either been processed or could not be
         // processed during the last cycle.
         skipped < inoutCells.length;
@@ -2128,8 +2127,8 @@ namespace gdjs {
      * @param grid
      * @param rootCell The cell used to seed the new region.
      * @param fillToDist The watershed distance to flood to.
-     * @param regionID The region ID to use for the new region.
-     * (If creation is successful.)
+     * @param regionID The region ID to use for the new region
+     * (if creation is successful).
      * @param workingStack A stack used internally. The content is
      * cleared before use. Its content has no meaning outside of
      * this operation.
@@ -2153,9 +2152,9 @@ namespace gdjs {
         // Check regions of neighbor cells.
         //
         // If any neighbor is found to have a region assigned, then
-        // the current cell can't be in the new region.
-        // (Want standard flooding algorithm to handle deciding which
-        // region this cell should go in.)
+        // the current cell can't be in the new region
+        // (want standard flooding algorithm to handle deciding which
+        // region this cell should go in).
         //
         // Up to 8 neighbors are checked.
         //
@@ -2344,7 +2343,7 @@ namespace gdjs {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
 
-          if (cell.contourFlags != 0)
+          if (cell.contourFlags !== 0)
             // Cell was processed in a previous iteration.
             // Ignore it.
             continue;
@@ -2362,7 +2361,7 @@ namespace gdjs {
           // connects to a cell in a non-obstacle region.
           edgeDirection =
             ObstacleRegionBordersCleaner.getNonNullBorderDirection(grid, cell);
-          if (edgeDirection == -1)
+          if (edgeDirection === -1)
             // This cell is not a border cell. Ignore it.
             continue;
 
@@ -2401,7 +2400,6 @@ namespace gdjs {
       grid.regionCount = nextRegionID;
 
       // Clear all flags.
-
       for (let y = 1; y < grid.dimY() - 1; y++) {
         for (let x = 1; x < grid.dimX() - 1; x++) {
           const cell = grid.get(x, y);
@@ -2412,8 +2410,11 @@ namespace gdjs {
 
     /**
      * Partially flood a region away from the specified direction.
-     * <p>{@link OpenHeightSpan#distanceToRegionCore()}
-     * is set to zero for all flooded cells.</p>
+     *
+     * {@link RasterizationCell.contourFlags}
+     * is set to zero for all flooded cells.
+     *
+     * @param grid
      * @param startCell The cell to start the flood from.
      * @param borderDirection  The hard border for flooding. No
      * cells in this direction from the startCell will be flooded.
@@ -2428,7 +2429,6 @@ namespace gdjs {
       workingOpenCells: RasterizationCell[],
       workingBorderDistance: integer[]
     ): void {
-      // Gather some information.
       const antiBorderDirection = (borderDirection + 2) & 0x3;
       const regionID = startCell.regionID;
 
@@ -2447,13 +2447,10 @@ namespace gdjs {
       workingBorderDistance.push(0);
 
       // Search for new cells that can be assigned the new region.
-      let iteration = 0;
       while (workingOpenCells.length !== 0) {
-        // Get the next cell off the stack.
         const cell = workingOpenCells.pop()!;
         const distance = workingBorderDistance.pop()!;
 
-        // Search in all directions for neighbors.
         for (let direction = 0; direction < 4; direction++) {
           const neighbor = grid.getNeighbor(cell, direction);
           if (neighbor.regionID !== regionID) {
@@ -2489,7 +2486,8 @@ namespace gdjs {
 
     /**
      * Detects and fixes bad cell configurations in the vicinity of a
-     * obstacle region contour. (See class description for details.)
+     * obstacle region contour (See class description for details).
+     * @param grid
      * @param startCell A cell in a non-obstacle region that borders a null
      * region.
      * @param startDirection The direction of the obstacle region border.
@@ -2501,26 +2499,26 @@ namespace gdjs {
       startCell: RasterizationCell,
       startDirection: integer
     ): boolean {
-       // This algorithm traverses the contour. As it does so, it detects
-       // and fixes various known dangerous cell configurations.
-       //
-       // Traversing the contour:  A good way to  visualize it is to think
-       // of a robot sitting on the floor facing  a known wall. It then
-       // does the following to skirt the wall:
-       // 1. If there is a wall in front of it, turn clockwise in 90 degrees
-       //    increments until it finds the wall is gone.
-       // 2. Move forward one step.
-       // 3. Turn counter-clockwise by 90 degrees.
-       // 4. Repeat from step 1 until it finds itself at its original
-       //    location facing its original direction.
-       //
-       // See also: http://www.critterai.org/projects/nmgen_study/regiongen.html#robotwalk
-       //
-       // As the traversal occurs, the number of acute (90 degree) and
-       // obtuse (270 degree) corners are monitored. If a complete contour is
-       // detected and (obtuse corners > acute corners), then the null
-       // region is inside the contour. Otherwise the obstacle region is
-       // outside the contour, which we don't care about.
+      // This algorithm traverses the contour. As it does so, it detects
+      // and fixes various known dangerous cell configurations.
+      //
+      // Traversing the contour:  A good way to  visualize it is to think
+      // of a robot sitting on the floor facing  a known wall. It then
+      // does the following to skirt the wall:
+      // 1. If there is a wall in front of it, turn clockwise in 90 degrees
+      //    increments until it finds the wall is gone.
+      // 2. Move forward one step.
+      // 3. Turn counter-clockwise by 90 degrees.
+      // 4. Repeat from step 1 until it finds itself at its original
+      //    location facing its original direction.
+      //
+      // See also: http://www.critterai.org/projects/nmgen_study/regiongen.html#robotwalk
+      //
+      // As the traversal occurs, the number of acute (90 degree) and
+      // obtuse (270 degree) corners are monitored. If a complete contour is
+      // detected and (obtuse corners > acute corners), then the null
+      // region is inside the contour. Otherwise the obstacle region is
+      // outside the contour, which we don't care about.
 
       const borderRegionID = startCell.regionID;
 
@@ -2541,19 +2539,19 @@ namespace gdjs {
       // until proven otherwise.
       let hasSingleConnection = true;
 
-       // The loop limit exists for the sole reason of preventing
-       // an infinite loop in case of bad input data.
-       // It is set to a very high value because there is no way of
-       // definitively determining a safe smaller value. Setting
-       // the value too low can result in rescanning a contour
-       // multiple times, killing performance.
+      // The loop limit exists for the sole reason of preventing
+      // an infinite loop in case of bad input data.
+      // It is set to a very high value because there is no way of
+      // definitively determining a safe smaller value. Setting
+      // the value too low can result in rescanning a contour
+      // multiple times, killing performance.
       while (++loopCount < 1 << 30) {
         // Get the cell across the border.
         const delta = RasterizationGrid.neighbor4Deltas[direction];
         neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
 
         // Detect which type of edge this direction points across.
-        if (neighbor == null) {
+        if (neighbor === null) {
           // It points across a obstacle region border edge.
           isBorder = true;
         } else {
@@ -2578,20 +2576,20 @@ namespace gdjs {
         if (isBorder) {
           // It is a border edge.
           if (borderSeenLastLoop) {
-             // A border was detected during the last loop as well.
-             // Two detections in a row indicates we passed an acute
-             // (inner) corner.
-             //
-             //     a x
-             //     x x
+            // A border was detected during the last loop as well.
+            // Two detections in a row indicates we passed an acute
+            // (inner) corner.
+            //
+            //     a x
+            //     x x
             acuteCornerCount++;
           } else if (stepsWithoutBorder > 1) {
-             // We have moved at least two cells before detecting
-             // a border. This indicates we passed an obtuse
-             // (outer) corner.
-             //
-             //     a a
-             //     a x
+            // We have moved at least two cells before detecting
+            // a border. This indicates we passed an obtuse
+            // (outer) corner.
+            //
+            //     a a
+            //     a x
             obtuseCornerCount++;
             stepsWithoutBorder = 0;
             // Detect and fix cell configuration issue around this
@@ -2611,10 +2609,10 @@ namespace gdjs {
           borderSeenLastLoop = true;
           stepsWithoutBorder = 0;
         } else {
-           // Not a obstacle region border.
-           // Move to the neighbor and swing the search direction back
-           // one increment (counterclockwise). By moving the direction
-           // back one increment we guarantee we don't miss any edges.
+          // Not a obstacle region border.
+          // Move to the neighbor and swing the search direction back
+          // one increment (counterclockwise). By moving the direction
+          // back one increment we guarantee we don't miss any edges.
           cell = neighbor;
           direction = (direction + 3) & 0x3; // Rotate counterclockwise direction.
           borderSeenLastLoop = false;
@@ -2642,8 +2640,8 @@ namespace gdjs {
      * just past the outer corner.
      * @param borderDirection The direction of the obstacle region border.
      * @return TRUE if more than one region connects to the obstacle region
-     * in the vicinity of the corner. (This may or may not be due to
-     * a change made by this operation.)
+     * in the vicinity of the corner (this may or may not be due to
+     * a change made by this operation).
      */
     private static processOuterCorner(
       grid: RasterizationGrid,
@@ -2664,58 +2662,56 @@ namespace gdjs {
         backOne.regionID !== referenceCell.regionID &&
         backTwo.regionID === referenceCell.regionID
       ) {
-         // Dangerous corner configuration.
-         //
-         //     a x
-         //     b a
-         //
-         // Need to change to one of the following configurations:
-         //
-         //     b x        a x
-         //     b a        b b
-         //
-         // Reason: During contour detection this type of configuration can
-         // result in the region connection being detected as a
-         // region-region portal, when it is not. The region connection
-         // is actually interrupted by the obstacle region.
-         //
-         // This configuration has been demonstrated to result in
-         // two regions being improperly merged to encompass an
-         // internal obstacle region.
-         //
-         // Example:
-         //
-         //     a a x x x a
-         //     a a x x a a
-         //     b b a a a a
-         //     b b a a a a
-         //
-         // During contour and connection detection for region b, at no
-         // point will the obstacle region be detected. It will appear
-         // as if a clean a-b portal exists.
-         //
-         // An investigation into fixing this issue via updates to the
-         // watershed or contour detection algorithms did not turn
-         // up a better way of resolving this issue.
+        // Dangerous corner configuration.
+        //
+        //     a x
+        //     b a
+        //
+        // Need to change to one of the following configurations:
+        //
+        //     b x        a x
+        //     b a        b b
+        //
+        // Reason: During contour detection this type of configuration can
+        // result in the region connection being detected as a
+        // region-region portal, when it is not. The region connection
+        // is actually interrupted by the obstacle region.
+        //
+        // This configuration has been demonstrated to result in
+        // two regions being improperly merged to encompass an
+        // internal obstacle region.
+        //
+        // Example:
+        //
+        //     a a x x x a
+        //     a a x x a a
+        //     b b a a a a
+        //     b b a a a a
+        //
+        // During contour and connection detection for region b, at no
+        // point will the obstacle region be detected. It will appear
+        // as if a clean a-b portal exists.
+        //
+        // An investigation into fixing this issue via updates to the
+        // watershed or contour detection algorithms did not turn
+        // up a better way of resolving this issue.
         hasMultiRegions = true;
         // Determine how many connections backTwo has to backOne's region.
         testCell = grid.getNeighbor(backOne, (borderDirection + 3) & 0x3);
         let backTwoConnections = 0;
-        if (testCell != null && testCell.regionID === backOne.regionID) {
+        if (testCell.regionID === backOne.regionID) {
           backTwoConnections++;
           testCell = grid.getNeighbor(testCell, borderDirection);
-          if (testCell != null && testCell.regionID === backOne.regionID)
-            backTwoConnections++;
+          if (testCell.regionID === backOne.regionID) backTwoConnections++;
         }
         // Determine how many connections the reference cell has
         // to backOne's region.
         let referenceConnections = 0;
         testCell = grid.getNeighbor(backOne, (borderDirection + 2) & 0x3);
-        if (testCell != null && testCell.regionID === backOne.regionID) {
+        if (testCell.regionID === backOne.regionID) {
           referenceConnections++;
           testCell = grid.getNeighbor(testCell, (borderDirection + 2) & 0x3);
-          if (testCell != null && testCell.regionID === backOne.regionID)
-            backTwoConnections++;
+          if (testCell.regionID === backOne.regionID) backTwoConnections++;
         }
         // Change the region of the cell that has the most connections
         // to the target region.
@@ -2726,31 +2722,31 @@ namespace gdjs {
         backOne.regionID === referenceCell.regionID &&
         backTwo.regionID === referenceCell.regionID
       ) {
-         // Potential dangerous short wrap.
-         //
-         //  a x
-         //  a a
-         //
-         //  Example of actual problem configuration:
-         //
-         //  b b x x
-         //  b a x x <- Short wrap.
-         //  b a a a
-         //
-         //  In the above case, the short wrap around the corner of the
-         //  obstacle region has been demonstrated to cause self-intersecting
-         //  polygons during polygon formation.
-         //
-         //  This algorithm detects whether or not one (and only one)
-         //  of the axis neighbors of the corner should be re-assigned to
-         //  a more appropriate region.
-         //
-         //  In the above example, the following configuration is more
-         //  appropriate:
-         //
-         //  b b x x
-         //  b b x x <- Change to this row.
-         //  b a a a
+        // Potential dangerous short wrap.
+        //
+        //  a x
+        //  a a
+        //
+        //  Example of actual problem configuration:
+        //
+        //  b b x x
+        //  b a x x <- Short wrap.
+        //  b a a a
+        //
+        //  In the above case, the short wrap around the corner of the
+        //  obstacle region has been demonstrated to cause self-intersecting
+        //  polygons during polygon formation.
+        //
+        //  This algorithm detects whether or not one (and only one)
+        //  of the axis neighbors of the corner should be re-assigned to
+        //  a more appropriate region.
+        //
+        //  In the above example, the following configuration is more
+        //  appropriate:
+        //
+        //  b b x x
+        //  b b x x <- Change to this row.
+        //  b a a a
         // Check to see if backTwo should be in a different region.
         let selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
           grid,
@@ -2758,7 +2754,7 @@ namespace gdjs {
           (borderDirection + 1) & 0x3,
           (borderDirection + 2) & 0x3
         );
-        if (selectedRegion == backTwo.regionID) {
+        if (selectedRegion === backTwo.regionID) {
           // backTwo should not be re-assigned. How about
           // the reference cell?
           selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
@@ -2767,7 +2763,7 @@ namespace gdjs {
             borderDirection,
             (borderDirection + 3) & 0x3
           );
-          if (selectedRegion != referenceCell.regionID) {
+          if (selectedRegion !== referenceCell.regionID) {
             // The reference cell should be reassigned
             // to a new region.
             referenceCell.regionID = selectedRegion;
@@ -2779,15 +2775,17 @@ namespace gdjs {
           hasMultiRegions = true;
         }
       } else hasMultiRegions = true;
-       // No dangerous configurations detected. But definitely
-       // has a change in regions at the corner. (We know this
-       // because one of the previous checks looked for a single
-       // region for all wrap cells.)
+      // No dangerous configurations detected. But definitely
+      // has a change in regions at the corner. We know this
+      // because one of the previous checks looked for a single
+      // region for all wrap cells.
       return hasMultiRegions;
     }
 
     /**
      * Checks the cell to see if it should be reassigned to a new region.
+     *
+     * @param grid
      * @param referenceCell A cell on one side of an obstacle region contour's
      * outer corner. It is expected that the all cells that wrap the
      * corner are in the same region.
@@ -2803,15 +2801,15 @@ namespace gdjs {
       borderDirection: integer,
       cornerDirection: integer
     ): integer {
-       // Initial example state:
-       //
-       // a - Known region.
-       // x - Null region.
-       // u - Unknown, not checked yet.
-       //
-       //     u u u
-       //     u a x
-       //     u a a
+      // Initial example state:
+      //
+      // a - Known region.
+      // x - Null region.
+      // u - Unknown, not checked yet.
+      //
+      //     u u u
+      //     u a x
+      //     u a a
 
       // The only possible alternate region id is from
       // the cell that is opposite the border. So check it first.
@@ -2823,12 +2821,12 @@ namespace gdjs {
         regionID === referenceCell.regionID ||
         regionID === RasterizationCell.OBSTACLE_REGION_ID
       )
-         // The region away from the border is either a obstacle region
-         // or the same region. So we keep the current region.
-         //
-         //     u u u      u u u
-         //     a a x  or  x a x  <-- Potentially bad, but stuck with it.
-         //     u a a      u a a
+        // The region away from the border is either a obstacle region
+        // or the same region. So we keep the current region.
+        //
+        //     u u u      u u u
+        //     a a x  or  x a x  <-- Potentially bad, but stuck with it.
+        //     u a a      u a a
         return referenceCell.regionID;
 
       // Candidate region for re-assignment.
@@ -2845,24 +2843,24 @@ namespace gdjs {
         regionID === referenceCell.regionID ||
         regionID === RasterizationCell.OBSTACLE_REGION_ID
       )
-         // The region opposite from the corner direction is
-         // either a obstacle region or the same region. So we
-         // keep the current region.
-         //
-         //     u a u      u x u
-         //     b a x  or  b a x
-         //     u a a      u a a
+        // The region opposite from the corner direction is
+        // either a obstacle region or the same region. So we
+        // keep the current region.
+        //
+        //     u a u      u x u
+        //     b a x  or  b a x
+        //     u a a      u a a
         return referenceCell.regionID;
 
-       // We have checked the early exit special cases. Now a generalized
-       // brute count is performed.
-       //
-       // Priority is given to the potential region. Here is why:
-       // (Highly unlikely worst case scenario.)
-       //
-       //     c c c    c c c
-       //     b a x -> b b x  Select b even though b count == a count.
-       //     b a a    b a a
+      // We have checked the early exit special cases. Now a generalized
+      // brute count is performed.
+      //
+      // Priority is given to the potential region. Here is why:
+      // (Highly unlikely worst case scenario)
+      //
+      //     c c c    c c c
+      //     b a x -> b b x  Select b even though b count == a count.
+      //     b a a    b a a
 
       // Neighbors in potential region.
       // We know this will have a minimum value of 1.
@@ -2872,18 +2870,18 @@ namespace gdjs {
       // We know this will have a minimum value of 2.
       let currentCount = 0;
 
-       // Maximum edge case:
-       //
-       //     b b b
-       //     b a x
-       //     b a a
-       //
-       // The maximum edge case for region A can't exist. It
-       // is filtered out during one of the earlier special cases
-       // handlers.
-       //
-       // Other cases may exist if more regions are involved.
-       // Such cases will tend to favor the current region.
+      // Maximum edge case:
+      //
+      //     b b b
+      //     b a x
+      //     b a a
+      //
+      // The maximum edge case for region A can't exist. It
+      // is filtered out during one of the earlier special cases
+      // handlers.
+      //
+      // Other cases may exist if more regions are involved.
+      // Such cases will tend to favor the current region.
 
       for (let direction = 0; direction < 8; direction++) {
         let regionID = grid.getNeighbor(referenceCell, direction).regionID;
@@ -2967,7 +2965,7 @@ namespace gdjs {
       const denominator = deltaABx * deltaCDy - deltaABy * deltaCDx;
 
       // Perform early exit tests.
-      if (denominator == 0 && numerator != 0) {
+      if (denominator === 0 && numerator !== 0) {
         // If numerator is zero, then the lines are colinear.
         // Since it isn't, then the lines must be parallel.
         return false;
@@ -2998,8 +2996,10 @@ namespace gdjs {
 
     /**
      * Returns the distance squared from the point to the line segment.
-     * <p>Behavior is undefined if the the closest distance is outside the
-     * line segment.</p>
+     *
+     * Behavior is undefined if the the closest distance is outside the
+     * line segment.
+     *
      * @param px The x-value of point (px, py).
      * @param py The y-value of point (px, py)
      * @param ax The x-value of the line segment's vertex A.
@@ -3028,7 +3028,7 @@ namespace gdjs {
       const deltaAPy = py - ay;
 
       const segmentABLengthSq = deltaABx * deltaABx + deltaABy * deltaABy;
-      if (segmentABLengthSq == 0) {
+      if (segmentABLengthSq === 0) {
         // AB is not a line segment. So just return
         // distanceSq from P to A
         return deltaAPx * deltaAPx + deltaAPy * deltaAPy;

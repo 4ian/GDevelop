@@ -47,7 +47,6 @@ namespace gdjs {
       closest: boolean = false
     ): Array<NodeType> {
       graph.cleanDirty();
-      var heuristic = heuristic;
 
       var openHeap = this.getHeap();
       var closestNode = start; // set the start node to be the closest if required
@@ -96,7 +95,7 @@ namespace gdjs {
             neighbor.f = neighbor.g + neighbor.h;
             graph.markDirty(neighbor);
             if (closest) {
-              // If the neighbour is closer than the current closestNode or if it's equally close but has
+              // If the neighbor is closer than the current closestNode or if it's equally close but has
               // a cheaper path than the current closest node then it becomes the closest node
               if (
                 neighbor.h < closestNode.h ||

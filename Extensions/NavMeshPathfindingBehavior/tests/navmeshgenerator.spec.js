@@ -124,13 +124,18 @@ describe.only('gdjs.NavMeshGeneration', function () {
     }
   };
 
+  const symbols =
+    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
   const checkDistanceField = (grid, expectedGridString) => {
     const actualGridString =
       grid.cells
         .map((cellRow) =>
           cellRow
             .map((cell) =>
-              cell.distanceToObstacle === 0 ? '.' : cell.distanceToObstacle
+              cell.distanceToObstacle === 0
+                ? '.'
+                : symbols[cell.distanceToObstacle]
             )
             .join('')
         )
@@ -148,7 +153,7 @@ describe.only('gdjs.NavMeshGeneration', function () {
       grid.cells
         .map((cellRow) =>
           cellRow
-            .map((cell) => (cell.regionID === 0 ? '.' : cell.regionID))
+            .map((cell) => (cell.regionID === 0 ? '.' : symbols[cell.regionID]))
             .join('')
         )
         .join('\n') + '\n';

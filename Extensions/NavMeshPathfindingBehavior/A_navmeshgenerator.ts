@@ -1232,7 +1232,10 @@ namespace gdjs {
         // They can be interesting for debugging.
       }
 
+      const superposingContourIndexes = new Array<integer>();
+      let contourCIndex = -1;
       for (const contourC of contours) {
+        contourCIndex++;
         for (
           let vertexIndexC = 0;
           vertexIndexC < contourC.length;
@@ -1282,7 +1285,10 @@ namespace gdjs {
             }
 
             if (vertexIndexB === -1 || vertexIndexA === -1) {
-              console.error('The vertex is not share by the 3 contours.');
+              // The vertex is not shared by the 2 contours neighbors
+              // This happens with small regions of 5 cells in the shape of a plus.
+              console.warn(`The contour (${contourCIndex}) is superposing other contours, it will be removed.`);
+              superposingContourIndexes.push(contourCIndex);
               continue;
             }
 
@@ -1382,6 +1388,9 @@ namespace gdjs {
             shrinkContourA!.splice(shrinkVertexIndexA, 1);
           }
         }
+      }
+      for (let index = superposingContourIndexes.length - 1; index >= 0; index--) {
+        contours.splice(superposingContourIndexes[index], 1);
       }
 
       return contours;

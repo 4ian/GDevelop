@@ -1237,6 +1237,7 @@ namespace gdjs {
       contours: Array<ContourPoint[]>,
       contoursByRegion: Array<ContourPoint[]>
     ): void {
+      let changeCount = 0;
       // This was not part of the CritterAI implementation.
 
       // It consider a vertex to be between only 3 regions.
@@ -1247,140 +1248,96 @@ namespace gdjs {
       // this can actually happen.
       const superposingContourIndexes = new Array<integer>();
       let contourCIndex = -1;
-      for (const contourC of contours) {
+      const commonVertexContours = new Array<ContourPoint[]>(5);
+      const commonVertexIndexes = new Array<integer>(5);
+      for (const contour of contours) {
         contourCIndex++;
-        for (
-          let vertexIndexC = 0;
-          vertexIndexC < contourC.length;
-          vertexIndexC++
-        ) {
-          const vertexC = contourC[vertexIndexC];
-          const nextVertexC = contourC[(vertexIndexC + 1) % contourC.length];
+        for (let vertexIndex = 0; vertexIndex < contour.length; vertexIndex++) {
+          const vertex = contour[vertexIndex];
+          const nextVertex = contour[(vertexIndex + 1) % contour.length];
           if (
-            vertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
-            nextVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID
+            vertex.region !== RasterizationCell.OBSTACLE_REGION_ID &&
+            nextVertex.region !== RasterizationCell.OBSTACLE_REGION_ID
           ) {
             // This is a vertex in the middle. It must be removed.
 
-            const contourB = contoursByRegion[vertexC.region];
-            const contourA = contoursByRegion[nextVertexC.region];
-
-            if (!contourA) {
-              console.warn('contour already discarded: ' + vertexC.region);
-              continue;
-            }
-            if (!contourB) {
-              console.warn('contour already discarded: ' + nextVertexC.region);
-              continue;
-            }
-
-            let vertexIndexB = -1;
-            for (let indexB = 0; indexB < contourB.length; indexB++) {
-              const vertexB = contourB[indexB];
-              if (vertexB.x === vertexC.x && vertexB.y === vertexC.y) {
-                vertexIndexB = indexB;
+            commonVertexContours.length = 0;
+            commonVertexIndexes.length = 0;
+            commonVertexContours.push(contour);
+            commonVertexIndexes.push(vertexIndex);
+            let errorFound = false;
+            let commonVertex = vertex;
+            do {
+              const neighborContour = contoursByRegion[commonVertex.region];
+              if (!neighborContour) {
+                errorFound = true;
+                console.warn(
+                  'contour already discarded: ' + commonVertex.region
+                );
                 break;
               }
-            }
-            let vertexIndexA = -1;
-            for (let indexA = 0; indexA < contourA.length; indexA++) {
-              const vertexA = contourA[indexA];
-              if (vertexA.x === vertexC.x && vertexA.y === vertexC.y) {
-                vertexIndexA = indexA;
+
+              let foundVertex = false;
+              for (
+                let neighborVertexIndex = 0;
+                neighborVertexIndex < neighborContour.length;
+                neighborVertexIndex++
+              ) {
+                const neighborVertex = neighborContour[neighborVertexIndex];
+                if (
+                  neighborVertex.x === commonVertex.x &&
+                  neighborVertex.y === commonVertex.y
+                ) {
+                  commonVertexContours.push(neighborContour);
+                  commonVertexIndexes.push(neighborVertexIndex);
+                  commonVertex = neighborVertex;
+                  foundVertex = true;
+                  break;
+                }
+              }
+              if (!foundVertex) {
+                errorFound = true;
+                console.error(
+                  `Can find a common vertex with a neighbor contour. There is probably a superposition.`
+                );
                 break;
               }
-            }
-
-            if (vertexIndexB === -1 || vertexIndexA === -1) {
-              // The vertex is not shared by the 2 contours neighbors
-              // This happens with small regions of 5 cells in the shape of a plus.
-              console.warn(
-                `The contour (${contourCIndex}) is superposing other contours, it will be removed.`
-              );
-              superposingContourIndexes.push(contourCIndex);
+            } while (commonVertex !== vertex);
+            if (errorFound) {
               continue;
             }
 
-            const previousVertexC =
-              contourC[(vertexIndexC - 1 + contourC.length) % contourC.length];
-            const previousVertexB =
-              contourB[(vertexIndexB - 1 + contourB.length) % contourB.length];
-            const previousVertexA =
-              contourA[(vertexIndexA - 1 + contourA.length) % contourA.length];
+            let shorterEdgeContourIndex = -1;
+            let edgeLengthMin = Number.MAX_VALUE;
+            for (let index = 0; index < commonVertexContours.length; index++) {
+              const vertexContour = commonVertexContours[index];
+              const vertexIndex = commonVertexIndexes[index];
 
-            if (
-              previousVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
-              previousVertexB.region !== RasterizationCell.OBSTACLE_REGION_ID &&
-              previousVertexA.region !== RasterizationCell.OBSTACLE_REGION_ID
-            ) {
+              const previousVertex =
+                vertexContour[
+                  (vertexIndex - 1 + vertexContour.length) %
+                    vertexContour.length
+                ];
+              if (
+                previousVertex.region === RasterizationCell.OBSTACLE_REGION_ID
+              ) {
+                const deltaX = previousVertex.x - vertex.x;
+                const deltaY = previousVertex.y - vertex.y;
+                const lengthSq = deltaX * deltaX + deltaY * deltaY;
+                if (lengthSq < edgeLengthMin) {
+                  edgeLengthMin = lengthSq;
+
+                  shorterEdgeContourIndex = index;
+                }
+              }
+            }
+            if (shorterEdgeContourIndex === -1) {
               console.error(
                 "A vertex has no neighbor on an obstacle. Pathfinding won't work as expected. It needs a fix."
               );
               continue;
             }
 
-            let expendedContour: ContourPoint[] | null = null;
-            let expendedVertexIndex: integer = -1;
-            let shrinkContourB: ContourPoint[] | null = null;
-            let shrinkVertexIndexB: integer = -1;
-            let shrinkContourA: ContourPoint[] | null = null;
-            let shrinkVertexIndexA: integer = -1;
-
-            let edgeLengthMin = Number.MAX_VALUE;
-            if (
-              previousVertexC.region === RasterizationCell.OBSTACLE_REGION_ID
-            ) {
-              const deltaX = previousVertexC.x - vertexC.x;
-              const deltaY = previousVertexC.y - vertexC.y;
-              const lengthSq = deltaX * deltaX + deltaY * deltaY;
-              if (lengthSq < edgeLengthMin) {
-                edgeLengthMin = lengthSq;
-
-                expendedContour = contourA;
-                shrinkContourB = contourC;
-                shrinkContourA = contourB;
-
-                expendedVertexIndex = vertexIndexA;
-                shrinkVertexIndexB = vertexIndexC;
-                shrinkVertexIndexA = vertexIndexB;
-              }
-            }
-            if (
-              previousVertexB.region === RasterizationCell.OBSTACLE_REGION_ID
-            ) {
-              const deltaX = previousVertexB.x - vertexC.x;
-              const deltaY = previousVertexB.y - vertexC.y;
-              const lengthSq = deltaX * deltaX + deltaY * deltaY;
-              if (lengthSq < edgeLengthMin) {
-                edgeLengthMin = lengthSq;
-
-                expendedContour = contourC;
-                shrinkContourB = contourB;
-                shrinkContourA = contourA;
-
-                expendedVertexIndex = vertexIndexC;
-                shrinkVertexIndexB = vertexIndexB;
-                shrinkVertexIndexA = vertexIndexA;
-              }
-            }
-            if (
-              previousVertexA.region === RasterizationCell.OBSTACLE_REGION_ID
-            ) {
-              const deltaX = previousVertexA.x - vertexC.x;
-              const deltaY = previousVertexA.y - vertexC.y;
-              const lengthSq = deltaX * deltaX + deltaY * deltaY;
-              if (lengthSq < edgeLengthMin) {
-                edgeLengthMin = lengthSq;
-
-                expendedContour = contourB;
-                shrinkContourB = contourA;
-                shrinkContourA = contourC;
-
-                expendedVertexIndex = vertexIndexB;
-                shrinkVertexIndexB = vertexIndexA;
-                shrinkVertexIndexA = vertexIndexC;
-              }
-            }
             // Merge the vertex on the other extremity of the smallest of the 3 edges.
             //
             //   \ C /
@@ -1389,27 +1346,56 @@ namespace gdjs {
             //     |
             //
             // Imagine that the Y will become a V and the vertices are store clockwise.
+            const shorterEdgeContour =
+              commonVertexContours[shorterEdgeContourIndex];
+            const shorterEdgeVertexIndex =
+              commonVertexIndexes[shorterEdgeContourIndex];
 
-            // Move the shared vertex at the other extremity of the A-B border.
-            const shrinkPreviousVertexB =
-              shrinkContourB![
-                (shrinkVertexIndexB - 1 + shrinkContourB!.length) %
-                  shrinkContourB!.length
+            const shorterEdgeExtremityVertex =
+              shorterEdgeContour[
+                (shorterEdgeVertexIndex - 1 + shorterEdgeContour.length) %
+                  shorterEdgeContour.length
               ];
-            const movedVertex = expendedContour![expendedVertexIndex];
-            movedVertex.x = shrinkPreviousVertexB.x;
-            movedVertex.y = shrinkPreviousVertexB.y;
-            movedVertex.region = RasterizationCell.NULL_REGION_ID;
+
+            const shorterEdgeOtherContourIndex =
+              (shorterEdgeContourIndex + 1) % commonVertexContours.length;
+            const shorterEdgeOtherContour =
+              commonVertexContours[shorterEdgeOtherContourIndex];
+            const shorterEdgeOtherVertexIndex =
+              commonVertexIndexes[shorterEdgeOtherContourIndex];
+
+            //console.log("commonVertexContours.length: " + commonVertexContours.length);
+            for (let index = 0; index < commonVertexContours.length; index++) {
+              if (
+                index === shorterEdgeContourIndex ||
+                index === shorterEdgeOtherContourIndex
+              ) {
+                continue;
+              }
+              const vertexContour = commonVertexContours[index];
+              const vertexIndex = commonVertexIndexes[index];
+
+              const movedVertex = vertexContour[vertexIndex];
+              //console.log("move: " + movedVertex.x + " " + movedVertex.y + " --> " + shorterEdgeExtremityVertex.x + " " + shorterEdgeExtremityVertex.y);
+              movedVertex.x = shorterEdgeExtremityVertex.x;
+              movedVertex.y = shorterEdgeExtremityVertex.y;
+              movedVertex.region = RasterizationCell.NULL_REGION_ID;
+            }
 
             // There is no more border between A and B,
             // update the region from B to C.
-            shrinkContourA![
-              (shrinkVertexIndexA + 1) % shrinkContourA!.length
-            ].region = shrinkContourA![shrinkVertexIndexA].region;
+            shorterEdgeOtherContour[
+              (shorterEdgeOtherVertexIndex + 1) % shorterEdgeOtherContour.length
+            ].region =
+              shorterEdgeOtherContour[shorterEdgeOtherVertexIndex].region;
 
             // Remove in A and B the vertex that's been move in C.
-            shrinkContourB!.splice(shrinkVertexIndexB, 1);
-            shrinkContourA!.splice(shrinkVertexIndexA, 1);
+            shorterEdgeContour.splice(shorterEdgeVertexIndex, 1);
+            shorterEdgeOtherContour.splice(shorterEdgeOtherVertexIndex, 1);
+
+            // changeCount++;
+            // if (changeCount === 2)
+            // return;
           }
         }
       }
@@ -1932,7 +1918,7 @@ namespace gdjs {
           // more than one cell is added initially to a new regions otherwise
           // no cell could be added to it later because of the conservative
           // constraint.
-          const fillTo = Math.max(distance - 2, distanceMin);
+          const fillTo = Math.max(distance - 2, distanceMin, 1);
           if (
             RegionGenerator.floodNewRegion(
               grid,

@@ -1655,7 +1655,12 @@ namespace gdjs {
         threshold
       );
 
-      if (outVertices.length < 3) {
+      if (outVertices.length < 2) {
+        // It will be ignored by the triangulation.
+        // It should be rare enough not to handle it now.
+        console.warn("A region is encompassed in another region. It will be ignored.");
+      }
+      if (outVertices.length === 2) {
         // Less than 3 vertices.
         //
         // This can occur in only one known case:  The contour started
@@ -1972,6 +1977,10 @@ namespace gdjs {
 
           // Fill to slightly more than the current "water level".
           // This improves efficiency of the algorithm.
+          // And it is necessary with the conservative expansion to ensure that
+          // more than one cell is added initially to a new regions otherwise
+          // no cell could be added to it later because of the conservative
+          // constraint.
           const fillTo = Math.max(distance - 2, distanceMin);
           if (
             RegionGenerator.floodNewRegion(
@@ -2070,15 +2079,17 @@ namespace gdjs {
           for (const delta of RasterizationGrid.neighbor4Deltas) {
             const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
             if (neighbor.regionID !== RasterizationCell.NULL_REGION_ID) {
-              if (neighbor.distanceToObstacle + 2 < regionCenterDist) {
+              if (neighbor.distanceToRegionCore + 2 < regionCenterDist) {
                 // This neighbor is closer to its region core
                 // than previously detected neighbors.
-                let sameRegionCount = 0;
+
+                // Conservative expansion constraint:
                 // Check to ensure that this neighbor has
                 // at least two other neighbors in its region.
                 // This makes sure that adding this cell to
                 // this neighbor's  region will not result
                 // in a single width line of cells.
+                let sameRegionCount = 0;
                 for (
                   let neighborDirection = 0;
                   neighborDirection < 4;
@@ -2094,7 +2105,7 @@ namespace gdjs {
                 }
                 if (sameRegionCount > 1) {
                   cellRegion = neighbor.regionID;
-                  regionCenterDist = neighbor.distanceToObstacle + 2;
+                  regionCenterDist = neighbor.distanceToRegionCore + 2;
                 }
               }
             }
@@ -2104,7 +2115,7 @@ namespace gdjs {
             // Mark this index as having been processed.
             inoutCells[index] = null;
             cell.regionID = cellRegion;
-            cell.distanceToObstacle = regionCenterDist;
+            cell.distanceToRegionCore = regionCenterDist;
           } else {
             // Could not find an existing region for this cell.
             skipped++;
@@ -2163,12 +2174,12 @@ namespace gdjs {
         for (const delta of RasterizationGrid.neighbor8Deltas) {
           const neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
           isOnRegionBorder =
-            neighbor.regionID !== RasterizationCell.OBSTACLE_REGION_ID &&
+            neighbor.regionID !== RasterizationCell.NULL_REGION_ID &&
             neighbor.regionID !== regionID;
           if (isOnRegionBorder) break;
         }
         if (isOnRegionBorder) {
-          cell.regionID = RasterizationCell.OBSTACLE_REGION_ID;
+          cell.regionID = RasterizationCell.NULL_REGION_ID;
           continue;
         }
         regionSize++;
@@ -2181,7 +2192,7 @@ namespace gdjs {
 
           if (
             neighbor.distanceToObstacle >= fillToDist &&
-            neighbor.regionID === RasterizationCell.OBSTACLE_REGION_ID
+            neighbor.regionID === RasterizationCell.NULL_REGION_ID
           ) {
             neighbor.regionID = regionID;
             neighbor.distanceToRegionCore = 0;
@@ -2659,7 +2670,11 @@ namespace gdjs {
 
       if (
         backOne.regionID !== referenceCell.regionID &&
-        backTwo.regionID === referenceCell.regionID
+        // This differ from the CritterAI implementation.
+        // To filter vertices in the middle, this must be avoided too:
+        //     a x
+        //     b c
+        backTwo.regionID !== backOne.regionID
       ) {
         // Dangerous corner configuration.
         //

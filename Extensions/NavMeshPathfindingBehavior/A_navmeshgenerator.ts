@@ -230,12 +230,8 @@ namespace gdjs {
       // Split every concave polygon into convex polygons.
       for (const contour of concavePolygons) {
         if (contour.length < 3) {
-          // This indicates a problem with contour creation
-          // since the contour builder should detect for this.
-          console.error(
-            'Polygon generation failure: Contour has ' +
-              'too few vertices. Bad input data.'
-          );
+          // CritterAI logged an error here, but we rely on this to filtered
+          // polygons that became useless
           continue;
         }
 
@@ -1184,19 +1180,12 @@ namespace gdjs {
             threshold
           );
 
-          if (workingSimplifiedVertices.length < 3) {
-            console.warn(
-              "Discarded contour: Can't form enough valid" +
-                'edges from the vertices.' +
-                ' Region: ' +
-                cell.regionID
-            );
-            discardedContours++;
-          } else {
-            const contour = Array.from(workingSimplifiedVertices);
-            contours.push(contour);
-            contoursByRegion[cell.regionID] = contour;
-          }
+          // The CritterAI implementation filters polygons with less than
+          // 3 vertices, but they are needed to filter vertices in the middle
+          // (not on an obstacle region border).
+          const contour = Array.from(workingSimplifiedVertices);
+          contours.push(contour);
+          contoursByRegion[cell.regionID] = contour;
         }
       }
 
@@ -1232,8 +1221,24 @@ namespace gdjs {
         // They can be interesting for debugging.
       }
 
-      // Search vertices that are not shared with the obstacle region and
-      // remove them.
+      ContourBuilder.filterNonObstacleVertices(contours, contoursByRegion);
+
+      return contours;
+    }
+
+    /**
+     * Search vertices that are not shared with the obstacle region and
+     * remove them.
+     * @param contours
+     * @param contoursByRegion Some regions may have been discarded
+     * so contours index can't be used.
+     */
+    private static filterNonObstacleVertices(
+      contours: Array<ContourPoint[]>,
+      contoursByRegion: Array<ContourPoint[]>
+    ): void {
+      // This was not part of the CritterAI implementation.
+
       // It consider a vertex to be between only 3 regions.
       // The removed vertex is merged on the nearest of 3 edges other extremity
       // that is on an obstacle border. In case none of them are, the vertex
@@ -1255,14 +1260,8 @@ namespace gdjs {
             vertexC.region !== RasterizationCell.OBSTACLE_REGION_ID &&
             nextVertexC.region !== RasterizationCell.OBSTACLE_REGION_ID
           ) {
-            console.warn(
-              'Vertex in the middle. contour:' +
-                vertexIndexC +
-                ' vertex: ' +
-                vertexC.x +
-                ' ' +
-                vertexC.y
-            );
+            // This is a vertex in the middle. It must be removed.
+
             const contourB = contoursByRegion[vertexC.region];
             const contourA = contoursByRegion[nextVertexC.region];
 
@@ -1421,8 +1420,6 @@ namespace gdjs {
       ) {
         contours.splice(superposingContourIndexes[index], 1);
       }
-
-      return contours;
     }
 
     private static leftVertexOfFacingCellBorderDeltas = [
@@ -1658,61 +1655,15 @@ namespace gdjs {
       if (outVertices.length < 2) {
         // It will be ignored by the triangulation.
         // It should be rare enough not to handle it now.
-        console.warn("A region is encompassed in another region. It will be ignored.");
+        console.warn(
+          'A region is encompassed in another region. It will be ignored.'
+        );
       }
-      if (outVertices.length === 2) {
-        // Less than 3 vertices.
-        //
-        // This can occur in only one known case:  The contour started
-        // with only two seed vertices and none of the algorithms added
-        // a vertex.
-        //
-        // This case is not completely unexpected. At this time,
-        // the contour algorithms only add vertices back if a obstacle region
-        // edge is involved. So if a region is only surrounded by two
-        // non-obstacle regions, it can end up in this situation.
-        //
-        // Find the vertex farthest from the current line segment
-        // and add it back to the contour.
-        let selectedVertex: ContourPoint | null = null;
-        let selectedVertexIndex = -1;
-        let maxDistance = 0;
-        const vertex0 = outVertices[0];
-        const vertex1 = outVertices[1];
-        let index = 0;
-        for (let sourceVertex of sourceVertices) {
-          const dist = Geometry.getPointSegmentDistanceSq(
-            sourceVertex.x,
-            sourceVertex.y,
-            vertex0.x,
-            vertex0.y,
-            vertex1.x,
-            vertex1.y
-          );
-          if (dist > maxDistance) {
-            maxDistance = dist;
-            selectedVertex = sourceVertex;
-            selectedVertexIndex = index;
-          }
-          index++;
-        }
-        // As selected vertex such that the contour stays
-        // wrapped clockwise.
-        if (selectedVertex) {
-          const addedVertex: ContourPoint = {
-            x: selectedVertex.x,
-            y: selectedVertex.y,
-            region: selectedVertexIndex,
-          };
-          if (selectedVertex.region < vertex0.region) {
-            outVertices.splice(0, 0, addedVertex);
-          } else if (selectedVertex.region < vertex1.region) {
-            outVertices.splice(1, 0, addedVertex);
-          } else {
-            outVertices.push(addedVertex);
-          }
-        }
-      }
+      // There can be polygons with only 2 vertices when a region is between
+      // 2 non-obstacles regions. It's still a useful information to filter
+      // vertices in the middle (not on an obstacle region border).
+      // In this case, the CritterAI implementation adds a 3rd point to avoid
+      // invisible polygons, but it makes it difficult to filter it later.
 
       // Replace the index pointers in the output list with region IDs.
       for (const outVertex of outVertices) {

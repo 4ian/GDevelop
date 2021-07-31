@@ -1,3 +1,12 @@
+# Travis CI configuration to build and run all tests
+# (and typing/formatting) for the Core, newIDE, GDJS (and even GDCpp).
+#
+# This builds GDevelop.js and store it on a S3 so it can be used to run
+# GDevelop without building it.
+#
+# See also Semaphore CI for quick tests (not building GDevelop.js, so
+# faster but not always reliable).
+
 language: cpp
 sudo: false
 compiler:

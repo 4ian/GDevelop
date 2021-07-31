@@ -286,10 +286,11 @@ namespace gdjs {
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
       this._lastUsedNavMesh = navMesh;
 
-      //TODO if the target is not on the mesh, find the nearest position
+      //TODO The pathfinding could use something like RBush to look for
+      // the the polygons at start and target locations.
+      //TODO If the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
       const path = navMesh.findPath(
-        //TODO convert coords in iso
         {
           x: this.owner.getX(),
           y: this.owner.getY() * this._manager._isometricRatio,

@@ -1956,7 +1956,7 @@ namespace gdjs {
           // more than one cell is added initially to a new regions otherwise
           // no cell could be added to it later because of the conservative
           // constraint.
-          const fillTo = Math.max(distance - 2, distanceMin, 1);
+          const fillTo = Math.max(distance - 2, distanceMin + 1, 1);
           if (
             RegionGenerator.floodNewRegion(
               grid,

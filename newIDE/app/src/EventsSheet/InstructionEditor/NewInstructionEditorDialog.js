@@ -13,7 +13,6 @@ import InstructionParametersEditor from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {
   type TabName,
 } from './InstructionOrObjectSelector';
-import { Column } from '../../UI/Grid';
 import InstructionOrExpressionSelector from './InstructionOrExpressionSelector';
 import HelpButton from '../../UI/HelpButton';
 import Background from '../../UI/Background';
@@ -199,24 +198,23 @@ export default function NewInstructionEditorDialog({
   );
 
   const renderParameters = () => (
-    <Column expand justifyContent="center" key="parameters">
-      <InstructionParametersEditor
-        project={project}
-        scope={scope}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        objectName={chosenObjectName}
-        isCondition={isCondition}
-        instruction={instruction}
-        resourceSources={resourceSources}
-        onChooseResource={onChooseResource}
-        resourceExternalEditors={resourceExternalEditors}
-        openInstructionOrExpression={openInstructionOrExpression}
-        ref={instructionParametersEditor}
-        focusOnMount={!!instructionType}
-        noHelpButton
-      />
-    </Column>
+    <InstructionParametersEditor
+      key="parameters"
+      project={project}
+      scope={scope}
+      globalObjectsContainer={globalObjectsContainer}
+      objectsContainer={objectsContainer}
+      objectName={chosenObjectName}
+      isCondition={isCondition}
+      instruction={instruction}
+      resourceSources={resourceSources}
+      onChooseResource={onChooseResource}
+      resourceExternalEditors={resourceExternalEditors}
+      openInstructionOrExpression={openInstructionOrExpression}
+      ref={instructionParametersEditor}
+      focusOnMount={!!instructionType}
+      noHelpButton
+    />
   );
 
   const renderObjectInstructionSelector = () =>

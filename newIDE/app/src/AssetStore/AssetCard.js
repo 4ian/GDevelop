@@ -24,10 +24,7 @@ const styles = {
   },
   previewImagePixelated: {
     width: '100%',
-    imageRendering: '-moz-crisp-edges',
-    imageRendering: '-webkit-optimize-contrast',
-    imageRendering: '-webkit-crisp-edges',
-    imageRendering: 'pixelated',
+    imageRendering: '-moz-crisp-edges' || 'pixelated', // TODO to check
     padding: 15,
   },
   icon: {

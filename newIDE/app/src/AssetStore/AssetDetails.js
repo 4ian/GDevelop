@@ -10,6 +10,7 @@ import {
   type Asset,
   type Author,
   getAsset,
+  isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -33,10 +34,8 @@ import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 const styles = {
   previewImagePixelated: {
     width: '100%',
-    imageRendering: '-moz-crisp-edges',
-    imageRendering: '-webkit-optimize-contrast',
-    imageRendering: '-webkit-crisp-edges',
-    imageRendering: 'pixelated',
+    imageRendering:
+      '-moz-crisp-edges -webkit-optimize-contrast -webkit-crisp-edges pixelated', // TODO not working, need to check if we can do that
     padding: 15,
   },
   previewBackground: {
@@ -80,14 +79,6 @@ type Props = {|
   canInstall: boolean,
   isBeingInstalled: boolean,
 |};
-
-const isPixelArt = assetShortHeader => {
-  let returnValue = false;
-  assetShortHeader.tags.map(tag => {
-    if (tag.toLowerCase() === 'pixel art') returnValue = true;
-  });
-  return returnValue;
-};
 
 export const AssetDetails = ({
   project,

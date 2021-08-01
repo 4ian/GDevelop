@@ -1229,6 +1229,9 @@ namespace gdjs {
     /**
      * Search vertices that are not shared with the obstacle region and
      * remove them.
+     * 
+     * Some contours will have no vertex left.
+     * 
      * @param contours
      * @param contoursByRegion Some regions may have been discarded
      * so contours index can't be used.
@@ -1237,21 +1240,17 @@ namespace gdjs {
       contours: Array<ContourPoint[]>,
       contoursByRegion: Array<ContourPoint[]>
     ): void {
-      let changeCount = 0;
       // This was not part of the CritterAI implementation.
 
-      // It consider a vertex to be between only 3 regions.
-      // The removed vertex is merged on the nearest of 3 edges other extremity
-      // that is on an obstacle border. In case none of them are, the vertex
-      // will be kept.
-      // TODO If such a case happens, a loop should fix it but I'm not sure
-      // this can actually happen.
-      const superposingContourIndexes = new Array<integer>();
-      let contourCIndex = -1;
+      // The removed vertex is merged on the nearest of the edges other extremity
+      // that is on an obstacle border.
       const commonVertexContours = new Array<ContourPoint[]>(5);
       const commonVertexIndexes = new Array<integer>(5);
+      // loop because of imbrications
+      let movedAnyVertex = false;
+      do {
+        movedAnyVertex = false;
       for (const contour of contours) {
-        contourCIndex++;
         for (let vertexIndex = 0; vertexIndex < contour.length; vertexIndex++) {
           const vertex = contour[vertexIndex];
           const nextVertex = contour[(vertexIndex + 1) % contour.length];
@@ -1298,13 +1297,16 @@ namespace gdjs {
               if (!foundVertex) {
                 errorFound = true;
                 console.error(
-                  `Can find a common vertex with a neighbor contour. There is probably a superposition.`
+                  "Can't find a common vertex with a neighbor contour. There is probably a superposition."
                 );
                 break;
               }
             } while (commonVertex !== vertex);
             if (errorFound) {
               continue;
+            }
+            if (commonVertexContours.length < 3) {
+              console.error(`The vertex is shared by only {$commonVertexContours.length} regions.`);
             }
 
             let shorterEdgeContourIndex = -1;
@@ -1332,9 +1334,8 @@ namespace gdjs {
               }
             }
             if (shorterEdgeContourIndex === -1) {
-              console.error(
-                "A vertex has no neighbor on an obstacle. Pathfinding won't work as expected. It needs a fix."
-              );
+              // A vertex has no neighbor on an obstacle.
+              // It will be solved in next iterations.
               continue;
             }
 
@@ -1372,14 +1373,14 @@ namespace gdjs {
               ) {
                 continue;
               }
-              const vertexContour = commonVertexContours[index];
-              const vertexIndex = commonVertexIndexes[index];
+              const commonVertexContour = commonVertexContours[index];
+              const commonVertexIndex = commonVertexIndexes[index];
 
-              const movedVertex = vertexContour[vertexIndex];
+              const movedVertex = commonVertexContour[commonVertexIndex];
               //console.log("move: " + movedVertex.x + " " + movedVertex.y + " --> " + shorterEdgeExtremityVertex.x + " " + shorterEdgeExtremityVertex.y);
-              movedVertex.x = shorterEdgeExtremityVertex.x;
-              movedVertex.y = shorterEdgeExtremityVertex.y;
-              movedVertex.region = RasterizationCell.NULL_REGION_ID;
+                movedVertex.x = shorterEdgeExtremityVertex.x;
+                movedVertex.y = shorterEdgeExtremityVertex.y;
+                movedVertex.region = RasterizationCell.NULL_REGION_ID;
             }
 
             // There is no more border between A and B,
@@ -1396,15 +1397,41 @@ namespace gdjs {
             // changeCount++;
             // if (changeCount === 2)
             // return;
+            movedAnyVertex = true;
           }
         }
       }
-      for (
-        let index = superposingContourIndexes.length - 1;
-        index >= 0;
-        index--
-      ) {
-        contours.splice(superposingContourIndexes[index], 1);
+    }
+      while (movedAnyVertex);
+
+      // Clean the polygons from identical vertices.
+      //
+      // This can happen with 2 vertices regions.
+      // 2 edges are superposed and there extremity is the same.
+      // One is move over the other.
+      // I could observe this with a region between 2 regions
+      // where one of one of these 2 regions were also encompassed.
+      // A bit like a rainbow, 2 big regions: the land, the sky
+      // and 2 regions for the colors.
+      //
+      // The vertex can't be removed during the process because
+      // they hold data used by other merging.
+      //
+      // Some contour will have no vertex left.
+      // It more efficient to let the next step ignore them.
+      for (const contour of contours) {
+        for (let vertexIndex = 0; vertexIndex < contour.length; vertexIndex++) {
+          const vertex = contour[vertexIndex];
+          const nextVertexIndex = (vertexIndex + 1) % contour.length;
+          const nextVertex = contour[nextVertexIndex];
+          if (
+            vertex.x === nextVertex.x
+            && vertex.y === nextVertex.y
+          ) {
+            contour.splice(nextVertexIndex, 1);
+            vertexIndex--;
+          }
+        }
       }
     }
 

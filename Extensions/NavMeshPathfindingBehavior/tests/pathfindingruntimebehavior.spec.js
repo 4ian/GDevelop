@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.NavMeshPathfindingBehavior', function () {
+describe.only('gdjs.NavMeshPathfindingBehavior', function () {
   const pathFindingName = 'auto1';
 
   const createScene = () => {
@@ -121,7 +121,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
 
   it('can find a path without any obstacle at all', function () {
     player.setPosition(200, 300);
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 750, 300);
+    player.getBehavior(pathFindingName).moveTo(runtimeScene, 900, 300);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(2);
   });
@@ -134,7 +134,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
 
     player.setPosition(200, 300);
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 750, 300);
+    player.getBehavior(pathFindingName).moveTo(runtimeScene, 900, 300);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(2);
   });
@@ -147,7 +147,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
 
     player.setPosition(200, 300);
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 750, 350);
+    player.getBehavior(pathFindingName).moveTo(runtimeScene, 650, 350);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(false);
   });
 
@@ -159,7 +159,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
 
     player.setPosition(200, 300);
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 750, 300);
+    player.getBehavior(pathFindingName).moveTo(runtimeScene, 900, 300);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be.above(2);
   });
@@ -179,7 +179,9 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       200,
       (pathwayTop + pathwayBottom) / 2 + player.getHeight() / 2
     );
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 750, player.getY());
+    player
+      .getBehavior(pathFindingName)
+      .moveTo(runtimeScene, 900, player.getY());
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
     expect(player.getBehavior(pathFindingName).getNodeCount()).to.be(2);
   });
@@ -198,7 +200,9 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
     runtimeScene.renderAndStep(1000 / 60);
 
     player.setPosition(200, 300);
-    player.getBehavior(pathFindingName).moveTo(runtimeScene, 600, 300 - player.getHeight() / 2);
+    player
+      .getBehavior(pathFindingName)
+      .moveTo(runtimeScene, 600, 300 - player.getHeight() / 2);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(false);
   });
 });

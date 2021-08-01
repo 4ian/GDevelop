@@ -276,12 +276,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     />
                   </Tabs>
                 )}
-                <ScrollView
-                  ref={
-                    // $FlowFixMe - improper typing of ScrollView?
-                    this._scrollView
-                  }
-                >
+                <ScrollView ref={this._scrollView}>
                   {!isSearching && currentTab === 'objects' && (
                     <TagChips
                       tags={selectedObjectTags}

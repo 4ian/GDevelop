@@ -1229,9 +1229,9 @@ namespace gdjs {
     /**
      * Search vertices that are not shared with the obstacle region and
      * remove them.
-     * 
+     *
      * Some contours will have no vertex left.
-     * 
+     *
      * @param contours
      * @param contoursByRegion Some regions may have been discarded
      * so contours index can't be used.
@@ -1250,159 +1250,173 @@ namespace gdjs {
       let movedAnyVertex = false;
       do {
         movedAnyVertex = false;
-      for (const contour of contours) {
-        for (let vertexIndex = 0; vertexIndex < contour.length; vertexIndex++) {
-          const vertex = contour[vertexIndex];
-          const nextVertex = contour[(vertexIndex + 1) % contour.length];
-          if (
-            vertex.region !== RasterizationCell.OBSTACLE_REGION_ID &&
-            nextVertex.region !== RasterizationCell.OBSTACLE_REGION_ID
+        for (const contour of contours) {
+          for (
+            let vertexIndex = 0;
+            vertexIndex < contour.length;
+            vertexIndex++
           ) {
-            // This is a vertex in the middle. It must be removed.
+            const vertex = contour[vertexIndex];
+            const nextVertex = contour[(vertexIndex + 1) % contour.length];
+            if (
+              vertex.region !== RasterizationCell.OBSTACLE_REGION_ID &&
+              nextVertex.region !== RasterizationCell.OBSTACLE_REGION_ID
+            ) {
+              // This is a vertex in the middle. It must be removed.
 
-            commonVertexContours.length = 0;
-            commonVertexIndexes.length = 0;
-            commonVertexContours.push(contour);
-            commonVertexIndexes.push(vertexIndex);
-            let errorFound = false;
-            let commonVertex = vertex;
-            do {
-              const neighborContour = contoursByRegion[commonVertex.region];
-              if (!neighborContour) {
-                errorFound = true;
-                console.warn(
-                  'contour already discarded: ' + commonVertex.region
-                );
-                break;
-              }
-
-              let foundVertex = false;
-              for (
-                let neighborVertexIndex = 0;
-                neighborVertexIndex < neighborContour.length;
-                neighborVertexIndex++
-              ) {
-                const neighborVertex = neighborContour[neighborVertexIndex];
-                if (
-                  neighborVertex.x === commonVertex.x &&
-                  neighborVertex.y === commonVertex.y
-                ) {
-                  commonVertexContours.push(neighborContour);
-                  commonVertexIndexes.push(neighborVertexIndex);
-                  commonVertex = neighborVertex;
-                  foundVertex = true;
+              commonVertexContours.length = 0;
+              commonVertexIndexes.length = 0;
+              commonVertexContours.push(contour);
+              commonVertexIndexes.push(vertexIndex);
+              let errorFound = false;
+              let commonVertex = vertex;
+              do {
+                const neighborContour = contoursByRegion[commonVertex.region];
+                if (!neighborContour) {
+                  errorFound = true;
+                  console.warn(
+                    'contour already discarded: ' + commonVertex.region
+                  );
                   break;
                 }
-              }
-              if (!foundVertex) {
-                errorFound = true;
-                console.error(
-                  "Can't find a common vertex with a neighbor contour. There is probably a superposition."
-                );
-                break;
-              }
-            } while (commonVertex !== vertex);
-            if (errorFound) {
-              continue;
-            }
-            if (commonVertexContours.length < 3) {
-              console.error(`The vertex is shared by only {$commonVertexContours.length} regions.`);
-            }
 
-            let shorterEdgeContourIndex = -1;
-            let edgeLengthMin = Number.MAX_VALUE;
-            for (let index = 0; index < commonVertexContours.length; index++) {
-              const vertexContour = commonVertexContours[index];
-              const vertexIndex = commonVertexIndexes[index];
-
-              const previousVertex =
-                vertexContour[
-                  (vertexIndex - 1 + vertexContour.length) %
-                    vertexContour.length
-                ];
-              if (
-                previousVertex.region === RasterizationCell.OBSTACLE_REGION_ID
-              ) {
-                const deltaX = previousVertex.x - vertex.x;
-                const deltaY = previousVertex.y - vertex.y;
-                const lengthSq = deltaX * deltaX + deltaY * deltaY;
-                if (lengthSq < edgeLengthMin) {
-                  edgeLengthMin = lengthSq;
-
-                  shorterEdgeContourIndex = index;
+                let foundVertex = false;
+                for (
+                  let neighborVertexIndex = 0;
+                  neighborVertexIndex < neighborContour.length;
+                  neighborVertexIndex++
+                ) {
+                  const neighborVertex = neighborContour[neighborVertexIndex];
+                  if (
+                    neighborVertex.x === commonVertex.x &&
+                    neighborVertex.y === commonVertex.y
+                  ) {
+                    commonVertexContours.push(neighborContour);
+                    commonVertexIndexes.push(neighborVertexIndex);
+                    commonVertex = neighborVertex;
+                    foundVertex = true;
+                    break;
+                  }
                 }
-              }
-            }
-            if (shorterEdgeContourIndex === -1) {
-              // A vertex has no neighbor on an obstacle.
-              // It will be solved in next iterations.
-              continue;
-            }
-
-            // Merge the vertex on the other extremity of the smallest of the 3 edges.
-            //
-            //   \ C /
-            //    \ /
-            //  A  |  B
-            //     |
-            //
-            // Imagine that the Y will become a V and the vertices are store clockwise.
-            const shorterEdgeContour =
-              commonVertexContours[shorterEdgeContourIndex];
-            const shorterEdgeVertexIndex =
-              commonVertexIndexes[shorterEdgeContourIndex];
-
-            const shorterEdgeExtremityVertex =
-              shorterEdgeContour[
-                (shorterEdgeVertexIndex - 1 + shorterEdgeContour.length) %
-                  shorterEdgeContour.length
-              ];
-
-            const shorterEdgeOtherContourIndex =
-              (shorterEdgeContourIndex + 1) % commonVertexContours.length;
-            const shorterEdgeOtherContour =
-              commonVertexContours[shorterEdgeOtherContourIndex];
-            const shorterEdgeOtherVertexIndex =
-              commonVertexIndexes[shorterEdgeOtherContourIndex];
-
-            //console.log("commonVertexContours.length: " + commonVertexContours.length);
-            for (let index = 0; index < commonVertexContours.length; index++) {
-              if (
-                index === shorterEdgeContourIndex ||
-                index === shorterEdgeOtherContourIndex
-              ) {
+                if (!foundVertex) {
+                  errorFound = true;
+                  console.error(
+                    "Can't find a common vertex with a neighbor contour. There is probably a superposition."
+                  );
+                  break;
+                }
+              } while (commonVertex !== vertex);
+              if (errorFound) {
                 continue;
               }
-              const commonVertexContour = commonVertexContours[index];
-              const commonVertexIndex = commonVertexIndexes[index];
+              if (commonVertexContours.length < 3) {
+                console.error(
+                  `The vertex is shared by only {$commonVertexContours.length} regions.`
+                );
+              }
 
-              const movedVertex = commonVertexContour[commonVertexIndex];
-              //console.log("move: " + movedVertex.x + " " + movedVertex.y + " --> " + shorterEdgeExtremityVertex.x + " " + shorterEdgeExtremityVertex.y);
+              let shorterEdgeContourIndex = -1;
+              let edgeLengthMin = Number.MAX_VALUE;
+              for (
+                let index = 0;
+                index < commonVertexContours.length;
+                index++
+              ) {
+                const vertexContour = commonVertexContours[index];
+                const vertexIndex = commonVertexIndexes[index];
+
+                const previousVertex =
+                  vertexContour[
+                    (vertexIndex - 1 + vertexContour.length) %
+                      vertexContour.length
+                  ];
+                if (
+                  previousVertex.region === RasterizationCell.OBSTACLE_REGION_ID
+                ) {
+                  const deltaX = previousVertex.x - vertex.x;
+                  const deltaY = previousVertex.y - vertex.y;
+                  const lengthSq = deltaX * deltaX + deltaY * deltaY;
+                  if (lengthSq < edgeLengthMin) {
+                    edgeLengthMin = lengthSq;
+
+                    shorterEdgeContourIndex = index;
+                  }
+                }
+              }
+              if (shorterEdgeContourIndex === -1) {
+                // A vertex has no neighbor on an obstacle.
+                // It will be solved in next iterations.
+                continue;
+              }
+
+              // Merge the vertex on the other extremity of the smallest of the 3 edges.
+              //
+              //   \ C /
+              //    \ /
+              //  A  |  B
+              //     |
+              //
+              // Imagine that the Y will become a V and the vertices are store clockwise.
+              const shorterEdgeContour =
+                commonVertexContours[shorterEdgeContourIndex];
+              const shorterEdgeVertexIndex =
+                commonVertexIndexes[shorterEdgeContourIndex];
+
+              const shorterEdgeExtremityVertex =
+                shorterEdgeContour[
+                  (shorterEdgeVertexIndex - 1 + shorterEdgeContour.length) %
+                    shorterEdgeContour.length
+                ];
+
+              const shorterEdgeOtherContourIndex =
+                (shorterEdgeContourIndex + 1) % commonVertexContours.length;
+              const shorterEdgeOtherContour =
+                commonVertexContours[shorterEdgeOtherContourIndex];
+              const shorterEdgeOtherVertexIndex =
+                commonVertexIndexes[shorterEdgeOtherContourIndex];
+
+              //console.log("commonVertexContours.length: " + commonVertexContours.length);
+              for (
+                let index = 0;
+                index < commonVertexContours.length;
+                index++
+              ) {
+                if (
+                  index === shorterEdgeContourIndex ||
+                  index === shorterEdgeOtherContourIndex
+                ) {
+                  continue;
+                }
+                const commonVertexContour = commonVertexContours[index];
+                const commonVertexIndex = commonVertexIndexes[index];
+
+                const movedVertex = commonVertexContour[commonVertexIndex];
+                //console.log("move: " + movedVertex.x + " " + movedVertex.y + " --> " + shorterEdgeExtremityVertex.x + " " + shorterEdgeExtremityVertex.y);
                 movedVertex.x = shorterEdgeExtremityVertex.x;
                 movedVertex.y = shorterEdgeExtremityVertex.y;
                 movedVertex.region = RasterizationCell.NULL_REGION_ID;
+              }
+
+              // There is no more border between A and B,
+              // update the region from B to C.
+              shorterEdgeOtherContour[
+                (shorterEdgeOtherVertexIndex + 1) %
+                  shorterEdgeOtherContour.length
+              ].region =
+                shorterEdgeOtherContour[shorterEdgeOtherVertexIndex].region;
+
+              // Remove in A and B the vertex that's been move in C.
+              shorterEdgeContour.splice(shorterEdgeVertexIndex, 1);
+              shorterEdgeOtherContour.splice(shorterEdgeOtherVertexIndex, 1);
+
+              // changeCount++;
+              // if (changeCount === 2)
+              // return;
+              movedAnyVertex = true;
             }
-
-            // There is no more border between A and B,
-            // update the region from B to C.
-            shorterEdgeOtherContour[
-              (shorterEdgeOtherVertexIndex + 1) % shorterEdgeOtherContour.length
-            ].region =
-              shorterEdgeOtherContour[shorterEdgeOtherVertexIndex].region;
-
-            // Remove in A and B the vertex that's been move in C.
-            shorterEdgeContour.splice(shorterEdgeVertexIndex, 1);
-            shorterEdgeOtherContour.splice(shorterEdgeOtherVertexIndex, 1);
-
-            // changeCount++;
-            // if (changeCount === 2)
-            // return;
-            movedAnyVertex = true;
           }
         }
-      }
-    }
-      while (movedAnyVertex);
+      } while (movedAnyVertex);
 
       // Clean the polygons from identical vertices.
       //
@@ -1424,10 +1438,7 @@ namespace gdjs {
           const vertex = contour[vertexIndex];
           const nextVertexIndex = (vertexIndex + 1) % contour.length;
           const nextVertex = contour[nextVertexIndex];
-          if (
-            vertex.x === nextVertex.x
-            && vertex.y === nextVertex.y
-          ) {
+          if (vertex.x === nextVertex.x && vertex.y === nextVertex.y) {
             contour.splice(nextVertexIndex, 1);
             vertexIndex--;
           }
@@ -2305,10 +2316,14 @@ namespace gdjs {
      * @param grid a grid with fully built regions.
      */
     public static fixObstacleRegion(grid: RasterizationGrid) {
-      const workingOpenCells = new Array<RasterizationCell>(1024);
+      const workingUpLeftOpenCells = new Array<RasterizationCell>(512);
+      workingUpLeftOpenCells.length = 0;
+      const workingDownRightOpenCells = new Array<RasterizationCell>(512);
+      workingDownRightOpenCells.length = 0;
+      const workingOpenCells = new Array<RasterizationCell>(512);
       workingOpenCells.length = 0;
-      const workingBorderDistance = new Array<integer>(1024);
-      workingBorderDistance.length = 0;
+      const extremeCells: [RasterizationCell | null, RasterizationCell | null] =
+        [null, null];
 
       let nextRegionID = grid.regionCount;
 
@@ -2351,7 +2366,8 @@ namespace gdjs {
             ObstacleRegionBordersCleaner.processNullRegion(
               grid,
               workingCell,
-              edgeDirection
+              edgeDirection,
+              extremeCells
             );
 
           if (isEncompassedNullRegion) {
@@ -2360,11 +2376,12 @@ namespace gdjs {
             // This is not permitted. Need to fix it.
             ObstacleRegionBordersCleaner.partialFloodRegion(
               grid,
-              workingCell,
-              edgeDirection,
+              extremeCells[0]!,
+              extremeCells[1]!,
               nextRegionID,
-              workingOpenCells,
-              workingBorderDistance
+              workingUpLeftOpenCells,
+              workingDownRightOpenCells,
+              workingOpenCells
             );
             nextRegionID++;
           }
@@ -2397,14 +2414,18 @@ namespace gdjs {
      */
     private static partialFloodRegion(
       grid: RasterizationGrid,
-      startCell: RasterizationCell,
-      borderDirection: integer,
+      upLeftCell: RasterizationCell,
+      downRightCell: RasterizationCell,
       newRegionID: integer,
-      workingOpenCells: RasterizationCell[],
-      workingBorderDistance: integer[]
+      upLeftOpenCells: RasterizationCell[],
+      downRightOpenCells: RasterizationCell[],
+      workingOpenCells: RasterizationCell[]
     ): void {
-      const antiBorderDirection = (borderDirection + 2) & 0x3;
-      const regionID = startCell.regionID;
+      // The implementation differs from CritterAI to avoid non-contiguous
+      // sections. Instead of brushing in one direction, it floods from
+      // 2 extremities of the encompassed obstacle region.
+
+      const regionID = upLeftCell.regionID;
 
       if (regionID === newRegionID) {
         // avoid infinity loop
@@ -2414,47 +2435,63 @@ namespace gdjs {
         return;
       }
 
-      // Re-assign the start cell and queue it for the neighbor search.
-      startCell.regionID = newRegionID;
-      startCell.distanceToRegionCore = 0; // This information is lost.
-      workingOpenCells.push(startCell);
-      workingBorderDistance.push(0);
+      // The 1st flooding set a new the regionID
+      upLeftCell.regionID = newRegionID;
+      upLeftCell.distanceToRegionCore = 0; // This information is lost.
+      upLeftOpenCells.length = 0;
+      upLeftOpenCells.push(upLeftCell);
 
-      // Search for new cells that can be assigned the new region.
-      while (workingOpenCells.length !== 0) {
-        const cell = workingOpenCells.pop()!;
-        const distance = workingBorderDistance.pop()!;
+      // The 2nd flooding keep the regionID and mark the cell as visited.
+      downRightCell.contourFlags = 2;
+      downRightCell.distanceToRegionCore = 0; // This information is lost.
+      downRightOpenCells.length = 0;
+      downRightOpenCells.push(downRightCell);
 
-        for (let direction = 0; direction < 4; direction++) {
-          const neighbor = grid.getNeighbor(cell, direction);
-          if (neighbor.regionID !== regionID) {
-            // No cell in this direction, or the cell
-            // is not in the region being processed.
-            // Note: It may have already been transferred.
-            continue;
-          }
-          let neighborDistance = distance;
-          if (direction === borderDirection) {
-            // This neighbor is back toward the border.
-            if (distance === 0) {
-              // The cell is at the border. Can't go
-              // further in this direction. Ignore
-              // this neighbor.
+      let swap: RasterizationCell[];
+      workingOpenCells.length = 0;
+
+      while (upLeftOpenCells.length !== 0 || downRightOpenCells.length !== 0) {
+        for (const cell of upLeftOpenCells) {
+          for (let direction = 0; direction < 4; direction++) {
+            const neighbor = grid.getNeighbor(cell, direction);
+            if (neighbor.regionID !== regionID || neighbor.contourFlags === 2) {
               continue;
             }
-            neighborDistance--;
-          } else if (direction === antiBorderDirection) {
-            // This neighbor is further away from the border.
-            neighborDistance++;
-          }
-          // Transfer the neighbor to the new region.
-          neighbor.regionID = newRegionID;
-          neighbor.distanceToRegionCore = 0; // This information is lost.
 
-          // Add the cell to the stack to be processed.
-          workingOpenCells.push(neighbor);
-          workingBorderDistance.push(neighborDistance);
+            // Transfer the neighbor to the new region.
+            neighbor.regionID = newRegionID;
+            neighbor.distanceToRegionCore = 0; // This information is lost.
+
+            workingOpenCells.push(neighbor);
+          }
         }
+
+        // This allows to flood the nearest cells first without needing lifo queue.
+        // But a queue would take less memory.
+        swap = upLeftOpenCells;
+        upLeftOpenCells = workingOpenCells;
+        workingOpenCells = swap;
+        workingOpenCells.length = 0;
+
+        for (const cell of downRightOpenCells) {
+          for (let direction = 0; direction < 4; direction++) {
+            const neighbor = grid.getNeighbor(cell, direction);
+            if (neighbor.regionID !== regionID || neighbor.contourFlags === 2) {
+              continue;
+            }
+
+            // Keep the neighbor to the current region.
+            neighbor.contourFlags = 2;
+            neighbor.distanceToRegionCore = 0; // This information is lost.
+
+            workingOpenCells.push(neighbor);
+          }
+        }
+
+        swap = downRightOpenCells;
+        downRightOpenCells = workingOpenCells;
+        workingOpenCells = swap;
+        workingOpenCells.length = 0;
       }
     }
 
@@ -2471,7 +2508,8 @@ namespace gdjs {
     private static processNullRegion(
       grid: RasterizationGrid,
       startCell: RasterizationCell,
-      startDirection: integer
+      startDirection: integer,
+      extremeCells: [RasterizationCell | null, RasterizationCell | null]
     ): boolean {
       // This algorithm traverses the contour. As it does so, it detects
       // and fixes various known dangerous cell configurations.
@@ -2501,6 +2539,9 @@ namespace gdjs {
       let neighbor: RasterizationCell | null = null;
       let direction = startDirection;
 
+      let upLeftCell = cell;
+      let downRightCell = cell;
+
       // Initialize monitoring variables.
       let loopCount = 0;
       let acuteCornerCount = 0;
@@ -2521,8 +2562,7 @@ namespace gdjs {
       // multiple times, killing performance.
       while (++loopCount < 1 << 30) {
         // Get the cell across the border.
-        const delta = RasterizationGrid.neighbor4Deltas[direction];
-        neighbor = grid.get(cell.x + delta.x, cell.y + delta.y);
+        neighbor = grid.getNeighbor(cell, direction);
 
         // Detect which type of edge this direction points across.
         if (neighbor === null) {
@@ -2591,9 +2631,24 @@ namespace gdjs {
           direction = (direction + 3) & 0x3; // Rotate counterclockwise direction.
           borderSeenLastLoop = false;
           stepsWithoutBorder++;
+
+          if (
+            cell.x < upLeftCell.x ||
+            (cell.x === upLeftCell.x && cell.y < upLeftCell.y)
+          ) {
+            upLeftCell = cell;
+          }
+          if (
+            cell.x > downRightCell.x ||
+            (cell.x === downRightCell.x && cell.y > downRightCell.y)
+          ) {
+            downRightCell = cell;
+          }
         }
 
         if (startCell === cell && startDirection === direction) {
+          extremeCells[0] = upLeftCell;
+          extremeCells[1] = downRightCell;
           // Have returned to the original cell and direction.
           // The search is complete.
           // Is the obstacle region inside the contour?

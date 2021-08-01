@@ -171,30 +171,28 @@ export default function NewInstructionEditorDialog({
     : undefined;
 
   const renderInstructionOrObjectSelector = () => (
-    <Background noFullHeight key="instruction-or-object-selector">
-      <InstructionOrObjectSelector
-        style={styles.fullHeightSelector}
-        project={project}
-        scope={scope}
-        currentTab={currentInstructionOrObjectSelectorTab}
-        onChangeTab={setCurrentInstructionOrObjectSelectorTab}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        isCondition={isCondition}
-        chosenInstructionType={!chosenObjectName ? instructionType : undefined}
-        onChooseInstruction={(instructionType: string) => {
-          chooseInstruction(instructionType);
-          setStep('parameters');
-        }}
-        chosenObjectName={chosenObjectName}
-        onChooseObject={(chosenObjectName: string) => {
-          chooseObject(chosenObjectName);
-          setStep('object-instructions');
-        }}
-        focusOnMount={!instructionType}
-        onSearchStartOrReset={forceUpdate}
-      />
-    </Background>
+    <InstructionOrObjectSelector
+      style={styles.fullHeightSelector}
+      project={project}
+      scope={scope}
+      currentTab={currentInstructionOrObjectSelectorTab}
+      onChangeTab={setCurrentInstructionOrObjectSelectorTab}
+      globalObjectsContainer={globalObjectsContainer}
+      objectsContainer={objectsContainer}
+      isCondition={isCondition}
+      chosenInstructionType={!chosenObjectName ? instructionType : undefined}
+      onChooseInstruction={(instructionType: string) => {
+        chooseInstruction(instructionType);
+        setStep('parameters');
+      }}
+      chosenObjectName={chosenObjectName}
+      onChooseObject={(chosenObjectName: string) => {
+        chooseObject(chosenObjectName);
+        setStep('object-instructions');
+      }}
+      focusOnMount={!instructionType}
+      onSearchStartOrReset={forceUpdate}
+    />
   );
 
   const renderParameters = () => (
@@ -290,6 +288,9 @@ export default function NewInstructionEditorDialog({
           maxWidth={false}
           noMargin
           flexRowBody
+          fullHeight={
+            true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
+          }
         >
           <SelectColumns
             columnsRenderer={{

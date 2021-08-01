@@ -81,7 +81,6 @@ type Props = {|
 |};
 
 const iconSize = 24;
-const minHeight = 400; // Avoid a super small list in empty scenes. 400 is enough to be displayed on an iPhone SE.
 
 export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
@@ -232,7 +231,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               <div
                 style={{
                   backgroundColor: muiTheme.list.itemsBackgroundColor,
-                  minHeight,
+                  minHeight: 0,
                   ...style,
                 }}
               >

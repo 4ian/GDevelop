@@ -106,6 +106,7 @@ export const ExtensionStore = ({
                 getSearchItemUniqueId={getExtensionName}
                 renderSearchItem={(extensionShortHeader, onHeightComputed) => (
                   <ExtensionListItem
+                    key={extensionShortHeader.name}
                     project={project}
                     onHeightComputed={onHeightComputed}
                     extensionShortHeader={extensionShortHeader}

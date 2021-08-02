@@ -122,6 +122,7 @@ namespace gdjs {
         gdjs.RegionGenerator.generateDistanceField(grid);
         gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
         //TODO make threshold configurable ?
+        // 1 seems to be a good value.
         const threshold = 1;
         const contours = gdjs.ContourBuilder.buildContours(grid, threshold);
         const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(

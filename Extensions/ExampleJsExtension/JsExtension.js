@@ -159,7 +159,6 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      console.log("updateProperty: " + propertyName);
       if (propertyName === 'My first property') {
         behaviorContent.setStringAttribute('property1', newValue);
         return true;

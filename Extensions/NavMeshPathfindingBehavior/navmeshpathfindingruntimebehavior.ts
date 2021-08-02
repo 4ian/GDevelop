@@ -319,7 +319,18 @@ namespace gdjs {
 
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
-        //shapePainter.setFillColor(Math.floor(Math.random() * 256) + ";" + Math.floor(Math.random() * 256) + ";" + Math.floor(Math.random() * 256));
+        if (polygon.length === 0) continue;
+        for (let index = 1; index < polygon.length; index++) {
+          shapePainter.drawCircle(
+            polygon[index].x,
+            polygon[index].y / this._manager._isometricRatio,
+            3
+          );
+        }
+      }
+      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
+        const polygon = navPoly.getPoints();
+        if (polygon.length === 0) continue;
         shapePainter.beginFillPath(
           polygon[0].x,
           polygon[0].y / this._manager._isometricRatio
@@ -335,6 +346,7 @@ namespace gdjs {
       }
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
+        if (polygon.length === 0) continue;
         shapePainter.drawPathMoveTo(
           polygon[0].x,
           polygon[0].y / this._manager._isometricRatio

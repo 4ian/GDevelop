@@ -2,8 +2,8 @@
 describe('gdjs.NavMeshGeneration', function () {
   // When adding a new case, both can be invert to easily copy/paste results.
   // It's also useful for debugging.
-  const logsResults = true;
-  const checksResults = false;
+  const logsResults = false;
+  const checksResults = true;
 
   let createDiamond = (runtimeScene) => {
     const diamond = new gdjs.SpriteRuntimeObject(runtimeScene, {

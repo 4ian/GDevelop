@@ -23,9 +23,9 @@ namespace gdjs {
       );
       return reflectionFilter;
     },
-    update: function (filter, layer) {
+    update: function (filter, target) {
       if (filter.animationSpeed !== 0) {
-        filter.time += (layer.getElapsedTime() / 1000) * filter.animationSpeed;
+        filter.time += (target.getElapsedTime(target.getRuntimeScene()) / 1000) * filter.animationSpeed;
       }
     },
     updateDoubleParameter: function (filter, parameterName, value) {

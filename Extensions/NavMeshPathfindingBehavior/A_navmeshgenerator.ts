@@ -1274,9 +1274,13 @@ namespace gdjs {
                 const neighborContour = contoursByRegion[commonVertex.region];
                 if (!neighborContour) {
                   errorFound = true;
-                  console.warn(
-                    'contour already discarded: ' + commonVertex.region
-                  );
+                  if (
+                    commonVertex.region !== RasterizationCell.OBSTACLE_REGION_ID
+                  ) {
+                    console.warn(
+                      'contour already discarded: ' + commonVertex.region
+                    );
+                  }
                   break;
                 }
 
@@ -3164,7 +3168,71 @@ namespace gdjs {
       // This implementation differ with the following:
       // - it handles float vertices
       //   so it focus on pixels center
+      // - it is conservative to thin vertical or horizontal polygons
 
+      let fillAnyPixels = false;
+      ObstacleRasterizer.scanY(
+        vertices,
+        minX,
+        maxX,
+        minY,
+        maxY,
+        workingNodes,
+        (pixelY: integer, minX: float, maxX: float) => {
+          for (let pixelX = minX; pixelX < maxX; pixelX++) {
+            fillAnyPixels = true;
+            fill(pixelX, pixelY);
+          }
+        }
+      );
+
+      if (fillAnyPixels) {
+        return;
+      }
+
+      ObstacleRasterizer.scanY(
+        vertices,
+        minX,
+        maxX,
+        minY,
+        maxY,
+        workingNodes,
+        (pixelY: integer, minX: float, maxX: float) => {
+          // conserve thin (less than one cell large) horizontal polygons
+          if (minX === maxX) {
+            fill(minX, pixelY);
+          }
+        }
+      );
+
+      ObstacleRasterizer.scanX(
+        vertices,
+        minX,
+        maxX,
+        minY,
+        maxY,
+        workingNodes,
+        (pixelX: integer, minY: float, maxY: float) => {
+          for (let pixelY = minY; pixelY < maxY; pixelY++) {
+            fill(pixelX, pixelY);
+          }
+          // conserve thin (less than one cell large) vertical polygons
+          if (minY === maxY) {
+            fill(pixelX, minY);
+          }
+        }
+      );
+    }
+
+    private static scanY(
+      vertices: Point[],
+      minX: integer,
+      maxX: integer,
+      minY: integer,
+      maxY: integer,
+      workingNodes: number[],
+      checkAndFillY: (pixelY: integer, minX: float, maxX: float) => void
+    ) {
       //  Loop through the rows of the image.
       for (let pixelY = minY; pixelY < maxY; pixelY++) {
         const pixelCenterY = pixelY + 0.5;
@@ -3205,22 +3273,85 @@ namespace gdjs {
 
         //  Fill the pixels between node pairs.
         for (let i = 0; i < workingNodes.length; i += 2) {
-          if (workingNodes[i] >= maxX) break;
-          if (workingNodes[i + 1] > minX) {
-            if (workingNodes[i] < minX) {
-              workingNodes[i] = minX;
-            }
-            if (workingNodes[i + 1] > maxX) {
-              workingNodes[i + 1] = maxX;
-            }
-            for (
-              let pixelX = workingNodes[i];
-              pixelX < workingNodes[i + 1];
-              pixelX++
-            ) {
-              fill(pixelX, pixelY);
+          if (workingNodes[i] >= maxX) {
+            break;
+          }
+          if (workingNodes[i + 1] <= minX) {
+            continue;
+          }
+          if (workingNodes[i] < minX) {
+            workingNodes[i] = minX;
+          }
+          if (workingNodes[i + 1] > maxX) {
+            workingNodes[i + 1] = maxX;
+          }
+          checkAndFillY(pixelY, workingNodes[i], workingNodes[i + 1]);
+        }
+      }
+    }
+
+    private static scanX(
+      vertices: Point[],
+      minX: integer,
+      maxX: integer,
+      minY: integer,
+      maxY: integer,
+      workingNodes: number[],
+      checkAndFillX: (pixelX: integer, minY: float, maxY: float) => void
+    ) {
+      //  Loop through the columns of the image.
+      for (let pixelX = minX; pixelX < maxX; pixelX++) {
+        const pixelCenterX = pixelX + 0.5;
+        //  Build a list of nodes.
+        workingNodes.length = 0;
+        let j = vertices.length - 1;
+        for (let i = 0; i < vertices.length; i++) {
+          if (
+            (vertices[i].x < pixelCenterX && pixelCenterX < vertices[j].x) ||
+            (vertices[j].x < pixelCenterX && pixelCenterX < vertices[i].x)
+          ) {
+            workingNodes.push(
+              Math.round(
+                vertices[i].y +
+                  ((pixelCenterX - vertices[i].x) /
+                    (vertices[j].x - vertices[i].x)) *
+                    (vertices[j].y - vertices[i].y)
+              )
+            );
+          }
+          j = i;
+        }
+
+        //  Sort the nodes, via a simple “Bubble” sort.
+        {
+          let i = 0;
+          while (i < workingNodes.length - 1) {
+            if (workingNodes[i] > workingNodes[i + 1]) {
+              const swap = workingNodes[i];
+              workingNodes[i] = workingNodes[i + 1];
+              workingNodes[i + 1] = swap;
+              if (i > 0) i--;
+            } else {
+              i++;
             }
           }
+        }
+
+        //  Fill the pixels between node pairs.
+        for (let i = 0; i < workingNodes.length; i += 2) {
+          if (workingNodes[i] >= maxY) {
+            break;
+          }
+          if (workingNodes[i + 1] <= minY) {
+            continue;
+          }
+          if (workingNodes[i] < minY) {
+            workingNodes[i] = minY;
+          }
+          if (workingNodes[i + 1] > maxY) {
+            workingNodes[i + 1] = maxY;
+          }
+          checkAndFillX(pixelX, workingNodes[i], workingNodes[i + 1]);
         }
       }
     }

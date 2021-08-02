@@ -2,8 +2,8 @@
 describe('gdjs.NavMeshGeneration', function () {
   // When adding a new case, both can be invert to easily copy/paste results.
   // It's also useful for debugging.
-  const logsResults = false;
-  const checksResults = true;
+  const logsResults = true;
+  const checksResults = false;
 
   let createDiamond = (runtimeScene) => {
     const diamond = new gdjs.SpriteRuntimeObject(runtimeScene, {
@@ -241,8 +241,6 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    // The flooding will make every cell in only one region.
-    // This region is splitted in 2 by ObstacleRegionBordersCleaner.partialFloodRegion
     gdjs.RegionGenerator.generateRegions(grid, 0);
     checkRegions(
       grid, //
@@ -347,8 +345,6 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    // The flooding will make every cell in only one region.
-    // This region is splitted in 2 by ObstacleRegionBordersCleaner.partialFloodRegion
     gdjs.RegionGenerator.generateRegions(grid, 0);
     checkRegions(
       grid, //
@@ -715,7 +711,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    // The flooding will make every cell in only one region.
+    // The flooding will make every cell in one region.
     // This region is splitted in 2 by ObstacleRegionBordersCleaner.partialFloodRegion
     gdjs.RegionGenerator.generateRegions(grid, 0);
     checkRegions(
@@ -1069,9 +1065,7 @@ describe('gdjs.NavMeshGeneration', function () {
     );
   });
 
-  // We could scan a 2nd time on X, but I'm not sure that's worth it.
-  // Obstacles will just have to be larger than on cell.
-  it.skip('can build a mesh for a plus thinner than the cell size', function () {
+  it('can build a mesh for a plus thinner than the cell size', function () {
     const runtimeScene = makeTestRuntimeScene();
     const horizontalRectangle = createRectangle(runtimeScene, 160, 5);
     horizontalRectangle.setPosition(160, 160);
@@ -1079,7 +1073,7 @@ describe('gdjs.NavMeshGeneration', function () {
     verticalRectangle.setPosition(160, 160);
     runtimeScene.renderAndStep(1000 / 60);
 
-    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 10, 10);
+    const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
     gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
       horizontalRectangle,
@@ -1143,8 +1137,8 @@ describe('gdjs.NavMeshGeneration', function () {
         '.11111111.2222222.\n' +
         '.11111111.2222222.\n' +
         '.1111........2222.\n' +
+        '.11133333.4444222.\n' +
         '.11333333.4444444.\n' +
-        '.33333333.4444444.\n' +
         '.33333333.4444444.\n' +
         '.3333333334444444.\n' +
         '.3333333334444444.\n' +
@@ -1158,7 +1152,7 @@ describe('gdjs.NavMeshGeneration', function () {
       contours.map((polygon) => polygon.map((point) => [point.x, point.y])),
       [
         [
-          [1, 11],
+          [1, 12],
           [5, 10],
           [9, 9],
           [10, 5],
@@ -1169,12 +1163,12 @@ describe('gdjs.NavMeshGeneration', function () {
           [10, 5],
           [10, 9],
           [13, 10],
-          [17, 10],
+          [17, 11],
           [17, 1],
           [11, 1],
         ],
         [
-          [1, 11],
+          [1, 12],
           [1, 17],
           [10, 17],
           [10, 13],
@@ -1185,7 +1179,7 @@ describe('gdjs.NavMeshGeneration', function () {
           [10, 13],
           [10, 17],
           [17, 17],
-          [17, 10],
+          [17, 11],
           [13, 10],
           [10, 10],
         ],
@@ -1211,13 +1205,13 @@ describe('gdjs.NavMeshGeneration', function () {
           [10, 5],
           [11, 1],
           [1, 1],
-          [1, 11],
+          [1, 12],
         ],
         [
           [10, 5],
           [10, 9],
           [13, 10],
-          [17, 10],
+          [17, 11],
           [17, 1],
           [11, 1],
         ],
@@ -1225,7 +1219,7 @@ describe('gdjs.NavMeshGeneration', function () {
           [10, 13],
           [9, 10],
           [5, 10],
-          [1, 11],
+          [1, 12],
           [1, 17],
           [10, 17],
         ],
@@ -1235,7 +1229,7 @@ describe('gdjs.NavMeshGeneration', function () {
           [10, 13],
         ],
         [
-          [17, 10],
+          [17, 11],
           [13, 10],
           [10, 13],
           [10, 17],
@@ -1264,13 +1258,13 @@ describe('gdjs.NavMeshGeneration', function () {
           [180, 80],
           [200, 0],
           [0, 0],
-          [0, 200],
+          [0, 220],
         ],
         [
           [180, 80],
           [180, 160],
           [240, 180],
-          [320, 180],
+          [320, 200],
           [320, 0],
           [200, 0],
         ],
@@ -1278,7 +1272,7 @@ describe('gdjs.NavMeshGeneration', function () {
           [180, 240],
           [160, 180],
           [80, 180],
-          [0, 200],
+          [0, 220],
           [0, 320],
           [180, 320],
         ],
@@ -1288,7 +1282,7 @@ describe('gdjs.NavMeshGeneration', function () {
           [180, 240],
         ],
         [
-          [320, 180],
+          [320, 200],
           [240, 180],
           [180, 240],
           [180, 320],

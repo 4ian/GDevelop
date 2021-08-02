@@ -1,6 +1,6 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
       return kawaseBlurFilter;
     },

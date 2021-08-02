@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.NavMeshPathfindingBehavior', function () {
+describe('gdjs.NavMeshPathfindingBehavior', function () {
   const pathFindingName = 'auto1';
 
   const createScene = () => {

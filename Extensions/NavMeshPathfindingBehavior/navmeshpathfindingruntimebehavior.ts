@@ -49,8 +49,9 @@ namespace gdjs {
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
       this._extraBorder = behaviorData.extraBorder;
-      this._manager =
-        gdjs.NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      this._manager = gdjs.NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {

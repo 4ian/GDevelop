@@ -2326,8 +2326,10 @@ namespace gdjs {
       workingDownRightOpenCells.length = 0;
       const workingOpenCells = new Array<RasterizationCell>(512);
       workingOpenCells.length = 0;
-      const extremeCells: [RasterizationCell | null, RasterizationCell | null] =
-        [null, null];
+      const extremeCells: [
+        RasterizationCell | null,
+        RasterizationCell | null
+      ] = [null, null];
 
       let nextRegionID = grid.regionCount;
 
@@ -2352,8 +2354,10 @@ namespace gdjs {
           }
           // This is a obstacle region cell. See if it
           // connects to a cell in a non-obstacle region.
-          edgeDirection =
-            ObstacleRegionBordersCleaner.getNonNullBorderDirection(grid, cell);
+          edgeDirection = ObstacleRegionBordersCleaner.getNonNullBorderDirection(
+            grid,
+            cell
+          );
           if (edgeDirection === -1)
             // This cell is not a border cell. Ignore it.
             continue;
@@ -2366,13 +2370,12 @@ namespace gdjs {
           // Process the obstacle region contour. Detect and fix
           // local issues. Determine if the region is
           // fully encompassed by a single non-obstacle region.
-          const isEncompassedNullRegion =
-            ObstacleRegionBordersCleaner.processNullRegion(
-              grid,
-              workingCell,
-              edgeDirection,
-              extremeCells
-            );
+          const isEncompassedNullRegion = ObstacleRegionBordersCleaner.processNullRegion(
+            grid,
+            workingCell,
+            edgeDirection,
+            extremeCells
+          );
 
           if (isEncompassedNullRegion) {
             // This cell is part of a group of obstacle region cells
@@ -2872,10 +2875,8 @@ namespace gdjs {
       // Next we check the region opposite from the corner direction.
       // If it is the current region, then we definitely can't
       // change the region id without risk of splitting the region.
-      regionID = grid.getNeighbor(
-        referenceCell,
-        (cornerDirection + 2) & 0x3
-      ).regionID;
+      regionID = grid.getNeighbor(referenceCell, (cornerDirection + 2) & 0x3)
+        .regionID;
       if (
         regionID === referenceCell.regionID ||
         regionID === RasterizationCell.OBSTACLE_REGION_ID

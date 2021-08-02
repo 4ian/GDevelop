@@ -88,15 +88,36 @@ describe('gdjs.NavMeshGeneration', function () {
   const makeTestRuntimeScene = () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
+      // @ts-ignore - missing properties.
+      properties: { windowWidth: 800, windowHeight: 600 },
       resources: {
         resources: [],
       },
-      properties: { windowWidth: 800, windowHeight: 600 },
     });
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
-      layers: [{ name: '', visibility: true, effects: [] }],
+      layers: [
+        {
+          name: '',
+          visibility: true,
+          effects: [],
+          cameras: [],
+
+          ambientLightColorR: 0,
+          ambientLightColorG: 0,
+          ambientLightColorB: 0,
+          isLightingLayer: false,
+          followBaseLayerCamera: true,
+        },
+      ],
       variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
       behaviorsSharedData: [],
       objects: [],
       instances: [],
@@ -195,7 +216,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [rectangle]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, new Set([rectangle]));
     checkObstacles(
       grid, //
       '##################\n' +
@@ -299,7 +320,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, []);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, new Set());
     checkObstacles(
       grid, //
       '..................\n' +
@@ -427,7 +448,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 10, 10);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [rectangle]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, new Set([rectangle]));
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -662,10 +683,10 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
-      horizontalRectangle,
-      verticalRectangle,
-    ]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(
+      grid,
+      new Set([horizontalRectangle, verticalRectangle])
+    );
     checkObstacles(
       grid, //
       '..................\n' +
@@ -748,10 +769,10 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 10, 10);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
-      horizontalRectangle,
-      verticalRectangle,
-    ]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(
+      grid,
+      new Set([horizontalRectangle, verticalRectangle])
+    );
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -1075,10 +1096,10 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
-      horizontalRectangle,
-      verticalRectangle,
-    ]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(
+      grid,
+      new Set([horizontalRectangle, verticalRectangle])
+    );
     checkObstacles(
       grid, //
       '..................\n' +
@@ -1304,10 +1325,10 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 10, 10);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [
-      horizontalRectangle,
-      verticalRectangle,
-    ]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(
+      grid,
+      new Set([horizontalRectangle, verticalRectangle])
+    );
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -1691,7 +1712,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [diamond]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, new Set([diamond]));
     checkObstacles(
       grid, //
       '..................\n' +
@@ -1900,7 +1921,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const grid = new gdjs.RasterizationGrid(0, 0, 320, 320, 20, 20);
 
-    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, [diamond]);
+    gdjs.ObstacleRasterizer.rasterizeObstacles(grid, new Set([diamond]));
     checkObstacles(
       grid, //
       '..................\n' +

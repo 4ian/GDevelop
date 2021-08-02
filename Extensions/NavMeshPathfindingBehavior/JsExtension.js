@@ -22,7 +22,7 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 const declarePathfindingBehavior = function (
   _ /*: (string) => string */,
   gd /*: libGDevelop */,
-  extension /*: PlatformExtension */
+  extension /*: gdPlatformExtension */
 ) {
   const pathfindingBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -263,8 +263,7 @@ const declarePathfindingBehavior = function (
       _('the speed of the object on the path'),
       _('the speed on the path'),
       _('Movement on the path (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -283,8 +282,7 @@ const declarePathfindingBehavior = function (
       _('the acceleration when moving the object'),
       _('the acceleration on the path'),
       _('Pathfinding configuration (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -303,8 +301,7 @@ const declarePathfindingBehavior = function (
       _('the maximum speed when moving the object'),
       _('the max. speed on the path'),
       _('Pathfinding configuration (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -323,8 +320,7 @@ const declarePathfindingBehavior = function (
       _('the maximum angular speed when moving the object'),
       _('the max. angular speed on the path'),
       _('Pathfinding configuration (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -343,8 +339,7 @@ const declarePathfindingBehavior = function (
       _('the rotation offset applied when moving the object'),
       _('the rotation offset on the path'),
       _('Pathfinding configuration (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -365,8 +360,7 @@ const declarePathfindingBehavior = function (
       ),
       _('the size of the extra border on the path'),
       _('Pathfinding configuration (NavMesh)'),
-      'CppPlatform/Extensions/AStaricon24.png',
-      'CppPlatform/Extensions/AStaricon16.png'
+      'CppPlatform/Extensions/AStaricon24.png'
     )
     .addParameter('object', _('Object'), '', false)
     .addParameter(
@@ -622,7 +616,7 @@ const declarePathfindingBehavior = function (
 const declareObstacleBehavior = function (
   _ /*: (string) => string */,
   gd /*: libGDevelop */,
-  extension /*: PlatformExtension */
+  extension /*: gdPlatformExtension */
 ) {
   //TODO Add some kind of layer to select the obstacles for an object?
   const pathfindingObstacleBehavior = new gd.BehaviorJsImplementation();

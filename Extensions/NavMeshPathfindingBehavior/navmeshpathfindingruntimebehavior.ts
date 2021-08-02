@@ -313,6 +313,8 @@ namespace gdjs {
      * @param shapePainter
      */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
+      //TODO should it check that shapePainter is not null?
+
       //TODO use the clear action function when it's added
       shapePainter._renderer.clear();
       //TODO Remove when the shape painter is fixed to update outline and fill at start.

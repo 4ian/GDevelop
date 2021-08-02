@@ -89,6 +89,12 @@ namespace gdjs {
       }
     }
 
+    /**
+     *
+     * @param position the position on the scene
+     * @param gridPosition the position on the grid
+     * @returns the position on the grid
+     */
     convertToGridBasis(position: Point, gridPosition: Point) {
       gridPosition.x = (position.x - this.originX) / this.cellWidth;
       gridPosition.y = (position.y - this.originY) / this.cellHeight;
@@ -97,14 +103,13 @@ namespace gdjs {
 
     /**
      *
-     * @param gridPosition
-     * @param position
-     * @param scaleY used for isometry
-     * @returns
+     * @param gridPosition the position on the grid
+     * @param position the position on the scene
+     * @returns the position on the scene
      */
-    convertFromGridBasis(gridPosition: Point, position: Point, scaleY: float) {
+    convertFromGridBasis(gridPosition: Point, position: Point) {
       position.x = gridPosition.x * this.cellWidth + this.originX;
-      position.y = (gridPosition.y * this.cellHeight + this.originY) * scaleY;
+      position.y = gridPosition.y * this.cellHeight + this.originY;
       return position;
     }
 
@@ -164,6 +169,13 @@ namespace gdjs {
   };
 
   export class GridCoordinateConverter {
+    /**
+     *
+     * @param gridPosition the position on the grid
+     * @param position the position on the scene
+     * @param scaleY for isometry
+     * @returns the position on the scene
+     */
     public static convertFromGridBasis(
       grid: RasterizationGrid,
       polygons: Point[][],
@@ -171,9 +183,12 @@ namespace gdjs {
     ): Point[][] {
       // point can be shared so them must be copied to be scaled.
       return polygons.map((polygon) =>
-        polygon.map((point) =>
-          grid.convertFromGridBasis(point, { x: 0, y: 0 }, scaleY)
-        )
+        polygon.map((point) => {
+          const scenePoint = { x: 0, y: 0 };
+          grid.convertFromGridBasis(point, scenePoint);
+          scenePoint.y *= scaleY;
+          return scenePoint;
+        })
       );
     }
   }

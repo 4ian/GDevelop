@@ -33,7 +33,7 @@ namespace gdjs {
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
    * (because gdjs.RuntimeObject don't call onCreated at the end of its constructor).
    */
-  export class RuntimeObject {
+  export class RuntimeObject implements EffectsTarget {
     name: string;
     type: string;
     x: float = 0;
@@ -210,7 +210,11 @@ namespace gdjs {
     getElapsedTime(runtimeScene: gdjs.RuntimeScene): float {
       //TODO: Memoize?
       const theLayer = runtimeScene.getLayer(this.layer);
-      return theLayer.getElapsedTime();
+      return theLayer.getElapsedTime(runtimeScene);
+    }
+
+    getRuntimeScene(): RuntimeScene {
+      return this._runtimeScene;
     }
 
     /**

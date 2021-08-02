@@ -8,6 +8,13 @@ namespace gdjs {
 
   type RendererEffects = Record<string, PixiFiltersTools.Filter>;
 
+  export interface EffectsTarget {
+    getRuntimeScene: () => RuntimeScene;
+    getElapsedTime: (runtimeScene: RuntimeScene) => number;
+    getHeight: () => number;
+    getWidth: () => number; 
+  };
+
   class PixiObjectEffectsManager {
     /**
      * Initialize the renderer effects from the effect data.
@@ -18,7 +25,7 @@ namespace gdjs {
     initializeEffect(
       effectData: EffectData,
       rendererEffects: RendererEffects,
-      layer: Layer
+      target: EffectsTarget
     ): boolean {
       const filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
         effectData.effectType
@@ -35,7 +42,7 @@ namespace gdjs {
       }
 
       const filter: PixiFiltersTools.Filter = {
-        pixiFilter: filterCreator.makePIXIFilter(layer, effectData),
+        pixiFilter: filterCreator.makePIXIFilter(target, effectData),
         updateDoubleParameter: filterCreator.updateDoubleParameter,
         updateStringParameter: filterCreator.updateStringParameter,
         updateBooleanParameter: filterCreator.updateBooleanParameter,

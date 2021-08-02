@@ -9,7 +9,7 @@ namespace gdjs {
    *
    * Viewports and multiple cameras are not supported.
    */
-  export class Layer {
+  export class Layer implements EffectsTarget {
     _name: string;
     _cameraRotation: float = 0;
     _zoomFactor: float = 1;
@@ -463,9 +463,9 @@ namespace gdjs {
      * Return the time elapsed since the last frame,
      * in milliseconds, for objects on the layer.
      */
-    getElapsedTime(): float {
+    getElapsedTime(runtimeScene: RuntimeScene): float {
       return (
-        this._runtimeScene.getTimeManager().getElapsedTime() * this._timeScale
+        runtimeScene.getTimeManager().getElapsedTime() * this._timeScale
       );
     }
 

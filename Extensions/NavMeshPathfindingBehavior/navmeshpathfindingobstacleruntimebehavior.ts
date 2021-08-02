@@ -71,8 +71,9 @@ namespace gdjs {
     static getManager(runtimeScene: any): NavMeshPathfindingObstaclesManager {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
-        runtimeScene.pathfindingObstaclesManager =
-          new gdjs.NavMeshPathfindingObstaclesManager(runtimeScene);
+        runtimeScene.pathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
+          runtimeScene
+        );
       }
       return runtimeScene.pathfindingObstaclesManager;
     }
@@ -97,8 +98,9 @@ namespace gdjs {
     }
 
     public static invalidateNavMesh(runtimeScene: any) {
-      const manager =
-        NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
       manager.invalidateNavMesh();
     }
 
@@ -130,12 +132,11 @@ namespace gdjs {
           16
         );
         // scaleY = isometricRatio to keep the same unit length on the 2 axis for the pathfinding
-        const scaledMeshField =
-          gdjs.GridCoordinateConverter.convertFromGridBasis(
-            grid,
-            meshField,
-            this._isometricRatio
-          );
+        const scaledMeshField = gdjs.GridCoordinateConverter.convertFromGridBasis(
+          grid,
+          meshField,
+          this._isometricRatio
+        );
         navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
       }
@@ -161,8 +162,9 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
-      this._manager =
-        NavMeshPathfindingObstaclesManager.getManager(runtimeScene);
+      this._manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
 
       //Note that we can't use getX(), getWidth()... of owner here:
       //The owner is not yet fully constructed.

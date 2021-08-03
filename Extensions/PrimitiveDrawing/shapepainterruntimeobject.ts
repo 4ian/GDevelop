@@ -148,9 +148,16 @@ namespace gdjs {
     stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
-        this._renderer.clear();
+        this.clear();
       }
       super.stepBehaviorsPreEvents(runtimeScene);
+    }
+
+    /**
+     * Clear the graphics.
+     */
+    clear() {
+      this._renderer.clear();
     }
 
     getVisibilityAABB() {

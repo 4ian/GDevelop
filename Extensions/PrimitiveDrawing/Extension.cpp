@@ -375,6 +375,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddScopedAction(
+         "ClearShapes",
+         _("Clear shapes"),
+         _("Clear the rendered shape."),
+         _("Clear the rendered image of _PARAM0_"),
+         _("Advanced"),
+         "res/actions/visibilite24.png",
+         "res/actions/visibilite.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer");
+
   obj.AddAction(
          "ClearBetweenFrames",
          _("Clear between frames"),

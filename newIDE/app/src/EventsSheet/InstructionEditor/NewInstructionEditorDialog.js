@@ -171,6 +171,7 @@ export default function NewInstructionEditorDialog({
 
   const renderInstructionOrObjectSelector = () => (
     <InstructionOrObjectSelector
+      key="instruction-or-object-selector"
       style={styles.fullHeightSelector}
       project={project}
       scope={scope}

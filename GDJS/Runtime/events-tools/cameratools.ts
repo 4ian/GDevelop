@@ -17,7 +17,7 @@ namespace gdjs {
         }
         runtimeScene.getLayer(layer).setCameraX(x, cameraId);
       };
-      
+
       export const setCameraY = function (
         runtimeScene: gdjs.RuntimeScene,
         y: float,

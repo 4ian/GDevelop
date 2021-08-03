@@ -11,6 +11,7 @@ namespace gdjs {
       ) {
         return runtimeScene.getSoundManager().getGlobalVolume();
       };
+
       export const setGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         globalVolume: float
@@ -34,6 +35,7 @@ namespace gdjs {
           .getSoundManager()
           .playSound(soundFile, loop, volume, pitch);
       };
+
       export const playSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         soundFile: string,
@@ -46,6 +48,7 @@ namespace gdjs {
           .getSoundManager()
           .playSoundOnChannel(soundFile, channel, loop, volume, pitch);
       };
+
       export const stopSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -53,6 +56,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         sound && sound.stop();
       };
+
       export const pauseSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -60,6 +64,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         sound && sound.pause();
       };
+
       export const continueSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -69,6 +74,7 @@ namespace gdjs {
           sound.play();
         }
       };
+
       export const isSoundOnChannelPlaying = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -76,6 +82,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.playing() : false;
       };
+
       export const isSoundOnChannelPaused = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -83,6 +90,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.paused() : false;
       };
+
       export const isSoundOnChannelStopped = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -90,6 +98,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.stopped() : true;
       };
+
       export const getSoundOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -97,6 +106,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.getVolume() * 100 : 100;
       };
+
       export const setSoundOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
@@ -105,6 +115,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         sound && sound.setVolume(volume / 100);
       };
+
       export const getSoundOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -112,6 +123,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.getSeek() : 0;
       };
+
       export const setSoundOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
@@ -120,6 +132,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         sound && sound.setSeek(playingOffset);
       };
+
       export const getSoundOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -127,6 +140,7 @@ namespace gdjs {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.getRate() : 1;
       };
+
       export const setSoundOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
@@ -164,6 +178,7 @@ namespace gdjs {
           .getSoundManager()
           .playMusic(soundFile, loop, volume, pitch);
       };
+
       export const playMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         soundFile: string,
@@ -176,6 +191,7 @@ namespace gdjs {
           .getSoundManager()
           .playMusicOnChannel(soundFile, channel, loop, volume, pitch);
       };
+
       export const stopMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -183,6 +199,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         music && music.stop();
       };
+
       export const pauseMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -190,6 +207,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         music && music.pause();
       };
+
       export const continueMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -199,6 +217,7 @@ namespace gdjs {
           music.play();
         }
       };
+
       export const isMusicOnChannelPlaying = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -206,6 +225,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.playing() : false;
       };
+
       export const isMusicOnChannelPaused = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -213,6 +233,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.paused() : false;
       };
+
       export const isMusicOnChannelStopped = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -220,6 +241,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.stopped() : true;
       };
+
       export const getMusicOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -227,6 +249,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.getVolume() * 100 : 100;
       };
+
       export const setMusicOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
@@ -235,6 +258,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         music && music.setVolume(volume / 100);
       };
+
       export const getMusicOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -242,6 +266,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.getSeek() : 0;
       };
+
       export const setMusicOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
@@ -250,6 +275,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         music && music.setSeek(playingOffset);
       };
+
       export const getMusicOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
@@ -257,6 +283,7 @@ namespace gdjs {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.getRate() : 1;
       };
+
       export const setMusicOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,

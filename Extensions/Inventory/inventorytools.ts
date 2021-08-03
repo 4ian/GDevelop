@@ -18,15 +18,19 @@ namespace gdjs {
       export const add = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).add(name);
       };
+
       export const remove = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).remove(name);
       };
+
       export const count = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).count(name);
       };
+
       export const has = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).has(name);
       };
+
       export const setMaximum = function (
         runtimeScene,
         inventoryName,
@@ -38,6 +42,7 @@ namespace gdjs {
           maxCount
         );
       };
+
       export const setUnlimited = function (
         runtimeScene,
         inventoryName,
@@ -49,20 +54,24 @@ namespace gdjs {
           enable
         );
       };
+
       export const isFull = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).isFull(name);
       };
+
       export const equip = function (runtimeScene, inventoryName, name, equip) {
         return InventoryManager.get(runtimeScene, inventoryName).equip(
           name,
           equip
         );
       };
+
       export const isEquipped = function (runtimeScene, inventoryName, name) {
         return InventoryManager.get(runtimeScene, inventoryName).isEquipped(
           name
         );
       };
+
       export const serializeToVariable = function (
         runtimeScene,
         inventoryName: string,
@@ -81,6 +90,7 @@ namespace gdjs {
           serializedItem.getChild('equipped').setBoolean(item.equipped);
         }
       };
+
       export const unserializeFromVariable = function (
         runtimeScene,
         inventoryName: string,

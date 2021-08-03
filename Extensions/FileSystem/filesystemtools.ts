@@ -24,6 +24,7 @@ namespace gdjs {
       }
       return gdjs.fileSystem._fs;
     };
+
     export const getDirectoryName = function (fileOrFolderPath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {
@@ -31,6 +32,7 @@ namespace gdjs {
       }
       return path.dirname(fileOrFolderPath);
     };
+
     export const getFileName = function (filePath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {
@@ -38,6 +40,7 @@ namespace gdjs {
       }
       return path.basename(filePath);
     };
+
     export const getExtensionName = function (filePath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {

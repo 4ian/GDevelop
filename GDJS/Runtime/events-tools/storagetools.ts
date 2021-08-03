@@ -126,6 +126,7 @@ namespace gdjs {
         }
         return returnValue;
       };
+
       export const clearJSONFile = (name: string) => {
         return loadObject(name, (jsObject) => {
           for (const p in jsObject) {
@@ -136,6 +137,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const elementExistsInJSONFile = (
         name: string,
         elementPath: string
@@ -152,6 +154,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const deleteElementFromJSONFile = (
         name: string,
         elementPath: string
@@ -172,6 +175,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const writeNumberInJSONFile = (
         name: string,
         elementPath: string,
@@ -193,6 +197,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const writeStringInJSONFile = (
         name: string,
         elementPath: string,
@@ -214,6 +219,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const readNumberFromJSONFile = (
         name: string,
         elementPath: string,
@@ -239,6 +245,7 @@ namespace gdjs {
           return true;
         });
       };
+
       export const readStringFromJSONFile = (
         name: string,
         elementPath: string,

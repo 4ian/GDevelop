@@ -39,6 +39,7 @@ namespace gdjs {
         const shopifyClient = ShopifyBuy.buildClient(config);
         ShopifyClientsManager.set(runtimeScene, name, shopifyClient);
       };
+
       export const getCheckoutUrlForProduct = function (
         runtimeScene,
         name,

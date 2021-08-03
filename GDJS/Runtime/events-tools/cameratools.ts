@@ -17,6 +17,7 @@ namespace gdjs {
         }
         runtimeScene.getLayer(layer).setCameraX(x, cameraId);
       };
+      
       export const setCameraY = function (
         runtimeScene: gdjs.RuntimeScene,
         y: float,
@@ -28,6 +29,7 @@ namespace gdjs {
         }
         runtimeScene.getLayer(layer).setCameraY(y, cameraId);
       };
+
       export const getCameraX = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -38,6 +40,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraX();
       };
+
       export const getCameraY = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -48,6 +51,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraY();
       };
+
       export const getCameraWidth = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -58,6 +62,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraWidth();
       };
+
       export const getCameraHeight = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -68,6 +73,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraHeight();
       };
+
       export const showLayer = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string
@@ -77,6 +83,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).show(true);
       };
+
       export const hideLayer = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string
@@ -86,6 +93,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).show(false);
       };
+
       export const layerIsVisible = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string
@@ -95,6 +103,7 @@ namespace gdjs {
           runtimeScene.getLayer(layer).isVisible()
         );
       };
+
       export const setCameraRotation = function (
         runtimeScene: gdjs.RuntimeScene,
         rotation: float,
@@ -108,6 +117,7 @@ namespace gdjs {
           .getLayer(layer)
           .setCameraRotation(rotation, cameraId);
       };
+
       export const getCameraRotation = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -118,6 +128,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraRotation(cameraId);
       };
+
       export const getCameraZoom = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -128,6 +139,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getCameraZoom(cameraId);
       };
+
       export const setCameraZoom = function (
         runtimeScene: gdjs.RuntimeScene,
         newZoom: float,
@@ -139,6 +151,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).setCameraZoom(newZoom, cameraId);
       };
+
       export const centerCamera = function (
         runtimeScene: gdjs.RuntimeScene,
         object: gdjs.RuntimeObject | null,
@@ -162,6 +175,7 @@ namespace gdjs {
         layer.setCameraX(object.getDrawableX() + object.getCenterX(), cameraId);
         layer.setCameraY(object.getDrawableY() + object.getCenterY(), cameraId);
       };
+
       export const centerCameraWithinLimits = function (
         runtimeScene: gdjs.RuntimeScene,
         object: gdjs.RuntimeObject | null,
@@ -309,6 +323,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).isEffectEnabled(effect);
       };
+
       export const setLayerTimeScale = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -319,6 +334,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).setTimeScale(timeScale);
       };
+
       export const getLayerTimeScale = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string
@@ -328,6 +344,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).getTimeScale();
       };
+
       export const setLayerDefaultZOrder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
@@ -338,6 +355,7 @@ namespace gdjs {
         }
         return runtimeScene.getLayer(layer).setDefaultZOrder(defaultZOrder);
       };
+
       export const getLayerDefaultZOrder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string

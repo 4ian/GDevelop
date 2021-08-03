@@ -19,9 +19,9 @@ namespace gdjs {
     fillColor: RGBColor;
     /** The color (in RGB format) of the outline of the painted shape */
     outlineColor: RGBColor;
-    /** The opacity of the inner part of the painted shape, form 0 to 255 */
+    /** The opacity of the inner part of the painted shape, from 0 to 255 */
     fillOpacity: integer;
-    /** The opacity of the outline of the painted shape, form 0 to 255 */
+    /** The opacity of the outline of the painted shape, from 0 to 255 */
     outlineOpacity: integer;
     /** The size of the outline of the painted shape, in pixels. */
     outlineSize: float;

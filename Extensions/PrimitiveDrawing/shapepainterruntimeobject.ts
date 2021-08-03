@@ -20,9 +20,9 @@ namespace gdjs {
     /** The color (in RGB format) of the outline of the painted shape */
     outlineColor: RGBColor;
     /** The opacity of the inner part of the painted shape, from 0 to 255 */
-    fillOpacity: integer;
+    fillOpacity: float;
     /** The opacity of the outline of the painted shape, from 0 to 255 */
-    outlineOpacity: integer;
+    outlineOpacity: float;
     /** The size of the outline of the painted shape, in pixels. */
     outlineSize: float;
     /** Use absolute coordinates? */
@@ -39,8 +39,8 @@ namespace gdjs {
   export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
     _fillColor: integer;
     _outlineColor: integer;
-    _fillOpacity: integer;
-    _outlineOpacity: integer;
+    _fillOpacity: float;
+    _outlineOpacity: float;
     _outlineSize: float;
     _absoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
@@ -397,7 +397,7 @@ namespace gdjs {
      *
      * @param opacity from 0 to 255
      */
-    setFillOpacity(opacity: integer): void {
+    setFillOpacity(opacity: float): void {
       this._fillOpacity = opacity;
     }
 
@@ -413,7 +413,7 @@ namespace gdjs {
      *
      * @param opacity from 0 to 255
      */
-    setOutlineOpacity(opacity: integer): void {
+    setOutlineOpacity(opacity: float): void {
       this._outlineOpacity = opacity;
       this._renderer.updateOutline();
     }

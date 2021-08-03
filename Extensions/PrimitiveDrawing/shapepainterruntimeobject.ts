@@ -6,11 +6,11 @@ namespace gdjs {
   /** Represents a color in RGB Format */
   export type RGBColor = {
     /** The Red component of the color, from 0 to 255. */
-    r: number;
+    r: integer;
     /** The Green component of the color, from 0 to 255. */
-    g: number;
+    g: integer;
     /** The Blue component of the color, from 0 to 255. */
-    b: number;
+    b: integer;
   };
 
   /** Initial properties for a for {@link gdjs.ShapePainterRuntimeObject}. */
@@ -19,12 +19,12 @@ namespace gdjs {
     fillColor: RGBColor;
     /** The color (in RGB format) of the outline of the painted shape */
     outlineColor: RGBColor;
-    /** The opacity of the inner part of the painted shape */
-    fillOpacity: number;
-    /** The opacity of the outline of the painted shape */
-    outlineOpacity: number;
+    /** The opacity of the inner part of the painted shape, form 0 to 255 */
+    fillOpacity: integer;
+    /** The opacity of the outline of the painted shape, form 0 to 255 */
+    outlineOpacity: integer;
     /** The size of the outline of the painted shape, in pixels. */
-    outlineSize: number;
+    outlineSize: float;
     /** Use absolute coordinates? */
     absoluteCoordinates: boolean;
     /** Clear the previous render before the next draw? */
@@ -39,9 +39,9 @@ namespace gdjs {
   export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
     _fillColor: integer;
     _outlineColor: integer;
-    _fillOpacity: float;
-    _outlineOpacity: float;
-    _outlineSize: number;
+    _fillOpacity: integer;
+    _outlineOpacity: integer;
+    _outlineSize: float;
     _absoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
@@ -145,7 +145,7 @@ namespace gdjs {
       return true;
     }
 
-    stepBehaviorsPreEvents(runtimeScene) {
+    stepBehaviorsPreEvents(runtimeScene: gdjs.RuntimeScene) {
       //We redefine stepBehaviorsPreEvents just to clear the graphics before running events.
       if (this._clearBetweenFrames) {
         this._renderer.clear();
@@ -157,27 +157,33 @@ namespace gdjs {
       return this._absoluteCoordinates ? null : this.getAABB();
     }
 
-    drawRectangle(x1, y1, x2, y2) {
+    drawRectangle(x1: float, y1: float, x2: float, y2: float) {
       this._renderer.drawRectangle(x1, y1, x2, y2);
     }
 
-    drawCircle(x, y, radius) {
+    drawCircle(x: float, y: float, radius: float) {
       this._renderer.drawCircle(x, y, radius);
     }
 
-    drawLine(x1, y1, x2, y2, thickness) {
+    drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
       this._renderer.drawLine(x1, y1, x2, y2, thickness);
     }
 
-    drawLineV2(x1, y1, x2, y2, thickness) {
+    drawLineV2(x1: float, y1: float, x2: float, y2: float, thickness: float) {
       this._renderer.drawLineV2(x1, y1, x2, y2, thickness);
     }
 
-    drawEllipse(centerX, centerY, width, height) {
+    drawEllipse(centerX: float, centerY: float, width: float, height: float) {
       this._renderer.drawEllipse(centerX, centerY, width, height);
     }
 
-    drawRoundedRectangle(startX1, startY1, endX2, endY2, radius) {
+    drawRoundedRectangle(
+      startX1: float,
+      startY1: float,
+      endX2: float,
+      endY2: float,
+      radius: float
+    ) {
       this._renderer.drawRoundedRectangle(
         startX1,
         startY1,
@@ -187,7 +193,14 @@ namespace gdjs {
       );
     }
 
-    drawStar(centerX, centerY, points, radius, innerRadius, rotation) {
+    drawStar(
+      centerX: float,
+      centerY: float,
+      points: float,
+      radius: float,
+      innerRadius: float,
+      rotation: float
+    ) {
       this._renderer.drawStar(
         centerX,
         centerY,
@@ -199,13 +212,13 @@ namespace gdjs {
     }
 
     drawArc(
-      centerX,
-      centerY,
-      radius,
-      startAngle,
-      endAngle,
-      anticlockwise,
-      closePath
+      centerX: float,
+      centerY: float,
+      radius: float,
+      startAngle: float,
+      endAngle: float,
+      anticlockwise: boolean,
+      closePath: boolean
     ) {
       this._renderer.drawArc(
         centerX,
@@ -218,15 +231,31 @@ namespace gdjs {
       );
     }
 
-    drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
+    drawBezierCurve(
+      x1: float,
+      y1: float,
+      cpX: float,
+      cpY: float,
+      cpX2: float,
+      cpY2: float,
+      x2: float,
+      y2: float
+    ) {
       this._renderer.drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2);
     }
 
-    drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2) {
+    drawQuadraticCurve(
+      x1: float,
+      y1: float,
+      cpX: float,
+      cpY: float,
+      x2: float,
+      y2: float
+    ) {
       this._renderer.drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2);
     }
 
-    beginFillPath(x1, y1) {
+    beginFillPath(x1: float, y1: float) {
       this._renderer.beginFillPath();
       this._renderer.drawPathMoveTo(x1, y1);
     }
@@ -235,19 +264,33 @@ namespace gdjs {
       this._renderer.endFillPath();
     }
 
-    drawPathMoveTo(x1, y1) {
+    drawPathMoveTo(x1: float, y1: float) {
       this._renderer.drawPathMoveTo(x1, y1);
     }
 
-    drawPathLineTo(x1, y1) {
+    drawPathLineTo(x1: float, y1: float) {
       this._renderer.drawPathLineTo(x1, y1);
     }
 
-    drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY) {
+    drawPathBezierCurveTo(
+      cpX: float,
+      cpY: float,
+      cpX2: float,
+      cpY2: float,
+      toX: float,
+      toY: float
+    ) {
       this._renderer.drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
     }
 
-    drawPathArc(cx, cy, radius, startAngle, endAngle, anticlockwise) {
+    drawPathArc(
+      cx: float,
+      cy: float,
+      radius: float,
+      startAngle: float,
+      endAngle: float,
+      anticlockwise: boolean
+    ) {
       this._renderer.drawPathArc(
         cx,
         cy,
@@ -258,7 +301,7 @@ namespace gdjs {
       );
     }
 
-    drawPathQuadraticCurveTo(cpX, cpY, toX, toY) {
+    drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
       this._renderer.drawPathQuadraticCurveTo(cpX, cpY, toX, toY);
     }
 
@@ -266,7 +309,7 @@ namespace gdjs {
       this._renderer.closePath();
     }
 
-    setClearBetweenFrames(value): void {
+    setClearBetweenFrames(value: boolean): void {
       this._clearBetweenFrames = value;
     }
 
@@ -274,7 +317,7 @@ namespace gdjs {
       return this._clearBetweenFrames;
     }
 
-    setCoordinatesRelative(value): void {
+    setCoordinatesRelative(value: boolean): void {
       this._absoluteCoordinates = !value;
     }
 
@@ -282,7 +325,11 @@ namespace gdjs {
       return !this._absoluteCoordinates;
     }
 
-    setFillColor(rgbColor): void {
+    /**
+     *
+     * @param rgbColor semicolon separated decimal values
+     */
+    setFillColor(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;
@@ -307,7 +354,11 @@ namespace gdjs {
       return gdjs.hexNumberToRGB(this._fillColor).b;
     }
 
-    setOutlineColor(rgbColor): void {
+    /**
+     *
+     * @param rgbColor semicolon separated decimal values
+     */
+    setOutlineColor(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;
@@ -333,7 +384,7 @@ namespace gdjs {
       return gdjs.hexNumberToRGB(this._outlineColor).b;
     }
 
-    setOutlineSize(size): void {
+    setOutlineSize(size: float): void {
       this._outlineSize = size;
       this._renderer.updateOutline();
     }
@@ -342,24 +393,40 @@ namespace gdjs {
       return this._outlineSize;
     }
 
-    setFillOpacity(opacity): void {
+    /**
+     *
+     * @param opacity from 0 to 255
+     */
+    setFillOpacity(opacity: integer): void {
       this._fillOpacity = opacity;
     }
 
+    /**
+     *
+     * @returns an opacity value from 0 to 255.
+     */
     getFillOpacity() {
       return this._fillOpacity;
     }
 
-    setOutlineOpacity(opacity): void {
+    /**
+     *
+     * @param opacity from 0 to 255
+     */
+    setOutlineOpacity(opacity: integer): void {
       this._outlineOpacity = opacity;
       this._renderer.updateOutline();
     }
 
+    /**
+     *
+     * @returns an opacity value from 0 to 255.
+     */
     getOutlineOpacity() {
       return this._outlineOpacity;
     }
 
-    setX(x): void {
+    setX(x: float): void {
       if (x === this.x) {
         return;
       }
@@ -367,7 +434,7 @@ namespace gdjs {
       this._renderer.updateXPosition();
     }
 
-    setY(y): void {
+    setY(y: float): void {
       if (y === this.y) {
         return;
       }

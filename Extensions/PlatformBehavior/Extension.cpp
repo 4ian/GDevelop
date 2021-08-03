@@ -380,6 +380,18 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsSimple()
         .SetFunctionName("SetCanJump")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+    
+    aut.AddScopedAction(
+           "SetCanNotAirJump",
+           _("Forbid to air jump"),
+           _("It revokes the effect of \"Allow jumping again\". The object is "
+             "made unable to jump while in mid air."),
+           _("Forbid _PARAM0_ to air jump"),
+           _("Options"),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
 
     aut.AddCondition("CanJump",
                      _("Can jump"),

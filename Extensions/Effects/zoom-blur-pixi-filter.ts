@@ -1,6 +1,6 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('ZoomBlur', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
       return zoomBlurFilter;
     },

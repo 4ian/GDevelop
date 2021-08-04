@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('BulgePinch', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const bulgePinchFilter = new PIXI.filters.BulgePinchFilter();
       return bulgePinchFilter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
       if (parameterName === 'centerX') {

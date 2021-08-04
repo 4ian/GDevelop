@@ -11,10 +11,13 @@ namespace gdjs {
       if (filter.animationSpeed !== 0) {
         // Multiply by 10 so that the default value is a sensible speed
         filter.time +=
-          (target.getElapsedTime(target.getRuntimeScene()) / 1000) * 10 * filter.animationSpeed;
+          (target.getElapsedTime(target.getRuntimeScene()) / 1000) *
+          10 *
+          filter.animationSpeed;
       }
       if (filter.animationFrequency !== 0) {
-        filter._animationTimer += target.getElapsedTime(target.getRuntimeScene()) / 1000;
+        filter._animationTimer +=
+          target.getElapsedTime(target.getRuntimeScene()) / 1000;
         if (filter._animationTimer >= 1 / filter.animationFrequency) {
           filter.seed = Math.random();
           filter._animationTimer = 0;

@@ -12,8 +12,8 @@ namespace gdjs {
     getRuntimeScene: () => RuntimeScene;
     getElapsedTime: (runtimeScene: RuntimeScene) => number;
     getHeight: () => number;
-    getWidth: () => number; 
-  };
+    getWidth: () => number;
+  }
 
   class PixiObjectEffectsManager {
     /**
@@ -73,10 +73,10 @@ namespace gdjs {
      * @param runtimeObject
      * @param layer
      */
-    update(rendererEffects: RendererEffects, layer: Layer) {
+    update(rendererEffects: RendererEffects, target: EffectsTarget) {
       for (const filterName in rendererEffects) {
         const filter = rendererEffects[filterName];
-        filter.update(filter.pixiFilter, layer);
+        filter.update(filter.pixiFilter, target);
       }
     }
 
@@ -92,11 +92,11 @@ namespace gdjs {
       effectData: EffectData,
       rendererEffects: RendererEffects,
       rendererObject: PIXI.DisplayObject,
-      layer: Layer
+      target: EffectsTarget
     ): boolean {
       let effectAdded = true;
       effectAdded =
-        this.initializeEffect(effectData, rendererEffects, layer) &&
+        this.initializeEffect(effectData, rendererEffects, target) &&
         effectAdded;
       effectAdded =
         this.updateAllEffectParameters(rendererEffects, effectData) &&

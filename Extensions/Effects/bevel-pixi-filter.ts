@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Bevel', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const bevelFilter = new PIXI.filters.BevelFilter();
       return bevelFilter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
       if (parameterName === 'rotation') {

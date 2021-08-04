@@ -1628,7 +1628,7 @@ namespace gdjs {
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
 
-      //TODO handle acceleration?
+      // TODO: we could consider supporting acceleration for ladder climbing in the future.
       if (behavior._upKey) {
         behavior._requestedDeltaY -= behavior._ladderClimbingSpeed * timeDelta;
       }

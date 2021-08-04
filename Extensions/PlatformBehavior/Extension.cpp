@@ -385,9 +385,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddScopedAction(
            "SetCanNotAirJump",
            _("Forbid jumping again in the air"),
-           _("It revokes the effect of \"Allow jumping again\". The object is "
-             "made unable to jump while in mid air. This has no effect if the "
-             "object is not in the air."),
+           _("This revokes the effect of \"Allow jumping again\". The object "
+             "is made unable to jump while in mid air. This has no effect if "
+             "the object is not in the air."),
            _("Forbid _PARAM0_ to air jump"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",

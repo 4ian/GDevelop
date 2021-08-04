@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('RGBSplit', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const rgbSplitFilter = new PIXI.filters.RGBSplitFilter();
       return rgbSplitFilter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
       if (parameterName === 'redX') {

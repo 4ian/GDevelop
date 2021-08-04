@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Ascii', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const asciiFilter = new PIXI.filters.AsciiFilter();
       return asciiFilter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
       if (parameterName === 'size') {

@@ -23,11 +23,11 @@ namespace gdjs {
   }
   LightNightPixiFilter.prototype.constructor = gdjs.LightNightPixiFilter;
   gdjs.PixiFiltersTools.registerFilterCreator('LightNight', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const filter = new gdjs.LightNightPixiFilter();
       return filter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName !== 'opacity') {
         return;

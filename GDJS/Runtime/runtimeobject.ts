@@ -102,7 +102,10 @@ namespace gdjs {
       this._averageForce = new gdjs.Force(0, 0, 0);
       this._behaviorsTable = new Hashtable();
       for (let i = 0; i < objectData.effects.length; ++i) {
-        this.initializeEffect(objectData.effects[i]);
+        // We call initializeEffect as we can't use addEffect, as the renderer is not ready yet.
+        // This means applyEffect will have to be called later (see onCreated).
+        // In all other cases, use addEffect, and avoid initialize/apply effect.
+        this._initializeEffect(objectData.effects[i]);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
 
@@ -127,10 +130,6 @@ namespace gdjs {
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
     onCreated(): void {
-      for (let i = 0; i < this._behaviors.length; ++i) {
-        this._behaviors[i].onCreated();
-      }
-
       const objectEffectsManager = this._runtimeScene
         .getGame()
         .getObjectEffectsManager();
@@ -139,6 +138,10 @@ namespace gdjs {
           this.getRendererObject(),
           this._rendererEffects[filterName]
         );
+      }
+
+      for (let i = 0; i < this._behaviors.length; ++i) {
+        this._behaviors[i].onCreated();
       }
     }
 
@@ -222,11 +225,10 @@ namespace gdjs {
      * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
      */
     update(runtimeScene: gdjs.RuntimeScene): void {
-      const layer = this._runtimeScene.getLayer(this.layer);
-      this._runtimeScene
+      runtimeScene
         .getGame()
         .getObjectEffectsManager()
-        .update(this._rendererEffects, layer);
+        .update(this._rendererEffects, this);
     }
 
     /**
@@ -246,25 +248,6 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ): void {}
 
-    /**
-     * Update the effects during hot-reload
-     * @param oldEffectData Old effect data
-     * @param newEffectData New effect data
-     * @returns
-     */
-    _hotReloadRuntimeObjectEffects(
-      oldEffectData: EffectData[],
-      newEffectData: EffectData[]
-    ): boolean {
-      for (let i = 0; i < oldEffectData.length; ++i) {
-        this.removeEffect(oldEffectData[i].name);
-      }
-      for (let i = 0; i < newEffectData.length; ++i) {
-        this.addEffect(newEffectData[i]);
-      }
-      return true;
-    }
-
     //Nothing to do.
     /**
      * Called when the object must be updated using the specified objectData. This is the
@@ -278,10 +261,8 @@ namespace gdjs {
       oldObjectData: ObjectData,
       newObjectData: ObjectData
     ): boolean {
-      return this._hotReloadRuntimeObjectEffects(
-        oldObjectData.effects,
-        newObjectData.effects
-      );
+      // If not redefined, mark by default the hot-reload as failed.
+      return false;
     }
 
     /**
@@ -776,20 +757,25 @@ namespace gdjs {
     }
 
     /**
-     * Returns the collection of effects to be rendered
-     * by the underlying renderer.
+     * This function is used to initialize an effect, as it can't be
+     * applied directly in the constructor, and we won't be able to
+     * retain the effect data later.
+     * @param effectsData The effect data.
+     */
+     private _initializeEffect(effectData: EffectData): void {
+      this._runtimeScene
+        .getGame()
+        .getObjectEffectsManager()
+        .initializeEffect(effectData, this._rendererEffects, this);
+    }
+
+    /**
+     * Returns the collection of effects to be rendered by the 
+     * underlying renderer.
      * @returns The render effects.
      */
     getRendererEffects() {
       return this._rendererEffects;
-    }
-
-    initializeEffect(effectsData: EffectData) {
-      const layer = this._runtimeScene.getLayer(this.layer);
-      this._runtimeScene
-        .getGame()
-        .getObjectEffectsManager()
-        .initializeEffect(effectsData, this._rendererEffects, layer);
     }
 
     /**
@@ -797,7 +783,6 @@ namespace gdjs {
      * @param effectData The data of the effect to add.
      */
     addEffect(effectData: EffectData): boolean {
-      const layer = this._runtimeScene.getLayer(this.layer);
       return this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
@@ -805,7 +790,7 @@ namespace gdjs {
           effectData,
           this._rendererEffects,
           this.getRendererObject(),
-          layer
+          this
         );
     }
 

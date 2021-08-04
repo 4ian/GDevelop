@@ -464,9 +464,7 @@ namespace gdjs {
      * in milliseconds, for objects on the layer.
      */
     getElapsedTime(runtimeScene: RuntimeScene): float {
-      return (
-        runtimeScene.getTimeManager().getElapsedTime() * this._timeScale
-      );
+      return runtimeScene.getTimeManager().getElapsedTime() * this._timeScale;
     }
 
     /**

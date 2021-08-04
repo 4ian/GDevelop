@@ -1,6 +1,6 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('RadialBlur', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const radialBlurFilter = new PIXI.filters.RadialBlurFilter();
       return radialBlurFilter;
     },

@@ -5,7 +5,7 @@ namespace gdjs {
   import PIXI_ = GlobalPIXIModule.PIXI;
 
   gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const twistFilter = new PIXI.filters.TwistFilter();
       twistFilter.offset = new PIXI_.Point(0, 0);
       return twistFilter;

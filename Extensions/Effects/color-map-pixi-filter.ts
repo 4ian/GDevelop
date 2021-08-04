@@ -1,7 +1,7 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('ColorMap', {
-    makePIXIFilter: function (layer, effectData) {
-      const colorMapTexture = layer
+    makePIXIFilter: function (target, effectData) {
+      const colorMapTexture = target
         .getRuntimeScene()
         .getGame()
         .getImageManager()
@@ -17,7 +17,7 @@ namespace gdjs {
       );
       return colorMapFilter;
     },
-    update: function (filter, layer) {},
+    update: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {

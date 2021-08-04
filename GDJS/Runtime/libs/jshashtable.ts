@@ -1,10 +1,4 @@
-/**
- * A generic map (key-value) container.
- *
- * Used notably for storing lists of objects for
- * GDevelop generated events.
- */
-class Hashtable<T> {
+export class Hashtable<T> {
   /**
    * The content of the Hashtable. Prefer using methods rather
    * than accessing this internal object, unless you need to iterate

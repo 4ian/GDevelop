@@ -21,16 +21,6 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 // Files under these paths (relative to the GDevelop root path) won't
 // be built with esbuild, but simply copied.
 const untransformedPaths = [
-  // GDJS prebuilt files:
-  'GDJS/Runtime/pixi-renderers/pixi.js',
-  'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
-  'GDJS/Runtime/Cocos2d',
-  'GDJS/Runtime/Cordova',
-  'GDJS/Runtime/Electron',
-  'GDJS/Runtime/FacebookInstantGames',
-  'GDJS/Runtime/libs/CocoonJS',
-  'GDJS/Runtime/libs/rbush.js',
-
   // Extensions pre-built files:
   'Extensions/Firebase/A_firebasejs',
   'Extensions/BBText/pixi-multistyle-text/dist',
@@ -78,9 +68,7 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
  * @param {string} filePath
  */
 const isJsExtensionDeclaration = (filePath) => {
-  return (
-    path.basename(filePath) === 'JsExtension.js'
-  );
+  return path.basename(filePath) === 'JsExtension.js';
 };
 
 /** @typedef {{inPath: string; outPath: string;}} InOutPath */
@@ -122,23 +110,13 @@ module.exports = {
    * @returns {Promise<{allGDJSInOutFilePaths: InOutPath[]; allExtensionsInOutFilePaths: InOutPath[];}>}
    */
   getAllInOutFilePaths: async (options) => {
-    // List all the files of the runtime
-    const allGDJSInFilePaths = await recursive(gdjsRuntimePath, [
-      isNotAllowedExtension,
-    ]);
     const allExtensionsInFilePaths = await recursive(extensionsRuntimePath, [
       isNotAllowedExtension,
       isTestDirectory,
     ]);
 
-    // Generate the output file paths
-    const allGDJSInOutFilePaths = allGDJSInFilePaths.map(
-      getInOutPaths(gdjsRuntimePath, options.bundledOutPath)
-    );
-    const allExtensionsInOutFilePaths = allExtensionsInFilePaths.map(
+    return allExtensionsInFilePaths.map(
       getInOutPaths(gdevelopRootPath, options.bundledOutPath)
     );
-
-    return { allGDJSInOutFilePaths, allExtensionsInOutFilePaths };
   },
 };

@@ -7,42 +7,38 @@ namespace gdjs {
 
     /** Get the Node.js path module, or null if it can't be loaded */
     export const _getPath = function () {
-      if (!gdjs.fileSystem._path) {
+      if (!fileSystem._path) {
         // @ts-ignore
-        gdjs.fileSystem._path =
+        fileSystem._path =
           typeof require !== 'undefined' ? require('path') : null;
       }
-      return gdjs.fileSystem._path;
+      return fileSystem._path;
     };
 
     /** Get the Node.js fs module, or null if it can't be loaded */
     export const _getFs = function () {
-      if (!gdjs.fileSystem._fs) {
+      if (!fileSystem._fs) {
         // @ts-ignore
-        gdjs.fileSystem._fs =
-          typeof require !== 'undefined' ? require('fs') : null;
+        fileSystem._fs = typeof require !== 'undefined' ? require('fs') : null;
       }
-      return gdjs.fileSystem._fs;
+      return fileSystem._fs;
     };
-
     export const getDirectoryName = function (fileOrFolderPath: string) {
-      const path = gdjs.fileSystem._getPath();
+      const path = fileSystem._getPath();
       if (!path) {
         return '';
       }
       return path.dirname(fileOrFolderPath);
     };
-
     export const getFileName = function (filePath: string) {
-      const path = gdjs.fileSystem._getPath();
+      const path = fileSystem._getPath();
       if (!path) {
         return '';
       }
       return path.basename(filePath);
     };
-
     export const getExtensionName = function (filePath: string) {
-      const path = gdjs.fileSystem._getPath();
+      const path = fileSystem._getPath();
       if (!path) {
         return '';
       }
@@ -121,8 +117,8 @@ namespace gdjs {
     export const getExecutableFolderPath = function (
       runtimeScene: gdjs.RuntimeScene
     ): string {
-      const path = gdjs.fileSystem._getPath();
-      const executablePath = gdjs.fileSystem.getExecutablePath(runtimeScene);
+      const path = fileSystem._getPath();
+      const executablePath = fileSystem.getExecutablePath(runtimeScene);
       if (!path) {
         return '';
       }
@@ -179,7 +175,7 @@ namespace gdjs {
      * @return The path delimiter
      */
     export const getPathDelimiter = function (): string {
-      const path = gdjs.fileSystem._getPath();
+      const path = fileSystem._getPath();
       if (path) {
         return path.sep || '/';
       } else {
@@ -196,7 +192,7 @@ namespace gdjs {
       directory: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -223,7 +219,7 @@ namespace gdjs {
       savePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         fileSystem.writeFile(savePath, text, 'utf8', (err) => {
           resultVar.setString('ok');
@@ -249,7 +245,7 @@ namespace gdjs {
       savePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -276,7 +272,7 @@ namespace gdjs {
       savePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -307,7 +303,7 @@ namespace gdjs {
       savePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         fileSystem.writeFile(
           savePath,
@@ -338,7 +334,7 @@ namespace gdjs {
       loadPath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -368,7 +364,7 @@ namespace gdjs {
       loadPath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -400,7 +396,7 @@ namespace gdjs {
       loadPath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
@@ -431,7 +427,7 @@ namespace gdjs {
       loadPath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
@@ -458,7 +454,7 @@ namespace gdjs {
       filePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       let result = 'error';
       if (fileSystem) {
         try {
@@ -481,7 +477,7 @@ namespace gdjs {
       filePath: string,
       resultVar: gdjs.Variable
     ) {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         fileSystem.unlink(filePath, (err) => {
           resultVar.setString('ok');
@@ -502,7 +498,7 @@ namespace gdjs {
      * @return true if fhe file or directory exists
      */
     export const pathExists = function (filePath: string): boolean {
-      const fileSystem = gdjs.fileSystem._getFs();
+      const fileSystem = fileSystem._getFs();
       if (fileSystem) {
         return fileSystem.existsSync(filePath);
       } else {

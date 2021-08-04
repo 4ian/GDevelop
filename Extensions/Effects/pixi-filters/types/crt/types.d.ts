@@ -1,34 +1,34 @@
-declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
-  export class CRTFilter extends PIXI.Filter {
-    constructor(options?: CRTFilterOptions);
-    curvature: number;
-    lineWidth: number;
-    lineContrast: number;
-    verticalLine: number;
-    noise: number;
-    noiseSize: number;
-    seed: number;
-    vignetting: number;
-    vignettingAlpha: number;
-    vignettingBlur: number;
-    time: number;
-  }
-  export interface CRTFilterOptions {
-    curvature?: number;
-    lineWidth?: number;
-    lineContrast?: number;
-    verticalLine?: number;
-    noise?: number;
-    noiseSize?: number;
-    seed?: number;
-    vignetting?: number;
-    vignettingAlpha?: number;
-    vignettingBlur?: number;
-    time?: number;
+declare module 'pixi.js' {
+  namespace filters {
+    export class CRTFilter extends PIXI.Filter {
+      constructor(options?: CRTFilterOptions);
+      curvature: number;
+      lineWidth: number;
+      lineContrast: number;
+      verticalLine: number;
+      noise: number;
+      noiseSize: number;
+      seed: number;
+      vignetting: number;
+      vignettingAlpha: number;
+      vignettingBlur: number;
+      time: number;
+    }
+    export interface CRTFilterOptions {
+      curvature?: number;
+      lineWidth?: number;
+      lineContrast?: number;
+      verticalLine?: number;
+      noise?: number;
+      noiseSize?: number;
+      seed?: number;
+      vignetting?: number;
+      vignettingAlpha?: number;
+      vignettingBlur?: number;
+      time?: number;
+    }
   }
 }
-
 declare module '@pixi/filter-crt' {
   export import CRTFilter = PIXI.filters.CRTFilter;
   export import CRTFilterOptions = PIXI.filters.CRTFilterOptions;

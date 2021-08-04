@@ -32,5 +32,13 @@
     "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "generate-doc": "jsdoc -c docs/jsdoc.conf.json docs/DocMainPage.md"
+  },
+  "dependencies": {
+    "@pixi/constants": "^6.1.0",
+    "@pixi/core": "^6.1.0",
+    "@pixi/display": "^6.1.0",
+    "@pixi/text": "^6.1.0",
+    "@pixi/utils": "^6.1.0",
+    "howler": "^2.2.3"
   }
 }

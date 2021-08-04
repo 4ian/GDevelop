@@ -1,10 +1,11 @@
-declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
-  export class ConvolutionFilter extends PIXI.Filter {
-    constructor(matrix: number[], width: number, height: number);
-    height: number;
-    width: number;
-    matrix: number[];
+declare module 'pixi.js' {
+  namespace filters {
+    export class ConvolutionFilter extends PIXI.Filter {
+      constructor(matrix: number[], width: number, height: number);
+      height: number;
+      width: number;
+      matrix: number[];
+    }
   }
 }
 

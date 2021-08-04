@@ -654,7 +654,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
-      // Fell from the platform
+      // Fall from the platform
       for (let i = 0; i < 35; ++i) {
         object.getBehavior('auto1').simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
@@ -682,7 +682,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
-      // Fell from the platform
+      // Fall from the platform
       for (let i = 0; i < 20; ++i) {
         object.getBehavior('auto1').simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
@@ -729,7 +729,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
-      // Fell from the platform
+      // Fall from the platform
       for (let i = 0; i < 20; ++i) {
         object.getBehavior('auto1').simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
@@ -745,8 +745,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
       }
 
-      // Miss an eventual time frame
-      // Forbid to jump
+      // Suppose that we miss an eventual time frame or some condition.
+      // So we forbid to jump again:
       object.getBehavior('auto1').setCanNotAirJump();
       expect(object.getBehavior('auto1').canJump()).to.be(false);
 

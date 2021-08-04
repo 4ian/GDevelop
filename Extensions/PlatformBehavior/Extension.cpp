@@ -5,8 +5,9 @@ Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
 #include "PlatformBehavior.h"
+
+#include "GDCpp/Extensions/ExtensionBase.h"
 #include "PlatformRuntimeBehavior.h"
 #include "PlatformerObjectBehavior.h"
 #include "PlatformerObjectRuntimeBehavior.h"
@@ -380,12 +381,13 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsSimple()
         .SetFunctionName("SetCanJump")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
-    
+
     aut.AddScopedAction(
            "SetCanNotAirJump",
-           _("Forbid to air jump"),
+           _("Forbid jumping again in the air"),
            _("It revokes the effect of \"Allow jumping again\". The object is "
-             "made unable to jump while in mid air."),
+             "made unable to jump while in mid air. This has no effect if the "
+             "object is not in the air."),
            _("Forbid _PARAM0_ to air jump"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",

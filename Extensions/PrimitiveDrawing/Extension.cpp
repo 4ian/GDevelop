@@ -378,7 +378,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddScopedAction(
          "ClearShapes",
          _("Clear shapes"),
-         _("Clear the rendered shape."),
+         _("Clear the rendered shape(s). Useful if not set to be done automatically."),
          _("Clear the rendered image of _PARAM0_"),
          _("Advanced"),
          "res/actions/visibilite24.png",

@@ -17,10 +17,12 @@ namespace gdjs {
 
   class PixiObjectEffectsManager {
     /**
-     * Initialize the renderer effects from the effect data.
+     * Initialize the renderer effect from the effect data.
+     * Call the applyEffect method afterwards, to correctly apply the
+     * initialized effects on the object.
      * @param effectData The effect data
      * @param rendererEffects The renderer effects collection
-     * @param layer The layer
+     * @param target The effects target
      */
     initializeEffect(
       effectData: EffectData,
@@ -55,6 +57,7 @@ namespace gdjs {
 
     /**
      * Apply the effect on the renderer object.
+     * Called after the effect is initialized.
      * @param rendererObject The renderer object
      * @param effect The effect to be applied.
      */
@@ -71,7 +74,7 @@ namespace gdjs {
     /**
      * Update the filters applied on an object.
      * @param runtimeObject
-     * @param layer
+     * @param target
      */
     update(rendererEffects: RendererEffects, target: EffectsTarget) {
       for (const filterName in rendererEffects) {
@@ -86,7 +89,7 @@ namespace gdjs {
      * @param effectData The effect data
      * @param rendererEffects The renderer effects
      * @param rendererObject The renderer object
-     * @param layer The Layer
+     * @param target The effects target
      */
     addEffect(
       effectData: EffectData,

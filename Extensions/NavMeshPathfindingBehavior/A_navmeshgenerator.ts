@@ -5,14 +5,19 @@
 // Most of the comments were written by him and were adapted to fit this implementation.
 // This implementation differs a bit from the original:
 // - it's only 2D instead of 3D
-// - it uses objects for points instead of pointer like in array of numbers
+// - it has less features (see TODO) and might have lesser performance
+// - it uses objects for points instead of pointer-like in arrays of numbers
 // - the rasterization comes from other sources because of the 2d focus
-// - it has less features and might have lesser performance
+// - partialFloodRegion was rewritten to fix an issue
+// - filterNonObstacleVertices was added
 //
 // The Java implementation was also inspired from Recast that can be found here:
 // https://github.com/recastnavigation/recastnavigation
 
 namespace gdjs {
+  /**
+   * A cell that holds data needed by the 1st steps of the NavMesh generation.
+   */
   export class RasterizationCell {
     /** A cell that has not been assigned to any region yet */
     static NULL_REGION_ID = 0;
@@ -27,9 +32,28 @@ namespace gdjs {
 
     x: integer;
     y: integer;
+    /**
+     * 0 means there is an obstacle in the cell.
+     * See {@link RegionGenerator}
+     */
     distanceToObstacle: integer = Number.MAX_VALUE;
     regionID: integer = RasterizationCell.NULL_REGION_ID;
     distanceToRegionCore: integer = 0;
+    /**
+     * If a cell is connected to one or more external regions then the
+     *  flag will be a 4 bit value where connections are recorded as
+     *  follows:
+     *  - bit1 = neighbor0
+     *  - bit2 = neighbor1
+     *  - bit3 = neighbor2
+     *  - bit4 = neighbor3
+     *  With the meaning of the bits as follows:
+     *  - 0 = neighbor in same region.
+     *  - 1 = neighbor not in same region (neighbor may be the obstacle
+     *    region or a real region).
+     *
+     * See {@link ContourBuilder}
+     */
     contourFlags: integer = 0;
 
     constructor(x: integer, y: integer) {
@@ -168,6 +192,7 @@ namespace gdjs {
     polygonBVertexIndex: integer;
   };
 
+  //TODO scaleY is behavior specific move this in the behavior.
   export class GridCoordinateConverter {
     /**
      *
@@ -1261,7 +1286,9 @@ namespace gdjs {
       // that is on an obstacle border.
       const commonVertexContours = new Array<ContourPoint[]>(5);
       const commonVertexIndexes = new Array<integer>(5);
-      // loop because of imbrications
+      // Each pass only filter vertex that have an edge other extremity on an obstacle.
+      // Vertex depth (in number of edges to reach an obstacle) is reduces by
+      // at least one by each pass.
       let movedAnyVertex = false;
       do {
         movedAnyVertex = false;
@@ -1279,6 +1306,18 @@ namespace gdjs {
             ) {
               // This is a vertex in the middle. It must be removed.
 
+              // Search the contours around the vertex.
+              //
+              // Typically a contour point to its neighbor and it form a cycle.
+              //
+              //   \ C /
+              //    \ /
+              //  A  |  B
+              //     |
+              //
+              // C -> B -> A -> C
+              //
+              // There can be more than 3 contours even if it's rare.
               commonVertexContours.length = 0;
               commonVertexIndexes.length = 0;
               commonVertexContours.push(contour);
@@ -1330,7 +1369,7 @@ namespace gdjs {
               }
               if (commonVertexContours.length < 3) {
                 console.error(
-                  `The vertex is shared by only {$commonVertexContours.length} regions.`
+                  `The vertex is shared by only ${commonVertexContours.length} regions.`
                 );
               }
 
@@ -1375,7 +1414,12 @@ namespace gdjs {
               //  A  |  B
               //     |
               //
-              // Imagine that the Y will become a V and the vertices are store clockwise.
+              // - the shortest edge is between A and B
+              // - the Y will become a V
+              // - vertices are store clockwise
+              // - there can be more than one C (it's rare)
+
+              // This is B
               const shorterEdgeContour =
                 commonVertexContours[shorterEdgeContourIndex];
               const shorterEdgeVertexIndex =
@@ -1387,6 +1431,7 @@ namespace gdjs {
                     shorterEdgeContour.length
                 ];
 
+              // This is A
               const shorterEdgeOtherContourIndex =
                 (shorterEdgeContourIndex + 1) % commonVertexContours.length;
               const shorterEdgeOtherContour =
@@ -1394,7 +1439,6 @@ namespace gdjs {
               const shorterEdgeOtherVertexIndex =
                 commonVertexIndexes[shorterEdgeOtherContourIndex];
 
-              //console.log("commonVertexContours.length: " + commonVertexContours.length);
               for (
                 let index = 0;
                 index < commonVertexContours.length;
@@ -1406,11 +1450,12 @@ namespace gdjs {
                 ) {
                   continue;
                 }
+                // These are C
                 const commonVertexContour = commonVertexContours[index];
                 const commonVertexIndex = commonVertexIndexes[index];
 
+                // Move the vertex to an obstacle border
                 const movedVertex = commonVertexContour[commonVertexIndex];
-                //console.log("move: " + movedVertex.x + " " + movedVertex.y + " --> " + shorterEdgeExtremityVertex.x + " " + shorterEdgeExtremityVertex.y);
                 movedVertex.x = shorterEdgeExtremityVertex.x;
                 movedVertex.y = shorterEdgeExtremityVertex.y;
                 movedVertex.region = RasterizationCell.NULL_REGION_ID;
@@ -1428,9 +1473,6 @@ namespace gdjs {
               shorterEdgeContour.splice(shorterEdgeVertexIndex, 1);
               shorterEdgeOtherContour.splice(shorterEdgeOtherVertexIndex, 1);
 
-              // changeCount++;
-              // if (changeCount === 2)
-              // return;
               movedAnyVertex = true;
             }
           }

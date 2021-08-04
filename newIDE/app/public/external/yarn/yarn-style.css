@@ -17,31 +17,6 @@ body {
   overflow-y: hidden;
 }
 
-#path-editor-header .leftSide {
-  width: 100%;
-}
-
-#path-editor-header .rightButtons {
-  display: flex;
-  padding-bottom: 4px;
-  width: 350px;
-}
-
-#path-editor-header .rightButtons > button {
-  right: 0;
-  margin-right: 4px;
-  margin-top: 5px;
-}
-
-#path-editor-header > button,
-#path-editor-header > span > button {
-  background-color: white;
-  border: 2px solid lightblue;
-  border-radius: 3px;
-  max-height: 30px;
-  margin-top: 5px;
-}
-
 #path-editor-header > span > input {
   font-family: 'Courier New';
   height: 27px;
@@ -62,8 +37,4 @@ body {
   float: left;
   margin-top: 10px;
   font-size: 15px;
-}
-
-#path-editor-header > span > * {
-  padding-left: 5px;
 }

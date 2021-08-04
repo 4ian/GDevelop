@@ -236,7 +236,9 @@ namespace gdjs {
       this._jumpKey = false;
 
       //5) Track the movement
-      this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
+      this._hasReallyMoved =
+        Math.abs(object.getX() - oldX) >= 1 ||
+        Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
     }
 
@@ -1000,6 +1002,15 @@ namespace gdjs {
     }
 
     /**
+     * Forbid the Platformer Object to air jump.
+     */
+    setCanNotAirJump(): void {
+      if (this._state === this._jumping || this._state === this._falling) {
+        this._canJump = false;
+      }
+    }
+
+    /**
      * Set if the Platformer Object can grab platforms.
      * @param enable Enable / Disable grabbing of platforms.
      */
@@ -1135,7 +1146,8 @@ namespace gdjs {
      */
     isMoving(): boolean {
       return (
-        (this._hasReallyMoved && this._currentSpeed !== 0) ||
+        (this._hasReallyMoved &&
+          (this._currentSpeed !== 0 || this._state === this._onLadder)) ||
         this._jumping.getCurrentJumpSpeed() !== 0 ||
         this._currentFallSpeed !== 0
       );
@@ -1616,6 +1628,7 @@ namespace gdjs {
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
 
+      // TODO: we could consider supporting acceleration for ladder climbing in the future.
       if (behavior._upKey) {
         behavior._requestedDeltaY -= behavior._ladderClimbingSpeed * timeDelta;
       }

@@ -1,9 +1,10 @@
-const esbuild = require('esbuild');
+const { build } = require('esbuild');
 const path = require('path');
 const shell = require('shelljs');
 const {
   getAllInOutFilePaths,
   isUntransformedFile,
+  gdjsEntryPoints,
 } = require('./lib/runtime-files-list');
 const args = require('minimist')(process.argv.slice(2), {
   string: ['out'],
@@ -26,46 +27,53 @@ if (!args.out) {
 shell.mkdir('-p', bundledOutPath);
 
 (async () => {
-  const esbuildService = await esbuild.startService();
-
-  // Generate the output file paths
-  const {
-    allGDJSInOutFilePaths,
-    allExtensionsInOutFilePaths,
-  } = await getAllInOutFilePaths({ bundledOutPath });
+  const allExtensionsInOutFilePaths = await getAllInOutFilePaths({
+    bundledOutPath,
+  });
 
   // Build (or copy) all the files
   let errored = false;
   const startTime = Date.now();
-  await Promise.all(
-    [...allGDJSInOutFilePaths, ...allExtensionsInOutFilePaths].map(
-      async ({ inPath, outPath }) => {
-        if (isUntransformedFile(inPath)) {
-          try {
-            await fs.mkdir(path.dirname(outPath), { recursive: true });
-            await fs.copyFile(inPath, outPath);
-          } catch (err) {
-            shell.echo(`❌ Error while copying "${inPath}":` + err);
-            errored = true;
-          }
-          return;
+  await Promise.all([
+    ...allExtensionsInOutFilePaths.map(async ({ inPath, outPath }) => {
+      if (isUntransformedFile(inPath)) {
+        try {
+          await fs.mkdir(path.dirname(outPath), { recursive: true });
+          await fs.copyFile(inPath, outPath);
+        } catch (err) {
+          shell.echo(`❌ Error while copying "${inPath}":` + err);
+          errored = true;
         }
-
-        return esbuildService
-          .build({
-            sourcemap: true,
-            entryPoints: [inPath],
-            outfile: renameBuiltFile(outPath),
-          })
-          .catch(() => {
-            // Error is already logged by esbuild.
-            errored = true;
-          });
+        return;
       }
-    )
-  );
 
-  esbuildService.stop();
+      return build({
+        sourcemap: true,
+        minify: true,
+        entryPoints: [inPath],
+        outfile: renameBuiltFile(outPath),
+      }).catch(() => {
+        // Error is already logged by esbuild.
+        errored = true;
+      });
+    }),
+
+    build({
+      entryPoints: gdjsEntryPoints,
+      entryNames: '[name]',
+      bundle: true,
+      sourcemap: true,
+      minify: true,
+      legalComments: 'external',
+      treeShaking: true,
+      external: ['electron'],
+      outdir: bundledOutPath,
+    }).catch(() => {
+      // Error is already logged by esbuild.
+      errored = true;
+    }),
+  ]);
+
   const buildDuration = Date.now() - startTime;
   if (!errored) shell.echo(`✅ GDJS built in ${buildDuration}ms`);
   if (errored) shell.exit(1);

@@ -119,4 +119,8 @@ module.exports = {
       getInOutPaths(gdevelopRootPath, options.bundledOutPath)
     );
   },
+  gdjsEntryPoints: [
+    path.join(gdjsRuntimePath, 'index.ts'),
+    path.join(gdjsRuntimePath, 'Debugger', 'websocket-debugger-client.ts'),
+  ],
 };

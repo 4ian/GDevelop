@@ -10,6 +10,7 @@ import {
   InputManager,
   Profiler,
   IDebuggerClient,
+  DebuggerClient,
   FontManager,
   makeUuid,
 } from '.';
@@ -174,7 +175,7 @@ export class RuntimeGame {
    * Get the FontManager of the RuntimeGame.
    * @return The font manager.
    */
-  getFontManager(): FontFaceObserverFontManager {
+  getFontManager(): FontManager {
     return this._fontManager;
   }
 

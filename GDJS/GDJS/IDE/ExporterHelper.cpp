@@ -610,38 +610,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
-  InsertUnique(includesFiles, "libs/jshashtable.js");
-  InsertUnique(includesFiles, "gd.js");
-  InsertUnique(includesFiles, "libs/rbush.js");
-  InsertUnique(includesFiles, "inputmanager.js");
-  InsertUnique(includesFiles, "jsonmanager.js");
-  InsertUnique(includesFiles, "timemanager.js");
-  InsertUnique(includesFiles, "runtimeobject.js");
-  InsertUnique(includesFiles, "profiler.js");
-  InsertUnique(includesFiles, "runtimescene.js");
-  InsertUnique(includesFiles, "scenestack.js");
-  InsertUnique(includesFiles, "polygon.js");
-  InsertUnique(includesFiles, "force.js");
-  InsertUnique(includesFiles, "layer.js");
-  InsertUnique(includesFiles, "timer.js");
-  InsertUnique(includesFiles, "runtimegame.js");
-  InsertUnique(includesFiles, "variable.js");
-  InsertUnique(includesFiles, "variablescontainer.js");
-  InsertUnique(includesFiles, "oncetriggers.js");
-  InsertUnique(includesFiles, "runtimebehavior.js");
-  InsertUnique(includesFiles, "spriteruntimeobject.js");
-
-  // Common includes for events only.
-  InsertUnique(includesFiles, "events-tools/commontools.js");
-  InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
-  InsertUnique(includesFiles, "events-tools/inputtools.js");
-  InsertUnique(includesFiles, "events-tools/objecttools.js");
-  InsertUnique(includesFiles, "events-tools/cameratools.js");
-  InsertUnique(includesFiles, "events-tools/soundtools.js");
-  InsertUnique(includesFiles, "events-tools/storagetools.js");
-  InsertUnique(includesFiles, "events-tools/stringtools.js");
-  InsertUnique(includesFiles, "events-tools/windowtools.js");
-  InsertUnique(includesFiles, "events-tools/networktools.js");
+  InsertUnique(includesFiles, "index.js");
 
   if (gdevelopLogoStyle == "dark") {
     InsertUnique(includesFiles, "splash/gd-logo-dark.js");
@@ -654,9 +623,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   }
 
   if (websocketDebuggerClient) {
-    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
-    InsertUnique(includesFiles,
-                 "websocket-debugger-client/websocket-debugger-client.js");
+    InsertUnique(includesFiles, "websocket-debugger-client.js");
   }
 
   if (pixiRenderers) {

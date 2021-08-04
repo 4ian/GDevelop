@@ -760,12 +760,14 @@ namespace gdjs {
     }
 
     /**
+
      * This function is used to initialize an effect, as it can't be
      * applied directly in the constructor, and we won't be able to
      * retain the effect data later.
+     * @private
      * @param effectsData The effect data.
      */
-     private _initializeEffect(effectData: EffectData): void {
+    private _initializeEffect(effectData: EffectData): void {
       this._runtimeScene
         .getGame()
         .getObjectEffectsManager()
@@ -773,7 +775,7 @@ namespace gdjs {
     }
 
     /**
-     * Returns the collection of effects to be rendered by the 
+     * Returns the collection of effects to be rendered by the
      * underlying renderer.
      * @returns The render effects.
      */

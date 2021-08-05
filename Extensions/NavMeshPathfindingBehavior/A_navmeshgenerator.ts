@@ -151,7 +151,8 @@ namespace gdjs {
     }
 
     dimX() {
-      return this.cells[0].length;
+      const firstColumn = this.cells[0];
+      return firstColumn ? firstColumn.length : 0;
     }
 
     obstacleDistanceMax() {

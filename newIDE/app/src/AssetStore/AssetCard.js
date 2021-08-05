@@ -4,6 +4,7 @@ import {
   type AssetShortHeader,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
+import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -24,7 +25,7 @@ const styles = {
   },
   previewImagePixelated: {
     width: '100%',
-    imageRendering: '-moz-crisp-edges' || 'pixelated', // TODO to check
+    imageRendering: getPixelatedImageRendering(),
     padding: 15,
   },
   icon: {

@@ -12,6 +12,7 @@ import {
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
+import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -34,8 +35,7 @@ import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 const styles = {
   previewImagePixelated: {
     width: '100%',
-    imageRendering:
-      '-moz-crisp-edges -webkit-optimize-contrast -webkit-crisp-edges pixelated', // TODO not working, need to check if we can do that
+    imageRendering: getPixelatedImageRendering(),
     padding: 15,
   },
   previewBackground: {

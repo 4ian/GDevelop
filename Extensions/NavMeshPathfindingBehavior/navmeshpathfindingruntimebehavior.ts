@@ -314,11 +314,9 @@ namespace gdjs {
      */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
       //TODO should it check that shapePainter is not null?
+      //TODO or even use a a list?
 
-      //TODO use the clear action function when it's added
-      shapePainter._renderer.clear();
-      //TODO Remove when the shape painter is fixed to update outline and fill at start.
-      shapePainter._renderer.updateOutline();
+      shapePainter.clear();
 
       for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
         const polygon = navPoly.getPoints();
@@ -335,22 +333,6 @@ namespace gdjs {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         shapePainter.beginFillPath(
-          polygon[0].x,
-          polygon[0].y / this._manager._isometricRatio
-        );
-        for (let index = 1; index < polygon.length; index++) {
-          shapePainter.drawPathLineTo(
-            polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio
-          );
-        }
-        shapePainter.closePath();
-        shapePainter.endFillPath();
-      }
-      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
-        const polygon = navPoly.getPoints();
-        if (polygon.length === 0) continue;
-        shapePainter.drawPathMoveTo(
           polygon[0].x,
           polygon[0].y / this._manager._isometricRatio
         );

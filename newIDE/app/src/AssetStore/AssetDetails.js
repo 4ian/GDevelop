@@ -10,7 +10,9 @@ import {
   type Asset,
   type Author,
   getAsset,
+  isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
+import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -31,6 +33,11 @@ import Window from '../Utils/Window';
 import CheckeredBackground from '../ResourcesList/CheckeredBackground';
 
 const styles = {
+  previewImagePixelated: {
+    width: '100%',
+    imageRendering: getPixelatedImageRendering(),
+    padding: 15,
+  },
   previewBackground: {
     position: 'relative',
     display: 'flex',
@@ -159,7 +166,12 @@ export const AssetDetails = ({
               >
                 <CheckeredBackground />
                 <CorsAwareImage
-                  style={styles.previewImage}
+                  style={{
+                    ...styles.previewImage,
+                    ...(isPixelArt(assetShortHeader)
+                      ? styles.previewImagePixelated
+                      : undefined),
+                  }}
                   src={assetShortHeader.previewImageUrls[0]}
                   alt={assetShortHeader.name}
                 />

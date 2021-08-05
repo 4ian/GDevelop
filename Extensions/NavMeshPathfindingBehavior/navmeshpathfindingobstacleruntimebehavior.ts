@@ -30,15 +30,12 @@ namespace gdjs {
     /**
      * @param object The object
      */
-    constructor(runtimeScene: gdjs.RuntimeScene) {
+    constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._obstacles = new Set();
       const game = runtimeScene.getGame();
 
-      const viewpoint = game.getExtensionProperty(
-        'NavMeshPathfinding',
-        'Viewpoint'
-      );
-      //TODO can an id be used instead of the name?
+      const viewpoint = sharedData.viewpoint;
+      //TODO can an id be used instead of the label? Does it work with translations?
       if (viewpoint === 'Isometry 2:1 (26.565°)') {
         this._isometricRatio = 2;
       } else if (viewpoint === 'True Isometry (30°)') {
@@ -46,36 +43,40 @@ namespace gdjs {
       } else {
         this._isometricRatio = 1;
       }
-      this._cellSize = Number.parseInt(
-        game.getExtensionProperty('NavMeshPathfinding', 'CellSize') || '10'
-      );
-      this._areaLeftBound = Number.parseInt(
-        game.getExtensionProperty('NavMeshPathfinding', 'AreaLeftBound') || '0'
-      );
-      this._areaTopBound = Number.parseInt(
-        game.getExtensionProperty('NavMeshPathfinding', 'AreaTopBound') || '0'
-      );
-      this._areaRightBound = Number.parseInt(
-        game.getExtensionProperty('NavMeshPathfinding', 'AreaRightBound') ||
-          game.getGameResolutionWidth().toString()
-      );
-      this._areaBottomBound = Number.parseInt(
-        game.getExtensionProperty('NavMeshPathfinding', 'AreaBottomBound') ||
-          game.getGameResolutionHeight().toString()
-      );
+      this._cellSize = sharedData.cellSize > 0 ? sharedData.cellSize : 10;
+      if (
+        sharedData.areaLeftBound === 0 &&
+        sharedData.areaTopBound === 0 &&
+        sharedData.areaRightBound === 0 &&
+        sharedData.areaBottomBound === 0
+      ) {
+        this._areaLeftBound = 0;
+        this._areaTopBound = 0;
+        this._areaRightBound = game.getGameResolutionWidth();
+        this._areaBottomBound = game.getGameResolutionHeight();
+      } else {
+        this._areaLeftBound = sharedData.areaLeftBound;
+        this._areaTopBound = sharedData.areaTopBound;
+        this._areaRightBound = sharedData.areaRightBound;
+        this._areaBottomBound = sharedData.areaBottomBound;
+      }
     }
 
     /**
      * Get the obstacles manager of a scene.
      */
     static getManager(runtimeScene: any): NavMeshPathfindingObstaclesManager {
-      if (!runtimeScene.pathfindingObstaclesManager) {
+      if (!runtimeScene.navMeshPathfindingObstaclesManager) {
+        const initialData = runtimeScene.getInitialSharedDataForBehavior(
+          'NavMeshPathfindingObstacleBehavior'
+        );
         //Create the shared manager if necessary.
-        runtimeScene.pathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
-          runtimeScene
+        runtimeScene.navMeshPathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
+          runtimeScene,
+          initialData
         );
       }
-      return runtimeScene.pathfindingObstaclesManager;
+      return runtimeScene.navMeshPathfindingObstaclesManager;
     }
 
     /**

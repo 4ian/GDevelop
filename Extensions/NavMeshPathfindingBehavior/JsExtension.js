@@ -31,27 +31,27 @@ const declarePathfindingBehavior = function (
     propertyName,
     newValue
   ) {
-    if (propertyName === _('Acceleration')) {
+    if (propertyName === 'acceleration') {
       behaviorContent.setDoubleAttribute('acceleration', newValue);
       return true;
     }
-    if (propertyName === _('Max. speed')) {
+    if (propertyName === 'maxSpeed') {
       behaviorContent.setDoubleAttribute('maxSpeed', newValue);
       return true;
     }
-    if (propertyName === _('Rotate speed')) {
+    if (propertyName === 'angularMaxSpeed') {
       behaviorContent.setDoubleAttribute('angularMaxSpeed', newValue);
       return true;
     }
-    if (propertyName === _('Rotate object')) {
+    if (propertyName === 'rotateObject') {
       behaviorContent.setBoolAttribute('rotateObject', newValue === '1');
       return true;
     }
-    if (propertyName === _('Angle offset')) {
+    if (propertyName === 'angleOffset') {
       behaviorContent.setDoubleAttribute('angleOffset', newValue);
       return true;
     }
-    if (propertyName === _('Extra border size')) {
+    if (propertyName === 'extraBorder') {
       behaviorContent.setDoubleAttribute('extraBorder', newValue);
       return true;
     }
@@ -63,33 +63,39 @@ const declarePathfindingBehavior = function (
     const behaviorProperties = new gd.MapStringPropertyDescriptor();
 
     behaviorProperties
-      .getOrCreate(_('Acceleration'))
-      .setValue(behaviorContent.getDoubleAttribute('acceleration').toString());
+      .getOrCreate('acceleration')
+      .setValue(behaviorContent.getDoubleAttribute('acceleration').toString())
+      .setLabel('Acceleration');
 
     behaviorProperties
-      .getOrCreate(_('Max. speed'))
-      .setValue(behaviorContent.getDoubleAttribute('maxSpeed').toString());
+      .getOrCreate('maxSpeed')
+      .setValue(behaviorContent.getDoubleAttribute('maxSpeed').toString())
+      .setLabel('Max. speed');
 
     behaviorProperties
-      .getOrCreate(_('Rotate speed'))
+      .getOrCreate('angularMaxSpeed')
       .setValue(
         behaviorContent.getDoubleAttribute('angularMaxSpeed').toString()
-      );
+      )
+      .setLabel('Rotate speed');
 
     behaviorProperties
-      .getOrCreate(_('Rotate object'))
+      .getOrCreate('rotateObject')
       .setValue(
         behaviorContent.getBoolAttribute('rotateObject') ? 'true' : 'false'
       )
+      .setLabel('Rotate object')
       .setType('Boolean');
 
     behaviorProperties
-      .getOrCreate(_('Angle offset'))
-      .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString());
+      .getOrCreate('angleOffset')
+      .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString())
+      .setLabel('Angle offset');
 
     behaviorProperties
-      .getOrCreate(_('Extra border size'))
-      .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString());
+      .getOrCreate('extraBorder')
+      .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString())
+      .setLabel('Extra border size');
 
     return behaviorProperties;
   };
@@ -229,7 +235,7 @@ const declarePathfindingBehavior = function (
       false
     )
     .getCodeExtraInformation()
-    .setFunctionName('pathFound');
+    .setFunctionName('destinationReached');
 
   pathfindingBehaviorDeclaration
     .addScopedCondition(
@@ -259,7 +265,7 @@ const declarePathfindingBehavior = function (
     .addExpressionAndConditionAndAction(
       'number',
       'Speed',
-      _('Speed'),
+      _('Speed on the path'),
       _('the speed of the object on the path'),
       _('the speed on the path'),
       _('Movement on the path (NavMesh)'),
@@ -272,7 +278,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setSpeed')
+    .setGetter('getSpeed');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -291,7 +299,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setAcceleration')
+    .setGetter('getAcceleration');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -310,7 +320,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setMaxSpeed')
+    .setGetter('getMaxSpeed');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -329,7 +341,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setAngularMaxSpeed')
+    .setGetter('getAngularMaxSpeed');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -348,7 +362,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setAngleOffset')
+    .setGetter('getAngleOffset');
 
   pathfindingBehaviorDeclaration
     .addExpressionAndConditionAndAction(
@@ -369,7 +385,9 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .useStandardParameters('number');
+    .useStandardParameters('number')
+    .setFunctionName('setExtraBorder')
+    .setGetter('getExtraBorder');
 
   pathfindingBehaviorDeclaration
     .addScopedAction(
@@ -635,6 +653,111 @@ const declareObstacleBehavior = function (
   };
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingObstacleBehavior.initializeContent = function (behaviorContent) {};
+
+  var sharedData = new gd.BehaviorSharedDataJsImplementation();
+  // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+  sharedData.updateProperty = function (sharedContent, propertyName, newValue) {
+    if (propertyName === 'viewpoint') {
+      sharedContent.setStringAttribute('viewpoint', newValue);
+      return true;
+    }
+    if (propertyName === 'cellSize') {
+      newValue = parseFloat(newValue);
+      if (newValue !== newValue || newValue <= 0) return false;
+      sharedContent.setDoubleAttribute('cellSize', newValue);
+      return true;
+    }
+    if (propertyName === 'areaLeftBound') {
+      newValue = parseFloat(newValue);
+      if (newValue !== newValue) return false;
+      sharedContent.setDoubleAttribute('areaLeftBound', newValue);
+      return true;
+    }
+    if (propertyName === 'areaTopBound') {
+      newValue = parseFloat(newValue);
+      if (newValue !== newValue) return false;
+      sharedContent.setDoubleAttribute('areaTopBound', newValue);
+      return true;
+    }
+    if (propertyName === 'areaRightBound') {
+      newValue = parseFloat(newValue);
+      if (newValue !== newValue) return false;
+      sharedContent.setDoubleAttribute('areaRightBound', newValue);
+      return true;
+    }
+    if (propertyName === 'areaBottomBound') {
+      newValue = parseFloat(newValue);
+      if (newValue !== newValue) return false;
+      sharedContent.setDoubleAttribute('areaBottomBound', newValue);
+      return true;
+    }
+
+    return false;
+  };
+  // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+  sharedData.getProperties = function (sharedContent) {
+    var sharedProperties = new gd.MapStringPropertyDescriptor();
+
+    sharedProperties
+      .getOrCreate('viewpoint')
+      .setValue(sharedContent.getStringAttribute('viewpoint'))
+      .setType('Choice')
+      .setLabel('Viewpoint')
+      .addExtraInfo('Top-Down')
+      .addExtraInfo('Isometry 2:1 (26.565°)')
+      .addExtraInfo('True Isometry (30°)');
+
+    sharedProperties
+      .getOrCreate('cellSize')
+      .setValue(
+        sharedContent.getDoubleAttribute('cellSize').toString(10)
+      )
+      .setType('Number')
+      .setLabel('Cell size')
+      .setDescription('Cell size for obstacle collision mask rasterization.');
+
+    sharedProperties
+      .getOrCreate('areaLeftBound')
+      .setValue(sharedContent.getDoubleAttribute('areaLeftBound').toString(10))
+      .setType('Number')
+      .setLabel('Area left bound')
+      .setDescription('The left bound of the area where object can go (default on game resolution).');
+
+    sharedProperties
+      .getOrCreate('areaTopBound')
+      .setValue(sharedContent.getDoubleAttribute('areaTopBound').toString(10))
+      .setType('Number')
+      .setLabel('Area top bound')
+      .setDescription('The top bound of the area where object can go (default on game resolution).');
+
+    sharedProperties
+      .getOrCreate('areaRightBound')
+      .setValue(sharedContent.getDoubleAttribute('areaRightBound').toString(10))
+      .setType('Number')
+      .setLabel('Area right bound')
+      .setDescription('The right bound of the area where object can go (default on game resolution).');
+
+    sharedProperties
+      .getOrCreate('areaBottomBound')
+      .setValue(
+        sharedContent.getDoubleAttribute('areaBottomBound').toString(10)
+      )
+      .setType('Number')
+      .setLabel('Area bottom bound')
+      .setDescription('The bottom bound of the area where object can go (default on game resolution).');
+
+    return sharedProperties;
+  };
+  // $FlowExpectedError - ignore Flow warning as we're creating a behavior
+  sharedData.initializeContent = function (behaviorContent) {
+    behaviorContent.setStringAttribute('viewpoint', 'Top-Down');
+    behaviorContent.setDoubleAttribute('cellSize', 10);
+    behaviorContent.setDoubleAttribute('areaLeftBound', 0);
+    behaviorContent.setDoubleAttribute('areaTopBound', 0);
+    behaviorContent.setDoubleAttribute('areaRightBound', 0);
+    behaviorContent.setDoubleAttribute('areaBottomBound', 0);
+  };
+
   extension
     .addBehavior(
       'NavMeshPathfindingObstacleBehavior',
@@ -645,7 +768,7 @@ const declareObstacleBehavior = function (
       'CppPlatform/Extensions/pathfindingobstacleicon.png',
       'NavMeshPathfindingObstacleBehavior',
       pathfindingObstacleBehavior,
-      new gd.BehaviorsSharedData()
+      sharedData
     )
     .setIncludeFile(
       'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
@@ -667,45 +790,6 @@ module.exports = {
       'D8H',
       'MIT'
     );
-
-    extension
-      .registerProperty('Viewpoint')
-      .setLabel(_('Viewpoint'))
-      .setDescription(_('Viewpoint of the game.'))
-      .setType('Choice')
-      .addExtraInfo(_('Top-Down'))
-      .addExtraInfo(_('Isometry 2:1 (26.565°)'))
-      .addExtraInfo(_('True Isometry (30°)'));
-
-    extension
-      .registerProperty('CellSize')
-      .setLabel(_('Cell size'))
-      .setDescription(_('Cell size for obstacle collision mask rasterization.'))
-      .setType('number');
-
-    extension
-      .registerProperty('AreaLeftBound')
-      .setLabel(_('Area left bound'))
-      .setDescription(_('The left bound of the area where object can go.'))
-      .setType('number');
-
-    extension
-      .registerProperty('AreaTopBound')
-      .setLabel(_('Area top bound'))
-      .setDescription(_('The top bound of the area where object can go.'))
-      .setType('number');
-
-    extension
-      .registerProperty('AreaRightBound')
-      .setLabel(_('Area right bound'))
-      .setDescription(_('The right bound of the area where object can go.'))
-      .setType('number');
-
-    extension
-      .registerProperty('AreaBottomBound')
-      .setLabel(_('Area bottom bound'))
-      .setDescription(_('The bottom bound of the area where object can go.'))
-      .setType('number');
 
     extension
       .addAction(
@@ -749,32 +833,32 @@ module.exports = {
     return [
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Acceleration',
+        'acceleration',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Max. speed',
+        'maxSpeed',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Rotate speed',
+        'angularMaxSpeed',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Rotate object',
+        'rotateObject',
         'false'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Angle offset',
+        'angleOffset',
         '45'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         dummyBehavior,
-        'Extra border size',
+        'extraBorder',
         '100'
       ),
     ];

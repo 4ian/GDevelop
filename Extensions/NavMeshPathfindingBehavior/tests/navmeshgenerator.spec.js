@@ -304,8 +304,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -422,8 +421,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -630,8 +628,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -1010,8 +1007,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -1261,8 +1257,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -1610,8 +1605,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -1864,8 +1858,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>
@@ -2071,8 +2064,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     const scaledPolygons = gdjs.GridCoordinateConverter.convertFromGridBasis(
       grid,
-      convexPolygons,
-      1
+      convexPolygons
     );
     checkPolygons(
       scaledPolygons.map((polygon) =>

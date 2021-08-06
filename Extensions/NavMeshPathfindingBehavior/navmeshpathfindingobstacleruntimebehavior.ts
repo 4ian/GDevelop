@@ -132,11 +132,15 @@ namespace gdjs {
           contours,
           16
         );
-        // scaleY = isometricRatio to keep the same unit length on the 2 axis for the pathfinding
         const scaledMeshField = gdjs.GridCoordinateConverter.convertFromGridBasis(
           grid,
-          meshField,
-          this._isometricRatio
+          meshField
+        );
+        // Rescale the mesh to have the same unit length on the 2 axis for the pathfinding
+        scaledMeshField.forEach((polygon) =>
+          polygon.forEach((point) => {
+            point.y *= this._isometricRatio;
+          })
         );
         navMesh = new gdjs.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);

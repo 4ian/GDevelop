@@ -193,7 +193,6 @@ namespace gdjs {
     polygonBVertexIndex: integer;
   };
 
-  //TODO scaleY is behavior specific move this in the behavior.
   export class GridCoordinateConverter {
     /**
      *
@@ -204,17 +203,11 @@ namespace gdjs {
      */
     public static convertFromGridBasis(
       grid: RasterizationGrid,
-      polygons: Point[][],
-      scaleY: float
+      polygons: Point[][]
     ): Point[][] {
       // point can be shared so them must be copied to be scaled.
       return polygons.map((polygon) =>
-        polygon.map((point) => {
-          const scenePoint = { x: 0, y: 0 };
-          grid.convertFromGridBasis(point, scenePoint);
-          scenePoint.y *= scaleY;
-          return scenePoint;
-        })
+        polygon.map((point) => grid.convertFromGridBasis(point, { x: 0, y: 0 }))
       );
     }
   }

@@ -15,12 +15,17 @@ import Text from '../../UI/Text';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import CheckeredBackground from '../CheckeredBackground';
+import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
+const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
 
 const styles = {
+  previewImagePixelated: {
+    imageRendering: getPixelatedImageRendering(),
+  },
   contentContainer: {
     position: 'relative',
     height: '100%',
@@ -147,6 +152,15 @@ const ImagePreview = (props: Props) => {
     }));
   };
 
+  const resourceIsSmooth = (
+    project: gdProject,
+    resourceName: string
+  ): boolean => {
+    const resource = project.getResourcesManager().getResource(resourceName);
+    const imageResource = gd.asImageResource(resource);
+    return imageResource.isSmooth();
+  };
+
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
   const previewBorderColor = theme.imagePreview.borderColor || '#aaa';
@@ -156,7 +170,7 @@ const ImagePreview = (props: Props) => {
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
-        const { resourceName, renderOverlay, fixedHeight } = props;
+        const { resourceName, renderOverlay, fixedHeight, project } = props;
         const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 
         const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
@@ -182,6 +196,9 @@ const ImagePreview = (props: Props) => {
           width: imageWidth ? imageWidth * imageZoomFactor : undefined,
           height: imageHeight ? imageHeight * imageZoomFactor : undefined,
           visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
+          ...(!resourceIsSmooth(project, resourceName)
+            ? styles.previewImagePixelated
+            : undefined),
         };
 
         const frameStyle = {

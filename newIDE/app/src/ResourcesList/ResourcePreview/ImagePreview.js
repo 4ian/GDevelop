@@ -75,6 +75,17 @@ type State = {|
   imageZoomFactor: number,
 |};
 
+const resourceIsSmooth = (
+  project: gdProject,
+  resourceName: string
+): boolean => {
+  const resource = project.getResourcesManager().getResource(resourceName);
+  if (resource.getKind() !== 'image') return false;
+
+  const imageResource = gd.asImageResource(resource);
+  return imageResource.isSmooth();
+};
+
 const loadStateFrom = (newProps: {
   project: gdProject,
   resourceName: string,
@@ -150,15 +161,6 @@ const ImagePreview = (props: Props) => {
         Math.max(MIN_ZOOM_FACTOR, imageZoomFactor)
       ),
     }));
-  };
-
-  const resourceIsSmooth = (
-    project: gdProject,
-    resourceName: string
-  ): boolean => {
-    const resource = project.getResourcesManager().getResource(resourceName);
-    const imageResource = gd.asImageResource(resource);
-    return imageResource.isSmooth();
   };
 
   const theme = React.useContext(GDevelopThemeContext);

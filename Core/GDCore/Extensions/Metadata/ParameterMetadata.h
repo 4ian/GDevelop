@@ -68,14 +68,14 @@ class GD_CORE_API ParameterMetadata {
 
   /**
    * \brief Return an optional additional information, used for some parameters
-   * with special type (For example, it can contains the type of object accepted
+   * with special type (for example, it can contains the type of object accepted
    * by the parameter).
    */
   const gd::String &GetExtraInfo() const { return supplementaryInformation; }
 
   /**
    * \brief Set an optional additional information, used for some parameters
-   * with special type (For example, it can contains the type of object accepted
+   * with special type (for example, it can contains the type of object accepted
    * by the parameter).
    */
   ParameterMetadata &SetExtraInfo(const gd::String &supplementaryInformation_) {

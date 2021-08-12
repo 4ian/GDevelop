@@ -40,7 +40,7 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
-    _releaseKey: boolean = false;
+    _releasePlatformKey: boolean = false;
     _releaseLadderKey: boolean = false;
 
     private _state: State;
@@ -182,8 +182,8 @@ namespace gdjs {
         (this._downKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
-      this._releaseKey ||
-        (this._releaseKey =
+      this._releasePlatformKey ||
+        (this._releasePlatformKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
@@ -234,7 +234,7 @@ namespace gdjs {
       this._releaseLadderKey = false;
       this._upKey = false;
       this._downKey = false;
-      this._releaseKey = false;
+      this._releasePlatformKey = false;
       this._jumpKey = false;
 
       //5) Track the movement
@@ -813,7 +813,7 @@ namespace gdjs {
       } else if (input === 'Jump') {
         this._jumpKey = true;
       } else if (input === 'Release') {
-        this._releaseKey = true;
+        this._releasePlatformKey = true;
       } else if (input === 'Release Ladder') {
         this._releaseLadderKey = true;
       }
@@ -1094,8 +1094,8 @@ namespace gdjs {
     /**
      * Simulate the "Release" control of the Platformer Object.
      */
-    simulateReleaseKey() {
-      this._releaseKey = true;
+    simulateReleasePlatformKey() {
+      this._releasePlatformKey = true;
     }
 
     /**
@@ -1593,7 +1593,7 @@ namespace gdjs {
       behavior._checkTransitionOnLadder();
 
       //Release the platform
-      if (behavior._releaseKey) {
+      if (behavior._releasePlatformKey) {
         behavior._releaseGrabbedPlatform();
       }
 

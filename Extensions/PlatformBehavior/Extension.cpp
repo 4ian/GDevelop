@@ -501,18 +501,21 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SimulateJumpKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
-    aut.AddAction("SimulateReleaseKey",
-                  _("Simulate release key press"),
-                  _("Simulate a press of the release key (used when grabbing a "
+    aut.AddAction("SimulateReleasePlatformKey",
+                  _("Simulate release platform key press"),
+                  _("Simulate a press of the release platform key (used when grabbing a "
                     "platform ledge)."),
-                  _("Simulate pressing Release key for _PARAM0_"),
+                  _("Simulate pressing Release Platform key for _PARAM0_"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .SetFunctionName("SimulateReleaseKey")
+        .SetFunctionName("SimulateReleasePlatformKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    // Support for deprecated names:
+    aut.AddDuplicatedAction("SimulateReleaseKey", "SimulateReleasePlatformKey").SetHidden();
 
     aut.AddAction("SimulateControl",
                   _("Simulate control"),

@@ -332,7 +332,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getY()).to.be(platform.getY());
 
-      object.getBehavior('auto1').simulateReleaseKey();
+      object.getBehavior('auto1').simulateReleasePlatformKey();
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -389,7 +389,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
 
         // Release upper platform
-        object.getBehavior('auto1').simulateReleaseKey();
+        object.getBehavior('auto1').simulateReleasePlatformKey();
         for (let i = 0; i < 35; ++i) {
           object.getBehavior('auto1').simulateLeftKey();
           runtimeScene.renderAndStep(1000 / 60);

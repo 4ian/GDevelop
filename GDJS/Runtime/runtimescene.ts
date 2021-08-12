@@ -711,6 +711,9 @@ namespace gdjs {
           obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
           obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
           obj.update(this);
+          this._runtimeGame
+            .getObjectEffectsManager()
+            .update(obj.getRendererEffects(), obj);
           obj.updateForces(elapsedTimeInSeconds);
         } else {
           obj.update(this);

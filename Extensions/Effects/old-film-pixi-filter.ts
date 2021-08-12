@@ -9,8 +9,7 @@ namespace gdjs {
     },
     update: function (filter, target) {
       if (filter.animationFrequency !== 0) {
-        filter._animationTimer +=
-          target.getElapsedTime(target.getRuntimeScene()) / 1000;
+        filter._animationTimer += target.getElapsedTime() / 1000;
         if (filter._animationTimer >= 1 / filter.animationFrequency) {
           filter.seed = Math.random();
           filter._animationTimer = 0;

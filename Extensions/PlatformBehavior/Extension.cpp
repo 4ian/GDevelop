@@ -475,6 +475,20 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SimulateLadderKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddAction(
+           "SimulateReleaseLadderKey",
+           _("Simulate release ladder key press"),
+           _("Simulate a press of the Release Ladder key (used to get off a ladder)."),
+           _("Simulate pressing Release Ladder key for _PARAM0_"),
+           _("Controls"),
+           "res/conditions/keyboard24.png",
+           "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsAdvanced()
+        .SetFunctionName("SimulateReleaseLadderKey")
+        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
     aut.AddAction("SimulateJumpKey",
                   _("Simulate jump key press"),
                   _("Simulate a press of the jump key."),
@@ -503,7 +517,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("SimulateControl",
                   _("Simulate control"),
                   _("Simulate a press of a key.\nValid keys are Left, Right, "
-                    "Jump, Ladder, Up, Down."),
+                    "Jump, Ladder, Release Ladder, Up, Down."),
                   _("Simulate pressing _PARAM2_ key for _PARAM0_"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",

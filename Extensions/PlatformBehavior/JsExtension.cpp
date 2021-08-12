@@ -132,6 +132,8 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           "simulateDownKey");
       autActions["PlatformBehavior::SimulateLadderKey"].SetFunctionName(
           "simulateLadderKey");
+      autActions["PlatformBehavior::SimulateReleaseLadderKey"].SetFunctionName(
+          "simulateReleaseLadderKey");
       autActions["PlatformBehavior::SimulateJumpKey"].SetFunctionName(
           "simulateJumpKey");
       autActions["PlatformBehavior::SimulateReleaseKey"].SetFunctionName(

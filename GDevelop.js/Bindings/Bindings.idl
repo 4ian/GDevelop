@@ -607,7 +607,7 @@ interface Layout {
     void SerializeLayersTo([Ref] SerializerElement element);
     void UnserializeLayersFrom([Const, Ref] SerializerElement element);
 
-    [Ref] LayoutEditorCanvasOptions GetAssociatedSettings();
+    [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -656,7 +656,7 @@ interface ExternalLayout {
     [Const, Ref] DOMString GetAssociatedLayout();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
-    [Ref] LayoutEditorCanvasOptions GetAssociatedSettings();
+    [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -2301,8 +2301,8 @@ interface ResourcesInUseHelper {
 };
 ResourcesInUseHelper implements ArbitraryResourceWorker;
 
-interface LayoutEditorCanvasOptions {
-    void LayoutEditorCanvasOptions();
+interface EditorSettings {
+    void EditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

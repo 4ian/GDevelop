@@ -30,6 +30,7 @@ import PinchHandler, { shouldBeHandledByPinch } from './PinchHandler';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import LongTouchHandler from './LongTouchHandler';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 const styles = {
   canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
@@ -42,8 +43,10 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   project: gdProject,
   layout: gdLayout,
   initialInstances: gdInitialInstancesContainer,
-  options: Object,
-  onChangeOptions: (uiSettings: Object) => void,
+  instancesEditorSettings: InstancesEditorSettings,
+  onChangeInstancesEditorSettings: (
+    instancesEditorSettings: InstancesEditorSettings
+  ) => void,
   instancesSelection: InstancesSelection,
   onDeleteSelection: () => void,
   onInstancesAdded: (instances: Array<gdInitialInstance>) => void,
@@ -229,13 +232,13 @@ export default class InstancesEditor extends Component<Props> {
       initialViewY: project ? project.getGameResolutionHeight() / 2 : 0,
       width: this.props.width,
       height: this.props.height,
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.pixiContainer.addChild(this.viewPosition.getPixiContainer());
 
     this.grid = new Grid({
       viewPosition: this.viewPosition,
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
@@ -265,7 +268,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this._instancesAdder = new InstancesAdder({
       instances: this.props.initialInstances,
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
 
     this._mountEditorComponents(this.props);
@@ -348,14 +351,14 @@ export default class InstancesEditor extends Component<Props> {
     });
     this.instancesResizer = new InstancesResizer({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.instancesRotator = new InstancesRotator(
       this.instancesRenderer.getInstanceMeasurer()
     );
     this.instancesMover = new InstancesMover({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.windowBorder = new WindowBorder({
       project: props.project,
@@ -365,7 +368,7 @@ export default class InstancesEditor extends Component<Props> {
     this.windowMask = new WindowMask({
       project: props.project,
       viewPosition: this.viewPosition,
-      options: this.props.options,
+      instancesEditorSettings: this.props.instancesEditorSettings,
     });
     this.statusBar = new StatusBar({
       width: this.props.width,
@@ -420,13 +423,25 @@ export default class InstancesEditor extends Component<Props> {
       this._renderScene();
     }
 
-    if (nextProps.options !== this.props.options) {
-      this.grid.setOptions(nextProps.options);
-      this.instancesMover.setOptions(nextProps.options);
-      this.instancesResizer.setOptions(nextProps.options);
-      this.windowMask.setOptions(nextProps.options);
-      this.viewPosition.setOptions(nextProps.options);
-      this._instancesAdder.setOptions(nextProps.options);
+    if (
+      nextProps.instancesEditorSettings !== this.props.instancesEditorSettings
+    ) {
+      this.grid.setInstancesEditorSettings(nextProps.instancesEditorSettings);
+      this.instancesMover.setInstancesEditorSettings(
+        nextProps.instancesEditorSettings
+      );
+      this.instancesResizer.setInstancesEditorSettings(
+        nextProps.instancesEditorSettings
+      );
+      this.windowMask.setInstancesEditorSettings(
+        nextProps.instancesEditorSettings
+      );
+      this.viewPosition.setInstancesEditorSettings(
+        nextProps.instancesEditorSettings
+      );
+      this._instancesAdder.setInstancesEditorSettings(
+        nextProps.instancesEditorSettings
+      );
     }
 
     if (nextProps.screenType !== this.props.screenType) {
@@ -484,11 +499,12 @@ export default class InstancesEditor extends Component<Props> {
   }
 
   getZoomFactor = () => {
-    return this.props.options.zoomFactor;
+    return this.props.instancesEditorSettings.zoomFactor;
   };
 
   setZoomFactor = (zoomFactor: number) => {
-    this.props.onChangeOptions({
+    this.props.onChangeInstancesEditorSettings({
+      ...this.props.instancesEditorSettings,
       zoomFactor: Math.max(Math.min(zoomFactor, 10), 0.01),
     });
   };

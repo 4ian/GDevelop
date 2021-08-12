@@ -176,7 +176,7 @@ declare class libGDevelop {
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
-  LayoutEditorCanvasOptions: Class<gdLayoutEditorCanvasOptions>;
+  EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;
   VectorPoint: Class<gdVectorPoint>;
   Polygon2d: Class<gdPolygon2d>;

@@ -13,7 +13,7 @@ namespace gd {
 class SerializerElement;
 }
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #endif
 
 namespace gd {
@@ -58,15 +58,15 @@ class GD_CORE_API ExternalLayout {
   /**
    * \brief Get the user settings for the IDE.
    */
-  const gd::LayoutEditorCanvasOptions& GetAssociatedSettings() const {
-    return editionSettings;
+  const gd::EditorSettings& GetAssociatedEditorSettings() const {
+    return editorSettings;
   }
 
   /**
    * \brief Get the user settings for the IDE.
    */
-  gd::LayoutEditorCanvasOptions& GetAssociatedSettings() {
-    return editionSettings;
+  gd::EditorSettings& GetAssociatedEditorSettings() {
+    return editorSettings;
   }
 #endif
 
@@ -100,7 +100,7 @@ class GD_CORE_API ExternalLayout {
   gd::String name;
   gd::InitialInstancesContainer instances;
 #if defined(GD_IDE_ONLY)
-  gd::LayoutEditorCanvasOptions editionSettings;
+  gd::EditorSettings editorSettings;
 #endif
   gd::String associatedLayout;
 };

@@ -27,7 +27,7 @@ declare class gdLayout extends gdObjectsContainer {
   moveLayer(oldIndex: number, newIndex: number): void;
   serializeLayersTo(element: gdSerializerElement): void;
   unserializeLayersFrom(element: gdSerializerElement): void;
-  getAssociatedSettings(): gdLayoutEditorCanvasOptions;
+  getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(project: gdProject, element: gdSerializerElement): void;
   setStopSoundsOnStartup(enable: boolean): void;

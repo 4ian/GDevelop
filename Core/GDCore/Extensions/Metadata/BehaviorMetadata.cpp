@@ -275,6 +275,76 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
+#if defined(GD_IDE_ONLY)
+gd::InstructionMetadata& BehaviorMetadata::AddDuplicatedAction(
+    const gd::String& newActionName, const gd::String& copiedActionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newActionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedActionName;
+
+  auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
+  if (copiedAction == actionsInfos.end()) {
+    gd::LogWarning("Could not find an action with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    actionsInfos[newNameWithNamespace] = copiedAction->second;
+  }
+
+  return actionsInfos[newNameWithNamespace];
+}
+
+gd::InstructionMetadata& BehaviorMetadata::AddDuplicatedCondition(
+    const gd::String& newConditionName, const gd::String& copiedConditionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newConditionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedConditionName;
+
+  auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
+  if (copiedCondition == conditionsInfos.end()) {
+    gd::LogWarning("Could not find a condition with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    conditionsInfos[newNameWithNamespace] = copiedCondition->second;
+  }
+
+  return conditionsInfos[newNameWithNamespace];
+}
+
+gd::ExpressionMetadata& BehaviorMetadata::AddDuplicatedExpression(
+    const gd::String& newExpressionName,
+    const gd::String& copiedExpressionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newExpressionName;
+  gd::String copiedNameWithNamespace =
+      extensionNamespace + copiedExpressionName;
+
+  auto copiedExpression = expressionsInfos.find(copiedNameWithNamespace);
+  if (copiedExpression == expressionsInfos.end()) {
+    gd::LogWarning("Could not find an expression with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    expressionsInfos[newNameWithNamespace] = copiedExpression->second;
+  }
+
+  return expressionsInfos[newNameWithNamespace];
+}
+
+gd::ExpressionMetadata& BehaviorMetadata::AddDuplicatedStrExpression(
+    const gd::String& newExpressionName,
+    const gd::String& copiedExpressionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newExpressionName;
+  gd::String copiedNameWithNamespace =
+      extensionNamespace + copiedExpressionName;
+
+  auto copiedExpression = strExpressionsInfos.find(copiedNameWithNamespace);
+  if (copiedExpression == strExpressionsInfos.end()) {
+    gd::LogWarning("Could not find a string expression with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    strExpressionsInfos[newNameWithNamespace] = copiedExpression->second;
+  }
+
+  return strExpressionsInfos[newNameWithNamespace];
+}
+#endif
+
 BehaviorMetadata& BehaviorMetadata::SetFullName(const gd::String& fullname_) {
 #if defined(GD_IDE_ONLY)
   fullname = fullname_;

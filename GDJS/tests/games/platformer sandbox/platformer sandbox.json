@@ -983,6 +983,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -1280,6 +1281,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1403,6 +1405,7 @@
               "yGrabOffset": 0
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -1462,6 +1465,7 @@
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1480,6 +1484,7 @@
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1496,6 +1501,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1572,6 +1578,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1649,6 +1656,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -1707,6 +1715,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -1766,6 +1775,7 @@
           "type": "TiledSpriteObject::TiledSprite",
           "width": 70,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Platform",
@@ -1782,6 +1792,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "PlatformerObject",
@@ -1862,6 +1873,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "PlatformerObject",
@@ -2021,6 +2033,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "PlatformerObject",
@@ -2181,6 +2194,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2335,6 +2349,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2492,6 +2507,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "x 0",
           "font": "Bimbo_JVE.ttf",
           "characterSize": 40,
@@ -2508,6 +2524,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2566,6 +2583,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2624,6 +2642,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2682,6 +2701,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",
@@ -2739,6 +2759,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Anchor",
@@ -2808,6 +2829,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",

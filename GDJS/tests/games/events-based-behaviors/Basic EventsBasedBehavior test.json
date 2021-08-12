@@ -312,6 +312,7 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "MyBehavior",
@@ -338,6 +339,7 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "MyBehavior",
@@ -362,6 +364,7 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "MyBehavior",
@@ -390,6 +393,7 @@
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "MyBehavior",
@@ -430,6 +434,7 @@
               "BooleanTestProperty": true
             }
           ],
+          "effects": [],
           "string": "This should be changed by MyBehavior, using ThirdBehavior of NewObject6. (seeing this is a FAIL)",
           "font": "",
           "characterSize": 20,
@@ -454,6 +459,7 @@
               "type": "NewEventsFunctionsExtension::ThirdBehavior"
             }
           ],
+          "effects": [],
           "string": "Unmodified text, just having ThirdBehavior (success 6)",
           "font": "",
           "characterSize": 20,
@@ -485,6 +491,7 @@
               "BooleanTestProperty": true
             }
           ],
+          "effects": [],
           "string": "This should be changed by MyBehavior, using \"BehaviorUsingMyBehaviorFromOtherExtension\" of the same object. (seeing this is a FAIL)",
           "font": "",
           "characterSize": 20,
@@ -509,6 +516,7 @@
               "type": "NewEventsFunctionsExtension::ThirdBehavior"
             }
           ],
+          "effects": [],
           "string": "Unmodified text, just having ThirdBehavior (success 8)",
           "font": "",
           "characterSize": 20,
@@ -536,6 +544,7 @@
               "BooleanTestProperty": true
             }
           ],
+          "effects": [],
           "string": "SHould be Modified by a function (seeing this is a FAIL)",
           "font": "",
           "characterSize": 20,
@@ -563,6 +572,7 @@
               "BooleanTestProperty": true
             }
           ],
+          "effects": [],
           "string": "SHould be Modified by NewObject 8 (seeing this is a FAIL)",
           "font": "",
           "characterSize": 20,
@@ -590,6 +600,7 @@
               "BooleanTestProperty": true
             }
           ],
+          "effects": [],
           "string": "This should rotate (if not FAIL, otherwise success 11)",
           "font": "",
           "characterSize": 20,

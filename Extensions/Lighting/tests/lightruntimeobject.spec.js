@@ -41,6 +41,7 @@ const addLightObstacle = (runtimeScene, width, height) => {
         type: 'Lighting::LightObstacleBehavior',
       },
     ],
+    effects: [],
   });
   obstacle.getWidth = function () {
     return width;

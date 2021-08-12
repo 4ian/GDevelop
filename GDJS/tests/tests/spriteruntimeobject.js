@@ -40,6 +40,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
       updateIfNotVisible: false,
       behaviors: [],
       variables: [],
+      effects: [],
       animations: [
         {
           name: 'firstAnimation',

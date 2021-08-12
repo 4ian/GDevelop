@@ -66,6 +66,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             collisionMethod: collisionMethod,
           },
         ],
+        effects: [],
       });
       player.getWidth = function () {
         return 90;
@@ -89,6 +90,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             cost: 2,
           },
         ],
+        effects: [],
       });
       obstacle.getWidth = function () {
         return 100;

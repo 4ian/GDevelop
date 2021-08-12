@@ -136,6 +136,9 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           "simulateReleaseLadderKey");
       autActions["PlatformBehavior::SimulateJumpKey"].SetFunctionName(
           "simulateJumpKey");
+      // deprecated release platform key.
+      autActions["PlatformBehavior::SimulateReleaseKey"].SetFunctionName(
+          "simulateReleasePlatformKey");
       autActions["PlatformBehavior::SimulateReleasePlatformKey"].SetFunctionName(
           "simulateReleasePlatformKey");
       autActions["PlatformBehavior::SimulateControl"].SetFunctionName(

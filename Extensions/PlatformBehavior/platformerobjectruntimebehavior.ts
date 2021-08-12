@@ -559,7 +559,7 @@ namespace gdjs {
     }
 
     /**
-     * Mark the platformer object as falling.
+     * Mark the platformer object as falling if on a ladder.
      */
     _releaseLadder() {
       if (this._state === this._onLadder) {

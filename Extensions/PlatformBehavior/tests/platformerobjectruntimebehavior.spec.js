@@ -1633,9 +1633,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     };
 
     const releaseLadder = (frameCount) => {
+      object.getBehavior('auto1').simulateReleaseLadderKey();
       for (let i = 0; i < frameCount; ++i) {
         const lastY = object.getY();
-        object.getBehavior('auto1').simulateReleaseLadderKey();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(false);
         expect(object.getBehavior('auto1').isMoving()).to.be(true);
@@ -1700,8 +1700,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.getBehavior('auto1').simulateLadderKey();
       climbLadder(10);
       stayOnLadder(10);
+      const objectPositionAfterFirstClimb = object.getY();
       releaseLadder(10);
       object.getBehavior('auto1').simulateLadderKey();
+      expect(object.getY()).to.be.within(
+        // gravity is 1500, 10 frames falling ~ 23px
+        objectPositionAfterFirstClimb + 22,
+        objectPositionAfterFirstClimb + 24
+      );
       climbLadder(24);
       // Check that we reached the maximum height
       const playerAtLadderTop = ladder.getY() - object.getHeight();

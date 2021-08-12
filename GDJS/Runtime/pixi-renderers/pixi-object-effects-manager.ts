@@ -10,7 +10,7 @@ namespace gdjs {
 
   export interface EffectsTarget {
     getRuntimeScene: () => RuntimeScene;
-    getElapsedTime: (runtimeScene: RuntimeScene) => number;
+    getElapsedTime: (runtimeScene?: RuntimeScene) => number;
     getHeight: () => number;
     getWidth: () => number;
   }

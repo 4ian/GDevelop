@@ -3612,4 +3612,26 @@ describe('libGD.js', function () {
       );
     });
   });
+
+  describe('gd.EditorSettings', () => {
+    it('can store anything', () => {
+      const element = gd.Serializer.fromJSObject({
+        test: 1,
+        anything: {
+          canBeStored: true,
+        },
+      });
+
+      const editorSettings = new gd.EditorSettings();
+      editorSettings.unserializeFrom(element);
+
+      const element2 = new gd.SerializerElement();
+      editorSettings.serializeTo(element2);
+
+      expect(element2.getChild('test').getIntValue()).toBe(1);
+      expect(
+        element2.getChild('anything').getChild('canBeStored').getBoolValue()
+      ).toBe(true);
+    });
+  });
 });

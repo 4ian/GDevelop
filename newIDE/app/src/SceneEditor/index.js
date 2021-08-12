@@ -36,6 +36,7 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
+import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 
 import {
   type ResourceSource,
@@ -107,7 +108,7 @@ const initialMosaicEditorNodesSmallWindow = {
 
 type Props = {|
   initialInstances: gdInitialInstancesContainer,
-  initialUiSettings: Object,
+  getInitialInstancesEditorSettings: () => InstancesEditorSettings,
   layout: gdLayout,
   onEditObject?: ?(object: gdObject) => void,
   onOpenMoreSettings?: ?() => void,
@@ -140,7 +141,7 @@ type State = {|
 
   editedGroup: ?gdObjectGroup,
 
-  uiSettings: Object,
+  instancesEditorSettings: Object,
   history: HistoryState,
 
   showObjectsListInfoBar: boolean,
@@ -190,7 +191,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
 
-      uiSettings: props.initialUiSettings,
+      instancesEditorSettings: props.getInitialInstancesEditorSettings(),
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
       }),
@@ -218,8 +219,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         this.props.unsavedChanges.triggerUnsavedChanges();
   }
 
-  getUiSettings() {
-    return this.state.uiSettings;
+  getInstancesEditorSettings() {
+    return this.state.instancesEditorSettings;
   }
 
   updateToolbar() {
@@ -234,8 +235,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         toggleLayersList={this.toggleLayersList}
         toggleWindowMask={this.toggleWindowMask}
         toggleGrid={this.toggleGrid}
-        isGridShown={() => !!this.state.uiSettings.grid}
-        isWindowMaskShown={() => !!this.state.uiSettings.windowMask}
+        isGridShown={() => !!this.state.instancesEditorSettings.grid}
+        isWindowMaskShown={() =>
+          !!this.state.instancesEditorSettings.windowMask
+        }
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
         centerView={this.centerView}
@@ -306,19 +309,19 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   toggleWindowMask = () => {
     this.setState({
-      uiSettings: {
-        ...this.state.uiSettings,
-        windowMask: !this.state.uiSettings.windowMask,
+      instancesEditorSettings: {
+        ...this.state.instancesEditorSettings,
+        windowMask: !this.state.instancesEditorSettings.windowMask,
       },
     });
   };
 
   toggleGrid = () => {
     this.setState({
-      uiSettings: {
-        ...this.state.uiSettings,
-        grid: !this.state.uiSettings.grid,
-        snap: !this.state.uiSettings.grid,
+      instancesEditorSettings: {
+        ...this.state.instancesEditorSettings,
+        grid: !this.state.instancesEditorSettings.grid,
+        snap: !this.state.instancesEditorSettings.grid,
       },
     });
   };
@@ -389,12 +392,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ editedGroup: group });
   };
 
-  setUiSettings = (uiSettings: Object) => {
+  setInstancesEditorSettings = (
+    instancesEditorSettings: InstancesEditorSettings
+  ) => {
     this.setState({
-      uiSettings: {
-        ...this.state.uiSettings,
-        ...uiSettings,
-      },
+      instancesEditorSettings,
     });
   };
 
@@ -1033,8 +1035,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             project={project}
             layout={layout}
             initialInstances={initialInstances}
-            options={this.state.uiSettings}
-            onChangeOptions={this.setUiSettings}
+            instancesEditorSettings={this.state.instancesEditorSettings}
+            onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
             instancesSelection={this.instancesSelection}
             onDeleteSelection={this.deleteSelection}
             onInstancesAdded={this._onInstancesAdded}
@@ -1268,13 +1270,10 @@ export default class SceneEditor extends React.Component<Props, State> {
         />
         {this.state.setupGridOpen && (
           <SetupGridDialog
-            open
-            gridOptions={this.state.uiSettings}
+            instancesEditorSettings={this.state.instancesEditorSettings}
+            onChangeInstancesEditorSettings={this.setInstancesEditorSettings}
             onCancel={() => this.openSetupGrid(false)}
-            onApply={gridOptions => {
-              this.setUiSettings(gridOptions);
-              this.openSetupGrid(false);
-            }}
+            onApply={() => this.openSetupGrid(false)}
           />
         )}
         {!!this.state.variablesEditedInstance && (

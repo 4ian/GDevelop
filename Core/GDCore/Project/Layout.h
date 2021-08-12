@@ -18,7 +18,7 @@
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #endif
 namespace gd {
 class BaseEvent;
@@ -291,18 +291,18 @@ class GD_CORE_API Layout : public ObjectsContainer {
 #if defined(GD_IDE_ONLY)
   /**
    * Return the settings associated to the layout.
-   * \see gd::LayoutEditorCanvasOptions
+   * \see gd::EditorSettings
    */
-  const gd::LayoutEditorCanvasOptions& GetAssociatedSettings() const {
-    return associatedSettings;
+  const gd::EditorSettings& GetAssociatedEditorSettings() const {
+    return editorSettings;
   }
 
   /**
    * Return the settings associated to the layout.
-   * \see gd::LayoutEditorCanvasOptions
+   * \see gd::EditorSettings
    */
-  gd::LayoutEditorCanvasOptions& GetAssociatedSettings() {
-    return associatedSettings;
+  gd::EditorSettings& GetAssociatedEditorSettings() {
+    return editorSettings;
   }
 #endif
 
@@ -436,7 +436,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
                            ///< specified behavior shared data.
 #if defined(GD_IDE_ONLY)
   EventsList events;  ///< Scene events
-  gd::LayoutEditorCanvasOptions associatedSettings;
+  gd::EditorSettings editorSettings;
 #endif
 
 // TODO: GD C++ Platform specific code below

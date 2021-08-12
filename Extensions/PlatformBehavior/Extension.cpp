@@ -475,6 +475,18 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SimulateLadderKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
+    aut.AddAction(
+           "SimulateReleaseLadderKey",
+           _("Simulate release ladder key press"),
+           _("Simulate a press of the Release Ladder key (used to get off a ladder)."),
+           _("Simulate pressing Release Ladder key for _PARAM0_"),
+           _("Controls"),
+           "res/conditions/keyboard24.png",
+           "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsAdvanced();
+
     aut.AddAction("SimulateJumpKey",
                   _("Simulate jump key press"),
                   _("Simulate a press of the jump key."),
@@ -487,30 +499,35 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SimulateJumpKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
 
-    aut.AddAction("SimulateReleaseKey",
-                  _("Simulate release key press"),
-                  _("Simulate a press of the release key (used when grabbing a "
+    aut.AddAction("SimulateReleasePlatformKey",
+                  _("Simulate release platform key press"),
+                  _("Simulate a press of the release platform key (used when grabbing a "
                     "platform ledge)."),
-                  _("Simulate pressing Release key for _PARAM0_"),
+                  _("Simulate pressing Release Platform key for _PARAM0_"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .SetFunctionName("SimulateReleaseKey")
+        .SetFunctionName("SimulateReleasePlatformKey")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
+
+    // Support for deprecated names:
+    aut.AddDuplicatedAction("SimulateReleaseKey", "SimulateReleasePlatformKey").SetHidden();
 
     aut.AddAction("SimulateControl",
                   _("Simulate control"),
                   _("Simulate a press of a key.\nValid keys are Left, Right, "
-                    "Jump, Ladder, Up, Down."),
+                    "Jump, Ladder, Release Ladder, Up, Down."),
                   _("Simulate pressing _PARAM2_ key for _PARAM0_"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
-        .AddParameter("string", _("Key"))
+        .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release Ladder\", \"Up\", \"Down\"]")
         .MarkAsAdvanced()
         .SetFunctionName("SimulateControl")
         .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");

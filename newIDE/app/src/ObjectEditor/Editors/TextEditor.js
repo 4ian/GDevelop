@@ -41,7 +41,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     return (
       <Column noMargin>
         <MiniToolbar>
-          <MiniToolbarText>
+          <MiniToolbarText firstChild>
             <Trans>Size:</Trans>
           </MiniToolbarText>
           <SemiControlledTextField

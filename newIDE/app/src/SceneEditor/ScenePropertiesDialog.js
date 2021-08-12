@@ -107,9 +107,14 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         const sharedDataContent = layout.getBehaviorSharedData(name);
         const type = sharedDataContent.getTypeName();
 
-        const behaviorSharedData = gd.JsPlatform.get().getBehaviorSharedDatas(
+        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          gd.JsPlatform.get(),
           type
         );
+        if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata))
+          return null;
+
+        const behaviorSharedData = behaviorMetadata.getSharedDataInstance();
         if (isNullPtr(gd, behaviorSharedData)) return null;
 
         const properties = behaviorSharedData.getProperties(

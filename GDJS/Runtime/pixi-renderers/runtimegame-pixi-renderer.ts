@@ -26,18 +26,20 @@ namespace gdjs {
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
     _pixiRenderer: PIXI.Renderer | null = null;
-    _canvasWidth: float = 0;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
+    _canvasWidth: float = 0;
+    // Current height of the canvas (might be scaled down/up compared to renderer)
     _canvasHeight: float = 0;
 
-    // Current height of the canvas (might be scaled down/up compared to renderer)
     _keepRatio: boolean = true;
     _marginLeft: any;
     _marginTop: any;
     _marginRight: any;
     _marginBottom: any;
     _notifySceneForResize: any;
+
+    _nextFrameId: integer = 0;
 
     /**
      * @param game The game that is being rendered
@@ -70,9 +72,9 @@ namespace gdjs {
         this._pixiRenderer.view
       );
       this._pixiRenderer.view.style['position'] = 'absolute';
+      //Ensure that the canvas has the focus.
       this._pixiRenderer.view.tabIndex = 1;
 
-      //Ensure that the canvas has the focus.
       this._resizeCanvas();
 
       // Handle scale mode
@@ -533,16 +535,21 @@ namespace gdjs {
     }
 
     startGameLoop(fn) {
-      requestAnimationFrame(gameLoop);
       let oldTime = 0;
+      const gameLoop = (time: float) => {
+        // Schedule the next frame now to be sure it's called as soon
+        // as possible after this one is finished.
+        this._nextFrameId = requestAnimationFrame(gameLoop);
 
-      function gameLoop(time) {
         const dt = oldTime ? time - oldTime : 0;
         oldTime = time;
-        if (fn(dt)) {
-          requestAnimationFrame(gameLoop);
+        if (!fn(dt)) {
+          // Stop the game loop if requested.
+          cancelAnimationFrame(this._nextFrameId);
         }
-      }
+      };
+
+      requestAnimationFrame(gameLoop);
     }
 
     getPIXIRenderer() {

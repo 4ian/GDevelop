@@ -1,12 +1,32 @@
+// @flow
 import * as PIXI from 'pixi.js-legacy';
-const gd /* TODO: add flow in this file */ = global.gd;
+import Rectangle from '../Utils/Rectangle';
+const gd: libGDevelop = global.gd;
 
 export default class SelectionRectangle {
+  instances: gdInitialInstancesContainer;
+  instanceMeasurer: any;
+  toSceneCoordinates: (x: number, y: number) => [number, number];
+
+  pixiRectangle: PIXI.Graphics;
+  selectionRectangleStart: any;
+  selectionRectangleEnd: any;
+  _instancesInSelectionRectangle: gdInitialInstance[];
+
+  selector: gdInitialInstanceJSFunctor;
+  /**
+   * Used to check if an instance is in the selection rectangle
+   */
+  _temporaryAABB: Rectangle;
+
   constructor({
     instances,
     instanceMeasurer,
     toSceneCoordinates,
-    toCanvasCoordinates,
+  }: {
+    instances: gdInitialInstancesContainer,
+    instanceMeasurer: any,
+    toSceneCoordinates: (x: number, y: number) => [number, number],
   }) {
     this.instances = instances;
     this.instanceMeasurer = instanceMeasurer;
@@ -18,13 +38,16 @@ export default class SelectionRectangle {
     this.selectionRectangleEnd = null;
     this._instancesInSelectionRectangle = [];
 
+    this._temporaryAABB = new Rectangle();
     this.selector = new gd.InitialInstanceJSFunctor();
+    // $FlowFixMe - invoke is not writable
     this.selector.invoke = instancePtr => {
+      // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
-      const x = this.instanceMeasurer.getInstanceLeft(instance);
-      const y = this.instanceMeasurer.getInstanceTop(instance);
-      const instanceHeight = this.instanceMeasurer.getInstanceHeight(instance);
-      const instanceWidth = this.instanceMeasurer.getInstanceWidth(instance);
+      const instanceAABB = this.instanceMeasurer.getInstanceAABB(
+        instance,
+        this._temporaryAABB
+      );
 
       if (!this.selectionRectangleStart || !this.selectionRectangleEnd) return;
 
@@ -38,10 +61,10 @@ export default class SelectionRectangle {
       );
 
       if (
-        selectionSceneStart[0] <= x &&
-        x + instanceWidth <= selectionSceneEnd[0] &&
-        selectionSceneStart[1] <= y &&
-        y + instanceHeight <= selectionSceneEnd[1]
+        selectionSceneStart[0] <= instanceAABB.left &&
+        instanceAABB.right <= selectionSceneEnd[0] &&
+        selectionSceneStart[1] <= instanceAABB.top &&
+        instanceAABB.bottom <= selectionSceneEnd[1]
       ) {
         this._instancesInSelectionRectangle.push(instance);
       }
@@ -52,12 +75,12 @@ export default class SelectionRectangle {
     return this.selectionRectangleStart;
   }
 
-  startSelectionRectangle = (x, y) => {
+  startSelectionRectangle = (x: number, y: number) => {
     this.selectionRectangleStart = { x, y };
     this.selectionRectangleEnd = { x, y };
   };
 
-  updateSelectionRectangle = (lastX, lastY) => {
+  updateSelectionRectangle = (lastX: number, lastY: number) => {
     if (!this.selectionRectangleStart)
       this.selectionRectangleStart = { x: lastX, y: lastY };
 
@@ -79,7 +102,10 @@ export default class SelectionRectangle {
       this.selectionRectangleEnd.y = tmp;
     }
 
-    this.instances.iterateOverInstances(this.selector);
+    this.instances.iterateOverInstances(
+      // $FlowFixMe - gd.castObject is not supporting typings.
+      this.selector
+    );
 
     this.selectionRectangleStart = null;
     return this._instancesInSelectionRectangle;

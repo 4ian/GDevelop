@@ -505,6 +505,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetExtensionAndObjectStrExpressionMetadata
 #define STATIC_GetExtensionAndBehaviorStrExpressionMetadata \
   GetExtensionAndBehaviorStrExpressionMetadata
+#define STATIC_IsBadExpressionMetadata IsBadExpressionMetadata
+#define STATIC_IsBadBehaviorMetadata IsBadBehaviorMetadata
 
 #define STATIC_RenameObjectInEvents RenameObjectInEvents
 #define STATIC_RemoveObjectInEvents RemoveObjectInEvents

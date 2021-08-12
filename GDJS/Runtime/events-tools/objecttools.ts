@@ -217,6 +217,7 @@ namespace gdjs {
         }
         arr.length = finalSize;
       };
+
       export const hitBoxesCollisionTest = function (
         objectsLists1,
         objectsLists2,
@@ -232,9 +233,11 @@ namespace gdjs {
           ignoreTouchingEdges
         );
       };
+
       export const _distanceBetweenObjects = function (obj1, obj2, distance) {
         return obj1.getSqDistanceToObject(obj2) <= distance;
       };
+
       export const distanceTest = function (
         objectsLists1,
         objectsLists2,
@@ -249,6 +252,7 @@ namespace gdjs {
           distance * distance
         );
       };
+
       export const _movesToward = function (obj1, obj2, tolerance) {
         if (obj1.hasNoForces()) {
           return false;
@@ -272,6 +276,7 @@ namespace gdjs {
           tolerance / 2
         );
       };
+
       export const movesTowardTest = function (
         objectsLists1,
         objectsLists2,
@@ -286,6 +291,7 @@ namespace gdjs {
           tolerance
         );
       };
+
       export const _turnedToward = function (obj1, obj2, tolerance) {
         let objAngle = Math.atan2(
           obj2.getDrawableY() +
@@ -303,6 +309,7 @@ namespace gdjs {
           tolerance / 2
         );
       };
+
       export const turnedTowardTest = function (
         objectsLists1,
         objectsLists2,
@@ -317,6 +324,7 @@ namespace gdjs {
           tolerance
         );
       };
+
       export const pickAllObjects = function (objectsContext, objectsLists) {
         for (const name in objectsLists.items) {
           if (objectsLists.items.hasOwnProperty(name)) {
@@ -328,6 +336,7 @@ namespace gdjs {
         }
         return true;
       };
+
       export const pickRandomObject = function (runtimeScene, objectsLists) {
         // Compute one many objects we have
         let objectsCount = 0;
@@ -366,6 +375,7 @@ namespace gdjs {
         gdjs.evtTools.object.pickOnly(objectsLists, theChosenOne);
         return true;
       };
+
       export const pickNearestObject = function (objectsLists, x, y, inverted) {
         let bestObject = null;
         let best = 0;
@@ -391,6 +401,7 @@ namespace gdjs {
         gdjs.evtTools.object.pickOnly(objectsLists, bestObject);
         return true;
       };
+
       export const raycastObject = function (
         objectsLists,
         x,
@@ -412,6 +423,7 @@ namespace gdjs {
           inverted
         );
       };
+
       export const raycastObjectToPosition = function (
         objectsLists,
         x,

@@ -64,10 +64,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Line",
                 _("Line"),
-                _("Draw a line on screen"),
-                _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
-                  "(thickness: _PARAM5_) "
-                  "with _PARAM0_"),
+                "Draw a line on screen",
+                "Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line "
+                "(thickness: _PARAM5_) "
+                "with _PARAM0_",
                 _("Drawing"),
                 "res/actions/line24.png",
                 "res/actions/line.png")
@@ -374,6 +374,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Shape Painter object"), "Drawer")
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
+
+  obj.AddScopedAction(
+         "ClearShapes",
+         _("Clear shapes"),
+         _("Clear the rendered shape(s). Useful if not set to be done automatically."),
+         _("Clear the rendered image of _PARAM0_"),
+         _("Advanced"),
+         "res/actions/visibilite24.png",
+         "res/actions/visibilite.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer");
 
   obj.AddAction(
          "ClearBetweenFrames",

@@ -188,6 +188,19 @@ class GD_CORE_API InstructionMetadata {
   };
 
   /**
+   * \brief Set the additional information, used for some parameters
+   * with special type (for example, it can contains the type of object accepted
+   * by the parameter), for the last added parameter.
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
+    if (!parameters.empty())
+      parameters.back().SetExtraInfo(extraInfo);
+    return *this;
+  };
+
+  /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
    */

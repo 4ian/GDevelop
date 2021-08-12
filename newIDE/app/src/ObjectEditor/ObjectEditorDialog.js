@@ -109,6 +109,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       open={props.open}
       noTitleMargin
       fullHeight
+      flexBody
       title={
         <div>
           <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -131,37 +132,48 @@ const InnerDialog = (props: InnerDialogProps) => {
         </div>
       }
     >
-      <Line>
-        <Column expand>
-          <SemiControlledTextField
-            fullWidth
-            commitOnBlur
-            floatingLabelText={<Trans>Object name</Trans>}
-            floatingLabelFixed
-            value={newObjectName}
-            hintText={t`Object Name`}
-            onChange={text => {
-              if (text === newObjectName) return;
+      {currentTab === 'properties' && EditorComponent && (
+        <Column
+          noMargin
+          expand
+          useFullHeight={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
+          }
+          noOverflowParent={
+            true /* Ensure editors with large/scrolling children won't grow outside of the dialog. */
+          }
+        >
+          <Line>
+            <Column expand>
+              <SemiControlledTextField
+                fullWidth
+                commitOnBlur
+                floatingLabelText={<Trans>Object name</Trans>}
+                floatingLabelFixed
+                value={newObjectName}
+                hintText={t`Object Name`}
+                onChange={text => {
+                  if (text === newObjectName) return;
 
-              if (props.canRenameObject(text)) {
-                setNewObjectName(text);
-              }
-            }}
+                  if (props.canRenameObject(text)) {
+                    setNewObjectName(text);
+                  }
+                }}
+              />
+            </Column>
+          </Line>
+          <EditorComponent
+            object={props.object}
+            project={props.project}
+            resourceSources={props.resourceSources}
+            onChooseResource={props.onChooseResource}
+            resourceExternalEditors={props.resourceExternalEditors}
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positionned*/
+            }
+            objectName={props.objectName}
           />
         </Column>
-      </Line>
-      {currentTab === 'properties' && EditorComponent && (
-        <EditorComponent
-          object={props.object}
-          project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positionned*/
-          }
-          objectName={props.objectName}
-        />
       )}
       {currentTab === 'behaviors' && (
         <BehaviorsEditor

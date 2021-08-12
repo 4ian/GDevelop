@@ -119,6 +119,7 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           "getCurrentJumpSpeed");
       autExpressions["CurrentJumpSpeed"].SetFunctionName("getCurrentJumpSpeed");
       autActions["PlatformBehavior::SetCanJump"].SetFunctionName("setCanJump");
+      autActions["PlatformBehavior::PlatformerObjectBehavior::SetCanNotAirJump"].SetFunctionName("setCanNotAirJump");
       autConditions["PlatformBehavior::CanJump"].SetFunctionName(
           "canJump");
       autActions["PlatformBehavior::SimulateLeftKey"].SetFunctionName(
@@ -131,10 +132,15 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           "simulateDownKey");
       autActions["PlatformBehavior::SimulateLadderKey"].SetFunctionName(
           "simulateLadderKey");
+      autActions["PlatformBehavior::SimulateReleaseLadderKey"].SetFunctionName(
+          "simulateReleaseLadderKey");
       autActions["PlatformBehavior::SimulateJumpKey"].SetFunctionName(
           "simulateJumpKey");
+      // deprecated release platform key.
       autActions["PlatformBehavior::SimulateReleaseKey"].SetFunctionName(
-          "simulateReleaseKey");
+          "simulateReleasePlatformKey");
+      autActions["PlatformBehavior::SimulateReleasePlatformKey"].SetFunctionName(
+          "simulateReleasePlatformKey");
       autActions["PlatformBehavior::SimulateControl"].SetFunctionName(
           "simulateControl");
       autActions["PlatformBehavior::IgnoreDefaultControls"].SetFunctionName(

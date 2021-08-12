@@ -134,9 +134,9 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
   obj.AddAction("Angle",
-                _("Angle"),
-                _("Modify the angle of a Panel Sprite."),
-                _("the angle"),
+                "Angle",
+                "Modify the angle of a Panel Sprite.",
+                "the angle",
                 _("Size and angle"),
                 "res/actions/rotate24.png",
                 "res/actions/rotate.png")
@@ -149,9 +149,9 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
   obj.AddCondition("Angle",
-                   _("Angle"),
-                   _("Check the angle of a Panel Sprite."),
-                   _("the angle"),
+                   "Angle",
+                   "Check the angle of a Panel Sprite.",
+                   "the angle",
                    _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")

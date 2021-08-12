@@ -33,36 +33,11 @@ import {
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
-import { Column, Line } from '../../../UI/Grid';
+import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import ScrollView from '../../../UI/ScrollView';
 
-const gd = global.gd;
-
-const styles = {
-  gridList: {
-    overflowY: 'auto',
-  },
-  animationTitle: {
-    flex: 1,
-  },
-  animationTools: {
-    flexShrink: 0,
-  },
-};
-
-const AddAnimationLine = ({ onAdd, extraTools }) => (
-  <Column expand>
-    <Line justifyContent="space-between">
-      {extraTools}
-      <RaisedButton
-        label={<Trans>Add an animation</Trans>}
-        primary
-        onClick={onAdd}
-        icon={<Add />}
-      />
-    </Line>
-  </Column>
-);
+const gd: libGDevelop = global.gd;
 
 type AnimationProps = {|
   animation: gdAnimation,
@@ -173,43 +148,37 @@ const SortableAnimationsList = SortableContainer(
     onSelectSprite,
     onReplaceDirection,
   }) => {
+    // Note that it's important to have <ScrollView> *inside* this
+    // component, otherwise the sortable list won't work (because the
+    // SortableContainer would not find a root div to use).
     return (
-      <div style={styles.gridList}>
-        {[
-          ...mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const animation = spriteObject.getAnimation(i);
-            return (
-              <SortableAnimation
-                key={i}
-                index={i}
-                id={i}
-                animation={animation}
-                project={project}
-                resourcesLoader={resourcesLoader}
-                resourceSources={resourceSources}
-                onChooseResource={onChooseResource}
-                resourceExternalEditors={resourceExternalEditors}
-                onRemove={() => onRemoveAnimation(i)}
-                onChangeName={newName => onChangeAnimationName(i, newName)}
-                onSpriteContextMenu={onSpriteContextMenu}
-                selectedSprites={selectedSprites}
-                onSelectSprite={onSelectSprite}
-                onReplaceDirection={(directionId, newDirection) =>
-                  onReplaceDirection(i, directionId, newDirection)
-                }
-                objectName={objectName}
-              />
-            );
-          }),
-          <AddAnimationLine
-            onAdd={onAddAnimation}
-            key="add-animation-line"
-            disabled
-            index={spriteObject.getAnimationsCount()}
-            extraTools={extraBottomTools}
-          />,
-        ]}
-      </div>
+      <ScrollView>
+        {mapFor(0, spriteObject.getAnimationsCount(), i => {
+          const animation = spriteObject.getAnimation(i);
+          return (
+            <SortableAnimation
+              key={i}
+              index={i}
+              id={i}
+              animation={animation}
+              project={project}
+              resourcesLoader={resourcesLoader}
+              resourceSources={resourceSources}
+              onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+              onRemove={() => onRemoveAnimation(i)}
+              onChangeName={newName => onChangeAnimationName(i, newName)}
+              onSpriteContextMenu={onSpriteContextMenu}
+              selectedSprites={selectedSprites}
+              onSelectSprite={onSelectSprite}
+              onReplaceDirection={(directionId, newDirection) =>
+                onReplaceDirection(i, directionId, newDirection)
+              }
+              objectName={objectName}
+            />
+          );
+        })}
+      </ScrollView>
     );
   }
 );
@@ -336,37 +305,50 @@ class AnimationsListContainer extends React.Component<
 
   render() {
     return (
-      <div>
-        {this.props.spriteObject.getAnimationsCount() === 0 && (
+      <Column noMargin expand useFullHeight>
+        {this.props.spriteObject.getAnimationsCount() === 0 ? (
           <EmptyMessage>
             <Trans>
               This object has no animations containing images. Start by adding
               an animation.
             </Trans>
           </EmptyMessage>
+        ) : (
+          <SortableAnimationsList
+            spriteObject={this.props.spriteObject}
+            objectName={this.props.objectName}
+            helperClass="sortable-helper"
+            project={this.props.project}
+            onSortEnd={this.onSortEnd}
+            onChangeAnimationName={this.changeAnimationName}
+            onRemoveAnimation={this.removeAnimation}
+            onReplaceDirection={this.replaceDirection}
+            onSpriteContextMenu={this.openSpriteContextMenu}
+            selectedSprites={this.state.selectedSprites}
+            onSelectSprite={this.selectSprite}
+            resourcesLoader={this.props.resourcesLoader}
+            resourceSources={this.props.resourceSources}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            onChooseResource={this.props.onChooseResource}
+            useDragHandle
+            lockAxis="y"
+            axis="y"
+          />
         )}
-        <SortableAnimationsList
-          spriteObject={this.props.spriteObject}
-          objectName={this.props.objectName}
-          helperClass="sortable-helper"
-          project={this.props.project}
-          onSortEnd={this.onSortEnd}
-          onAddAnimation={this.addAnimation}
-          onChangeAnimationName={this.changeAnimationName}
-          onRemoveAnimation={this.removeAnimation}
-          onReplaceDirection={this.replaceDirection}
-          onSpriteContextMenu={this.openSpriteContextMenu}
-          selectedSprites={this.state.selectedSprites}
-          onSelectSprite={this.selectSprite}
-          resourcesLoader={this.props.resourcesLoader}
-          resourceSources={this.props.resourceSources}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          onChooseResource={this.props.onChooseResource}
-          extraBottomTools={this.props.extraBottomTools}
-          useDragHandle
-          lockAxis="y"
-          axis="y"
-        />
+        <Column>
+          <ResponsiveLineStackLayout
+            justifyContent="space-between"
+            noColumnMargin
+          >
+            {this.props.extraBottomTools}
+            <RaisedButton
+              label={<Trans>Add an animation</Trans>}
+              primary
+              onClick={this.addAnimation}
+              icon={<Add />}
+            />
+          </ResponsiveLineStackLayout>
+        </Column>
         <ContextMenu
           ref={spriteContextMenu =>
             (this.spriteContextMenu = spriteContextMenu)
@@ -382,7 +364,7 @@ class AnimationsListContainer extends React.Component<
             },
           ]}
         />
-      </div>
+      </Column>
     );
   }
 }
@@ -431,7 +413,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
     const spriteObject = gd.asSpriteObject(object);
 
     return (
-      <div>
+      <>
         <AnimationsListContainer
           spriteObject={spriteObject}
           resourcesLoader={this.resourcesLoader}
@@ -442,7 +424,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
-            <ResponsiveLineStackLayout noMargin>
+            <ResponsiveLineStackLayout noMargin noColumnMargin>
               <RaisedButton
                 label={<Trans>Edit collision masks</Trans>}
                 primary={false}
@@ -518,7 +500,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
             />
           </Dialog>
         )}
-      </div>
+      </>
     );
   }
 }

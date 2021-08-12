@@ -51,6 +51,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setIsMenuBarHiddenInPreview,
     setBackdropClickBehavior,
     setIsAlwaysOnTopInPreview,
+    setEventsSheetCancelInlineParameter,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -260,6 +261,23 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 </Trans>
               }
             />
+          </Line>
+          <Line>
+            <SelectField
+              floatingLabelText={
+                <Trans>
+                  Escape key behavior when editing an parameter inline
+                </Trans>
+              }
+              value={values.eventsSheetCancelInlineParameter}
+              onChange={(e, i, value: string) => {
+                setEventsSheetCancelInlineParameter(value);
+              }}
+              fullWidth
+            >
+              <SelectOption value="cancel" primaryText={t`Cancel changes`} />
+              <SelectOption value="apply" primaryText={t`Apply changes`} />
+            </SelectField>
           </Line>
           <Text size="title">
             <Trans>Advanced</Trans>

@@ -5,6 +5,8 @@
  */
 #include "GDCore/Project/Object.h"
 
+#include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Layout.h"
@@ -87,16 +89,17 @@ std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties() const {
 gd::BehaviorContent* Object::AddNewBehavior(gd::Project& project,
                                             const gd::String& type,
                                             const gd::String& name) {
-  gd::Behavior* behavior = project.GetCurrentPlatform().GetBehavior(type);
-
-  if (behavior) {
-    auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
-    behavior->InitializeContent(behaviorContent->GetContent());
-    behaviors[name] = std::move(behaviorContent);
-    return behaviors[name].get();
-  } else {
+  const gd::BehaviorMetadata& behaviorMetadata =
+      gd::MetadataProvider::GetBehaviorMetadata(project.GetCurrentPlatform(),
+                                                type);
+  if (gd::MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
     return nullptr;
   }
+
+  auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
+  behaviorMetadata.Get().InitializeContent(behaviorContent->GetContent());
+  behaviors[name] = std::move(behaviorContent);
+  return behaviors[name].get();
 }
 
 std::map<gd::String, gd::PropertyDescriptor>

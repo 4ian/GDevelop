@@ -175,7 +175,7 @@ const VariableRow = ({
             onChange={newValue => {
               // Note that onChangeValue pass all the values as strings.
               // It's the parent responsibility to cast them back according to the variable type.
-              onChangeValue('' + newValue);
+              onChangeValue(newValue ? 'true' : 'false');
             }}
             disabled={origin === 'parent' && depth !== 0}
           />

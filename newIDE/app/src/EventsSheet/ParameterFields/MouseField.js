@@ -1,12 +1,18 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
-export default class MouseField extends Component {
-  focus() {}
+export default class MouseField extends Component<ParameterFieldProps> {
+  _field: ?SelectField;
+
+  focus() {
+    if (this._field) this._field.focus();
+  }
 
   render() {
     const { parameterMetadata, value } = this.props;
@@ -25,7 +31,6 @@ export default class MouseField extends Component {
         value={value}
         ref={field => (this._field = field)}
         onChange={(e, i, value) => this.props.onChange(value)}
-        errorText={value ? undefined : <Trans>You must select a button</Trans>}
       >
         <SelectOption value="Left" primaryText={t`Left (primary)`} />
         <SelectOption value="Right" primaryText={t`Right (secondary)`} />
@@ -33,15 +38,6 @@ export default class MouseField extends Component {
           value="Middle"
           primaryText={t`Middle (Auxiliary button, usually the wheel button)`}
         />
-        {/* TODO: Add support for these buttons in the game engine
-         <SelectOption
-          value="XButton1"
-          primaryText={t`Special button #1`}
-        />
-        <SelectOption
-          value="XButton2"
-          primaryText={t`Special button #2`}
-        /> */}
       </SelectField>
     );
   }

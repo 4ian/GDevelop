@@ -112,9 +112,9 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
 
   extension
       .AddExpression("StrRFind",
-                     _("Search in a text from the end"),
-                     _("Search in a text from the end (return the position of "
-                       "the result or -1 if not found)"),
+                     "Search in a text from the end",
+                     "Search in a text from the end (return the position of "
+                     "the result or -1 if not found)",
                      _("Manipulation of text"),
                      "res/conditions/toujours24.png")
 
@@ -152,17 +152,17 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
   extension
       .AddExpression(
           "StrRFindFrom",
-          _("Search in a text from the end, starting from a position"),
-          _("Search in a text from the end, starting from a position (return "
-            "the position of the result or -1 if not found)"),
+          "Search in a text from the end, starting from a position",
+          "Search in a text from the end, starting from a position (return "
+          "the position of the result or -1 if not found)",
           _("Manipulation of text"),
           "res/conditions/toujours24.png")
 
       .AddParameter("string", _("Text"))
       .AddParameter("string", _("Text to search for"))
       .AddParameter("expression",
-                    _("Position of the last character in the string to be "
-                      "considered in the search"))
+                    "Position of the last character in the string to be "
+                    "considered in the search")
       .SetHidden();  // Deprecated, see StrFindLastFrom instead.
 
   extension

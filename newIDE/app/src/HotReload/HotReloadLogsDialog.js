@@ -8,7 +8,7 @@ import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { type HotReloaderLog } from '../Export/PreviewLauncher.flow';
-import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
+import { NewPreviewIcon } from './HotReloadPreviewButton';
 
 type Props = {|
   logs: Array<HotReloaderLog>,
@@ -40,7 +40,7 @@ export default function HotReloadLogsDialog({
           onClick={onClose}
         />,
         <RaisedButton
-          icon={<PlayCircleFilledIcon />}
+          icon={<NewPreviewIcon />}
           label={<Trans>Close and launch a new preview</Trans>}
           key="new-preview"
           primary

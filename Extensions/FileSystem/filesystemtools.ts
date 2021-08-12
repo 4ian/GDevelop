@@ -24,6 +24,7 @@ namespace gdjs {
       }
       return gdjs.fileSystem._fs;
     };
+
     export const getDirectoryName = function (fileOrFolderPath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {
@@ -31,6 +32,7 @@ namespace gdjs {
       }
       return path.dirname(fileOrFolderPath);
     };
+
     export const getFileName = function (filePath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {
@@ -38,6 +40,7 @@ namespace gdjs {
       }
       return path.basename(filePath);
     };
+
     export const getExtensionName = function (filePath: string) {
       const path = gdjs.fileSystem._getPath();
       if (!path) {
@@ -274,13 +277,12 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      const network = gdjs.evtTools.network;
       let result = 'error';
-      if (fileSystem && network) {
+      if (fileSystem) {
         try {
           fileSystem.writeFileSync(
             savePath,
-            network.variableStructureToJSON(variable),
+            JSON.stringify(variable.toJSObject()),
             'utf8'
           );
           result = 'ok';
@@ -306,11 +308,10 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      const network = gdjs.evtTools.network;
-      if (fileSystem && network) {
+      if (fileSystem) {
         fileSystem.writeFile(
           savePath,
-          network.variableStructureToJSON(variable),
+          JSON.stringify(variable.toJSObject()),
           'utf8',
           (err) => {
             resultVar.setString('ok');
@@ -368,13 +369,12 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      const network = gdjs.evtTools.network;
       let result = 'error';
-      if (fileSystem && network) {
+      if (fileSystem) {
         try {
           const data = fileSystem.readFileSync(loadPath, 'utf8');
           if (data) {
-            network.jsonToVariableStructure(data, variable);
+            variable.fromJSON(data);
             result = 'ok';
           }
         } catch (err) {
@@ -401,11 +401,10 @@ namespace gdjs {
       resultVar: gdjs.Variable
     ) {
       const fileSystem = gdjs.fileSystem._getFs();
-      const network = gdjs.evtTools.network;
-      if (fileSystem && network) {
+      if (fileSystem) {
         fileSystem.readFile(loadPath, 'utf8', (err, data) => {
           if (data) {
-            network.jsonToVariableStructure(data, variable);
+            variable.fromJSON(data);
             resultVar.setString('ok');
           }
           if (err) {

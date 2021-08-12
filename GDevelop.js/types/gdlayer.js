@@ -14,6 +14,8 @@ declare class gdLayer {
   getAmbientLightColorGreen(): number;
   getAmbientLightColorBlue(): number;
   getEffects(): gdEffectsContainer;
+  getCameraCount(): number;
+  setCameraCount(cameraCount: number): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

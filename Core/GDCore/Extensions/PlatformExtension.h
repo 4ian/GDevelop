@@ -400,7 +400,7 @@ class GD_CORE_API PlatformExtension {
    * \brief Return a function to create the object if the type is handled by the
    * extension
    */
-  CreateFunPtr GetObjectCreationFunctionPtr(gd::String objectType) const;
+  CreateFunPtr GetObjectCreationFunctionPtr(const gd::String& objectType) const;
 
   /**
    * \brief Return a vector containing all the effect types provided by the
@@ -413,13 +413,13 @@ class GD_CORE_API PlatformExtension {
    *
    * Return an empty pointer if \a eventType is not provided by the extension.
    */
-  std::shared_ptr<gd::BaseEvent> CreateEvent(gd::String eventType) const;
+  std::shared_ptr<gd::BaseEvent> CreateEvent(const gd::String& eventType) const;
   /**
    * \brief Get the gd::Behavior handling the given behavior type.
    *
    * Return nullptr if \a behaviorType is not provided by the extension.
    */
-  gd::Behavior* GetBehavior(gd::String behaviorType) const;
+  gd::Behavior* GetBehavior(const gd::String& behaviorType) const;
 
   /**
    * \brief Get the gd::BehaviorsSharedData handling the given behavior shared
@@ -428,7 +428,7 @@ class GD_CORE_API PlatformExtension {
    * Return nullptr if \a behaviorType is not provided by the extension.
    */
   gd::BehaviorsSharedData* GetBehaviorSharedDatas(
-      gd::String behaviorType) const;
+      const gd::String& behaviorType) const;
 
   /**
    * \brief Return a reference to the ObjectMetadata object associated to \a

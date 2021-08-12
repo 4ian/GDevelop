@@ -103,6 +103,7 @@ namespace gdjs {
           responseVar.setString(xhr.responseText);
         } catch (e) {}
       };
+
       export const enableMetrics = function (
         runtimeScene: gdjs.RuntimeScene,
         enable: boolean
@@ -114,105 +115,33 @@ namespace gdjs {
        * Convert a variable to JSON.
        * @param variable The variable to convert to JSON
        * @returns The JSON string representing the variable
+       *
+       * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
        */
       export const variableStructureToJSON = function (
         variable: gdjs.Variable
       ): string {
-        // TODO: Move this function to gdjs.Variable
-        if (variable.isPrimitive()) {
-          return JSON.stringify(variable.getValue());
-        } else if (variable.getType() === 'array') {
-          let str = '[';
-          let firstChild = true;
-          const children = variable.getAllChildren();
-          for (const p in children) {
-            if (children.hasOwnProperty(p)) {
-              if (!firstChild) {
-                str += ',';
-              }
-              str += variableStructureToJSON(children[p]);
-              firstChild = false;
-            }
-          }
-          str += ']';
-          return str;
-        } else if (variable.getType() === 'structure') {
-          let str = '{';
-          let firstChild = true;
-          const children = variable.getAllChildren();
-          for (const p in children) {
-            if (children.hasOwnProperty(p)) {
-              if (!firstChild) {
-                str += ',';
-              }
-              str +=
-                JSON.stringify(p) + ': ' + variableStructureToJSON(children[p]);
-              firstChild = false;
-            }
-          }
-          str += '}';
-          return str;
-        }
-
-        console.error('JSON conversion error: Variable type not recognized');
-        return '';
+        return JSON.stringify(variable.toJSObject());
       };
 
-      export const objectVariableStructureToJSON = function (object, variable) {
-        return gdjs.evtTools.network.variableStructureToJSON(variable);
+      /**
+       * @deprecated Use `JSON.stringify(variable.toJSObject())` instead.
+       */
+      export const objectVariableStructureToJSON = function (
+        object: gdjs.RuntimeObject,
+        variable: gdjs.Variable
+      ): string {
+        return JSON.stringify(variable.toJSObject());
       };
 
+      /**
+       * @deprecated Use `variable.fromJSObject` instead.
+       */
       export const _objectToVariable = function (
         obj: any,
         variable: gdjs.Variable
       ) {
-        if (obj === null) {
-          variable.setString('null');
-        } else if (typeof obj === 'number') {
-          if (Number.isNaN(obj)) {
-            console.warn('Variables cannot be set to NaN, setting it to 0.');
-            variable.setNumber(0);
-          } else {
-            variable.setNumber(obj);
-          }
-        } else if (typeof obj === 'string') {
-          variable.setString(obj);
-        } else if (typeof obj === 'undefined') {
-          // Do not modify the variable, as there is no value to set it to.
-        } else if (typeof obj === 'boolean') {
-          variable.setBoolean(obj);
-        } else if (Array.isArray(obj)) {
-          variable.castTo('array');
-          variable.clearChildren();
-          for (const i in obj) {
-            _objectToVariable(obj[i], variable.getChild(i));
-          }
-        } else if (typeof obj === 'object') {
-          variable.castTo('structure');
-          variable.clearChildren();
-          for (var p in obj) {
-            if (obj.hasOwnProperty(p)) {
-              _objectToVariable(obj[p], variable.getChild(p));
-            }
-          }
-        } else if (typeof obj === 'symbol') {
-          variable.setString(obj.toString());
-        } else if (typeof obj === 'bigint') {
-          if (obj > Number.MAX_SAFE_INTEGER)
-            console.warn(
-              'Integers bigger than ' +
-                Number.MAX_SAFE_INTEGER +
-                " aren't supported by variables, it will be reduced to that size."
-            );
-          // @ts-ignore
-          variable.setNumber(parseInt(obj, 10));
-        } else if (typeof obj === 'function') {
-          console.error(
-            'Error: Impossible to set variable value to a function.'
-          );
-        } else {
-          console.error('Cannot identify type of object:', obj);
-        }
+        variable.fromJSObject(obj);
       };
 
       /**
@@ -221,30 +150,25 @@ namespace gdjs {
        * @param jsonStr The JSON string
        * @param variable The variable where to put the parsed JSON
        * @returns true if JSON was properly parsed
+       *
+       * @deprecated Use `variable.fromJSON` instead.
        */
       export const jsonToVariableStructure = function (
         jsonStr: string,
         variable: gdjs.Variable
-      ): boolean {
-        // TODO: Move this function to gdjs.Variable
-        if (jsonStr.length === 0) {
-          return false;
-        }
-        try {
-          const obj = JSON.parse(jsonStr);
-          gdjs.evtTools.network._objectToVariable(obj, variable);
-          return true;
-        } catch (e) {
-          // Do nothing if JSON was not properly parsed.
-          return false;
-        }
+      ): void {
+        variable.fromJSON(jsonStr);
       };
+
+      /**
+       * @deprecated Use `variable.fromJSON` instead.
+       */
       export const jsonToObjectVariableStructure = function (
-        jsonStr,
-        object,
-        variable
+        jsonStr: string,
+        object: gdjs.RuntimeObject,
+        variable: gdjs.Variable
       ) {
-        gdjs.evtTools.network.jsonToVariableStructure(jsonStr, variable);
+        variable.fromJSON(jsonStr);
       };
     }
   }

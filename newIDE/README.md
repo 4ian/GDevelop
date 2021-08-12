@@ -42,15 +42,7 @@ cd newIDE/app && npm start # Be sure to have this running in another terminal, b
 # In a new terminal:
 cd newIDE/electron-app
 npm install # or yarn
-
-#For macOS:
-npm run electron-mac
-
-#For Windows:
-npm run electron-win
-
-#For Linux:
-npm run electron-linux
+npm run start # or yarn start
 ```
 
 ### Quick Install and Run
@@ -142,7 +134,7 @@ cd newIDE/web-app
 yarn deploy # or npm run deploy
 ```
 
-> Note: this will also upload the game engine (GDJS) and extension sources, needed by the IDE and purge the CloudFlare cache. If examples have been added/changed, be also sure to run `newIDE/web-app/scripts/deploy-examples-resources.js`.
+> Note: this will also upload the game engine (GDJS) and extension sources, needed by the IDE and purge the CloudFlare cache.
 
 ### (Optional) Updating translations
 

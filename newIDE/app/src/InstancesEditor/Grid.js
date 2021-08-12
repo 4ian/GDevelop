@@ -1,8 +1,12 @@
 import * as PIXI from 'pixi.js-legacy';
-import { rgbColorToHexNumber, type RGBColor } from '../Utils/ColorTransformer';
+import {
+  rgbColorToHexNumber,
+  // TODO: Add Flow typing in this file.
+  // , type RGBColor
+} from '../Utils/ColorTransformer';
 
 // Equal to #6868E8
-const DEFAULT_COLOR: RGBColor = {
+const DEFAULT_COLOR /*: RGBColor */ = {
   r: 104,
   g: 104,
   b: 232,

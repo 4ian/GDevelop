@@ -17,12 +17,13 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { ExplanationHeader } from '../GenericExporters/OnlineCordovaExport';
+import {
+  type ExportState,
+  SetupExportHeader,
+} from '../GenericExporters/OnlineCordovaExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
-
-type ExportState = null;
 
 type PreparedExporter = {|
   exporter: gdjsExporter,
@@ -50,11 +51,15 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   onlineBuildType: 'cordova-build',
   packageNameWarningType: 'mobile',
 
-  getInitialExportState: () => null,
+  getInitialExportState: () => ({
+    targets: ['androidApk'],
+    keystore: 'new',
+    signingDialogOpen: false,
+  }),
 
   canLaunchBuild: () => true,
 
-  renderHeader: () => <ExplanationHeader />,
+  renderHeader: props => <SetupExportHeader {...props} />,
 
   renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
 
@@ -142,7 +147,9 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
     return buildCordovaAndroid(
       getAuthorizationHeader,
       profile.uid,
-      uploadBucketKey
+      uploadBucketKey,
+      exportState.targets,
+      exportState.keystore
     );
   },
 };

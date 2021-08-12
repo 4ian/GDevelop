@@ -5,7 +5,6 @@ import {
   getAsset,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { isNullPtr } from '../Utils/IsNullPtr';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import flatten from 'lodash/flatten';
 import uniqBy from 'lodash/uniqBy';
@@ -196,13 +195,18 @@ export const addAssetToProject = async ({
     objectAsset.customization.forEach(customization => {
       if (customization.behaviorName) {
         const { behaviorName, behaviorType } = customization;
-        const behavior = gd.JsPlatform.get().getBehavior(behaviorType);
-        if (isNullPtr(gd, behavior)) {
+
+        const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+          gd.JsPlatform.get(),
+          behaviorType
+        );
+        if (gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata)) {
           throw new Error(
             'Behavior with type ' + behaviorType + ' could not be found.'
           );
         }
 
+        const behavior = behaviorMetadata.get();
         const behaviorContent = object.addNewBehavior(
           project,
           behaviorType,
@@ -362,8 +366,11 @@ export const filterMissingBehaviors = (
   requiredBehaviors: Array<RequiredBehavior>
 ): Array<RequiredBehavior> => {
   return requiredBehaviors.filter(({ behaviorType }) => {
-    const behavior = gd.JsPlatform.get().getBehavior(behaviorType);
-    return isNullPtr(gd, behavior);
+    const behaviorMetadata = gd.MetadataProvider.getBehaviorMetadata(
+      gd.JsPlatform.get(),
+      behaviorType
+    );
+    return gd.MetadataProvider.isBadBehaviorMetadata(behaviorMetadata);
   });
 };
 

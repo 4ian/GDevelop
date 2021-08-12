@@ -15,7 +15,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .SetExtensionInformation(
           "BuiltinNetwork",
           _("Basic internet features"),
-          _("Features to send web requests, communicate with external \"APIs\" and other network related tasks."),
+          _("Features to send web requests, communicate with external \"APIs\" "
+            "and other network related tasks."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/network");
@@ -24,33 +25,33 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
   extension
       .AddAction(
           "SendRequest",
-          _("Send a request to a web page"),
-          _("Send a request to the specified web page.\n\nPlease note that for "
-            "the web games, the game must be hosted on the same host "
-            "as specified below, except if the server is configured to answer "
-            "to all requests (cross-domain requests)."),
-          _("Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"),
+          "Send a request to a web page",
+          "Send a request to the specified web page.\n\nPlease note that for "
+          "the web games, the game must be hosted on the same host "
+          "as specified below, except if the server is configured to answer "
+          "to all requests (cross-domain requests).",
+          "Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_",
           _("Network"),
           "res/actions/net24.png",
           "res/actions/net.png")
-      .AddParameter("string", _("Host, with protocol"))
-      .SetParameterLongDescription(_("Example: \"http://example.com/\"."))
-      .AddParameter("string", _("Path"))
+      .AddParameter("string", "Host, with protocol")
+      .SetParameterLongDescription("Example: \"http://example.com/\".")
+      .AddParameter("string", "Path")
       .SetParameterLongDescription(
-          _("Example: \"/user/123\" or \"/some-page.php\"."))
-      .AddParameter("string", _("Request body content"))
-      .AddParameter("string", _("Method: \"POST\" or \"GET\""), "", true)
-      .SetParameterLongDescription(_("If empty, \"GET\" will be used."))
+          "Example: \"/user/123\" or \"/some-page.php\".")
+      .AddParameter("string", "Request body content")
+      .AddParameter("string", "Method: \"POST\" or \"GET\"", "", true)
+      .SetParameterLongDescription("If empty, \"GET\" will be used.")
       .SetDefaultValue("\"GET\"")
-      .AddParameter("string", _("Content type"), "", true)
+      .AddParameter("string", "Content type", "", true)
       .SetParameterLongDescription(
-          _("If empty, \"application/x-www-form-urlencoded\" will be used."))
-      .AddParameter("scenevar", _("Reponse scene variable"), "", true)
+          "If empty, \"application/x-www-form-urlencoded\" will be used.")
+      .AddParameter("scenevar", "Reponse scene variable", "", true)
       .SetParameterLongDescription(
-          _("The response of the server will be stored, as a string, in this "
-            "variable. If the server returns *JSON*, you may want to use the "
-            "action \"Convert JSON to a scene variable\" afterwards, to "
-            "explore the results with a *structure variable*."))
+          "The response of the server will be stored, as a string, in this "
+          "variable. If the server returns *JSON*, you may want to use the "
+          "action \"Convert JSON to a scene variable\" afterwards, to "
+          "explore the results with a *structure variable*.")
       .MarkAsComplex()
       .SetHidden();
 
@@ -74,7 +75,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "highly recommended."))
       .AddParameter("string", _("Request body content"))
       .AddParameter("stringWithSelector",
-                    _("Resize mode"),
+                    _("Request method"),
                     "[\"GET\", \"POST\", \"PUT\", \"HEAD\", \"DELETE\", "
                     "\"PATCH\", \"OPTIONS\"]",
                     false)

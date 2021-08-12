@@ -221,7 +221,7 @@ module.exports = {
         'res/actions/color.png'
       )
       .addParameter('object', _('Object'), 'LightObject', false)
-      .addParameter('string', _('Color'), '', false)
+      .addParameter('color', _('Color'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setColor');
 

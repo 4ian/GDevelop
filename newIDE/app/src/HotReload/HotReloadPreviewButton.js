@@ -8,7 +8,11 @@ import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 export type HotReloadPreviewButtonProps = {|
   hasPreviewsRunning: boolean,
   launchProjectDataOnlyPreview: () => void,
+  launchProjectWithLoadingScreenPreview: () => void,
 |};
+
+export const NewPreviewIcon = PlayCircleFilledIcon;
+export const HotReloadPreviewIcon = OfflineBoltIcon;
 
 export default function HotReloadPreviewButton({
   launchProjectDataOnlyPreview,
@@ -16,7 +20,7 @@ export default function HotReloadPreviewButton({
 }: HotReloadPreviewButtonProps) {
   return (
     <FlatButton
-      icon={hasPreviewsRunning ? <OfflineBoltIcon /> : <PlayCircleFilledIcon />}
+      icon={hasPreviewsRunning ? <HotReloadPreviewIcon /> : <NewPreviewIcon />}
       label={
         hasPreviewsRunning ? (
           <Trans>Apply changes to preview</Trans>

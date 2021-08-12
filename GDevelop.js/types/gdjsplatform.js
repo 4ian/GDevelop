@@ -9,8 +9,6 @@ declare class gdJsPlatform extends gdPlatform {
   isExtensionLoaded(name: string): boolean;
   removeExtension(name: string): void;
   reloadBuiltinExtensions(): void;
-  getBehavior(type: string): gdBehavior;
-  getBehaviorSharedDatas(type: string): gdBehaviorsSharedData;
   getAllPlatformExtensions(): gdVectorPlatformExtension;
   delete(): void;
   ptr: number;

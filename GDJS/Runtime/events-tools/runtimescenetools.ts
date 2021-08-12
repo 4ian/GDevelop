@@ -9,12 +9,15 @@ namespace gdjs {
       export const sceneJustBegins = function (runtimeScene) {
         return runtimeScene.getTimeManager().isFirstFrame();
       };
+
       export const sceneJustResumed = function (runtimeScene) {
         return runtimeScene.sceneJustResumed();
       };
+
       export const getSceneName = function (runtimeScene) {
         return runtimeScene.getName();
       };
+
       export const setBackgroundColor = function (runtimeScene, rgbColor) {
         const colors = rgbColor.split(';');
         if (colors.length < 3) {
@@ -26,15 +29,19 @@ namespace gdjs {
           parseInt(colors[2])
         );
       };
+
       export const getElapsedTimeInSeconds = function (runtimeScene) {
         return runtimeScene.getTimeManager().getElapsedTime() / 1000;
       };
+
       export const setTimeScale = function (runtimeScene, timeScale) {
         return runtimeScene.getTimeManager().setTimeScale(timeScale);
       };
+
       export const getTimeScale = function (runtimeScene) {
         return runtimeScene.getTimeManager().getTimeScale();
       };
+
       export const timerElapsedTime = function (
         runtimeScene,
         timeInSeconds,
@@ -49,6 +56,7 @@ namespace gdjs {
           timeManager.getTimer(timerName).getTime() / 1000 >= timeInSeconds
         );
       };
+
       export const timerPaused = function (runtimeScene, timerName) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -56,6 +64,7 @@ namespace gdjs {
         }
         return timeManager.getTimer(timerName).isPaused();
       };
+
       export const resetTimer = function (runtimeScene, timerName) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -64,6 +73,7 @@ namespace gdjs {
           timeManager.getTimer(timerName).reset();
         }
       };
+
       export const pauseTimer = function (runtimeScene, timerName) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -71,6 +81,7 @@ namespace gdjs {
         }
         timeManager.getTimer(timerName).setPaused(true);
       };
+
       export const unpauseTimer = function (runtimeScene, timerName) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -78,10 +89,12 @@ namespace gdjs {
         }
         return timeManager.getTimer(timerName).setPaused(false);
       };
+
       export const removeTimer = function (runtimeScene, timerName) {
         const timeManager = runtimeScene.getTimeManager();
         timeManager.removeTimer(timerName);
       };
+
       export const getTimerElapsedTimeInSeconds = function (
         runtimeScene,
         timerName
@@ -92,9 +105,11 @@ namespace gdjs {
         }
         return timeManager.getTimer(timerName).getTime() / 1000;
       };
+
       export const getTimeFromStartInSeconds = function (runtimeScene) {
         return runtimeScene.getTimeManager().getTimeFromStart() / 1000;
       };
+
       export const getTime = function (runtimeScene, what) {
         if (what === 'timestamp') {
           return Date.now();
@@ -123,6 +138,7 @@ namespace gdjs {
         }
         return 0;
       };
+
       export const replaceScene = function (
         runtimeScene,
         newSceneName,
@@ -138,6 +154,7 @@ namespace gdjs {
           newSceneName
         );
       };
+
       export const pushScene = function (runtimeScene, newSceneName) {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
@@ -147,12 +164,15 @@ namespace gdjs {
           newSceneName
         );
       };
+
       export const popScene = function (runtimeScene) {
         runtimeScene.requestChange(gdjs.SceneChangeRequest.POP_SCENE);
       };
+
       export const stopGame = function (runtimeScene) {
         runtimeScene.requestChange(gdjs.SceneChangeRequest.STOP_GAME);
       };
+
       export const createObjectsFromExternalLayout = function (
         scene,
         externalLayout,

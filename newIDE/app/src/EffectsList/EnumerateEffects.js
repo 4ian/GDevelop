@@ -119,6 +119,15 @@ export const enumerateEffectsMetadata = (
           };
         });
     })
+  ).sort(
+    (
+      enumeratedEffectMetadata1: EnumeratedEffectMetadata,
+      enumeratedEffectMetadata2: EnumeratedEffectMetadata
+    ) => {
+      return enumeratedEffectMetadata1.fullName.localeCompare(
+        enumeratedEffectMetadata2.fullName
+      );
+    }
   );
 };
 

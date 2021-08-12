@@ -35,6 +35,7 @@ struct PreviewExportOptions {
       : project(project_),
         exportPath(exportPath_),
         projectDataOnlyExport(false),
+        fullLoadingScreen(false),
         nonRuntimeScriptsCacheBurst(0){};
 
   /**
@@ -86,6 +87,15 @@ struct PreviewExportOptions {
   }
 
   /**
+   * \brief Set if the export should show the full loading screen (false
+   * by default, skipping the minimum duration and GDevelop logo).
+   */
+  PreviewExportOptions &SetFullLoadingScreen(bool enable) {
+    fullLoadingScreen = enable;
+    return *this;
+  }
+
+  /**
    * \brief If set to a non zero value, the exported script URLs will have an
    * extra search parameter added (with the given value) to ensure browser cache
    * is bypassed when they are loaded.
@@ -103,6 +113,7 @@ struct PreviewExportOptions {
   gd::String externalLayoutName;
   std::map<gd::String, int> includeFileHashes;
   bool projectDataOnlyExport;
+  bool fullLoadingScreen;
   unsigned int nonRuntimeScriptsCacheBurst;
 };
 
@@ -158,6 +169,7 @@ class ExporterHelper {
   void AddLibsInclude(bool pixiRenderers,
                       bool cocosRenderers,
                       bool websocketDebuggerClient,
+                      gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 
   /**

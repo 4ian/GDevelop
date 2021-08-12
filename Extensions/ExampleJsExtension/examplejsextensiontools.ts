@@ -11,6 +11,7 @@ namespace gdjs {
       export const myConditionFunction = function (number, text) {
         return number <= 10 && text.length < 5;
       };
+
       export const getString = function () {
         return 'Hello World';
       };

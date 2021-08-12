@@ -13,7 +13,10 @@ import ListItem from '@material-ui/core/ListItem';
 import { computeTextFieldStyleProps } from './TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import muiZIndex from '@material-ui/core/styles/zIndex';
-import { shouldCloseOrCancel } from './KeyboardShortcuts/InteractionKeys';
+import {
+  shouldCloseOrCancel,
+  shouldSubmit,
+} from './KeyboardShortcuts/InteractionKeys';
 
 type Option =
   | {|
@@ -37,6 +40,7 @@ type Props = {|
   id?: string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   onRequestClose?: () => void,
+  onApply?: () => void,
   errorText?: React.Node,
   disabled?: boolean,
   floatingLabelText?: React.Node,
@@ -165,17 +169,13 @@ const handleChange = (
       props.onChange(option.value);
     }
 
-    if (props.onRequestClose) {
-      props.onRequestClose();
-    }
+    // Call onApply (if specified) as an option was chosen.
+    if (props.onApply) props.onApply();
+    else if (props.onRequestClose) props.onRequestClose();
   }
 };
 
-const getDefaultStylingProps = (
-  params: Object,
-  value: string,
-  props: Props
-): Object => {
+const getDefaultStylingProps = (params: Object, props: Props): Object => {
   const { InputProps, inputProps, InputLabelProps, ...other } = params;
   return {
     ...other,
@@ -189,8 +189,17 @@ const getDefaultStylingProps = (
       className: null,
       disabled: props.disabled,
       onKeyDown: (event: SyntheticKeyboardEvent<HTMLInputElement>): void => {
-        if (shouldCloseOrCancel(event) && props.onRequestClose)
-          props.onRequestClose();
+        if (shouldCloseOrCancel(event)) {
+          if (props.onRequestClose) props.onRequestClose();
+        } else if (shouldSubmit(event)) {
+          // Make sure the current value is reported to the parent before
+          // calling onApply (or onRequestClose), otherwise the parent would only
+          // know about the previous value.
+          props.onChange(event.currentTarget.value);
+
+          if (props.onApply) props.onApply();
+          else if (props.onRequestClose) props.onRequestClose();
+        }
       },
     },
   };
@@ -268,7 +277,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                 InputProps,
                 inputProps,
                 ...otherStylingProps
-              } = getDefaultStylingProps(params, currentInputValue, props);
+              } = getDefaultStylingProps(params, props);
               return (
                 <TextField
                   InputProps={{

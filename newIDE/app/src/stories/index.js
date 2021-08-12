@@ -242,6 +242,8 @@ import {
   AccordionHeader,
   AccordionBody,
 } from '../UI/Accordion';
+import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
+import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
 
 configureActions({
   depth: 2,
@@ -269,6 +271,9 @@ const buildFakeMenuTemplate = () => [
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
+  launchProjectWithLoadingScreenPreview: action(
+    'launchProjectWithLoadingScreenPreview'
+  ),
 };
 
 storiesOf('Welcome', module)
@@ -382,7 +387,7 @@ storiesOf('UI Building Blocks/Buttons', module)
       </Line>
       <Line>
         <MiniToolbar>
-          <MiniToolbarText>Some text:</MiniToolbarText>
+          <MiniToolbarText firstChild>Some text:</MiniToolbarText>
           <IconButton>
             <Brush />
           </IconButton>
@@ -541,7 +546,7 @@ storiesOf('UI Building Blocks/SemiControlledTextField', module)
     return (
       <React.Fragment>
         <MiniToolbar>
-          <MiniToolbarText>Please enter something:</MiniToolbarText>
+          <MiniToolbarText firstChild>Please enter something:</MiniToolbarText>
           <SemiControlledTextField
             margin="none"
             value={value}
@@ -728,7 +733,7 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       render={(value, onChange) => (
         <React.Fragment>
           <MiniToolbar>
-            <MiniToolbarText>Please make a choice:</MiniToolbarText>
+            <MiniToolbarText firstChild>Please make a choice:</MiniToolbarText>
             <SemiControlledAutoComplete
               margin="none"
               value={value}
@@ -2104,6 +2109,7 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <MouseField
           project={testProject.project}
+          scope={{}}
           value={value}
           onChange={onChange}
           globalObjectsContainer={testProject.project}
@@ -4350,6 +4356,9 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ))
   .add('Error in functions', () => (
@@ -4394,6 +4403,9 @@ storiesOf('ProjectManager', module)
       )}
       freezeUpdate={false}
       hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ));
 
@@ -4638,12 +4650,14 @@ storiesOf('HotReloadPreviewButton', module)
     <HotReloadPreviewButton
       hasPreviewsRunning={false}
       launchProjectDataOnlyPreview={() => {}}
+      launchProjectWithLoadingScreenPreview={() => {}}
     />
   ))
   .add('with preview(s) running', () => (
     <HotReloadPreviewButton
       hasPreviewsRunning={true}
       launchProjectDataOnlyPreview={() => {}}
+      launchProjectWithLoadingScreenPreview={() => {}}
     />
   ));
 
@@ -5100,5 +5114,34 @@ storiesOf('GamesShowcase/ShowcasedGameListItem', module)
     <ShowcasedGameListItem
       onHeightComputed={() => {}}
       showcasedGame={showcasedGame1}
+    />
+  ));
+
+storiesOf('ProjectPropertiesDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ProjectPropertiesDialog
+      open
+      initialTab="properties"
+      project={testProject.project}
+      onClose={action('onClose')}
+      onApply={action('onApply')}
+      onChangeSubscription={action('onChangeSubscription')}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
+    />
+  ));
+
+storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LoadingScreenEditor
+      loadingScreen={testProject.project.getLoadingScreen()}
+      onChangeSubscription={action('onChangeSubscription')}
+      project={testProject.project}
+      resourceSources={[]}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceExternalEditors={fakeResourceExternalEditors}
     />
   ));

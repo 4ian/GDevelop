@@ -221,8 +221,8 @@ module.exports = {
 
     const blurEffect = extension
       .addEffect('Blur')
-      .setFullName(_('Blur'))
-      .setDescription(_('Blur the rendered image.'))
+      .setFullName(_('Blur (Gaussian, slow - prefer to use Kawase blur)'))
+      .setDescription(_('Blur the rendered image. This is slow, so prefer to use Kawase blur in most cases.'))
       .addIncludeFile('Extensions/Effects/blur-pixi-filter.js');
     const blurProperties = blurEffect.getProperties();
     blurProperties
@@ -707,9 +707,9 @@ module.exports = {
 
     const kawaseBlurEffect = extension
       .addEffect('KawaseBlur')
-      .setFullName(_('Kawase blur'))
+      .setFullName(_('Blur (Kawase, fast)'))
       .setDescription(
-        _('A much faster blur than Gaussian blur, but more complicated to use.')
+        _('Blur the rendered image, with much better performance than Gaussian blur.')
       )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-kawase-blur.js')
       .addIncludeFile('Extensions/Effects/kawase-blur-pixi-filter.js');

@@ -90,6 +90,7 @@ namespace gdjs {
         }
         LinksManager.getManager(runtimeScene).linkObjects(objA, objB);
       };
+
       export const removeLinkBetween = function (
         runtimeScene: gdjs.RuntimeScene,
         objA: gdjs.RuntimeObject,
@@ -100,6 +101,7 @@ namespace gdjs {
         }
         LinksManager.getManager(runtimeScene).removeLinkBetween(objA, objB);
       };
+
       export const removeAllLinksOf = function (
         runtimeScene: gdjs.RuntimeScene,
         objA: gdjs.RuntimeObject
@@ -109,12 +111,14 @@ namespace gdjs {
         }
         LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
       };
+
       export const _objectIsInList = function (
         obj: gdjs.RuntimeObject,
         linkedObjects: gdjs.RuntimeObject[]
       ) {
         return linkedObjects.indexOf(obj) !== -1;
       };
+
       export const pickObjectsLinkedTo = function (
         runtimeScene: gdjs.RuntimeScene,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,

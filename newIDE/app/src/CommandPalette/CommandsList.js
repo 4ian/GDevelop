@@ -19,6 +19,7 @@ export type CommandName =
   | 'OPEN_RECENT_PROJECT'
   | 'OPEN_COMMAND_PALETTE'
   | 'OPEN_PROJECT_PROPERTIES'
+  | 'OPEN_PROJECT_LOADING_SCREEN'
   | 'OPEN_PROJECT_VARIABLES'
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
   | 'OPEN_PROJECT_RESOURCES'
@@ -155,6 +156,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROJECT_PROPERTIES: {
     area: 'PROJECT',
     displayText: t`Open project properties`,
+  },
+  OPEN_PROJECT_LOADING_SCREEN: {
+    area: 'PROJECT',
+    displayText: t`Edit loading screen`,
   },
   OPEN_PROJECT_VARIABLES: {
     area: 'PROJECT',

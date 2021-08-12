@@ -108,21 +108,6 @@ export const ResourceStoreStateProvider = ({
     [resourcesByUrl, isLoading]
   );
 
-  React.useEffect(
-    () => {
-      // Don't attempt to load again resources and filters if they
-      // were loaded already.
-      if (resourcesByUrl || isLoading.current) return;
-
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching resources from asset store...');
-        fetchResourcesAndFilters();
-      }, 6000);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchResourcesAndFilters, resourcesByUrl, isLoading]
-  );
-
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<Resource> = useSearchItem(
     resourcesByUrl,

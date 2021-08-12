@@ -5,7 +5,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
-import { ExtensionIcon } from './ExtensionIcon';
+import { IconContainer } from '../../UI/IconContainer';
 
 const styles = {
   container: {
@@ -44,9 +44,10 @@ export const ExtensionListItem = ({
     <ButtonBase onClick={onChoose} focusRipple>
       <div style={styles.container} ref={containerRef}>
         <Line noMargin>
-          <ExtensionIcon
-            extensionShortHeader={extensionShortHeader}
-            size={40}
+          <IconContainer
+            alt={extensionShortHeader.fullName}
+            src={extensionShortHeader.previewIconUrl}
+            size={48}
           />
           <Column expand>
             <Text noMargin>

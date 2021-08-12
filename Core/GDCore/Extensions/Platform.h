@@ -126,7 +126,8 @@ class GD_CORE_API Platform {
   ///@}
 
   /** \name Factory method
-   * Member functions used to create the platforms objects
+   * Member functions used to create the platform objects.
+   * TODO: This could be moved to gd::MetadataProvider.
    */
   ///@{
 
@@ -135,18 +136,6 @@ class GD_CORE_API Platform {
    */
   std::unique_ptr<gd::Object> CreateObject(gd::String type,
                                            const gd::String& name) const;
-
-  /**
-   * \brief Get the class handling the behavior with the given type, or
-   * `nullptr` if no behavior with the given type is found.
-   */
-  gd::Behavior* GetBehavior(const gd::String& type) const;
-
-  /**
-   * \brief Get the class handling the behavior shared data with the given type,
-   * or `nullptr` if no behavior with the given type is found.
-   */
-  gd::BehaviorsSharedData* GetBehaviorSharedDatas(const gd::String& type) const;
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -165,11 +154,13 @@ class GD_CORE_API Platform {
   /**
    * \brief Called when the IDE is about to shut down: Take this opportunity for
    * erasing for example any temporary file.
+   * @deprecated This should be removed.
    */
   virtual void OnIDEClosed(){};
 
   /**
    * \brief Called when the IDE is initialized and ready to be used.
+   * @deprecated This should be removed.
    */
   virtual void OnIDEInitialized(){};
 

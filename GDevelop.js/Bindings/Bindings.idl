@@ -126,7 +126,7 @@ interface EventsVariablesFinder {
     [Const, Value] SetString STATIC_FindAllGlobalVariables([Const, Ref] Platform platform, [Const, Ref] Project project);
     [Const, Value] SetString STATIC_FindAllLayoutVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout);
     [Const, Value] SetString STATIC_FindAllObjectVariables([Const, Ref] Platform platform, [Const, Ref] Project project, [Const, Ref] Layout layout, [Const, Ref] gdObject obj);
-    
+
     //Inherited from ExpressionParser2NodeWorker:
 };
 
@@ -167,9 +167,6 @@ interface JsPlatform {
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
-
-    Behavior GetBehavior([Const] DOMString type);
-    BehaviorsSharedData GetBehaviorSharedDatas([Const] DOMString type);
 
     [Const, Ref] VectorPlatformExtension GetAllPlatformExtensions();
 };
@@ -296,8 +293,35 @@ interface PlatformSpecificAssets {
 interface LoadingScreen {
     void LoadingScreen();
 
-    void ShowGDevelopSplash(boolean show);
     boolean IsGDevelopSplashShown();
+    void ShowGDevelopSplash(boolean show);
+    [Const, Ref] DOMString GetGDevelopLogoStyle();
+    [Ref] LoadingScreen SetGDevelopLogoStyle([Const] DOMString value);
+    [Const, Ref] DOMString GetBackgroundImageResourceName();
+    [Ref] LoadingScreen SetBackgroundImageResourceName([Const] DOMString value);
+    long GetBackgroundColor();
+    [Ref] LoadingScreen SetBackgroundColor(long value);
+    double GetBackgroundFadeInDuration();
+    [Ref] LoadingScreen SetBackgroundFadeInDuration(double value);
+    double GetMinDuration();
+    [Ref] LoadingScreen SetMinDuration(double value);
+    double GetLogoAndProgressFadeInDuration();
+    [Ref] LoadingScreen SetLogoAndProgressFadeInDuration(double value);
+    double GetLogoAndProgressLogoFadeInDelay();
+    [Ref] LoadingScreen SetLogoAndProgressLogoFadeInDelay(double value);
+    boolean GetShowProgressBar();
+    [Ref] LoadingScreen SetShowProgressBar(boolean value);
+    double GetProgressBarMaxWidth();
+    [Ref] LoadingScreen SetProgressBarMaxWidth(double value);
+    double GetProgressBarMinWidth();
+    [Ref] LoadingScreen SetProgressBarMinWidth(double value);
+    double GetProgressBarWidthPercent();
+    [Ref] LoadingScreen SetProgressBarWidthPercent(double value);
+    double GetProgressBarHeight();
+    [Ref] LoadingScreen SetProgressBarHeight(double value);
+    long GetProgressBarColor();
+    [Ref] LoadingScreen SetProgressBarColor(long value);
+
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -366,9 +390,6 @@ interface Project {
 
     [Ref] PlatformSpecificAssets GetPlatformSpecificAssets();
     [Ref] LoadingScreen GetLoadingScreen();
-
-    //createObject
-    //createEvent
 
     boolean HasLayoutNamed([Const] DOMString name);
     [Ref] Layout GetLayout([Const] DOMString name);
@@ -667,7 +688,7 @@ interface Effect {
 
 interface EffectsContainer {
   void EffectsContainer();
-  
+
   boolean HasEffectNamed([Const] DOMString name);
   [Ref] Effect GetEffect([Const] DOMString name);
   [Ref] Effect GetEffectAt(unsigned long index);
@@ -699,6 +720,11 @@ interface Layer {
     unsigned long GetAmbientLightColorBlue();
 
     [Ref] EffectsContainer GetEffects();
+
+    // Note that for now, cameras are not used in the editor (and not supported in the game engine).
+    // Just exposing the count to ensure we can test it.
+    unsigned long GetCameraCount();
+    void SetCameraCount(unsigned long cameraCount);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1028,21 +1054,12 @@ interface VectorPairStringTextFormatting {
 };
 
 interface TextFormatting {
-    boolean IsBold();
-    boolean IsItalic();
-    unsigned long GetColorRed();
-    unsigned long GetColorGreen();
-    unsigned long GetColorBlue();
     unsigned long GetUserData();
 };
 
 interface InstructionSentenceFormatter {
     InstructionSentenceFormatter STATIC_Get();
-    [Const, Value] DOMString Translate([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
     [Value] VectorPairStringTextFormatting GetAsFormattedText([Const, Ref] Instruction instr, [Const, Ref] InstructionMetadata metadat);
-    [Value] TextFormatting GetFormattingFromType([Const] DOMString type);
-    [Const, Value] DOMString LabelFromType([Const] DOMString type);
-    void LoadTypesFormattingFromConfig();
 };
 
 //TODO: This should be renamed to InstructionCodeGenerationInformation
@@ -1093,6 +1110,7 @@ interface InstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
@@ -1379,6 +1397,19 @@ interface BehaviorMetadata {
                                         [Const] DOMString sentenceName,
                                         [Const] DOMString group,
                                         [Const] DOMString icon);
+
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -1945,6 +1976,9 @@ interface MetadataProvider {
     [Const, Ref] ExpressionMetadata STATIC_GetStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetObjectStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString objectType, [Const] DOMString type);
     [Const, Ref] ExpressionMetadata STATIC_GetBehaviorStrExpressionMetadata([Const, Ref] Platform p, [Const] DOMString autoType, [Const] DOMString type);
+
+    boolean STATIC_IsBadExpressionMetadata([Const, Ref] ExpressionMetadata metadata);
+    boolean STATIC_IsBadBehaviorMetadata([Const, Ref] BehaviorMetadata metadata);
 };
 
 interface ExpressionParserDiagnostic {
@@ -2658,6 +2692,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
+    [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
 };
 

@@ -190,6 +190,18 @@ declare interface ExtensionProperty {
 
 declare interface LoadingScreenData {
   showGDevelopSplash: boolean;
+  backgroundImageResourceName: string;
+  backgroundColor: integer;
+  backgroundFadeInDuration: float;
+  minDuration: float;
+  logoAndProgressFadeInDuration: float;
+  logoAndProgressLogoFadeInDelay: float;
+  showProgressBar: boolean;
+  progressBarMinWidth: float;
+  progressBarMaxWidth: float;
+  progressBarWidthPercent: float;
+  progressBarHeight: float;
+  progressBarColor: integer;
 }
 
 declare interface ResourcesData {

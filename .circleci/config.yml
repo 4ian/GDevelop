@@ -1,9 +1,75 @@
-# CircleCI 2.0 configuration file to build GDevelop app running
-# on the Electron runtime (newIDE/electron-app).
+# CircleCI configuration to build GDevelop app running
+# on the Electron runtime (newIDE/electron-app) for macOS and Linux.
+# For Windows, see the appveyor.yml file.
 
-version: 2
+version: 2.1
 jobs:
-  build:
+  build-macos:
+    macos:
+      xcode: 12.5.1
+    steps:
+      - checkout
+
+      # System dependencies (for Emscripten and upload)
+      - run:
+          name: Install dependencies for Emscripten and AWS S3 upload
+          command: brew install cmake && brew install awscli
+
+      - run:
+          name: Install Emscripten (for GDevelop.js)
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+
+      # GDevelop.js dependencies
+      - restore_cache:
+          keys:
+            - gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gd-macos-nodejs-dependencies---
+
+      - run:
+          name: Install GDevelop.js dependencies and build it
+          command: cd GDevelop.js && npm install && cd ..
+
+      # Build GDevelop.js (and run tests to ensure it works)
+      - run:
+          name: Build GDevelop.js
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+
+      # GDevelop IDE dependencies (after building GDevelop.js to avoid downloading a pre-built version)
+      - run:
+          name: Install GDevelop IDE dependencies
+          command: cd newIDE/app && npm install && cd ../electron-app && npm install
+
+      - save_cache:
+          paths:
+            - newIDE/electron-app/node_modules
+            - newIDE/app/node_modules
+            - GDevelop.js/node_modules
+          key: gd-macos-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+
+      # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
+      # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
+      - run:
+          name: Build GDevelop IDE
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
+
+      - run:
+          name: Clean dist folder to keep only installers/binaries.
+          command: rm -rf "newIDE/electron-app/dist/mac/GDevelop 5.app"
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: newIDE/electron-app/dist
+
+      # Upload artifacts (AWS)
+      - run:
+          name: Deploy to S3 (specific commit)
+          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+      - run:
+          name: Deploy to S3 (latest)
+          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
+
+  build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
@@ -24,25 +90,21 @@ jobs:
           command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
 
       - run:
-          name: Install Wine for Electron builder
-          command: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt install wine32
-
-      - run:
           name: Install system dependencies for Electron builder
           command: sudo apt install icnsutils && sudo apt install graphicsmagick && sudo apt install rsync
 
       # GDevelop.js dependencies
       - restore_cache:
           keys:
-            - gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
+            - gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
             # fallback to using the latest cache if no exact match is found
-            - gd-nodejs-dependencies---
+            - gd-linux-nodejs-dependencies---
 
       - run:
           name: Install GDevelop.js dependencies and build it
-          command: cd GDevelop.js && sudo npm install -g grunt-cli && npm install && cd ..
+          command: cd GDevelop.js && npm install && cd ..
 
-      # Build GDevelop.js
+      # Build GDevelop.js (and run tests to ensure it works)
       - run:
           name: Build GDevelop.js
           command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
@@ -57,16 +119,16 @@ jobs:
             - newIDE/electron-app/node_modules
             - newIDE/app/node_modules
             - GDevelop.js/node_modules
-          key: gd-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}
+          key: gd-linux-nodejs-dependencies-{{ checksum "newIDE/app/package.json" }}-{{ checksum "newIDE/electron-app/package.json" }}-{{ checksum "GDevelop.js/package.json" }}
 
       # Build GDevelop IDE (seems like we need to allow Node.js to use more space than usual)
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac zip --win --linux tar.gz --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --linux AppImage --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/win-unpacked && rm -rf newIDE/electron-app/dist/mac
+          command: rm -rf newIDE/electron-app/dist/linux-unpacked
 
       # Upload artifacts (CircleCI)
       - store_artifacts:
@@ -79,3 +141,20 @@ jobs:
       - run:
           name: Deploy to S3 (latest)
           command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
+
+
+workflows:
+  builds:
+    jobs:
+      - build-macos:
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/
+      - build-linux:
+          filters:
+            branches:
+              only:
+                - master
+                - /experimental-build.*/

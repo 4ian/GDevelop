@@ -332,7 +332,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getY()).to.be(platform.getY());
 
-      object.getBehavior('auto1').simulateReleaseKey();
+      object.getBehavior('auto1').simulateReleasePlatformKey();
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(true);
@@ -389,7 +389,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(true);
 
         // Release upper platform
-        object.getBehavior('auto1').simulateReleaseKey();
+        object.getBehavior('auto1').simulateReleasePlatformKey();
         for (let i = 0; i < 35; ++i) {
           object.getBehavior('auto1').simulateLeftKey();
           runtimeScene.renderAndStep(1000 / 60);
@@ -550,6 +550,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
+      // Forbid to jump
+      object.getBehavior('auto1').setCanNotAirJump();
+      // It has no impact as the object is on a platform.
+      expect(object.getBehavior('auto1').canJump()).to.be(true);
+
       // Jump with sustaining as much as possible, and
       // even more (18 frames at 60fps is greater than 0.2s)
       for (let i = 0; i < 18; ++i) {
@@ -649,13 +654,103 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
-      // Fell from the platform
+      // Fall from the platform
       for (let i = 0; i < 35; ++i) {
         object.getBehavior('auto1').simulateLeftKey();
         runtimeScene.renderAndStep(1000 / 60);
       }
 
       // Try to jump
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
+    it('can be allowed to jump in mid air', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Fall from the platform
+      for (let i = 0; i < 20; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Allow to jump in mid air
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      object.getBehavior('auto1').setCanJump();
+      expect(object.getBehavior('auto1').canJump()).to.be(true);
+
+      // Can jump in the air
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+
+      for (let i = 0; i < 40; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      // Can no longer to jump
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
+    it('can allow coyote time', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Fall from the platform
+      for (let i = 0; i < 20; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      // Allow to jump
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      object.getBehavior('auto1').setCanJump();
+      expect(object.getBehavior('auto1').canJump()).to.be(true);
+
+      // Still falling from the platform
+      for (let i = 0; i < 4; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Suppose that we miss an eventual time frame or some condition.
+      // So we forbid to jump again:
+      object.getBehavior('auto1').setCanNotAirJump();
+      expect(object.getBehavior('auto1').canJump()).to.be(false);
+
+      // Can no longer to jump in mid air
       object.getBehavior('auto1').simulateJumpKey();
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isJumping()).to.be(false);
@@ -1532,9 +1627,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         object.getBehavior('auto1').simulateUpKey();
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-        //TODO Probably a bug, uncomment it after it's fixed
-        //expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
         expect(object.getY()).to.be.below(lastY);
+      }
+    };
+
+    const releaseLadder = (frameCount) => {
+      object.getBehavior('auto1').simulateReleaseLadderKey();
+      for (let i = 0; i < frameCount; ++i) {
+        const lastY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isOnLadder()).to.be(false);
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getY()).to.be.above(lastY);
       }
     };
 
@@ -1586,7 +1691,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
     };
 
-    it('can climb a ladder', function () {
+    it('can climb and release a ladder', function () {
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
       fallOnPlatform(10);
@@ -1595,7 +1700,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.getBehavior('auto1').simulateLadderKey();
       climbLadder(10);
       stayOnLadder(10);
-      climbLadder(14);
+      const objectPositionAfterFirstClimb = object.getY();
+      releaseLadder(10);
+      object.getBehavior('auto1').simulateLadderKey();
+      expect(object.getY()).to.be.within(
+        // gravity is 1500, 10 frames falling ~ 23px
+        objectPositionAfterFirstClimb + 22,
+        objectPositionAfterFirstClimb + 24
+      );
+      climbLadder(24);
       // Check that we reached the maximum height
       const playerAtLadderTop = ladder.getY() - object.getHeight();
       expect(object.getY()).to.be.within(

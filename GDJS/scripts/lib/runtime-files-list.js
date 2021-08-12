@@ -7,7 +7,6 @@ const gdjsRootPath = path.join(__dirname, '..', '..');
 
 const extensionsRuntimePath = path.join(gdevelopRootPath, 'Extensions');
 const gdjsRuntimePath = path.join(gdjsRootPath, 'Runtime');
-const bundledOutPath = path.join(gdjsRootPath, 'Runtime-dist');
 
 // The extensions to be included in the bundled Runtime (will be built with esbuild or copied).
 const allowedExtensions = ['.js', '.ts', '.html', '.json', '.xml'];
@@ -87,7 +86,7 @@ const isJsExtensionDeclaration = (filePath) => {
 /** @typedef {{inPath: string; outPath: string;}} InOutPath */
 
 /** Returns a function to generate the file paths in the bundled runtime. */
-const getInOutPaths = (basePath) => (inPath) => {
+const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
   const relativePath = path.relative(basePath, inPath);
   return {
     inPath,
@@ -96,10 +95,6 @@ const getInOutPaths = (basePath) => (inPath) => {
 };
 
 module.exports = {
-  /**
-   * Returns the path where the bundled Runtime will be generated.
-   */
-  getOutRootPath: () => bundledOutPath,
   /**
    * Check if a file must be copied without being built with esbuild.
    * @param {string} path
@@ -123,9 +118,10 @@ module.exports = {
   },
   /**
    * Get the list of all files part of the runtime, and their destination file when the runtime is bundled.
+   * @param {{bundledOutPath: string}} options
    * @returns {Promise<{allGDJSInOutFilePaths: InOutPath[]; allExtensionsInOutFilePaths: InOutPath[];}>}
    */
-  getAllInOutFilePaths: async () => {
+  getAllInOutFilePaths: async (options) => {
     // List all the files of the runtime
     const allGDJSInFilePaths = await recursive(gdjsRuntimePath, [
       isNotAllowedExtension,
@@ -137,10 +133,10 @@ module.exports = {
 
     // Generate the output file paths
     const allGDJSInOutFilePaths = allGDJSInFilePaths.map(
-      getInOutPaths(gdjsRuntimePath)
+      getInOutPaths(gdjsRuntimePath, options.bundledOutPath)
     );
     const allExtensionsInOutFilePaths = allExtensionsInFilePaths.map(
-      getInOutPaths(gdevelopRootPath)
+      getInOutPaths(gdevelopRootPath, options.bundledOutPath)
     );
 
     return { allGDJSInOutFilePaths, allExtensionsInOutFilePaths };

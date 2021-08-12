@@ -128,7 +128,6 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                     return (
                       <div style={style} key={key}>
                         <AddListItem
-                          disabled
                           onClick={onAddNewItem}
                           primaryText={addNewItemLabel}
                         />

@@ -4,11 +4,22 @@ import transformRect from '../Utils/TransformRect';
 import * as PIXI from 'pixi.js-legacy';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
+import {
+  type ResizeGrabbingLocation,
+  resizeGrabbingLocationValues,
+  resizeGrabbingRelativePositions,
+  canMoveOnX,
+  canMoveOnY,
+} from './InstancesResizer';
 
 type Props = {|
   instancesSelection: InstancesSelection,
   instanceMeasurer: Object, // To be typed in InstancesRenderer
-  onResize: (deltaX: number | null, deltaY: number | null) => void,
+  onResize: (
+    deltaX: number,
+    deltaY: number,
+    grabbingLocation: ResizeGrabbingLocation
+  ) => void,
   onResizeEnd: () => void,
   onRotate: (number, number) => void,
   onRotateEnd: () => void,
@@ -19,7 +30,7 @@ type Props = {|
 const getButtonSizes = (screenType: ScreenType) => {
   if (screenType === 'touch') {
     return {
-      buttonSize: 14,
+      bigButtonSize: 14,
       smallButtonSize: 12,
       buttonPadding: 5,
       hitAreaPadding: 12,
@@ -27,7 +38,7 @@ const getButtonSizes = (screenType: ScreenType) => {
   }
 
   return {
-    buttonSize: 10,
+    bigButtonSize: 10,
     smallButtonSize: 8,
     buttonPadding: 5,
     hitAreaPadding: 5,
@@ -37,13 +48,28 @@ const getButtonSizes = (screenType: ScreenType) => {
 const RECTANGLE_BUTTON_SHAPE = 0;
 const CIRCLE_BUTTON_SHAPE = 1;
 
+const resizeGrabbingIconNames = {
+  TopLeft: 'nwse-resize',
+  BottomLeft: 'nesw-resize',
+  BottomRight: 'nwse-resize',
+  TopRight: 'nesw-resize',
+  Top: 'ns-resize',
+  Left: 'ew-resize',
+  Bottom: 'ns-resize',
+  Right: 'ew-resize',
+};
+
 /**
  * Render selection rectangle for selected instances.
  */
 export default class SelectedInstances {
   instancesSelection: InstancesSelection;
   instanceMeasurer: Object; // To be typed in InstancesRenderer
-  onResize: (deltaX: number | null, deltaY: number | null) => void;
+  onResize: (
+    deltaX: number,
+    deltaY: number,
+    grabbingLocation: ResizeGrabbingLocation
+  ) => void;
   onResizeEnd: () => void;
   onRotate: (number, number) => void;
   onRotateEnd: () => void;
@@ -53,10 +79,7 @@ export default class SelectedInstances {
   pixiContainer = new PIXI.Container();
   rectanglesContainer = new PIXI.Container();
   selectedRectangles = [];
-  resizeButton = new PIXI.Graphics();
-  resizeIcon = PIXI.Sprite.from('res/actions/direction.png');
-  rightResizeButton = new PIXI.Graphics();
-  bottomResizeButton = new PIXI.Graphics();
+  resizeButtons: { [ResizeGrabbingLocation]: PIXI.Graphics } = {};
   rotateButton = new PIXI.Graphics();
 
   constructor({
@@ -80,36 +103,20 @@ export default class SelectedInstances {
 
     this.pixiContainer.addChild(this.rectanglesContainer);
 
-    this._makeButton(
-      this.resizeButton,
-      event => {
-        this.onResize(event.deltaX, event.deltaY);
-      },
-      () => {
-        this.onResizeEnd();
-      },
-      'nwse-resize'
-    );
-    this._makeButton(
-      this.rightResizeButton,
-      event => {
-        this.onResize(event.deltaX, null);
-      },
-      () => {
-        this.onResizeEnd();
-      },
-      'ew-resize'
-    );
-    this._makeButton(
-      this.bottomResizeButton,
-      event => {
-        this.onResize(null, event.deltaY);
-      },
-      () => {
-        this.onResizeEnd();
-      },
-      'ns-resize'
-    );
+    for (const resizeGrabbingLocation of resizeGrabbingLocationValues) {
+      const resizeButton = new PIXI.Graphics();
+      this.resizeButtons[resizeGrabbingLocation] = resizeButton;
+      this._makeButton(
+        resizeButton,
+        event => {
+          this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
+        },
+        () => {
+          this.onResizeEnd();
+        },
+        resizeGrabbingIconNames[resizeGrabbingLocation]
+      );
+    }
     this._makeButton(
       this.rotateButton,
       event => {
@@ -183,7 +190,7 @@ export default class SelectedInstances {
 
   render() {
     const {
-      buttonSize,
+      bigButtonSize,
       smallButtonSize,
       buttonPadding,
       hitAreaPadding,
@@ -242,54 +249,39 @@ export default class SelectedInstances {
       this.rectanglesContainer.removeChild(this.selectedRectangles.pop());
     }
 
-    //Position the resize button.
     const show = selection.length !== 0;
-    const resizeButtonPos = this.toCanvasCoordinates(x2, y2);
-    resizeButtonPos[0] += buttonPadding;
-    resizeButtonPos[1] += buttonPadding;
 
-    const rightResizeButtonPos = this.toCanvasCoordinates(
-      x2,
-      y1 + (y2 - y1) / 2
-    );
-    rightResizeButtonPos[0] += buttonPadding;
-    rightResizeButtonPos[1] -= smallButtonSize / 2;
+    // Position the resize buttons.
+    for (const grabbingLocation of resizeGrabbingLocationValues) {
+      const resizeButton = this.resizeButtons[grabbingLocation];
+      const relativePositions =
+        resizeGrabbingRelativePositions[grabbingLocation];
 
-    const bottomResizeButtonPos = this.toCanvasCoordinates(
-      x1 + (x2 - x1) / 2,
-      y2
-    );
-    bottomResizeButtonPos[0] -= smallButtonSize / 2;
-    bottomResizeButtonPos[1] += buttonPadding;
+      const useBigButton =
+        canMoveOnX(grabbingLocation) && canMoveOnY(grabbingLocation);
+      const buttonSize = useBigButton ? bigButtonSize : smallButtonSize;
+      const padding = buttonPadding + buttonSize / 2;
+      const resizeButtonPos = this.toCanvasCoordinates(
+        x1 - padding + relativePositions[0] * (x2 - x1 + 2 * padding),
+        y1 - padding + relativePositions[1] * (y2 - y1 + 2 * padding)
+      );
+      resizeButtonPos[0] -= buttonSize / 2;
+      resizeButtonPos[1] -= buttonSize / 2;
+
+      this._renderButton(
+        show,
+        resizeButton,
+        resizeButtonPos,
+        buttonSize,
+        RECTANGLE_BUTTON_SHAPE,
+        hitAreaPadding
+      );
+    }
 
     const rotateButtonPos = this.toCanvasCoordinates(x1 + (x2 - x1) / 2, y1);
     rotateButtonPos[0] -= smallButtonSize / 2;
-    rotateButtonPos[1] -= buttonPadding * 4;
+    rotateButtonPos[1] -= buttonPadding * 8;
 
-    this._renderButton(
-      show,
-      this.resizeButton,
-      resizeButtonPos,
-      buttonSize,
-      RECTANGLE_BUTTON_SHAPE,
-      hitAreaPadding
-    );
-    this._renderButton(
-      show,
-      this.rightResizeButton,
-      rightResizeButtonPos,
-      smallButtonSize,
-      RECTANGLE_BUTTON_SHAPE,
-      hitAreaPadding
-    );
-    this._renderButton(
-      show,
-      this.bottomResizeButton,
-      bottomResizeButtonPos,
-      smallButtonSize,
-      RECTANGLE_BUTTON_SHAPE,
-      hitAreaPadding
-    );
     this._renderButton(
       show,
       this.rotateButton,

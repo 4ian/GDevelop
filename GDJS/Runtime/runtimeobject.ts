@@ -660,10 +660,7 @@ namespace gdjs {
      * @static
      */
     static getVariableChildCount(variable: gdjs.Variable): integer {
-      if (variable.isStructure() == false) {
-        return 0;
-      }
-      return Object.keys(variable.getAllChildren()).length;
+      return variable.getChildrenCount();
     }
 
     /**

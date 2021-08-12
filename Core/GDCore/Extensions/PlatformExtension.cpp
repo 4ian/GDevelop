@@ -512,7 +512,7 @@ PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType) {
   return badExpressionsMetadata;
 }
 
-gd::BaseEventSPtr PlatformExtension::CreateEvent(gd::String eventType) const {
+gd::BaseEventSPtr PlatformExtension::CreateEvent(const gd::String& eventType) const {
   if (eventsInfos.find(eventType) != eventsInfos.end()) {
     if (eventsInfos.find(eventType)->second.instance ==
         std::shared_ptr<BaseEvent>()) {
@@ -531,14 +531,14 @@ gd::BaseEventSPtr PlatformExtension::CreateEvent(gd::String eventType) const {
 #endif
 
 CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(
-    gd::String objectType) const {
+    const gd::String& objectType) const {
   if (objectsInfos.find(objectType) != objectsInfos.end())
     return objectsInfos.find(objectType)->second.createFunPtr;
 
   return NULL;
 }
 
-gd::Behavior* PlatformExtension::GetBehavior(gd::String type) const {
+gd::Behavior* PlatformExtension::GetBehavior(const gd::String& type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end())
     return &behaviorsInfo.find(type)->second.Get();
 
@@ -546,7 +546,7 @@ gd::Behavior* PlatformExtension::GetBehavior(gd::String type) const {
 }
 
 gd::BehaviorsSharedData* PlatformExtension::GetBehaviorSharedDatas(
-    gd::String type) const {
+    const gd::String& type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end() &&
       behaviorsInfo.find(type)->second.GetSharedDataInstance())
     return behaviorsInfo.find(type)->second.GetSharedDataInstance();

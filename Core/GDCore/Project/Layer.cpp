@@ -70,54 +70,35 @@ void Layer::UnserializeFrom(const SerializerElement& element) {
                        element.GetIntAttribute("ambientLightColorG", 200),
                        element.GetIntAttribute("ambientLightColorB", 200));
 
-  // Compatibility with GD <= 3.3
-  if (element.HasChild("Camera")) {
-    for (std::size_t i = 0; i < element.GetChildrenCount("Camera"); ++i) {
-      const SerializerElement& cameraElement = element.GetChild("Camera", i);
-      SetCameraCount(GetCameraCount() + 1);
-      Camera& camera = GetCamera(GetCameraCount() - 1);
+  cameras.clear();
+  SerializerElement& camerasElement = element.GetChild("cameras");
+  camerasElement.ConsiderAsArrayOf("camera");
+  for (std::size_t i = 0; i < camerasElement.GetChildrenCount(); ++i) {
+    const SerializerElement& cameraElement = camerasElement.GetChild(i);
 
-      camera.SetUseDefaultSize(
-          cameraElement.GetBoolAttribute("DefaultSize", true));
-      camera.SetSize(cameraElement.GetDoubleAttribute("Width"),
-                     cameraElement.GetDoubleAttribute("Height"));
+    Camera camera;
+    camera.SetUseDefaultSize(
+        cameraElement.GetBoolAttribute("defaultSize", true));
+    camera.SetSize(cameraElement.GetDoubleAttribute("width"),
+                    cameraElement.GetDoubleAttribute("height"));
+    camera.SetUseDefaultViewport(
+        cameraElement.GetBoolAttribute("defaultViewport", true));
+    camera.SetViewport(
+        cameraElement.GetDoubleAttribute("viewportLeft"),
+        cameraElement.GetDoubleAttribute("viewportTop"),
+        cameraElement.GetDoubleAttribute("viewportRight"),
+        cameraElement.GetDoubleAttribute(
+            "viewportBottom"));
 
-      camera.SetUseDefaultViewport(
-          cameraElement.GetBoolAttribute("DefaultViewport", true));
-      camera.SetViewport(
-          cameraElement.GetDoubleAttribute("ViewportLeft"),
-          cameraElement.GetDoubleAttribute("ViewportTop"),
-          cameraElement.GetDoubleAttribute("ViewportRight"),
-          cameraElement.GetDoubleAttribute(
-              "ViewportBottom"));  // (sf::Rect used Right and Bottom instead of
-                                   // Width and Height before)
-    }
+    cameras.push_back(camera);
   }
-  // End of compatibility code
-  else {
-    SerializerElement& camerasElement = element.GetChild("cameras");
-    camerasElement.ConsiderAsArrayOf("camera");
-    for (std::size_t i = 0; i < camerasElement.GetChildrenCount(); ++i) {
-      const SerializerElement& cameraElement = camerasElement.GetChild(i);
 
-      SetCameraCount(GetCameraCount() + 1);
-      Camera& camera = GetCamera(GetCameraCount() - 1);
-
-      camera.SetUseDefaultSize(
-          cameraElement.GetBoolAttribute("defaultSize", true));
-      camera.SetSize(cameraElement.GetDoubleAttribute("width"),
-                     cameraElement.GetDoubleAttribute("height"));
-
-      camera.SetUseDefaultViewport(
-          cameraElement.GetBoolAttribute("defaultViewport", true));
-      camera.SetViewport(
-          cameraElement.GetDoubleAttribute("viewportLeft"),
-          cameraElement.GetDoubleAttribute("viewportTop"),
-          cameraElement.GetDoubleAttribute("viewportRight"),
-          cameraElement.GetDoubleAttribute(
-              "viewportBottom"));  // (sf::Rect used Right and Bottom instead of
-                                   // Width and Height before)
-    }
+  if (camerasElement.GetChildrenCount() > 50) {
+    // Highly unlikely that we want as many cameras, as they were not even exposed in
+    // the editor nor used in the game engine. Must be because of a bug in the editor that
+    // duplicated cameras when cancelling changes on a layer.
+    // Reset to one camera.
+    SetCameraCount(1);
   }
 
   const SerializerElement& effectsElement = element.GetChild("effects");

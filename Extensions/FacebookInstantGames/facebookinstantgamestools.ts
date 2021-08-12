@@ -18,18 +18,21 @@ namespace gdjs {
           supportedAPIs.indexOf('getRewardedVideoAsync') !== -1
         );
       };
+
       export const getPlayerId = function () {
         if (typeof FBInstant === 'undefined') {
           return '';
         }
         return FBInstant.player.getID() || '';
       };
+
       export const getPlayerName = function () {
         if (typeof FBInstant === 'undefined') {
           return '';
         }
         return FBInstant.player.getName() || '';
       };
+
       export const loadPlayerData = function (
         key,
         successVariable,
@@ -43,15 +46,13 @@ namespace gdjs {
         FBInstant.player
           .getDataAsync([key])
           .then(function (data) {
-            gdjs.evtTools.network.jsonToVariableStructure(
-              data[key],
-              successVariable
-            );
+            successVariable.fromJSON(data[key]);
           })
           .catch(function (error) {
             errorVariable.setString(error.message || 'Unknown error');
           });
       };
+
       export const setPlayerData = function (
         key,
         variable,
@@ -64,7 +65,7 @@ namespace gdjs {
         errorVariable.setString('');
         successVariable.setString('');
         const data = {};
-        data[key] = gdjs.evtTools.network.variableStructureToJSON(variable);
+        data[key] = JSON.stringify(variable.toJSObject());
         FBInstant.player
           .setDataAsync(data)
           .then(function () {
@@ -74,6 +75,7 @@ namespace gdjs {
             errorVariable.setString(error.message || 'Unknown error');
           });
       };
+
       export const setPlayerScore = function (
         leaderboardName,
         score,
@@ -86,9 +88,7 @@ namespace gdjs {
         }
         errorVariable.setString('');
         successVariable.setString('');
-        const data = gdjs.evtTools.network.variableStructureToJSON(
-          extraDataVariable
-        );
+        const data = JSON.stringify(extraDataVariable.toJSObject());
         FBInstant.getLeaderboardAsync(leaderboardName)
           .then(function (leaderboard) {
             return leaderboard.setScoreAsync(score, data);
@@ -100,6 +100,7 @@ namespace gdjs {
             errorVariable.setString(error.message || 'Unknown error');
           });
       };
+
       export const getPlayerEntry = function (
         leaderboardName,
         rankVariable,
@@ -123,15 +124,13 @@ namespace gdjs {
             scoreVariable.setNumber(
               entry.getScore() === null ? -1 : entry.getScore()
             );
-            gdjs.evtTools.network.jsonToVariableStructure(
-              entry.getExtraData(),
-              extraDataVariable
-            );
+            extraDataVariable.fromJSON(entry.getExtraData());
           })
           .catch(function (error) {
             errorVariable.setString(error.message || 'Unknown error');
           });
       };
+
       export const loadInterstitialAd = function (
         adPlacementId,
         errorVariable
@@ -163,6 +162,7 @@ namespace gdjs {
             errorVariable.setString(err.message || 'Unknown error');
           });
       };
+
       export const showInterstitialAd = function (errorVariable) {
         if (typeof FBInstant === 'undefined') {
           return;
@@ -183,9 +183,11 @@ namespace gdjs {
             gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
           });
       };
+
       export const isInterstitialAdReady = function () {
         return gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded;
       };
+
       export const loadRewardedVideo = function (adPlacementId, errorVariable) {
         if (typeof FBInstant === 'undefined') {
           return;
@@ -214,6 +216,7 @@ namespace gdjs {
             errorVariable.setString(err.message || 'Unknown error');
           });
       };
+
       export const showRewardedVideo = function (errorVariable) {
         if (typeof FBInstant === 'undefined') {
           return;
@@ -234,6 +237,7 @@ namespace gdjs {
             gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
           });
       };
+
       export const isRewardedVideoReady = function () {
         return gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded;
       };

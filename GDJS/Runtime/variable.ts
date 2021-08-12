@@ -13,6 +13,7 @@ namespace gdjs {
    * A Variable is an object storing a value (number or a string) or children variables.
    */
   export class Variable {
+    // TODO: convert this to an integer to speed up the type checks at runtime.
     _type: VariableType = 'number';
     _value: float = 0;
     _str: string = '0';
@@ -98,6 +99,97 @@ namespace gdjs {
           target.pushVariableCopy(p);
       }
       return target;
+    }
+
+    /**
+     * Converts a JavaScript object into a value compatible
+     * with GDevelop variables and store it inside this variable.
+     * @param obj - The value to convert.
+     */
+    fromJSObject(obj: any): this {
+      if (obj === null) {
+        this.setString('null');
+      } else if (typeof obj === 'number') {
+        if (Number.isNaN(obj)) {
+          console.warn('Variables cannot be set to NaN, setting it to 0.');
+          this.setNumber(0);
+        } else {
+          this.setNumber(obj);
+        }
+      } else if (typeof obj === 'string') {
+        this.setString(obj);
+      } else if (typeof obj === 'undefined') {
+        // Do not modify the variable, as there is no value to set it to.
+      } else if (typeof obj === 'boolean') {
+        this.setBoolean(obj);
+      } else if (Array.isArray(obj)) {
+        this.castTo('array');
+        this.clearChildren();
+        for (const i in obj) this.getChild(i).fromJSObject(obj[i]);
+      } else if (typeof obj === 'object') {
+        this.castTo('structure');
+        this.clearChildren();
+        for (var p in obj)
+          if (obj.hasOwnProperty(p)) this.getChild(p).fromJSObject(obj[p]);
+      } else if (typeof obj === 'symbol') {
+        this.setString(obj.toString());
+      } else if (typeof obj === 'bigint') {
+        if (obj > Number.MAX_SAFE_INTEGER)
+          console.warn(
+            'Integers bigger than ' +
+              Number.MAX_SAFE_INTEGER +
+              " aren't supported by GDevelop variables, it will be reduced to that size."
+          );
+        // @ts-ignore
+        variable.setNumber(parseInt(obj, 10));
+      } else if (typeof obj === 'function') {
+        console.error('Error: Impossible to set variable value to a function.');
+      } else {
+        console.error('Cannot identify type of object:', obj);
+      }
+      return this;
+    }
+
+    /**
+     * Unserialize a JSON string into this variable.
+     *
+     * This just logs an error if the JSON is invalid.
+     *
+     * @param json - A JSON string.
+     */
+    fromJSON(json: string): this {
+      try {
+        var obj = JSON.parse(json);
+      } catch (e) {
+        console.error('Unable to parse JSON: ', json, e);
+        return this;
+      }
+      this.fromJSObject(obj);
+      return this;
+    }
+
+    /**
+     * Converts this variable into an equivalent JavaScript object.
+     * @returns A JavaScript object equivalent to the variable.
+     */
+    toJSObject(): any {
+      switch (this._type) {
+        case 'string':
+          return this.getAsString();
+        case 'number':
+          return this.getAsNumber();
+        case 'boolean':
+          return this.getAsBoolean();
+        case 'structure':
+          const obj = {};
+          for (const name in this._children)
+            obj[name] = this._children[name].toJSObject();
+          return obj;
+        case 'array':
+          const arr: any[] = [];
+          for (const item of this._childrenArray) arr.push(item.toJSObject());
+          return arr;
+      }
     }
 
     /**
@@ -359,7 +451,7 @@ namespace gdjs {
     }
 
     /**
-     * Return the object containing all the children of the variable
+     * Return the object containing all the children of the variable.
      * @return All the children of the variable
      */
     getAllChildren(): Children {
@@ -371,7 +463,7 @@ namespace gdjs {
     }
 
     /**
-     * Return an Array containing all the children of the variable
+     * Return an Array containing all the children of the variable.
      */
     getAllChildrenArray(): gdjs.Variable[] {
       return this._type === 'structure'
@@ -382,11 +474,14 @@ namespace gdjs {
     }
 
     /**
-     * Return the length of the collection
+     * Return the length of the collection.
      */
-    getChildrenCount() {
-      if (this.isPrimitive()) return 0;
-      return this.getAllChildrenArray().length;
+    getChildrenCount(): integer {
+      return this._type === 'structure'
+        ? Object.keys(this._children).length
+        : this._type === 'array'
+        ? this._childrenArray.length
+        : 0;
     }
 
     /**
@@ -434,7 +529,9 @@ namespace gdjs {
      * @private
      * @alias concatenateString
      */
-    concatenate = gdjs.Variable.prototype.concatenateString;
+    concatenate(str: string) {
+      this.setString(this.getAsString() + str);
+    }
 
     /**
      * Get a variable at a given index of the array.

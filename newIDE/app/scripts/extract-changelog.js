@@ -59,6 +59,8 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.indexOf('update fixtures') === 0 ||
           lowerCaseMessage.indexOf('try to fix flow') === 0 ||
           lowerCaseMessage.indexOf('fix flow') === 0 ||
+          lowerCaseMessage.indexOf('fix typing') === 0 ||
+          lowerCaseMessage.indexOf('fix test') === 0 ||
           lowerCaseMessage.indexOf('merge branch') === 0 ||
           lowerCaseMessage.indexOf('merge pull request #') === 0 ||
           lowerCaseMessage.includes('bump newide version') ||

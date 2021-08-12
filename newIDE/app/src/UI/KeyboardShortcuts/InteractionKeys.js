@@ -27,6 +27,15 @@ export const shouldActivate = (event: SupportedEvent) => {
 };
 
 /**
+ * Check if the user wants to apply changes or "submit" what they did.
+ * This is more intentional from the user than just
+ * `shouldValidate` or `shouldActivate`.
+ */
+export const shouldSubmit = (event: SupportedEvent) => {
+  return (event.metaKey || event.ctrlKey) && event.key === 'Enter';
+};
+
+/**
  * Check if the user asked to go to the next field.
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.

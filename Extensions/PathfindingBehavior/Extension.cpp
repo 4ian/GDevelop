@@ -45,7 +45,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Move to a position"),
                   _("Move the object to a position"),
                   _("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
-                  "",
+                  "Movement on the path",
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
@@ -61,7 +61,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Path found"),
                      _("Check if a path has been found."),
                      _("A path has been found for _PARAM0_"),
-                     "",
+                     "Movement on the path",
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -74,7 +74,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Destination reached"),
                      _("Check if the destination was reached."),
                      _("_PARAM0_ reached its destination"),
-                     "",
+                     "Movement on the path",
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -145,7 +145,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Acceleration"),
                   _("Change the acceleration when moving the object"),
                   _("the acceleration on the path"),
-                  _("Path"),
+                  _("Pathfinding configuration"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
@@ -160,7 +160,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Acceleration"),
                      _("Compare the acceleration when moving the object"),
                      _("the acceleration"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -174,7 +174,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Maximum speed"),
                   _("Change the maximum speed when moving the object"),
                   _("the max. speed on the path"),
-                  _("Path"),
+                  _("Pathfinding configuration"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
@@ -189,7 +189,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Maximum speed"),
                      _("Compare the maximum speed when moving the object"),
                      _("the max. speed"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -203,7 +203,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Speed"),
                   _("Change the speed of the object on the path"),
                   _("the speed on the path"),
-                  _("Path"),
+                  _("Movement on the path"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
@@ -215,10 +215,10 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Speed",
-                     _("Speed"),
-                     _("Compare the speed of the object on the path"),
+                     _("Speed on its path"),
+                     _("Compare the speed of the object on its path."),
                      _("the speed"),
-                     _("Path"),
+                     _("Movement on the path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -228,11 +228,25 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetSpeed")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
+    aut.AddScopedCondition("MovementAngleIsAround",
+                          _("Angle of movement on its path"),
+                          _("Compare the angle of movement of an object on its path."),
+                          _("Angle of movement of _PARAM0_ is _PARAM2_ (tolerance"
+                              ": _PARAM3_ degrees)"),
+                          _("Movement on the path"),
+                         "CppPlatform/Extensions/AStaricon24.png",
+                         "CppPlatform/Extensions/AStaricon16.png")
+
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
+        .AddParameter("expression", _("Angle, in degrees"))
+        .AddParameter("expression", _("Tolerance, in degrees"));
+
     aut.AddAction("AngularMaxSpeed",
                   _("Angular maximum speed"),
                   _("Change the maximum angular speed when moving the object"),
                   _("the max. angular speed on the path"),
-                  _("Path"),
+                  _("Pathfinding configuration"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
@@ -248,7 +262,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Angular maximum speed"),
            _("Compare the maximum angular speed when moving the object"),
            _("the max. angular speed"),
-           _("Path"),
+           _("Pathfinding configuration"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -263,7 +277,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Rotation offset"),
            _("Change the rotation offset applied when moving the object"),
            _("the rotation offset on the path"),
-           _("Path"),
+           _("Pathfinding configuration"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -278,7 +292,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Rotation offset"),
                      _("Compare the rotation offset when moving the object"),
                      _("the rotation offset"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -294,7 +308,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Change the size of the extra border applied to the object when "
              "planning a path"),
            _("the size of the extra border on the path"),
-           _("Path"),
+           _("Pathfinding configuration"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -310,7 +324,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the size of the extra border applied to the "
                        "object when planning a path"),
                      _("the size of the extra border on the path"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -325,7 +339,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
            _("Diagonal movement"),
            _("Allow or restrict diagonal movement on the path"),
            _("Allow diagonal movement for _PARAM0_ on the path: _PARAM2_"),
-           _("Path"),
+           _("Pathfinding configuration"),
            "CppPlatform/Extensions/AStaricon24.png",
            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -340,7 +354,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Check if the object is allowed to move "
                        "diagonally on the path"),
                      _("Diagonal moves allowed for _PARAM0_"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -353,7 +367,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Rotate the object"),
                   _("Enable or disable rotation of the object on the path"),
                   _("Enable rotation of _PARAM0_ on the path: _PARAM2_"),
-                  _("Path"),
+                  _("Pathfinding configuration"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
 
@@ -368,7 +382,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Check if the object is rotated when traveling on "
                        "its path."),
                      _("_PARAM0_ is rotated when traveling on its path"),
-                     _("Path"),
+                     _("Pathfinding configuration"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -380,7 +394,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("GetNodeX",
                       _("Get a waypoint X position"),
                       _("Get next waypoint X position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -391,7 +405,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("GetNodeY",
                       _("Get a waypoint Y position"),
                       _("Get next waypoint Y position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -402,7 +416,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("NextNodeIndex",
                       _("Index of the next waypoint"),
                       _("Get the index of the next waypoint to reach"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -412,7 +426,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("NodeCount",
                       _("Waypoint count"),
                       _("Get the number of waypoints on the path"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -422,7 +436,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("NextNodeX",
                       _("Get next waypoint X position"),
                       _("Get next waypoint X position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -432,7 +446,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("NextNodeY",
                       _("Get next waypoint Y position"),
                       _("Get next waypoint Y position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -442,7 +456,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("LastNodeX",
                       _("Last waypoint X position"),
                       _("Last waypoint X position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -452,7 +466,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("LastNodeY",
                       _("Last waypoint Y position"),
                       _("Last waypoint Y position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -462,7 +476,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("DestinationX",
                       _("Destination X position"),
                       _("Destination X position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -472,7 +486,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("DestinationY",
                       _("Destination Y position"),
                       _("Destination Y position"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -482,7 +496,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("Acceleration",
                       _("Acceleration"),
                       _("Acceleration of the object on the path"),
-                      _("Path"),
+                      _("Pathfinding configuration"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -492,7 +506,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("MaxSpeed",
                       _("Maximum speed"),
                       _("Maximum speed of the object on the path"),
-                      _("Path"),
+                      _("Pathfinding configuration"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -502,7 +516,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("Speed",
                       _("Speed"),
                       _("Speed of the object on the path"),
-                      _("Path"),
+                      _("Movement on the path"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -512,7 +526,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("AngularMaxSpeed",
                       _("Angular maximum speed"),
                       _("Angular maximum speed of the object on the path"),
-                      _("Path"),
+                      _("Pathfinding configuration"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -522,7 +536,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("AngleOffset",
                       _("Rotation offset"),
                       _("Rotation offset applied the object on the path"),
-                      _("Path"),
+                      _("Pathfinding configuration"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -532,7 +546,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("ExtraBorder",
                       _("Extra border size"),
                       _("Extra border applied the object on the path"),
-                      _("Path"),
+                      _("Pathfinding configuration"),
                       "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
@@ -559,13 +573,21 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCellHeight")
         .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
+    aut.AddExpression("MovementAngle",
+                    _("Angle of movement on its path"),
+                    _("Angle of movement on its path"),
+                    _("Movement on the path"),
+                    "CppPlatform/Extensions/AStaricon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PathfindingBehavior");
+
     aut.AddExpressionAndConditionAndAction("number",
                       "GridOffsetX",
                       _("Grid X offset"),
                       _("X offset of the virtual grid"),
                       _("X offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number");
@@ -576,7 +598,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                       _("Y offset of the virtual grid"),
                       _("Y offset of the virtual grid"),
                       _("Virtual grid"),
-                      "CppPlatform/Extensions/AStaricon16.png")
+                      "CppPlatform/Extensions/AStaricon24.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .UseStandardParameters("number");

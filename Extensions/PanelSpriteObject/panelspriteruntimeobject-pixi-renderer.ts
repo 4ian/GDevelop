@@ -2,10 +2,18 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
-    _spritesContainer: any;
-    _centerSprite: any;
-    _borderSprites: any;
-    _alpha: float;
+    /**
+     * The _wrapperContainer must be considered as the main container of this object
+     * All transformations are applied on this container
+     * See updateOpacity for more info why.
+     */
+    _wrapperContainer: PIXI.Container;
+    /**
+     * The _spritesContainer is used to create the sprites and apply cacheAsBitmap only.
+     */
+    _spritesContainer: PIXI.Container;
+    _centerSprite: PIXI.Sprite | PIXI.TilingSprite;
+    _borderSprites: Array<PIXI.Sprite | PIXI.TilingSprite>;
     _wasRendered: boolean = false;
     _textureWidth = 0;
     _textureHeight = 0;
@@ -17,38 +25,37 @@ namespace gdjs {
       tiled: boolean
     ) {
       this._object = runtimeObject;
-      if (this._spritesContainer === undefined) {
-        const texture = (runtimeScene
-          .getGame()
-          .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
-          textureName
-        );
-        const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
-        this._spritesContainer = new PIXI.Container();
+      const texture = (runtimeScene
+        .getGame()
+        .getImageManager() as gdjs.PixiImageManager).getPIXITexture(
+        textureName
+      );
+      const StretchedSprite = !tiled ? PIXI.Sprite : PIXI.TilingSprite;
+      this._spritesContainer = new PIXI.Container();
+      this._wrapperContainer = new PIXI.Container();
+      // @ts-ignore
+      this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
+      this._borderSprites = [
         // @ts-ignore
-        this._centerSprite = new StretchedSprite(new PIXI.Texture(texture));
-        this._borderSprites = [
-          // @ts-ignore
-          new StretchedSprite(new PIXI.Texture(texture)),
-          //Right
-          new PIXI.Sprite(texture),
-          //Top-Right
-          // @ts-ignore
-          new StretchedSprite(new PIXI.Texture(texture)),
-          //Top
-          new PIXI.Sprite(texture),
-          //Top-Left
-          // @ts-ignore
-          new StretchedSprite(new PIXI.Texture(texture)),
-          //Left
-          new PIXI.Sprite(texture),
-          //Bottom-Left
-          // @ts-ignore
-          new StretchedSprite(new PIXI.Texture(texture)),
-          //Bottom
-          new PIXI.Sprite(texture),
-        ];
-      }
+        new StretchedSprite(new PIXI.Texture(texture)),
+        //Right
+        new PIXI.Sprite(texture),
+        //Top-Right
+        // @ts-ignore
+        new StretchedSprite(new PIXI.Texture(texture)),
+        //Top
+        new PIXI.Sprite(texture),
+        //Top-Left
+        // @ts-ignore
+        new StretchedSprite(new PIXI.Texture(texture)),
+        //Left
+        new PIXI.Sprite(texture),
+        //Bottom-Left
+        // @ts-ignore
+        new StretchedSprite(new PIXI.Texture(texture)),
+        //Bottom
+        new PIXI.Sprite(texture),
+      ];
 
       //Bottom-Right
       this.setTexture(textureName, runtimeScene);
@@ -57,44 +64,43 @@ namespace gdjs {
       for (let i = 0; i < this._borderSprites.length; ++i) {
         this._spritesContainer.addChild(this._borderSprites[i]);
       }
-      this._alpha = this._spritesContainer.alpha;
+      this._wrapperContainer.addChild(this._spritesContainer);
       runtimeScene
         .getLayer('')
         .getRenderer()
-        .addRendererObject(this._spritesContainer, runtimeObject.getZOrder());
+        .addRendererObject(this._wrapperContainer, runtimeObject.getZOrder());
     }
 
     getRendererObject() {
-      return this._spritesContainer;
+      return this._wrapperContainer;
     }
 
     ensureUpToDate() {
       if (this._spritesContainer.visible && this._wasRendered) {
-        // Update the alpha of the container to make sure that it's applied.
-        // If not done, the alpha will be back to full opaque when changing the color
-        // of the object.
-        this._spritesContainer.alpha = this._alpha;
+        // Cache the rendered sprites as a bitmap to speed up rendering when
+        // lots of panel sprites are on the scene.
+        // Sadly, because of this, we need a wrapper container to workaround
+        // a PixiJS issue with alpha (see updateOpacity).
         this._spritesContainer.cacheAsBitmap = true;
       }
       this._wasRendered = true;
     }
 
     updateOpacity(): void {
-      //TODO: Workaround a not working property in PIXI.js:
-      this._spritesContainer.alpha = this._spritesContainer.visible
-        ? this._object.opacity / 255
-        : 0;
-      this._alpha = this._spritesContainer.alpha;
+      // The alpha is updated on a wrapper around the sprite because a known bug
+      // in Pixi will create a flicker when cacheAsBitmap is set to true.
+      // (see https://github.com/pixijs/pixijs/issues/4610)
+      this._wrapperContainer.alpha = this._object.opacity / 255;
     }
 
     updateAngle(): void {
-      this._spritesContainer.rotation = gdjs.toRad(this._object.angle);
+      this._wrapperContainer.rotation = gdjs.toRad(this._object.angle);
     }
 
     updatePosition(): void {
-      this._spritesContainer.position.x =
+      this._wrapperContainer.position.x =
         this._object.x + this._object._width / 2;
-      this._spritesContainer.position.y =
+      this._wrapperContainer.position.y =
         this._object.y + this._object._height / 2;
     }
 
@@ -316,19 +322,19 @@ namespace gdjs {
       this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
-      this._spritesContainer.pivot.x = this._object._width / 2;
-      this._spritesContainer.pivot.y = this._object._height / 2;
+      this._wrapperContainer.pivot.x = this._object._width / 2;
+      this._wrapperContainer.pivot.y = this._object._height / 2;
     }
 
     updateWidth(): void {
-      this._spritesContainer.pivot.x = this._object._width / 2;
+      this._wrapperContainer.pivot.x = this._object._width / 2;
       this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
     }
 
     updateHeight(): void {
-      this._spritesContainer.pivot.y = this._object._height / 2;
+      this._wrapperContainer.pivot.y = this._object._height / 2;
       this._updateSpritesAndTexturesSize();
       this._updateLocalPositions();
       this.updatePosition();
@@ -339,25 +345,21 @@ namespace gdjs {
       if (colors.length < 3) {
         return;
       }
-      this._centerSprite.tint =
-        '0x' +
-        gdjs.rgbToHex(
-          parseInt(colors[0], 10),
-          parseInt(colors[1], 10),
-          parseInt(colors[2], 10)
-        );
+      this._centerSprite.tint = gdjs.rgbToHexNumber(
+        parseInt(colors[0], 10),
+        parseInt(colors[1], 10),
+        parseInt(colors[2], 10)
+      );
       for (
         let borderCounter = 0;
         borderCounter < this._borderSprites.length;
         borderCounter++
       ) {
-        this._borderSprites[borderCounter].tint =
-          '0x' +
-          gdjs.rgbToHex(
-            parseInt(colors[0], 10),
-            parseInt(colors[1], 10),
-            parseInt(colors[2], 10)
-          );
+        this._borderSprites[borderCounter].tint = gdjs.rgbToHexNumber(
+          parseInt(colors[0], 10),
+          parseInt(colors[1], 10),
+          parseInt(colors[2], 10)
+        );
       }
       this._spritesContainer.cacheAsBitmap = false;
     }

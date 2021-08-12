@@ -52,6 +52,12 @@ import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewB
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { IconContainer } from '../UI/IconContainer';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -128,6 +134,7 @@ const ProjectStructureItem = (props: ProjectStructureItemProps) => (
 type ItemProps = {|
   primaryText: string,
   editingName: boolean,
+  leftIcon?: ?React.Node,
   onEdit: () => void,
   onDelete: () => void,
   addLabel: string,
@@ -189,6 +196,7 @@ class Item extends React.Component<ItemProps, {||}> {
                   ...this.props.style,
                 }}
                 primaryText={label}
+                leftIcon={this.props.leftIcon}
                 displayMenuButton
                 buildMenuTemplate={(i18n: I18nType) => [
                   {
@@ -292,6 +300,11 @@ type Props = {|
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
   onInstallExtension: ExtensionShortHeader => void,
+
+  // For resources:
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
 type State = {|
@@ -301,6 +314,7 @@ type State = {|
   renamedItemName: string,
   searchText: string,
   projectPropertiesDialogOpen: boolean,
+  projectPropertiesDialogInitialTab: 'properties' | 'loading-screen',
   projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
   layoutPropertiesDialogOpen: boolean,
@@ -317,6 +331,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     renamedItemName: '',
     searchText: '',
     projectPropertiesDialogOpen: false,
+    projectPropertiesDialogInitialTab: 'properties',
     projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
     layoutPropertiesDialogOpen: false,
@@ -352,6 +367,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   _openProjectProperties = () => {
     this.setState({
       projectPropertiesDialogOpen: true,
+      projectPropertiesDialogInitialTab: 'properties',
+    });
+  };
+
+  _openProjectLoadingScreen = () => {
+    this.setState({
+      projectPropertiesDialogOpen: true,
+      projectPropertiesDialogInitialTab: 'loading-screen',
     });
   };
 
@@ -770,6 +793,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         <ProjectManagerCommands
           project={this.props.project}
           onOpenProjectProperties={this._openProjectProperties}
+          onOpenProjectLoadingScreen={this._openProjectLoadingScreen}
           onOpenProjectVariables={this._openProjectVariables}
           onOpenResourcesDialog={this.props.onOpenResources}
           onOpenPlatformSpecificAssetsDialog={
@@ -1037,9 +1061,19 @@ export default class ProjectManager extends React.Component<Props, State> {
               )
                 .map((eventsFunctionsExtension, i) => {
                   const name = eventsFunctionsExtension.getName();
+                  const iconUrl = eventsFunctionsExtension.getIconUrl();
                   return (
                     <Item
                       key={i}
+                      leftIcon={
+                        iconUrl ? (
+                          <IconContainer
+                            size={24}
+                            alt={eventsFunctionsExtension.getFullName()}
+                            src={iconUrl}
+                          />
+                        ) : null
+                      }
                       primaryText={name}
                       editingName={
                         renamedItemKind === 'events-functions-extension' &&
@@ -1160,6 +1194,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         {this.state.projectPropertiesDialogOpen && (
           <ProjectPropertiesDialog
             open={this.state.projectPropertiesDialogOpen}
+            initialTab={this.state.projectPropertiesDialogInitialTab}
             project={project}
             onClose={() =>
               this.setState({ projectPropertiesDialogOpen: false })
@@ -1170,6 +1205,10 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false });
             }}
             onChangeSubscription={this.props.onChangeSubscription}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         )}
         {!!this.state.editedPropertiesLayout && (

@@ -74,7 +74,12 @@ const BehaviorsEditor = (props: Props) => {
     const name = newNameGenerator(defaultName, name =>
       object.hasBehaviorNamed(name)
     );
-    object.addNewBehavior(project, type, name);
+    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+      project,
+      object,
+      type,
+      name
+    );
 
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();
@@ -97,12 +102,23 @@ const BehaviorsEditor = (props: Props) => {
   };
 
   const onRemoveBehavior = (behaviorName: string) => {
-    const answer = Window.showConfirmDialog(
-      "Are you sure you want to remove this behavior? This can't be undone."
-    );
+    let message =
+      "Are you sure you want to remove this behavior? This can't be undone.";
+    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
+      project,
+      object,
+      behaviorName
+    ).toJSArray();
+    if (dependentBehaviors.length > 0) {
+      message +=
+        '\nDependent behaviors will be removed too: ' +
+        dependentBehaviors.join(', ');
+    }
+    const answer = Window.showConfirmDialog(message);
 
     if (answer) {
       object.removeBehavior(behaviorName);
+      dependentBehaviors.forEach(name => object.removeBehavior(name));
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
   };

@@ -547,6 +547,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   GetAllObjectTypesUsingEventsBasedBehavior
 #define STATIC_EnsureBehaviorEventsFunctionsProperParameters \
   EnsureBehaviorEventsFunctionsProperParameters
+#define STATIC_AddBehaviorAndRequiredBehaviors \
+  AddBehaviorAndRequiredBehaviors
+#define STATIC_FindDependentBehaviorNames \
+  FindDependentBehaviorNames
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty

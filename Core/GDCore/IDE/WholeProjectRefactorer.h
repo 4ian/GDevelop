@@ -7,9 +7,12 @@
 #define GDCORE_WHOLEPROJECTREFACTORER_H
 #include <set>
 #include <vector>
+#include <unordered_set>
 namespace gd {
+class Platform;
 class Project;
 class Layout;
+class Object;
 class String;
 class EventsFunctionsExtension;
 class EventsFunction;
@@ -18,6 +21,9 @@ class EventsBasedBehavior;
 class ArbitraryEventsWorker;
 class ArbitraryObjectsWorker;
 class ArbitraryEventsWorkerWithContext;
+class Behavior;
+class BehaviorContent;
+class BehaviorMetadata;
 }  // namespace gd
 
 namespace gd {
@@ -148,6 +154,25 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::String& newPropertyName);
 
   /**
+   * \brief Add a behavior to an object and add required behaviors if necessary
+   * to fill every behavior properties of the added behaviors.
+   */
+  static void AddBehaviorAndRequiredBehaviors(
+    gd::Project& project,
+    gd::Object& object,
+    const gd::String& behaviorType,
+    const gd::String& behaviorName);
+
+  /**
+   * \brief Find every behavior of the object that needs the given behaviors
+   * directly or indirectly.
+   */
+  static std::vector<gd::String> FindDependentBehaviorNames(
+    gd::Project& project,
+    gd::Object& object,
+    const gd::String& behaviorName);
+
+  /**
    * \brief Refactor the project **before** a behavior is renamed.
    *
    * \warning Do the renaming of the specified behavior after calling this.
@@ -266,6 +291,15 @@ class GD_CORE_API WholeProjectRefactorer {
   static void DoRenameBehavior(gd::Project& project,
                                const gd::String& oldBehaviorType,
                                const gd::String& newBehaviorType);
+
+  static const std::vector<gd::BehaviorContent> GetBehaviorsWithType(
+      const gd::Object& object, const gd::String& type);
+
+  static void FindDependentBehaviorNames(
+    gd::Project& project,
+    gd::Object& object,
+    const gd::String& behaviorName,
+    std::unordered_set<gd::String>& dependentBehaviorNames);
 
   WholeProjectRefactorer(){};
 };

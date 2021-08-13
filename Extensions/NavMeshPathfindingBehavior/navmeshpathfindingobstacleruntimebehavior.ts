@@ -1,6 +1,6 @@
 /*
-GDevelop - Pathfinding Behavior Extension
-Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
+GDevelop - NavMesh Pathfinding Behavior Extension
+Copyright (c) 2013-2021 Florian Rival (Florian.Rival@gmail.com)
  */
 
 namespace gdjs {
@@ -27,9 +27,6 @@ namespace gdjs {
      */
     _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
 
-    /**
-     * @param object The object
-     */
     constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._obstacles = new Set();
       const game = runtimeScene.getGame();

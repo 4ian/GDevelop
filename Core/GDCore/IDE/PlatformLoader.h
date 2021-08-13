@@ -31,15 +31,6 @@ passing
 class GD_CORE_API PlatformLoader {
  public:
   /**
-   * Load all the platforms available in a directory.
-   *
-   * \param dir The directory where platforms must be searched for.
-   *
-   * \todo For now, only GDCpp.dll and GDJS.dll are loaded.
-   */
-  static void LoadAllPlatformsInManager(gd::String dir);
-
-  /**
    * Load a specific platform.
    *
    * \param fullpath The path to the platform file.

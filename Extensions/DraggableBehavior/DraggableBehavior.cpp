@@ -6,6 +6,6 @@ This project is released under the MIT License.
 */
 
 #include "DraggableBehavior.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 DraggableBehavior::DraggableBehavior() {}

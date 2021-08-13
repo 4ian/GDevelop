@@ -49,11 +49,6 @@ class GD_CORE_API VersionWrapper {
   static gd::String Status();
 
   /**
-   * \brief Return true if GDCpp is compiled with edittime support.
-   */
-  static bool CompiledForEdittime();
-
-  /**
    * \brief Get Year of the release
    */
   static gd::String Year();

@@ -5,8 +5,8 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "InventoryTools.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 
 #include <iostream>
 
@@ -212,38 +212,3 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("Inventory/InventoryTools.h");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class InventoryCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  InventoryCppExtension() {
-    DeclareInventoryExtension(*this);
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-
-  virtual void SceneLoaded(RuntimeScene& scene) override {
-#if defined(GD_IDE_ONLY)
-    InventoryTools::ClearAll(scene);
-#endif
-  }
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppInventoryExtension() {
-  return new InventoryCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new InventoryCppExtension;
-}
-#endif

@@ -47,10 +47,10 @@ getLocales().then(locales =>
   })
 );
 
-// Launch extractions of translations in GDCore/GDCpp/GDJS
+// Launch extractions of translations in GDCore/GDJS
 // and extensions with gettext.
 shell.echo(
-  'ℹ️ Extracting translations for GDCore/GDCpp/GDJS/Extensions to scripts/gdcore-gdcpp-gdjs-extensions-messages.pot...'
+  'ℹ️ Extracting translations for GDCore/GDJS/Extensions to scripts/gdcore-gdcpp-gdjs-extensions-messages.pot...'
 );
 if (isWin) {
   hasErrors |= shell.exec('ExtractTranslations.bat', {

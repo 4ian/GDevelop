@@ -16,7 +16,6 @@
 *.bc
 /Binaries/Output
 *.autosave
-!/GDCpp/scripts/bcp.exe
 !/scripts/libgettextlib-0-17.dll
 !/scripts/libgettextsrc-0-17.dll
 !/xgettext.exe

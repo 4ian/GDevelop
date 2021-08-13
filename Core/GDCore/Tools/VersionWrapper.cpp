@@ -35,13 +35,6 @@ gd::String VersionWrapper::Year() {
 gd::String VersionWrapper::Status() {
   return Revision() == 0 ? "Release" : "Dev";
 }
-bool VersionWrapper::CompiledForEdittime() {
-#if defined(GD_IDE_ONLY)
-  return true;
-#else
-  return false;
-#endif
-}
 
 bool VersionWrapper::IsOlder(int major,
                              int minor,

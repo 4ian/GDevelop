@@ -1,6 +1,6 @@
 #Launch this script to generate the .POT file used
 #to update the strings to be translated.
-echo "ℹ️ Listing all GDCore, GDCpp, GDJS and Extensions sources files to translate..."
+echo "ℹ️ Listing all GDCore, GDJS and Extensions sources files to translate..."
 
 find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt

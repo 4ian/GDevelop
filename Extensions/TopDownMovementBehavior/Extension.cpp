@@ -5,10 +5,11 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
 #include "TopDownMovementBehavior.h"
-#include "TopDownMovementRuntimeBehavior.h"
 
 void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -541,39 +542,3 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .UseStandardParameters("number");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class TopDownMovementBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  TopDownMovementBehaviorCppExtension() {
-    DeclareTopDownMovementBehaviorExtension(*this);
-    AddRuntimeBehavior<TopDownMovementRuntimeBehavior>(
-        GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior"),
-        "TopDownMovementRuntimeBehavior");
-    GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior")
-        .SetIncludeFile(
-            "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppTopDownMovementBehaviorExtension() {
-  return new TopDownMovementBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new TopDownMovementBehaviorCppExtension;
-}
-#endif

@@ -34,7 +34,7 @@ namespace gdjs {
     _manager: NavMeshPathfindingObstaclesManager;
 
     /** Used to draw traces for debugging */
-    _lastUsedNavMesh: gdjs.NavMesh | null = null;
+    _lastUsedObstacleCellPadding: float | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -284,8 +284,8 @@ namespace gdjs {
           (Math.sqrt(radiusSqMax) + this._extraBorder) / this._manager._cellSize
         )
       );
+      this._lastUsedObstacleCellPadding = obstacleCellPadding;
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
-      this._lastUsedNavMesh = navMesh;
 
       //TODO The pathfinding could use something like RBush to look for
       // the the polygons at start and target locations.
@@ -313,13 +313,16 @@ namespace gdjs {
      * @param shapePainter
      */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      if (!shapePainter) {
+      if (!shapePainter || this._lastUsedObstacleCellPadding === null) {
         return;
       }
 
       shapePainter.clear();
 
-      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
+      const navMesh = this._manager.getNavMesh(
+        this._lastUsedObstacleCellPadding
+      );
+      for (const navPoly of navMesh.getPolygons()) {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         for (let index = 1; index < polygon.length; index++) {
@@ -331,7 +334,7 @@ namespace gdjs {
           );
         }
       }
-      for (const navPoly of this._lastUsedNavMesh!.getPolygons()) {
+      for (const navPoly of navMesh.getPolygons()) {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         shapePainter.beginFillPath(

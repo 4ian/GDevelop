@@ -172,7 +172,7 @@ const declarePathfindingBehavior = function (
       false
     )
     .addParameter('objectPtr', _('Shape painter'), '', false)
-    .setParameterExtraInfo("PrimitiveDrawing::Drawer")
+    .setParameterExtraInfo('PrimitiveDrawing::Drawer')
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('drawNavMesh');
@@ -435,7 +435,7 @@ const declarePathfindingBehavior = function (
       'NodeCount',
       _('Waypoint count'),
       _('Get the number of waypoints on the path'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -453,7 +453,7 @@ const declarePathfindingBehavior = function (
       'GetNodeX',
       _('Get a waypoint X position'),
       _('Get next waypoint X position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -472,7 +472,7 @@ const declarePathfindingBehavior = function (
       'GetNodeY',
       _('Get a waypoint Y position'),
       _('Get next waypoint Y position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -491,7 +491,7 @@ const declarePathfindingBehavior = function (
       'NextNodeIndex',
       _('Index of the next waypoint'),
       _('Get the index of the next waypoint to reach'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -509,7 +509,7 @@ const declarePathfindingBehavior = function (
       'NextNodeX',
       _('Get next waypoint X position'),
       _('Get next waypoint X position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -527,7 +527,7 @@ const declarePathfindingBehavior = function (
       'NextNodeY',
       _('Get next waypoint Y position'),
       _('Get next waypoint Y position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -545,7 +545,7 @@ const declarePathfindingBehavior = function (
       'PreviousNodeX',
       _('Previous waypoint X position'),
       _('Previous waypoint X position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -563,7 +563,7 @@ const declarePathfindingBehavior = function (
       'PreviousNodeY',
       _('Previous waypoint Y position'),
       _('Previous waypoint Y position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -581,7 +581,7 @@ const declarePathfindingBehavior = function (
       'DestinationX',
       _('Destination X position'),
       _('Destination X position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -599,7 +599,7 @@ const declarePathfindingBehavior = function (
       'DestinationY',
       _('Destination Y position'),
       _('Destination Y position'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -617,7 +617,7 @@ const declarePathfindingBehavior = function (
       'MovementAngle',
       _('Angle of movement on its path'),
       _('Angle of movement on its path'),
-      _('Movement on the path'),
+      _('Movement on the path (NavMesh)'),
       'CppPlatform/Extensions/AStaricon16.png'
     )
     .addParameter('object', _('Object'), '', false)
@@ -711,33 +711,45 @@ const declareObstacleBehavior = function (
 
     sharedProperties
       .getOrCreate('cellSize')
-      .setValue(
-        sharedContent.getDoubleAttribute('cellSize').toString(10)
-      )
+      .setValue(sharedContent.getDoubleAttribute('cellSize').toString(10))
       .setType('Number')
       .setLabel(_('Cell size'))
-      .setDescription(_('Cell size for obstacle collision mask rasterization.'));
+      .setDescription(
+        _('Cell size for obstacle collision mask rasterization.')
+      );
 
     sharedProperties
       .getOrCreate('areaLeftBound')
       .setValue(sharedContent.getDoubleAttribute('areaLeftBound').toString(10))
       .setType('Number')
       .setLabel(_('Area left bound'))
-      .setDescription(_('The left bound of the area where object can go (default on game resolution).'));
+      .setDescription(
+        _(
+          'The left bound of the area where objects can go (default on game resolution).'
+        )
+      );
 
     sharedProperties
       .getOrCreate('areaTopBound')
       .setValue(sharedContent.getDoubleAttribute('areaTopBound').toString(10))
       .setType('Number')
       .setLabel(_('Area top bound'))
-      .setDescription(_('The top bound of the area where object can go (default on game resolution).'));
+      .setDescription(
+        _(
+          'The top bound of the area where objects can go (default on game resolution).'
+        )
+      );
 
     sharedProperties
       .getOrCreate('areaRightBound')
       .setValue(sharedContent.getDoubleAttribute('areaRightBound').toString(10))
       .setType('Number')
       .setLabel(_('Area right bound'))
-      .setDescription(_('The right bound of the area where object can go (default on game resolution).'));
+      .setDescription(
+        _(
+          'The right bound of the area where objects can go (default on game resolution).'
+        )
+      );
 
     sharedProperties
       .getOrCreate('areaBottomBound')
@@ -746,7 +758,11 @@ const declareObstacleBehavior = function (
       )
       .setType('Number')
       .setLabel(_('Area bottom bound'))
-      .setDescription(_('The bottom bound of the area where object can go (default on game resolution).'));
+      .setDescription(
+        _(
+          'The bottom bound of the area where objects can go (default on game resolution).'
+        )
+      );
 
     return sharedProperties;
   };
@@ -793,22 +809,104 @@ module.exports = {
       'MIT'
     );
 
+    extension
+      .addAction(
+        'SetAreaBounds',
+        _('Area bounds'),
+        _('Change the bounds of the area where objects can go.'),
+        _(
+          'Change the NavMesh area to left: _PARAM1_, top: _PARAM2_, right: _PARAM3_, bottom: _PARAM4_'
+        ),
+        '',
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('expression', _('Area left bound'))
+      .addParameter('expression', _('Area top bound'))
+      .addParameter('expression', _('Area right bound'))
+      .addParameter('expression', _('Area bottom bound'))
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.setAreaBounds');
+
+      extension
+        .addAction(
+          'SetCellSize',
+          _('Cell size'),
+          _('Change the cell size for obstacle collision mask rasterization.'),
+          _(
+            'Change the obstacle rasterization cell size: _PARAM1_'
+          ),
+          '',
+          'CppPlatform/Extensions/AStaricon24.png',
+          'CppPlatform/Extensions/AStaricon16.png'
+        )
+        .addCodeOnlyParameter('currentScene', '')
+        .addParameter('expression', _('Cell size'))
+        .getCodeExtraInformation()
+        .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.setCellSize');
+
+    extension
+      .addExpression(
+        'AreaLeftBound',
+        _('Area left bound'),
+        _('Get the left bound of the area where objects can go.'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getAreaLeftBound');
+
+    extension
+      .addExpression(
+        'AreaTopBound',
+        _('Area top bound'),
+        _('Get the top bound of the area where objects can go.'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getAreaLeftBound');
+
+    extension
+      .addExpression(
+        'AreaRightBound',
+        _('Area right bound'),
+        _('Get the right bound of the area where objects can go.'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getAreaLeftBound');
+
+    extension
+      .addExpression(
+        'AreaBottomBound',
+        _('Area bottom bound'),
+        _('Get the bottom bound of the area where objects can go.'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getAreaLeftBound');
+    
+    extension
+      .addExpression(
+        'CellSize',
+        _('Cell size'),
+        _('Get the cell size for obstacle collision mask rasterization.'),
+        _('Pathfinding configuration (NavMesh)'),
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getCellSize');
+
     declarePathfindingBehavior(_, gd, extension);
     declareObstacleBehavior(_, gd, extension);
 
     return extension;
   },
 
-  /**
-   * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
-   * and setting the property to a given value.
-   *
-   * If you don't have any tests, you can simply return an empty array.
-   *
-   * But it is recommended to create tests for the behaviors/objects properties you created
-   * to avoid mistakes.
-   */
   runExtensionSanityTests: function (
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/

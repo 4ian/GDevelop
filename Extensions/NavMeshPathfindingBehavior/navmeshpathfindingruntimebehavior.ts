@@ -1,6 +1,6 @@
 /*
-GDevelop - Pathfinding Behavior Extension
-Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
+GDevelop - NavMesh Pathfinding Behavior Extension
+Copyright (c) 2010-2021 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //import {NavMesh} from "./navmesh";
@@ -313,8 +313,9 @@ namespace gdjs {
      * @param shapePainter
      */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      //TODO should it check that shapePainter is not null?
-      //TODO or even use a a list?
+      if (!shapePainter) {
+        return;
+      }
 
       shapePainter.clear();
 
@@ -322,6 +323,7 @@ namespace gdjs {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         for (let index = 1; index < polygon.length; index++) {
+          // It helps to spot vertices with 180° between edges.
           shapePainter.drawCircle(
             polygon[index].x,
             polygon[index].y / this._manager._isometricRatio,

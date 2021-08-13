@@ -793,22 +793,6 @@ module.exports = {
       'MIT'
     );
 
-    extension
-      .addAction(
-        'InvalidateNavMesh',
-        _('Invalidate the navigation mesh'),
-        _('Invalidate the navigation mesh'),
-        _('Invalidate the navigation mesh'),
-        '',
-        'CppPlatform/Extensions/AStaricon24.png',
-        'CppPlatform/Extensions/AStaricon16.png'
-      )
-      .addCodeOnlyParameter('currentScene', '')
-      .getCodeExtraInformation()
-      .setFunctionName(
-        'gdjs.NavMeshPathfindingObstaclesManager.invalidateNavMesh'
-      );
-
     declarePathfindingBehavior(_, gd, extension);
     declareObstacleBehavior(_, gd, extension);
 

@@ -102,6 +102,94 @@ namespace gdjs {
       this._navMeshes.clear();
     }
 
+    public static setAreaBounds(
+      runtimeScene: any,
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.setAreaBounds(left, top, right, bottom);
+    }
+
+    public setAreaBounds(left: float, top: float, right: float, bottom: float) {
+      this._areaLeftBound = left;
+      this._areaTopBound = top;
+      this._areaRightBound = right;
+      this._areaBottomBound = bottom;
+      this.invalidateNavMesh();
+    }
+
+    public static setCellSize(runtimeScene: any, cellSize: float) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.setCellSize(cellSize);
+    }
+
+    public setCellSize(cellSize: float) {
+      this._cellSize = cellSize;
+      this.invalidateNavMesh();
+    }
+
+    public static getAreaLeftBound(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.getAreaLeftBound();
+    }
+
+    public static getAreaToptBound(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.getAreaTopBound();
+    }
+
+    public static getAreaRightBound(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.getAreaRightBound();
+    }
+
+    public static getAreaBottomBound(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.getAreaBottomBound();
+    }
+
+    public static getCellSize(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.getCellSize();
+    }
+
+    public getAreaLeftBound() {
+      return this._areaLeftBound;
+    }
+
+    public getAreaTopBound() {
+      return this._areaTopBound;
+    }
+
+    public getAreaRightBound() {
+      return this._areaRightBound;
+    }
+
+    public getAreaBottomBound() {
+      return this._areaBottomBound;
+    }
+
+    public getCellSize() {
+      return this._cellSize;
+    }
+
     getNavMesh(obstacleCellPadding: integer): NavMesh {
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {

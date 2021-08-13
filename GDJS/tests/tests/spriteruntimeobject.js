@@ -20,6 +20,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
       variables: [],
       behaviors: [],
       animations: [],
+      effects: [],
     });
 
     expect(object.getScaleX()).to.be(1);

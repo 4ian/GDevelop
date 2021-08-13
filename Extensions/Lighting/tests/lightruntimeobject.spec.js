@@ -14,6 +14,7 @@ const addLightObject = (runtimeScene, radius) => {
     type: 'Lighting::LightObject',
     variables: [],
     behaviors: [],
+    effects: [],
     content: {
       radius: radius,
       color: '#b4b4b4',

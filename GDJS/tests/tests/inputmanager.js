@@ -155,6 +155,7 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
   object.setPosition(450, 500);
 

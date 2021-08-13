@@ -7,7 +7,6 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <iostream>
 #include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"
-#include "GDCore/Project/ImageManager.h"
 
 using namespace std;
 
@@ -16,11 +15,7 @@ namespace gd {
 Point Sprite::badPoint("");
 
 Sprite::Sprite()
-    :
-#if !defined(EMSCRIPTEN)
-      hasItsOwnImage(false),
-#endif
-      automaticCollisionMask(true),
+    : automaticCollisionMask(true),
       origine("origine"),
       centre("centre"),
       automaticCentre(true) {
@@ -73,36 +68,10 @@ Point& Sprite::GetPoint(const gd::String& name) {
 
 bool Sprite::SetDefaultCenterPoint(bool enabled) {
   automaticCentre = enabled;
-
-#if !defined(EMSCRIPTEN)
-  if (automaticCentre)
-    centre.SetXY(sfmlSprite.getLocalBounds().width / 2,
-                 sfmlSprite.getLocalBounds().height / 2);
-#endif
-
   return true;
 }
 
 std::vector<Polygon2d> Sprite::GetCollisionMask() const {
-  // TODO(perf): Cache to avoid re-creating a mask at every call
-#if !defined(EMSCRIPTEN)
-  if (automaticCollisionMask) {
-    std::vector<Polygon2d> mask;
-
-    Polygon2d rectangle;
-    rectangle.vertices.push_back(sf::Vector2f(0, 0));
-    rectangle.vertices.push_back(
-        sf::Vector2f(sfmlSprite.getLocalBounds().width, 0));
-    rectangle.vertices.push_back(sf::Vector2f(
-        sfmlSprite.getLocalBounds().width, sfmlSprite.getLocalBounds().height));
-    rectangle.vertices.push_back(
-        sf::Vector2f(0, sfmlSprite.getLocalBounds().height));
-
-    mask.push_back(rectangle);
-    return mask;
-  }
-#endif
-
   return customCollisionMask;
 }
 
@@ -110,26 +79,5 @@ void Sprite::SetCustomCollisionMask(
     const std::vector<Polygon2d>& collisionMask) {
   customCollisionMask = collisionMask;
 }
-
-#if !defined(EMSCRIPTEN)
-void Sprite::LoadImage(std::shared_ptr<SFMLTextureWrapper> image_) {
-  sfmlImage = image_;
-  sfmlSprite.setTexture(sfmlImage->texture, true);
-  hasItsOwnImage = false;
-
-  if (automaticCentre)
-    centre.SetXY(sfmlSprite.getLocalBounds().width / 2,
-                 sfmlSprite.getLocalBounds().height / 2);
-}
-
-void Sprite::MakeSpriteOwnsItsImage() {
-  if (!hasItsOwnImage || sfmlImage == std::shared_ptr<SFMLTextureWrapper>()) {
-    sfmlImage = std::make_shared<SFMLTextureWrapper>(
-        sfmlImage->texture);  // Copy the texture.
-    sfmlSprite.setTexture(sfmlImage->texture);
-    hasItsOwnImage = true;
-  }
-}
-#endif
 
 }  // namespace gd

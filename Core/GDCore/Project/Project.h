@@ -28,7 +28,6 @@ class Object;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
-class ImageManager;
 class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
@@ -499,19 +498,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SerializeTo(SerializerElement& element) const;
 
   /**
-   * \brief Return true if the project is marked as being modified (The IDE or
-   * application using the project should ask to save the project if the project
-   * is closed).
-   */
-  bool IsDirty() { return dirty; }
-
-  /**
-   * \brief Mark the project as being modified (The IDE or application
-   * using the project should ask to save the project if the project is closed).
-   */
-  void SetDirty(bool enable = true) { dirty = enable; }
-
-  /**
    * Get the major version of GDevelop used to save the project.
    */
   unsigned int GetLastSaveGDMajorVersion() { return gdMajorVersion; };
@@ -793,28 +779,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   ResourcesManager& GetResourcesManager() { return resourcesManager; }
 
   /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  const std::shared_ptr<gd::ImageManager>& GetImageManager() const {
-    return imageManager;
-  }
-
-  /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  std::shared_ptr<gd::ImageManager>& GetImageManager() { return imageManager; }
-
-  /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  void SetImageManager(std::shared_ptr<gd::ImageManager> imageManager_) {
-    imageManager = imageManager_;
-  }
-
-  /**
    * \brief Called ( e.g. during compilation ) so as to inventory internal
    * resources, sometimes update their filename or any other work or resources.
    *
@@ -910,12 +874,6 @@ class GD_CORE_API Project : public ObjectsContainer {
 #endif
 ///@}
 
-// TODO: Put this in private part
-#if defined(GD_IDE_ONLY)
-  std::vector<gd::String> imagesChanged;  ///< Images that have been changed and
-                                          ///< which have to be reloaded
-#endif
-
  private:
   /**
    * Initialize from another game. Used by copy-ctor and assign-op.
@@ -954,9 +912,6 @@ class GD_CORE_API Project : public ObjectsContainer {
 #endif
   gd::ResourcesManager
       resourcesManager;  ///< Contains all resources used by the project
-  std::shared_ptr<gd::ImageManager>
-      imageManager;  ///< Image manager is accessed thanks to a (smart) ptr as
-                     ///< it can be shared with GD C++ Platform projects.
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
@@ -987,7 +942,6 @@ class GD_CORE_API Project : public ObjectsContainer {
                                         ///< time the project was saved.
   mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
-  mutable bool dirty;  ///< True to flag the project as being modified.
 #endif
 };
 

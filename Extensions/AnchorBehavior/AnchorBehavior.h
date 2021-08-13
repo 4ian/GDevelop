@@ -6,8 +6,8 @@ This project is released under the MIT License.
 #ifndef ANCHORBEHAVIOR_H
 #define ANCHORBEHAVIOR_H
 #include <vector>
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 namespace gd {
 class SerializerElement;
 class Project;
@@ -16,7 +16,7 @@ class Project;
 /**
  * \brief Allow to anchor objects to the window's bounds.
  */
-class GD_EXTENSION_API AnchorBehavior : public Behavior {
+class GD_EXTENSION_API AnchorBehavior : public gd::Behavior {
  public:
   enum HorizontalAnchor {
     ANCHOR_HORIZONTAL_NONE = 0,

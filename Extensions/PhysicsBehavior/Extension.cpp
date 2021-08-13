@@ -9,11 +9,10 @@ This project is released under the MIT License.
  * Victor Levasseur (Collisions using custom polygons, fixed time step fix)
  */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 #include "PhysicsBehavior.h"
-#include "PhysicsRuntimeBehavior.h"
 #include "ScenePhysicsDatas.h"
-#include "RuntimeScenePhysicsDatas.h"
 
 void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -659,41 +658,3 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
 #endif
   }
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class PhysicsBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  PhysicsBehaviorCppExtension() {
-    DeclarePhysicsBehaviorExtension(*this);
-    AddRuntimeBehavior<PhysicsRuntimeBehavior>(
-        GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior"),
-        "PhysicsRuntimeBehavior");
-    GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior")
-        .SetIncludeFile("PhysicsBehavior/PhysicsRuntimeBehavior.h");
-
-    AddBehaviorsRuntimeSharedData<RuntimeScenePhysicsDatas>(
-        GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior"));
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppPhysicsBehaviorExtension() {
-  return new PhysicsBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new PhysicsBehaviorCppExtension;
-}
-#endif

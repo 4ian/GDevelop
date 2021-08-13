@@ -7,8 +7,6 @@
 #define GDCORE_VERSIONWRAPPER_H
 #include "GDCore/String.h"
 
-#include "GDCore/Tools/VersionPriv.h"
-
 namespace gd {
 
 /**
@@ -47,11 +45,6 @@ class GD_CORE_API VersionWrapper {
    * \brief Get GDCore status ( Alpha/Beta/Release Candidate/Release )
    */
   static gd::String Status();
-
-  /**
-   * \brief Return true if GDCpp is compiled with edittime support.
-   */
-  static bool CompiledForEdittime();
 
   /**
    * \brief Get Year of the release

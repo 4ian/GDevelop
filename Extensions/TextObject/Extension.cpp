@@ -10,7 +10,7 @@ This project is released under the MIT License.
  */
 
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Tools/Localization.h"
 #include "TextObject.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
@@ -546,35 +546,3 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 #endif
 }
-
-/**
- * \brief This class declares information about the C++ extension.
- */
-class Extension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  Extension() {
-    DeclareTextObjectExtension(*this);
-    AddRuntimeObject<TextObject, RuntimeTextObject>(
-        GetObjectMetadata("TextObject::Text"), "RuntimeTextObject");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppTextObjectExtension() {
-  return new Extension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new Extension;
-}
-#endif

@@ -5,12 +5,12 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"
-#include "PathfindingObstacleRuntimeBehavior.h"
-#include "PathfindingRuntimeBehavior.h"
 
 void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -695,45 +695,3 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 #endif
   }
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class PathfindingBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  PathfindingBehaviorCppExtension() {
-    DeclarePathfindingBehaviorExtension(*this);
-    AddRuntimeBehavior<PathfindingRuntimeBehavior>(
-        GetBehaviorMetadata("PathfindingBehavior::Pathfinding"),
-        "PathfindingRuntimeBehavior");
-    GetBehaviorMetadata("PathfindingBehavior::Pathfinding")
-        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
-
-    AddRuntimeBehavior<PathfindingObstacleRuntimeBehavior>(
-        GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle"),
-        "PathfindingObstacleRuntimeBehavior");
-    GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle")
-        .SetIncludeFile(
-            "PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppPathfindingBehaviorExtension() {
-  return new PathfindingBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new PathfindingBehaviorCppExtension;
-}
-#endif

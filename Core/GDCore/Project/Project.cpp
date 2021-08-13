@@ -26,7 +26,6 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
-#include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -67,23 +66,16 @@ Project::Project()
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
       projectUuid(""),
-      useDeprecatedZeroAsDefaultZOrder(false),
-      imageManager(std::make_shared<ImageManager>())
+      useDeprecatedZeroAsDefaultZOrder(false)
 #if defined(GD_IDE_ONLY)
       ,
       useExternalSourceFiles(false),
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
-      gdBuildVersion(gd::VersionWrapper::Build()),
-      dirty(false)
+      gdBuildVersion(gd::VersionWrapper::Build())
 #endif
 {
-  imageManager->SetResourcesManager(&resourcesManager);
-
-#if !defined(GD_IDE_ONLY)
-  platforms.push_back(&CppPlatform::Get());
-#endif
 }
 
 Project::~Project() {}
@@ -823,10 +815,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < externalSourceFiles.size(); ++i)
     externalSourceFiles[i]->SerializeTo(
         externalSourceFilesElement.AddChild("sourceFile"));
-
-#if defined(GD_IDE_ONLY)
-  dirty = false;
-#endif
 }
 
 bool Project::ValidateName(const gd::String& name) {
@@ -969,9 +957,7 @@ void Project::Init(const gd::Project& game) {
   platforms = game.platforms;
 
   resourcesManager = game.resourcesManager;
-  imageManager = std::make_shared<ImageManager>(*game.imageManager);
-  imageManager->SetResourcesManager(&resourcesManager);
-
+  
   initialObjects = gd::Clone(game.initialObjects);
 
   scenes = gd::Clone(game.scenes);
@@ -993,7 +979,6 @@ void Project::Init(const gd::Project& game) {
 
 #if defined(GD_IDE_ONLY)
   projectFile = game.GetProjectFile();
-  imagesChanged = game.imagesChanged;
 #endif
 }
 

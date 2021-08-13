@@ -430,7 +430,6 @@ interface Project {
     [Ref] ResourcesManager GetResourcesManager();
     void ExposeResources([Ref] ArbitraryResourceWorker worker);
     boolean STATIC_ValidateName([Const] DOMString name);
-    boolean IsDirty();
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
 

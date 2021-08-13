@@ -11,8 +11,8 @@ This project is released under the MIT License.
 #include <map>
 #include <set>
 #include <vector>
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 #include "SFML/System/Vector2.hpp"
 namespace gd {
 class Project;

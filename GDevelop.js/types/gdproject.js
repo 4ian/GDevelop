@@ -75,7 +75,6 @@ declare class gdProject extends gdObjectsContainer {
   getResourcesManager(): gdResourcesManager;
   exposeResources(worker: gdArbitraryResourceWorker): void;
   static validateName(name: string): boolean;
-  isDirty(): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   getTypeOfBehavior(layout: gdLayout, name: string, searchInGroups: boolean): string;

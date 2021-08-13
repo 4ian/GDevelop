@@ -8,7 +8,7 @@ This project is released under the MIT License.
 #ifndef PATHFINDINGOBSTACLEBEHAVIOR_H
 #define PATHFINDINGOBSTACLEBEHAVIOR_H
 #include <map>
-#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCore/Project/Behavior.h"
 namespace gd {
 class SerializerElement;
 class PropertyDescriptor;
@@ -20,7 +20,7 @@ class Layout;
  * \brief Behavior that mark object as being obstacles for objects using
  * pathfinding behavior.
  */
-class GD_EXTENSION_API PathfindingObstacleBehavior : public Behavior {
+class GD_EXTENSION_API PathfindingObstacleBehavior : public gd::Behavior {
  public:
   PathfindingObstacleBehavior(){};
   virtual ~PathfindingObstacleBehavior(){};

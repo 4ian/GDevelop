@@ -16,7 +16,6 @@
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
-class MainFrameWrapper;
 class Project;
 class Layout;
 class EventsCodeGenerator;

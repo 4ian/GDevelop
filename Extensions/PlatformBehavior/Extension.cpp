@@ -7,11 +7,10 @@ This project is released under the MIT License.
 
 #include "PlatformBehavior.h"
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "PlatformRuntimeBehavior.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
 #include "PlatformerObjectBehavior.h"
-#include "PlatformerObjectRuntimeBehavior.h"
-#include "ScenePlatformObjectsManager.h"
 
 void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -764,58 +763,3 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 #endif
   }
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class PlatformBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  PlatformBehaviorCppExtension() {
-    DeclarePlatformBehaviorExtension(*this);
-    AddRuntimeBehavior<PlatformRuntimeBehavior>(
-        GetBehaviorMetadata("PlatformBehavior::PlatformBehavior"),
-        "PlatformRuntimeBehavior");
-    GetBehaviorMetadata("PlatformBehavior::PlatformBehavior")
-        .SetIncludeFile("PlatformBehavior/PlatformRuntimeBehavior.h");
-    AddRuntimeBehavior<PlatformerObjectRuntimeBehavior>(
-        GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior"),
-        "PlatformerObjectRuntimeBehavior");
-    GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior")
-        .SetIncludeFile("PlatformBehavior/PlatformerObjectRuntimeBehavior.h");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-
-  /**
-   * \brief Initialize platforms list of the scene
-   */
-  virtual void SceneLoaded(RuntimeScene& scene) {
-    ScenePlatformObjectsManager emptyManager;
-    ScenePlatformObjectsManager::managers[&scene] = emptyManager;
-  }
-
-  /**
-   * \brief Destroy platforms list of the scene
-   */
-  virtual void SceneUnloaded(RuntimeScene& scene) {
-    ScenePlatformObjectsManager::managers.erase(&scene);
-  }
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppPlatformBehaviorExtension() {
-  return new PlatformBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new PlatformBehaviorCppExtension;
-}
-#endif

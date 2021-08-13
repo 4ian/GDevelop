@@ -27,50 +27,6 @@ namespace gd {
 
 PlatformLoader::PlatformLoader() {}
 
-void PlatformLoader::LoadAllPlatformsInManager(gd::String dir) {
-  {
-#if defined(WINDOWS)
-    std::shared_ptr<gd::Platform> platform = LoadPlatformInManager("GDCpp.dll");
-#elif defined(LINUX)
-    std::shared_ptr<gd::Platform> platform =
-        LoadPlatformInManager("libGDCpp.so");
-#elif defined(MACOS)
-    std::shared_ptr<gd::Platform> platform =
-        LoadPlatformInManager("libGDCpp.dylib");
-#else
-#warning Add the appropriate filename here for the C++ Platform!
-    std::shared_ptr<gd::Platform> platform;
-#endif
-    if (platform)
-      gd::ExtensionsLoader::LoadAllExtensions("./CppPlatform/Extensions/",
-                                              *platform);
-  }
-
-  {
-#if defined(WINDOWS)
-    std::shared_ptr<gd::Platform> platform =
-        LoadPlatformInManager("./JsPlatform/GDJS.dll");
-#elif defined(LINUX)
-    std::shared_ptr<gd::Platform> platform =
-        LoadPlatformInManager("./JsPlatform/libGDJS.so");
-#elif defined(MACOS)
-    std::shared_ptr<gd::Platform> platform =
-        LoadPlatformInManager("./JsPlatform/libGDJS.dylib");
-#else
-#warning Add the appropriate filename here for the Js Platform!
-    std::shared_ptr<gd::Platform> platform;
-#endif
-    if (platform)
-      gd::ExtensionsLoader::LoadAllExtensions("./JsPlatform/Extensions/",
-                                              *platform);
-    if (platform)
-      gd::ExtensionsLoader::LoadAllExtensions(
-          "./CppPlatform/Extensions/", *platform, true);
-  }
-
-  gd::ExtensionsLoader::ExtensionsLoadingDone("./CppPlatform/Extensions/");
-}
-
 std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(
     gd::String fullpath) {
   std::cout << "Loading platform " << fullpath << "..." << std::endl;

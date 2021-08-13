@@ -83,6 +83,8 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstacles.add(pathfindingObstacleBehavior.owner);
+      //TODO Look for algorithms to update NavMeshes without reprocessing everything.
+      this.invalidateNavMesh();
     }
 
     /**
@@ -93,16 +95,10 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstacles.delete(pathfindingObstacleBehavior.owner);
+      this.invalidateNavMesh();
     }
 
-    public static invalidateNavMesh(runtimeScene: any) {
-      const manager = NavMeshPathfindingObstaclesManager.getManager(
-        runtimeScene
-      );
-      manager.invalidateNavMesh();
-    }
-
-    public invalidateNavMesh() {
+    private invalidateNavMesh() {
       this._navMeshes.clear();
     }
 

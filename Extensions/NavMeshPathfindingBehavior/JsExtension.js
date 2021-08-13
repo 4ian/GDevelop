@@ -65,37 +65,37 @@ const declarePathfindingBehavior = function (
     behaviorProperties
       .getOrCreate('acceleration')
       .setValue(behaviorContent.getDoubleAttribute('acceleration').toString())
-      .setLabel('Acceleration');
+      .setLabel(_('Acceleration'));
 
     behaviorProperties
       .getOrCreate('maxSpeed')
       .setValue(behaviorContent.getDoubleAttribute('maxSpeed').toString())
-      .setLabel('Max. speed');
+      .setLabel(_('Max. speed'));
 
     behaviorProperties
       .getOrCreate('angularMaxSpeed')
       .setValue(
         behaviorContent.getDoubleAttribute('angularMaxSpeed').toString()
       )
-      .setLabel('Rotate speed');
+      .setLabel(_('Rotate speed'));
 
     behaviorProperties
       .getOrCreate('rotateObject')
       .setValue(
         behaviorContent.getBoolAttribute('rotateObject') ? 'true' : 'false'
       )
-      .setLabel('Rotate object')
+      .setLabel(_('Rotate object'))
       .setType('Boolean');
 
     behaviorProperties
       .getOrCreate('angleOffset')
       .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString())
-      .setLabel('Angle offset');
+      .setLabel(_('Angle offset'));
 
     behaviorProperties
       .getOrCreate('extraBorder')
       .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString())
-      .setLabel('Extra border size');
+      .setLabel(_('Extra border size'));
 
     return behaviorProperties;
   };
@@ -171,8 +171,8 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    //TODO tried Drawer, PrimitiveDrawing::Drawer, ShapePainterObject
     .addParameter('objectPtr', _('Shape painter'), '', false)
+    .setParameterExtraInfo("PrimitiveDrawing::Drawer")
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('drawNavMesh');
@@ -636,7 +636,9 @@ const declareObstacleBehavior = function (
   gd /*: libGDevelop */,
   extension /*: gdPlatformExtension */
 ) {
-  //TODO Add some kind of layer to select the obstacles for an object?
+  // The same obstacles are used for every moving object.
+  // TODO Adding some tag property here and a list of tags in the moving object
+  // properties could allow to select which obstacles to use.
   const pathfindingObstacleBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingObstacleBehavior.updateProperty = function (
@@ -702,10 +704,10 @@ const declareObstacleBehavior = function (
       .getOrCreate('viewpoint')
       .setValue(sharedContent.getStringAttribute('viewpoint'))
       .setType('Choice')
-      .setLabel('Viewpoint')
-      .addExtraInfo('Top-Down')
-      .addExtraInfo('Isometry 2:1 (26.565°)')
-      .addExtraInfo('True Isometry (30°)');
+      .setLabel(_('Viewpoint'))
+      .addExtraInfo(_('Top-Down'))
+      .addExtraInfo(_('Isometry 2:1 (26.565°)'))
+      .addExtraInfo(_('True Isometry (30°)'));
 
     sharedProperties
       .getOrCreate('cellSize')
@@ -713,29 +715,29 @@ const declareObstacleBehavior = function (
         sharedContent.getDoubleAttribute('cellSize').toString(10)
       )
       .setType('Number')
-      .setLabel('Cell size')
-      .setDescription('Cell size for obstacle collision mask rasterization.');
+      .setLabel(_('Cell size'))
+      .setDescription(_('Cell size for obstacle collision mask rasterization.'));
 
     sharedProperties
       .getOrCreate('areaLeftBound')
       .setValue(sharedContent.getDoubleAttribute('areaLeftBound').toString(10))
       .setType('Number')
-      .setLabel('Area left bound')
-      .setDescription('The left bound of the area where object can go (default on game resolution).');
+      .setLabel(_('Area left bound'))
+      .setDescription(_('The left bound of the area where object can go (default on game resolution).'));
 
     sharedProperties
       .getOrCreate('areaTopBound')
       .setValue(sharedContent.getDoubleAttribute('areaTopBound').toString(10))
       .setType('Number')
-      .setLabel('Area top bound')
-      .setDescription('The top bound of the area where object can go (default on game resolution).');
+      .setLabel(_('Area top bound'))
+      .setDescription(_('The top bound of the area where object can go (default on game resolution).'));
 
     sharedProperties
       .getOrCreate('areaRightBound')
       .setValue(sharedContent.getDoubleAttribute('areaRightBound').toString(10))
       .setType('Number')
-      .setLabel('Area right bound')
-      .setDescription('The right bound of the area where object can go (default on game resolution).');
+      .setLabel(_('Area right bound'))
+      .setDescription(_('The right bound of the area where object can go (default on game resolution).'));
 
     sharedProperties
       .getOrCreate('areaBottomBound')
@@ -743,8 +745,8 @@ const declareObstacleBehavior = function (
         sharedContent.getDoubleAttribute('areaBottomBound').toString(10)
       )
       .setType('Number')
-      .setLabel('Area bottom bound')
-      .setDescription('The bottom bound of the area where object can go (default on game resolution).');
+      .setLabel(_('Area bottom bound'))
+      .setDescription(_('The bottom bound of the area where object can go (default on game resolution).'));
 
     return sharedProperties;
   };
@@ -827,37 +829,37 @@ module.exports = {
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {
-    const dummyBehavior = extension
+    const pathfindingBehavior = extension
       .getBehaviorMetadata('NavMeshPathfinding::NavMeshPathfindingBehavior')
       .get();
     return [
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'acceleration',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'maxSpeed',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'angularMaxSpeed',
         '1000'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'rotateObject',
         'false'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'angleOffset',
         '45'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
-        dummyBehavior,
+        pathfindingBehavior,
         'extraBorder',
         '100'
       ),

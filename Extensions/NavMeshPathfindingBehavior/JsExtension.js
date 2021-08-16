@@ -114,8 +114,8 @@ const declarePathfindingBehavior = function (
       _('NavMesh Pathfinding'),
       'NavMeshPathfindingBehavior',
       _(
-        'With this behavior, the object will move while avoiding all objects' +
-          'that are flagged as obstacles.'
+        'With this behavior, the object will move in strait lines while ' +
+        'avoiding all objects that are flagged as obstacles.'
       ),
       '',
       'CppPlatform/Extensions/AStaricon.png',
@@ -808,6 +808,38 @@ module.exports = {
       'D8H',
       'MIT'
     );
+
+    extension
+    .addAction(
+      'SetNavMeshesUpdateEnable',
+      _('Enable or disable navigation meshes updates'),
+      _('Enable or disable navigation meshes updates.'),
+      _(
+        'Enable navigation meshes update: _PARAM1_'
+      ),
+      '',
+      'CppPlatform/Extensions/AStaricon24.png',
+      'CppPlatform/Extensions/AStaricon16.png'
+    )
+    .addCodeOnlyParameter('currentScene', '')
+    .addParameter('yesorno', _('Enable updates?'))
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.setNavMeshesUpdateEnable');
+
+    extension
+      .addCondition(
+        'NavMeshesUpdateIsEnable',
+        _('Navigation meshes updates are enable'),
+        _('Check if navigation meshes updates are enable.'),
+        _('Navigation meshes updates are enable'),
+        _(''),
+        'CppPlatform/Extensions/AStaricon24.png',
+        'CppPlatform/Extensions/AStaricon16.png'
+      )
+      .markAsAdvanced()
+      .getCodeExtraInformation()
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.navMeshesUpdateIsEnable');
 
     extension
       .addAction(

@@ -71,8 +71,10 @@ export default function SetupGridDialog(props: Props) {
           <ColorField
             floatingLabelText={<Trans>Line color</Trans>}
             fullWidth
-            color={hexNumberToRGBColor(props.instancesEditorSettings.gridColor)}
-            disableAlpha
+            color={{
+              ...hexNumberToRGBColor(props.instancesEditorSettings.gridColor),
+              a: props.instancesEditorSettings.gridAlpha,
+            }}
             onChangeComplete={color => {
               props.onChangeInstancesEditorSettings({
                 ...props.instancesEditorSettings,
@@ -81,6 +83,7 @@ export default function SetupGridDialog(props: Props) {
                   color.rgb.g,
                   color.rgb.b
                 ),
+                gridAlpha: color.rgb.a,
               });
             }}
           />

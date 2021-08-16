@@ -37,14 +37,13 @@ export default class Grid {
     }
 
     const gridColor = instancesEditorSettings.gridColor;
-    const gridAlpha = 1;
+    const gridAlpha = instancesEditorSettings.gridAlpha;
 
     this.pixiGrid.visible = true;
     this.pixiGrid.clear();
     this.pixiGrid.beginFill(gridColor);
-    this.pixiGrid.lineStyle(1, gridColor, gridAlpha);
-    this.pixiGrid.fill.alpha = 0.1;
-    this.pixiGrid.alpha = 0.8;
+    this.pixiGrid.lineStyle(1, gridColor, 1);
+    this.pixiGrid.alpha = gridAlpha;
 
     const sceneStartPoint = this.viewPosition.toSceneCoordinates(0, 0);
     const sceneEndPoint = this.viewPosition.toSceneCoordinates(

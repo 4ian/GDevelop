@@ -10,6 +10,7 @@ export type InstancesEditorSettings = {|
   gridOffsetX: number,
   gridOffsetY: number,
   gridColor: number,
+  gridAlpha: number,
 
   /** Is snap to grid activated? */
   snap: boolean,
@@ -31,7 +32,11 @@ export const prepareInstancesEditorSettings = (
     gridHeight: object.gridHeight || 32,
     gridOffsetX: object.gridOffsetX || 0,
     gridOffsetY: object.gridOffsetY || 0,
-    gridColor: object.gridColor || rgbToHexNumber(158, 180, 255),
+    gridColor:
+      object.gridColor !== undefined
+        ? object.gridColor
+        : rgbToHexNumber(158, 180, 255),
+    gridAlpha: object.gridAlpha !== undefined ? object.gridAlpha : 0.8,
     snap: object.snap || false,
     zoomFactor: Math.max(object.zoomFactor || 1, 0.0001),
     windowMask: object.windowMask || false,

@@ -805,6 +805,29 @@ void WholeProjectRefactorer::DoRenameBehavior(
         }
       };
 
+  // Rename behavior in required behavior properties 
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount(); e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+
+    for (auto&& eventsBasedBehavior :
+        eventsFunctionsExtension.GetEventsBasedBehaviors()
+            .GetInternalVector()) {
+      for (size_t i = 0; i < eventsBasedBehavior->GetPropertyDescriptors().GetCount(); i++)
+      {
+        NamedPropertyDescriptor& propertyDescriptor
+            = eventsBasedBehavior->GetPropertyDescriptors().Get(i);
+        const std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
+        if (propertyDescriptor.GetType() == "Behavior" && extraInfo.size() > 0) {
+          const gd::String& requiredBehaviorType = extraInfo[0];
+          if (requiredBehaviorType == oldBehaviorType) {
+            propertyDescriptor.ClearExtraInfo();
+            propertyDescriptor.AddExtraInfo(newBehaviorType);
+          }
+        }
+      }
+    }
+  }
+
   // Rename behavior in global objects
   renameBehaviorTypeInObjects(project.GetObjects());
 

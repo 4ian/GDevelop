@@ -188,17 +188,6 @@ const Instruction = (props: Props) => {
     );
   };
 
-  //TODO: Metadata could be cached for performance boost.
-  const metadata = isCondition
-    ? gd.MetadataProvider.getConditionMetadata(
-        gd.JsPlatform.get(),
-        instruction.getType()
-      )
-    : gd.MetadataProvider.getActionMetadata(
-        gd.JsPlatform.get(),
-        instruction.getType()
-      );
-
   // Disable drag on touchscreens, because it would interfere with the
   // scroll, and would create too much mistake/frustration.
   const screenType = useScreenType();
@@ -232,6 +221,21 @@ const Instruction = (props: Props) => {
       }}
     >
       {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
+        // /!\ It's important to get the metadata now so that we're sure they
+        // are valid.
+        // If the metadata is retrieved outside of the closure, it's possible
+        // that the metadata is changed in the meantime (especially on behavior
+        // properties it seems).
+        const metadata = isCondition
+          ? gd.MetadataProvider.getConditionMetadata(
+              gd.JsPlatform.get(),
+              instruction.getType()
+            )
+          : gd.MetadataProvider.getActionMetadata(
+              gd.JsPlatform.get(),
+              instruction.getType()
+            );
+
         // The instruction itself can be dragged and is a target for
         // another instruction to be dropped. It's IMPORTANT NOT to have
         // the subinstructions list inside the connectDropTarget/connectDragSource

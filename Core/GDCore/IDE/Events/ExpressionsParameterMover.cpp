@@ -4,9 +4,11 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
+
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
@@ -134,10 +136,11 @@ class GD_CORE_API ExpressionParameterMover
 
 bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
                                                    bool isCondition) {
-  auto& metadata = isCondition ? gd::MetadataProvider::GetConditionMetadata(
-                                     platform, instruction.GetType())
-                               : gd::MetadataProvider::GetActionMetadata(
-                                     platform, instruction.GetType());
+  const auto& metadata = isCondition
+                             ? gd::MetadataProvider::GetConditionMetadata(
+                                   platform, instruction.GetType())
+                             : gd::MetadataProvider::GetActionMetadata(
+                                   platform, instruction.GetType());
 
   for (std::size_t pNb = 0; pNb < metadata.parameters.size() &&
                             pNb < instruction.GetParametersCount();

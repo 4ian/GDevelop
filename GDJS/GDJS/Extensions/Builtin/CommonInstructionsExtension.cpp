@@ -290,7 +290,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                         context) +
                     ".val ) {\n";
 
-              gd::InstructionMetadata instrInfos =
+              const gd::InstructionMetadata& instrInfos =
                   gd::MetadataProvider::GetConditionMetadata(
                       codeGenerator.GetPlatform(), conditions[cId].GetType());
 
@@ -352,13 +352,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
         if (
-          event.GetWhileConditions().empty() && 
-          event.GetConditions().empty() && 
+          event.GetWhileConditions().empty() &&
+          event.GetConditions().empty() &&
           event.GetActions().empty()
         )
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
-       
+
         gd::String outputCode;
 
         // Context is "reset" each time the event is repeated (i.e. objects
@@ -501,7 +501,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               "    else if($ITERABLE_REFERENCE.getType() === \"array\")\n"
               "        $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY);\n";
 
-        if(valueIteratorExists) outputCode += 
+        if(valueIteratorExists) outputCode +=
             "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
             "    $VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE.getType())\n"
             "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
@@ -513,7 +513,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        // Arrays are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n";
-        
+
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;
         outputCode += conditionsCode;

@@ -245,6 +245,10 @@ class GD_CORE_API MetadataProvider {
     return &metadata == &badExpressionMetadata;
   }
 
+  static bool IsBadInstructionMetadata(const gd::InstructionMetadata& metadata) {
+    return &metadata == &badInstructionMetadata;
+  }
+
   static bool IsBadBehaviorMetadata(const gd::BehaviorMetadata& metadata) {
     return &metadata == &badBehaviorMetadata;
   }

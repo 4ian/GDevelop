@@ -261,8 +261,11 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     EventsCodeGenerationContext& context) {
   gd::String conditionCode;
 
-  gd::InstructionMetadata instrInfos =
+  const gd::InstructionMetadata& instrInfos =
       MetadataProvider::GetConditionMetadata(platform, condition.GetType());
+  if (MetadataProvider::IsBadInstructionMetadata(instrInfos)) {
+    return "/* Unknown instruction - skipped. */";
+  }
 
   AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
   maxConditionsListsSize =
@@ -299,15 +302,13 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
-        condition.SetParameter(pNb, gd::Expression(""));
-        condition.SetType("");
+        return "/* Unknown object - skipped. */";
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
-        condition.SetParameter(pNb, gd::Expression(""));
-        condition.SetType("");
+        return "/* Mismatched object type - skipped. */";
       }
     }
   }
@@ -425,6 +426,11 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
       outputCode += "{\n";
       outputCode += conditionCode;
       outputCode += "}";
+    } else {
+      // Deprecated way to cancel code generation - but still honor it.
+      // Can be removed once condition is passed by const reference to
+      // GenerateConditionCode.
+      outputCode += "/* Skipped condition (empty type) */";
     }
   }
 
@@ -440,8 +446,11 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     gd::Instruction& action, EventsCodeGenerationContext& context) {
   gd::String actionCode;
 
-  gd::InstructionMetadata instrInfos =
+  const gd::InstructionMetadata& instrInfos =
       MetadataProvider::GetActionMetadata(platform, action.GetType());
+  if (MetadataProvider::IsBadInstructionMetadata(instrInfos)) {
+    return "/* Unknown instruction - skipped. */";
+  }
 
   AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
 
@@ -466,15 +475,13 @@ gd::String EventsCodeGenerator::GenerateActionCode(
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
           !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
               objectInParameter)) {
-        action.SetParameter(pNb, gd::Expression(""));
-        action.SetType("");
+        return "/* Unknown object - skipped. */";
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
-        action.SetParameter(pNb, gd::Expression(""));
-        action.SetType("");
+        return "/* Mismatched object type - skipped. */";
       }
     }
   }
@@ -556,7 +563,14 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
     gd::String actionCode = GenerateActionCode(actions[aId], context);
 
     outputCode += "{";
-    if (!actions[aId].GetType().empty()) outputCode += actionCode;
+    if (actions[aId].GetType().empty()) {
+      // Deprecated way to cancel code generation - but still honor it.
+      // Can be removed once action is passed by const reference to
+      // GenerateActionCode.
+      outputCode += "/* Skipped action (empty type) */";
+    } else {
+      outputCode += actionCode;
+    }
     outputCode += "}";
   }
 

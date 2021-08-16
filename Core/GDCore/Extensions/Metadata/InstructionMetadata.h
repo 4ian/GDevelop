@@ -234,14 +234,14 @@ class GD_CORE_API InstructionMetadata {
   /**
    * \brief Check if the instruction is an object instruction.
    */
-  bool IsObjectInstruction() {
+  bool IsObjectInstruction() const {
     return isObjectInstruction;
   }
 
   /**
    * \brief Check if the instruction is a behavior instruction.
    */
-  bool IsBehaviorInstruction() {
+  bool IsBehaviorInstruction() const {
     return isBehaviorInstruction;
   }
 

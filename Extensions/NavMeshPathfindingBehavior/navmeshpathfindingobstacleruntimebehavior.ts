@@ -26,6 +26,16 @@ namespace gdjs {
      * (rounded on _cellSize)
      */
     _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
+    /**
+     * Used while NavMeshes update is disable to remember to do the update
+     * when it's enable back.
+     */
+    _navMeshesAreUpToDate = true;
+    /**
+     * This allows to continue finding paths with the old NavMeshes while
+     * moving obstacles.
+     */
+    _navMeshesUpdateIsEnable = true;
 
     constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._obstacles = new Set();
@@ -99,7 +109,41 @@ namespace gdjs {
     }
 
     private invalidateNavMesh() {
-      this._navMeshes.clear();
+      if (this._navMeshesUpdateIsEnable) {
+        this._navMeshes.clear();
+        this._navMeshesAreUpToDate = true;
+      } else {
+        this._navMeshesAreUpToDate = false;
+      }
+    }
+
+    public setNavMeshesUpdateEnable(navMeshesUpdateIsEnable: boolean) {
+      this._navMeshesUpdateIsEnable = navMeshesUpdateIsEnable;
+      if (navMeshesUpdateIsEnable && !this._navMeshesAreUpToDate) {
+        this._navMeshes.clear();
+        this._navMeshesAreUpToDate = true;
+      }
+    }
+
+    public static setNavMeshesUpdateEnable(
+      runtimeScene: any,
+      navMeshesUpdateIsEnable: boolean
+    ) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      manager.setNavMeshesUpdateEnable(navMeshesUpdateIsEnable);
+    }
+
+    public navMeshesUpdateIsEnable() {
+      return this._navMeshesUpdateIsEnable;
+    }
+
+    public static navMeshesUpdateIsEnable(runtimeScene: any) {
+      const manager = NavMeshPathfindingObstaclesManager.getManager(
+        runtimeScene
+      );
+      return manager.navMeshesUpdateIsEnable();
     }
 
     public static setAreaBounds(
@@ -135,58 +179,58 @@ namespace gdjs {
       this.invalidateNavMesh();
     }
 
-    public static getAreaLeftBound(runtimeScene: any) {
+    public static getAreaLeftBound(runtimeScene: any): float {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.getAreaLeftBound();
+      return manager.getAreaLeftBound();
     }
 
-    public static getAreaToptBound(runtimeScene: any) {
+    public static getAreaToptBound(runtimeScene: any): float {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.getAreaTopBound();
+      return manager.getAreaTopBound();
     }
 
-    public static getAreaRightBound(runtimeScene: any) {
+    public static getAreaRightBound(runtimeScene: any): float {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.getAreaRightBound();
+      return manager.getAreaRightBound();
     }
 
-    public static getAreaBottomBound(runtimeScene: any) {
+    public static getAreaBottomBound(runtimeScene: any): float {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.getAreaBottomBound();
+      return manager.getAreaBottomBound();
     }
 
-    public static getCellSize(runtimeScene: any) {
+    public static getCellSize(runtimeScene: any): float {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.getCellSize();
+      return manager.getCellSize();
     }
 
-    public getAreaLeftBound() {
+    public getAreaLeftBound(): float {
       return this._areaLeftBound;
     }
 
-    public getAreaTopBound() {
+    public getAreaTopBound(): float {
       return this._areaTopBound;
     }
 
-    public getAreaRightBound() {
+    public getAreaRightBound(): float {
       return this._areaRightBound;
     }
 
-    public getAreaBottomBound() {
+    public getAreaBottomBound(): float {
       return this._areaBottomBound;
     }
 
-    public getCellSize() {
+    public getCellSize(): float {
       return this._cellSize;
     }
 

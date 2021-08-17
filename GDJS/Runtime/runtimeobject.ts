@@ -130,13 +130,13 @@ namespace gdjs {
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
     onCreated(): void {
-      for (const filterName in this._rendererEffects) {
+      for (const effectName in this._rendererEffects) {
         this._runtimeScene
           .getGame()
           .getObjectEffectsManager()
           .applyEffect(
             this.getRendererObject(),
-            this._rendererEffects[filterName]
+            this._rendererEffects[effectName]
           );
       }
 
@@ -208,15 +208,16 @@ namespace gdjs {
      *
      * Objects can have different elapsed time if they are on layers with different time scales.
      *
-     * @param runtimeScene The RuntimeScene the object belongs to.
+     * @param runtimeScene The RuntimeScene the object belongs to (deprecated - can be omitted).
      */
     getElapsedTime(runtimeScene?: gdjs.RuntimeScene): float {
-      //TODO: Memoize?
-      runtimeScene = runtimeScene || this._runtimeScene;
-      const theLayer = runtimeScene.getLayer(this.layer);
-      return theLayer.getElapsedTime(runtimeScene);
+      const theLayer = this._runtimeScene.getLayer(this.layer);
+      return theLayer.getElapsedTime();
     }
 
+    /**
+     * The gdjs.RuntimeScene the object belongs to.
+     */
     getRuntimeScene(): RuntimeScene {
       return this._runtimeScene;
     }
@@ -755,7 +756,7 @@ namespace gdjs {
     /**
      * Returns the collection of effects to be rendered by the
      * underlying renderer.
-     * @returns The render effects.
+     * @returns The renderer effects.
      */
     getRendererEffects() {
       return this._rendererEffects;
@@ -763,7 +764,7 @@ namespace gdjs {
 
     /**
      * Add a new effect, or replace the one with the same name.
-     * @param effectData The data of the effect to add.
+     * @param effectData The data describing the effect to add.
      */
     addEffect(effectData: EffectData): boolean {
       return this._runtimeScene
@@ -859,8 +860,8 @@ namespace gdjs {
     }
 
     /**
-     * Updates all the effect parameters.
-     * @param effectData
+     * Updates all the parameters of an effect.
+     * @param effectData The data describing the effect
      */
     updateAllEffectParameters(effectData: EffectData): boolean {
       return this._runtimeScene

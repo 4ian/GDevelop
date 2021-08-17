@@ -34,6 +34,8 @@ namespace gdjs {
 
     /** Used to draw traces for debugging */
     _lastUsedObstacleCellPadding: float | null = null;
+    _outOfDateMeshesPainter: gdjs.ShapePainterRuntimeObject | null = null;
+    _needToWaitNextFrameToDraw: boolean = false;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -321,53 +323,6 @@ namespace gdjs {
       this._pathFound = false;
     }
 
-    /**
-     * Draw the navigation mesh on a shape painter object for debugging purpose
-     * @param shapePainter
-     */
-    drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      // TODO This should be reworked to render on the debug view exposed by
-      // the runtime scene renderer instead of relying on an action.
-
-      if (!shapePainter || this._lastUsedObstacleCellPadding === null) {
-        return;
-      }
-
-      shapePainter.clear();
-
-      const navMesh = this._manager.getNavMesh(
-        this._lastUsedObstacleCellPadding
-      );
-      for (const navPoly of navMesh.getPolygons()) {
-        const polygon = navPoly.getPoints();
-        if (polygon.length === 0) continue;
-        for (let index = 1; index < polygon.length; index++) {
-          // It helps to spot vertices with 180° between edges.
-          shapePainter.drawCircle(
-            polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio,
-            3
-          );
-        }
-      }
-      for (const navPoly of navMesh.getPolygons()) {
-        const polygon = navPoly.getPoints();
-        if (polygon.length === 0) continue;
-        shapePainter.beginFillPath(
-          polygon[0].x,
-          polygon[0].y / this._manager._isometricRatio
-        );
-        for (let index = 1; index < polygon.length; index++) {
-          shapePainter.drawPathLineTo(
-            polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio
-          );
-        }
-        shapePainter.closePath();
-        shapePainter.endFillPath();
-      }
-    }
-
     _enterSegment(segmentNumber: integer) {
       if (this._path.length === 0) {
         return;
@@ -455,7 +410,78 @@ namespace gdjs {
       }
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
+    /**
+     * Draw the navigation mesh on a shape painter object for debugging purpose
+     * @param shapePainter
+     */
+    drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
+      if (!shapePainter) {
+        return;
+      }
+      // Obstacles are watched in doStepPreEvents.
+      // If events request a redraw, the obstacles will only be invalidated at
+      // the next frame.
+      this._outOfDateMeshesPainter = shapePainter;
+      this._needToWaitNextFrameToDraw = true;
+    }
+
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {
+      if (this._needToWaitNextFrameToDraw) {
+        this._needToWaitNextFrameToDraw = false;
+        return;
+      }
+      if (this._outOfDateMeshesPainter) {
+        this.doDrawNavMesh(this._outOfDateMeshesPainter);
+        this._outOfDateMeshesPainter = null;
+      }
+    }
+
+    /**
+     * Draw the navigation mesh on a shape painter object for debugging purpose
+     * @param shapePainter
+     */
+    private doDrawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
+      // TODO This should be reworked to render on the debug view exposed by
+      // the runtime scene renderer instead of relying on an action.
+
+      if (this._lastUsedObstacleCellPadding === null) {
+        return;
+      }
+
+      shapePainter.clear();
+
+      const navMesh = this._manager.getNavMesh(
+        this._lastUsedObstacleCellPadding
+      );
+      for (const navPoly of navMesh.getPolygons()) {
+        const polygon = navPoly.getPoints();
+        if (polygon.length === 0) continue;
+        for (let index = 1; index < polygon.length; index++) {
+          // It helps to spot vertices with 180° between edges.
+          shapePainter.drawCircle(
+            polygon[index].x,
+            polygon[index].y / this._manager._isometricRatio,
+            3
+          );
+        }
+      }
+      for (const navPoly of navMesh.getPolygons()) {
+        const polygon = navPoly.getPoints();
+        if (polygon.length === 0) continue;
+        shapePainter.beginFillPath(
+          polygon[0].x,
+          polygon[0].y / this._manager._isometricRatio
+        );
+        for (let index = 1; index < polygon.length; index++) {
+          shapePainter.drawPathLineTo(
+            polygon[index].x,
+            polygon[index].y / this._manager._isometricRatio
+          );
+        }
+        shapePainter.closePath();
+        shapePainter.endFillPath();
+      }
+    }
   }
   gdjs.registerBehavior(
     'NavMeshPathfinding::NavMeshPathfindingBehavior',

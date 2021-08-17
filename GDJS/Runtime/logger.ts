@@ -14,12 +14,12 @@ namespace gdjs {
     message: string,
     type: 'info' | 'warning' | 'error' = 'info',
     internal = true
-  ) => {
+  ): void => {
     const logger = _console[type] || _console.info;
     logger(`[${group}] ${message}`);
   };
 
-  function objectsToString(...objects): string {
+  function objectsToString(objects: any[]): string {
     return objects.reduce(
       (accumulator, value) => accumulator + value.toString(),
       ''
@@ -35,19 +35,19 @@ namespace gdjs {
       this.group = group;
     }
 
-    log(...messages) {
+    log(...messages: any[]): void {
       this.info(...messages);
     }
 
-    info(...messages) {
+    info(...messages: any[]): void {
       log(this.group, objectsToString(messages), 'info');
     }
 
-    warn(...messages) {
+    warn(...messages: any[]): void {
       log(this.group, objectsToString(messages), 'warning');
     }
 
-    error(...messages) {
+    error(...messages: any[]): void {
       log(this.group, objectsToString(messages), 'error');
     }
   }

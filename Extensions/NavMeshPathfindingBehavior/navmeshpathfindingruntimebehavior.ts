@@ -3,8 +3,6 @@ GDevelop - NavMesh Pathfinding Behavior Extension
 Copyright (c) 2010-2021 Florian Rival (Florian.Rival@gmail.com)
  */
 
-//import {NavMesh} from "./navmesh";
-
 namespace gdjs {
   /**
    * NavMeshPathfindingRuntimeBehavior represents a behavior allowing objects to
@@ -252,7 +250,7 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
-      //TODO Add a non-blocking padding property to make the path farer from the obstacle if possible?
+      // TODO Add a non-blocking padding property to make the path farther from the obstacle if possible?
       // It may need to have several contour lines with a one cell increment
       // and do a dichotomy like this:
       // * find path with obstacleCellPaddingMax (infinity if not found)
@@ -263,7 +261,10 @@ namespace gdjs {
       // The contour lines may be needed if there is objects of different size anyway.
 
       let radiusSqMax = 0;
-      // TODO the center may not be the best thing to use if the object doesn't rotate
+      // In case games have only rectangular obstacles and a square for
+      // the moving object, using the extraBorder to have an inner disk
+      // instead of a bounding disk may be complicated.
+      // TODO Add a boolean parameter to use either the inner or bounding disk.
       const centerX = this.owner.getCenterXInScene();
       const centerY = this.owner.getCenterYInScene();
       for (const hitBox of this.owner.getHitBoxes()) {
@@ -287,9 +288,9 @@ namespace gdjs {
       this._lastUsedObstacleCellPadding = obstacleCellPadding;
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
 
-      //TODO The pathfinding could use something like RBush to look for
+      // TODO The pathfinding could use something like RBush to look for
       // the the polygons at start and target locations.
-      //TODO If the target is not on the mesh, find the nearest position
+      // TODO If the target is not on the mesh, find the nearest position
       // maybe the same with the origin to avoid to be stuck.
       const path = navMesh.findPath(
         {
@@ -313,6 +314,9 @@ namespace gdjs {
      * @param shapePainter
      */
     drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
+      // TODO This should be reworked to render on the debug view exposed by
+      // the runtime scene renderer instead of relying on an action.
+
       if (!shapePainter || this._lastUsedObstacleCellPadding === null) {
         return;
       }

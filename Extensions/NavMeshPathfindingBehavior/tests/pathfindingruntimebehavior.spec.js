@@ -9,33 +9,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       properties: {
         windowWidth: 800,
         windowHeight: 600,
-        extensionProperties: [
-          {
-            extension: 'NavMeshPathfinding',
-            property: 'AreaLeftBound',
-            value: '0',
-          },
-          {
-            extension: 'NavMeshPathfinding',
-            property: 'AreaTopBound',
-            value: '0',
-          },
-          {
-            extension: 'NavMeshPathfinding',
-            property: 'AreaRightBound',
-            value: '1280',
-          },
-          {
-            extension: 'NavMeshPathfinding',
-            property: 'AreaBottomBound',
-            value: '800',
-          },
-          {
-            extension: 'NavMeshPathfinding',
-            property: 'CellSize',
-            value: '20',
-          },
-        ],
+        extensionProperties: [],
       },
       resources: { resources: [] },
     });
@@ -63,7 +37,16 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       name: 'Scene1',
       stopSoundsOnStartup: false,
       title: '',
-      behaviorsSharedData: [],
+      behaviorsSharedData: [
+        {
+          name: 'NavMeshPathfindingObstacleBehavior',
+          areaLeftBound: 0,
+          areaTopBound: 0,
+          areaRightBound: 1280,
+          areaBottomBound: 800,
+          cellSize: 20,
+        },
+      ],
       objects: [],
       instances: [],
     });

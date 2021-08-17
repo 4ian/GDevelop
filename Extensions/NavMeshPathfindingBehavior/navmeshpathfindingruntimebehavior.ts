@@ -16,6 +16,7 @@ namespace gdjs {
     _angularMaxSpeed: float;
     _rotateObject: boolean;
     _angleOffset: float;
+    _collisionShape: string;
     _extraBorder: float;
 
     // Attributes used for traveling on the path:
@@ -46,6 +47,7 @@ namespace gdjs {
       this._angularMaxSpeed = behaviorData.angularMaxSpeed;
       this._rotateObject = behaviorData.rotateObject;
       this._angleOffset = behaviorData.angleOffset;
+      this._collisionShape = behaviorData.collisionShape;
       this._extraBorder = behaviorData.extraBorder;
       this._manager = gdjs.NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
@@ -67,6 +69,9 @@ namespace gdjs {
       }
       if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
         this.setAngleOffset(newBehaviorData.angleOffset);
+      }
+      if (oldBehaviorData.collisionShape !== newBehaviorData.collisionShape) {
+        this.setCollisionShape(newBehaviorData.collisionShape);
       }
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this.setExtraBorder(newBehaviorData.extraBorder);
@@ -124,6 +129,14 @@ namespace gdjs {
 
     getAngleOffset() {
       return this._angleOffset;
+    }
+
+    setCollisionShape(collisionShape: string): void {
+      this._collisionShape = collisionShape;
+    }
+
+    getCollisionShape() {
+      return this._collisionShape;
     }
 
     setExtraBorder(extraBorder: float): void {
@@ -261,19 +274,18 @@ namespace gdjs {
       // The contour lines may be needed if there is objects of different size anyway.
 
       let radiusSqMax = 0;
-      // In case games have only rectangular obstacles and a square for
-      // the moving object, using the extraBorder to have an inner disk
-      // instead of a bounding disk may be complicated.
-      // TODO Add a boolean parameter to use either the inner or bounding disk.
-      const centerX = this.owner.getCenterXInScene();
-      const centerY = this.owner.getCenterYInScene();
-      for (const hitBox of this.owner.getHitBoxes()) {
-        for (const vertex of hitBox.vertices) {
-          const deltaX = vertex[0] - centerX;
-          // to have the same unit on x and y
-          const deltaY = (vertex[1] - centerY) * this._manager._isometricRatio;
-          const radiusSq = deltaX * deltaX + deltaY * deltaY;
-          radiusSqMax = Math.max(radiusSq, radiusSqMax);
+      if (this._collisionShape !== 'Dot at center') {
+        const centerX = this.owner.getCenterXInScene();
+        const centerY = this.owner.getCenterYInScene();
+        for (const hitBox of this.owner.getHitBoxes()) {
+          for (const vertex of hitBox.vertices) {
+            const deltaX = vertex[0] - centerX;
+            // to have the same unit on x and y
+            const deltaY =
+              (vertex[1] - centerY) * this._manager._isometricRatio;
+            const radiusSq = deltaX * deltaX + deltaY * deltaY;
+            radiusSqMax = Math.max(radiusSq, radiusSqMax);
+          }
         }
       }
       // Round to avoid to flicker between 2 NavMesh

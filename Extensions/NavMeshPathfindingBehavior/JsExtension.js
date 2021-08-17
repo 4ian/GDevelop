@@ -114,7 +114,7 @@ const declarePathfindingBehavior = function (
       _('NavMesh Pathfinding'),
       'NavMeshPathfindingBehavior',
       _(
-        'With this behavior, the object will move in strait lines while ' +
+        'With this behavior, the object will move in straight lines while ' +
         'avoiding all objects that are flagged as obstacles.'
       ),
       '',
@@ -636,9 +636,6 @@ const declareObstacleBehavior = function (
   gd /*: libGDevelop */,
   extension /*: gdPlatformExtension */
 ) {
-  // The same obstacles are used for every moving object.
-  // TODO Adding some tag property here and a list of tags in the moving object
-  // properties could allow to select which obstacles to use.
   const pathfindingObstacleBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingObstacleBehavior.updateProperty = function (
@@ -705,9 +702,9 @@ const declareObstacleBehavior = function (
       .setValue(sharedContent.getStringAttribute('viewpoint'))
       .setType('Choice')
       .setLabel(_('Viewpoint'))
-      .addExtraInfo(_('Top-Down'))
-      .addExtraInfo(_('Isometry 2:1 (26.565°)'))
-      .addExtraInfo(_('True Isometry (30°)'));
+      .addExtraInfo('Top-Down')
+      .addExtraInfo('Isometry 2:1 (26.565°)')
+      .addExtraInfo('True Isometry (30°)');
 
     sharedProperties
       .getOrCreate('cellSize')
@@ -725,7 +722,7 @@ const declareObstacleBehavior = function (
       .setLabel(_('Area left bound'))
       .setDescription(
         _(
-          'The left bound of the area where objects can go (default on game resolution).'
+          'The left bound of the area where objects can go (default to the game resolution).'
         )
       );
 
@@ -736,7 +733,7 @@ const declareObstacleBehavior = function (
       .setLabel(_('Area top bound'))
       .setDescription(
         _(
-          'The top bound of the area where objects can go (default on game resolution).'
+          'The top bound of the area where objects can go (default to the game resolution).'
         )
       );
 
@@ -747,7 +744,7 @@ const declareObstacleBehavior = function (
       .setLabel(_('Area right bound'))
       .setDescription(
         _(
-          'The right bound of the area where objects can go (default on game resolution).'
+          'The right bound of the area where objects can go (default to the game resolution).'
         )
       );
 
@@ -760,7 +757,7 @@ const declareObstacleBehavior = function (
       .setLabel(_('Area bottom bound'))
       .setDescription(
         _(
-          'The bottom bound of the area where objects can go (default on game resolution).'
+          'The bottom bound of the area where objects can go (default to the game resolution).'
         )
       );
 
@@ -811,7 +808,7 @@ module.exports = {
 
     extension
     .addAction(
-      'SetNavMeshesUpdateEnable',
+      'SetNavMeshesUpdateEnabled',
       _('Enable or disable navigation meshes updates'),
       _('Enable or disable navigation meshes updates.'),
       _(
@@ -825,21 +822,21 @@ module.exports = {
     .addParameter('yesorno', _('Enable updates?'))
     .markAsAdvanced()
     .getCodeExtraInformation()
-    .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.setNavMeshesUpdateEnable');
+    .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.setNavMeshesUpdateEnabled');
 
     extension
       .addCondition(
-        'NavMeshesUpdateIsEnable',
-        _('Navigation meshes updates are enable'),
-        _('Check if navigation meshes updates are enable.'),
-        _('Navigation meshes updates are enable'),
+        'NavMeshesUpdateIsEnabled',
+        _('Navigation meshes updates are enabled'),
+        _('Check if navigation meshes updates are enabled.'),
+        _('Navigation meshes updates are enabled'),
         _(''),
         'CppPlatform/Extensions/AStaricon24.png',
         'CppPlatform/Extensions/AStaricon16.png'
       )
       .markAsAdvanced()
       .getCodeExtraInformation()
-      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.navMeshesUpdateIsEnable');
+      .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.navMeshesUpdateIsEnabled');
 
     extension
       .addAction(

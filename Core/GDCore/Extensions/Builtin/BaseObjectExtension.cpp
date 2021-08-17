@@ -1072,6 +1072,74 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
 
+  obj.AddAction("EnableEffect",
+                _("Enable an object effect"),
+                _("Enable an effect on the object"),
+                _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Effect Name"))
+      .AddParameter("yesorno", _("Enable?"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectDoubleParameter",
+                _("Effect parameter (number)"),
+                _("Change the value of a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Effect Name"))
+      .AddParameter("string", _("Parameter name"))
+      .AddParameter("expression", _("New value"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectStringParameter",
+                _("Effect parameter (string)"),
+                _("Change the value (string) of a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Effect Name"))
+      .AddParameter("string", _("Parameter name"))
+      .AddParameter("string", _("New value"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectBooleanParameter",
+                _("Effect parameter (enable or disable)"),
+                _("Enable or disable a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Effect Name"))
+      .AddParameter("string", _("Parameter Name"))
+      .AddParameter("yesorno", _("Enable?"))
+      .MarkAsSimple();
+
+  obj.AddCondition("IsEffectEnabled",
+                  _("Effect is enabled"),
+                  _("Check if the effect on an object is enabled."),
+                  _("Effect _PARAM2_ on _PARAM1_ is enabled"),
+                  _("Effects"),
+                  "res/actions/effect24.png",
+                  "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Effect Name"))
+      .MarkAsSimple();
+
   extension
       .AddAction("Create",
                  _("Create an object"),
@@ -1373,75 +1441,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Objects"),
                        "res/actions/layer.png")
       .AddParameter("object", _("Object"));
-  
-  obj.AddAction("EnableEffect",
-                _("Enable an object effect"),
-                _("Enable an effect on the object"),
-                _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
-                _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("yesorno", _("Enable"))
-      .MarkAsSimple();
-  
-  obj.AddAction("SetEffectDoubleParameter",
-                _("Effect parameter (number)"),
-                _("Change the value of a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
-                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
-                _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter name"))
-      .AddParameter("expression", _("New value"))
-      .MarkAsSimple();
-  
-  obj.AddAction("SetEffectStringParameter",
-                _("Effect parameter (string)"),
-                _("Change the value (string) of a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
-                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
-                _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter name"))
-      .AddParameter("string", _("New value"))
-      .MarkAsSimple();
-  
-  obj.AddAction("SetEffectBooleanParameter",
-                _("Effect parameter (enable or disable)"),
-                _("Enable or disable a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
-                _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
-                _("Effects"),
-                "res/actions/effect24.png",
-                "res/actions/effect.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter Name"))
-      .AddParameter("yesorno", _("Parameter Value"))
-      .MarkAsSimple();
-  
-  obj.AddCondition("IsEffectEnabled",
-                  _("Effect is enabled"),
-                  _("The effect on an object is enabled"),
-                  _("Effect _PARAM2_ on _PARAM1_ is enabled"),
-                  _("Effects"),
-                  "res/actions/effect24.png",
-                  "res/actions/effect.png")
-      .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .MarkAsSimple();
-
 #endif
 }
 

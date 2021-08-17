@@ -10,7 +10,6 @@
 #include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
-#include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"

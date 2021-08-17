@@ -6,8 +6,9 @@ This project is released under the MIT License.
 */
 
 #include "DraggableBehavior.h"
-#include "DraggableRuntimeBehavior.h"
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -46,33 +47,3 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("IsDragged");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class Extension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  Extension() {
-    DeclareDraggableBehaviorExtension(*this);
-    AddRuntimeBehavior<DraggableRuntimeBehavior>(
-        GetBehaviorMetadata("DraggableBehavior::Draggable"),
-        "DraggableRuntimeBehavior");
-    GetBehaviorMetadata("DraggableBehavior::Draggable")
-        .SetIncludeFile("DraggableBehavior/DraggableRuntimeBehavior.h");
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new Extension;
-}
-#endif

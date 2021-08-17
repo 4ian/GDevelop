@@ -9,8 +9,8 @@ This project is released under the MIT License.
 #define PATHFINDINGBEHAVIOR_H
 #include <SFML/System/Vector2.hpp>
 #include <vector>
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 namespace gd {
 class Layout;
 }
@@ -25,7 +25,7 @@ class RuntimeScenePlatformData;
 /**
  * \brief Compute path for objects avoiding obstacles
  */
-class GD_EXTENSION_API PathfindingBehavior : public Behavior {
+class GD_EXTENSION_API PathfindingBehavior : public gd::Behavior {
  public:
   PathfindingBehavior(){};
   virtual ~PathfindingBehavior(){};

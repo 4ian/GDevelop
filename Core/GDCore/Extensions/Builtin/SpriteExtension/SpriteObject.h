@@ -16,7 +16,6 @@ class Object;
 class Layout;
 class Sprite;
 class Animation;
-class MainFrameWrapper;
 class SerializerElement;
 class PropertyDescriptor;
 }  // namespace gd

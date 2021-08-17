@@ -9,7 +9,7 @@ This project is released under the MIT License.
 #include <map>
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCore/Serialization/SerializerElement.h"
 
 void PathfindingBehavior::InitializeContent(
     gd::SerializerElement& behaviorContent) {

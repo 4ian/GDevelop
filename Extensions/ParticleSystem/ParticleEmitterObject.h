@@ -8,19 +8,11 @@ This project is released under the MIT License.
 #ifndef PARTICLEEMITTEROBJECT_H
 #define PARTICLEEMITTEROBJECT_H
 
-#include "GDCpp/Runtime/Project/Object.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-class ParticleSystemWrapper;
-class RuntimeScene;
+#include "GDCore/Project/Object.h"
 namespace gd {
-class ImageManager;
 class InitialInstance;
-}
-#if defined(GD_IDE_ONLY)
-namespace gd {
 class Project;
 }
-#endif
 
 /**
  * \brief Base class containing the parameters of an emitter as well as the
@@ -30,7 +22,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
  public:
   ParticleEmitterBase();
   virtual ~ParticleEmitterBase();
-  ParticleEmitterBase(const ParticleEmitterBase& other) : particleSystem(NULL) {
+  ParticleEmitterBase(const ParticleEmitterBase& other) {
     Init(other);
   };
   ParticleEmitterBase& operator=(const ParticleEmitterBase& other) {
@@ -38,36 +30,11 @@ class GD_EXTENSION_API ParticleEmitterBase {
     return *this;
   }
 
-  /** Change texture at runtime
-   */
-  void SetTexture(RuntimeScene& scene, const gd::String& textureParticleName);
-
-  /** Change texture name without changing it effectively at runtime
-   */
   void SetParticleTexture(const gd::String & imageName) {
     textureParticleName = imageName;
   };
   const gd::String & GetParticleTexture() const { return textureParticleName; };
 
-  /**
-   * \brief Initialize the particle system with the current objects settings.
-   */
-  void CreateParticleSystem();
-
-  void UpdateRedParameters();
-  void UpdateGreenParameters();
-  void UpdateBlueParameters();
-  void UpdateAlphaParameters();
-  void UpdateSizeParameters();
-  void UpdateAngleParameters();
-  void UpdateLifeTime();
-  void RecreateParticleSystem();
-  const ParticleSystemWrapper* GetParticleSystem() const {
-    return particleSystem;
-  }
-  ParticleSystemWrapper* GetParticleSystem() { return particleSystem; }
-
-  // Getters/Setters
   void SetRendererParam1(float newValue) { rendererParam1 = newValue; };
   void SetRendererParam2(float newValue) { rendererParam2 = newValue; };
   void SetTank(float newValue);
@@ -101,83 +68,63 @@ class GD_EXTENSION_API ParticleEmitterBase {
 
   void SetParticleRed1(float newValue) {
     particleRed1 = newValue;
-    UpdateRedParameters();
   };
   void SetParticleRed2(float newValue) {
     particleRed2 = newValue;
-    UpdateRedParameters();
   };
   void SetParticleGreen1(float newValue) {
     particleGreen1 = newValue;
-    UpdateGreenParameters();
   };
   void SetParticleGreen2(float newValue) {
     particleGreen2 = newValue;
-    UpdateGreenParameters();
   };
   void SetParticleBlue1(float newValue) {
     particleBlue1 = newValue;
-    UpdateBlueParameters();
   };
   void SetParticleBlue2(float newValue) {
     particleBlue2 = newValue;
-    UpdateBlueParameters();
   };
   void SetParticleAlpha1(float newValue) {
     particleAlpha1 = newValue;
-    UpdateAlphaParameters();
   };
   void SetParticleAlpha2(float newValue) {
     particleAlpha2 = newValue;
-    UpdateAlphaParameters();
   };
   void SetParticleSize1(float newValue) {
     particleSize1 = newValue;
-    UpdateSizeParameters();
   };
   void SetParticleSize2(float newValue) {
     particleSize2 = newValue;
-    UpdateSizeParameters();
   };
   void SetParticleAngle1(float newValue) {
     particleAngle1 = newValue;
-    UpdateAngleParameters();
   };
   void SetParticleAngle2(float newValue) {
     particleAngle2 = newValue;
-    UpdateAngleParameters();
   };
   void SetParticleAlphaRandomness1(float newValue) {
     particleAlphaRandomness1 = newValue;
-    UpdateAlphaParameters();
   };
   void SetParticleAlphaRandomness2(float newValue) {
     particleAlphaRandomness2 = newValue;
-    UpdateAlphaParameters();
   };
   void SetParticleSizeRandomness1(float newValue) {
     particleSizeRandomness1 = newValue;
-    UpdateSizeParameters();
   };
   void SetParticleSizeRandomness2(float newValue) {
     particleSizeRandomness2 = newValue;
-    UpdateSizeParameters();
   };
   void SetParticleAngleRandomness1(float newValue) {
     particleAngleRandomness1 = newValue;
-    UpdateAngleParameters();
   };
   void SetParticleAngleRandomness2(float newValue) {
     particleAngleRandomness2 = newValue;
-    UpdateAngleParameters();
   };
   void SetParticleLifeTimeMin(float newValue) {
     particleLifeTimeMin = newValue;
-    UpdateLifeTime();
   };
   void SetParticleLifeTimeMax(float newValue) {
     particleLifeTimeMax = newValue;
-    UpdateLifeTime();
   };
   void SetMaxParticleNb(std::size_t newValue) { maxParticleNb = newValue; };
   void SetDestroyWhenNoParticles(bool enable = true) {
@@ -291,11 +238,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   bool destroyWhenNoParticles;  ///< If set to true, the object will removed
                                 ///< itself from the scene when it has no more
                                 ///< particles.
-
-  ParticleSystemWrapper*
-      particleSystem;  ///< Pointer to the class wrapping all the real particle
-                       ///< engine related stuff. This pointer is managed by the
-                       ///< object.
 };
 
 /**
@@ -326,56 +268,6 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::Object,
 #if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
 #endif
-};
-
-/**
- * \brief Particle Emitter object used by the game engine.
- */
-class GD_EXTENSION_API RuntimeParticleEmitterObject
-    : public RuntimeObject,
-      public ParticleEmitterBase {
- public:
-  RuntimeParticleEmitterObject(
-      RuntimeScene& scene, const ParticleEmitterObject& particleEmitterObject);
-  virtual ~RuntimeParticleEmitterObject(){};
-  virtual std::unique_ptr<RuntimeObject> Clone() const {
-    return gd::make_unique<RuntimeParticleEmitterObject>(*this);
-  }
-
-  virtual bool Draw(sf::RenderTarget& renderTarget);
-
-  virtual void OnPositionChanged();
-
-  virtual float GetWidth() const { return 32; };
-  virtual float GetHeight() const { return 32; };
-
-  virtual void Update(const RuntimeScene& scene);
-
-  bool NoMoreParticles() const { return !hasSomeParticles; };
-
-  /**
-   * Changing object angle is equivalent to changing emission X/Y direction
-   */
-  virtual bool SetAngle(float newAngleInDegrees);
-  virtual float GetAngle() const;
-
-#if defined(GD_IDE_ONLY)
-  virtual void GetPropertyForDebugger(std::size_t propertyNb,
-                                      gd::String& name,
-                                      gd::String& value) const;
-  virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
-  virtual std::size_t GetNumberOfProperties() const;
-#endif
-
-  const ParticleSystemWrapper& GetAssociatedParticleSystemWrapper() const {
-    return *GetParticleSystem();
-  };
-  ParticleSystemWrapper& GetAssociatedParticleSystemWrapper() {
-    return *GetParticleSystem();
-  };
-
- private:
-  bool hasSomeParticles;
 };
 
 #endif  // PARTICLEEMITTEROBJECT_H

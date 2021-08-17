@@ -6,9 +6,9 @@ This project is released under the MIT License.
 */
 
 #include "AnchorBehavior.h"
-#include "AnchorRuntimeBehavior.h"
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -30,38 +30,3 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
       std::make_shared<AnchorBehavior>(),
       std::make_shared<gd::BehaviorsSharedData>());
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class AnchorBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  AnchorBehaviorCppExtension() {
-    DeclareAnchorBehaviorExtension(*this);
-    AddRuntimeBehavior<AnchorRuntimeBehavior>(
-        GetBehaviorMetadata("AnchorBehavior::AnchorBehavior"),
-        "AnchorRuntimeBehavior");
-    GetBehaviorMetadata("AnchorBehavior::AnchorBehavior")
-        .SetIncludeFile("AnchorBehavior/AnchorRuntimeBehavior.h");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppAnchorBehaviorExtension() {
-  return new AnchorBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new AnchorBehaviorCppExtension;
-}
-#endif

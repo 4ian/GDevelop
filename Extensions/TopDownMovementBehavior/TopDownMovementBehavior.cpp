@@ -15,12 +15,9 @@ This project is released under the MIT License.
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Extensions/Builtin/MathematicalTools.h"
-#include "GDCpp/Runtime/CommonTools.h"
-#include "GDCpp/Runtime/Project/Layout.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-#include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
 

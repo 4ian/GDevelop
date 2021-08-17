@@ -11,6 +11,7 @@ export type EnumeratedEffectMetadata = {|
   fullName: string,
   description: string,
   parametersSchema: Schema,
+  isMarkedAsNotWorkingForObjects: boolean,
 |};
 
 /**
@@ -115,6 +116,7 @@ export const enumerateEffectsMetadata = (
             effectMetadata,
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
+            isMarkedAsNotWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
             parametersSchema,
           };
         });

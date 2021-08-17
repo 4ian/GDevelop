@@ -35,6 +35,19 @@ export const makeTestExtensions = (gd: libGDevelop) => {
       .setLabel('Opacity (between 0 and 1)')
       .setType('number');
 
+    const layerOnlySepiaEffect = extension
+      .addEffect('FakeSepiaThatWouldWorkOnlyForLayers')
+      .setFullName('Fake Sepia Effect only for layers')
+      .setDescription('A fake sepia effect only for layers')
+      .addIncludeFile('Extensions/Effects/fake-sepia-only-for-layers.js')
+      .markAsNotWorkingForObjects();
+    const layerOnlySepiaProperties = layerOnlySepiaEffect.getProperties();
+    layerOnlySepiaProperties
+      .getOrCreate('opacity')
+      .setValue('1')
+      .setLabel('Opacity (between 0 and 1)')
+      .setType('number');
+
     const nightEffect = extension
       .addEffect('FakeNight')
       .setFullName('Fake Night Effect')

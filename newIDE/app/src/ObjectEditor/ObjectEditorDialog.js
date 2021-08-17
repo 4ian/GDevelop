@@ -190,6 +190,7 @@ const InnerDialog = (props: InnerDialogProps) => {
       )}
       {currentTab === 'effects' && (
         <EffectsList
+          target="object"
           project={props.project}
           resourceSources={props.resourceSources}
           onChooseResource={props.onChooseResource}

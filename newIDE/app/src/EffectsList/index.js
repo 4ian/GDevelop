@@ -42,6 +42,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   effectsContainer: gdEffectsContainer,
   onEffectsUpdated: () => void,
+  target: 'object' | 'layer',
 |};
 
 const getEnumeratedEffectMetadata = (
@@ -194,6 +195,10 @@ export default function EffectsList(props: Props) {
                             key={effectMetadata.type}
                             value={effectMetadata.type}
                             primaryText={effectMetadata.fullName}
+                            disabled={
+                              props.target === 'object' &&
+                              effectMetadata.isMarkedAsNotWorkingForObjects
+                            }
                           />
                         ))}
                       </SelectField>

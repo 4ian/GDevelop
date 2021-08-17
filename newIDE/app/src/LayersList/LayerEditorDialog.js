@@ -186,6 +186,7 @@ const LayerEditorDialog = (props: Props) => {
         )}
         {currentTab === 'effects' && (
           <EffectsList
+            target="layer"
             project={props.project}
             resourceSources={props.resourceSources}
             onChooseResource={props.onChooseResource}

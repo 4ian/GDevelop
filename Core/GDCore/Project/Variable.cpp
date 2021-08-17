@@ -91,7 +91,7 @@ double Variable::GetValue() const {
   if (type == Type::Number) {
     return value;
   } else if (type == Type::String) {
-    double retVal = str.To<double>();
+    double retVal = str.empty() ? 0.0 : str.To<double>();
     if(std::isnan(retVal)) retVal = 0.0;
     return retVal;
   } else if (type == Type::Boolean) {

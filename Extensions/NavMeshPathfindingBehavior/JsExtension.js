@@ -51,6 +51,10 @@ const declarePathfindingBehavior = function (
       behaviorContent.setDoubleAttribute('angleOffset', newValue);
       return true;
     }
+    if (propertyName === 'collisionShape') {
+      behaviorContent.setStringAttribute('collisionShape', newValue);
+      return true;
+    }
     if (propertyName === 'extraBorder') {
       behaviorContent.setDoubleAttribute('extraBorder', newValue);
       return true;
@@ -93,6 +97,14 @@ const declarePathfindingBehavior = function (
       .setLabel(_('Angle offset'));
 
     behaviorProperties
+      .getOrCreate('collisionShape')
+      .setValue(behaviorContent.getStringAttribute('collisionShape').toString())
+      .setType('Choice')
+      .setLabel(_('Collision shape'))
+      .addExtraInfo('Bounding disk')
+      .addExtraInfo('Dot at center');
+
+    behaviorProperties
       .getOrCreate('extraBorder')
       .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString())
       .setLabel(_('Extra border size'));
@@ -106,6 +118,7 @@ const declarePathfindingBehavior = function (
     behaviorContent.setDoubleAttribute('angularMaxSpeed', 180);
     behaviorContent.setBoolAttribute('rotateObject', true);
     behaviorContent.setDoubleAttribute('angleOffset', 0);
+    behaviorContent.setStringAttribute('collisionShape', 'Bounding disk');
     behaviorContent.setDoubleAttribute('extraBorder', 0);
   };
   const pathfindingBehaviorDeclaration = extension
@@ -968,6 +981,11 @@ module.exports = {
         pathfindingBehavior,
         'angleOffset',
         '45'
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        pathfindingBehavior,
+        'collisionShape',
+        'Dot at center'
       ),
       gd.ProjectHelper.sanityCheckBehaviorProperty(
         pathfindingBehavior,

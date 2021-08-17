@@ -179,9 +179,11 @@ namespace gdjs {
       export const anyKeyPressed = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().anyKeyPressed();
       };
+
       export const anyKeyReleased = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().anyKeyReleased();
       };
+
       export const isMouseButtonPressed = function (runtimeScene, button) {
         if (button === 'Left') {
           return runtimeScene
@@ -203,6 +205,7 @@ namespace gdjs {
         }
         return false;
       };
+
       export const isMouseButtonReleased = function (runtimeScene, button) {
         if (button === 'Left') {
           return runtimeScene
@@ -224,21 +227,27 @@ namespace gdjs {
         }
         return false;
       };
+
       export const hideCursor = function (runtimeScene) {
         runtimeScene.getRenderer().hideCursor();
       };
+
       export const showCursor = function (runtimeScene) {
         runtimeScene.getRenderer().showCursor();
       };
+
       export const getMouseWheelDelta = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().getMouseWheelDelta();
       };
+
       export const isScrollingUp = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().isScrollingUp();
       };
+
       export const isScrollingDown = function (runtimeScene) {
         return runtimeScene.getGame().getInputManager().isScrollingDown();
       };
+
       export const getMouseX = function (runtimeScene, layer, camera) {
         return runtimeScene
           .getLayer(layer)
@@ -247,6 +256,7 @@ namespace gdjs {
             runtimeScene.getGame().getInputManager().getMouseY()
           )[0];
       };
+
       export const getMouseY = function (runtimeScene, layer, camera) {
         return runtimeScene
           .getLayer(layer)
@@ -255,9 +265,11 @@ namespace gdjs {
             runtimeScene.getGame().getInputManager().getMouseY()
           )[1];
       };
+
       export const _cursorIsOnObject = function (obj, runtimeScene) {
         return obj.cursorOnObject(runtimeScene);
       };
+
       export const cursorOnObject = function (
         objectsLists,
         runtimeScene,
@@ -271,6 +283,7 @@ namespace gdjs {
           runtimeScene
         );
       };
+
       export const getTouchX = function (
         runtimeScene,
         identifier,
@@ -284,6 +297,7 @@ namespace gdjs {
             runtimeScene.getGame().getInputManager().getTouchY(identifier)
           )[0];
       };
+
       export const getTouchY = function (
         runtimeScene,
         identifier,
@@ -297,12 +311,15 @@ namespace gdjs {
             runtimeScene.getGame().getInputManager().getTouchY(identifier)
           )[1];
       };
+
       export const getLastTouchId = function () {
         return gdjs.evtTools.input.lastTouchId || 0;
       };
+
       export const getLastEndedTouchId = function () {
         return gdjs.evtTools.input.lastEndedTouchId || 0;
       };
+
       export const popStartedTouch = function (runtimeScene) {
         const startedTouchId = runtimeScene
           .getGame()
@@ -314,6 +331,7 @@ namespace gdjs {
         }
         return false;
       };
+
       export const popEndedTouch = function (runtimeScene) {
         const endedTouchId = runtimeScene
           .getGame()
@@ -325,6 +343,7 @@ namespace gdjs {
         }
         return false;
       };
+
       export const touchSimulateMouse = function (runtimeScene, enable) {
         runtimeScene.getGame().getInputManager().touchSimulateMouse(enable);
       };

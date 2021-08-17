@@ -1,24 +1,37 @@
+// @flow
 import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
+import ViewPosition from './ViewPosition';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
-export default class WindowBorder {
-  constructor({ project, viewPosition, options }) {
+type Props = {|
+  project: gdProject,
+  instancesEditorSettings: InstancesEditorSettings,
+  viewPosition: ViewPosition,
+|};
+
+export default class WindowMask {
+  project: gdProject;
+  instancesEditorSettings: InstancesEditorSettings;
+  viewPosition: ViewPosition;
+  pixiRectangle = new PIXI.Graphics();
+  windowRectangle = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  };
+
+  constructor({ project, viewPosition, instancesEditorSettings }: Props) {
     this.project = project;
     this.viewPosition = viewPosition;
-    this.options = options;
+    this.instancesEditorSettings = instancesEditorSettings;
 
-    this.pixiRectangle = new PIXI.Graphics();
     this.pixiRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
-    this.windowRectangle = {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
   }
 
-  setOptions(options) {
-    this.options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
   getPixiObject() {
@@ -26,9 +39,7 @@ export default class WindowBorder {
   }
 
   render() {
-    const options = this.options;
-
-    if (!options.windowMask) {
+    if (!this.instancesEditorSettings.windowMask) {
       this.pixiRectangle.visible = false;
       return;
     }

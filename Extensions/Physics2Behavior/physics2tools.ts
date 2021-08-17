@@ -14,6 +14,7 @@ namespace gdjs {
         behavior
       );
     };
+
     export const setTimeScale = function (objectsLists, behavior, timeScale) {
       const lists = gdjs.staticArray(gdjs.physics2.setTimeScale);
       objectsLists.values(lists);

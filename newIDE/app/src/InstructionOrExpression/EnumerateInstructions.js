@@ -4,6 +4,8 @@ import {
   type InstructionOrExpressionScope,
   type EnumeratedInstructionOrExpressionMetadata,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
+import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
+
 const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -507,41 +509,31 @@ export const filterInstructionsList = <
   list: Array<T>,
   { searchText }: InstructionFilteringOptions
 ): Array<T> => {
-  if (!searchText === '') {
+  if (!searchText) {
     return list;
   }
 
+  const directMatches = [];
+  const fuzzyMatches = [];
   const lowercaseSearch = searchText.toLowerCase();
 
-  const matchCritera = (enumeratedInstructionOrExpressionMetadata: T) => {
-    const {
-      displayedName,
-      fullGroupName,
-    } = enumeratedInstructionOrExpressionMetadata;
-    return (
-      displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
-      fullGroupName.toLowerCase().indexOf(lowercaseSearch) !== -1
-    );
-  };
-
-  const favorExactMatch = (list: Array<T>): Array<T> => {
-    if (!searchText) {
-      return list;
+  list.forEach(option => {
+    const lowerCaseDisplayedName = option.displayedName.toLowerCase();
+    const lowerCaseFullGroupName = option.fullGroupName.toLowerCase();
+    // favor direct matches first
+    if (lowerCaseDisplayedName.includes(lowercaseSearch)) {
+      return directMatches.push(option);
     }
-
-    for (var i = 0; i < list.length; ++i) {
-      if (list[i].displayedName.toLowerCase() === lowercaseSearch) {
-        const exactMatch = list[i];
-        list.splice(i, 1);
-        list.unshift(exactMatch);
-      }
+    // then add fuzzy matches
+    if (
+      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseDisplayedName) ||
+      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseFullGroupName)
+    ) {
+      return fuzzyMatches.push(option);
     }
+  });
 
-    return list;
-  };
-
-  // See EnumerateExpressions for a similar logic for expressions
-  return favorExactMatch(list.filter(matchCritera));
+  return [...directMatches, ...fuzzyMatches];
 };
 
 export const getObjectParameterIndex = (

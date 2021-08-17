@@ -240,7 +240,8 @@ describe('libGD.js', function () {
       const element = new gd.SerializerElement();
       layer.serializeTo(element);
 
-      for (let i = 0; i < 5;++i) { // Repeat multiple time to check idempotency.
+      for (let i = 0; i < 5; ++i) {
+        // Repeat multiple time to check idempotency.
         layer2.unserializeFrom(element);
 
         expect(layer2.getName()).toBe('GUI');
@@ -956,8 +957,8 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.BitmapFontResource', function() {
-    it('should have name and file', function() {
+  describe('gd.BitmapFontResource', function () {
+    it('should have name and file', function () {
       const resource = new gd.BitmapFontResource();
       resource.setName('MyBitmapFontResource');
       resource.setFile('MyBitmapFontFile');
@@ -965,7 +966,7 @@ describe('libGD.js', function () {
       expect(resource.getFile()).toBe('MyBitmapFontFile');
       resource.delete();
     });
-    it('can have metadata', function() {
+    it('can have metadata', function () {
       const resource = new gd.BitmapFontResource();
       expect(resource.getMetadata()).toBe('');
       resource.setMetadata(JSON.stringify({ hello: 'world' }));
@@ -974,8 +975,8 @@ describe('libGD.js', function () {
     });
   });
 
-  describe('gd.VideoResource', function() {
-    it('should have name and file', function() {
+  describe('gd.VideoResource', function () {
+    it('should have name and file', function () {
       const resource = new gd.VideoResource();
       resource.setName('MyVideoResource');
       resource.setFile('MyVideoFile');
@@ -1941,10 +1942,11 @@ describe('libGD.js', function () {
       action.setParametersCount(2);
       action.setParameter(0, 'MyCharacter');
 
-      var formattedTexts = gd.InstructionSentenceFormatter.get().getAsFormattedText(
-        action,
-        gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
-      );
+      var formattedTexts =
+        gd.InstructionSentenceFormatter.get().getAsFormattedText(
+          action,
+          gd.MetadataProvider.getActionMetadata(gd.JsPlatform.get(), 'Delete')
+        );
 
       expect(formattedTexts.size()).toBe(2);
       expect(formattedTexts.getString(0)).toBe('Delete ');
@@ -2419,7 +2421,8 @@ describe('libGD.js', function () {
       resourcesMergingHelper.setBaseDirectory('/my/project/');
       project.exposeResources(resourcesMergingHelper);
 
-      const oldAndNewFilenames = resourcesMergingHelper.getAllResourcesOldAndNewFilename();
+      const oldAndNewFilenames =
+        resourcesMergingHelper.getAllResourcesOldAndNewFilename();
       expect(oldAndNewFilenames.get('/my/project/MyResource.png')).toBe(
         'MyResource.png'
       );
@@ -2905,11 +2908,12 @@ describe('libGD.js', function () {
         layout
       );
       const expressionNode = parser.parseExpression(type, expression).get();
-      const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-        expressionNode,
-        // We're looking for completion for the character just before the caret.
-        Math.max(0, caretPosition - 1)
-      );
+      const completionDescriptions =
+        gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          expressionNode,
+          // We're looking for completion for the character just before the caret.
+          Math.max(0, caretPosition - 1)
+        );
 
       for (let i = 0; i < completionDescriptions.size(); i++) {
         const completionDescription = completionDescriptions.at(i);
@@ -3554,12 +3558,23 @@ describe('libGD.js', function () {
       const instructionMetadata = new gd.InstructionMetadata();
 
       expect(instructionMetadata.getParametersCount()).toBe(0);
-      instructionMetadata.addParameter('type', 'label', '', false);
+      instructionMetadata.addParameter(
+        'type',
+        'label',
+        'AdditionalStuffThatWillBeReplaced',
+        false
+      );
       instructionMetadata.setParameterLongDescription('Blabla');
+      instructionMetadata.setParameterExtraInfo(
+        'AdditionalStuffLikeTypicallyAnObjectOrBehaviorType'
+      );
       expect(instructionMetadata.getParametersCount()).toBe(1);
       expect(instructionMetadata.getParameter(0).getType()).toBe('type');
       expect(instructionMetadata.getParameter(0).getDescription()).toBe(
         'label'
+      );
+      expect(instructionMetadata.getParameter(0).getExtraInfo()).toBe(
+        'AdditionalStuffLikeTypicallyAnObjectOrBehaviorType'
       );
       expect(instructionMetadata.getParameter(0).getLongDescription()).toBe(
         'Blabla'
@@ -3595,6 +3610,28 @@ describe('libGD.js', function () {
       expect(expressionMetadata.getParameter(0).getLongDescription()).toBe(
         'Blabla'
       );
+    });
+  });
+
+  describe('gd.EditorSettings', () => {
+    it('can store anything', () => {
+      const element = gd.Serializer.fromJSObject({
+        test: 1,
+        anything: {
+          canBeStored: true,
+        },
+      });
+
+      const editorSettings = new gd.EditorSettings();
+      editorSettings.unserializeFrom(element);
+
+      const element2 = new gd.SerializerElement();
+      editorSettings.serializeTo(element2);
+
+      expect(element2.getChild('test').getIntValue()).toBe(1);
+      expect(
+        element2.getChild('anything').getChild('canBeStored').getBoolValue()
+      ).toBe(true);
     });
   });
 });

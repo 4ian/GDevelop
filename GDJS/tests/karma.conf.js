@@ -13,7 +13,7 @@ module.exports = function (config) {
     client: {
       mocha: {
         reporter: 'html',
-        timeout: 5000, // Give a bit more time for CIs (the default 2s can be too low sometimes)
+        timeout: 10000, // Give a bit more time for CIs (the default 2s can be too low sometimes, as a real browser is involved).
       },
     },
     files: [

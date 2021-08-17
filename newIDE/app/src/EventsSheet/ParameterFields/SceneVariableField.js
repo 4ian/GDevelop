@@ -62,6 +62,7 @@ export default class SceneVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
+              if (this._field) this._field.updateAutocompletions();
             }}
             emptyExplanationMessage={
               <Trans>

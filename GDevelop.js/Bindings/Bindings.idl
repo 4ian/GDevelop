@@ -607,7 +607,7 @@ interface Layout {
     void SerializeLayersTo([Ref] SerializerElement element);
     void UnserializeLayersFrom([Const, Ref] SerializerElement element);
 
-    [Ref] LayoutEditorCanvasOptions GetAssociatedSettings();
+    [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
@@ -656,7 +656,7 @@ interface ExternalLayout {
     [Const, Ref] DOMString GetAssociatedLayout();
 
     [Ref] InitialInstancesContainer GetInitialInstances();
-    [Ref] LayoutEditorCanvasOptions GetAssociatedSettings();
+    [Ref] EditorSettings GetAssociatedEditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1110,6 +1110,7 @@ interface InstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
@@ -1396,6 +1397,19 @@ interface BehaviorMetadata {
                                         [Const] DOMString sentenceName,
                                         [Const] DOMString group,
                                         [Const] DOMString icon);
+
+    [Ref] InstructionMetadata AddDuplicatedAction(
+        [Const] DOMString newActionName,
+        [Const] DOMString copiedActionName);
+    [Ref] InstructionMetadata AddDuplicatedCondition(
+        [Const] DOMString newConditionName,
+        [Const] DOMString copiedConditionName);
+    [Ref] ExpressionMetadata AddDuplicatedExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
+    [Ref] ExpressionMetadata AddDuplicatedStrExpression(
+        [Const] DOMString newExpressionName,
+        [Const] DOMString copiedExpressionName);
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
@@ -2300,8 +2314,8 @@ interface ResourcesInUseHelper {
 };
 ResourcesInUseHelper implements ArbitraryResourceWorker;
 
-interface LayoutEditorCanvasOptions {
-    void LayoutEditorCanvasOptions();
+interface EditorSettings {
+    void EditorSettings();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

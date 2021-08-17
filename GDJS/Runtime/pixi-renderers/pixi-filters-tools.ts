@@ -6,6 +6,7 @@ namespace gdjs {
     export const clampValue = function (value, min, max) {
       return Math.max(min, Math.min(max, value));
     };
+
     export const clampKernelSize = function (value, min, max) {
       const len = Math.round((max - min) / 2 + 1);
       const arr = new Array(len);

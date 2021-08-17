@@ -2,14 +2,15 @@ namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
 
   class ShapePainterRuntimeObjectPixiRenderer {
-    _object: any;
-    _graphics: any;
+    _object: gdjs.ShapePainterRuntimeObject;
+    _graphics: PIXI.Graphics;
 
-    constructor(runtimeObject, runtimeScene) {
+    constructor(
+      runtimeObject: gdjs.ShapePainterRuntimeObject,
+      runtimeScene: gdjs.RuntimeScene
+    ) {
       this._object = runtimeObject;
-      if (this._graphics === undefined) {
-        this._graphics = new PIXI.Graphics();
-      }
+      this._graphics = new PIXI.Graphics();
       runtimeScene
         .getLayer('')
         .getRenderer()
@@ -24,7 +25,7 @@ namespace gdjs {
       this._graphics.clear();
     }
 
-    drawRectangle(x1, y1, x2, y2) {
+    drawRectangle(x1: float, y1: float, x2: float, y2: float) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -34,7 +35,7 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawCircle(x, y, radius) {
+    drawCircle(x: float, y: float, radius: float) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -44,7 +45,7 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawLine(x1, y1, x2, y2, thickness) {
+    drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
@@ -69,7 +70,7 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawLineV2(x1, y1, x2, y2, thickness) {
+    drawLineV2(x1: float, y1: float, x2: float, y2: float, thickness: float) {
       this._graphics.lineStyle(
         thickness,
         this._object._outlineColor,
@@ -80,7 +81,7 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawEllipse(x1, y1, width, height) {
+    drawEllipse(x1: float, y1: float, width: float, height: float) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -90,7 +91,13 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawRoundedRectangle(x1, y1, x2, y2, radius) {
+    drawRoundedRectangle(
+      x1: float,
+      y1: float,
+      x2: float,
+      y2: float,
+      radius: float
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -101,12 +108,20 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawStar(x1, y1, points, radius, innerRadius, rotation) {
+    drawStar(
+      x1: float,
+      y1: float,
+      points: float,
+      radius: float,
+      innerRadius: float,
+      rotation: float
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
         this._object._fillOpacity / 255
       );
+      //@ts-ignore from @pixi/graphics-extras
       this._graphics.drawStar(
         x1,
         y1,
@@ -119,7 +134,15 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawArc(x1, y1, radius, startAngle, endAngle, anticlockwise, closePath) {
+    drawArc(
+      x1: float,
+      y1: float,
+      radius: float,
+      startAngle: float,
+      endAngle: float,
+      anticlockwise: boolean,
+      closePath: boolean
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -143,7 +166,16 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawBezierCurve(x1, y1, cpX, cpY, cpX2, cpY2, x2, y2) {
+    drawBezierCurve(
+      x1: float,
+      y1: float,
+      cpX: float,
+      cpY: float,
+      cpX2: float,
+      cpY2: float,
+      x2: float,
+      y2: float
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -154,7 +186,14 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawQuadraticCurve(x1, y1, cpX, cpY, x2, y2) {
+    drawQuadraticCurve(
+      x1: float,
+      y1: float,
+      cpX: float,
+      cpY: float,
+      x2: float,
+      y2: float
+    ) {
       this.updateOutline();
       this._graphics.beginFill(
         this._object._fillColor,
@@ -176,19 +215,33 @@ namespace gdjs {
       this._graphics.endFill();
     }
 
-    drawPathMoveTo(x1, y1) {
+    drawPathMoveTo(x1: float, y1: float) {
       this._graphics.moveTo(x1, y1);
     }
 
-    drawPathLineTo(x1, y1) {
+    drawPathLineTo(x1: float, y1: float) {
       this._graphics.lineTo(x1, y1);
     }
 
-    drawPathBezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY) {
+    drawPathBezierCurveTo(
+      cpX: float,
+      cpY: float,
+      cpX2: float,
+      cpY2: float,
+      toX: float,
+      toY: float
+    ) {
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
     }
 
-    drawPathArc(x1, y1, radius, startAngle, endAngle, anticlockwise) {
+    drawPathArc(
+      x1: float,
+      y1: float,
+      radius: float,
+      startAngle: float,
+      endAngle: float,
+      anticlockwise: boolean
+    ) {
       this._graphics.arc(
         x1,
         y1,
@@ -199,7 +252,7 @@ namespace gdjs {
       );
     }
 
-    drawPathQuadraticCurveTo(cpX, cpY, toX, toY) {
+    drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
       this._graphics.quadraticCurveTo(cpX, cpY, toX, toY);
     }
 

@@ -5,7 +5,7 @@
  */
 
 #include "GDCore/Project/ExternalLayout.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
@@ -16,7 +16,7 @@ void ExternalLayout::UnserializeFrom(const SerializerElement& element) {
   name = element.GetStringAttribute("name", "", "Name");
   instances.UnserializeFrom(element.GetChild("instances", 0, "Instances"));
 #if defined(GD_IDE_ONLY)
-  editionSettings.UnserializeFrom(element.GetChild("editionSettings"));
+  editorSettings.UnserializeFrom(element.GetChild("editionSettings"));
 #endif
   associatedLayout = element.GetStringAttribute("associatedLayout");
 }
@@ -25,7 +25,7 @@ void ExternalLayout::UnserializeFrom(const SerializerElement& element) {
 void ExternalLayout::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   instances.SerializeTo(element.AddChild("instances"));
-  editionSettings.SerializeTo(element.AddChild("editionSettings"));
+  editorSettings.SerializeTo(element.AddChild("editionSettings"));
   element.SetAttribute("associatedLayout", associatedLayout);
 }
 #endif

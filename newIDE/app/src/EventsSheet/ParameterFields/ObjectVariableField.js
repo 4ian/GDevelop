@@ -93,6 +93,7 @@ export default class ObjectVariableField extends React.Component<
             onCancel={() => this.setState({ editorOpen: false })}
             onApply={() => {
               this.setState({ editorOpen: false });
+              if (this._field) this._field.updateAutocompletions();
             }}
           />
         )}

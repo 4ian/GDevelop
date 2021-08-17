@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <cmath>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -96,6 +97,8 @@ class GD_CORE_API Variable {
    */
   void SetValue(double val) {
     value = val;
+    // NaN values are not supported by GDevelop nor the serializer.
+    if(std::isnan(value)) value = 0.0;
     type = Type::Number;
   }
 

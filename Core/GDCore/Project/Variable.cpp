@@ -7,7 +7,6 @@
 #include "GDCore/Project/Variable.h"
 
 #include <sstream>
-#include <cmath>
 
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"

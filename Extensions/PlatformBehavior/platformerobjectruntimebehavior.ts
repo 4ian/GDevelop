@@ -40,7 +40,8 @@ namespace gdjs {
     _upKey: boolean = false;
     _downKey: boolean = false;
     _jumpKey: boolean = false;
-    _releaseKey: boolean = false;
+    _releasePlatformKey: boolean = false;
+    _releaseLadderKey: boolean = false;
 
     private _state: State;
     _falling: Falling;
@@ -181,8 +182,8 @@ namespace gdjs {
         (this._downKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
-      this._releaseKey ||
-        (this._releaseKey =
+      this._releasePlatformKey ||
+        (this._releasePlatformKey =
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
@@ -230,13 +231,16 @@ namespace gdjs {
       this._leftKey = false;
       this._rightKey = false;
       this._ladderKey = false;
+      this._releaseLadderKey = false;
       this._upKey = false;
       this._downKey = false;
-      this._releaseKey = false;
+      this._releasePlatformKey = false;
       this._jumpKey = false;
 
       //5) Track the movement
-      this._hasReallyMoved = Math.abs(object.getX() - oldX) >= 1;
+      this._hasReallyMoved =
+        Math.abs(object.getX() - oldX) >= 1 ||
+        Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
     }
 
@@ -546,10 +550,19 @@ namespace gdjs {
     }
 
     /**
-     * Mark the platformer object has not being grabbing any platform.
+     * Mark the platformer object as not grabbing any platform.
      */
     _releaseGrabbedPlatform() {
       if (this._state === this._grabbingPlatform) {
+        this._setFalling();
+      }
+    }
+
+    /**
+     * Mark the platformer object as falling if on a ladder.
+     */
+    _releaseLadder() {
+      if (this._state === this._onLadder) {
         this._setFalling();
       }
     }
@@ -784,7 +797,7 @@ namespace gdjs {
 
     /**
      * Simulate a control action in the Platformer Object by specifying an input.
-     * @param input The string expression of the control action [Left,Right,Up,Down,Ladder,Jump,Release].
+     * @param input The string expression of the control action [Left,Right,Up,Down,Ladder,Jump,Release,Release Ladder].
      */
     simulateControl(input: string) {
       if (input === 'Left') {
@@ -800,7 +813,9 @@ namespace gdjs {
       } else if (input === 'Jump') {
         this._jumpKey = true;
       } else if (input === 'Release') {
-        this._releaseKey = true;
+        this._releasePlatformKey = true;
+      } else if (input === 'Release Ladder') {
+        this._releaseLadderKey = true;
       }
     }
 
@@ -1000,6 +1015,15 @@ namespace gdjs {
     }
 
     /**
+     * Forbid the Platformer Object to air jump.
+     */
+    setCanNotAirJump(): void {
+      if (this._state === this._jumping || this._state === this._falling) {
+        this._canJump = false;
+      }
+    }
+
+    /**
      * Set if the Platformer Object can grab platforms.
      * @param enable Enable / Disable grabbing of platforms.
      */
@@ -1040,6 +1064,13 @@ namespace gdjs {
     }
 
     /**
+     * Simulate the "Release Ladder" control of the Platformer Object.
+     */
+    simulateReleaseLadderKey() {
+      this._releaseLadderKey = true;
+    }
+
+    /**
      * Simulate the "Up" control of the Platformer Object.
      */
     simulateUpKey() {
@@ -1063,8 +1094,8 @@ namespace gdjs {
     /**
      * Simulate the "Release" control of the Platformer Object.
      */
-    simulateReleaseKey() {
-      this._releaseKey = true;
+    simulateReleasePlatformKey() {
+      this._releasePlatformKey = true;
     }
 
     /**
@@ -1135,7 +1166,8 @@ namespace gdjs {
      */
     isMoving(): boolean {
       return (
-        (this._hasReallyMoved && this._currentSpeed !== 0) ||
+        (this._hasReallyMoved &&
+          (this._currentSpeed !== 0 || this._state === this._onLadder)) ||
         this._jumping.getCurrentJumpSpeed() !== 0 ||
         this._currentFallSpeed !== 0
       );
@@ -1560,7 +1592,8 @@ namespace gdjs {
       //Go on a ladder
       behavior._checkTransitionOnLadder();
 
-      if (behavior._releaseKey) {
+      //Release the platform
+      if (behavior._releasePlatformKey) {
         behavior._releaseGrabbedPlatform();
       }
 
@@ -1569,7 +1602,6 @@ namespace gdjs {
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
-      const behavior = this._behavior;
       this._grabbedPlatformLastX = this._grabbedPlatform.owner.getX();
       this._grabbedPlatformLastY = this._grabbedPlatform.owner.getY();
     }
@@ -1611,11 +1643,17 @@ namespace gdjs {
 
       //Jumping
       behavior._checkTransitionJumping();
+
+      //Release the ladder
+      if (behavior._releaseLadderKey) {
+        behavior._releaseLadder();
+      }
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
 
+      // TODO: we could consider supporting acceleration for ladder climbing in the future.
       if (behavior._upKey) {
         behavior._requestedDeltaY -= behavior._ladderClimbingSpeed * timeDelta;
       }

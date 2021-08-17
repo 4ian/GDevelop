@@ -5,7 +5,8 @@ Copyright (c) 2011-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 #include "TextEntryObject.h"
 
 void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
@@ -92,32 +93,3 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class Extension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  Extension() {
-    DeclareTextEntryObjectExtension(*this);
-    AddRuntimeObject<TextEntryObject, RuntimeTextEntryObject>(
-        GetObjectMetadata("TextEntryObject::TextEntry"),
-        "RuntimeTextEntryObject");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new Extension;
-}
-#endif

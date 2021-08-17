@@ -334,39 +334,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced();
 
-  obj.AddAction("CopyImageOnImageOfSprite",
-                _("Copy an image on the current one of an object"),
-                _("Copy an image on the current image of an object.\nNote that "
-                  "the source image must be preferably kept loaded in memory."),
-                _("Copy image _PARAM2_ on the current of _PARAM0_ at "
-                  "_PARAM3_;_PARAM4_"),
-                _("Effects"),
-                "res/copy24.png",
-                "res/copyicon.png")
-
-      .AddParameter("object", _("Object"), "Sprite")
-      .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Name of the source image"))
-      .AddParameter("expression", _("X position"))
-      .AddParameter("expression", _("Y position"))
-      .AddParameter(
-          "yesorno",
-          _("Should the copy take in account the source transparency\?"));
-
-  obj.AddAction(
-         "CreateMaskFromColorOnActualImage",  // Actual is indeed a mistake :
-                                              // Current should have been
-                                              // chosen.
-         _("Make a color of the image of an object transparent"),
-         _("Make a color of the image of an object transparent."),
-         _("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
-         _("Effects"),
-         "res/actions/opacity24.png",
-         "res/actions/opacity.png")
-
-      .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("color", _("Color to make transparent"));
-
   obj.AddAction("ChangeColor",
                 _("Tint color"),
                 _("Change the tint of an object. The default color is white."),

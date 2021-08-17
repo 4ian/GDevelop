@@ -4,7 +4,6 @@
       "name": "Mac",
       "includePath": [
         "${workspaceRoot}",
-        "${workspaceRoot}/GDCpp",
         "${workspaceRoot}/GDJS",
         "${workspaceRoot}/Extensions",
         "${workspaceRoot}/Core",
@@ -43,7 +42,6 @@
       "name": "Linux",
       "includePath": [
         "${workspaceRoot}",
-        "${workspaceRoot}/GDCpp",
         "${workspaceRoot}/GDJS",
         "${workspaceRoot}/Extensions",
         "${workspaceRoot}/Core",
@@ -70,7 +68,6 @@
       "name": "Win32",
       "includePath": [
         "${workspaceRoot}",
-        "${workspaceRoot}/GDCpp",
         "${workspaceRoot}/GDJS",
         "${workspaceRoot}/Extensions",
         "${workspaceRoot}/Core",

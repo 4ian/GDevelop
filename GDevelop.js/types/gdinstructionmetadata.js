@@ -23,6 +23,7 @@ declare class gdInstructionMetadata {
   addCodeOnlyParameter(type: string, supplementaryInformation: string): gdInstructionMetadata;
   setDefaultValue(defaultValue: string): gdInstructionMetadata;
   setParameterLongDescription(longDescription: string): gdInstructionMetadata;
+  setParameterExtraInfo(extraInfo: string): gdInstructionMetadata;
   useStandardOperatorParameters(type: string): gdInstructionMetadata;
   useStandardRelationalOperatorParameters(type: string): gdInstructionMetadata;
   markAsSimple(): gdInstructionMetadata;

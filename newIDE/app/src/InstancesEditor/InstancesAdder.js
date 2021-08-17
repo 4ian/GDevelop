@@ -1,26 +1,27 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
   instances: gdInitialInstancesContainer,
-  options: Object,
+  instancesEditorSettings: InstancesEditorSettings,
 |};
 
 const roundPositionsToGrid = (
   pos: [number, number],
-  options: Object
+  instancesEditorSettings: InstancesEditorSettings
 ): [number, number] => {
   const newPos = pos;
 
-  if (options.grid && options.snap) {
+  if (instancesEditorSettings.grid && instancesEditorSettings.snap) {
     roundPosition(
       newPos,
-      options.gridWidth,
-      options.gridHeight,
-      options.gridOffsetX,
-      options.gridOffsetY,
-      options.gridType
+      instancesEditorSettings.gridWidth,
+      instancesEditorSettings.gridHeight,
+      instancesEditorSettings.gridOffsetX,
+      instancesEditorSettings.gridOffsetY,
+      instancesEditorSettings.gridType
     );
   } else {
     newPos[0] = Math.round(newPos[0]);
@@ -37,17 +38,17 @@ const roundPositionsToGrid = (
 export default class InstancesAdder {
   _instances: gdInitialInstancesContainer;
   _temporaryInstances: Array<gdInitialInstance>;
-  _options: Object;
+  _instancesEditorSettings: InstancesEditorSettings;
   _zOrderFinder = new gd.HighestZOrderFinder();
 
-  constructor({ instances, options }: Props) {
+  constructor({ instances, instancesEditorSettings }: Props) {
     this._instances = instances;
-    this._options = options;
+    this._instancesEditorSettings = instancesEditorSettings;
     this._temporaryInstances = [];
   }
 
-  setOptions(options: Object) {
-    this._options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this._instancesEditorSettings = instancesEditorSettings;
   }
 
   /**
@@ -61,7 +62,7 @@ export default class InstancesAdder {
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
-    const newPos = roundPositionsToGrid(pos, this._options);
+    const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
     const addedInstances = objectNames.map(objectName => {
       const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
@@ -101,7 +102,7 @@ export default class InstancesAdder {
     this._instances.iterateOverInstances(this._zOrderFinder);
     const zOrder = this._zOrderFinder.getHighestZOrder() + 1;
 
-    const newPos = roundPositionsToGrid(pos, this._options);
+    const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
     this._temporaryInstances = objectNames.map(objectName => {
       const instance: gdInitialInstance = this._instances.insertNewInitialInstance();
       instance.setObjectName(objectName);
@@ -120,7 +121,7 @@ export default class InstancesAdder {
   updateTemporaryInstancePositions = (
     pos: [number, number]
   ): Array<gdInitialInstance> => {
-    const newPos = roundPositionsToGrid(pos, this._options);
+    const newPos = roundPositionsToGrid(pos, this._instancesEditorSettings);
     this._temporaryInstances.forEach(instance => {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);

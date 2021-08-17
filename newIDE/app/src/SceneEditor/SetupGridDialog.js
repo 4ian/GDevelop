@@ -1,123 +1,158 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Dialog from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
+import {
+  type InstancesEditorSettings,
+  cloneInstancesEditorSettings,
+} from '../InstancesEditor/InstancesEditorSettings';
+import { hexNumberToRGBColor, rgbToHexNumber } from '../Utils/ColorTransformer';
 
-export default class SetupGridDialog extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ...props.gridOptions,
-    };
-  }
+type Props = {|
+  instancesEditorSettings: InstancesEditorSettings,
+  onChangeInstancesEditorSettings: InstancesEditorSettings => void,
+  onApply: () => void,
+  onCancel: () => void,
+|};
 
-  onApply = () => {
-    this.props.onApply({
-      gridWidth: this.state.gridWidth,
-      gridHeight: this.state.gridHeight,
-      gridOffsetX: this.state.gridOffsetX,
-      gridOffsetY: this.state.gridOffsetY,
-      gridColor: this.state.gridColor,
-      gridType: this.state.gridType,
+/** Below this value, rendering the grid is too costly (risk of infinite loop/memory saturation). */
+const GRID_MIN_VALUE = 0.01;
+
+export default function SetupGridDialog(props: Props) {
+  const [previousOptions] = React.useState(() =>
+    cloneInstancesEditorSettings(props.instancesEditorSettings)
+  );
+
+  const onCancel = () => {
+    props.onChangeInstancesEditorSettings({
+      ...props.instancesEditorSettings,
+      gridWidth: previousOptions.gridWidth,
+      gridHeight: previousOptions.gridHeight,
+      gridOffsetX: previousOptions.gridOffsetX,
+      gridOffsetY: previousOptions.gridOffsetY,
+      gridColor: previousOptions.gridColor,
+      gridType: previousOptions.gridType,
     });
+    props.onCancel();
   };
 
-  render() {
-    const actions = [
-      <FlatButton
-        key="cancel"
-        label={<Trans>Cancel</Trans>}
-        primary={false}
-        onClick={this.props.onCancel}
-      />,
-      <FlatButton
-        key="apply"
-        label={<Trans>Apply</Trans>}
-        primary={true}
-        keyboardFocused={true}
-        onClick={this.onApply}
-      />,
-    ];
-
-    return (
-      <Dialog
-        onApply={this.onApply}
-        title={<Trans>Edit Grid Options</Trans>}
-        actions={actions}
-        cannotBeDismissed={true}
-        open={this.props.open}
-        onRequestClose={this.props.onCancel}
-        maxWidth="sm"
-        noMargin
-      >
-        <ColumnStackLayout>
-          <ResponsiveLineStackLayout noMargin expand>
-            <ColorField
-              floatingLabelText={<Trans>Line color</Trans>}
-              fullWidth
-              color={this.state.gridColor}
-              onChangeComplete={color => {
-                this.setState({ gridColor: color.rgb });
-              }}
-            />
-          </ResponsiveLineStackLayout>
-          <ResponsiveLineStackLayout noMargin expand>
-            <TextField
-              floatingLabelText={<Trans>Cell width (in pixels)</Trans>}
-              fullWidth
-              type="number"
-              value={this.state.gridWidth}
-              onChange={(e, value) =>
-                this.setState({ gridWidth: parseFloat(value) })
-              }
-            />
-            <TextField
-              floatingLabelText={<Trans>Cell height (in pixels)</Trans>}
-              fullWidth
-              type="number"
-              value={this.state.gridHeight}
-              onChange={(e, value) =>
-                this.setState({ gridHeight: parseFloat(value) })
-              }
-            />
-          </ResponsiveLineStackLayout>
-          <ResponsiveLineStackLayout noMargin expand>
-            <TextField
-              floatingLabelText={<Trans>X offset (in pixels)</Trans>}
-              fullWidth
-              type="number"
-              value={this.state.gridOffsetX}
-              onChange={(e, value) =>
-                this.setState({ gridOffsetX: parseFloat(value) })
-              }
-            />
-            <TextField
-              floatingLabelText={<Trans>Y offset (in pixels)</Trans>}
-              fullWidth
-              type="number"
-              value={this.state.gridOffsetY}
-              onChange={(e, value) =>
-                this.setState({ gridOffsetY: parseFloat(value) })
-              }
-            />
-          </ResponsiveLineStackLayout>
-          <ResponsiveLineStackLayout noMargin expand>
-            <Checkbox
-              checked={this.state.gridType === 'isometric'}
-              label={<Trans>Isometric</Trans>}
-              onCheck={(e, check) =>
-                this.setState({
-                  gridType: check ? 'isometric' : 'rectangular',
-                })
-              }
-            />
-          </ResponsiveLineStackLayout>
-        </ColumnStackLayout>
-      </Dialog>
-    );
-  }
+  return (
+    <Dialog
+      onApply={props.onApply}
+      title={<Trans>Edit Grid Options</Trans>}
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          primary={false}
+          onClick={onCancel}
+        />,
+        <FlatButton
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          primary={true}
+          keyboardFocused={true}
+          onClick={props.onApply}
+        />,
+      ]}
+      cannotBeDismissed={true}
+      open
+      onRequestClose={onCancel}
+      maxWidth="sm"
+      noMargin
+    >
+      <ColumnStackLayout>
+        <ResponsiveLineStackLayout noMargin expand>
+          <ColorField
+            floatingLabelText={<Trans>Line color</Trans>}
+            fullWidth
+            color={{
+              ...hexNumberToRGBColor(props.instancesEditorSettings.gridColor),
+              a: props.instancesEditorSettings.gridAlpha,
+            }}
+            onChangeComplete={color => {
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridColor: rgbToHexNumber(
+                  color.rgb.r,
+                  color.rgb.g,
+                  color.rgb.b
+                ),
+                gridAlpha: color.rgb.a,
+              });
+            }}
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin expand>
+          <TextField
+            floatingLabelText={<Trans>Cell width (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridWidth}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridWidth: Math.max(parseFloat(value), GRID_MIN_VALUE),
+              })
+            }
+          />
+          <TextField
+            floatingLabelText={<Trans>Cell height (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridHeight}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridHeight: Math.max(parseFloat(value), GRID_MIN_VALUE),
+              })
+            }
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin expand>
+          <TextField
+            floatingLabelText={<Trans>X offset (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridOffsetX}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridOffsetX: parseFloat(value),
+              })
+            }
+          />
+          <TextField
+            floatingLabelText={<Trans>Y offset (in pixels)</Trans>}
+            fullWidth
+            type="number"
+            value={props.instancesEditorSettings.gridOffsetY}
+            onChange={(e, value) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridOffsetY: parseFloat(value),
+              })
+            }
+          />
+        </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout noMargin expand>
+          <Checkbox
+            checked={props.instancesEditorSettings.gridType === 'isometric'}
+            label={<Trans>Isometric</Trans>}
+            onCheck={(e, check) =>
+              props.onChangeInstancesEditorSettings({
+                ...props.instancesEditorSettings,
+                gridType: check ? 'isometric' : 'rectangular',
+              })
+            }
+          />
+        </ResponsiveLineStackLayout>
+      </ColumnStackLayout>
+    </Dialog>
+  );
 }

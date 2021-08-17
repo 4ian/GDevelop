@@ -9,12 +9,11 @@
 /** @file
  * Provide a way to mark strings to be translated.
  * 
- * Strings to be translated in GDevelop Core codebase (and GDCpp),
+ * Strings to be translated in GDevelop Core codebase
  * are marked with the underscore macro, for example: _("Hello World").
  * 
  * The macro is then defined to be using the translation function
- * of the underlying platform (Emscripten for GDevelop 5,
- * no translation for GDCpp Runtime).
+ * of the underlying platform (Emscripten for GDevelop 5).
  */
 
 #if defined(EMSCRIPTEN)
@@ -33,7 +32,7 @@ gd::String GetTranslation(const char* str);
 #define _(s) gd::GetTranslation(u8##s)
 
 #else
-// When compiling without Emscripten (typically for GDC++ Runtime),
+// When compiling without Emscripten,
 // just return an untranslated gd::String.
 
 // Create a new macro to return UTF8 gd::String from a translation

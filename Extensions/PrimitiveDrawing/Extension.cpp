@@ -5,7 +5,8 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 #include "ShapePainterObject.h"
 
 void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
@@ -375,6 +376,16 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddScopedAction(
+         "ClearShapes",
+         _("Clear shapes"),
+         _("Clear the rendered shape(s). Useful if not set to be done automatically."),
+         _("Clear the rendered image of _PARAM0_"),
+         _("Advanced"),
+         "res/actions/visibilite24.png",
+         "res/actions/visibilite.png")
+      .AddParameter("object", _("Shape Painter object"), "Drawer");
+
   obj.AddAction(
          "ClearBetweenFrames",
          _("Clear between frames"),
@@ -623,127 +634,3 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class Extension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  Extension() {
-    DeclarePrimitiveDrawingExtension(*this);
-    AddRuntimeObject<ShapePainterObject, RuntimeShapePainterObject>(
-        GetObjectMetadata("PrimitiveDrawing::Drawer"),
-        "RuntimeShapePainterObject");
-
-#if defined(GD_IDE_ONLY)
-    AddAction("CopyImageOnAnother",
-              _("Copy an image on another"),
-              _("Copy an image on another.\nNote that the source image must be "
-                "preferably kept loaded in memory."),
-              _("Copy the image _PARAM1_ on _PARAM0_ at _PARAM2_;_PARAM3_"),
-              _("Images"),
-              "res/copy24.png",
-              "res/copyicon.png")
-
-        .AddParameter("string", _("Name of the image to modify"))
-        .AddParameter("string", _("Name of the source image"))
-        .AddParameter("expression", _("X position"))
-        .AddParameter("expression", _("Y position"))
-        .AddParameter(
-            "yesorno",
-            _("Should the copy take in account the source transparency\?"))
-        .AddCodeOnlyParameter("currentScene", "")
-
-        .SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother")
-        .SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
-
-    AddAction("CaptureScreen",
-              _("Capture the screen"),
-              _("Capture the screen and save it into the specified folder "
-                "and/or\nin the specified image."),
-              _("Capture the screen ( Save it in file _PARAM1_ and/or in image "
-                "_PARAM2_ )"),
-              _("Images"),
-              "res/imageicon24.png",
-              "res/imageicon.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("File where save capture"), "", true)
-        .SetDefaultValue("")
-        .AddParameter("string",
-                      _("Name of the image where capture must be saved"),
-                      "",
-                      true)
-        .SetDefaultValue("")
-
-        .SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen")
-        .SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
-
-    AddAction("CreateSFMLTexture",
-              _("Create an image in memory"),
-              _("Create an image in memory."),
-              _("Create image _PARAM1_ in memory ( Width: _PARAM2_, Height: "
-                "_PARAM3_, Color: _PARAM4_ )"),
-              _("Images"),
-              "res/imageicon24.png",
-              "res/imageicon.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the image"))
-        .AddParameter("expression", _("Width"), "", true)
-        .AddParameter("expression", _("Height"), "", true)
-        .AddParameter("color", _("Initial color"), "", true)
-        .SetDefaultValue("0;0;0")
-
-        .SetFunctionName("GDpriv::PrimitiveDrawingTools::CreateSFMLTexture")
-        .SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
-
-    AddAction("OpenSFMLTextureFromFile",
-              _("Open an image from a file"),
-              _("Load in memory an image from a file."),
-              _("Load in memory file _PARAM1_ inside image _PARAM2_"),
-              _("Images"),
-              "res/imageicon24.png",
-              "res/imageicon.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("file", _("File"))
-        .AddParameter("string", _("Name of the image"))
-
-        .SetFunctionName(
-            "GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile")
-        .SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
-
-    AddAction("SaveSFMLTextureToFile",
-              _("Save an image to a file"),
-              _("Save an image to a file"),
-              _("Save image _PARAM2_ to file _PARAM1_"),
-              _("Images"),
-              "res/imageicon24.png",
-              "res/imageicon.png")
-
-        .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("file", _("File"))
-        .AddParameter("string", _("Name of the image"))
-
-        .SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile")
-        .SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
-
-#endif
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new Extension;
-}
-#endif

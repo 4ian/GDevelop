@@ -272,7 +272,7 @@ void Layout::SerializeTo(SerializerElement& element) const {
                        disableInputWhenNotFocused);
 
 #if defined(GD_IDE_ONLY)
-  GetAssociatedSettings().SerializeTo(element.AddChild("uiSettings"));
+  editorSettings.SerializeTo(element.AddChild("uiSettings"));
 #endif
 
   GetObjectGroups().SerializeTo(element.AddChild("objectsGroups"));
@@ -333,7 +333,7 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetBoolAttribute("disableInputWhenNotFocused");
 
 #if defined(GD_IDE_ONLY)
-  associatedSettings.UnserializeFrom(
+  editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
   GetObjectGroups().UnserializeFrom(
@@ -412,7 +412,7 @@ void Layout::Init(const Layout& other) {
 
 #if defined(GD_IDE_ONLY)
   events = other.events;
-  associatedSettings = other.associatedSettings;
+  editorSettings = other.editorSettings;
   objectGroups = other.objectGroups;
 
   profiler = other.profiler;

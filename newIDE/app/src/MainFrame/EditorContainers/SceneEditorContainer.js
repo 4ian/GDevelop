@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 import SceneEditor from '../../SceneEditor';
 import {
   serializeToJSObject,
@@ -69,8 +70,8 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
 
     if (editor && layout) {
       unserializeFromJSObject(
-        layout.getAssociatedSettings(),
-        editor.getUiSettings()
+        layout.getAssociatedEditorSettings(),
+        editor.getInstancesEditorSettings()
       );
     }
   };
@@ -94,7 +95,11 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
         project={project}
         layout={layout}
         initialInstances={layout.getInitialInstances()}
-        initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
+        getInitialInstancesEditorSettings={() =>
+          prepareInstancesEditorSettings(
+            serializeToJSObject(layout.getAssociatedEditorSettings())
+          )
+        }
         isActive={isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />

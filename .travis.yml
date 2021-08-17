@@ -1,5 +1,5 @@
 # Travis CI configuration to build and run all tests
-# (and typing/formatting) for the Core, newIDE, GDJS (and even GDCpp).
+# (and typing/formatting) for the Core, newIDE, GDJS.
 #
 # This builds GDevelop.js and store it on a S3 so it can be used to run
 # GDevelop without building it.
@@ -62,7 +62,7 @@ before_install:
 install:
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
-#Compile the tests only for GDCore and GDCpp
+#Compile the tests only for GDCore
   - mkdir .build-tests
   - cd .build-tests
   - cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
@@ -89,12 +89,9 @@ install:
   - cd ../..
 
 script:
-# GDCore and GDCpp game engine tests:
+# GDCore tests:
   - cd .build-tests
   - Core/GDCore_tests
-  - GDCpp/GDCpp_tests
-  - Extensions/PathfindingBehavior/PathfindingBehavior_Runtime_tests
-  - Extensions/LinkedObjects/LinkedObjects_Runtime_tests
   - cd ..
 # GDevelop.js tests
   - cd GDevelop.js

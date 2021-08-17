@@ -18,19 +18,13 @@ SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O2") # Optimizations during compilati
 
 #Common directories:
 ###
-set(GDCpp_include_dir ${GD_base_dir}/GDCpp)
-set(GDCpp_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(GDJS_include_dir ${GD_base_dir}/GDJS)
 set(GDJS_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform)
-
-set(GDCpp_include_dir ${GDCpp_include_dir} PARENT_SCOPE) #Expose GDCpp directories to extensions for includes.
-set(GDCpp_lib_dir ${GDCpp_lib_dir} PARENT_SCOPE)
 
 #Dependencies on external libraries:
 ###
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
-include_directories(${GDCpp_include_dir})
 include_directories(${GDJS_include_dir})
 
 #Defines

@@ -16,6 +16,7 @@ import {
 import LayoutChooserDialog from './LayoutChooserDialog';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
+import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
 
 const styles = {
   container: {
@@ -132,8 +133,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
 
     if (editor && layout) {
       unserializeFromJSObject(
-        layout.getAssociatedSettings(),
-        editor.getUiSettings()
+        layout.getAssociatedEditorSettings(),
+        editor.getInstancesEditorSettings()
       );
     }
   };
@@ -162,9 +163,13 @@ export class ExternalLayoutEditorContainer extends React.Component<
             project={project}
             layout={layout}
             initialInstances={externalLayout.getInitialInstances()}
-            initialUiSettings={serializeToJSObject(
-              externalLayout.getAssociatedSettings()
-            )}
+            getInitialInstancesEditorSettings={() =>
+              prepareInstancesEditorSettings(
+                serializeToJSObject(
+                  externalLayout.getAssociatedEditorSettings()
+                )
+              )
+            }
             onOpenMoreSettings={this.openLayoutChooser}
             isActive={isActive}
           />

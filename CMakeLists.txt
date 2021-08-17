@@ -14,12 +14,10 @@ macro(gd_set_option var default type docstring)
     endif()
     set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
 endmacro()
-gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build GDevelop Core library, FALSE to use the already compiled binaries")
-gd_set_option(BUILD_GDCPP TRUE BOOL "TRUE to build GDevelop C++ Platform")
+gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build GDevelop Core library")
 gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build GDevelop JS Platform")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
 gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
-gd_set_option(FULL_VERSION_NUMBER TRUE BOOL "TRUE to build GDevelop with its full version number (lastest tag + commit hash), FALSE to only use the lastest tag (avoid rebulding many source file when developping)")
 
 # Disable deprecated code
 set(NO_GUI TRUE CACHE BOOL "" FORCE) #Force disable old GUI related code.
@@ -55,9 +53,6 @@ IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
 	set(CMAKE_BUILD_TYPE Release)
 ENDIF()
-IF (EMSCRIPTEN)
-	set(BUILD_GDCPP FALSE CACHE BOOL "" FORCE) #Force disable GDC++ when compiling with emscripten.
-ENDIF()
 
 IF("${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
 	SET(CMAKE_SHARED_LINKER_FLAGS "-s") #Force stripping to avoid errors when packaging for linux.
@@ -84,7 +79,6 @@ endif()
 set(GD_base_dir ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Add all the CMakeLists:
-ADD_SUBDIRECTORY(Version)
 ADD_SUBDIRECTORY(ExtLibs)
 IF(BUILD_CORE)
 	ADD_SUBDIRECTORY(Core)
@@ -92,10 +86,7 @@ ENDIF()
 IF(BUILD_GDJS)
 	ADD_SUBDIRECTORY(GDJS)
 ENDIF()
-IF(BUILD_GDCPP)
-	ADD_SUBDIRECTORY(GDCpp)
-ENDIF()
-IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/GDevelop.js/CMakeLists.txt" AND EMSCRIPTEN)
+IF(EMSCRIPTEN)
 	ADD_SUBDIRECTORY(GDevelop.js)
 ENDIF()
 IF(BUILD_EXTENSIONS)

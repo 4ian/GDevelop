@@ -1,6 +1,7 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -49,7 +50,7 @@ const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
 
 export default class InstancesResizer {
   instanceMeasurer: any;
-  options: Object;
+  instancesEditorSettings: InstancesEditorSettings;
 
   // The initial state of instances before a resize:
   _initialSelectionAABB: ?Rectangle = null;
@@ -68,17 +69,17 @@ export default class InstancesResizer {
 
   constructor({
     instanceMeasurer,
-    options,
+    instancesEditorSettings,
   }: {
     instanceMeasurer: any,
-    options: Object,
+    instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
-    this.options = options;
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  setOptions(options: Object) {
-    this.options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
@@ -154,14 +155,17 @@ export default class InstancesResizer {
     const grabbingPosition = this._temporaryGrabbingPosition;
     grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
-    if (this.options.snap && this.options.grid) {
+    if (
+      this.instancesEditorSettings.snap &&
+      this.instancesEditorSettings.grid
+    ) {
       roundPositionForResizing(
         grabbingPosition,
-        this.options.gridWidth,
-        this.options.gridHeight,
-        this.options.gridOffsetX,
-        this.options.gridOffsetY,
-        this.options.gridType
+        this.instancesEditorSettings.gridWidth,
+        this.instancesEditorSettings.gridHeight,
+        this.instancesEditorSettings.gridOffsetX,
+        this.instancesEditorSettings.gridOffsetY,
+        this.instancesEditorSettings.gridType
       );
     } else {
       // Without a grid, the position is still rounded to the nearest pixel.

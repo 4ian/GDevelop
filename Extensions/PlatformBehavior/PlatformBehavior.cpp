@@ -8,12 +8,9 @@ This project is released under the MIT License.
 #include "PlatformBehavior.h"
 #include <memory>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Runtime/CommonTools.h"
-#include "GDCpp/Runtime/Project/Layout.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-#include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
-#include "ScenePlatformObjectsManager.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include <iostream>
 #include <map>

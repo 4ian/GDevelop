@@ -18,3 +18,11 @@ jobs:
         type: "body"
         regex: ".*_instance.getRawFloatProperty is not a function.*"
         message: "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
+    - name: Autoclose known beta 114 web-app update bug
+      uses: arkon/issue-closer-action@v1.1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        type: "body"
+        regex: ".*getAssociatedSettings is not a function.*"
+        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
+

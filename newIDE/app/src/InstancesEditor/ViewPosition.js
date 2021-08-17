@@ -1,12 +1,13 @@
 // @flow
 import * as PIXI from 'pixi.js-legacy';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 type Props = {|
   initialViewX: number,
   initialViewY: number,
   width: number,
   height: number,
-  options: any,
+  instancesEditorSettings: InstancesEditorSettings,
 |};
 
 export default class ViewPosition {
@@ -14,18 +15,24 @@ export default class ViewPosition {
   viewY: number = 0;
   _width: number;
   _height: number;
-  options: any;
+  instancesEditorSettings: InstancesEditorSettings;
   _pixiContainer = new PIXI.Container();
 
-  constructor({ initialViewX, initialViewY, width, height, options }: Props) {
+  constructor({
+    initialViewX,
+    initialViewY,
+    width,
+    height,
+    instancesEditorSettings,
+  }: Props) {
     this.viewX = initialViewX;
     this.viewY = initialViewY;
-    this.options = options;
+    this.instancesEditorSettings = instancesEditorSettings;
     this.resize(width, height);
   }
 
-  setOptions(options: any) {
-    this.options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
   resize(width: number, height: number) {
@@ -48,8 +55,8 @@ export default class ViewPosition {
   toSceneCoordinates = (x: number, y: number): [number, number] => {
     x -= this._width / 2;
     y -= this._height / 2;
-    x /= Math.abs(this.options.zoomFactor);
-    y /= Math.abs(this.options.zoomFactor);
+    x /= Math.abs(this.instancesEditorSettings.zoomFactor);
+    y /= Math.abs(this.instancesEditorSettings.zoomFactor);
 
     var viewRotation = 0;
     var tmp = x;
@@ -80,8 +87,8 @@ export default class ViewPosition {
       Math.sin((viewRotation / 180) * Math.PI) * tmp +
       Math.cos((viewRotation / 180) * Math.PI) * y;
 
-    x *= Math.abs(this.options.zoomFactor);
-    y *= Math.abs(this.options.zoomFactor);
+    x *= Math.abs(this.instancesEditorSettings.zoomFactor);
+    y *= Math.abs(this.instancesEditorSettings.zoomFactor);
 
     return [x + this._width / 2, y + this._height / 2];
   };
@@ -114,11 +121,13 @@ export default class ViewPosition {
   }
 
   render() {
-    this._pixiContainer.position.x = -this.viewX * this.options.zoomFactor;
-    this._pixiContainer.position.y = -this.viewY * this.options.zoomFactor;
+    this._pixiContainer.position.x =
+      -this.viewX * this.instancesEditorSettings.zoomFactor;
+    this._pixiContainer.position.y =
+      -this.viewY * this.instancesEditorSettings.zoomFactor;
     this._pixiContainer.position.x += this._width / 2;
     this._pixiContainer.position.y += this._height / 2;
-    this._pixiContainer.scale.x = this.options.zoomFactor;
-    this._pixiContainer.scale.y = this.options.zoomFactor;
+    this._pixiContainer.scale.x = this.instancesEditorSettings.zoomFactor;
+    this._pixiContainer.scale.y = this.instancesEditorSettings.zoomFactor;
   }
 }

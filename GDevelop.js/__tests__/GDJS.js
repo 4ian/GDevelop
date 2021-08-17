@@ -187,6 +187,70 @@ describe('libGD.js - GDJS related tests', function () {
 
       condition.delete();
     });
+    it('does not generate code for improperly set up action/conditions', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const layout = project.insertNewLayout('Scene', 0);
+      const evt = layout
+        .getEvents()
+        .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+      layout.insertNewObject(project, 'Sprite', "MyObject", 0);
+      layout.insertNewObject(project, 'TextObject::Text', "MyTextObject", 0);
+
+      // Valid action (to check code generation is done).
+      const action = new gd.Instruction();
+      action.setType('ChangeAnimation');
+      action.setParametersCount(4);
+      action.setParameter(0, 'MyObject');
+      action.setParameter(1, '=');
+      action.setParameter(2, '2');
+      gd.asStandardEvent(evt).getActions().insert(action, 0);
+
+      // Action with mismatched object type.
+      const mismatchedObjectTypeAction = new gd.Instruction();
+      mismatchedObjectTypeAction.setType('ChangeAnimation');
+      mismatchedObjectTypeAction.setParametersCount(4);
+      mismatchedObjectTypeAction.setParameter(0, 'MyTextObject');
+      mismatchedObjectTypeAction.setParameter(1, '=');
+      mismatchedObjectTypeAction.setParameter(2, '2');
+      gd.asStandardEvent(evt).getActions().insert(mismatchedObjectTypeAction, 1);
+
+      // Action with an unknown object.
+      const unknownObjectAction = new gd.Instruction();
+      unknownObjectAction.setType('ChangeAnimation');
+      unknownObjectAction.setParametersCount(4);
+      unknownObjectAction.setParameter(0, 'UnknownObject');
+      unknownObjectAction.setParameter(1, '=');
+      unknownObjectAction.setParameter(2, '2');
+      gd.asStandardEvent(evt).getActions().insert(unknownObjectAction, 2);
+
+      // Action that is unknown.
+      const unknownAction = new gd.Instruction();
+      unknownAction.setType('UnknownExtension::NotExistingInstruction');
+      unknownAction.setParametersCount(1);
+      unknownAction.setParameter(0, 'Anything');
+      gd.asStandardEvent(evt).getActions().insert(unknownAction, 3);
+
+      const layoutCodeGenerator = new gd.LayoutCodeGenerator(project);
+      const code = layoutCodeGenerator.generateLayoutCompleteCode(
+        layout,
+        new gd.SetString(),
+        true
+      );
+
+      // Animation is set to 2 for MyObject
+      expect(code).toMatch('gdjs.SceneCode.GDMyObjectObjects1[i].setAnimation(2);');
+
+      // Check that the action with a wrong obejct was not generated.
+      expect(code).toMatch('/* Mismatched object type - skipped. */');
+
+      // Check that the action with a wrong obejct was not generated.
+      expect(code).toMatch('/* Unknown object - skipped. */');
+
+      // Check that the unknown action was not generated.
+      expect(code).toMatch('/* Unknown instruction - skipped. */');
+
+      action.delete();
+    });
   });
 
   describe('EventsFunctionsExtensionCodeGenerator', () => {
@@ -309,7 +373,7 @@ describe('libGD.js - GDJS related tests', function () {
         'eventsFunctionContext.getOnceTriggers().triggerOnce'
       );
 
-      // A variable have 42 added to it
+      // A variable has 42 added to it
       expect(code).toMatch('getVariables().get("ObjectVariable")).add(42)');
 
       condition.delete();

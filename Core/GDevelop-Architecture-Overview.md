@@ -1,13 +1,12 @@
 # GDevelop Architecture Overview
 
-GDevelop is architectured around a `Core` library, platforms (`GDJS`, `GDCpp`) and extensions (`Extensions` folder). The editor (`newIDE` folder) is using all of these libraries. This is a recap table of the main folders:
+GDevelop is architectured around a `Core` library, the game engine (`GDJS`) and extensions (`Extensions` folder). The editor (`newIDE` folder) is using all of these libraries. This is a recap table of the main folders:
 
 | Directory     | ℹ️ Description                                                                                        |
 | ------------- | ----------------------------------------------------------------------------------------------------- |
 | `Core`        | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games.     |
-| `GDCpp`       | The C++ game engine, used to build native games (_not used in GDevelop 5_).                           |
 | `GDJS`        | The game engine, written in TypeScript, using PixiJS (WebGL), powering all GDevelop games.            |
-| `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
+| `GDevelop.js` | Bindings of `Core`, `GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
 | `newIDE`      | The game editor, written in JavaScript with React, Electron and PixiJS.                               |
 | `Extensions`  | Extensions for the game engine, providing objects, behaviors, events and new features.                |
 
@@ -17,11 +16,11 @@ The rest of this page is an introduction to the main concepts of GDevelop archit
 
 **IDE** stands for "Integrated Development Environment". A synonym for it is also simply "editor". In GDevelop, the software itself, that is used to create games and running as an app or a web-app, is called the "GDevelop Editor" or the "GDevelop IDE"
 
-> The term "IDE" is also used in some folders. When you browse `Core`, `GDCpp` or `GDJS` subfolders, some folders are called `IDE`. They contain classes and tools that are **only useful for the editor** (they are not per se mandatory to describe the structure of a game).
+> The term "IDE" is also used in some folders. When you browse `Core` or `GDJS` subfolders, some folders are called `IDE`. They contain classes and tools that are **only useful for the editor** (they are not per se mandatory to describe the structure of a game).
 
 **Runtime** is a word used to describe classes, tools and source files being used during a game. This could also be called "in-game" or a "game engine".
 
-> When you browse `GDCpp` or `GDJS` subfolders, you can find folders called `Runtime`. They contain the **game engine** of GDevelop.
+> When you browse `GDJS` subfolder, you can find a folder called `Runtime`. It's the **game engine** of GDevelop.
 
 Extensions do have the same distinction between the "**IDE**" part and the "**Runtime**" part. For example, most extensions have:
 
@@ -79,7 +78,7 @@ You're welcome to do so! Please get in touch :)
 The idea of the GDevelop editor and game engine is to have a lean game engine, supporting almost nothing. Then, one can add "mods", "plugins", "modules" for GDevelop. We chose to call them "**Extensions**" in GDevelop.
 
 -   `GDevelop/Core/GDCore/Extensions` is the **declaration** of default (we say "builtin") extensions, that are available for any game and are "mandatory". They are called Extensions but they could be named "Extensions that will always be in your game". In programming languages, this is called a "[Standard Library](https://en.wikipedia.org/wiki/Standard_library)" (but don't get too distracted by this naming).
--   `GDevelop/GDJS/GDJS/Extensions/` and `GDevelop/GDCpp/GDCpp/Extensions/` are reusing these **declarations** and **adding** their own declarations. Mainly, they are setting the name of the functions to be called (either in TypeScript or in C++) for each action, condition or expression.
+-   `GDevelop/GDJS/GDJS/Extensions/` is reusing these **declarations** and **adding** their own declarations. Mainly, they are setting the name of the functions to be called (either in TypeScript or in C++) for each action, condition or expression.
 -   `GDevelop/Extensions/` is the folder for the "mods"/"plugins" for GDevelop - the ones that are not mandatory. They are not part of GDCore - they work on their own.
 
 > In theory, all extensions could be moved to `GDevelop/Extensions/`. In practice, it's more pragmatic to have a set of "built-in" extensions with basic features.

@@ -13,6 +13,5 @@
 -fPIC
 -I./ExtLibs/SFML/include
 -I./Core
--I./GDCpp/.
 -I./GDJS/.
 -F./ExtLibs/SFML/extlibs/libs-osx/Frameworks

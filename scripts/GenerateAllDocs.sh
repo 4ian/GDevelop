@@ -14,10 +14,6 @@ cd GDJS/docs
 doxygen
 echo ℹ️ Generated GDJS docs
 cd ../..
-cd GDCpp/docs
-doxygen
-echo ℹ️ Generated GDCpp docs
-cd ../..
 cd GDJS
 npm install
 npm run generate-doc

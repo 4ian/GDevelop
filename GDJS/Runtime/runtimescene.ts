@@ -710,12 +710,15 @@ namespace gdjs {
           const elapsedTimeInSeconds = elapsedTime / 1000;
           obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
           obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-          obj.update(this);
           this._runtimeGame
             .getObjectEffectsManager()
             .update(obj.getRendererEffects(), obj);
+          obj.update(this);
           obj.updateForces(elapsedTimeInSeconds);
         } else {
+          this._runtimeGame
+            .getObjectEffectsManager()
+            .update(obj.getRendererEffects(), obj);
           obj.update(this);
         }
         obj.updateTimers(elapsedTime);

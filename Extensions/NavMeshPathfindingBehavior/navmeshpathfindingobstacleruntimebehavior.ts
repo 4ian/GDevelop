@@ -25,9 +25,9 @@ namespace gdjs {
      * The navigation meshes by moving object size
      * (rounded on _cellSize)
      */
-    _navMeshes: Map<integer, gdjs.NavMesh> = new Map();
+    _navMeshes: Map<integer, gdjs.NavMeshPathfinding.NavMesh> = new Map();
     /**
-     * Used while NavMeshes update is disable to remember to do the update
+     * Used while NavMeshes update is disabled to remember to do the update
      * when it's enable back.
      */
     _navMeshesAreUpToDate = true;
@@ -35,14 +35,13 @@ namespace gdjs {
      * This allows to continue finding paths with the old NavMeshes while
      * moving obstacles.
      */
-    _navMeshesUpdateIsEnable = true;
+    _navMeshesUpdateIsEnabled = true;
 
     constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._obstacles = new Set();
       const game = runtimeScene.getGame();
 
       const viewpoint = sharedData.viewpoint;
-      //TODO can an id be used instead of the label? Does it work with translations?
       if (viewpoint === 'Isometry 2:1 (26.565°)') {
         this._isometricRatio = 2;
       } else if (viewpoint === 'True Isometry (30°)') {
@@ -93,7 +92,7 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstacles.add(pathfindingObstacleBehavior.owner);
-      //TODO Look for algorithms to update NavMeshes without reprocessing everything.
+      // TODO Look for algorithms to update NavMeshes without reprocessing everything.
       this.invalidateNavMesh();
     }
 
@@ -109,7 +108,7 @@ namespace gdjs {
     }
 
     private invalidateNavMesh() {
-      if (this._navMeshesUpdateIsEnable) {
+      if (this._navMeshesUpdateIsEnabled) {
         this._navMeshes.clear();
         this._navMeshesAreUpToDate = true;
       } else {
@@ -117,33 +116,33 @@ namespace gdjs {
       }
     }
 
-    public setNavMeshesUpdateEnable(navMeshesUpdateIsEnable: boolean) {
-      this._navMeshesUpdateIsEnable = navMeshesUpdateIsEnable;
-      if (navMeshesUpdateIsEnable && !this._navMeshesAreUpToDate) {
+    public setNavMeshesUpdateEnabled(navMeshesUpdateIsEnabled: boolean) {
+      this._navMeshesUpdateIsEnabled = navMeshesUpdateIsEnabled;
+      if (navMeshesUpdateIsEnabled && !this._navMeshesAreUpToDate) {
         this._navMeshes.clear();
         this._navMeshesAreUpToDate = true;
       }
     }
 
-    public static setNavMeshesUpdateEnable(
+    public static setNavMeshesUpdateEnabled(
       runtimeScene: any,
-      navMeshesUpdateIsEnable: boolean
+      navMeshesUpdateIsEnabled: boolean
     ) {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      manager.setNavMeshesUpdateEnable(navMeshesUpdateIsEnable);
+      manager.setNavMeshesUpdateEnabled(navMeshesUpdateIsEnabled);
     }
 
-    public navMeshesUpdateIsEnable() {
-      return this._navMeshesUpdateIsEnable;
+    public navMeshesUpdateIsEnabled() {
+      return this._navMeshesUpdateIsEnabled;
     }
 
-    public static navMeshesUpdateIsEnable(runtimeScene: any) {
+    public static navMeshesUpdateIsEnabled(runtimeScene: any) {
       const manager = NavMeshPathfindingObstaclesManager.getManager(
         runtimeScene
       );
-      return manager.navMeshesUpdateIsEnable();
+      return manager.navMeshesUpdateIsEnabled();
     }
 
     public static setAreaBounds(
@@ -234,10 +233,10 @@ namespace gdjs {
       return this._cellSize;
     }
 
-    getNavMesh(obstacleCellPadding: integer): NavMesh {
+    getNavMesh(obstacleCellPadding: integer): gdjs.NavMeshPathfinding.NavMesh {
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {
-        const grid = new gdjs.RasterizationGrid(
+        const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
           this._areaLeftBound,
           this._areaTopBound,
           this._areaRightBound,
@@ -246,18 +245,26 @@ namespace gdjs {
           // make cells square in the world
           this._cellSize / this._isometricRatio
         );
-        gdjs.ObstacleRasterizer.rasterizeObstacles(grid, this._obstacles);
-        gdjs.RegionGenerator.generateDistanceField(grid);
-        gdjs.RegionGenerator.generateRegions(grid, obstacleCellPadding);
-        //TODO make threshold configurable ?
-        // 1 seems to be a good value.
+        gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+          grid,
+          this._obstacles
+        );
+        gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+        gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(
+          grid,
+          obstacleCellPadding
+        );
+        // TODO make the threshold configurable (see the documentation)
         const threshold = 1;
-        const contours = gdjs.ContourBuilder.buildContours(grid, threshold);
-        const meshField = gdjs.ConvexPolygonGenerator.splitToConvexPolygons(
+        const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+          grid,
+          threshold
+        );
+        const meshField = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
           contours,
           16
         );
-        const scaledMeshField = gdjs.GridCoordinateConverter.convertFromGridBasis(
+        const scaledMeshField = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
           grid,
           meshField
         );
@@ -267,7 +274,7 @@ namespace gdjs {
             point.y *= this._isometricRatio;
           })
         );
-        navMesh = new gdjs.NavMesh(scaledMeshField);
+        navMesh = new gdjs.NavMeshPathfinding.NavMesh(scaledMeshField);
         this._navMeshes.set(obstacleCellPadding, navMesh);
       }
       return navMesh;

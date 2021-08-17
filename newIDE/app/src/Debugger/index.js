@@ -29,6 +29,15 @@ export type ProfilerOutput = {|
   },
 |};
 
+/**
+ * Returns true if a log is a warning or debug log from a library out of our control that we do not want to bother users with.
+ * This is used in Debugger#_handleMessage below to filter out those kinds of messages.
+ */
+const isUnavoidableLibraryWarning = ({ group, message }: Log): boolean =>
+  group === 'JavaScript' &&
+  (message.includes('Electron Security Warning') ||
+    message.includes('Warning: This is a browser-targeted Firebase bundle'));
+
 type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
@@ -217,15 +226,7 @@ export default class Debugger extends React.Component<Props, State> {
       // Nothing to do.
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.
-      if (
-        data.payload.group === 'JavaScript' &&
-        (data.payload.message.includes('Electron Security Warning') ||
-          data.payload.message.includes(
-            'Warning: This is a browser-targeted Firebase bundle'
-          ))
-      )
-        return;
-
+      if (isUnavoidableLibraryWarning(data.payload)) return;
       this.setState(state => ({
         logs: {
           ...state.logs,

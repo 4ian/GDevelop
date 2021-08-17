@@ -112,8 +112,8 @@ import {
   GDevelopGameApi,
 } from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
-import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
-import consoleLogs from '../fixtures/ConsoleTestData.json';
+import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
+import consoleTestData from '../fixtures/ConsoleTestData.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -2620,9 +2620,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
-          logs={consoleLogs}
+          logs={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2639,9 +2639,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
-          logs={consoleLogs}
+          logs={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2679,7 +2679,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
@@ -2691,7 +2691,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
@@ -2702,7 +2702,7 @@ storiesOf('MeasuresTable', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 250 }}>
-      <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
+      <MeasuresTable profilerMeasures={profilerOutputsTestData.framesAverageMeasures} />
     </div>
   ));
 

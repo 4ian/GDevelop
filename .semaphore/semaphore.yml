@@ -21,6 +21,9 @@ blocks:
             - cd GDJS
             - npm i
             - cd ..
+            - cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
+            - cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
+            - cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
     dependencies: []
   - name: Type checks
     dependencies:
@@ -29,12 +32,18 @@ blocks:
       jobs:
         - name: GDJS typing and documentation generation
           commands:
+            - checkout
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
+            - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
             - cd GDJS
             - npm run check-types
             - npm run generate-doc
         - name: newIDE typing
           commands:
+            - checkout
+            - cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
             - cd newIDE/app
+            - npm run postinstall
             - npm run flow
             - cd ../..
   - name: Auto formatting
@@ -44,11 +53,16 @@ blocks:
       jobs:
         - name: newIDE auto-formatting
           commands:
+            - checkout
+            - cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
             - cd newIDE/app
+            - npm run postinstall
             - npm run check-format
             - cd ../..
         - name: GDJS auto-formatting
           commands:
+            - checkout
+            - cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
             - cd GDJS
             - npm run check-format
             - cd ..
@@ -59,11 +73,17 @@ blocks:
       jobs:
         - name: newIDE tests
           commands:
+            - checkout
+            - cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
             - cd newIDE/app
+            - npm run postinstall
             - npm run analyze-test-coverage
             - cd ../..
         - name: GDJS tests
           commands:
+            - checkout
+            - cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
+            - cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
             - cd GDJS
             - npm run test
             - cd ../..

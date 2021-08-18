@@ -13,15 +13,19 @@ namespace gdjs {
     getElapsedTime: (runtimeScene?: RuntimeScene) => number;
     getHeight: () => number;
     getWidth: () => number;
+    isLightingLayer?: () => boolean;
   }
 
-  class PixiObjectEffectsManager {
+  /**
+   * Handle effects (aka PixiJS "filters") on PixiJS objects.
+   */
+  class PixiEffectsManager {
     /**
-     * Initialize the renderer effect from the effect data.
+     * Initialize the renderer effect (PixiJS filter) from the effect data.
      * Call the applyEffect method afterwards, to correctly apply the
      * initialized effects on the object.
      * @param effectData The effect data
-     * @param rendererEffects The renderer effects collection
+     * @param rendererEffects The collection of PixiJS filters
      * @param target The effects target
      */
     initializeEffect(
@@ -34,7 +38,7 @@ namespace gdjs {
       );
       if (!filterCreator) {
         console.log(
-          'Filter "' +
+          'Effect "' +
             effectData.name +
             '" has an unknown effect type: "' +
             effectData.effectType +
@@ -51,12 +55,16 @@ namespace gdjs {
         update: filterCreator.update,
       };
 
+      if (target.isLightingLayer && target.isLightingLayer()) {
+        filter.pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
+      }
+
       rendererEffects[effectData.name] = filter;
       return true;
     }
 
     /**
-     * Apply the effect on the renderer object.
+     * Apply the effect on the PixiJS DisplayObject.
      * Called after the effect is initialized.
      * @param rendererObject The renderer object
      * @param effect The effect to be applied.
@@ -72,7 +80,7 @@ namespace gdjs {
     }
 
     /**
-     * Update the filters applied on an object.
+     * Update the filters applied on a PixiJS DisplayObject.
      * @param runtimeObject
      * @param target
      */
@@ -84,7 +92,7 @@ namespace gdjs {
     }
 
     /**
-     * Add a new effect on a runtime object, or replace the one
+     * Add a new effect on a PixiJS DisplayObject, or replace the one
      * with the same name.
      * @param effectData The effect data
      * @param rendererEffects The renderer effects
@@ -111,8 +119,8 @@ namespace gdjs {
     }
 
     /**
-     * Remove the effect from a runtime object with the specified name
-     * @param rendererEffects The renderer effects of the object.
+     * Remove the effect with the specified name from a PixiJS DisplayObject.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param rendererObject The renderer object.
      * @param effectName The name of the effect.
      */
@@ -132,7 +140,7 @@ namespace gdjs {
 
     /**
      * Update the parameter of an effect (with a number).
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
@@ -151,7 +159,7 @@ namespace gdjs {
 
     /**
      * Update the parameter of an effect (with a string).
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
@@ -170,7 +178,7 @@ namespace gdjs {
 
     /**
      * Enable or disable the parameter of an effect (boolean).
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @param parameterName The parameter name
      * @param value The new value for the parameter
@@ -232,7 +240,7 @@ namespace gdjs {
 
     /**
      * Check if an effect exists.
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @returns True if the effect exists, false otherwise
      */
@@ -242,7 +250,7 @@ namespace gdjs {
 
     /**
      * Enable an effect.
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @param value Set to true to enable, false to disable
      */
@@ -258,7 +266,7 @@ namespace gdjs {
 
     /**
      * Check if an effect is enabled.
-     * @param rendererEffects The renderer effects of the object.
+     * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name
      * @return true if the filter is enabled
      */
@@ -269,6 +277,7 @@ namespace gdjs {
     }
   }
 
-  export const ObjectEffectsManager = PixiObjectEffectsManager;
-  export type ObjectEffectsManager = PixiObjectEffectsManager;
+  // Expose the effect manager to the game engine.
+  export const EffectsManager = PixiEffectsManager;
+  export type EffectsManager = PixiEffectsManager;
 }

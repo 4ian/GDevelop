@@ -104,7 +104,7 @@ namespace gdjs {
       for (let i = 0; i < objectData.effects.length; ++i) {
         this._runtimeScene
           .getGame()
-          .getObjectEffectsManager()
+          .getEffectsManager()
           .initializeEffect(objectData.effects[i], this._rendererEffects, this);
         this.updateAllEffectParameters(objectData.effects[i]);
       }
@@ -133,7 +133,7 @@ namespace gdjs {
       for (const effectName in this._rendererEffects) {
         this._runtimeScene
           .getGame()
-          .getObjectEffectsManager()
+          .getEffectsManager()
           .applyEffect(
             this.getRendererObject(),
             this._rendererEffects[effectName]
@@ -769,7 +769,7 @@ namespace gdjs {
     addEffect(effectData: EffectData): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .addEffect(
           effectData,
           this._rendererEffects,
@@ -785,7 +785,7 @@ namespace gdjs {
     removeEffect(effectName: string): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .removeEffect(
           this._rendererEffects,
           this.getRendererObject(),
@@ -806,7 +806,7 @@ namespace gdjs {
     ): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .setEffectDoubleParameter(
           this._rendererEffects,
           name,
@@ -828,7 +828,7 @@ namespace gdjs {
     ): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .setEffectStringParameter(
           this._rendererEffects,
           name,
@@ -850,7 +850,7 @@ namespace gdjs {
     ): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .setEffectBooleanParameter(
           this._rendererEffects,
           name,
@@ -866,7 +866,7 @@ namespace gdjs {
     updateAllEffectParameters(effectData: EffectData): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .updateAllEffectParameters(this._rendererEffects, effectData);
     }
 
@@ -878,7 +878,7 @@ namespace gdjs {
     enableEffect(name: string, enable: boolean): void {
       this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .enableEffect(this._rendererEffects, name, enable);
     }
 
@@ -890,7 +890,7 @@ namespace gdjs {
     isEffectEnabled(name: string): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .isEffectEnabled(this._rendererEffects, name);
     }
 
@@ -902,7 +902,7 @@ namespace gdjs {
     hasEffect(name: string): boolean {
       return this._runtimeScene
         .getGame()
-        .getObjectEffectsManager()
+        .getEffectsManager()
         .hasEffect(this._rendererEffects, name);
     }
 

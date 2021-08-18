@@ -711,13 +711,13 @@ namespace gdjs {
           obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
           obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
           this._runtimeGame
-            .getObjectEffectsManager()
+            .getEffectsManager()
             .update(obj.getRendererEffects(), obj);
           obj.update(this);
           obj.updateForces(elapsedTimeInSeconds);
         } else {
           this._runtimeGame
-            .getObjectEffectsManager()
+            .getEffectsManager()
             .update(obj.getRendererEffects(), obj);
           obj.update(this);
         }

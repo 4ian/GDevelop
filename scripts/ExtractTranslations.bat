@@ -1,5 +1,5 @@
 @echo off
-echo Listing all GDCore, GDCpp, GDJS and Extensions sources files to translate...
+echo Listing all GDCore, GDJS and Extensions sources files to translate...
 
 dir ..\GDJS\GDJS\*.cpp /L /B /S |find /v /i "\Dialogs\" > %TEMP%\listfile.txt
 dir ..\GDJS\GDJS\*.h /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt

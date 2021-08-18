@@ -11,10 +11,6 @@ cd GDJS\docs
 doxygen > ..\..\scripts\logs\GDJSDoxygenLog.txt  2> ..\..\scripts\logs\GDJSDoxygenWarningLog.txt
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..\..
-cd GDCpp\docs
-doxygen > ..\..\scripts\logs\GDCppDoxygenLog.txt 2> ..\..\scripts\logs\GDCppDoxygenWarningLog.txt
-IF NOT ERRORLEVEL 0 echo "Error during doc generation"
-cd ..\..
 cd GDJS
 npm install
 npm run generate-doc

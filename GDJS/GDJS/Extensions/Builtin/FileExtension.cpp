@@ -47,7 +47,7 @@ FileExtension::FileExtension() {
                  "res/conditions/fichier24.png",
                  "res/conditions/fichier.png")
       .AddParameter("file", _("Filename"))
-      .SetFunctionName("FileExists").SetIncludeFile("GDCpp/Extensions/Builtin/FileTools.h");
+      .SetFunctionName("FileExists");
 
   AddAction("ExecuteCmd",
                  _("Execute a command"),
@@ -57,7 +57,7 @@ FileExtension::FileExtension() {
                  "res/actions/launchFile24.png",
                  "res/actions/launchFile.png")
       .AddParameter("string", _("Command"))
-      .SetFunctionName("ExecuteCmd").SetIncludeFile("GDCpp/Extensions/Builtin/FileTools.h");
+      .SetFunctionName("ExecuteCmd");
   */
 }
 

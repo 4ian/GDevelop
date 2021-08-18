@@ -5,7 +5,8 @@ Copyright (c) 2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 
 void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
@@ -71,32 +72,3 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class SystemInfoCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  SystemInfoCppExtension() {
-    DeclareSystemInfoExtension(*this);
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppSystemInfoExtension() {
-  return new SystemInfoCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new SystemInfoCppExtension;
-}
-#endif

@@ -7,26 +7,16 @@ This project is released under the MIT License.
 
 #include "PlatformerObjectBehavior.h"
 
-#include <SFML/Window.hpp>
-#include <algorithm>
-#include <cmath>
 #include <iostream>
 #include <memory>
-
-#include "GDCore/Tools/Localization.h"
-#include "GDCpp/Runtime/CommonTools.h"
-#include "GDCpp/Runtime/Project/Layout.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-#include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
-#include "PlatformBehavior.h"
-#include "ScenePlatformObjectsManager.h"
-#if defined(GD_IDE_ONLY)
-#include <iostream>
 #include <map>
 
+#include "GDCore/Tools/Localization.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Project/Layout.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
-#endif
+#include "PlatformBehavior.h"
 
 void PlatformerObjectBehavior::InitializeContent(
     gd::SerializerElement& behaviorContent) {

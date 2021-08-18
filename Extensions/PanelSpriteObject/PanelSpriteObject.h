@@ -8,10 +8,7 @@ This project is released under the MIT License.
 #ifndef PANELSPRITEOBJECT_H
 #define PANELSPRITEOBJECT_H
 #include <memory>
-#include "GDCpp/Runtime/Project/Object.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-class SFMLTextureWrapper;
-class RuntimeScene;
+#include "GDCore/Project/Object.h"
 namespace gd {
 class Object;
 class InitialInstance;
@@ -84,77 +81,6 @@ class GD_EXTENSION_API PanelSpriteObject : public gd::Object {
   float bottomMargin;
 
   bool tiled;
-
-  std::shared_ptr<SFMLTextureWrapper> texture;
-};
-
-class GD_EXTENSION_API RuntimePanelSpriteObject : public RuntimeObject {
- public:
-  RuntimePanelSpriteObject(RuntimeScene &scene,
-                           const PanelSpriteObject &panelSpriteObject);
-  virtual ~RuntimePanelSpriteObject(){};
-  virtual std::unique_ptr<RuntimeObject> Clone() const {
-    return gd::make_unique<RuntimePanelSpriteObject>(*this);
-  }
-
-  virtual bool Draw(sf::RenderTarget &renderTarget);
-
-  virtual float GetWidth() const { return width; };
-  virtual float GetHeight() const { return height; };
-
-  virtual inline void SetWidth(float newWidth) {
-    width = newWidth >= (leftMargin + rightMargin) ? newWidth
-                                                   : (leftMargin + rightMargin);
-  };
-  virtual inline void SetHeight(float newHeight) {
-    height = newHeight >= (topMargin + bottomMargin)
-                 ? newHeight
-                 : (topMargin + bottomMargin);
-  };
-
-  virtual bool SetAngle(float newAngle) {
-    angle = newAngle;
-    return true;
-  };
-  virtual float GetAngle() const { return angle; };
-
-  float GetLeftMargin() const { return leftMargin; };
-  void SetLeftMargin(float newMargin) { leftMargin = newMargin; };
-
-  float GetTopMargin() const { return topMargin; };
-  void SetTopMargin(float newMargin) { topMargin = newMargin; };
-
-  float GetRightMargin() const { return rightMargin; };
-  void SetRightMargin(float newMargin) { rightMargin = newMargin; };
-
-  float GetBottomMargin() const { return bottomMargin; };
-  void SetBottomMargin(float newMargin) { bottomMargin = newMargin; };
-
-  void ChangeAndReloadImage(const gd::String &texture,
-                            const RuntimeScene &scene);
-
-  gd::String textureName;
-
-#if defined(GD_IDE_ONLY)
-  virtual void GetPropertyForDebugger(std::size_t propertyNb,
-                                      gd::String &name,
-                                      gd::String &value) const;
-  virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
-  virtual std::size_t GetNumberOfProperties() const;
-#endif
-
- private:
-  float width;
-  float height;
-
-  float leftMargin;
-  float topMargin;
-  float rightMargin;
-  float bottomMargin;
-
-  float angle;
-
-  std::shared_ptr<SFMLTextureWrapper> texture;
 };
 
 #endif  // PANELSPRITEOBJECT_H

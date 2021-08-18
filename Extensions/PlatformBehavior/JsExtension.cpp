@@ -6,6 +6,7 @@ This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 
 #include "GDCore/Tools/Localization.h"
 

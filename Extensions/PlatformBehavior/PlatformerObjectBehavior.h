@@ -9,8 +9,8 @@ This project is released under the MIT License.
 #define PLATFORMEROBJECTBEHAVIOR_H
 #include <map>
 
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 namespace gd {
 class SerializerElement;
 }
@@ -18,7 +18,7 @@ class SerializerElement;
 /**
  * \brief Allows objects to jump and stand on platforms.
  */
-class GD_EXTENSION_API PlatformerObjectBehavior : public Behavior {
+class GD_EXTENSION_API PlatformerObjectBehavior : public gd::Behavior {
  public:
   PlatformerObjectBehavior(){};
   virtual ~PlatformerObjectBehavior(){};

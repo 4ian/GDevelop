@@ -6,8 +6,9 @@ This project is released under the MIT License.
 */
 
 #include "DestroyOutsideBehavior.h"
-#include "DestroyOutsideRuntimeBehavior.h"
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 
 void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
   extension
@@ -66,39 +67,3 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class DestroyOutsideBehaviorCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  DestroyOutsideBehaviorCppExtension() {
-    DeclareDestroyOutsideBehaviorExtension(*this);
-    AddRuntimeBehavior<DestroyOutsideRuntimeBehavior>(
-        GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside"),
-        "DestroyOutsideRuntimeBehavior");
-    GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside")
-        .SetIncludeFile(
-            "DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppDestroyOutsideBehaviorExtension() {
-  return new DestroyOutsideBehaviorCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new DestroyOutsideBehaviorCppExtension;
-}
-#endif

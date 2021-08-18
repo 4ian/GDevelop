@@ -7,8 +7,8 @@ This project is released under the MIT License.
 
 #ifndef PLATFORMBEHAVIOR_H
 #define PLATFORMBEHAVIOR_H
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 class ScenePlatformObjectsManager;
 class RuntimeScene;
 namespace gd {
@@ -27,7 +27,7 @@ class Layout;
  * \brief Behavior that mark object as being a platform for objects using
  * PlatformerObject behavior.
  */
-class GD_EXTENSION_API PlatformBehavior : public Behavior {
+class GD_EXTENSION_API PlatformBehavior : public gd::Behavior {
  public:
   PlatformBehavior(){};
   virtual ~PlatformBehavior(){};

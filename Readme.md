@@ -20,9 +20,8 @@ GDevelop is a full-featured, open-source game development software, allowing to 
 | Directory     | ℹ️ Description                                                                                        |
 | ------------- | ----------------------------------------------------------------------------------------------------- |
 | `Core`        | GDevelop core library, containing common tools to implement the IDE and work with GDevelop games.     |
-| `GDCpp`       | The C++ game engine, used to build native games (_not used in GDevelop 5_).                           |
 | `GDJS`        | The game engine, written in TypeScript, using PixiJS (WebGL), powering all GDevelop games.            |
-| `GDevelop.js` | Bindings of `Core`/`GDCpp`/`GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE. |
+| `GDevelop.js` | Bindings of `Core`, `GDJS` and `Extensions` to JavaScript (with WebAssembly), used by the IDE.        |
 | `newIDE`      | The game editor, written in JavaScript with React, Electron and PixiJS.                               |
 | `Extensions`  | Extensions for the game engine, providing objects, behaviors, events and new features.                |
 
@@ -30,7 +29,7 @@ To learn more about GDevelop Architecture, read the [architecture overview here]
 
 Pre-generated documentation of the Core library, C++ and TypeScript game engines is [available here](https://docs.gdevelop-app.com).
 
-Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Quick tests status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/shields_badge.svg)](https://semaphoreci.com/4ian/gd) [![All tests status](https://www.travis-ci.com/4ian/GDevelop.svg?branch=master)](https://www.travis-ci.com/github/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
+Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Fast tests status](https://gdevelop.semaphoreci.com/badges/GDevelop/branches/master.svg?style=shields)](https://gdevelop.semaphoreci.com/projects/GDevelop) [![All tests status](https://www.travis-ci.com/4ian/GDevelop.svg?branch=master)](https://www.travis-ci.com/github/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
 ## Links
 
@@ -57,9 +56,9 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 
 ## License
 
--   The Core library, the native and HTML5 game engines, the IDE, and all extensions (respectively `Core`, `GDCpp`, `GDJS`, `newIDE` and `Extensions` folders) are under the **MIT license**.
+-   The Core library, the native and HTML5 game engines, the IDE, and all extensions (respectively `Core`, `GDJS`, `newIDE` and `Extensions` folders) are under the **MIT license**.
 -   The name, GDevelop, and its logo are the exclusive property of Florian Rival.
 
-Games exported with GDevelop are based on the native and/or HTML5 game engines (see `Core`, `GDCpp` and `GDJS` folders): these engines are distributed under the MIT license so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open source.
+Games exported with GDevelop are based on the HTML5 game engine (see `Core` and `GDJS` folders): this engine is distributed under the MIT license so that you can **distribute, sell or do anything** with the games you created with GDevelop. In particular, you are not forced to make your game open-source.
 
 [node.js]: https://nodejs.org

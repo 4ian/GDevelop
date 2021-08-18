@@ -634,6 +634,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
+  InsertUnique(includesFiles, "events-tools/variabletools.js");
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");

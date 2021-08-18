@@ -6,6 +6,8 @@ import Dialog from '../UI/Dialog';
 import EventsBasedBehaviorEditor from './index';
 import HelpButton from '../UI/HelpButton';
 
+const gd: libGDevelop = global.gd;
+
 type Props = {|
   onApply: () => void,
   project: gdProject,
@@ -26,9 +28,14 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
       project,
     } = this.props;
 
+    const onApplyAndFixIssues = () => {
+      onApply();
+      fillRequiredBehaviorProperties(this.props.project);
+    };
+
     return (
       <Dialog
-        onApply={onApply}
+        onApply={onApplyAndFixIssues}
         noMargin
         secondaryActions={[
           <HelpButton
@@ -41,13 +48,13 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
             label={<Trans>Apply</Trans>}
             primary
             keyboardFocused
-            onClick={onApply}
+            onClick={onApplyAndFixIssues}
             key={'Apply'}
           />,
         ]}
         cannotBeDismissed={true}
         open
-        onRequestClose={onApply}
+        onRequestClose={onApplyAndFixIssues}
         title={<Trans>Edit the behavior</Trans>}
       >
         <EventsBasedBehaviorEditor
@@ -68,3 +75,37 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
     );
   }
 }
+
+/**
+ * Try to find a default value for any required behavior property that is set
+ * with an invalid value.
+ * @param {*} project
+ */
+const fillRequiredBehaviorProperties = (project: gdProject): void => {
+  const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
+    project
+  );
+  for (let index = 0; index < problems.size(); index++) {
+    const problem = problems.at(index);
+
+    const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
+      problem.getSourceObject(),
+      problem.getExpectedBehaviorTypeName()
+    ).toJSArray();
+
+    if (suggestedBehaviorNames.length > 0) {
+      // There is a matching behavior on the object use it by default.
+      const behaviorContent = problem.getSourceBehaviorContent();
+      const behavior = gd.MetadataProvider.getBehaviorMetadata(
+        project.getCurrentPlatform(),
+        behaviorContent.getTypeName()
+      ).get();
+      behavior.updateProperty(
+        behaviorContent.getContent(),
+        problem.getSourcePropertyName(),
+        // It's unlikely the object has 2 behaviors of the same type.
+        suggestedBehaviorNames[0]
+      );
+    }
+  }
+};

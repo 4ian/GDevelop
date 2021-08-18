@@ -1209,7 +1209,7 @@ const MainFrame = (props: Props) => {
       autosaveProjectIfNeeded();
 
       // TODO open the Diagnostic Report instead of launching the preview if
-      // there is blocking issues.
+      // there is any blocking issue.
       const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
         currentProject
       );

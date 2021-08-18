@@ -1,0 +1,69 @@
+version: v1.0
+name: Fast tests pipeline (not building GDevelop.js)
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: Install
+    task:
+      jobs:
+        - name: Checkout and install dependencies
+          commands:
+            - checkout
+            - node -v
+            - cd newIDE/app
+            - npm i
+            - cd ../..
+            - cd GDJS/tests
+            - npm i
+            - cd ../..
+            - cd GDJS
+            - npm i
+            - cd ..
+    dependencies: []
+  - name: Type checks
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: GDJS typing and documentation generation
+          commands:
+            - cd GDJS
+            - npm run check-types
+            - npm run generate-doc
+        - name: newIDE typing
+          commands:
+            - cd newIDE/app
+            - npm run flow
+            - cd ../..
+  - name: Auto formatting
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE auto-formatting
+          commands:
+            - cd newIDE/app
+            - npm run check-format
+            - cd ../..
+        - name: GDJS auto-formatting
+          commands:
+            - cd GDJS
+            - npm run check-format
+            - cd ..
+  - name: Tests
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE tests
+          commands:
+            - cd newIDE/app
+            - npm run analyze-test-coverage
+            - cd ../..
+        - name: GDJS tests
+          commands:
+            - cd GDJS
+            - npm run test
+            - cd ../..

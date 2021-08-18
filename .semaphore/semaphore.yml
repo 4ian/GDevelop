@@ -8,22 +8,28 @@ blocks:
   - name: Install
     task:
       jobs:
-        - name: Checkout and install dependencies
+        - name: Install node_modules and cache them
           commands:
             - checkout
             - node -v
-            - cd newIDE/app
-            - npm i
-            - cd ../..
-            - cd GDJS/tests
-            - npm i
-            - cd ../..
-            - cd GDJS
-            - npm i
-            - cd ..
-            - cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
-            - cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
-            - cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
+            - 'if ! [ cache has_key newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) ]; then'
+            - '  cd newIDE/app'
+            - '  npm i'
+            - '  cd ../..'
+            - '  cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules'
+            - fi
+            - 'if ! [ cache has_key GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) ]; then'
+            - '  cd GDJS'
+            - '  npm i'
+            - '  cd ..'
+            - '  cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules'
+            - fi
+            - 'if ! [ cache has_key GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) ]; then'
+            - '  cd GDJS/tests'
+            - '  npm i'
+            - '  cd ../..'
+            - '  cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules'
+            - fi
     dependencies: []
   - name: Type checks
     dependencies:
@@ -88,5 +94,6 @@ blocks:
             - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
             - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
             - cd GDJS
+            - npm run build
             - npm run test
             - cd ../..

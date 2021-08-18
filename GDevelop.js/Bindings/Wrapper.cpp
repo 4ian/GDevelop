@@ -43,6 +43,7 @@
 #include <GDCore/IDE/Project/ResourcesMergingHelper.h>
 #include <GDCore/IDE/Project/ResourcesRenamer.h>
 #include <GDCore/IDE/WholeProjectRefactorer.h>
+#include <GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h>
 #include <GDCore/Project/Behavior.h>
 #include <GDCore/Project/Effect.h>
 #include <GDCore/Project/EventsBasedBehavior.h>
@@ -411,6 +412,7 @@ typedef std::map<gd::String, gd::SerializerValue> MapStringSerializerValue;
 typedef std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement>>>
     VectorPairStringSharedPtrSerializerElement;
 typedef std::shared_ptr<SerializerElement> SharedPtrSerializerElement;
+typedef std::vector<UnfilledRequiredBehaviorPropertyProblem> VectorUnfilledRequiredBehaviorPropertyProblem;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;
@@ -425,6 +427,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
+
 
 // Customize some functions implementation thanks to WRAPPED_* macros
 // The original names will be reconstructed in the js file (see postjs.js)
@@ -551,6 +554,10 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   AddBehaviorAndRequiredBehaviors
 #define STATIC_FindDependentBehaviorNames \
   FindDependentBehaviorNames
+#define STATIC_FindInvalidRequiredBehaviorProperties \
+  FindInvalidRequiredBehaviorProperties
+#define STATIC_GetBehaviorsWithType \
+  GetBehaviorsWithType
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty

@@ -24,6 +24,7 @@ class ArbitraryEventsWorkerWithContext;
 class Behavior;
 class BehaviorContent;
 class BehaviorMetadata;
+class UnfilledRequiredBehaviorPropertyProblem;
 }  // namespace gd
 
 namespace gd {
@@ -168,9 +169,15 @@ class GD_CORE_API WholeProjectRefactorer {
    * directly or indirectly.
    */
   static std::vector<gd::String> FindDependentBehaviorNames(
-    gd::Project& project,
-    gd::Object& object,
+    const gd::Project& project,
+    const gd::Object& object,
     const gd::String& behaviorName);
+
+  static std::vector<gd::String> GetBehaviorsWithType(
+      const gd::Object& object, const gd::String& type);
+
+  static std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> FindInvalidRequiredBehaviorProperties(
+    gd::Project& project);
 
   /**
    * \brief Refactor the project **before** a behavior is renamed.
@@ -292,12 +299,9 @@ class GD_CORE_API WholeProjectRefactorer {
                                const gd::String& oldBehaviorType,
                                const gd::String& newBehaviorType);
 
-  static const std::vector<gd::BehaviorContent> GetBehaviorsWithType(
-      const gd::Object& object, const gd::String& type);
-
   static void FindDependentBehaviorNames(
-    gd::Project& project,
-    gd::Object& object,
+    const gd::Project& project,
+    const gd::Object& object,
     const gd::String& behaviorName,
     std::unordered_set<gd::String>& dependentBehaviorNames);
 

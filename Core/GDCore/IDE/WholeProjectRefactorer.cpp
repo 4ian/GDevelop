@@ -9,6 +9,7 @@
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
@@ -570,7 +571,7 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
         defaultBehaviorName = &requiredBehaviorName;
       }
       else {
-          defaultBehaviorName = &behaviorContents.at(0).GetName();
+          defaultBehaviorName = &behaviorContents.at(0);
       }
       behavior.UpdateProperty(
           behaviorContent.GetContent(),
@@ -580,22 +581,22 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
   }
 }
 
-const std::vector<gd::BehaviorContent> WholeProjectRefactorer::GetBehaviorsWithType(
+std::vector<gd::String> WholeProjectRefactorer::GetBehaviorsWithType(
     const gd::Object& object, const gd::String& type) {
-  std::vector<gd::BehaviorContent> behaviors;
+  std::vector<gd::String> behaviors;
   for (auto& behaviorName : object.GetAllBehaviorNames()) {
     const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(behaviorName);
     if (behaviorContent.GetTypeName() == type) {
-        behaviors.push_back(behaviorContent);
+        behaviors.push_back(behaviorName);
     }
   }
   return behaviors;
 }
 
 std::vector<gd::String> WholeProjectRefactorer::FindDependentBehaviorNames(
-    gd::Project& project,
-    gd::Object& object,
+    const gd::Project& project,
+    const gd::Object& object,
     const gd::String& behaviorName) {
       std::unordered_set<gd::String> dependentBehaviorNames;
       WholeProjectRefactorer::FindDependentBehaviorNames(
@@ -611,13 +612,13 @@ std::vector<gd::String> WholeProjectRefactorer::FindDependentBehaviorNames(
 }
 
 void WholeProjectRefactorer::FindDependentBehaviorNames(
-    gd::Project& project,
-    gd::Object& object,
+    const gd::Project& project,
+    const gd::Object& object,
     const gd::String& behaviorName,
     std::unordered_set<gd::String>& dependentBehaviorNames) {
   const gd::Platform& platform = project.GetCurrentPlatform();
   for (auto const& objectBehaviorName : object.GetAllBehaviorNames()) {
-    gd::BehaviorContent& behaviorContent =
+    const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(objectBehaviorName);
     gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
       platform, behaviorContent.GetTypeName()).Get();
@@ -626,22 +627,69 @@ void WholeProjectRefactorer::FindDependentBehaviorNames(
       const gd::String& propertyName = keyValue.first;
       const gd::PropertyDescriptor& property = keyValue.second;
       if (
-        property.GetType().LowerCase() == "behavior" &&
-        property.GetValue() == behaviorName
-      ) {
-        if (dependentBehaviorNames.find(objectBehaviorName) ==
-            dependentBehaviorNames.end()) {
-          dependentBehaviorNames.insert(objectBehaviorName);
-          WholeProjectRefactorer::FindDependentBehaviorNames(
-              project,
-              object,
-              objectBehaviorName,
-              dependentBehaviorNames);
-        }
+          property.GetType().LowerCase() == "behavior" &&
+          property.GetValue() == behaviorName &&
+          dependentBehaviorNames.find(objectBehaviorName) ==
+              dependentBehaviorNames.end()) {
+        dependentBehaviorNames.insert(objectBehaviorName);
+        WholeProjectRefactorer::FindDependentBehaviorNames(
+            project,
+            object,
+            objectBehaviorName,
+            dependentBehaviorNames);
       }
     }
   }
 };
+
+std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+    gd::Project& project) {
+
+  std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> invalidRequiredBehaviorProperties;
+  auto findInvalidRequiredBehaviorPropertiesInObjects =
+      [&project, &invalidRequiredBehaviorProperties](
+          std::vector<std::unique_ptr<gd::Object> >& objectsList) {
+        for (auto& object : objectsList) {
+          for (auto& behaviorContentKeyValuePair : object->GetAllBehaviorContents()) {
+            gd::BehaviorContent& behaviorContent = *behaviorContentKeyValuePair.second;
+            gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
+                project.GetCurrentPlatform(), behaviorContent.GetTypeName()).Get();
+            for (auto const& keyValue :
+                behavior.GetProperties(behaviorContent.GetContent())) {
+              const gd::String& propertyName = keyValue.first;
+              const gd::PropertyDescriptor& property = keyValue.second;
+              if (
+                property.GetType().LowerCase() != "behavior"
+              ) {
+                continue;
+              }
+              const gd::String& requiredBehaviorName = property.GetValue();
+              const std::vector<gd::String>& extraInfo = property.GetExtraInfo();
+              if (extraInfo.size() == 0) {
+                // very unlikely
+                continue;
+              }
+              const gd::String& requiredBehaviorType = extraInfo.at(0);
+
+              if (requiredBehaviorName == "" || object->GetBehavior(requiredBehaviorName).GetTypeName() != requiredBehaviorType) {
+                auto problem = UnfilledRequiredBehaviorPropertyProblem(project, *object.get(), behaviorContent, propertyName, requiredBehaviorType);
+                invalidRequiredBehaviorProperties.push_back(problem);
+              }
+            }
+          }
+        }
+      };
+
+  // Find in global objects
+  findInvalidRequiredBehaviorPropertiesInObjects(project.GetObjects());
+
+  // Find in layout objects and layout behavior shared data.
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    gd::Layout& layout = project.GetLayout(i);
+    findInvalidRequiredBehaviorPropertiesInObjects(layout.GetObjects());
+  }
+  return invalidRequiredBehaviorProperties;
+}
 
 void WholeProjectRefactorer::RenameEventsBasedBehavior(
     gd::Project& project,

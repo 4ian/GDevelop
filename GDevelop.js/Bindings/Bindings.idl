@@ -1875,6 +1875,19 @@ interface EventsRefactorer {
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings);
 };
 
+interface UnfilledRequiredBehaviorPropertyProblem {
+  [Ref] Project GetSourceProject();
+  [Ref] gdObject GetSourceObject();
+  [Ref] BehaviorContent GetSourceBehaviorContent();
+  [Const, Ref] DOMString GetSourcePropertyName();
+  [Const, Ref] DOMString GetExpectedBehaviorTypeName();
+};
+
+interface VectorUnfilledRequiredBehaviorPropertyProblem {
+    unsigned long size();
+    [Const, Ref] UnfilledRequiredBehaviorPropertyProblem at(unsigned long index);
+};
+
 interface WholeProjectRefactorer {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
     void STATIC_RenameEventsFunctionsExtension(
@@ -1926,7 +1939,9 @@ interface WholeProjectRefactorer {
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_AddBehaviorAndRequiredBehaviors([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorType, [Const] DOMString behaviorName);
-    [Value] VectorString STATIC_FindDependentBehaviorNames([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorName);
+    [Value] VectorString STATIC_FindDependentBehaviorNames([Const, Ref] Project project, [Const, Ref] gdObject obj, [Const] DOMString behaviorName);
+    [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Ref] Project project);
+    [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
 };
 
 interface UsedExtensionsFinder {

@@ -1208,6 +1208,33 @@ const MainFrame = (props: Props) => {
 
       autosaveProjectIfNeeded();
 
+      // TODO open the Diagnostic Report instead of launching the preview if
+      // there is blocking issues.
+      const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
+        currentProject
+      );
+      for (let index = 0; index < problems.size(); index++) {
+        const problem = problems.at(index);
+
+        const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
+          problem.getSourceObject(),
+          problem.getExpectedBehaviorTypeName()
+        ).toJSArray();
+
+        console.error(
+          'Invalid required behavior properties value for: ' +
+            problem.getSourceObject().getName() +
+            '.' +
+            problem.getSourceBehaviorContent().getName() +
+            '.' +
+            problem.getSourcePropertyName() +
+            ' a ' +
+            problem.getExpectedBehaviorTypeName() +
+            ' is expected. Possible values are: ' +
+            suggestedBehaviorNames.join(', ')
+        );
+      }
+
       eventsFunctionsExtensionsState
         .ensureLoadFinished()
         .then(() =>

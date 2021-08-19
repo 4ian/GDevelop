@@ -19,6 +19,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object.setPosition(15, 20);
 
@@ -31,6 +32,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object.setPosition(15, 20);
 
@@ -43,6 +45,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object.setCustomWidthAndHeight(10, 20);
 
@@ -84,6 +87,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object1.setCustomWidthAndHeight(10, 20);
     object1.setCustomCenter(0, 0);
@@ -93,6 +97,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object2.setCustomWidthAndHeight(10, 20);
     object2.setCustomCenter(0, 0);
@@ -152,6 +157,7 @@
       type: '',
       variables: [],
       behaviors: [],
+      effects: [],
     });
     object1.setCustomWidthAndHeight(10, 20);
     object1.setCustomCenter(10, 10);

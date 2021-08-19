@@ -344,7 +344,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetObjectVariableAsBoolean",
                 _("Boolean value of an object variable"),
                 _("Change the boolean value of an object variable."),
-                _("Set the boolean value of the variable _PARAM1_ of object "
+                _("Set the boolean value of variable _PARAM1_ of "
                   "_PARAM0_ to _PARAM2_"),
                 _("Variables"),
                 "res/actions/var24.png",
@@ -360,7 +360,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Toggles the boolean value of an object variable.") + "\n" +
              _("If it was true, it will become false, and if it was false "
                "it will become true."),
-         _("Toggle the boolean value of the variable _PARAM1_ of object "
+         _("Toggle the boolean value of variable _PARAM1_ of "
            "_PARAM0_"),
          _("Variables"),
          "res/actions/var24.png",

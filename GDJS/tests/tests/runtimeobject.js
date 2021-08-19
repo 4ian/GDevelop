@@ -4,7 +4,7 @@
  * See README.md for more information.
  */
 
-describe('gdjs.RuntimeObject', () => {
+ describe('gdjs.RuntimeObject', () => {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     // @ts-ignore TODO: make a function to create an empty game and use it across tests.
@@ -17,6 +17,7 @@ describe('gdjs.RuntimeObject', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object.setPosition(15, 20);
@@ -28,6 +29,7 @@ describe('gdjs.RuntimeObject', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object.setPosition(15, 20);
@@ -39,6 +41,7 @@ describe('gdjs.RuntimeObject', () => {
     const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object.setCustomWidthAndHeight(10, 20);
@@ -79,6 +82,7 @@ describe('gdjs.RuntimeObject', () => {
     const object1 = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object1.setCustomWidthAndHeight(10, 20);
@@ -87,6 +91,7 @@ describe('gdjs.RuntimeObject', () => {
     const object2 = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object2.setCustomWidthAndHeight(10, 20);
@@ -145,6 +150,7 @@ describe('gdjs.RuntimeObject', () => {
     const object1 = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
+      variables: [],
       behaviors: [],
     });
     object1.setCustomWidthAndHeight(10, 20);

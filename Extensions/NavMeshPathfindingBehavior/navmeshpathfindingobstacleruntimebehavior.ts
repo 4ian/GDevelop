@@ -92,7 +92,6 @@ namespace gdjs {
       pathfindingObstacleBehavior: NavMeshPathfindingObstacleRuntimeBehavior
     ) {
       this._obstacles.add(pathfindingObstacleBehavior.owner);
-      // TODO Look for algorithms to update NavMeshes without reprocessing everything.
       this.invalidateNavMesh();
     }
 
@@ -254,7 +253,11 @@ namespace gdjs {
           grid,
           obstacleCellPadding
         );
-        // TODO make the threshold configurable (see the documentation)
+        // It's probably not a good idea to expose the vectorization threshold.
+        // As stated in the parameter documentation, the value 1 gives good
+        // results in any situations.
+        // Moreover, this property would be hard to explain to users and
+        // some legit values could make the behavior appear buggy.
         const threshold = 1;
         const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
           grid,

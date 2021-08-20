@@ -265,16 +265,6 @@ namespace gdjs {
      * Compute and move on the path to the specified destination.
      */
     moveTo(runtimeScene: gdjs.RuntimeScene, x: float, y: float) {
-      // TODO Add a non-blocking padding property to make the path farther from the obstacle if possible?
-      // It may need to have several contour lines with a one cell increment
-      // and do a dichotomy like this:
-      // * find path with obstacleCellPaddingMax (infinity if not found)
-      // * find path with obstacleCellPaddingMin
-      // * path length delta < detourMax ?
-      //   * yes: take PaddingMax path
-      //   * no: do the dichotomy
-      // The contour lines may be needed if there is objects of different size anyway.
-
       let radiusSqMax = 0;
       if (this._collisionShape !== 'Dot at center') {
         const centerX = this.owner.getCenterXInScene();
@@ -302,10 +292,6 @@ namespace gdjs {
       this._lastUsedObstacleCellPadding = obstacleCellPadding;
       const navMesh = this._manager.getNavMesh(obstacleCellPadding);
 
-      // TODO The pathfinding could use something like RBush to look for
-      // the the polygons at start and target locations.
-      // TODO If the target is not on the mesh, find the nearest position
-      // maybe the same with the origin to avoid to be stuck.
       const path = navMesh.findPath(
         {
           x: this.owner.getX(),

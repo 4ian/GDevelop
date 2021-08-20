@@ -164,19 +164,17 @@ class ExporterHelper {
                               gd::String exportDir);
 
   /**
-   * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.
+   * \brief Add libraries files from Pixi.js to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
-                      bool cocosRenderers,
                       bool websocketDebuggerClient,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 
   /**
-   * \brief Remove include files that are Pixi or Cocos2d renderers.
+   * \brief Remove include files that are Pixi renderers.
    */
   void RemoveIncludes(bool pixiRenderers,
-                      bool cocosRenderers,
                       std::vector<gd::String> &includesFiles);
 
   /**
@@ -291,14 +289,6 @@ class ExporterHelper {
   bool ExportCordovaFiles(const gd::Project &project,
                           gd::String exportDir,
                           std::set<gd::String> usedExtensions);
-
-  /**
-   * \brief Generate the base Cocos2d files.
-   */
-  bool ExportCocos2dFiles(const gd::Project &project,
-                          gd::String exportDir,
-                          bool debugMode,
-                          const std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Generate the Electron files for packaging and save it to the export

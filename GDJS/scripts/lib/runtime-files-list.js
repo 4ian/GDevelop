@@ -24,7 +24,6 @@ const untransformedPaths = [
   // GDJS prebuilt files:
   'GDJS/Runtime/pixi-renderers/pixi.js',
   'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
-  'GDJS/Runtime/Cocos2d',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',
   'GDJS/Runtime/FacebookInstantGames',

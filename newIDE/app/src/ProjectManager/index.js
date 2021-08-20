@@ -341,14 +341,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     if (
       nextState.projectPropertiesDialogOpen !==
-      this.state.projectPropertiesDialogOpen
-    )
-      return true;
-    if (
+        this.state.projectPropertiesDialogOpen ||
       nextState.projectVariablesEditorOpen !==
-      this.state.projectVariablesEditorOpen
+        this.state.projectVariablesEditorOpen ||
+      nextState.extensionsSearchDialogOpen !==
+        this.state.extensionsSearchDialogOpen
     )
       return true;
+
     // Rendering the component is (super) costly (~20ms) as it iterates over
     // every project layouts/external layouts/external events,
     // so the prop freezeUpdate allow to ask the component to stop
@@ -382,6 +382,10 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({
       projectVariablesEditorOpen: true,
     });
+  };
+
+  _openSearchExtensionDialog = () => {
+    this.setState({ extensionsSearchDialogOpen: true });
   };
 
   _onEditName = (kind: ?string, name: string) => {
@@ -799,6 +803,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           onOpenPlatformSpecificAssetsDialog={
             this.props.onOpenPlatformSpecificAssets
           }
+          onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
         />
         <List style={styles.list}>
           {this._renderMenu()}
@@ -1143,9 +1148,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   <SearchListItem
                     key={'extensions-search'}
                     primaryText={<Trans>Search for new extensions</Trans>}
-                    onClick={() =>
-                      this.setState({ extensionsSearchDialogOpen: true })
-                    }
+                    onClick={this._openSearchExtensionDialog}
                   />
                 )
             }

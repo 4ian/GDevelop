@@ -23,6 +23,7 @@ export type CommandName =
   | 'OPEN_PROJECT_VARIABLES'
   | 'OPEN_PLATFORM_SPECIFIC_ASSETS_DIALOG'
   | 'OPEN_PROJECT_RESOURCES'
+  | 'OPEN_SEARCH_EXTENSIONS_DIALOG'
   | 'OPEN_LAYOUT'
   | 'OPEN_EXTERNAL_EVENTS'
   | 'OPEN_EXTERNAL_LAYOUT'
@@ -172,6 +173,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
   OPEN_PROJECT_RESOURCES: {
     area: 'PROJECT',
     displayText: t`Open project resources`,
+  },
+  OPEN_SEARCH_EXTENSIONS_DIALOG: {
+    area: 'PROJECT',
+    displayText: t`Search/import extensions`,
   },
 
   // Tab-opening commands

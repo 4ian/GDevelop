@@ -56,6 +56,38 @@ type State = {|
   buildsDialogOpen: boolean,
 |};
 
+type ExportButtonProps = {|
+  showExperimental: boolean,
+  onClick: (value: boolean) => void,
+  disabled: boolean,
+|};
+
+const ExportButton = (props: ExportButtonProps) => {
+  const { showExperimental, onClick, disabled } = props;
+  return (
+    <>
+      {!disabled && !showExperimental && (
+        <FlatButton
+          key="toggle-experimental"
+          icon={<Visibility />}
+          primary={false}
+          onClick={() => onClick(true)}
+          label={<Trans>Show experimental exports</Trans>}
+        />
+      )}
+      {!disabled && showExperimental && (
+        <FlatButton
+          key="toggle-experimental"
+          icon={<VisibilityOff />}
+          primary={false}
+          onClick={() => onClick(false)}
+          label={<Trans>Hide experimental exports</Trans>}
+        />
+      )}
+    </>
+  );
+};
+
 export default class ExportDialog extends React.Component<Props, State> {
   state = {
     chosenExporterKey: '',
@@ -211,23 +243,11 @@ export default class ExportDialog extends React.Component<Props, State> {
                             )}
                       </List>
                       <Line justifyContent="center" alignItems="center">
-                        {!showExperimental ? (
-                          <FlatButton
-                            key="toggle-experimental"
-                            icon={<Visibility />}
-                            primary={false}
-                            onClick={() => this._showExperimental(true)}
-                            label={<Trans>Show experimental exports</Trans>}
-                          />
-                        ) : (
-                          <FlatButton
-                            key="toggle-experimental"
-                            icon={<VisibilityOff />}
-                            primary={false}
-                            onClick={() => this._showExperimental(false)}
-                            label={<Trans>Hide experimental exports</Trans>}
-                          />
-                        )}
+                        <ExportButton
+                          showExperimental={showExperimental}
+                          onClick={value => this._showExperimental(value)}
+                          disabled
+                        />
                       </Line>
                     </React.Fragment>
                   )}

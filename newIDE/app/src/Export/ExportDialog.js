@@ -56,13 +56,13 @@ type State = {|
   buildsDialogOpen: boolean,
 |};
 
-type ExportButtonProps = {|
+type ExperimentalExportButtonProps = {|
   showExperimental: boolean,
   onClick: (value: boolean) => void,
   disabled: boolean,
 |};
 
-const ExportButton = (props: ExportButtonProps) => {
+const ExperimentalExportButton = (props: ExperimentalExportButtonProps) => {
   const { showExperimental, onClick, disabled } = props;
   return (
     <>
@@ -243,7 +243,7 @@ export default class ExportDialog extends React.Component<Props, State> {
                             )}
                       </List>
                       <Line justifyContent="center" alignItems="center">
-                        <ExportButton
+                        <ExperimentalExportButton
                           showExperimental={showExperimental}
                           onClick={value => this._showExperimental(value)}
                           disabled

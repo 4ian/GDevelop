@@ -8,6 +8,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
 
@@ -49,7 +50,8 @@ class GD_CORE_API EffectMetadata {
   };
 
   /**
-   * Set the help path of the effect, relative to the GDevelop documentation root.
+   * Set the help path of the effect, relative to the GDevelop documentation
+   * root.
    */
   EffectMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
@@ -67,6 +69,11 @@ class GD_CORE_API EffectMetadata {
   EffectMetadata& AddIncludeFile(const gd::String& includeFile);
 
   /**
+   * \brief Mark the effect as not working as an object effect.
+   */
+  EffectMetadata& MarkAsNotWorkingForObjects();
+
+  /**
    * \brief Return a reference to the properties of this effect.
    */
   std::map<gd::String, gd::PropertyDescriptor>& GetProperties() {
@@ -81,12 +88,14 @@ class GD_CORE_API EffectMetadata {
   }
 
   /**
-   * \brief Get the help path of the effect, relative to the GDevelop documentation root.
+   * \brief Get the help path of the effect, relative to the GDevelop
+   * documentation root.
    */
   const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
-   * \brief Get the type of the effect (its internal name, like "BlackAndWhite").
+   * \brief Get the type of the effect (its internal name, like
+   * "BlackAndWhite").
    */
   const gd::String& GetType() const { return type; }
 
@@ -107,6 +116,11 @@ class GD_CORE_API EffectMetadata {
     return includeFiles;
   }
 
+  /**
+   * \brief Check if the effect is marked as not working as an object effect.
+   */
+  bool IsMarkedAsNotWorkingForObjects() const { return isMarkedAsNotWorkingForObjects; };
+
  private:
   gd::String extensionNamespace;
   gd::String type;
@@ -114,6 +128,7 @@ class GD_CORE_API EffectMetadata {
   gd::String fullname;
   gd::String description;
   std::vector<gd::String> includeFiles;
+  bool isMarkedAsNotWorkingForObjects;
   std::map<gd::String, gd::PropertyDescriptor> properties;
 };
 

@@ -14,6 +14,7 @@ const addLightObject = (runtimeScene, radius) => {
     type: 'Lighting::LightObject',
     variables: [],
     behaviors: [],
+    effects: [],
     content: {
       radius: radius,
       color: '#b4b4b4',
@@ -41,6 +42,7 @@ const addLightObstacle = (runtimeScene, width, height) => {
         type: 'Lighting::LightObstacleBehavior',
       },
     ],
+    effects: [],
   });
   obstacle.getWidth = function () {
     return width;

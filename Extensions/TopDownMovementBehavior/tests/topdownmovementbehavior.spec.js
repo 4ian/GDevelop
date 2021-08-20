@@ -47,6 +47,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
     const player = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'player',
       type: '',
+      effects: [],
       behaviors: [
         {
           type: 'TopDownMovementBehavior::TopDownMovementBehavior',

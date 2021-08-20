@@ -8,11 +8,12 @@ import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService
 const generateLayoutObjectsOptions = (
   project: gdProject,
   layout: gdLayout,
-  onChoose: (object: gdObject) => void
+  onChoose: (object: gdObject, arg: ?string) => void,
+  onChooseArg: ?string
 ): Array<CommandOption> => {
   return enumerateObjects(project, layout).containerObjectsList.map(item => ({
     text: item.object.getName(),
-    handler: () => onChoose(item.object),
+    handler: () => onChoose(item.object, onChooseArg),
     iconSrc: ObjectsRenderingService.getThumbnail.bind(ObjectsRenderingService)(
       project,
       item.object
@@ -23,7 +24,7 @@ const generateLayoutObjectsOptions = (
 type Props = {|
   project: gdProject,
   layout: gdLayout,
-  onEditObject: (object: gdObject) => void,
+  onEditObject: (object: gdObject, initialTab: ?string) => void,
   onEditObjectVariables: (object: gdObject) => void,
 |};
 
@@ -32,6 +33,27 @@ const useObjectsListCommands = (props: Props) => {
   useCommandWithOptions('EDIT_OBJECT', true, {
     generateOptions: React.useCallback(
       () => generateLayoutObjectsOptions(project, layout, onEditObject),
+      [project, layout, onEditObject]
+    ),
+  });
+
+  useCommandWithOptions('EDIT_OBJECT_BEHAVIORS', true, {
+    generateOptions: React.useCallback(
+      () =>
+        generateLayoutObjectsOptions(
+          project,
+          layout,
+          onEditObject,
+          'behaviors'
+        ),
+      [project, layout, onEditObject]
+    ),
+  });
+
+  useCommandWithOptions('EDIT_OBJECT_EFFECTS', true, {
+    generateOptions: React.useCallback(
+      () =>
+        generateLayoutObjectsOptions(project, layout, onEditObject, 'effects'),
       [project, layout, onEditObject]
     ),
   });

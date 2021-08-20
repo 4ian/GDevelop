@@ -199,6 +199,7 @@
           "type": "Sprite",
           "updateIfNotVisible": false,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "MyBehavior",

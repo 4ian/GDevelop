@@ -77,6 +77,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             ],
           },
         ],
+        effects: [],
         behaviors: [
           {
             type: 'PathfindingBehavior::PathfindingBehavior',
@@ -131,6 +132,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             ],
           },
         ],
+        effects: [],
         behaviors: [
           {
             type: 'PathfindingBehavior::PathfindingObstacleBehavior',

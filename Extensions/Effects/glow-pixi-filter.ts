@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Glow', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const glowFilter = new PIXI.filters.GlowFilter();
       return glowFilter;
     },
-    update: function (filter, layer) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter;
       if (parameterName === 'innerStrength') {

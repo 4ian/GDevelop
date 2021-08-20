@@ -789,6 +789,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Variable tweens",
           "font": "",
           "characterSize": 20,
@@ -811,6 +812,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "TweenBehavior",
@@ -839,6 +841,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Position tweens",
           "font": "",
           "characterSize": 20,
@@ -858,6 +861,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "TweenBehavior",
@@ -909,6 +913,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Position X tweens",
           "font": "",
           "characterSize": 20,
@@ -927,6 +932,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "0",
           "font": "",
           "characterSize": 20,
@@ -956,6 +962,7 @@
               }
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "Sprite",
@@ -997,6 +1004,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Position Y\n tweens",
           "font": "",
           "characterSize": 20,
@@ -1016,6 +1024,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "TweenBehavior",
@@ -1067,6 +1076,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Angle \ntweens",
           "font": "",
           "characterSize": 20,
@@ -1096,6 +1106,7 @@
               }
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "Sprite",
@@ -1137,6 +1148,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Scale tweens",
           "font": "",
           "characterSize": 20,
@@ -1166,6 +1178,7 @@
               }
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "Sprite",
@@ -1207,6 +1220,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Scale-X tweens",
           "font": "",
           "characterSize": 20,
@@ -1236,6 +1250,7 @@
               }
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "Sprite",
@@ -1277,6 +1292,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Scale-Y\ntweens",
           "font": "",
           "characterSize": 20,
@@ -1306,6 +1322,7 @@
               }
             }
           ],
+          "effects": [],
           "animations": [
             {
               "name": "Sprite",
@@ -1347,6 +1364,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Opacity tweens",
           "font": "",
           "characterSize": 20,
@@ -1366,6 +1384,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "TweenBehavior",
@@ -1417,6 +1436,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Pause/resume tweens",
           "font": "",
           "characterSize": 20,
@@ -1430,6 +1450,7 @@
           "name": "PauseResumeTweenSprite",
           "type": "Sprite",
           "updateIfNotVisible": false,
+          "effects": [],
           "variables": [
             {
               "name": "var",
@@ -1487,6 +1508,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Colour tweens",
           "font": "",
           "characterSize": 20,
@@ -1505,6 +1527,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "0",
           "font": "",
           "characterSize": 20,
@@ -1524,6 +1547,7 @@
               "value": "0"
             }
           ],
+          "effects": [],
           "behaviors": [
             {
               "name": "TweenBehavior",
@@ -1575,6 +1599,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Character size",
           "font": "",
           "characterSize": 20,
@@ -1599,6 +1624,7 @@
               "content": {}
             }
           ],
+          "effects": [],
           "string": "Hello world",
           "font": "",
           "characterSize": 20,
@@ -1614,6 +1640,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "Background",
@@ -1652,6 +1679,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "Background_Wip",

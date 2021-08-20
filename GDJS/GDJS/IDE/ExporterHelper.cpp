@@ -672,6 +672,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
     InsertUnique(includesFiles,

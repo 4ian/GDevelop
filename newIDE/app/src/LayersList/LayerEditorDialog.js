@@ -22,7 +22,7 @@ import HotReloadPreviewButton, {
 import HelpButton from '../UI/HelpButton';
 import { Tab, Tabs } from '../UI/Tabs';
 import EffectsList from '../EffectsList';
-import { Spacer } from '../UI/Grid';
+import { Column, Spacer } from '../UI/Grid';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -100,99 +100,104 @@ const LayerEditorDialog = (props: Props) => {
         />,
       ]}
       onRequestClose={onCancelChanges}
+      fullHeight
+      flexBody
     >
-      <Tabs value={currentTab} onChange={setCurrentTab}>
-        <Tab label={<Trans>Properties</Trans>} value="properties" />
-        <Tab label={<Trans>Effects</Trans>} value="effects" />
-      </Tabs>
-      {currentTab === 'properties' && (
-        <ColumnStackLayout>
-          {layer.isLightingLayer() ? (
-            <DismissableAlertMessage
-              kind="info"
-              identifier="lighting-layer-usage"
-            >
-              <Trans>
-                The lighting layer renders an ambient light on the scene. All
-                lights should be placed on this layer so that shadows are
-                properly rendered. By default, the layer follows the base layer
-                camera. Uncheck this if you want to manually move the camera
-                using events.
-              </Trans>
-            </DismissableAlertMessage>
-          ) : null}
-          <Text>
-            There are {instancesCount} instances of objects on this layer.
-          </Text>
-          {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
+      <Column expand noMargin useFullHeight>
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>Properties</Trans>} value="properties" />
+          <Tab label={<Trans>Effects</Trans>} value="effects" />
+        </Tabs>
+        {currentTab === 'properties' && (
+          <ColumnStackLayout>
+            {layer.isLightingLayer() ? (
+              <DismissableAlertMessage
+                kind="info"
+                identifier="lighting-layer-usage"
+              >
+                <Trans>
+                  The lighting layer renders an ambient light on the scene. All
+                  lights should be placed on this layer so that shadows are
+                  properly rendered. By default, the layer follows the base
+                  layer camera. Uncheck this if you want to manually move the
+                  camera using events.
+                </Trans>
+              </DismissableAlertMessage>
+            ) : null}
             <Text>
-              Objects created using events on this layer will be given a "Z
-              order" of {highestZOrder + 1}, so that they appear in front of all
-              objects of this layer. You can change this using the action to
-              change an object Z order, after using an action to create it.
+              There are {instancesCount} instances of objects on this layer.
             </Text>
-          )}
-          <InlineCheckbox
-            label={<Trans>Layer visible</Trans>}
-            checked={layer.getVisibility()}
-            onCheck={(e, checked) => {
-              layer.setVisibility(checked);
-              forceUpdate();
-            }}
-          />
-          {layer.isLightingLayer() ? (
-            <React.Fragment>
-              <Text size="title">
-                <Trans>Lighting settings</Trans>
+            {!props.project.getUseDeprecatedZeroAsDefaultZOrder() && (
+              <Text>
+                Objects created using events on this layer will be given a "Z
+                order" of {highestZOrder + 1}, so that they appear in front of
+                all objects of this layer. You can change this using the action
+                to change an object Z order, after using an action to create it.
               </Text>
-              <InlineCheckbox
-                label={<Trans>Automatically follow the base layer.</Trans>}
-                checked={layer.isFollowingBaseLayerCamera()}
-                onCheck={(e, checked) => {
-                  layer.setFollowBaseLayerCamera(checked);
-                  forceUpdate();
-                }}
-              />
-              <ColorField
-                fullWidth
-                floatingLabelText={<Trans>Ambient light color</Trans>}
-                disableAlpha
-                color={{
-                  r: layer.getAmbientLightColorRed(),
-                  g: layer.getAmbientLightColorGreen(),
-                  b: layer.getAmbientLightColorBlue(),
-                }}
-                onChange={(color: ColorResult) => {
-                  layer.setAmbientLightColor(
-                    color.rgb.r,
-                    color.rgb.g,
-                    color.rgb.b
-                  );
-                  forceUpdate();
-                }}
-              />
-            </React.Fragment>
-          ) : (
-            // Add some space to avoid a dialog to short that would show scrollbars
-            <React.Fragment>
-              <Spacer />
-              <Spacer />
-            </React.Fragment>
-          )}
-        </ColumnStackLayout>
-      )}
-      {currentTab === 'effects' && (
-        <EffectsList
-          project={props.project}
-          resourceSources={props.resourceSources}
-          onChooseResource={props.onChooseResource}
-          resourceExternalEditors={props.resourceExternalEditors}
-          effectsContainer={layer.getEffects()}
-          onEffectsUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
-        />
-      )}
+            )}
+            <InlineCheckbox
+              label={<Trans>Layer visible</Trans>}
+              checked={layer.getVisibility()}
+              onCheck={(e, checked) => {
+                layer.setVisibility(checked);
+                forceUpdate();
+              }}
+            />
+            {layer.isLightingLayer() ? (
+              <React.Fragment>
+                <Text size="title">
+                  <Trans>Lighting settings</Trans>
+                </Text>
+                <InlineCheckbox
+                  label={<Trans>Automatically follow the base layer.</Trans>}
+                  checked={layer.isFollowingBaseLayerCamera()}
+                  onCheck={(e, checked) => {
+                    layer.setFollowBaseLayerCamera(checked);
+                    forceUpdate();
+                  }}
+                />
+                <ColorField
+                  fullWidth
+                  floatingLabelText={<Trans>Ambient light color</Trans>}
+                  disableAlpha
+                  color={{
+                    r: layer.getAmbientLightColorRed(),
+                    g: layer.getAmbientLightColorGreen(),
+                    b: layer.getAmbientLightColorBlue(),
+                  }}
+                  onChange={(color: ColorResult) => {
+                    layer.setAmbientLightColor(
+                      color.rgb.r,
+                      color.rgb.g,
+                      color.rgb.b
+                    );
+                    forceUpdate();
+                  }}
+                />
+              </React.Fragment>
+            ) : (
+              // Add some space to avoid a dialog to short that would show scrollbars
+              <React.Fragment>
+                <Spacer />
+                <Spacer />
+              </React.Fragment>
+            )}
+          </ColumnStackLayout>
+        )}
+        {currentTab === 'effects' && (
+          <EffectsList
+            target="layer"
+            project={props.project}
+            resourceSources={props.resourceSources}
+            onChooseResource={props.onChooseResource}
+            resourceExternalEditors={props.resourceExternalEditors}
+            effectsContainer={layer.getEffects()}
+            onEffectsUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+          />
+        )}
+      </Column>
     </Dialog>
   );
 };

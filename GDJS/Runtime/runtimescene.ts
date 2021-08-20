@@ -509,16 +509,16 @@ namespace gdjs {
         this._profiler.end('callbacks and extensions (post-events)');
       }
       if (this._profiler) {
-        this._profiler.begin('objects (pre-render)');
+        this._profiler.begin('objects (pre-render, effects update)');
       }
       this._updateObjectsPreRender();
       if (this._profiler) {
-        this._profiler.end('objects (pre-render)');
+        this._profiler.end('objects (pre-render, effects update)');
       }
       if (this._profiler) {
         this._profiler.begin('layers (effects update)');
       }
-      this._updateLayers();
+      this._updateLayersPreRender();
       if (this._profiler) {
         this._profiler.end('layers (effects update)');
       }
@@ -577,19 +577,22 @@ namespace gdjs {
       }
     }
 
-    _updateLayers() {
+    /**
+     * Called to update effects of layers before rendering.
+     */
+    _updateLayersPreRender() {
       for (const name in this._layers.items) {
         if (this._layers.items.hasOwnProperty(name)) {
-          /** @type gdjs.Layer */
-          const theLayer: gdjs.Layer = this._layers.items[name];
-          theLayer.update(this);
+          const layer = this._layers.items[name];
+          layer.updatePreRender(this);
         }
       }
     }
 
     /**
      * Called to update visibility of the renderers of objects
-     * rendered on the scene and give a last chance for objects to update before rendering.
+     * rendered on the scene ("culling"), update effects (of visible objects)
+     * and give a last chance for objects to update before rendering.
      *
      * Visibility is set to false if object is hidden, or if
      * object is too far from the camera of its layer ("culling").
@@ -601,8 +604,16 @@ namespace gdjs {
           const object = this._allInstancesList[i];
           const rendererObject = object.getRendererObject();
           if (rendererObject) {
-            object.getRendererObject().visible = !object.isHidden();
+            rendererObject.visible = !object.isHidden();
+
+            // Update effects, only for visible objects.
+            if (rendererObject.visible) {
+              this._runtimeGame
+                .getEffectsManager()
+                .updatePreRender(object.getRendererEffects(), object);
+            }
           }
+
           // Perform pre-render update.
           object.updatePreRender(this);
         }
@@ -613,9 +624,11 @@ namespace gdjs {
         // TODO: For compatibility, pass a scale of `2`,
         // meaning that size of cameras will be multiplied by 2 and so objects
         // will be hidden if they are outside of this *larger* camera area.
-        // Useful for objects not properly reporting their visibility AABB,
+        // This is useful for:
+        // - objects not properly reporting their visibility AABB,
         // (so we have a "safety margin") but these objects should be fixed
         // instead.
+        // - objects having effects rendering outside of their visibility AABB.
         this._updateLayersCameraCoordinates(2);
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
@@ -642,6 +655,14 @@ namespace gdjs {
               rendererObject.visible = true;
             }
           }
+
+          // Update effects, only for visible objects.
+          if (rendererObject.visible) {
+            this._runtimeGame
+              .getEffectsManager()
+              .updatePreRender(object.getRendererEffects(), object);
+          }
+
           // Perform pre-render update.
           object.updatePreRender(this);
         }

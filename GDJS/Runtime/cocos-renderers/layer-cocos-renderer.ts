@@ -140,7 +140,7 @@ namespace gdjs {
       this._cocosLayer.setVisible(visible);
     }
 
-    update(): void {}
+    updatePreRender(): void {}
 
     // Unimplemented
     updateClearColor(): void {}

@@ -34,6 +34,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           canBeGrabbed: true,
         },
       ],
+      effects: [],
     });
     platform.setCustomWidthAndHeight(60, 32);
     runtimeScene.addObject(platform);
@@ -53,6 +54,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           canBeGrabbed: false,
         },
       ],
+      effects: [],
     });
     platform.setCustomWidthAndHeight(60, 32);
     runtimeScene.addObject(platform);
@@ -72,6 +74,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           platformType: 'Ladder',
         },
       ],
+      effects: [],
     });
     ladder.setCustomWidthAndHeight(20, 60);
     runtimeScene.addObject(ladder);
@@ -106,6 +109,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -302,6 +306,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -469,6 +474,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             roundCoordinates: true,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -915,6 +921,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -937,6 +944,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             platformType: 'Jumpthru',
           },
         ],
+        effects: [],
       });
       jumpthru.setCustomWidthAndHeight(60, 5);
       runtimeScene.addObject(jumpthru);
@@ -1051,6 +1059,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -1312,6 +1321,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               slopeMaxAngle: 60,
             },
           ],
+          effects: [],
         });
         object.setCustomWidthAndHeight(10, 20);
         runtimeScene.addObject(object);
@@ -1441,6 +1451,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             slopeMaxAngle: 60,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -1476,6 +1487,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             platformType: 'Platform',
           },
         ],
+        effects: [],
       });
       object2.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object2);
@@ -1599,6 +1611,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             roundCoordinates: true,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);
@@ -1990,6 +2003,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             roundCoordinates: true,
           },
         ],
+        effects: [],
       });
       object.setCustomWidthAndHeight(10, 20);
       runtimeScene.addObject(object);

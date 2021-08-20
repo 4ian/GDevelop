@@ -13,7 +13,6 @@ namespace gdjs {
   export class LayerPixiRenderer {
     _pixiContainer: PIXI.Container;
 
-    _filters: Record<string, gdjs.PixiFiltersTools.Filter> = {};
     _layer: any;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
@@ -83,66 +82,10 @@ namespace gdjs {
       this._pixiContainer.visible = !!visible;
     }
 
-    update(): void {
+    updatePreRender(): void {
       if (this._renderTexture) {
         this._updateRenderTexture();
       }
-      for (const filterName in this._filters) {
-        const filter = this._filters[filterName];
-        filter.update(filter.pixiFilter, this._layer);
-      }
-    }
-
-    /**
-     * Add a new effect, or replace the one with the same name.
-     * @param effectData The data of the effect to add.
-     */
-    addEffect(effectData: EffectData): void {
-      const filterCreator = gdjs.PixiFiltersTools.getFilterCreator(
-        effectData.effectType
-      );
-      if (!filterCreator) {
-        console.log(
-          'Filter "' +
-            effectData.name +
-            '" has an unknown effect type: "' +
-            effectData.effectType +
-            '". Was it registered properly? Is the effect type correct?'
-        );
-        return;
-      }
-
-      const filter: gdjs.PixiFiltersTools.Filter = {
-        pixiFilter: filterCreator.makePIXIFilter(this._layer, effectData),
-        updateDoubleParameter: filterCreator.updateDoubleParameter,
-        updateStringParameter: filterCreator.updateStringParameter,
-        updateBooleanParameter: filterCreator.updateBooleanParameter,
-        update: filterCreator.update,
-      };
-      if (this._isLightingLayer) {
-        filter.pixiFilter.blendMode = PIXI.BLEND_MODES.ADD;
-      }
-      this._pixiContainer.filters = (this._pixiContainer.filters || []).concat(
-        filter.pixiFilter
-      );
-      this._filters[effectData.name] = filter;
-    }
-
-    /**
-     * Remove the effect with the specified name
-     * @param effectName The name of the effect.
-     */
-    removeEffect(effectName: string): void {
-      const filter = this._filters[effectName];
-      if (!filter) {
-        return;
-      }
-      this._pixiContainer.filters = (this._pixiContainer.filters || []).filter(
-        function (pixiFilter) {
-          return pixiFilter !== filter.pixiFilter;
-        }
-      );
-      delete this._filters[effectName];
     }
 
     /**
@@ -186,95 +129,6 @@ namespace gdjs {
      */
     removeRendererObject(child): void {
       this._pixiContainer.removeChild(child);
-    }
-
-    /**
-     * Update the parameter of an effect (with a number).
-     * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
-     */
-    setEffectDoubleParameter(
-      name: string,
-      parameterName: string,
-      value: float
-    ): void {
-      const filter = this._filters[name];
-      if (!filter) {
-        return;
-      }
-      filter.updateDoubleParameter(filter.pixiFilter, parameterName, value);
-    }
-
-    /**
-     * Update the parameter of an effect (with a string).
-     * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
-     */
-    setEffectStringParameter(
-      name: string,
-      parameterName: string,
-      value: string
-    ): void {
-      const filter = this._filters[name];
-      if (!filter) {
-        return;
-      }
-      filter.updateStringParameter(filter.pixiFilter, parameterName, value);
-    }
-
-    /**
-     * Enable or disable the parameter of an effect (boolean).
-     * @param name The effect name
-     * @param parameterName The parameter name
-     * @param value The new value for the parameter
-     */
-    setEffectBooleanParameter(
-      name: string,
-      parameterName: string,
-      value: boolean
-    ): void {
-      const filter = this._filters[name];
-      if (!filter) {
-        return;
-      }
-      filter.updateBooleanParameter(filter.pixiFilter, parameterName, value);
-    }
-
-    /**
-     * Check if an effect exists.
-     * @param name The effect name
-     * @returns True if the effect exists, false otherwise
-     */
-    hasEffect(name: string): boolean {
-      return !!this._filters[name];
-    }
-
-    /**
-     * Enable an effect.
-     * @param name The effect name
-     * @param value Set to true to enable, false to disable
-     */
-    enableEffect(name: string, value: boolean): void {
-      const filter = this._filters[name];
-      if (!filter) {
-        return;
-      }
-      gdjs.PixiFiltersTools.enableEffect(filter, value);
-    }
-
-    /**
-     * Check if an effect is enabled.
-     * @param name The effect name
-     * @return true if the filter is enabled
-     */
-    isEffectEnabled(name: string): boolean {
-      const filter = this._filters[name];
-      if (!filter) {
-        return false;
-      }
-      return gdjs.PixiFiltersTools.isEffectEnabled(filter);
     }
 
     updateClearColor(): void {

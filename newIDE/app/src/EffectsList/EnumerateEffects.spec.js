@@ -5,7 +5,7 @@ import { makeTestProject } from '../fixtures/TestProject';
 const gd: libGDevelop = global.gd;
 
 describe('EnumerateEffects', () => {
-  it('can enumerate effects', () => {
+  it('can enumerate effects for layers', () => {
     makeTestExtensions(gd);
     const { project } = makeTestProject(gd);
     const enumeratedEffectsMetadata = enumerateEffectsMetadata(project);
@@ -14,12 +14,21 @@ describe('EnumerateEffects', () => {
       expect.objectContaining({
         type: 'FakeSepia',
         fullName: 'Fake Sepia Effect',
+        isMarkedAsNotWorkingForObjects: false,
+      })
+    );
+    expect(enumeratedEffectsMetadata).toContainEqual(
+      expect.objectContaining({
+        type: 'FakeSepiaThatWouldWorkOnlyForLayers',
+        fullName: 'Fake Sepia Effect only for layers',
+        isMarkedAsNotWorkingForObjects: true,
       })
     );
     expect(enumeratedEffectsMetadata).toContainEqual(
       expect.objectContaining({
         type: 'FakeNight',
         fullName: 'Fake Night Effect',
+        isMarkedAsNotWorkingForObjects: false,
       })
     );
   });

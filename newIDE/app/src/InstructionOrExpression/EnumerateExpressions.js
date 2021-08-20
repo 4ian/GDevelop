@@ -1,6 +1,4 @@
 // @flow
-import React from 'react';
-import { Trans } from '@lingui/macro';
 import {
   type EnumeratedExpressionMetadata,
   type InstructionOrExpressionScope,
@@ -25,10 +23,10 @@ const getExtensionPrefix = (extension: gdPlatformExtension): string => {
   const allBehaviorsTypes = extension.getBehaviorsTypes();
 
   if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-    return extension.getName() === 'BuiltinObject' ? (
-      <Trans>Common expressions for all objects</Trans>
-    ) : (
-      extension.getFullName() + GROUP_DELIMITER
+    return (
+      (extension.getName() === 'BuiltinObject'
+        ? 'Common expressions for all objects'
+        : extension.getFullName()) + GROUP_DELIMITER
     );
   }
 

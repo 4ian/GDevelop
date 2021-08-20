@@ -3639,6 +3639,18 @@ storiesOf('BehaviorsEditor', module)
         onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
+  ))
+  .add('without any behaviors', () => (
+    <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
+      <BehaviorsEditor
+        project={testProject.project}
+        object={testProject.spriteObjectWithoutBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
+      />
+    </SerializedObjectDisplay>
   ));
 
 storiesOf('VariablesList', module)

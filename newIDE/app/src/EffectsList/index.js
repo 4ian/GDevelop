@@ -10,7 +10,6 @@ import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
-import EmptyMessage from '../UI/EmptyMessage';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
@@ -34,6 +33,7 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import ScrollView from '../UI/ScrollView';
+import { EmptyEffectsPlaceholder } from './EmptyEffectsPlaceholder';
 
 type Props = {|
   project: gdProject,
@@ -113,25 +113,6 @@ export default function EffectsList(props: Props) {
         <Column noMargin expand useFullHeight>
           {effectsContainer.getEffectsCount() !== 0 ? (
             <ScrollView>
-              <Line>
-                <Column>
-                  <DismissableAlertMessage
-                    identifier="effects-usage"
-                    kind="info"
-                  >
-                    <Trans>
-                      Effects can change how layers or objects are rendered on
-                      screen.
-                    </Trans>
-                    <Trans>
-                      After adding an effect, set up its parameters. Launch a
-                      preview to see the result. Using the events and the name
-                      of the effect, you can change the parameters during the
-                      game.
-                    </Trans>
-                  </DismissableAlertMessage>
-                </Column>
-              </Line>
               {effectsContainer.getEffectsCount() > 3 && (
                 <Line>
                   <Column>
@@ -264,9 +245,9 @@ export default function EffectsList(props: Props) {
               })}
             </ScrollView>
           ) : (
-            <EmptyMessage>
-              <Trans>No effects applied.</Trans>
-            </EmptyMessage>
+            <Column noMargin expand justifyContent="center">
+              <EmptyEffectsPlaceholder target={props.target} />
+            </Column>
           )}
           <Column>
             <Line justifyContent="flex-end" expand>

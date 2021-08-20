@@ -9,6 +9,7 @@ export type TestProject = {|
   panelSpriteObject: any,
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
+  spriteObjectWithoutBehaviors: gdSpriteObject,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -74,6 +75,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
+  );
+  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
+    'MySpriteObjectWithoutBehaviors'
   );
 
   {
@@ -150,6 +154,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(panelSpriteObject, 0);
   testLayout.insertObject(spriteObject, 0);
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
+  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -540,6 +545,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     panelSpriteObject,
     spriteObject,
     spriteObjectWithBehaviors,
+    spriteObjectWithoutBehaviors,
     testLayout,
     group1,
     group2,

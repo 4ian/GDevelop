@@ -5,7 +5,7 @@ namespace gdjs {
       const blur = new PIXI.filters.BlurFilter();
       return blur;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       if (
         parameterName !== 'blur' &&

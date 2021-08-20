@@ -6,7 +6,7 @@ namespace gdjs {
       brightness.brightness(1, false);
       return brightness;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       // @ts-ignore - unsure why PIXI.filters is not recognised.
       const brightnessFilter = (filter as unknown) as PIXI.filters.ColorMatrixFilter;

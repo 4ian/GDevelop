@@ -4,7 +4,7 @@ namespace gdjs {
       const rgbSplitFilter = new PIXI.filters.RGBSplitFilter();
       return rgbSplitFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
       if (parameterName === 'redX') {

@@ -6,7 +6,7 @@ namespace gdjs {
       const godrayFilter = new PIXI.filters.GodrayFilter();
       return godrayFilter;
     },
-    update: function (filter, target) {
+    updatePreRender: function (filter, target) {
       if (filter.animationSpeed !== 0) {
         filter.time += (target.getElapsedTime() / 1000) * filter.animationSpeed;
       }

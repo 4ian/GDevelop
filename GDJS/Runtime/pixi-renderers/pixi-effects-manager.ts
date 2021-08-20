@@ -52,7 +52,7 @@ namespace gdjs {
         updateDoubleParameter: filterCreator.updateDoubleParameter,
         updateStringParameter: filterCreator.updateStringParameter,
         updateBooleanParameter: filterCreator.updateBooleanParameter,
-        update: filterCreator.update,
+        updatePreRender: filterCreator.updatePreRender,
       };
 
       if (target.isLightingLayer && target.isLightingLayer()) {
@@ -81,13 +81,16 @@ namespace gdjs {
 
     /**
      * Update the filters applied on a PixiJS DisplayObject.
-     * @param runtimeObject
-     * @param target
+     * This must be called after the events and before the rendering.
+     *
+     * This allows effects to be sure that they are up to date and ready
+     * to render. This is not called on objects that are not rendered on screen
+     * ("culling"). This is always called on layers.
      */
-    update(rendererEffects: RendererEffects, target: EffectsTarget) {
+    updatePreRender(rendererEffects: RendererEffects, target: EffectsTarget) {
       for (const filterName in rendererEffects) {
         const filter = rendererEffects[filterName];
-        filter.update(filter.pixiFilter, target);
+        filter.updatePreRender(filter.pixiFilter, target);
       }
     }
 

@@ -57,11 +57,12 @@ namespace gdjs {
       );
       return filter;
     },
-    // Function called at every frame rendered
-    update: function (filter, layer) {},
-    // If your filter depends on the time, you can get the elapsed time
-    // with `layer.getElapsedTime()`.
-    // You can update the uniforms or other state of the filter.
+    // Function called at every frame, after events and before the frame is rendered.
+    updatePreRender: function (filter, layer) {
+      // If your filter depends on the time, you can get the elapsed time
+      // with `layer.getElapsedTime()`.
+      // You can update the uniforms or other state of the filter.
+    },
     // Function that will be called to update a (number) parameter of the PIXI filter with a new value
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'opacity') {

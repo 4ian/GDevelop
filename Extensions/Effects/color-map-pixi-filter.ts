@@ -17,7 +17,7 @@ namespace gdjs {
       );
       return colorMapFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {

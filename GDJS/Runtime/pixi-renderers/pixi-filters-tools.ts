@@ -90,8 +90,8 @@ namespace gdjs {
     export type FilterCreator = {
       /** Function to call to create the filter */
       makePIXIFilter: (target: EffectsTarget, effectData: EffectData) => any;
-      /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
+      /** The function to be called to update the filter at every frame before the rendering. */
+      updatePreRender: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,
@@ -116,8 +116,8 @@ namespace gdjs {
     export type Filter = {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
-      /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
+      /** The function to be called to update the filter at every frame before the rendering. */
+      updatePreRender: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,

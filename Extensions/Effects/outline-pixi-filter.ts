@@ -4,7 +4,7 @@ namespace gdjs {
       const outlineFilter = new PIXI.filters.OutlineFilter();
       return outlineFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
       if (parameterName === 'thickness') {

@@ -4,7 +4,7 @@ namespace gdjs {
       const bevelFilter = new PIXI.filters.BevelFilter();
       return bevelFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const bevelFilter = (filter as unknown) as PIXI.filters.BevelFilter;
       if (parameterName === 'rotation') {

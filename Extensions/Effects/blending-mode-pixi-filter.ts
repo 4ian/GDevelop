@@ -5,7 +5,7 @@ namespace gdjs {
       const blendingModeFilter = new PIXI.filters.AlphaFilter();
       return blendingModeFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       // @ts-ignore - unsure why PIXI.filters is not recognised.
       const blendingModeFilter = (filter as unknown) as PIXI.filters.AlphaFilter;

@@ -4,7 +4,7 @@ namespace gdjs {
       const bulgePinchFilter = new PIXI.filters.BulgePinchFilter();
       return bulgePinchFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const bulgePinchFilter = (filter as unknown) as PIXI.filters.BulgePinchFilter;
       if (parameterName === 'centerX') {

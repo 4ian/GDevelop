@@ -1089,7 +1089,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the value of a parameter of an effect.") + "\n" +
                   _("You can find the parameter names (and change the effect "
                     "names) in the effects window."),
-                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
@@ -1104,7 +1104,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Change the value (string) of a parameter of an effect.") + "\n" +
                   _("You can find the parameter names (and change the effect "
                     "names) in the effects window."),
-                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM3_ of _PARAM0_"),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
@@ -1132,7 +1132,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddCondition("IsEffectEnabled",
                   _("Effect is enabled"),
                   _("Check if the effect on an object is enabled."),
-                  _("Effect _PARAM2_ on _PARAM1_ is enabled"),
+                  _("Effect _PARAM1_ of _PARAM0_ is enabled"),
                   _("Effects"),
                   "res/actions/effect24.png",
                   "res/actions/effect.png")

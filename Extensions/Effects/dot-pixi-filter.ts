@@ -4,7 +4,7 @@ namespace gdjs {
       const dotFilter = new PIXI.filters.DotFilter();
       return dotFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
       if (parameterName === 'scale') {

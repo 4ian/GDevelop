@@ -31,7 +31,7 @@ namespace gdjs {
       const filter = new gdjs.NightPixiFilter();
       return filter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName !== 'intensity' && parameterName !== 'opacity') {
         return;

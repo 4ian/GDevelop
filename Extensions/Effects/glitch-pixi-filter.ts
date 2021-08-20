@@ -7,7 +7,7 @@ namespace gdjs {
       glitchFilter._animationTimer = 0;
       return glitchFilter;
     },
-    update: function (filter, target) {
+    updatePreRender: function (filter, target) {
       if (filter.animationFrequency !== 0) {
         filter._animationTimer += target.getElapsedTime() / 1000;
         if (filter._animationTimer >= 1 / filter.animationFrequency) {

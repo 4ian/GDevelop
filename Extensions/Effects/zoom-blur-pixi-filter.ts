@@ -4,7 +4,7 @@ namespace gdjs {
       const zoomBlurFilter = new PIXI.filters.ZoomBlurFilter();
       return zoomBlurFilter;
     },
-    update: function (filter, target) {
+    updatePreRender: function (filter, target) {
       const zoomBlurFilter = (filter as unknown) as PIXI.filters.ZoomBlurFilter;
       zoomBlurFilter.center[0] = Math.round(
         // @ts-ignore - extra properties are stored on the filter.

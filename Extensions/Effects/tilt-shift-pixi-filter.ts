@@ -4,7 +4,7 @@ namespace gdjs {
       const tiltShiftFilter = new PIXI.filters.TiltShiftFilter();
       return tiltShiftFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
       if (parameterName === 'blur') {

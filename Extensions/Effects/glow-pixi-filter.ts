@@ -4,7 +4,7 @@ namespace gdjs {
       const glowFilter = new PIXI.filters.GlowFilter();
       return glowFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const glowFilter = (filter as unknown) as PIXI.filters.GlowFilter;
       if (parameterName === 'innerStrength') {

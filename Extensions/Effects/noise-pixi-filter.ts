@@ -5,7 +5,7 @@ namespace gdjs {
       const noiseFilter = new PIXI.filters.NoiseFilter();
       return noiseFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       // @ts-ignore - unsure why PIXI.filters is not recognised.
       const noiseFilter = (filter as unknown) as PIXI.filters.NoiseFilter;

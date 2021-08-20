@@ -6,7 +6,7 @@ namespace gdjs {
       );
       return pixelateFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const pixelateFilter = (filter as unknown) as PIXI.filters.PixelateFilter;
       if (parameterName === 'size') {

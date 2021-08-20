@@ -4,7 +4,7 @@ namespace gdjs {
       const asciiFilter = new PIXI.filters.AsciiFilter();
       return asciiFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const asciiFilter = (filter as unknown) as PIXI.filters.AsciiFilter;
       if (parameterName === 'size') {

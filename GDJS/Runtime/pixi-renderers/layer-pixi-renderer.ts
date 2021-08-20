@@ -82,7 +82,7 @@ namespace gdjs {
       this._pixiContainer.visible = !!visible;
     }
 
-    update(): void {
+    updatePreRender(): void {
       if (this._renderTexture) {
         this._updateRenderTexture();
       }

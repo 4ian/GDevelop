@@ -4,7 +4,7 @@ namespace gdjs {
       const adjustmentFilter = new PIXI.filters.AdjustmentFilter();
       return adjustmentFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const adjustmentFilter = (filter as unknown) as PIXI.filters.AdjustmentFilter;
       if (parameterName === 'gamma') {

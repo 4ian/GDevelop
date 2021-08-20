@@ -7,7 +7,7 @@ namespace gdjs {
       crtFilter._animationTimer = 0;
       return crtFilter;
     },
-    update: function (filter, target) {
+    updatePreRender: function (filter, target) {
       if (filter.animationSpeed !== 0) {
         // Multiply by 10 so that the default value is a sensible speed
         filter.time +=

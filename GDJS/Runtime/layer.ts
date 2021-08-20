@@ -124,14 +124,13 @@ namespace gdjs {
 
     /**
      * Called at each frame, after events are run and before rendering.
-     * @param [runtimeScene] The scene the layer belongs to.
      */
-    update(runtimeScene?: gdjs.RuntimeScene): void {
+    updatePreRender(runtimeScene?: gdjs.RuntimeScene): void {
       if (this._followBaseLayerCamera) {
         this.followBaseLayer();
       }
-      this._renderer.update();
-      this._effectsManager.update(this._rendererEffects, this);
+      this._renderer.updatePreRender();
+      this._effectsManager.updatePreRender(this._rendererEffects, this);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace gdjs {
       const colorReplaceFilter = new PIXI.filters.ColorReplaceFilter();
       return colorReplaceFilter;
     },
-    update: function (filter, target) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
       if (parameterName === 'epsilon') {

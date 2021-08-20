@@ -104,7 +104,13 @@ export class SubscriptionCheckDialog extends React.Component<
         cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
-        title={mode === 'try' ? 'We need your support!' : this.props.title}
+        title={
+          mode === 'try' ? (
+            <Trans>We need your support!</Trans>
+          ) : (
+            this.props.title
+          )
+        }
       >
         <Column noMargin>
           <Line noMargin alignItems="center">

@@ -29,10 +29,7 @@ class TextEntryObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextEntryObject/textentryruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextEntryObject/"
-            "textentryruntimeobject-pixi-renderer.js")
-        .AddIncludeFile(
-            "Extensions/TextEntryObject/"
-            "textentryruntimeobject-cocos-renderer.js");
+            "textentryruntimeobject-pixi-renderer.js");
 
     GetAllActionsForObject(
         "TextEntryObject::TextEntry")["TextEntryObject::String"]

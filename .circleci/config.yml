@@ -17,7 +17,7 @@ jobs:
 
       - run:
           name: Install dependencies for AWS S3 upload
-          command: pip3 install awscli --upgrade --user
+          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
           name: Install Emscripten (for GDevelop.js)

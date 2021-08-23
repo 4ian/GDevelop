@@ -19,6 +19,7 @@ gdjs.getPixiRuntimeGameWithAssets = () => {
       packageName: 'com.gdevelop.integrationtest',
       projectFile: '',
       scaleMode: 'linear',
+      pixelsRounding: false,
       sizeOnStartupMode: 'adaptWidth',
       useExternalSourceFiles: true,
       version: '1.0.0',

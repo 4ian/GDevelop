@@ -471,7 +471,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],
@@ -909,7 +908,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1047,7 +1045,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: maxFallingSpeed,
             acceleration: 500,
@@ -1309,7 +1306,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             {
               type: 'PlatformBehavior::PlatformerObjectBehavior',
               name: 'auto1',
-              roundCoordinates: false,
               gravity: 900,
               maxFallingSpeed: maxFallingSpeed,
               acceleration: 500,
@@ -1439,7 +1435,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1469,7 +1464,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1608,7 +1602,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],
@@ -2000,7 +1993,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],

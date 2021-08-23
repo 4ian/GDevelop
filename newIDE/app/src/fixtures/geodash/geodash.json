@@ -1583,7 +1583,6 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -2967,7 +2966,6 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -4336,7 +4334,6 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -5544,7 +5541,6 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -6752,7 +6748,6 @@
               "jumpSpeed": 1200,
               "maxFallingSpeed": 1000,
               "maxSpeed": 300,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0

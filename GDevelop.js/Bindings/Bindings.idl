@@ -370,6 +370,8 @@ interface Project {
     void SetAdaptGameResolutionAtRuntime(boolean adaptGameResolutionAtRuntime);
     void SetScaleMode([Const] DOMString scaleMode);
     [Const, Ref] DOMString GetScaleMode();
+    void SetPixelsRounding(boolean pixelsRounding);
+    boolean GetPixelsRounding();
     void SetSizeOnStartupMode([Const] DOMString orientation);
     [Const, Ref] DOMString GetSizeOnStartupMode();
     long GetMaximumFPS();

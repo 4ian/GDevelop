@@ -1204,7 +1204,6 @@
               "jumpSpeed": 680,
               "maxFallingSpeed": 700,
               "maxSpeed": 160,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0

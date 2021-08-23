@@ -643,7 +643,6 @@
               "gravity": 600,
               "ignoreDefaultControls": false,
               "jumpSustainTime": 0.2,
-              "roundCoordinates": true,
               "slopeMaxAngle": 60,
               "xGrabTolerance": 10,
               "yGrabOffset": 0

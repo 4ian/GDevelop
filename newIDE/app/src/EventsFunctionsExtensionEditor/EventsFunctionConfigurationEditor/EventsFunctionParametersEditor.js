@@ -93,7 +93,7 @@ type StringSelectorEditorProps = {|
   setExtraInfo: string => void,
 |};
 
-const StringSelectorEditor = ({
+export const StringSelectorEditor = ({
   extraInfo,
   setExtraInfo,
 }: StringSelectorEditorProps) => {

@@ -22,6 +22,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
+import { StringSelectorEditor } from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -222,6 +223,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Boolean"
                                 primaryText={t`Boolean (checkbox)`}
                               />
+                              <SelectOption
+                                value="Choice"
+                                primaryText={t`String from a list of options (text)`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -266,6 +271,15 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                   primaryText={t`False (not checked)`}
                                 />
                               </SelectField>
+                            )}
+                            {property.getType() === 'Choice' && (
+                              <StringSelectorEditor
+                                extraInfo={property.getExtraInfo()}
+                                setExtraInfo={newExtraInfo => {
+                                  property.addExtraInfo(newExtraInfo); //TODO Crash, parsing of data not correct data return is "["New Option"]" 
+                                  this.forceUpdate();
+                                }}
+                              />
                             )}
                           </ResponsiveLineStackLayout>
                           <SemiControlledTextField

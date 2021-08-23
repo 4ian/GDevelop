@@ -2673,7 +2673,6 @@
               "ignoreDefaultControls": false,
               "maxFallingSpeed": 1000,
               "maxSpeed": 250,
-              "roundCoordinates": true,
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -2754,7 +2753,6 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 75,
-              "roundCoordinates": false,
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0
@@ -2917,7 +2915,6 @@
               "jumpSpeed": 600,
               "maxFallingSpeed": 700,
               "maxSpeed": 400,
-              "roundCoordinates": false,
               "slopeMaxAngle": 0,
               "xGrabTolerance": 10,
               "yGrabOffset": 0

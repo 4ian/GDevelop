@@ -9,6 +9,7 @@ export type TestProject = {|
   panelSpriteObject: any,
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
+  spriteObjectWithoutBehaviors: gdSpriteObject,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -29,6 +30,8 @@ export type TestProject = {|
   layerWithEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
+  spriteObjectWithEffects: gdSpriteObject,
+  spriteObjectWithoutEffects: gdSpriteObject,
 |};
 */
 
@@ -72,6 +75,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
+  );
+  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
+    'MySpriteObjectWithoutBehaviors'
   );
 
   {
@@ -148,6 +154,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(panelSpriteObject, 0);
   testLayout.insertObject(spriteObject, 0);
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
+  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -503,6 +510,33 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
+  const spriteObjectWithoutEffects = new gd.SpriteObject(
+    'MySpriteObjectWithoutEffects'
+  );
+  const spriteObjectWithEffects = new gd.SpriteObject(
+    'MySpriteObjectWithEffects'
+  );
+  {
+    const effect1 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+  }
+
   return {
     project,
     shapePainterObject,
@@ -511,6 +545,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     panelSpriteObject,
     spriteObject,
     spriteObjectWithBehaviors,
+    spriteObjectWithoutBehaviors,
     testLayout,
     group1,
     group2,
@@ -531,5 +566,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWithEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
+    spriteObjectWithEffects,
+    spriteObjectWithoutEffects,
   };
 };

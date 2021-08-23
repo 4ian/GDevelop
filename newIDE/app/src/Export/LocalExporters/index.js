@@ -5,7 +5,6 @@ import { type Exporter } from '../ExportDialog';
 import { localCordovaExportPipeline } from './LocalCordovaExport';
 import { localElectronExportPipeline } from './LocalElectronExport';
 import { localHTML5ExportPipeline } from './LocalHTML5Export';
-import { localCocos2dExportPipeline } from './LocalCocos2dExport';
 import { localFacebookInstantGamesExportPipeline } from './LocalFacebookInstantGamesExport';
 import { localOnlineCordovaExportPipeline } from './LocalOnlineCordovaExport.js';
 import { localOnlineElectronExportPipeline } from './LocalOnlineElectronExport.js';
@@ -113,19 +112,5 @@ export const getLocalExporters = (): Array<Exporter> => [
     key: 'localelectronexport',
     exportPipeline: localElectronExportPipeline,
     advanced: true,
-  },
-  {
-    name: <Trans>Cocos2d-JS</Trans>,
-    renderIcon: props => <PhoneIphone {...props} />,
-    helpPage: '/publishing/android_and_ios_with_cocos2d-js',
-    description: (
-      <Trans>
-        Export your game using Cocos2d-JS game engine. The game can be compiled
-        for Android or iOS if you install Cocos2d-JS developer tools.
-      </Trans>
-    ),
-    key: 'localcocos2dexport',
-    exportPipeline: localCocos2dExportPipeline,
-    experimental: true,
   },
 ];

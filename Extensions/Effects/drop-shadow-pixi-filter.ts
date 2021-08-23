@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('DropShadow', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const dropShadowFilter = new PIXI.filters.DropShadowFilter();
       return dropShadowFilter;
     },
-    update: function (filter, layer) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const dropShadowFilter = (filter as unknown) as PIXI.filters.DropShadowFilter;
       if (parameterName === 'blur') {

@@ -19,32 +19,38 @@ describe('gdjs.LinksManager', function () {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
   var object1B = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
   var object1C = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
 
   var object2A = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
   var object2B = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
   var object2C = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [],
+    effects: [],
   });
 
   runtimeScene.addObject(object1A);

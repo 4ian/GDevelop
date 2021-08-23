@@ -1426,11 +1426,13 @@ interface EffectMetadata {
     [Ref] EffectMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] EffectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] EffectMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Ref] EffectMetadata MarkAsNotWorkingForObjects();
 
     [Const, Ref] DOMString GetType();
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetHelpPath();
+    boolean IsMarkedAsNotWorkingForObjects();
 
     [Ref] MapStringPropertyDescriptor GetProperties();
 };
@@ -2702,8 +2704,6 @@ interface Exporter {
 
     boolean ExportProjectForPixiPreview([Const, Ref] PreviewExportOptions options);
     boolean ExportWholePixiProject([Ref] Project project, [Const] DOMString exportDir, [Ref] MapStringBoolean exportOptions);
-
-    boolean ExportWholeCocos2dProject([Ref] Project project, boolean debugMode, [Const] DOMString exportDir);
 
     [Const, Ref] DOMString GetLastError();
 };

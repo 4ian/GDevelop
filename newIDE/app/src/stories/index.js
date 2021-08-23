@@ -3642,6 +3642,18 @@ storiesOf('BehaviorsEditor', module)
         onUpdateBehaviorsSharedData={() => {}}
       />
     </SerializedObjectDisplay>
+  ))
+  .add('without any behaviors', () => (
+    <SerializedObjectDisplay object={testProject.spriteObjectWithoutBehaviors}>
+      <BehaviorsEditor
+        project={testProject.project}
+        object={testProject.spriteObjectWithoutBehaviors}
+        resourceSources={[]}
+        onChooseResource={() => Promise.reject('Unimplemented')}
+        resourceExternalEditors={fakeResourceExternalEditors}
+        onUpdateBehaviorsSharedData={() => {}}
+      />
+    </SerializedObjectDisplay>
   ));
 
 storiesOf('VariablesList', module)
@@ -4523,8 +4535,9 @@ storiesOf('LayersList', module)
 storiesOf('EffectsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('with some effects', () => (
+  .add('with some effects (for a layer)', () => (
     <EffectsList
+      target="layer"
       project={testProject.project}
       resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
@@ -4536,8 +4549,23 @@ storiesOf('EffectsList', module)
       onEffectsUpdated={action('effects updated')}
     />
   ))
-  .add('with an effect without effect type', () => (
+  .add('with some effects (for an object)', () => (
     <EffectsList
+      target="object"
+      project={testProject.project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('with an effect without effect type (for a layer)', () => (
+    <EffectsList
+      target="layer"
       project={testProject.project}
       resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
@@ -4549,8 +4577,9 @@ storiesOf('EffectsList', module)
       onEffectsUpdated={action('effects updated')}
     />
   ))
-  .add('without effects', () => (
+  .add('without effects (for a layer)', () => (
     <EffectsList
+      target="layer"
       project={testProject.project}
       resourceExternalEditors={fakeResourceExternalEditors}
       onChooseResource={() => {
@@ -4559,6 +4588,20 @@ storiesOf('EffectsList', module)
       }}
       resourceSources={[]}
       effectsContainer={testProject.layerWithoutEffects.getEffects()}
+      onEffectsUpdated={action('effects updated')}
+    />
+  ))
+  .add('without effects (for an object)', () => (
+    <EffectsList
+      target="object"
+      project={testProject.project}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+      effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
       onEffectsUpdated={action('effects updated')}
     />
   ));

@@ -232,6 +232,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "Ship",
@@ -290,6 +291,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "NewObject",

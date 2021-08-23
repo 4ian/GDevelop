@@ -20,6 +20,10 @@ type Props = {|
   children: ?React.Node,
 |};
 
+/**
+ * Show a message when there is no content to display.
+ * Also take a look at EmptyPlaceholder for a more visible placerholder.
+ */
 const EmptyMessage = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (

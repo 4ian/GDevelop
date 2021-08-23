@@ -7,7 +7,8 @@
 
 namespace gd {
 
-EffectMetadata::EffectMetadata(const gd::String& type_) : type(type_) {}
+EffectMetadata::EffectMetadata(const gd::String& type_)
+    : type(type_), isMarkedAsNotWorkingForObjects(false) {}
 
 EffectMetadata& EffectMetadata::SetIncludeFile(const gd::String& includeFile) {
   includeFiles.clear();
@@ -19,6 +20,11 @@ EffectMetadata& EffectMetadata::AddIncludeFile(const gd::String& includeFile) {
   if (std::find(includeFiles.begin(), includeFiles.end(), includeFile) ==
       includeFiles.end())
     includeFiles.push_back(includeFile);
+  return *this;
+}
+
+EffectMetadata& EffectMetadata::MarkAsNotWorkingForObjects() {
+  isMarkedAsNotWorkingForObjects = true;
   return *this;
 }
 

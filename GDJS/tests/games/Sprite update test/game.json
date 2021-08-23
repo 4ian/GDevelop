@@ -356,6 +356,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "sprite1",
@@ -398,6 +399,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Press any key to reload the scene\nGreen objects loaded from external layout are displaced at first and flicker\nRed objects belongs to this scene are fine",
           "font": "",
           "characterSize": 20,
@@ -414,6 +416,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "sprite2",
@@ -456,6 +459,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Text from external Layout seems fine, no flicker",
           "font": "",
           "characterSize": 20,
@@ -650,6 +654,7 @@
           "updateIfNotVisible": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "Hurt",
@@ -881,6 +886,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "The idle animation should be shown immediately. \nThe first \"hurt\" animation should not be visible even when the scene is just changed.",
           "font": "",
           "characterSize": 20,

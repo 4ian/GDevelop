@@ -5,10 +5,12 @@ declare class gdEffectMetadata {
   setHelpPath(helpPath: string): gdEffectMetadata;
   setIncludeFile(includeFile: string): gdEffectMetadata;
   addIncludeFile(includeFile: string): gdEffectMetadata;
+  markAsNotWorkingForObjects(): gdEffectMetadata;
   getType(): string;
   getFullName(): string;
   getDescription(): string;
   getHelpPath(): string;
+  isMarkedAsNotWorkingForObjects(): boolean;
   getProperties(): gdMapStringPropertyDescriptor;
   delete(): void;
   ptr: number;

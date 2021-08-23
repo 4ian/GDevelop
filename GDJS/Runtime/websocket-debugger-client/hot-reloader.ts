@@ -792,7 +792,7 @@ namespace gdjs {
             hotReloadSucceeded;
         });
 
-        // Don't update the variables and behaviors for each runtime object to avoid
+        // Don't update the variables, behaviors and effects for each runtime object to avoid
         // doing the check for differences for every single object.
 
         // Update variables
@@ -808,6 +808,13 @@ namespace gdjs {
         this._hotReloadRuntimeObjectsBehaviors(
           oldObjectData.behaviors,
           newObjectData.behaviors,
+          runtimeObjects
+        );
+
+        // Update effects
+        this._hotReloadRuntimeObjectsEffects(
+          oldObjectData.effects,
+          newObjectData.effects,
           runtimeObjects
         );
       }
@@ -893,6 +900,80 @@ namespace gdjs {
               message:
                 newBehaviorData.name +
                 ' behavior could not be added during hot-reload.',
+            });
+          }
+        }
+      });
+    }
+
+    _hotReloadRuntimeObjectsEffects(
+      oldEffects: EffectData[],
+      newEffects: EffectData[],
+      runtimeObjects: RuntimeObject[]
+    ): void {
+      oldEffects.forEach((oldEffectData) => {
+        const name = oldEffectData.name;
+        const newEffectData = newEffects.filter(
+          (effectData) => effectData.name === name
+        )[0];
+        if (!newEffectData) {
+          // Effect was removed.
+          runtimeObjects.forEach((runtimeObject) => {
+            if (runtimeObject.hasEffect(name)) {
+              if (!runtimeObject.removeEffect(name)) {
+                this._logs.push({
+                  kind: 'error',
+                  message:
+                    'Effect ' +
+                    name +
+                    ' could not be removed from object' +
+                    runtimeObject.getName(),
+                });
+              }
+            }
+          });
+        } else {
+          if (!HotReloader.deepEqual(oldEffectData, newEffectData)) {
+            let hotReloadSucceeded = true;
+            runtimeObjects.forEach((runtimeObject) => {
+              if (oldEffectData.effectType === newEffectData.effectType) {
+                hotReloadSucceeded =
+                  runtimeObject.updateAllEffectParameters(newEffectData) &&
+                  hotReloadSucceeded;
+              } else {
+                // Another effect type was applied
+                runtimeObject.removeEffect(oldEffectData.name);
+                runtimeObject.addEffect(newEffectData);
+              }
+            });
+            if (!hotReloadSucceeded) {
+              this._logs.push({
+                kind: 'error',
+                message:
+                  newEffectData.name + ' effect could not be hot-reloaded.',
+              });
+            }
+          }
+        }
+      });
+      newEffects.forEach((newEffectData) => {
+        const name = newEffectData.name;
+        const oldEffectData = oldEffects.filter(
+          (oldEffectData) => oldEffectData.name === name
+        )[0];
+        if (!oldEffectData) {
+          // Effect was added
+          let hotReloadSucceeded = true;
+          runtimeObjects.forEach((runtimeObject) => {
+            hotReloadSucceeded =
+              runtimeObject.addEffect(newEffectData) && hotReloadSucceeded;
+          });
+          if (!hotReloadSucceeded) {
+            this._logs.push({
+              kind: 'error',
+              message:
+                newEffectData.name +
+                ' effect could not be added during hot-reload.',
             });
           }
         }

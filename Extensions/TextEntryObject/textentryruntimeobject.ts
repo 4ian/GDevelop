@@ -38,7 +38,7 @@ namespace gdjs {
       }
     }
 
-    update(): void {
+    update(runtimeScene: gdjs.RuntimeScene): void {
       if ((this._renderer as any).getString) {
         this._str = (this._renderer as any).getString();
       }

@@ -12,8 +12,12 @@ jobs:
 
       # System dependencies (for Emscripten and upload)
       - run:
-          name: Install dependencies for Emscripten and AWS S3 upload
-          command: brew install cmake && brew install awscli
+          name: Install dependencies for Emscripten
+          command: brew install cmake
+
+      - run:
+          name: Install dependencies for AWS S3 upload
+          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
           name: Install Emscripten (for GDevelop.js)
@@ -64,10 +68,10 @@ jobs:
       # Upload artifacts (AWS)
       - run:
           name: Deploy to S3 (specific commit)
-          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
       - run:
           name: Deploy to S3 (latest)
-          command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
+          command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)

@@ -130,7 +130,6 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/Video/videoruntimeobject-cocos-renderer.js');
 
     object
       .addAction(

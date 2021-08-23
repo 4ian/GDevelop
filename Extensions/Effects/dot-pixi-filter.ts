@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('Dot', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const dotFilter = new PIXI.filters.DotFilter();
       return dotFilter;
     },
-    update: function (filter, layer) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
       if (parameterName === 'scale') {

@@ -28,10 +28,7 @@ class PanelSpriteObjectJsExtension : public gd::PlatformExtension {
             "Extensions/PanelSpriteObject/panelspriteruntimeobject.js")
         .AddIncludeFile(
             "Extensions/PanelSpriteObject/"
-            "panelspriteruntimeobject-pixi-renderer.js")
-        .AddIncludeFile(
-            "Extensions/PanelSpriteObject/"
-            "panelspriteruntimeobject-cocos-renderer.js");
+            "panelspriteruntimeobject-pixi-renderer.js");
 
     GetAllActionsForObject(
         "PanelSpriteObject::PanelSprite")["PanelSpriteObject::SetOpacity"]

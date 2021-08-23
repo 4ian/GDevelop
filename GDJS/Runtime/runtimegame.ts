@@ -42,6 +42,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;
@@ -96,6 +97,7 @@ namespace gdjs {
         this._data.resources.resources,
         this._imageManager
       );
+      this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
       this._minFPS = this._data ? this._data.properties.minFPS : 15;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -201,6 +203,15 @@ namespace gdjs {
      */
     getJsonManager(): gdjs.JsonManager {
       return this._jsonManager;
+    }
+
+    /**
+     * Get the effects manager of the game, which allows to manage
+     * effects on runtime objects or runtime layers.
+     * @return The effects manager for the game
+     */
+    getEffectsManager(): gdjs.EffectsManager {
+      return this._effectsManager;
     }
 
     /**

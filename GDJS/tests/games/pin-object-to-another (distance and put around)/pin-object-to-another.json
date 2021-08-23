@@ -272,6 +272,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "string": "Add child objects in the editor and position, scale and rotate them as you like.\nIn preview, rotate the parent using A and S keys and drag the parent with the mouse.\nAll child object should keep it relative rotation and position to the parent object.",
           "font": "",
           "characterSize": 20,
@@ -286,6 +287,7 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
+          "effects": [],
           "behaviors": [
             {
               "name": "Draggable",
@@ -349,6 +351,7 @@
           "updateIfNotVisible": true,
           "variables": [],
           "behaviors": [],
+          "effects": [],
           "animations": [
             {
               "name": "",

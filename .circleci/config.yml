@@ -8,20 +8,20 @@ jobs:
     macos:
       xcode: 12.5.1
     steps:
-      - checkout
+      # - checkout
 
       # System dependencies (for Emscripten and upload)
-      - run:
-          name: Install dependencies for Emscripten
-          command: brew install cmake
+      #- run:
+      #    name: Install dependencies for Emscripten
+      #    command: brew install cmake
 
       - run:
           name: Install dependencies for AWS S3 upload
-          command: pip3 install awscli --upgrade --user
+          command: curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg" && sudo installer -pkg AWSCLIV2.pkg -target /
 
       - run:
           name: Temporary AWS test
-          command: export PATH=~/.local/bin:$PATH && aws --version
+          command: aws --version
 
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)

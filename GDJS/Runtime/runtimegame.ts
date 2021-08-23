@@ -604,6 +604,7 @@ namespace gdjs {
         }, 10000);
       } catch (e) {
         logger.error('Internal crash: ' + e);
+        throw e;
       }
     }
 

@@ -29,10 +29,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
         .AddIncludeFile(
             "Extensions/ParticleSystem/particleemitterobject-pixi-renderer.js")
         .AddIncludeFile(
-            "Extensions/ParticleSystem/pixi-particles-pixi-renderer.min.js")
-        .AddIncludeFile(
-            "Extensions/ParticleSystem/"
-            "particleemitterobject-cocos-renderer.js");
+            "Extensions/ParticleSystem/pixi-particles-pixi-renderer.min.js");
 
     auto& actions = GetAllActionsForObject("ParticleSystem::ParticleEmitter");
     auto& conditions =

@@ -27,7 +27,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
       });

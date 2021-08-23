@@ -17,7 +17,6 @@ namespace gdjs {
     // platform hitbox left edge is also at X position 10).
     // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
     _ignoreTouchingEdges: boolean = true;
-    _roundCoordinates: boolean;
     _gravity: float;
     private _maxFallingSpeed: float;
     _ladderClimbingSpeed: float;
@@ -72,7 +71,7 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
-      this._roundCoordinates = behaviorData.roundCoordinates;
+
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.maxFallingSpeed;
       this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
@@ -101,11 +100,6 @@ namespace gdjs {
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (
-        oldBehaviorData.roundCoordinates !== newBehaviorData.roundCoordinates
-      ) {
-        this._roundCoordinates = newBehaviorData.roundCoordinates;
-      }
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
       }
@@ -352,20 +346,20 @@ namespace gdjs {
         //Stop when colliding with an obstacle.
         while (
           (this._requestedDeltaY < 0 &&
+            //Jumpthru = obstacle <=> Never when going up
             this._isCollidingWithOneOf(
               this._potentialCollidingObjects,
               null,
               /*excludeJumpThrus=*/
               true
             )) ||
-          //Jumpthru = obstacle <=> Never when going up
           (this._requestedDeltaY > 0 &&
+            //Jumpthru = obstacle <=> Only if not already overlapped when going down
             this._isCollidingWithOneOfExcluding(
               this._potentialCollidingObjects,
               this._overlappedJumpThru
             ))
         ) {
-          //Jumpthru = obstacle <=> Only if not already overlapped when going down
           if (this._state === this._jumping) {
             this._setFalling();
           }
@@ -1359,11 +1353,7 @@ namespace gdjs {
         //Floor is flat or get down.
         let oldY = object.getY();
         const tentativeStartY = object.getY() + 1;
-        object.setY(
-          behavior._roundCoordinates
-            ? Math.round(tentativeStartY)
-            : tentativeStartY
-        );
+        object.setY(tentativeStartY);
         let step = 0;
         let noMoreOnFloor = false;
         while (

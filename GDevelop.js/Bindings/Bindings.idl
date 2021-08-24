@@ -743,6 +743,7 @@ interface PropertyDescriptor {
     [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
     [Const, Ref] DOMString GetDescription();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
+    [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Value] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
     boolean IsHidden();
@@ -758,8 +759,6 @@ interface NamedPropertyDescriptor {
 
     [Ref] PropertyDescriptor SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
-
-    [Value] PropertyDescriptor ToPropertyDescriptor();
 };
 NamedPropertyDescriptor implements PropertyDescriptor;
 

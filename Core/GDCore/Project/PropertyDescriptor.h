@@ -77,6 +77,14 @@ class GD_CORE_API PropertyDescriptor {
   }
 
   /**
+   * \brief Set and replace the additional information for the property.
+   */
+  PropertyDescriptor& SetExtraInfo(const std::vector<gd::String>& info) {
+    extraInformation = info;
+    return *this;
+  }
+
+  /**
    * \brief Add an information about the property.
    * \note The information are arbitrary and are interpreted by the class
    * updating the property grid: Refer to it or to the documentation of the

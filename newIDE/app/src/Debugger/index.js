@@ -15,7 +15,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
 } from '../Export/PreviewLauncher.flow';
-import { type Log } from './DebuggerConsole';
+import { type Log, LogsManager } from './DebuggerConsole';
 
 export type ProfilerMeasuresSection = {|
   time: number,
@@ -76,6 +76,7 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
+  _debuggerLogs: Map<string, LogsManager> = new Map();
 
   updateToolbar() {
     if (!this.props.isActive) return;
@@ -140,17 +141,16 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionClosed: ({ id, debuggerIds }) => {
+        this._debuggerLogs.delete(id);
         this.setState(
           ({
             selectedId,
-            logs,
             debuggerGameData,
             profilerOutputs,
             profilingInProgress,
           }) => {
             // Remove any data bound to the instance that might have been stored.
             // Otherwise this would be a memory leak.
-            if (logs[id]) delete logs[id];
             if (debuggerGameData[id]) delete debuggerGameData[id];
             if (profilerOutputs[id]) delete profilerOutputs[id];
             if (profilingInProgress[id]) delete profilingInProgress[id];
@@ -163,7 +163,6 @@ export default class Debugger extends React.Component<Props, State> {
                   : debuggerIds.length
                   ? debuggerIds[debuggerIds.length - 1]
                   : selectedId,
-              logs,
               debuggerGameData,
               profilerOutputs,
               profilingInProgress,
@@ -173,6 +172,7 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionOpened: ({ id, debuggerIds }) => {
+        this._debuggerLogs.set(id, new LogsManager());
         this.setState(
           {
             debuggerIds,
@@ -227,12 +227,7 @@ export default class Debugger extends React.Component<Props, State> {
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (isUnavoidableLibraryWarning(data.payload)) return;
-      this.setState(state => ({
-        logs: {
-          ...state.logs,
-          [id]: [...(state.logs[id] || []), data.payload],
-        },
-      }));
+      this._debuggerLogs.get(id).addLog(data.payload);
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -355,7 +350,7 @@ export default class Debugger extends React.Component<Props, State> {
                 onStopProfiler={() => this._stopProfiler(selectedId)}
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
-                logs={this.state.logs[selectedId]}
+                logsManager={this._debuggerLogs.get(selectedId)}
               />
             )}
             {!this._hasSelectedDebugger() && (

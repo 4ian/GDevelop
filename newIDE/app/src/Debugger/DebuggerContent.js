@@ -22,7 +22,7 @@ import Flash from '@material-ui/icons/FlashOn';
 import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
-import { DebuggerConsole, type Log } from './DebuggerConsole';
+import { DebuggerConsole, type LogsManager } from './DebuggerConsole';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
@@ -39,7 +39,7 @@ type Props = {|
   onStopProfiler: () => void,
   profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
-  logs: Array<Log>,
+  logsManager: LogsManager,
 |};
 
 type State = {|
@@ -96,7 +96,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onStopProfiler,
       profilerOutput,
       profilingInProgress,
-      logs,
+      logsManager,
     } = this.props;
     const {
       selectedInspector,
@@ -223,7 +223,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
         title: t`Console`,
         renderEditor: () => (
           <Background>
-            <DebuggerConsole logs={logs || []} />
+            <DebuggerConsole logsManager={logsManager || []} />
           </Background>
         ),
       },

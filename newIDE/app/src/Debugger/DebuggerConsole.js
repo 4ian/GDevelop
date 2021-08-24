@@ -33,13 +33,70 @@ export type Log = {
   internal: boolean,
 };
 
+export class LogsManager {
+  logs: Array<Log> = [];
+  groups: Set<string> = new Set();
+  _onNewLog: Set<() => void> = new Set();
+  _onNewGroup: Set<() => void> = new Set();
+  _pendingLogs: Array<Log> = [];
+  _pendingCommit: boolean = false;
+
+  _commitLogs() {
+    this.logs.push(...this._pendingLogs);
+    this._pendingLogs.length = 0;
+    this._pendingCommit = false;
+    this._onNewLog.forEach(f => f());
+  }
+
+  addLog(log: Log) {
+    this._pendingLogs.push(log);
+    if (!this.groups.has(log.group)) {
+      this.groups.add(log.group);
+      this._onNewGroup.forEach(f => f());
+    }
+    if (!this._pendingCommit) {
+      setTimeout(this._commitLogs.bind(this), 1000);
+      this._pendingCommit = true;
+    }
+  }
+
+  on(event: 'group' | 'log', handler: () => void) {
+    if (event === 'group') this._onNewGroup.add(handler);
+    if (event === 'log') this._onNewLog.add(handler);
+  }
+
+  off(event: 'group' | 'log', handler: () => void) {
+    if (event === 'group') this._onNewGroup.delete(handler);
+    if (event === 'log') this._onNewLog.delete(handler);
+  }
+}
+
 const iconMap = {
   info: <InfoIcon color="primary" />,
   warning: <WarningIcon color="secondary" />,
   error: <ErrorIcon color="error" />,
 };
 
-export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
+export const DebuggerConsole = ({
+  logsManager,
+}: {
+  logsManager: LogsManager,
+}) => {
+  const forceUpdate = useForceUpdate();
+
+  const { logs, groups } = logsManager;
+  React.useEffect(
+    () => {
+      // Rerender when the logs are updated
+      const onUpdate = () => forceUpdate();
+      logsManager.on('log', onUpdate);
+      return () => {
+        logsManager.off('log', onUpdate);
+      };
+    },
+    [forceUpdate, logsManager]
+  );
+
   const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
   const cache = React.useMemo(
     () =>
@@ -54,7 +111,6 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
   // If tabs are switched, the element is not visible and its height is 0 when rendered again.
   // If this is the case, trigger a rerender after rendering has finished (thanks to useEffect).
   const rerenderNeeded = sizeMeasurer && sizeMeasurer.offsetHeight === 0;
-  const forceUpdate = useForceUpdate();
   React.useEffect(() => {
     if (rerenderNeeded) forceUpdate();
   });
@@ -69,7 +125,20 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
   const hiddenGroups = React.useRef(new Set()).current;
-  const groups = [...new Set(logs.map(({ group }) => group))];
+  React.useEffect(
+    () => {
+      // Do not register for group updates to avoid rerendering when the groups are not displayed.
+      if (!editingHiddenGroups) return;
+
+      // Rerender when the groups are updated
+      const onUpdate = () => forceUpdate();
+      logsManager.on('group', onUpdate);
+      return () => {
+        logsManager.off('group', onUpdate);
+      };
+    },
+    [editingHiddenGroups, forceUpdate, logsManager]
+  );
 
   const filteredLogs = logs
     .filter(({ internal }) => !(hideInternal && internal))
@@ -168,20 +237,28 @@ export const DebuggerConsole = ({ logs }: { logs: Array<Log> }) => {
         ]}
       >
         <Column>
-          {groups.map(group => (
-            <Line key={group}>
-              <Checkbox
-                label={group}
-                checked={!hiddenGroups.has(group)}
-                onCheck={(_, checked) => {
-                  if (checked) hiddenGroups.delete(group);
-                  else hiddenGroups.add(group);
-                  // Since hiddenGroups is a ref, not a state, we need to manually update.
-                  forceUpdate();
-                }}
-              />
-            </Line>
-          ))}
+          {(() => {
+            // Do not bother regenerating all of this if it is not displayed.
+            if (!editingHiddenGroups) return;
+
+            const list = [];
+            for (const group of groups.values())
+              list.push(
+                <Line key={group}>
+                  <Checkbox
+                    label={group}
+                    checked={!hiddenGroups.has(group)}
+                    onCheck={(_, checked) => {
+                      if (checked) hiddenGroups.delete(group);
+                      else hiddenGroups.add(group);
+                      // Since hiddenGroups is a ref, not a state, we need to manually update.
+                      forceUpdate();
+                    }}
+                  />
+                </Line>
+              );
+            return list;
+          })()}
         </Column>
       </Dialog>
     </>

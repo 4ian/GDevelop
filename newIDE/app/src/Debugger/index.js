@@ -119,6 +119,12 @@ export default class Debugger extends React.Component<Props, State> {
     }
   }
 
+  _getLogsManager(id: number): LogsManager {
+    if (!this._debuggerLogs.has(id))
+      this._debuggerLogs.set(id, new LogsManager());
+    return (this._debuggerLogs.get(id): LogsManager);
+  }
+
   _startServer = () => {
     const { previewDebuggerServer } = this.props;
     const { unregisterDebuggerServerCallbacks } = this.state;
@@ -172,7 +178,6 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionOpened: ({ id, debuggerIds }) => {
-        this._debuggerLogs.set(id, new LogsManager());
         this.setState(
           {
             debuggerIds,
@@ -227,7 +232,7 @@ export default class Debugger extends React.Component<Props, State> {
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (isUnavoidableLibraryWarning(data.payload)) return;
-      (this._debuggerLogs.get(id): LogsManager).addLog(data.payload);
+      this._getLogsManager(id).addLog(data.payload);
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -350,7 +355,7 @@ export default class Debugger extends React.Component<Props, State> {
                 onStopProfiler={() => this._stopProfiler(selectedId)}
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
-                logsManager={(this._debuggerLogs.get(selectedId): LogsManager)}
+                logsManager={this._getLogsManager(selectedId)}
               />
             )}
             {!this._hasSelectedDebugger() && (

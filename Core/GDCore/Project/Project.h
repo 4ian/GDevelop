@@ -277,6 +277,19 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetScaleMode(const gd::String& scaleMode_) { scaleMode = scaleMode_; }
 
   /**
+   * Return true if pixels rounding option is enabled.
+   */
+  bool GetPixelsRounding() const {
+    return pixelsRounding;
+  }
+
+  /**
+   * Set pixels rounding option to true or false.
+   */
+  void SetPixelsRounding(bool enable) { pixelsRounding = enable; }
+
+
+  /**
    * \brief Return if the project should set 0 as Z-order for objects created
    * from events (which is deprecated) - instead of the highest Z order that was
    * found on each layer when the scene started.
@@ -890,6 +903,8 @@ class GD_CORE_API Project : public ObjectsContainer {
                         ///< are below this number )
   bool verticalSync;    ///< If true, must activate vertical synchronization.
   gd::String scaleMode;
+  bool pixelsRounding; ///< If true, the rendering should stop pixel interpolation 
+                       ///< of rendered objects.
   bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
                                       ///< to the window size at runtime
   gd::String

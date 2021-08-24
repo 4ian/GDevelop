@@ -113,7 +113,7 @@ import {
 } from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
-import consoleTestData from '../fixtures/ConsoleTestData.json';
+import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -2622,7 +2622,7 @@ storiesOf('DebuggerContent', module)
           onStopProfiler={action('stop profiler')}
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
-          logs={consoleTestData}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2641,7 +2641,7 @@ storiesOf('DebuggerContent', module)
           onStopProfiler={action('stop profiler')}
           profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
-          logs={consoleTestData}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

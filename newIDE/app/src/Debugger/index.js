@@ -76,7 +76,7 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
-  _debuggerLogs: Map<string, LogsManager> = new Map();
+  _debuggerLogs: Map<number, LogsManager> = new Map();
 
   updateToolbar() {
     if (!this.props.isActive) return;
@@ -227,7 +227,7 @@ export default class Debugger extends React.Component<Props, State> {
     } else if (data.command === 'console.log') {
       // Filter out unavoidable warnings that do not concern non-engine devs.
       if (isUnavoidableLibraryWarning(data.payload)) return;
-      this._debuggerLogs.get(id).addLog(data.payload);
+      (this._debuggerLogs.get(id): LogsManager).addLog(data.payload);
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -350,7 +350,7 @@ export default class Debugger extends React.Component<Props, State> {
                 onStopProfiler={() => this._stopProfiler(selectedId)}
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
-                logsManager={this._debuggerLogs.get(selectedId)}
+                logsManager={(this._debuggerLogs.get(selectedId): LogsManager)}
               />
             )}
             {!this._hasSelectedDebugger() && (

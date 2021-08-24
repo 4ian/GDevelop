@@ -25,10 +25,10 @@ import {
 } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 import Add from '@material-ui/icons/Add';
-import Delete from '@material-ui/icons/Delete';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
+import StringSelectorEditor from '../../StringSelectorEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -88,65 +88,17 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
   return true;
 };
 
-type StringSelectorEditorProps = {|
-  extraInfo: string,
-  setExtraInfo: string => void,
-|};
-
-const StringSelectorEditor = ({
-  extraInfo,
-  setExtraInfo,
-}: StringSelectorEditorProps) => {
+const getExtraInfoArray = (parameter: gdParameterMetadata) => {
+  const extraInfoJson = parameter.getExtraInfo();
   let array = [];
   try {
-    if (extraInfo !== '') array = JSON.parse(extraInfo);
+    if (extraInfoJson !== '') array = JSON.parse(extraInfoJson);
     if (!Array.isArray(array)) array = [];
   } catch (e) {
     console.error('Cannot parse parameter extraInfo: ', e);
   }
 
-  const updateExtraInfo = () => setExtraInfo(JSON.stringify(array));
-
-  return (
-    <ResponsiveLineStackLayout>
-      <Column justifyContent="flex-end" expand>
-        {array.map((item, index) => (
-          <Line key={index} justifyContent="flex-end" expand>
-            <SemiControlledTextField
-              commitOnBlur
-              value={item}
-              onChange={text => {
-                array[index] = text;
-                updateExtraInfo();
-              }}
-              fullWidth
-            />
-            <IconButton
-              tooltip={t`Delete option`}
-              onClick={() => {
-                array.splice(index, 1);
-                updateExtraInfo();
-              }}
-            >
-              <Delete />
-            </IconButton>
-          </Line>
-        ))}
-
-        <Line justifyContent="flex-end" expand>
-          <RaisedButton
-            primary
-            onClick={() => {
-              array.push('New Option');
-              updateExtraInfo();
-            }}
-            label={<Trans>Add a new option</Trans>}
-            icon={<Add />}
-          />
-        </Line>
-      </Column>
-    </ResponsiveLineStackLayout>
-  );
+  return array;
 };
 
 export default class EventsFunctionParametersEditor extends React.Component<
@@ -235,6 +187,13 @@ export default class EventsFunctionParametersEditor extends React.Component<
           }
         );
     }
+  };
+
+  _setStringSelectorExtraInfo = (parameter: gdParameterMetadata) => {
+    return (newExtraInfo: Array<string>) => {
+      parameter.setExtraInfo(JSON.stringify(newExtraInfo));
+      this.forceUpdate();
+    };
   };
 
   render() {
@@ -497,11 +456,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           </ResponsiveLineStackLayout>
                           {parameter.getType() === 'stringWithSelector' && (
                             <StringSelectorEditor
-                              extraInfo={parameter.getExtraInfo()}
-                              setExtraInfo={newExtraInfo => {
-                                parameter.setExtraInfo(newExtraInfo);
-                                this.forceUpdate();
-                              }}
+                              extraInfo={getExtraInfoArray(parameter)}
+                              setExtraInfo={this._setStringSelectorExtraInfo(
+                                parameter
+                              )}
                             />
                           )}
                           {isParameterDescriptionAndTypeShown(i) && (

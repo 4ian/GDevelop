@@ -22,6 +22,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
+import StringSelectorEditor from '../StringSelectorEditor';
 
 const gd: libGDevelop = global.gd;
 
@@ -80,6 +81,11 @@ const validatePropertyName = (
   return true;
 };
 
+const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
+  const extraInfoVector = property.getExtraInfo();
+  return extraInfoVector.toJSArray();
+};
+
 export default class EventsBasedBehaviorPropertiesEditor extends React.Component<
   Props,
   {||}
@@ -111,6 +117,16 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
     this.props.onPropertiesUpdated();
+  };
+
+  _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
+    return (newExtraInfo: Array<string>) => {
+      const vectorString = new gd.VectorString();
+      newExtraInfo.forEach(item => vectorString.push_back(item));
+      property.setExtraInfo(vectorString);
+      vectorString.delete();
+      this.forceUpdate();
+    };
   };
 
   render() {
@@ -222,6 +238,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Boolean"
                                 primaryText={t`Boolean (checkbox)`}
                               />
+                              <SelectOption
+                                value="Choice"
+                                primaryText={t`String from a list of options (text)`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -268,6 +288,12 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               </SelectField>
                             )}
                           </ResponsiveLineStackLayout>
+                          {property.getType() === 'Choice' && (
+                            <StringSelectorEditor
+                              extraInfo={getExtraInfoArray(property)}
+                              setExtraInfo={this._setChoiceExtraInfo(property)}
+                            />
+                          )}
                           <SemiControlledTextField
                             commitOnBlur
                             floatingLabelText={

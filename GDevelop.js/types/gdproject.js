@@ -23,6 +23,8 @@ declare class gdProject extends gdObjectsContainer {
   setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime: boolean): void;
   setScaleMode(scaleMode: string): void;
   getScaleMode(): string;
+  setPixelsRounding(pixelsRounding: boolean): void;
+  getPixelsRounding(): boolean;
   setSizeOnStartupMode(orientation: string): void;
   getSizeOnStartupMode(): string;
   getMaximumFPS(): number;

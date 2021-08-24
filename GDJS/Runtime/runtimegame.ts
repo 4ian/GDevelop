@@ -51,6 +51,7 @@ namespace gdjs {
     _resizeMode: 'adaptWidth' | 'adaptHeight' | string;
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
+    _pixelsRounding: boolean;
     _renderer: RuntimeGameRenderer;
 
     //Game loop management (see startGameLoop method)
@@ -105,6 +106,7 @@ namespace gdjs {
       this._resizeMode = this._data.properties.sizeOnStartupMode;
       this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
+      this._pixelsRounding = this._data.properties.pixelsRounding;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -425,6 +427,13 @@ namespace gdjs {
      */
     getScaleMode(): 'linear' | 'nearest' {
       return this._scaleMode;
+    }
+
+    /**
+     * Return if the game is rounding pixels when rendering.
+     */
+    getPixelsRounding(): boolean {
+      return this._pixelsRounding;
     }
 
     /**

@@ -87,6 +87,11 @@ namespace gdjs {
         this._pixiRenderer.view.style['image-rendering'] = 'pixelated';
       }
 
+      // Handle pixels rounding
+      if (this._game.getPixelsRounding()) {
+        PIXI.settings.ROUND_PIXELS = true;
+      }
+
       //Handle resize
       const that = this;
       window.addEventListener('resize', function () {

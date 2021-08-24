@@ -756,8 +756,6 @@ interface NamedPropertyDescriptor {
 
     [Ref] PropertyDescriptor SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
-
-    [Value] PropertyDescriptor ToPropertyDescriptor();
 };
 NamedPropertyDescriptor implements PropertyDescriptor;
 

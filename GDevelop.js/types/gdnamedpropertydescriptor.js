@@ -3,7 +3,6 @@ declare class gdNamedPropertyDescriptor extends gdPropertyDescriptor {
   constructor(): void;
   setName(name: string): gdPropertyDescriptor;
   getName(): string;
-  toPropertyDescriptor(): gdPropertyDescriptor;
   delete(): void;
   ptr: number;
 };

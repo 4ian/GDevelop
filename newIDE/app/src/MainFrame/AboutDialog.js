@@ -213,7 +213,7 @@ const contributors = [
   {
     name: 'HelperWesley',
     description: 'Examples and youtube content that is relevant to GDevelop',
-    link: 'https://helperwesley.itch.io/',
+    link: 'https://www.youtube.com/channel/UC8RsU74-hU1pfNKHNMfiFfw',
   },
   {
     name: 'UlisesFreitas',

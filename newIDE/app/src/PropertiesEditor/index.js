@@ -12,7 +12,7 @@ import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
-import { hexToRGBColor } from '../Utils/ColorTransformer';
+import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
 import {
@@ -294,10 +294,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           disableAlpha
           fullWidth
-          color={hexToRGBColor(getFieldValue(this.props.instances, field))}
-          onChangeComplete={color => {
+          color={getFieldValue(this.props.instances, field)}
+          onChange={color => {
             this.props.instances.forEach(i =>
-              setValue(i, color.hex || '#000000')
+              setValue(i, rgbOrHexToRGBString(color))
             );
             this._onInstancesModified(this.props.instances);
           }}

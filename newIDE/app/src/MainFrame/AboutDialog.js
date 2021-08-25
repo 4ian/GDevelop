@@ -39,16 +39,23 @@ const styles = {
 // If you contributed to GDevelop but you're not in the list, please
 // send a Pull Request on GitHub or open an issue ;)
 const contributors = [
+  // Core development team
+  {
+    name: 'Clément Pasteau',
+    description: 'Core development team',
+    link: 'https://github.com/ClementPasteau',
+  },
+
   // GitHub contributors
   {
     name: 'Victor Levasseur',
     description:
-      'Numerous contributions to GDevelop core and various extensions',
+      'Numerous code contributions to GDevelop and community moderation',
   },
   {
     name: 'Lizard-13',
     description:
-      'Numerous contributions to GDevelop (particle engine, bugfixes, new conditions, examples, tutorials...)',
+      'Numerous code contributions to GDevelop and community moderation',
   },
   {
     name: "Christina 'Castpixel' Antoinette Neofotistou",
@@ -60,13 +67,12 @@ const contributors = [
   {
     name: 'Aurélien Vivet',
     description:
-      'Numerous contributions to GDevelop (Video extension, advanced shapes, bugfixes, new conditions, examples...)',
+      'Numerous code contributions to GDevelop and community management',
     link: 'https://www.witly.fr',
   },
   {
     name: 'Todor Imreorov',
-    description:
-      'Numerous contributions to GDevelop, added Piskel sprite editor and jfxr',
+    description: 'Numerous code contributions to GDevelop',
   },
   { name: 'brylie', description: 'Contributions to GDevelop' },
   { name: 'Nnarol', description: 'Contributions to GDevelop' },
@@ -88,18 +94,29 @@ const contributors = [
   },
   {
     name: 'Arthur Pacaud (arthuro555)',
-    description: 'Contributions to GDevelop and Moderation on the Forum',
+    description:
+      'Numerous code contributions to GDevelop and community moderation',
     link: 'https://forum.gdevelop-app.com/u/arthuro555/summary',
   },
   {
-    name: 'Tristan Rhodes (Victris Games)',
-    description: 'High quality extensions for GDevelop',
-    link: 'https://www.youtube.com/channel/UClbq1M-D83t_bYhfa1mfyEQ',
+    name: 'The Gem Dev',
+    description: 'Code contributions to GDevelop and tutorials on Youtube',
+    link: 'https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q',
   },
   {
-    name: 'The Gem Dev',
-    description: 'Contributions to GDevelop and tutorials on Youtube',
+    name: 'D8H',
+    description: 'Numerous code contributions to GDevelop',
     link: 'https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q',
+  },
+  {
+    name: 'Harsimran Singh Virk',
+    description: 'Numerous code contributions to GDevelop',
+    link: 'https://github.com/HarsimranVirk',
+  },
+  {
+    name: 'Nilay Majorwar',
+    description: 'Numerous code contributions to GDevelop',
+    link: 'https://github.com/nilaymaj',
   },
 
   // Community members:
@@ -143,6 +160,71 @@ const contributors = [
   {
     name: 'MillionthVector',
     description: 'Assets of various examples',
+  },
+  {
+    name: 'Tristan Rhodes (Victris Games)',
+    description: 'High quality extensions for GDevelop',
+    link: 'https://www.youtube.com/channel/UClbq1M-D83t_bYhfa1mfyEQ',
+  },
+  {
+    name: 'Entropy',
+    description: 'High quality extensions for GDevelop',
+    link: 'https://github.com/Entr0py404',
+  },
+  {
+    name: 'FlokiTV',
+    description: 'High quality extensions for GDevelop',
+    link: 'https://github.com/Entr0py404',
+  },
+  {
+    name: 'Silver-Streak',
+    description:
+      'Examples, bug reports, testing of new features, providing community support to users, community moderation',
+    link: 'https://github.com/Silver-Streak',
+  },
+  {
+    name: 'Jurfix',
+    description: 'Discord moderation',
+  },
+  {
+    name: 'Wishforge Games',
+    description: 'Making high quality tutorials',
+    link: 'https://www.wishforge.games/',
+  },
+  {
+    name: 'Sleeper Games',
+    description: 'Making the game feel starter',
+    link: 'https://twitter.com/Sleeper_Games',
+  },
+  {
+    name: 'VegeTato',
+    description: 'Extensions for GDevelop',
+  },
+  {
+    name: 'Leo Red',
+    description: 'Reviewing examples submissions',
+    link: 'https://github.com/Midhil457',
+  },
+  {
+    name: 'add_',
+    description: 'Extensions for GDevelop',
+    link: 'https://github.com/add00',
+  },
+  {
+    name: 'HelperWesley',
+    description: 'Examples and youtube content that is relevant to GDevelop',
+    link: 'https://www.youtube.com/channel/UC8RsU74-hU1pfNKHNMfiFfw',
+  },
+  {
+    name: 'UlisesFreitas',
+    description:
+      'Numerous examples and making external services that integrate with GDevelop games',
+    link: 'https://helperwesley.itch.io/',
+  },
+  {
+    name: 'IttaloXD',
+    description: 'The GDevelop embassador in Brazil',
+    link: 'https://twitter.com/ittaloxd',
   },
 ];
 

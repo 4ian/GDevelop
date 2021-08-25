@@ -39,10 +39,10 @@ const styles = {
 // If you contributed to GDevelop but you're not in the list, please
 // send a Pull Request on GitHub or open an issue ;)
 const contributors = [
-  // Core team
+  // Core development team
   {
     name: 'Clément Pasteau',
-    description: 'CTO of the core development team',
+    description: 'Core development team',
     link: 'https://github.com/ClementPasteau',
   },
 

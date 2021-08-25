@@ -118,7 +118,7 @@ module.exports = {
         opacity: 255,
         fontSize: 20,
         visible: true,
-        color: '#000000',
+        color: '0;0;0',
         fontFamily: 'Arial',
         align: 'left',
         wordWrap: true,

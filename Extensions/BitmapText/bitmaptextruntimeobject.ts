@@ -61,7 +61,7 @@ namespace gdjs {
 
       this._opacity = objectData.content.opacity;
       this._text = objectData.content.text;
-      this._tint = gdjs.hexToRGBColor(objectData.content.tint);
+      this._tint = gdjs.rgbOrHexToRGBColor(objectData.content.tint);
 
       this._bitmapFontResourceName = objectData.content.bitmapFontResourceName; // fnt/xml files
       this._textureAtlasResourceName =
@@ -96,7 +96,7 @@ namespace gdjs {
         this.setText(newObjectData.content.text);
       }
       if (oldObjectData.content.tint !== newObjectData.content.tint) {
-        this._tint = gdjs.hexToRGBColor(newObjectData.content.tint);
+        this._tint = gdjs.rgbOrHexToRGBColor(newObjectData.content.tint);
         this._renderer.updateTint();
       }
       if (
@@ -159,12 +159,7 @@ namespace gdjs {
     }
 
     setTint(rgbColorString: string): void {
-      const splitValue = rgbColorString.split(';');
-      if (splitValue.length !== 3) return;
-
-      this._tint[0] = parseInt(splitValue[0], 10);
-      this._tint[1] = parseInt(splitValue[1], 10);
-      this._tint[2] = parseInt(splitValue[2], 10);
+      this._tint = gdjs.rgbOrHexToRGBColor(rgbColorString);
       this._renderer.updateTint();
     }
 

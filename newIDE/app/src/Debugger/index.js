@@ -120,9 +120,12 @@ export default class Debugger extends React.Component<Props, State> {
   }
 
   _getLogsManager(id: number): LogsManager {
-    if (!this._debuggerLogs.has(id))
-      this._debuggerLogs.set(id, new LogsManager());
-    return (this._debuggerLogs.get(id): LogsManager);
+    let result = this._debuggerLogs.get(id);
+    if (!result) {
+      result = new LogsManager();
+      this._debuggerLogs.set(id, result);
+    }
+    return result;
   }
 
   _startServer = () => {

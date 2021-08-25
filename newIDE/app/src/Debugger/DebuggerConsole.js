@@ -9,6 +9,8 @@ import MUIList from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import Chip from '@material-ui/core/Chip';
+import Paper from '@material-ui/core/Paper';
 
 import { Line, Column, Spacer } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
@@ -25,6 +27,8 @@ import ExpandIcon from '@material-ui/icons/AspectRatio';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import FilterIcon from '@material-ui/icons/FilterList';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 export type Log = {
   message: string,
@@ -77,6 +81,19 @@ const iconMap = {
   error: <ErrorIcon color="error" />,
 };
 
+const ConsoleText = ({ children, monospace }) => (
+  <span
+    style={{
+      userSelect: 'text',
+      cursor: 'text',
+      wordBreak: 'break-word',
+      fontFamily: monospace ? "'Courier New', monospace" : undefined,
+    }}
+  >
+    {children}
+  </span>
+);
+
 export const DebuggerConsole = ({
   logsManager,
 }: {
@@ -85,16 +102,24 @@ export const DebuggerConsole = ({
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;
+  const [followNew, setFollowNew] = React.useState(true);
+  const virtualListRef = React.useRef<null | List>(null);
   React.useEffect(
     () => {
-      // Rerender when the logs are updated
-      const onUpdate = () => forceUpdate();
+      // Rerender when the logs are updated...
+      const onUpdate = () => {
+        // ...scroll to the new item if needed and possible...
+        if (virtualListRef.current && followNew)
+          virtualListRef.current.scrollToRow(logsManager.logs.length + 1);
+        // ...and rerender.
+        forceUpdate();
+      };
       logsManager.on('log', onUpdate);
       return () => {
         logsManager.off('log', onUpdate);
       };
     },
-    [forceUpdate, logsManager]
+    [forceUpdate, logsManager, virtualListRef, followNew]
   );
 
   const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
@@ -102,7 +127,7 @@ export const DebuggerConsole = ({
     () =>
       new CellMeasurerCache({
         defaultHeight: 45,
-        minHeight: 30,
+        minHeight: 25,
         fixedWidth: true,
       }),
     []
@@ -159,6 +184,7 @@ export const DebuggerConsole = ({
           {sizeMeasurer && (
             <MUIList dense={true} style={{ padding: 0 }}>
               <List
+                ref={virtualListRef}
                 autoContainerWidth
                 deferredMeasurementCache={cache}
                 height={sizeMeasurer.offsetHeight}
@@ -174,16 +200,35 @@ export const DebuggerConsole = ({
                     rowIndex={index}
                   >
                     {({ registerChild }) => (
-                      <ListItem key={key} style={style} ref={registerChild}>
+                      <ListItem
+                        dense
+                        key={key}
+                        style={style}
+                        ref={registerChild}
+                      >
                         <ListItemIcon>
                           {iconMap[filteredLogs[index].type] || iconMap['info']}
                         </ListItemIcon>
                         <ListItemText
-                          primary={filteredLogs[index].message}
+                          primary={
+                            <Paper variant="outlined">
+                              <ConsoleText monospace>
+                                {filteredLogs[index].message}
+                              </ConsoleText>
+                            </Paper>
+                          }
                           secondary={
-                            maximized
-                              ? filteredLogs[index].group || 'Default'
-                              : undefined
+                            maximized && filteredLogs[index].group ? (
+                              <Chip
+                                label={
+                                  <ConsoleText>
+                                    {filteredLogs[index].group}
+                                  </ConsoleText>
+                                }
+                              />
+                            ) : (
+                              undefined
+                            )
                           }
                         />
                       </ListItem>
@@ -212,6 +257,19 @@ export const DebuggerConsole = ({
               checked={!hideInternal}
               onCheck={(_, value) => setHideInternal(!value)}
             />
+            <Checkbox
+              label={
+                followNew ? (
+                  <Trans>Stop autoscrolling</Trans>
+                ) : (
+                  <Trans>Autoscroll to new logs</Trans>
+                )
+              }
+              checkedIcon={<CancelIcon />}
+              uncheckedIcon={<ArrowDownwardIcon />}
+              checked={followNew}
+              onCheck={(_, value) => setFollowNew(value)}
+            />
             <IconButton
               tooltip={t`Filter the logs by group`}
               onClick={() => setEditingHiddenGroups(true)}
@@ -223,44 +281,43 @@ export const DebuggerConsole = ({
         </MiniToolbar>
       </div>
 
-      <Dialog
-        open={editingHiddenGroups}
-        title={<Trans>Select log groups to display</Trans>}
-        onRequestClose={() => setEditingHiddenGroups(false)}
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            primary={false}
-            onClick={() => setEditingHiddenGroups(false)}
-          />,
-        ]}
-      >
-        <Column>
-          {(() => {
-            // Do not bother regenerating all of this if it is not displayed.
-            if (!editingHiddenGroups) return;
-
-            const list = [];
-            for (const group of groups.values())
-              list.push(
-                <Line key={group}>
-                  <Checkbox
-                    label={group}
-                    checked={!hiddenGroups.has(group)}
-                    onCheck={(_, checked) => {
-                      if (checked) hiddenGroups.delete(group);
-                      else hiddenGroups.add(group);
-                      // Since hiddenGroups is a ref, not a state, we need to manually update.
-                      forceUpdate();
-                    }}
-                  />
-                </Line>
-              );
-            return list;
-          })()}
-        </Column>
-      </Dialog>
+      {editingHiddenGroups && (
+        <Dialog
+          open
+          title={<Trans>Select log groups to display</Trans>}
+          onRequestClose={() => setEditingHiddenGroups(false)}
+          actions={[
+            <FlatButton
+              key="close"
+              label={<Trans>Close</Trans>}
+              primary={false}
+              onClick={() => setEditingHiddenGroups(false)}
+            />,
+          ]}
+        >
+          <Column>
+            {(() => {
+              const list = [];
+              for (const group of groups.values())
+                list.push(
+                  <Line key={group}>
+                    <Checkbox
+                      label={group}
+                      checked={!hiddenGroups.has(group)}
+                      onCheck={(_, checked) => {
+                        if (checked) hiddenGroups.delete(group);
+                        else hiddenGroups.add(group);
+                        // Since hiddenGroups is a ref, not a state, we need to manually update.
+                        forceUpdate();
+                      }}
+                    />
+                  </Line>
+                );
+              return list;
+            })()}
+          </Column>
+        </Dialog>
+      )}
     </>
   );
 };

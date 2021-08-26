@@ -7,11 +7,9 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
 #include "TextObject.h"
 
 #include <iostream>
-#include "GDCore/Tools/Localization.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension);
 
@@ -70,18 +68,19 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    GetAllActionsForObject("TextObject::Text")["TextObject::Size"]
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetFontSize"]
         .SetFunctionName("setCharacterSize")
         .SetGetter("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    GetAllConditionsForObject("TextObject::Text")["TextObject::Size"]
+    GetAllConditionsForObject("TextObject::Text")["TextObject::FontSize"]
         .SetFunctionName("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    GetAllExpressionsForObject("TextObject::Text")["FontSize"]
+    GetAllExpressionsForObject("TextObject::Text")["GetFontSize"]
         .SetFunctionName("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(

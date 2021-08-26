@@ -74,6 +74,33 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("ChangeFont")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddAction("Size",
+                _("Size"),
+                _("Change the size of the text."),
+                _("the size of the text"),
+                "",
+                "res/actions/characterSize24.png",
+                "res/actions/characterSize.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardOperatorParameters("number")
+      .SetFunctionName("SetCharacterSize")
+      .SetGetter("GetCharacterSize")
+      .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddCondition("Size",
+                   _("Size"),
+                   _("Compare the size of the text"),
+                   _("the size of the text"),
+                   "",
+                   "res/conditions/characterSize24.png",
+                   "res/conditions/characterSize.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardRelationalOperatorParameters("number")
+      .SetFunctionName("GetCharacterSize")
+      .SetIncludeFile("TextObject/TextObject.h");
+
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),

@@ -119,7 +119,7 @@ module.exports = {
         opacity: 255,
         scale: 1,
         fontSize: 20,
-        tint: '#ffffff',
+        tint: '255;255;255',
         bitmapFontResourceName: '',
         textureAtlasResourceName: '',
         align: 'left',
@@ -638,7 +638,7 @@ module.exports = {
       this._pixiObject.align = align;
 
       const color = properties.get('tint').getValue();
-      this._pixiObject.tint = parseInt(color.replace('#', '0x'), 16);
+      this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const scale = properties.get('scale').getValue() || 1;
       this._pixiObject.scale.set(scale);

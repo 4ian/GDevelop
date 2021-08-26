@@ -151,7 +151,7 @@ module.exports = {
     lightObject.setRawJSONContent(
       JSON.stringify({
         radius: 50,
-        color: '#ffffff',
+        color: '255;255;255',
         debugMode: false,
         texture: '',
       })
@@ -287,18 +287,16 @@ module.exports = {
           .getValue()
       );
       if (this._radius <= 0) this._radius = 1;
-      this._colorHex = parseInt(
+      const colorHex = objectsRenderingService.rgbOrHexToHexNumber(
         this._associatedObject
           .getProperties(this.project)
           .get('color')
           .getValue()
-          .replace('#', ''),
-        16
       );
       this._color = [
-        ((this._colorHex >> 16) & 0xff) / 255,
-        ((this._colorHex >> 8) & 0xff) / 255,
-        (this._colorHex & 0xff) / 255,
+        ((colorHex >> 16) & 0xff) / 255,
+        ((colorHex >> 8) & 0xff) / 255,
+        (colorHex & 0xff) / 255,
       ];
 
       const geometry = new PIXI.Geometry();

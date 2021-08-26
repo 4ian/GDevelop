@@ -14,6 +14,11 @@ import some from 'lodash/some';
 import Checkbox from '../UI/Checkbox';
 import { isNullPtr } from '../Utils/IsNullPtr';
 import { ColumnStackLayout } from '../UI/Layout';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+  type RGBColor,
+} from '../Utils/ColorTransformer';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -29,12 +34,7 @@ type Props = {|
 type State = {|
   windowTitle: string,
   shouldStopSoundsOnStartup: boolean,
-  backgroundColor: {
-    r: number,
-    g: number,
-    b: number,
-    a: number,
-  },
+  backgroundColor: ?RGBColor,
 |};
 
 export default class ScenePropertiesDialog extends Component<Props, State> {
@@ -71,9 +71,9 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       this.state.shouldStopSoundsOnStartup
     );
     this.props.layout.setBackgroundColor(
-      this.state.backgroundColor.r,
-      this.state.backgroundColor.g,
-      this.state.backgroundColor.b
+      this.state.backgroundColor ? this.state.backgroundColor.r : 0,
+      this.state.backgroundColor ? this.state.backgroundColor.g : 0,
+      this.state.backgroundColor ? this.state.backgroundColor.b : 0
     );
     this.props.onApply();
   };
@@ -185,9 +185,11 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             floatingLabelText={<Trans>Scene background color</Trans>}
             fullWidth
             disableAlpha
-            color={this.state.backgroundColor}
-            onChangeComplete={color =>
-              this.setState({ backgroundColor: color.rgb })
+            color={rgbColorToRGBString(this.state.backgroundColor)}
+            onChange={color =>
+              this.setState({
+                backgroundColor: rgbStringAndAlphaToRGBColor(color),
+              })
             }
           />
           {!some(propertiesEditors) && (

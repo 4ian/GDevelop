@@ -4,6 +4,10 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Checkbox from '../../UI/Checkbox';
 import ColorField from '../../UI/ColorField';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+} from '../../Utils/ColorTransformer';
 import { type EditorProps } from './EditorProps.flow';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
@@ -45,19 +49,22 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
             fullWidth
-            color={{
+            color={rgbColorToRGBString({
               r: shapePainterObject.getOutlineColorR(),
               g: shapePainterObject.getOutlineColorG(),
               b: shapePainterObject.getOutlineColorB(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              shapePainterObject.setOutlineColor(
-                color.rgb.r,
-                color.rgb.g,
-                color.rgb.b
-              );
-              this.forceUpdate();
+            })}
+            onChange={color => {
+              const rgbColor = rgbStringAndAlphaToRGBColor(color);
+              if (rgbColor) {
+                shapePainterObject.setOutlineColor(
+                  rgbColor.r,
+                  rgbColor.g,
+                  rgbColor.b
+                );
+
+                this.forceUpdate();
+              }
             }}
           />
           <SemiControlledTextField
@@ -88,19 +95,22 @@ export default class PanelSpriteEditor extends React.Component<
             floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
             fullWidth
-            color={{
+            color={rgbColorToRGBString({
               r: shapePainterObject.getFillColorR(),
               g: shapePainterObject.getFillColorG(),
               b: shapePainterObject.getFillColorB(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              shapePainterObject.setFillColor(
-                color.rgb.r,
-                color.rgb.g,
-                color.rgb.b
-              );
-              this.forceUpdate();
+            })}
+            onChange={color => {
+              const rgbColor = rgbStringAndAlphaToRGBColor(color);
+              if (rgbColor) {
+                shapePainterObject.setFillColor(
+                  rgbColor.r,
+                  rgbColor.g,
+                  rgbColor.b
+                );
+
+                this.forceUpdate();
+              }
             }}
           />
           <SemiControlledTextField

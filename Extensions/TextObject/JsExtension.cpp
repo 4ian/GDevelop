@@ -81,6 +81,12 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+    GetAllExpressionsForObject("TextObject::Text")["FontSize"]
+        .SetFunctionName("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::Angle"]
         .SetFunctionName("setAngle")
         .SetGetter("getAngle")
@@ -103,7 +109,6 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"]
         .SetFunctionName("setBold")

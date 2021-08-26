@@ -6,7 +6,10 @@ import Dialog from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import { ColumnStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import { type ColorResult } from '../UI/ColorField/ColorPicker';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+} from '../Utils/ColorTransformer';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import Text from '../UI/Text';
@@ -160,18 +163,21 @@ const LayerEditorDialog = (props: Props) => {
                   fullWidth
                   floatingLabelText={<Trans>Ambient light color</Trans>}
                   disableAlpha
-                  color={{
+                  color={rgbColorToRGBString({
                     r: layer.getAmbientLightColorRed(),
                     g: layer.getAmbientLightColorGreen(),
                     b: layer.getAmbientLightColorBlue(),
-                  }}
-                  onChange={(color: ColorResult) => {
-                    layer.setAmbientLightColor(
-                      color.rgb.r,
-                      color.rgb.g,
-                      color.rgb.b
-                    );
-                    forceUpdate();
+                  })}
+                  onChange={color => {
+                    const rgbColor = rgbStringAndAlphaToRGBColor(color);
+                    if (rgbColor) {
+                      layer.setAmbientLightColor(
+                        rgbColor.r,
+                        rgbColor.g,
+                        rgbColor.b
+                      );
+                      forceUpdate();
+                    }
                   }}
                 />
               </React.Fragment>

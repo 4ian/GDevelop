@@ -19,7 +19,7 @@ type ValueProps =
   | {|
       type: 'number',
       value: number | string,
-      onChange?: (event: {||}, value: string) => void,
+      onChange?: ({| target: {| value: number |} |}, value: string) => void,
     |}
   // Support an "uncontrolled" field:
   | {| defaultValue: string |}
@@ -83,7 +83,7 @@ type Props = {|
   style?: {|
     fontSize?: 14 | 18,
     fontStyle?: 'normal' | 'italic',
-    width?: number | '100%',
+    width?: number | string,
     flex?: 1,
     top?: number,
     padding?: number,

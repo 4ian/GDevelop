@@ -36,9 +36,7 @@ namespace gdjs {
       super(runtimeScene, lightObjectData);
       this._radius =
         lightObjectData.content.radius > 0 ? lightObjectData.content.radius : 1;
-      this._color = LightRuntimeObject.hexToRGBColor(
-        lightObjectData.content.color
-      );
+      this._color = gdjs.rgbOrHexToRGBColor(lightObjectData.content.color);
       this._debugMode = lightObjectData.content.debugMode;
       this._texture = lightObjectData.content.texture;
       this._obstaclesManager = gdjs.LightObstaclesManager.getManager(
@@ -68,9 +66,7 @@ namespace gdjs {
         this.setRadius(newObjectData.content.radius);
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
-        this._color = LightRuntimeObject.hexToRGBColor(
-          newObjectData.content.color
-        );
+        this._color = gdjs.rgbOrHexToRGBColor(newObjectData.content.color);
         this._renderer.updateColor();
       }
       if (oldObjectData.content.texture !== newObjectData.content.texture) {
@@ -148,12 +144,7 @@ namespace gdjs {
      * Set the color of the light object in format "R;G;B" string, with components in the range of [0-255].
      */
     setColor(color: string): void {
-      const rgbColor = color.split(';');
-      this._color = [
-        parseInt(rgbColor[0], 10),
-        parseInt(rgbColor[1], 10),
-        parseInt(rgbColor[2], 10),
-      ];
+      this._color = gdjs.rgbOrHexToRGBColor(color);
       this._renderer.updateColor();
     }
 

@@ -11,7 +11,10 @@ import {
   type InstancesEditorSettings,
   cloneInstancesEditorSettings,
 } from '../InstancesEditor/InstancesEditorSettings';
-import { hexNumberToRGBColor, rgbToHexNumber } from '../Utils/ColorTransformer';
+import {
+  hexNumberToRGBString,
+  rgbStringToHexNumber,
+} from '../Utils/ColorTransformer';
 
 type Props = {|
   instancesEditorSettings: InstancesEditorSettings,
@@ -71,19 +74,14 @@ export default function SetupGridDialog(props: Props) {
           <ColorField
             floatingLabelText={<Trans>Line color</Trans>}
             fullWidth
-            color={{
-              ...hexNumberToRGBColor(props.instancesEditorSettings.gridColor),
-              a: props.instancesEditorSettings.gridAlpha,
-            }}
-            onChangeComplete={color => {
+            color={hexNumberToRGBString(
+              props.instancesEditorSettings.gridColor
+            )}
+            onChange={color => {
               props.onChangeInstancesEditorSettings({
                 ...props.instancesEditorSettings,
-                gridColor: rgbToHexNumber(
-                  color.rgb.r,
-                  color.rgb.g,
-                  color.rgb.b
-                ),
-                gridAlpha: color.rgb.a,
+                gridColor: rgbStringToHexNumber(color),
+                gridAlpha: 1,
               });
             }}
           />

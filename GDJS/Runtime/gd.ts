@@ -74,6 +74,26 @@ namespace gdjs {
   };
 
   /**
+   * Convert a string RGB color string ("rrr;ggg;bbb") or a hex string ("#rrggbb") to a rgb object.
+   * @param value The color as a RGB string or hex string
+   */
+  export const rgbOrHexToRGBColor = function (
+    value: string
+  ): [number, number, number] {
+    const splitValue = value.split(';');
+    // If a RGB string is provided, return the RGB object.
+    if (splitValue.length === 3) {
+      return [
+        parseInt(splitValue[0], 0),
+        parseInt(splitValue[1], 0),
+        parseInt(splitValue[2], 0),
+      ];
+    }
+    // Otherwise, convert the Hex to RGB.
+    return hexToRGBColor(value);
+  };
+
+  /**
    * Convert a rgb color value to a hex value.
    * @param r Red
    * @param g Green

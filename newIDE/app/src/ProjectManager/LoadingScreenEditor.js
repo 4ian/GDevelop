@@ -5,11 +5,13 @@ import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import Checkbox from '../UI/Checkbox';
 import ColorField from '../UI/ColorField';
 import { I18n } from '@lingui/react';
-import { type ColorResult } from '../UI/ColorField/ColorPicker';
 import { Line } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
-import { hexNumberToRGBColor, rgbToHexNumber } from '../Utils/ColorTransformer';
+import {
+  hexNumberToRGBString,
+  rgbStringToHexNumber,
+} from '../Utils/ColorTransformer';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import {
@@ -70,11 +72,9 @@ export const LoadingScreenEditor = ({
               fullWidth
               floatingLabelText={<Trans>Background color</Trans>}
               disableAlpha
-              color={hexNumberToRGBColor(loadingScreen.getBackgroundColor())}
-              onChangeComplete={(color: ColorResult) => {
-                loadingScreen.setBackgroundColor(
-                  rgbToHexNumber(color.rgb.r, color.rgb.g, color.rgb.b)
-                );
+              color={hexNumberToRGBString(loadingScreen.getBackgroundColor())}
+              onChange={color => {
+                loadingScreen.setBackgroundColor(rgbStringToHexNumber(color));
                 forceUpdate();
               }}
             />
@@ -234,11 +234,9 @@ export const LoadingScreenEditor = ({
             fullWidth
             floatingLabelText={<Trans>Progress bar color</Trans>}
             disableAlpha
-            color={hexNumberToRGBColor(loadingScreen.getProgressBarColor())}
-            onChangeComplete={(color: ColorResult) => {
-              loadingScreen.setProgressBarColor(
-                rgbToHexNumber(color.rgb.r, color.rgb.g, color.rgb.b)
-              );
+            color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
+            onChange={color => {
+              loadingScreen.setProgressBarColor(rgbStringToHexNumber(color));
               forceUpdate();
             }}
           />

@@ -118,7 +118,7 @@ module.exports = {
         opacity: 255,
         fontSize: 20,
         visible: true,
-        color: '#000000',
+        color: '0;0;0',
         fontFamily: 'Arial',
         align: 'left',
         wordWrap: true,
@@ -511,7 +511,7 @@ module.exports = {
       this._pixiObject.alpha = opacity / 255;
 
       const color = properties.get('color').getValue();
-      this._pixiObject.textStyles.default.fill = color;
+      this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;

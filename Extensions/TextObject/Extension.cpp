@@ -539,6 +539,15 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetAngle")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddExpression("GetFontSize",
+                    _("Font size"),
+                    _("Font size"),
+                    _("Font size"),
+                    "res/conditions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .SetFunctionName("GetCharacterSize")
+      .SetIncludeFile("TextObject/TextObject.h");
+
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
       .AddParameter("object", _("Object"), "Text")

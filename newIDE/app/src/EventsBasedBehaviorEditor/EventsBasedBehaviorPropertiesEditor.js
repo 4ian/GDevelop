@@ -308,10 +308,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 }
                                 onChange={(newValue: string) => {
                                   // Change the type of the required behavior.
-                                  if (property.getExtraInfo().size() !== 0) {
-                                    property.clearExtraInfo();
+                                  const extraInfo = property.getExtraInfo();
+                                  if (extraInfo.size() === 0) {
+                                    extraInfo.push_back(newValue);
                                   }
-                                  property.addExtraInfo(newValue);
+                                  else {
+                                    extraInfo.set(0, newValue);
+                                  }
                                   this.forceUpdate();
                                   this.props.onPropertiesUpdated();
                                 }}

@@ -864,12 +864,11 @@ void WholeProjectRefactorer::DoRenameBehavior(
       {
         NamedPropertyDescriptor& propertyDescriptor
             = eventsBasedBehavior->GetPropertyDescriptors().Get(i);
-        const std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
+        std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
         if (propertyDescriptor.GetType() == "Behavior" && extraInfo.size() > 0) {
           const gd::String& requiredBehaviorType = extraInfo[0];
           if (requiredBehaviorType == oldBehaviorType) {
-            propertyDescriptor.ClearExtraInfo();
-            propertyDescriptor.AddExtraInfo(newBehaviorType);
+            extraInfo[0] = newBehaviorType;
           }
         }
       }

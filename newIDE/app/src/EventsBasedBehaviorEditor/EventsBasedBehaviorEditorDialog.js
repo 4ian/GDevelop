@@ -29,8 +29,11 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
     } = this.props;
 
     const onApplyAndFixIssues = () => {
+      // TODO It only works when the dialog is opened and closed again.
       onApply();
-      fillRequiredBehaviorProperties(this.props.project);
+      if (fillRequiredBehaviorProperties(this.props.project)) {
+        onApply();
+      }
     };
 
     return (
@@ -81,25 +84,45 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
  * with an invalid value.
  * @param {*} project
  */
-const fillRequiredBehaviorProperties = (project: gdProject): void => {
+const fillRequiredBehaviorProperties = (project: gdProject): boolean => {
   const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
     project
   );
   for (let index = 0; index < problems.size(); index++) {
     const problem = problems.at(index);
 
+    const object = problem.getSourceObject();
+    const expectedBehaviorTypeName = problem.getExpectedBehaviorTypeName();
     const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
-      problem.getSourceObject(),
-      problem.getExpectedBehaviorTypeName()
+      object,
+      expectedBehaviorTypeName
     ).toJSArray();
+    const behaviorContent = problem.getSourceBehaviorContent();
+    const behavior = gd.MetadataProvider.getBehaviorMetadata(
+      project.getCurrentPlatform(),
+      behaviorContent.getTypeName()
+    ).get();
 
-    if (suggestedBehaviorNames.length > 0) {
-      // There is a matching behavior on the object use it by default.
-      const behaviorContent = problem.getSourceBehaviorContent();
-      const behavior = gd.MetadataProvider.getBehaviorMetadata(
+    if (suggestedBehaviorNames.length === 0) {
+      // No matching behavior on the object.
+      // Add required behaviors on the object.
+      const defaultName = gd.MetadataProvider.getBehaviorMetadata(
         project.getCurrentPlatform(),
-        behaviorContent.getTypeName()
-      ).get();
+        expectedBehaviorTypeName
+      ).getDefaultName();
+      gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        expectedBehaviorTypeName,
+        defaultName
+      );
+      behavior.updateProperty(
+        behaviorContent.getContent(),
+        problem.getSourcePropertyName(),
+        defaultName
+      );
+    } else {
+      // There is a matching behavior on the object use it by default.
       behavior.updateProperty(
         behaviorContent.getContent(),
         problem.getSourcePropertyName(),
@@ -108,4 +131,5 @@ const fillRequiredBehaviorProperties = (project: gdProject): void => {
       );
     }
   }
+  return problems.size() > 0;
 };

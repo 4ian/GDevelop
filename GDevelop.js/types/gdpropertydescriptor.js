@@ -11,7 +11,6 @@ declare class gdPropertyDescriptor {
   getDescription(): string;
   addExtraInfo(type: string): gdPropertyDescriptor;
   setExtraInfo(info: gdVectorString): gdPropertyDescriptor;
-  clearExtraInfo(): gdPropertyDescriptor;
   getExtraInfo(): gdVectorString;
   setHidden(enable: boolean): gdPropertyDescriptor;
   isHidden(): boolean;

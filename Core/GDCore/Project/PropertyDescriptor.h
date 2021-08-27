@@ -96,17 +96,16 @@ class GD_CORE_API PropertyDescriptor {
     return *this;
   }
 
-  PropertyDescriptor& ClearExtraInfo() {
-    extraInformation.clear();
-    return *this;
-  }
-
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
-  // TODO why not adding a non-constant getter?
+
   const std::vector<gd::String>& GetExtraInfo() const {
+    return extraInformation;
+  }
+  
+  std::vector<gd::String>& GetExtraInfo() {
     return extraInformation;
   }
 

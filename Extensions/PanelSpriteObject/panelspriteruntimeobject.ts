@@ -114,11 +114,6 @@ namespace gdjs {
 
     onDestroyFromScene(runtimeScene): void {
       super.onDestroyFromScene(runtimeScene);
-      // @ts-ignore
-      if (this._renderer.onDestroy) {
-        // @ts-ignore
-        this._renderer.onDestroy();
-      }
     }
 
     update(runtimeScene: gdjs.RuntimeScene): void {
@@ -192,6 +187,7 @@ namespace gdjs {
      * @param width The new width in pixels.
      */
     setWidth(width: float): void {
+      if (width < 0) width = 0;
       if (this._width === width) return;
 
       this._width = width;
@@ -204,6 +200,7 @@ namespace gdjs {
      * @param height The new height in pixels.
      */
     setHeight(height: float): void {
+      if (height < 0) height = 0;
       if (this._height === height) return;
 
       this._height = height;

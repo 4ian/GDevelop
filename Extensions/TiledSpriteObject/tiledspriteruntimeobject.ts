@@ -143,6 +143,7 @@ namespace gdjs {
      * @param width The new width.
      */
     setWidth(width: float): void {
+      if (width < 0) width = 0;
       if (this._width === width) return;
 
       this._width = width;
@@ -155,6 +156,7 @@ namespace gdjs {
      * @param height The new height.
      */
     setHeight(height: float): void {
+      if (height < 0) height = 0;
       if (this._height === height) return;
 
       this._height = height;

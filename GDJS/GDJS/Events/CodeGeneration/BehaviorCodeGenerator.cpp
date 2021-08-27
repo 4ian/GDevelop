@@ -213,7 +213,7 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
-  if (property.GetType() == "String" || property.GetType() == "Choice") {
+  if (property.GetType() == "String" || property.GetType() == "Choice" || property.GetType() == "Color") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (property.GetType() == "Number") {
     return "Number(" +

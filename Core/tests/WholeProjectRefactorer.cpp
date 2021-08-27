@@ -943,17 +943,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("RequiredBehaviorProperty", 0)
-        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     gd::Project& project);
     
     REQUIRE(problems.size() == 1);
-    REQUIRE(problem[0].getSourceObject() == object);
-    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
-    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
-    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(problem[0].GetSourceObject() == object);
+    REQUIRE(problem[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
     REQUIRE(suggestedBehaviorNames.length == 0);
   }
   SECTION("(Events based Behavior) unfilled required behavior and 1 match") {
@@ -966,7 +966,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("RequiredBehaviorProperty", 0)
-        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     object.AddBehavior(gd::BehaviorContent(
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
@@ -976,10 +976,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     gd::Project& project);
     
     REQUIRE(problems.size() == 1);
-    REQUIRE(problem[0].getSourceObject() == object);
-    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
-    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
-    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(problem[0].GetSourceObject() == object);
+    REQUIRE(problem[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
     REQUIRE(suggestedBehaviorNames.length == 1);
     REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
   }
@@ -993,7 +993,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("RequiredBehaviorProperty", 0)
-        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     object.AddBehavior(gd::BehaviorContent(
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
@@ -1005,10 +1005,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     gd::Project& project);
     
     REQUIRE(problems.size() == 1);
-    REQUIRE(problem[0].getSourceObject() == object);
-    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
-    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
-    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(problem[0].GetSourceObject() == object);
+    REQUIRE(problem[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
     REQUIRE(suggestedBehaviorNames.length == 2);
     REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
     REQUIRE(suggestedBehaviorNames[1] == "PlatformBehavior2");

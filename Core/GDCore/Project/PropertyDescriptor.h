@@ -100,7 +100,12 @@ class GD_CORE_API PropertyDescriptor {
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
   const gd::String& GetDescription() const { return description; }
+
   const std::vector<gd::String>& GetExtraInfo() const {
+    return extraInformation;
+  }
+  
+  std::vector<gd::String>& GetExtraInfo() {
     return extraInformation;
   }
 

@@ -97,7 +97,8 @@ export const declareBehaviorMetadata = (
     if (
       propertyType === 'String' ||
       propertyType === 'Choice' ||
-      propertyType === 'Color'
+      propertyType === 'Color' ||
+      propertyType === 'Behavior'
     ) {
       element.setStringValue(newValue);
     } else if (propertyType === 'Number') {
@@ -125,7 +126,8 @@ export const declareBehaviorMetadata = (
         if (
           propertyType === 'String' ||
           propertyType === 'Choice' ||
-          propertyType === 'Color'
+          propertyType === 'Color' ||
+          propertyType === 'Behavior'
         ) {
           newProperty.setValue(
             behaviorContent.getChild(propertyName).getStringValue()
@@ -159,7 +161,8 @@ export const declareBehaviorMetadata = (
       if (
         propertyType === 'String' ||
         propertyType === 'Choice' ||
-        propertyType === 'Color'
+        propertyType === 'Color' ||
+        propertyType === 'Behavior'
       ) {
         element.setStringValue(enumeratedProperty.value);
       } else if (propertyType === 'Number') {

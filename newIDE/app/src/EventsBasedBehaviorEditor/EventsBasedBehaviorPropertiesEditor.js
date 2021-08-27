@@ -23,6 +23,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
+import ColorField from '../UI/ColorField';
 
 const gd: libGDevelop = global.gd;
 
@@ -242,6 +243,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Choice"
                                 primaryText={t`String from a list of options (text)`}
                               />
+                              <SelectOption
+                                value="Color"
+                                primaryText={t`Color (text)`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -292,6 +297,19 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             <StringArrayEditor
                               extraInfo={getExtraInfoArray(property)}
                               setExtraInfo={this._setChoiceExtraInfo(property)}
+                            />
+                          )}
+                          {property.getType() === 'Color' && (
+                            <ColorField
+                              floatingLabelText={<Trans>Color</Trans>}
+                              disableAlpha
+                              fullWidth
+                              color={property.getValue()}
+                              onChange={color => {
+                                property.setValue(color);
+                                this.forceUpdate();
+                                this.props.onPropertiesUpdated();
+                              }}
                             />
                           )}
                           <SemiControlledTextField

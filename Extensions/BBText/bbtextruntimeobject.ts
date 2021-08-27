@@ -56,7 +56,7 @@ namespace gdjs {
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._opacity = parseFloat(objectData.content.opacity);
       this._text = objectData.content.text;
-      this._color = gdjs.hexToRGBColor(objectData.content.color);
+      this._color = gdjs.rgbOrHexToRGBColor(objectData.content.color);
       this._fontFamily = objectData.content.fontFamily;
       // @ts-ignore - parseFloat should not be required, but GDevelop 5.0 beta 92 and below were storing it as a string.
       this._fontSize = parseFloat(objectData.content.fontSize);
@@ -88,7 +88,7 @@ namespace gdjs {
         this.setBBText(newObjectData.content.text);
       }
       if (oldObjectData.content.color !== newObjectData.content.color) {
-        this._color = gdjs.hexToRGBColor(newObjectData.content.color);
+        this._color = gdjs.rgbOrHexToRGBColor(newObjectData.content.color);
         this._renderer.updateColor();
       }
       if (
@@ -142,13 +142,7 @@ namespace gdjs {
     }
 
     setColor(rgbColorString): void {
-      const splitValue = rgbColorString.split(';');
-      if (splitValue.length !== 3) {
-        return;
-      }
-      this._color[0] = parseInt(splitValue[0], 10);
-      this._color[1] = parseInt(splitValue[1], 10);
-      this._color[2] = parseInt(splitValue[2], 10);
+      this._color = gdjs.rgbOrHexToRGBColor(rgbColorString);
       this._renderer.updateColor();
     }
 

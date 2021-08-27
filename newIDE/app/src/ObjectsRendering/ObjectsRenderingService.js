@@ -12,6 +12,7 @@ import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
 import * as PIXI from 'pixi.js-legacy';
 import optionalRequire from '../Utils/OptionalRequire';
+import { rgbOrHexToHexNumber } from '../Utils/ColorTransformer';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const gd: libGDevelop = global.gd;
@@ -199,6 +200,7 @@ export default {
       return null;
     }
   },
+  rgbOrHexToHexNumber, // Expose a ColorTransformer function, useful to manage different color types for the extensions
   gd, // Expose gd so that it can be used by renderers
   PIXI, // Expose PIXI so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers

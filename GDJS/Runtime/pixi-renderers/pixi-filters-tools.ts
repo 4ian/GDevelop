@@ -78,9 +78,9 @@ namespace gdjs {
       const splitValue = value.split(';');
       if (splitValue.length === 3) {
         return gdjs.rgbToHexNumber(
-          parseInt(splitValue[0], 0),
-          parseInt(splitValue[1], 0),
-          parseInt(splitValue[2], 0)
+          parseInt(splitValue[0], 10),
+          parseInt(splitValue[1], 10),
+          parseInt(splitValue[2], 10)
         );
       }
       return parseInt(value.replace('#', '0x'), 16);

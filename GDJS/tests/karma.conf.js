@@ -78,11 +78,16 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/PanelSpriteObject/panelspriteruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/PanelSpriteObject/panelspriteruntimeobject-pixi-renderer.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TiledSpriteObject/tiledspriteruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TiledSpriteObject/tiledspriteruntimeobject-pixi-renderer.js',
 
       // Test extensions:
       './tests/Extensions/**.js',
 
       //All tests files:
+      './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
 
       // Assets

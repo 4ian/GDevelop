@@ -1,38 +1,9 @@
 // @ts-check
 describe('gdjs.DraggableRuntimeBehavior', function () {
-  var runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: { resources: [] },
-    // @ts-ignore
-    properties: { windowWidth: 800, windowHeight: 600 },
-  });
-  var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({
-    layers: [
-      {
-        name: '',
-        visibility: true,
-        cameras: [],
-        effects: [],
-        ambientLightColorR: 127,
-        ambientLightColorB: 127,
-        ambientLightColorG: 127,
-        isLightingLayer: false,
-        followBaseLayerCamera: false,
-      },
-    ],
-    variables: [],
-    r: 0,
-    v: 0,
-    b: 0,
-    mangledName: 'Scene1',
-    name: 'Scene1',
-    stopSoundsOnStartup: false,
-    title: '',
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-  });
+  const {
+    runtimeGame,
+    runtimeScene,
+  } = gdjs.makeTestRuntimeGameAndRuntimeScene();
 
   var object = new gdjs.RuntimeObject(runtimeScene, {
     name: 'obj1',

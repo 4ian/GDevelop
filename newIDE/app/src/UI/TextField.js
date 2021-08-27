@@ -83,7 +83,7 @@ type Props = {|
   style?: {|
     fontSize?: 14 | 18,
     fontStyle?: 'normal' | 'italic',
-    width?: number | '100%',
+    width?: number | '30%' | '60%' | '100%',
     flex?: 1,
     top?: number,
     padding?: number,

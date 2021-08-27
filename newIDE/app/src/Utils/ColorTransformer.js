@@ -7,11 +7,6 @@ export type RGBColor = {|
   a?: number,
 |};
 
-export const rgbColorToHexNumber = (rgbColor: RGBColor) => {
-  const { r, g, b } = rgbColor;
-  return rgbToHexNumber(r, g, b);
-};
-
 /**
  * Convert a RGB color to a RGB string.
  */
@@ -58,7 +53,7 @@ export const rgbOrHexToHexNumber = (value: string): number => {
 /**
  * Convert a Hex number to a RGB color.
  */
-export const hexNumberToRGBColor = (hexNumber: number) => {
+const hexNumberToRGBColor = (hexNumber: number) => {
   return {
     r: (hexNumber >> 16) & 0xff,
     g: (hexNumber >> 8) & 0xff,
@@ -70,7 +65,7 @@ export const hexNumberToRGBColor = (hexNumber: number) => {
 /**
  * Convert a Hex string to a RGB color.
  */
-export const hexToRGBColor = (hex: string) => {
+const hexToRGBColor = (hex: string) => {
   const hexNumber = parseInt(hex.replace('#', ''), 16);
   return hexNumberToRGBColor(hexNumber);
 };
@@ -94,11 +89,8 @@ export const rgbOrHexToRGBString = function(value: string): string {
     return value;
   }
   // Otherwise, convert the Hex to RGB.
-  const rgbNumber = hexToRGBColor(value);
-  return `${parseInt(rgbNumber.r, 10)};${parseInt(rgbNumber.g, 10)};${parseInt(
-    rgbNumber.b,
-    10
-  )}`;
+  const rgbColor = hexToRGBColor(value);
+  return `${rgbColor.r};${rgbColor.g};${rgbColor.b}`;
 };
 
 /**

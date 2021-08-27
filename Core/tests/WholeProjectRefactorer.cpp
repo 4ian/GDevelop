@@ -7,6 +7,7 @@
  * @file Tests covering project refactoring
  */
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "DummyPlatform.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -917,5 +918,99 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvents()
                     .GetEvent(3)) ==
             "ObjectWithMyBehavior.MyBehavior::PropertyMyRenamedProperty()");
+  }
+  SECTION("(Events based Behavior) no false positive on unfilled required behavior check") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    gd::Project& project);
+    
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("(Events based Behavior) unfilled required behavior and no match") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    gd::Project& project);
+    
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problem[0].getSourceObject() == object);
+    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(suggestedBehaviorNames.length == 0);
+  }
+  SECTION("(Events based Behavior) unfilled required behavior and 1 match") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    gd::Project& project);
+    
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problem[0].getSourceObject() == object);
+    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(suggestedBehaviorNames.length == 1);
+    REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
+  }
+  SECTION("(Events based Behavior) unfilled required behavior and 2 match") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").getExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior2", "PlatformBehavior::PlatformBehavior"));
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    gd::Project& project);
+    
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problem[0].getSourceObject() == object);
+    REQUIRE(problem[0].getSourceBehaviorContent().getName() == "MyEventsBasedBehavior");
+    REQUIRE(problem[0].getSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problem[0].getExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+    REQUIRE(suggestedBehaviorNames.length == 2);
+    REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
+    REQUIRE(suggestedBehaviorNames[1] == "PlatformBehavior2");
   }
 }

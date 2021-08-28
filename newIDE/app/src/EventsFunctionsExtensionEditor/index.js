@@ -129,7 +129,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _loadEventsFunctionFrom = (
     project: gdProject,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior
   ) => {
     // Create an empty "context" of objects.
     // Avoid recreating containers if they were already created, so that
@@ -145,12 +146,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     // Initialize this "context" of objects with the function
     // (as done during code generation).
-    gd.EventsFunctionTools.eventsFunctionToObjectsContainer(
-      project,
-      eventsFunction,
-      this._globalObjectsContainer,
-      this._objectsContainer
-    );
+    if (eventsBasedBehavior) {
+      gd.EventsFunctionTools.behaviorEventsFunctionToObjectsContainer(
+        project,
+        eventsBasedBehavior,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    } else {
+      gd.EventsFunctionTools.freeEventsFunctionToObjectsContainer(
+        project,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    }
   };
 
   updateToolbar = () => {
@@ -206,7 +217,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       return;
     }
 
-    this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
+    this._loadEventsFunctionFrom(
+      this.props.project,
+      selectedEventsFunction,
+      selectedEventsBasedBehavior
+    );
     this.setState(
       {
         selectedEventsFunction,

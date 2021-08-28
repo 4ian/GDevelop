@@ -12,6 +12,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
@@ -968,12 +969,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     // Add the required behavior on the object
-    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
-            .GetObject("ObjectWithMyBehavior");
-    object.AddBehavior(gd::BehaviorContent(
-        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
-    
-    // Add the behavior on the object
     auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
             .GetObject("ObjectWithMyBehavior");
     object.AddBehavior(gd::BehaviorContent(

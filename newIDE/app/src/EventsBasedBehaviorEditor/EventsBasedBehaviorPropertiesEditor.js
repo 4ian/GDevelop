@@ -311,8 +311,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                   const extraInfo = property.getExtraInfo();
                                   if (extraInfo.size() === 0) {
                                     extraInfo.push_back(newValue);
-                                  }
-                                  else {
+                                  } else {
                                     extraInfo.set(0, newValue);
                                   }
                                   this.forceUpdate();

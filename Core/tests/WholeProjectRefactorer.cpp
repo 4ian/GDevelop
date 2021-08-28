@@ -1070,12 +1070,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         gd::MetadataProvider::GetBehaviorMetadata(
             platform,
             "MyEventsExtension::MyEventsBasedBehavior").Get()
-                .GetProperties(object.GetBehavior("MyEventsBasedBehavior").Get());
+                .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
     std::map<gd::String, gd::PropertyDescriptor>& behaviorBProperties = ;
         gd::MetadataProvider::GetBehaviorMetadata(
             platform,
             "MyEventsExtension::MyEventsBasedBehaviorB").Get()
-                .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").Get());
+                .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").GetContent());
     
     REQUIRE(behaviorProperties.at("RequiredBehaviorProperty").GetValue() == "MyEventsBasedBehaviorB");
     REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty").GetValue() == "PlatformBehavior");

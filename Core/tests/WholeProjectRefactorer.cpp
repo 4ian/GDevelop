@@ -1067,10 +1067,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(object.HasBehaviorNamed("MyBehaviorB"));
     REQUIRE(object.HasBehaviorNamed("PlatformBehavior"));
     
-    auto& behaviorProperties = gd::MetadataProvider::GetBehaviorMetadata(
+    const auto& behaviorProperties = gd::MetadataProvider::GetBehaviorMetadata(
         platform, "MyEventsExtension::MyEventsBasedBehavior").Get()
             .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
-    auto& behaviorBProperties = gd::MetadataProvider::GetBehaviorMetadata(
+    const auto& behaviorBProperties = gd::MetadataProvider::GetBehaviorMetadata(
         platform, "MyEventsExtension::MyEventsBasedBehaviorB").Get()
             .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").GetContent());
     
@@ -1136,7 +1136,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "PlatformBehavior");
     
     // Required behavior are added transitively
-    REQUIRE(behaviorNames.length == 2);
+    REQUIRE(behaviorNames.size() == 2);
     REQUIRE(std::find(behaviorNames.begin(), behaviorNames.end(), "MyEventsBasedBehaviorB") != behaviorNames.end());
     REQUIRE(std::find(behaviorNames.begin(), behaviorNames.end(), "MyEventsBasedBehavior") != behaviorNames.end());
   }

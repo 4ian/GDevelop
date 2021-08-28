@@ -1062,9 +1062,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "behaviorName");
     
     // Required behavior are added transitively 
-    REQUIRE(object.hasBehaviorNamed("MyBehavior"));
-    REQUIRE(object.hasBehaviorNamed("MyBehaviorB"));
-    REQUIRE(object.hasBehaviorNamed("PlatformBehavior"));
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("MyBehaviorB"));
+    REQUIRE(object.HasBehaviorNamed("PlatformBehavior"));
     
     std::map<gd::String, gd::PropertyDescriptor>& behaviorProperties = ;
         gd::MetadataProvider::GetBehaviorMetadata(
@@ -1081,10 +1081,3 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty").GetValue() == "PlatformBehavior");
   }
 }
-
-
-  static void AddBehaviorAndRequiredBehaviors(
-    gd::Project& project,
-    gd::Object& object,
-    const gd::String& behaviorType,
-    const gd::String& behaviorName);

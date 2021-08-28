@@ -21,6 +21,7 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
@@ -950,7 +951,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     project);
     REQUIRE(problems.size() == 1);
-    REQUIRE(problems[0].GetSourceObject().getName() == "ObjectWithMyBehavior");
+    REQUIRE(problems[0].GetSourceObject().GetName() == "ObjectWithMyBehavior");
     REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
     REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
     REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");

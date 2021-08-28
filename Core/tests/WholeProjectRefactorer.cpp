@@ -1130,7 +1130,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "PlatformBehavior");
 
     // Find dependent behaviors
-    auto &behaviorNames = gd::WholeProjectRefactorer::FindDependentBehaviorNames(
+    const auto& behaviorNames = gd::WholeProjectRefactorer::FindDependentBehaviorNames(
         project,
         object,
         "PlatformBehavior");

@@ -950,7 +950,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     project);
     REQUIRE(problems.size() == 1);
-    REQUIRE(problems[0].GetSourceObject() == object);
+    REQUIRE(problems[0].GetSourceObject().getName() == "ObjectWithMyBehavior");
     REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
     REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
     REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
@@ -975,7 +975,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
 
     // Fill the required behavior property on the object
-    gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
+    gd::Behavior& behavior = gd::MetadataProvider::GetBehaviorMetadata(
         platform,
         "MyEventsExtension::MyEventsBasedBehavior").Get();
     gd::BehaviorContent& behaviorContent = object.GetBehavior("MyEventsBasedBehavior");

@@ -16,6 +16,10 @@ declare class gdWholeProjectRefactorer {
   static globalObjectOrGroupRemoved(project: gdProject, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): gdSetString;
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): void;
+  static addBehaviorAndRequiredBehaviors(project: gdProject, obj: gdObject, behaviorType: string, behaviorName: string): void;
+  static findDependentBehaviorNames(project: gdProject, obj: gdObject, behaviorName: string): gdVectorString;
+  static findInvalidRequiredBehaviorProperties(project: gdProject): gdVectorUnfilledRequiredBehaviorPropertyProblem;
+  static getBehaviorsWithType(obj: gdObject, type: string): gdVectorString;
   delete(): void;
   ptr: number;
 };

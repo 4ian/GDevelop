@@ -929,7 +929,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-                    gd::Project& project);
+                    project);
     
     REQUIRE(problems.size() == 0);
   }
@@ -947,7 +947,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-                    gd::Project& project);
+                    project);
     
     REQUIRE(problems.size() == 1);
     REQUIRE(problems[0].GetSourceObject() == object);
@@ -973,7 +973,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-                    gd::Project& project);
+                    project);
     
     REQUIRE(problems.size() == 1);
     REQUIRE(problems[0].GetSourceObject() == object);
@@ -1002,7 +1002,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-                    gd::Project& project);
+                    project);
     
     REQUIRE(problems.size() == 1);
     REQUIRE(problems[0].GetSourceObject() == object);

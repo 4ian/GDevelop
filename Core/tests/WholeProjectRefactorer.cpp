@@ -963,6 +963,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
 
     // Add a required behavior property
     eventsBasedBehavior.GetPropertyDescriptors()
@@ -970,8 +972,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     // Add the required behavior on the object
-    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
-            .GetObject("ObjectWithMyBehavior");
     object.AddBehavior(gd::BehaviorContent(
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
 
@@ -997,6 +997,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
 
     // Add a required behavior property
     eventsBasedBehavior.GetPropertyDescriptors()
@@ -1004,8 +1006,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     // Add the required behavior on the object
-    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
-            .GetObject("ObjectWithMyBehavior");
     object.AddBehavior(gd::BehaviorContent(
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
 
@@ -1024,13 +1024,15 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     project);
     REQUIRE(problems.size() == 0);
   }
-  SECTION("(Events based Behavior) add behavior and required behaviors on an object") {
+  SECTION("(Events based Behavior) add a behavior and its required behaviors on an object") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
 
     // Add a 2nd behavior on the object
     auto &eventsBasedBehaviorB =
@@ -1050,7 +1052,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
     // Remove the behavior from the object
-    object.RemoveBehavior(gd::BehaviorContent("MyBehavior"));
+    object.RemoveBehavior("MyBehavior");
 
     // Add it back
     gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -1075,8 +1077,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyEventsExtension::MyEventsBasedBehaviorB").Get()
                 .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").Get());
     
-    REQUIRE(behaviorProperties.at("RequiredBehaviorProperty") == "MyEventsBasedBehaviorB");
-    REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty") == "PlatformBehavior");
+    REQUIRE(behaviorProperties.at("RequiredBehaviorProperty").GetValue() == "MyEventsBasedBehaviorB");
+    REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty").GetValue() == "PlatformBehavior");
   }
 }
 

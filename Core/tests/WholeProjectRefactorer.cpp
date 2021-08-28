@@ -919,7 +919,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvent(3)) ==
             "ObjectWithMyBehavior.MyBehavior::PropertyMyRenamedProperty()");
   }
-  SECTION("(Events based Behavior) no false positive on unfilled required behavior check") {
+  SECTION("(Events based Behavior) no required behavior") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -930,17 +930,17 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     project);
-    
     REQUIRE(problems.size() == 0);
   }
-  SECTION("(Events based Behavior) unfilled required behavior and no match") {
+  SECTION("(Events based Behavior) unfilled required behavior") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
-    
+
+    // Add a required behavior
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("RequiredBehaviorProperty", 0)
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
@@ -948,69 +948,50 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     project);
-    
     REQUIRE(problems.size() == 1);
     REQUIRE(problems[0].GetSourceObject() == object);
     REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
     REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
     REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
-    REQUIRE(suggestedBehaviorNames.length == 0);
   }
-  SECTION("(Events based Behavior) unfilled required behavior and 1 match") {
+  SECTION("(Events based Behavior) filled required behavior") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
-    
+
+    // Add a required behavior property
     eventsBasedBehavior.GetPropertyDescriptors()
         .InsertNew("RequiredBehaviorProperty", 0)
         .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
 
+    // Add the required behavior on the object
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+    
+    // Add the behavior on the object
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
     object.AddBehavior(gd::BehaviorContent(
         "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
 
-    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
-            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-                    project);
-    
-    REQUIRE(problems.size() == 1);
-    REQUIRE(problems[0].GetSourceObject() == object);
-    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
-    REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
-    REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
-    REQUIRE(suggestedBehaviorNames.length == 1);
-    REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
-  }
-  SECTION("(Events based Behavior) unfilled required behavior and 2 match") {
-    gd::Project project;
-    gd::Platform platform;
-    SetupProjectWithDummyPlatform(project, platform);
-    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
-    auto &eventsBasedBehavior =
-        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
-    
-    eventsBasedBehavior.GetPropertyDescriptors()
-        .InsertNew("RequiredBehaviorProperty", 0)
-        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
-
-    object.AddBehavior(gd::BehaviorContent(
-        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
-    object.AddBehavior(gd::BehaviorContent(
-        "PlatformBehavior2", "PlatformBehavior::PlatformBehavior"));
+    // Fill the required behavior property on the object
+    gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyEventsExtension::MyEventsBasedBehavior").Get();
+    gd::BehaviorContent& behaviorContent = object.GetBehavior("MyEventsBasedBehavior");
+        behavior.UpdateProperty(
+            behaviorContent.GetContent(),
+            "RequiredBehaviorProperty",
+            "PlatformBehavior");
 
     std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
             gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
                     project);
-    
-    REQUIRE(problems.size() == 1);
-    REQUIRE(problems[0].GetSourceObject() == object);
-    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
-    REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
-    REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
-    REQUIRE(suggestedBehaviorNames.length == 2);
-    REQUIRE(suggestedBehaviorNames[0] == "PlatformBehavior");
-    REQUIRE(suggestedBehaviorNames[1] == "PlatformBehavior2");
+    REQUIRE(problems.size() == 0);
   }
 }

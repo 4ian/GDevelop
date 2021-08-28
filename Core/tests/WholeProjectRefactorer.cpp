@@ -1067,16 +1067,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(object.HasBehaviorNamed("MyBehaviorB"));
     REQUIRE(object.HasBehaviorNamed("PlatformBehavior"));
     
-    std::map<gd::String, gd::PropertyDescriptor>& behaviorProperties =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform,
-            "MyEventsExtension::MyEventsBasedBehavior").Get()
-                .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
-    std::map<gd::String, gd::PropertyDescriptor>& behaviorBProperties =
-        gd::MetadataProvider::GetBehaviorMetadata(
-            platform,
-            "MyEventsExtension::MyEventsBasedBehaviorB").Get()
-                .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").GetContent());
+    auto& behaviorProperties = gd::MetadataProvider::GetBehaviorMetadata(
+        platform, "MyEventsExtension::MyEventsBasedBehavior").Get()
+            .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
+    auto& behaviorBProperties = gd::MetadataProvider::GetBehaviorMetadata(
+        platform, "MyEventsExtension::MyEventsBasedBehaviorB").Get()
+            .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").GetContent());
     
     REQUIRE(behaviorProperties.at("RequiredBehaviorProperty").GetValue() == "MyEventsBasedBehaviorB");
     REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty").GetValue() == "PlatformBehavior");

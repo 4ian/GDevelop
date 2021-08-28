@@ -219,7 +219,7 @@ const contributors = [
     name: 'UlisesFreitas',
     description:
       'Numerous examples and making external services that integrate with GDevelop games',
-    link: 'https://helperwesley.itch.io/',
+    link: 'https://ulisesfreitas.itch.io/',
   },
   {
     name: 'IttaloXD',

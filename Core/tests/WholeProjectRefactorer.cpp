@@ -1066,12 +1066,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(object.HasBehaviorNamed("MyBehaviorB"));
     REQUIRE(object.HasBehaviorNamed("PlatformBehavior"));
     
-    std::map<gd::String, gd::PropertyDescriptor>& behaviorProperties = ;
+    std::map<gd::String, gd::PropertyDescriptor>& behaviorProperties =
         gd::MetadataProvider::GetBehaviorMetadata(
             platform,
             "MyEventsExtension::MyEventsBasedBehavior").Get()
                 .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
-    std::map<gd::String, gd::PropertyDescriptor>& behaviorBProperties = ;
+    std::map<gd::String, gd::PropertyDescriptor>& behaviorBProperties =
         gd::MetadataProvider::GetBehaviorMetadata(
             platform,
             "MyEventsExtension::MyEventsBasedBehaviorB").Get()

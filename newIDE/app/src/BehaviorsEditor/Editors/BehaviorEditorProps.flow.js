@@ -12,6 +12,7 @@ export type BehaviorEditorProps = {|
   behavior: gdBehavior,
   behaviorContent: gdBehaviorContent,
   project: gdProject,
+  object: gdObject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,

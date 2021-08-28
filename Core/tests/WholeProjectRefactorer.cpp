@@ -7,10 +7,12 @@
  * @file Tests covering project refactoring
  */
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "DummyPlatform.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
@@ -19,9 +21,11 @@
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/Variable.h"
 #include "catch.hpp"
+#include <algorithm>
 
 namespace {
 
@@ -917,5 +921,223 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvents()
                     .GetEvent(3)) ==
             "ObjectWithMyBehavior.MyBehavior::PropertyMyRenamedProperty()");
+  }
+  SECTION("(Events based Behavior) no required behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    project);
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("(Events based Behavior) unfilled required behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // Add a required behavior
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    project);
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problems[0].GetSourceObject().GetName() == "ObjectWithMyBehavior");
+    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() == "MyEventsBasedBehavior");
+    REQUIRE(problems[0].GetSourcePropertyName() == "RequiredBehaviorProperty");
+    REQUIRE(problems[0].GetExpectedBehaviorTypeName() == "PlatformBehavior::PlatformBehavior");
+  }
+  SECTION("(Events based Behavior) filled required behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
+
+    // Add a required behavior property
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    // Add the required behavior on the object
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+
+    // Fill the required behavior property on the object
+    gd::Behavior& behavior = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyEventsExtension::MyEventsBasedBehavior").Get();
+    gd::BehaviorContent& behaviorContent = object.GetBehavior("MyEventsBasedBehavior");
+        behavior.UpdateProperty(
+            behaviorContent.GetContent(),
+            "RequiredBehaviorProperty",
+            "PlatformBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    project);
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("(Events based Behavior) wrongly filled required behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
+
+    // Add a required behavior property
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    // Add the required behavior on the object
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+
+    // Fill the required behavior property on the object with the wrong behavior name
+    gd::Behavior& behavior = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyEventsExtension::MyEventsBasedBehavior").Get();
+    gd::BehaviorContent& behaviorContent = object.GetBehavior("MyEventsBasedBehavior");
+        behavior.UpdateProperty(
+            behaviorContent.GetContent(),
+            "RequiredBehaviorProperty",
+            "MyEventsBasedBehavior");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+            gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+                    project);
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("(Events based Behavior) add a behavior and its required behaviors on an object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
+
+    // Add a 2nd behavior on the object
+    auto &eventsBasedBehaviorB =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyEventsBasedBehaviorB", 0);
+    eventsBasedBehaviorB.SetFullName("My events based behavior B");
+    eventsBasedBehaviorB.SetDescription("An events based behavior for test B");
+
+    // Make the 1st behavior requires it
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("MyEventsExtension::MyEventsBasedBehaviorB");
+
+    // Make the 2nd behavior require a Platformer
+    eventsBasedBehaviorB.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    // Remove the behavior from the object
+    object.RemoveBehavior("MyBehavior");
+
+    // Add it back
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyEventsExtension::MyEventsBasedBehavior",
+        "MyEventsBasedBehavior");
+    
+    // Required behavior are added transitively 
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("MyBehaviorB"));
+    REQUIRE(object.HasBehaviorNamed("PlatformBehavior"));
+    
+    const auto& behaviorProperties = gd::MetadataProvider::GetBehaviorMetadata(
+        platform, "MyEventsExtension::MyEventsBasedBehavior").Get()
+            .GetProperties(object.GetBehavior("MyEventsBasedBehavior").GetContent());
+    const auto& behaviorBProperties = gd::MetadataProvider::GetBehaviorMetadata(
+        platform, "MyEventsExtension::MyEventsBasedBehaviorB").Get()
+            .GetProperties(object.GetBehavior("MyEventsBasedBehaviorB").GetContent());
+    
+    REQUIRE(behaviorProperties.at("RequiredBehaviorProperty").GetValue() == "MyEventsBasedBehaviorB");
+    REQUIRE(behaviorBProperties.at("RequiredBehaviorProperty").GetValue() == "PlatformBehavior");
+  }
+
+  SECTION("(Events based Behavior) add a behavior and its required behaviors on an object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+    auto &object = project.GetLayout("LayoutWithBehaviorFunctions")
+            .GetObject("ObjectWithMyBehavior");
+
+    // Add a 2nd behavior on the object
+    auto &eventsBasedBehaviorB =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyEventsBasedBehaviorB", 0);
+    eventsBasedBehaviorB.SetFullName("My events based behavior B");
+    eventsBasedBehaviorB.SetDescription("An events based behavior for test B");
+
+    // Make the 1st behavior requires it
+    eventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("MyEventsExtension::MyEventsBasedBehaviorB");
+
+    // Make the 2nd behavior require a Platformer
+    eventsBasedBehaviorB.GetPropertyDescriptors()
+        .InsertNew("RequiredBehaviorProperty", 0)
+        .SetType("Behavior").GetExtraInfo().push_back("PlatformBehavior::PlatformBehavior");
+
+    // Add the behaviors on the object
+    object.AddBehavior(gd::BehaviorContent(
+        "MyBehaviorB", "MyEventsExtension::MyEventsBasedBehaviorB"));
+    object.AddBehavior(gd::BehaviorContent(
+        "PlatformBehavior", "PlatformBehavior::PlatformBehavior"));
+
+    // Fill the required behavior properties
+    gd::Behavior& behavior = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyEventsExtension::MyEventsBasedBehavior").Get();
+    gd::BehaviorContent& behaviorContent = object.GetBehavior("MyEventsBasedBehavior");
+        behavior.UpdateProperty(
+            behaviorContent.GetContent(),
+            "RequiredBehaviorProperty",
+            "MyEventsBasedBehaviorB");
+    gd::Behavior& behaviorB = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyEventsExtension::MyEventsBasedBehaviorB").Get();
+    gd::BehaviorContent& behaviorContentB = object.GetBehavior("MyEventsBasedBehaviorB");
+        behaviorB.UpdateProperty(
+            behaviorContentB.GetContent(),
+            "RequiredBehaviorProperty",
+            "PlatformBehavior");
+
+    // Find dependent behaviors
+    auto &behaviorNames = gd::WholeProjectRefactorer::FindDependentBehaviorNames(
+        project,
+        object,
+        "PlatformBehavior");
+    
+    // Required behavior are added transitively
+    REQUIRE(behaviorNames.size() == 2);
+    REQUIRE(std::find(behaviorNames.begin(), behaviorNames.end(), "MyEventsBasedBehaviorB") != behaviorNames.end());
+    REQUIRE(std::find(behaviorNames.begin(), behaviorNames.end(), "MyEventsBasedBehavior") != behaviorNames.end());
   }
 }

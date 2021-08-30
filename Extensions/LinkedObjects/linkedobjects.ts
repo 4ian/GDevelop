@@ -32,7 +32,7 @@ namespace gdjs {
 
     linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
       const objALinkedObjectMap = this.getObjectsLinkedWith(objA);
-      if (!objALinkedObjectMap.hasOwnProperty(objB.getName())) {
+      if (!objALinkedObjectMap.containsKey(objB.getName())) {
         objALinkedObjectMap.put(
           objB.getName(),
           new Array<gdjs.RuntimeObject>()
@@ -43,7 +43,7 @@ namespace gdjs {
         objALinkedObjects.push(objB);
       }
       const objBLinkedObjectMap = this.getObjectsLinkedWith(objB);
-      if (!objBLinkedObjectMap.hasOwnProperty(objA.getName())) {
+      if (!objBLinkedObjectMap.containsKey(objA.getName())) {
         objBLinkedObjectMap.put(
           objA.getName(),
           new Array<gdjs.RuntimeObject>()
@@ -58,9 +58,10 @@ namespace gdjs {
     removeAllLinksOf(obj: gdjs.RuntimeObject) {
       const linkedObjectMap = this.getObjectsLinkedWith(obj);
 
-      for (const linkedObjectMapItem in linkedObjectMap.items) {
-        if (linkedObjectMap.items.hasOwnProperty(linkedObjectMapItem)) {
-          const objLinkedObjects = linkedObjectMap.items[linkedObjectMapItem];
+      for (const linkedObjectName in linkedObjectMap.items) {
+        if (linkedObjectMap.containsKey(linkedObjectName)) {
+          const objLinkedObjects = linkedObjectMap.get(linkedObjectName);
+
           for (let i = 0; i < objLinkedObjects.length; i++) {
             if (this.links.hasOwnProperty(objLinkedObjects[i].id)) {
               const otherObjList = this.links[objLinkedObjects[i].id].get(
@@ -82,7 +83,7 @@ namespace gdjs {
     removeLinkBetween(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
       if (this.links.hasOwnProperty(objA.id)) {
         const map = this.links[objA.id];
-        if (map.hasOwnProperty(objB.getName())) {
+        if (map.containsKey(objB.getName())) {
           const list = map.get(objB.getName());
           const index = list.indexOf(objB);
           if (index !== -1) {
@@ -92,7 +93,7 @@ namespace gdjs {
       }
       if (this.links.hasOwnProperty(objB.id)) {
         const map = this.links[objB.id];
-        if (map.hasOwnProperty(objA.getName())) {
+        if (map.containsKey(objA.getName())) {
           const list = map.get(objA.getName());
           const index = list.indexOf(objA);
           if (index !== -1) {
@@ -140,13 +141,6 @@ namespace gdjs {
         LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
       };
 
-      export const _objectIsInList = function (
-        obj: gdjs.RuntimeObject,
-        linkedObjects: gdjs.RuntimeObject[]
-      ) {
-        return linkedObjects.indexOf(obj) !== -1;
-      };
-
       export const pickObjectsLinkedTo = function (
         runtimeScene: gdjs.RuntimeScene,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
@@ -165,8 +159,8 @@ namespace gdjs {
         );
         for (const objectName in linkedObjectMap.items) {
           if (
-            linkedObjectMap.items.hasOwnProperty(objectName) &&
-            objectsLists.items.hasOwnProperty(objectName)
+            linkedObjectMap.containsKey(objectName) &&
+            objectsLists.containsKey(objectName)
           ) {
             const linkedObjects = linkedObjectMap.items[objectName];
             const pickedObjects = objectsLists.items[objectName];
@@ -176,8 +170,8 @@ namespace gdjs {
               runtimeScene.getObjects(objectName).length
             ) {
               // All the objects were picked, there is no need to make an intersection.
-              pickedObjects.length = 0;
               pickedSomething = pickedSomething || linkedObjects.length > 0;
+              pickedObjects.length = 0;
               pickedObjects.push.apply(pickedObjects, linkedObjects);
             } else {
               temporaryObjects.length = 0;
@@ -186,8 +180,8 @@ namespace gdjs {
                   temporaryObjects.push(otherObject);
                 }
               }
-              pickedObjects.length = 0;
               pickedSomething = pickedSomething || temporaryObjects.length > 0;
+              pickedObjects.length = 0;
               pickedObjects.push.apply(pickedObjects, temporaryObjects);
             }
           }

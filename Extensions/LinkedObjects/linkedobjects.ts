@@ -23,7 +23,7 @@ namespace gdjs {
       return runtimeScene.linkedObjectsManager;
     }
 
-    getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
+    _getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
       if (!this.links.hasOwnProperty(objA.id)) {
         this.links[objA.id] = new Hashtable<gdjs.RuntimeObject[]>();
       }
@@ -31,7 +31,7 @@ namespace gdjs {
     }
 
     linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
-      const objALinkedObjectMap = this.getObjectsLinkedWith(objA);
+      const objALinkedObjectMap = this._getObjectsLinkedWith(objA);
       if (!objALinkedObjectMap.containsKey(objB.getName())) {
         objALinkedObjectMap.put(
           objB.getName(),
@@ -42,7 +42,7 @@ namespace gdjs {
       if (objALinkedObjects.indexOf(objB) === -1) {
         objALinkedObjects.push(objB);
       }
-      const objBLinkedObjectMap = this.getObjectsLinkedWith(objB);
+      const objBLinkedObjectMap = this._getObjectsLinkedWith(objB);
       if (!objBLinkedObjectMap.containsKey(objA.getName())) {
         objBLinkedObjectMap.put(
           objA.getName(),
@@ -56,7 +56,7 @@ namespace gdjs {
     }
 
     removeAllLinksOf(obj: gdjs.RuntimeObject) {
-      const linkedObjectMap = this.getObjectsLinkedWith(obj);
+      const linkedObjectMap = this._getObjectsLinkedWith(obj);
 
       for (const linkedObjectName in linkedObjectMap.items) {
         if (linkedObjectMap.containsKey(linkedObjectName)) {
@@ -151,7 +151,7 @@ namespace gdjs {
         }
         const linkedObjectMap = LinksManager.getManager(
           runtimeScene
-        ).getObjectsLinkedWith(obj);
+        )._getObjectsLinkedWith(obj);
 
         let pickedSomething = false;
         const temporaryObjects = gdjs.staticArray(

@@ -154,39 +154,42 @@ namespace gdjs {
         )._getObjectsLinkedWith(obj);
 
         let pickedSomething = false;
-        const temporaryObjects = gdjs.staticArray(
-          gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
-        );
-        for (const objectName in linkedObjectMap.items) {
-          if (
-            linkedObjectMap.containsKey(objectName) &&
-            objectsLists.containsKey(objectName)
-          ) {
-            const linkedObjects = linkedObjectMap.items[objectName];
+        for (const objectName in objectsLists.items) {
+          if (objectsLists.containsKey(objectName)) {
             const pickedObjects = objectsLists.items[objectName];
 
-            if (
-              pickedObjects.length ===
-              runtimeScene.getObjects(objectName).length
-            ) {
-              // All the objects were picked, there is no need to make an intersection.
-              pickedSomething = pickedSomething || linkedObjects.length > 0;
-              pickedObjects.length = 0;
-              pickedObjects.push.apply(pickedObjects, linkedObjects);
-            } else {
-              temporaryObjects.length = 0;
-              for (const otherObject of linkedObjects) {
-                if (pickedObjects.indexOf(otherObject) >= 0) {
-                  temporaryObjects.push(otherObject);
+            if (linkedObjectMap.containsKey(objectName)) {
+              const linkedObjects = linkedObjectMap.get(objectName);
+              if (
+                pickedObjects.length ===
+                runtimeScene.getObjects(objectName).length
+              ) {
+                // All the objects were picked, there is no need to make an intersection.
+                pickedSomething = pickedSomething || linkedObjects.length > 0;
+                pickedObjects.length = 0;
+                pickedObjects.push.apply(pickedObjects, linkedObjects);
+              } else {
+                const temporaryObjects = gdjs.staticArray(
+                  gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
+                );
+                temporaryObjects.length = 0;
+                for (const otherObject of linkedObjects) {
+                  if (pickedObjects.indexOf(otherObject) >= 0) {
+                    temporaryObjects.push(otherObject);
+                  }
                 }
+                pickedSomething =
+                  pickedSomething || temporaryObjects.length > 0;
+                pickedObjects.length = 0;
+                pickedObjects.push.apply(pickedObjects, temporaryObjects);
+                temporaryObjects.length = 0;
               }
-              pickedSomething = pickedSomething || temporaryObjects.length > 0;
+            } else {
+              // No object is linked for this name
               pickedObjects.length = 0;
-              pickedObjects.push.apply(pickedObjects, temporaryObjects);
             }
           }
         }
-        temporaryObjects.length = 0;
         return pickedSomething;
       };
     }

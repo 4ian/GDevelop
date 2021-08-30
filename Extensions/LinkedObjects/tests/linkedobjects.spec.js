@@ -78,14 +78,14 @@ describe('gdjs.LinksManager', function () {
     manager.linkObjects(object1A, object2A);
 
     let objectsLists = pickObjectsLinkedTo(object1A);
-    expect(objectsLists.get('obj1').length).to.be(3);
+    expect(objectsLists.get('obj1').length).to.be(0);
     expect(objectsLists.get('obj2').length).to.be(1);
     expect(objectsLists.get('obj2')[0]).to.be(object2A);
 
     objectsLists = pickObjectsLinkedTo(object2A);
     expect(objectsLists.get('obj1').length).to.be(1);
     expect(objectsLists.get('obj1')[0]).to.be(object1A);
-    expect(objectsLists.get('obj2').length).to.be(3);
+    expect(objectsLists.get('obj2').length).to.be(0);
   });
   it('can link more objects', function () {
     manager.linkObjects(object1A, object2A); //Including the same objects as before
@@ -93,19 +93,19 @@ describe('gdjs.LinksManager', function () {
     manager.linkObjects(object1A, object2C);
 
     let objectsLists = pickObjectsLinkedTo(object1A);
-    expect(objectsLists.get('obj1').length).to.be(3);
+    expect(objectsLists.get('obj1').length).to.be(0);
     expect(objectsLists.get('obj2').length).to.be(3);
 
     objectsLists = pickObjectsLinkedTo(object2C);
     expect(objectsLists.get('obj1').length).to.be(1);
     expect(objectsLists.get('obj1')[0]).to.be(object1A);
-    expect(objectsLists.get('obj2').length).to.be(3);
+    expect(objectsLists.get('obj2').length).to.be(0);
   });
   it('supports removing links', function () {
     manager.removeLinkBetween(object1A, object2B);
 
     let objectsLists = pickObjectsLinkedTo(object1A);
-    expect(objectsLists.get('obj1').length).to.be(3);
+    expect(objectsLists.get('obj1').length).to.be(0);
     expect(objectsLists.get('obj2').length).to.be(2);
 
     manager.linkObjects(object2B, object2C);

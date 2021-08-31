@@ -33,10 +33,7 @@ namespace gdjs {
     linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
       const objALinkedObjectMap = this._getObjectsLinkedWith(objA);
       if (!objALinkedObjectMap.containsKey(objB.getName())) {
-        objALinkedObjectMap.put(
-          objB.getName(),
-          new Array<gdjs.RuntimeObject>()
-        );
+        objALinkedObjectMap.put(objB.getName(), []);
       }
       const objALinkedObjects = objALinkedObjectMap.get(objB.getName());
       if (objALinkedObjects.indexOf(objB) === -1) {
@@ -44,10 +41,7 @@ namespace gdjs {
       }
       const objBLinkedObjectMap = this._getObjectsLinkedWith(objB);
       if (!objBLinkedObjectMap.containsKey(objA.getName())) {
-        objBLinkedObjectMap.put(
-          objA.getName(),
-          new Array<gdjs.RuntimeObject>()
-        );
+        objBLinkedObjectMap.put(objA.getName(), []);
       }
       const objBLinkedObjects = objBLinkedObjectMap.get(objA.getName());
       if (objBLinkedObjects.indexOf(objA) === -1) {
@@ -56,15 +50,18 @@ namespace gdjs {
     }
 
     removeAllLinksOf(obj: gdjs.RuntimeObject) {
+      // Remove the other side of the links
       const linkedObjectMap = this._getObjectsLinkedWith(obj);
-
       for (const linkedObjectName in linkedObjectMap.items) {
         if (linkedObjectMap.containsKey(linkedObjectName)) {
-          const objLinkedObjects = linkedObjectMap.get(linkedObjectName);
+          const linkedObjects = linkedObjectMap.get(linkedObjectName);
 
-          for (let i = 0; i < objLinkedObjects.length; i++) {
-            if (this.links.hasOwnProperty(objLinkedObjects[i].id)) {
-              const otherObjList = this.links[objLinkedObjects[i].id].get(
+          for (let i = 0; i < linkedObjects.length; i++) {
+            // This is the object on the other side of the link
+            // We find obj in its list of linked objects and remove it.
+            const linkedObject = linkedObjects[i];
+            if (this.links.hasOwnProperty(linkedObject.id)) {
+              const otherObjList = this.links[linkedObject.id].get(
                 obj.getName()
               );
               const index = otherObjList.indexOf(obj);
@@ -75,6 +72,7 @@ namespace gdjs {
           }
         }
       }
+      // Remove the links on obj side
       if (this.links.hasOwnProperty(obj.id)) {
         delete this.links[obj.id];
       }

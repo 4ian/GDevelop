@@ -5,11 +5,10 @@
  */
 #include "WholeProjectRefactorer.h"
 
-#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
-#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
@@ -18,6 +17,9 @@
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/Project/ArbitraryObjectsWorker.h"
+#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -26,8 +28,6 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/BehaviorContent.h"
 #include "GDCore/String.h"
 #include "GDCore/Tools/Log.h"
 
@@ -530,18 +530,24 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
     gd::Object& object,
     const gd::String& behaviorType,
     const gd::String& behaviorName) {
-  object.AddNewBehavior(
-      project,
-      behaviorType,
-      behaviorName);
+  if (object.AddNewBehavior(project, behaviorType, behaviorName) == nullptr) {
+    // The behavior type/metadata can't be found.
+    return;
+  };
 
   const gd::Platform& platform = project.GetCurrentPlatform();
   const gd::BehaviorMetadata& behaviorMetadata =
       MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+  if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+    // Should not happen because the behavior was added successfully (so its metadata
+    // are valid) - but double check anyway and bail out if the behavior metadata are invalid.
+    return;
+  }
+
   gd::Behavior& behavior = behaviorMetadata.Get();
   gd::BehaviorContent& behaviorContent = object.GetBehavior(behaviorName);
   for (auto const& keyValue :
-      behavior.GetProperties(behaviorContent.GetContent())) {
+       behavior.GetProperties(behaviorContent.GetContent())) {
     const gd::String& propertyName = keyValue.first;
     const gd::PropertyDescriptor& property = keyValue.second;
     if (property.GetType().LowerCase() == "behavior") {
@@ -552,31 +558,23 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
       }
       const gd::String& requiredBehaviorType = extraInfo.at(0);
       const auto behaviorContents =
-          WholeProjectRefactorer::GetBehaviorsWithType(
-              object,
-              requiredBehaviorType);
+          WholeProjectRefactorer::GetBehaviorsWithType(object,
+                                                       requiredBehaviorType);
       const gd::String* defaultBehaviorName = nullptr;
       if (behaviorContents.size() == 0) {
         const gd::BehaviorMetadata& requiredBehaviorMetadata =
-            MetadataProvider::GetBehaviorMetadata(
-                platform,
-                requiredBehaviorType);
+            MetadataProvider::GetBehaviorMetadata(platform,
+                                                  requiredBehaviorType);
         const gd::String& requiredBehaviorName =
             requiredBehaviorMetadata.GetDefaultName();
         WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
-            project,
-            object,
-            requiredBehaviorType,
-            requiredBehaviorName);
+            project, object, requiredBehaviorType, requiredBehaviorName);
         defaultBehaviorName = &requiredBehaviorName;
-      }
-      else {
-          defaultBehaviorName = &behaviorContents.at(0);
+      } else {
+        defaultBehaviorName = &behaviorContents.at(0);
       }
       behavior.UpdateProperty(
-          behaviorContent.GetContent(),
-          propertyName,
-          *defaultBehaviorName);
+          behaviorContent.GetContent(), propertyName, *defaultBehaviorName);
     }
   }
 }
@@ -588,7 +586,7 @@ std::vector<gd::String> WholeProjectRefactorer::GetBehaviorsWithType(
     const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(behaviorName);
     if (behaviorContent.GetTypeName() == type) {
-        behaviors.push_back(behaviorName);
+      behaviors.push_back(behaviorName);
     }
   }
   return behaviors;
@@ -598,17 +596,14 @@ std::vector<gd::String> WholeProjectRefactorer::FindDependentBehaviorNames(
     const gd::Project& project,
     const gd::Object& object,
     const gd::String& behaviorName) {
-      std::unordered_set<gd::String> dependentBehaviorNames;
-      WholeProjectRefactorer::FindDependentBehaviorNames(
-          project,
-          object,
-          behaviorName,
-          dependentBehaviorNames);
-      std::vector<gd::String> results;
-      results.insert(results.end(),
-                     dependentBehaviorNames.begin(),
-                     dependentBehaviorNames.end());
-      return results;
+  std::unordered_set<gd::String> dependentBehaviorNames;
+  WholeProjectRefactorer::FindDependentBehaviorNames(
+      project, object, behaviorName, dependentBehaviorNames);
+  std::vector<gd::String> results;
+  results.insert(results.end(),
+                 dependentBehaviorNames.begin(),
+                 dependentBehaviorNames.end());
+  return results;
 }
 
 void WholeProjectRefactorer::FindDependentBehaviorNames(
@@ -621,58 +616,76 @@ void WholeProjectRefactorer::FindDependentBehaviorNames(
     const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(objectBehaviorName);
     gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
-      platform, behaviorContent.GetTypeName()).Get();
+                                 platform, behaviorContent.GetTypeName())
+                                 .Get();
     for (auto const& keyValue :
-        behavior.GetProperties(behaviorContent.GetContent())) {
+         behavior.GetProperties(behaviorContent.GetContent())) {
       const gd::String& propertyName = keyValue.first;
       const gd::PropertyDescriptor& property = keyValue.second;
-      if (
-          property.GetType().LowerCase() == "behavior" &&
+      if (property.GetType().LowerCase() == "behavior" &&
           property.GetValue() == behaviorName &&
           dependentBehaviorNames.find(objectBehaviorName) ==
               dependentBehaviorNames.end()) {
         dependentBehaviorNames.insert(objectBehaviorName);
         WholeProjectRefactorer::FindDependentBehaviorNames(
-            project,
-            object,
-            objectBehaviorName,
-            dependentBehaviorNames);
+            project, object, objectBehaviorName, dependentBehaviorNames);
       }
     }
   }
 };
 
-std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
+WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
     gd::Project& project) {
-
-  std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> invalidRequiredBehaviorProperties;
+  std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
+      invalidRequiredBehaviorProperties;
   auto findInvalidRequiredBehaviorPropertiesInObjects =
       [&project, &invalidRequiredBehaviorProperties](
           std::vector<std::unique_ptr<gd::Object> >& objectsList) {
         for (auto& object : objectsList) {
-          for (auto& behaviorContentKeyValuePair : object->GetAllBehaviorContents()) {
-            gd::BehaviorContent& behaviorContent = *behaviorContentKeyValuePair.second;
-            gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
-                project.GetCurrentPlatform(), behaviorContent.GetTypeName()).Get();
+          for (auto& behaviorContentKeyValuePair :
+               object->GetAllBehaviorContents()) {
+            gd::BehaviorContent& behaviorContent =
+                *behaviorContentKeyValuePair.second;
+
+            const auto& behaviorMetadata =
+                gd::MetadataProvider::GetBehaviorMetadata(
+                    project.GetCurrentPlatform(),
+                    behaviorContent.GetTypeName());
+            if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+              std::cout << "Could not find metadata for behavior with type \""
+                        << behaviorContent.GetTypeName() << "\"" << std::endl;
+              continue;
+            }
+
+            const auto& behavior = behaviorMetadata.Get();
+
             for (auto const& keyValue :
-                behavior.GetProperties(behaviorContent.GetContent())) {
+                 behavior.GetProperties(behaviorContent.GetContent())) {
               const gd::String& propertyName = keyValue.first;
               const gd::PropertyDescriptor& property = keyValue.second;
-              if (
-                property.GetType().LowerCase() != "behavior"
-              ) {
+              if (property.GetType().LowerCase() != "behavior") {
                 continue;
               }
               const gd::String& requiredBehaviorName = property.GetValue();
-              const std::vector<gd::String>& extraInfo = property.GetExtraInfo();
+              const std::vector<gd::String>& extraInfo =
+                  property.GetExtraInfo();
               if (extraInfo.size() == 0) {
                 // very unlikely
                 continue;
               }
               const gd::String& requiredBehaviorType = extraInfo.at(0);
 
-              if (requiredBehaviorName == "" || object->GetBehavior(requiredBehaviorName).GetTypeName() != requiredBehaviorType) {
-                auto problem = UnfilledRequiredBehaviorPropertyProblem(project, *object.get(), behaviorContent, propertyName, requiredBehaviorType);
+              if (requiredBehaviorName == "" ||
+                  !object->HasBehaviorNamed(requiredBehaviorName) ||
+                  object->GetBehavior(requiredBehaviorName).GetTypeName() !=
+                      requiredBehaviorType) {
+                auto problem = UnfilledRequiredBehaviorPropertyProblem(
+                    project,
+                    *object,
+                    behaviorContent,
+                    propertyName,
+                    requiredBehaviorType);
                 invalidRequiredBehaviorProperties.push_back(problem);
               }
             }
@@ -853,19 +866,22 @@ void WholeProjectRefactorer::DoRenameBehavior(
         }
       };
 
-  // Rename behavior in required behavior properties 
-  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount(); e++) {
+  // Rename behavior in required behavior properties
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
 
     for (auto&& eventsBasedBehavior :
-        eventsFunctionsExtension.GetEventsBasedBehaviors()
-            .GetInternalVector()) {
-      for (size_t i = 0; i < eventsBasedBehavior->GetPropertyDescriptors().GetCount(); i++)
-      {
-        NamedPropertyDescriptor& propertyDescriptor
-            = eventsBasedBehavior->GetPropertyDescriptors().Get(i);
+         eventsFunctionsExtension.GetEventsBasedBehaviors()
+             .GetInternalVector()) {
+      for (size_t i = 0;
+           i < eventsBasedBehavior->GetPropertyDescriptors().GetCount();
+           i++) {
+        NamedPropertyDescriptor& propertyDescriptor =
+            eventsBasedBehavior->GetPropertyDescriptors().Get(i);
         std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
-        if (propertyDescriptor.GetType() == "Behavior" && extraInfo.size() > 0) {
+        if (propertyDescriptor.GetType() == "Behavior" &&
+            extraInfo.size() > 0) {
           const gd::String& requiredBehaviorType = extraInfo[0];
           if (requiredBehaviorType == oldBehaviorType) {
             extraInfo[0] = newBehaviorType;

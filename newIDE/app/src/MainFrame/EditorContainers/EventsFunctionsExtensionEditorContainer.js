@@ -56,7 +56,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // reload/regeneration of extensions, as changes can have
     // been made inside before it's closed.
     if (this.props.isActive) {
-      this.props.onLoadEventsFunctionsExtensions();
+      return this.props.onLoadEventsFunctionsExtensions();
     }
   }
 
@@ -64,7 +64,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // Immediately trigger the reload/regeneration of extensions
     // as a change in the properties of a behavior can create changes
     // in actions/conditions/expressions to manipulate these properties.
-    this.props.onLoadEventsFunctionsExtensions();
+    return this.props.onLoadEventsFunctionsExtensions();
   };
 
   previewWillStart = () => {

@@ -2191,11 +2191,10 @@ const MainFrame = (props: Props) => {
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
-                  onLoadEventsFunctionsExtensions: () => {
+                  onLoadEventsFunctionsExtensions: () =>
                     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                       currentProject
-                    );
-                  },
+                    ),
                   onDeleteResource: (
                     resource: gdResource,
                     cb: boolean => void

@@ -59,7 +59,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  onBehaviorEdited?: () => void,
+  onBehaviorEdited?: () => Promise<void>,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
@@ -129,7 +129,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _loadEventsFunctionFrom = (
     project: gdProject,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior
   ) => {
     // Create an empty "context" of objects.
     // Avoid recreating containers if they were already created, so that
@@ -145,12 +146,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     // Initialize this "context" of objects with the function
     // (as done during code generation).
-    gd.EventsFunctionTools.eventsFunctionToObjectsContainer(
-      project,
-      eventsFunction,
-      this._globalObjectsContainer,
-      this._objectsContainer
-    );
+    if (eventsBasedBehavior) {
+      gd.EventsFunctionTools.behaviorEventsFunctionToObjectsContainer(
+        project,
+        eventsBasedBehavior,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    } else {
+      gd.EventsFunctionTools.freeEventsFunctionToObjectsContainer(
+        project,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    }
   };
 
   updateToolbar = () => {
@@ -206,7 +217,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       return;
     }
 
-    this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
+    this._loadEventsFunctionFrom(
+      this.props.project,
+      selectedEventsFunction,
+      selectedEventsBasedBehavior
+    );
     this.setState(
       {
         selectedEventsFunction,
@@ -546,7 +561,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           // If we're closing the properties of a behavior, notify parent
           // that a behavior was edited (to trigger reload of extensions)
           if (this.props.onBehaviorEdited) {
-            this.props.onBehaviorEdited();
+            this.props
+              .onBehaviorEdited()
+              .then(() => this._fillRequiredBehaviorProperties());
           }
 
           // Reload the selected events function, if any, as the behavior was
@@ -563,6 +580,62 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
+  /**
+   * Try to find a default value for any required behavior property that is set
+   * with an invalid value.
+   * @param {*} project
+   */
+  _fillRequiredBehaviorProperties = (): boolean => {
+    const project = this.props.project;
+    const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
+      project
+    );
+    for (let index = 0; index < problems.size(); index++) {
+      const problem = problems.at(index);
+
+      const object = problem.getSourceObject();
+      const expectedBehaviorTypeName = problem.getExpectedBehaviorTypeName();
+      const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
+        object,
+        expectedBehaviorTypeName
+      ).toJSArray();
+      const behaviorContent = problem.getSourceBehaviorContent();
+      const behavior = gd.MetadataProvider.getBehaviorMetadata(
+        project.getCurrentPlatform(),
+        behaviorContent.getTypeName()
+      ).get();
+
+      if (suggestedBehaviorNames.length === 0) {
+        // No matching behavior on the object.
+        // Add required behaviors on the object.
+        const defaultName = gd.MetadataProvider.getBehaviorMetadata(
+          project.getCurrentPlatform(),
+          expectedBehaviorTypeName
+        ).getDefaultName();
+        gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+          project,
+          object,
+          expectedBehaviorTypeName,
+          defaultName
+        );
+        behavior.updateProperty(
+          behaviorContent.getContent(),
+          problem.getSourcePropertyName(),
+          defaultName
+        );
+      } else {
+        // There is a matching behavior on the object use it by default.
+        behavior.updateProperty(
+          behaviorContent.getContent(),
+          problem.getSourcePropertyName(),
+          // It's unlikely the object has 2 behaviors of the same type.
+          suggestedBehaviorNames[0]
+        );
+      }
+    }
+    return problems.size() > 0;
+  };
+
   _openFreeFunctionsListEditor = () => {
     if (this._editorNavigator)
       this._editorNavigator.openEditor('free-functions-list');
@@ -570,7 +643,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _openBehaviorsListEditor = () => {
     if (this._editorNavigator)
-      this._editorNavigator.openEditor('behaviors-list');
+      return this._editorNavigator.openEditor('behaviors-list');
   };
 
   _onEditorNavigatorEditorChanged = (editorName: string) => {

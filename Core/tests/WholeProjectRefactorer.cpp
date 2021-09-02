@@ -7,13 +7,19 @@
  * @file Tests covering project refactoring
  */
 #include "GDCore/IDE/WholeProjectRefactorer.h"
+
+#include <algorithm>
+
 #include "DummyPlatform.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/UnfilledRequiredBehaviorPropertyProblem.h"
+#include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -113,13 +119,29 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     eventsBasedBehavior.SetFullName("My events based behavior");
     eventsBasedBehavior.SetDescription("An events based behavior for test");
 
-    // Add functions
+    // Add functions, and parameters that should be there by convention.
     auto &behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
-    behaviorEventsFunctions.InsertNewEventsFunction("MyBehaviorEventsFunction",
-                                                    0);
-    behaviorEventsFunctions
-        .InsertNewEventsFunction("MyBehaviorEventsFunctionExpression", 1)
-        .SetFunctionType(gd::EventsFunction::Expression);
+    auto &behaviorAction = behaviorEventsFunctions.InsertNewEventsFunction(
+        "MyBehaviorEventsFunction", 0);
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata().SetName("Object").SetType("object"));
+    behaviorAction.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Behavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
+
+    auto &behaviorExpression =
+        behaviorEventsFunctions
+            .InsertNewEventsFunction("MyBehaviorEventsFunctionExpression", 1)
+            .SetFunctionType(gd::EventsFunction::Expression);
+    behaviorExpression.GetParameters().push_back(
+        gd::ParameterMetadata().SetName("Object").SetType("object"));
+    behaviorExpression.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Behavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
 
     // Add property
     eventsBasedBehavior.GetPropertyDescriptors()
@@ -917,5 +939,321 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvents()
                     .GetEvent(3)) ==
             "ObjectWithMyBehavior.MyBehavior::PropertyMyRenamedProperty()");
+  }
+}
+TEST_CASE("WholeProjectRefactorer (FindInvalidRequiredBehaviorProperties)",
+          "[common]") {
+  SECTION("Find nothing if there are no missing required behavior") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+        gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+            project);
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("Find unfilled required behavior properties") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    // Insert an object using a behavior requiring another behavior.
+    // But don't fill the property, which is a problem.
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    object.AddNewBehavior(project,
+                          "MyExtension::BehaviorWithRequiredBehaviorProperty",
+                          "MyBehaviorWithRequiredBehaviorProperty");
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+        gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+            project);
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problems[0].GetSourceObject().GetName() == "MyObject");
+    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() ==
+            "MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(problems[0].GetSourcePropertyName() == "requiredBehaviorProperty");
+    REQUIRE(problems[0].GetExpectedBehaviorTypeName() ==
+            "MyExtension::MyBehavior");
+  }
+  SECTION("Find nothing if the required behavior properties are filled") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    // Insert an object using a behavior requiring another behavior.
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    object.AddNewBehavior(project,
+                          "MyExtension::BehaviorWithRequiredBehaviorProperty",
+                          "MyBehaviorWithRequiredBehaviorProperty");
+    object.AddNewBehavior(project, "MyExtension::MyBehavior", "MyBehavior");
+
+    // Fill the required behavior property on the object.
+    gd::Behavior &behavior =
+        gd::MetadataProvider::GetBehaviorMetadata(
+            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
+            .Get();
+    gd::BehaviorContent &behaviorContent =
+        object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
+                                    "requiredBehaviorProperty",
+                                    "MyBehavior") == true);
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+        gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+            project);
+    REQUIRE(problems.size() == 0);
+  }
+  SECTION("Find wrongly filled (wrong type) required behavior properties") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    // Insert an object using a behavior requiring another behavior.
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    object.AddNewBehavior(project,
+                          "MyExtension::BehaviorWithRequiredBehaviorProperty",
+                          "MyBehaviorWithRequiredBehaviorProperty");
+    object.AddNewBehavior(
+        project, "MyExtension::MyOtherBehavior", "MyOtherBehavior");
+
+    // Fill the required behavior property on the object with the wrong behavior
+    // name
+    gd::Behavior &behavior =
+        gd::MetadataProvider::GetBehaviorMetadata(
+            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
+            .Get();
+    gd::BehaviorContent &behaviorContent =
+        object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
+                                    "requiredBehaviorProperty",
+                                    "MyOtherBehavior") == true);
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+        gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+            project);
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problems[0].GetSourceObject().GetName() == "MyObject");
+    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() ==
+            "MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(problems[0].GetSourcePropertyName() == "requiredBehaviorProperty");
+    REQUIRE(problems[0].GetExpectedBehaviorTypeName() ==
+            "MyExtension::MyBehavior");
+  }
+  SECTION("Find wrongly filled (not existing) required behavior properties") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+
+    // Insert an object using a behavior requiring another behavior.
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+    object.AddNewBehavior(project,
+                          "MyExtension::BehaviorWithRequiredBehaviorProperty",
+                          "MyBehaviorWithRequiredBehaviorProperty");
+
+    // Fill the required behavior property on the object with the wrong behavior
+    // name
+    gd::Behavior &behavior =
+        gd::MetadataProvider::GetBehaviorMetadata(
+            platform, "MyExtension::BehaviorWithRequiredBehaviorProperty")
+            .Get();
+    gd::BehaviorContent &behaviorContent =
+        object.GetBehavior("MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(behavior.UpdateProperty(behaviorContent.GetContent(),
+                                    "requiredBehaviorProperty",
+                                    "MyNotExistingBehavior") == true);
+
+    std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> problems =
+        gd::WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
+            project);
+    REQUIRE(problems.size() == 1);
+    REQUIRE(problems[0].GetSourceObject().GetName() == "MyObject");
+    REQUIRE(problems[0].GetSourceBehaviorContent().GetName() ==
+            "MyBehaviorWithRequiredBehaviorProperty");
+    REQUIRE(problems[0].GetSourcePropertyName() == "requiredBehaviorProperty");
+    REQUIRE(problems[0].GetExpectedBehaviorTypeName() ==
+            "MyExtension::MyBehavior");
+  }
+}
+TEST_CASE("WholeProjectRefactorer (AddBehaviorAndRequiredBehaviors)",
+          "[common]") {
+  SECTION(
+      "Does not add anything else if the newly added behavior has no required "
+      "behavior properties") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add a simple behavior.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project, object, "MyExtension::MyBehavior", "MyBehavior");
+
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.GetAllBehaviorNames().size() == 1);
+  }
+
+  SECTION("Does not add anything else if the newly added behavior is unknown") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add a simple behavior.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyExtension::MyNotExistingBehavior",
+        "MyNotExistingBehavior");
+
+    REQUIRE(object.GetAllBehaviorNames().size() == 0);
+  }
+
+  SECTION("Add a behavior and its required behaviors on an object") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add the behavior that requires a behavior.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorProperty",
+        "BehaviorWithRequiredBehaviorProperty");
+
+    // Required behavior are added.
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
+
+    // Check that required behavior properties were filled properly too.
+    const auto &metadata1 = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorProperty");
+    REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata1));
+    const auto &behaviorWithRequiredBehaviorPropertyProperties =
+        metadata1.Get().GetProperties(
+            object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
+                .GetContent());
+
+    REQUIRE(behaviorWithRequiredBehaviorPropertyProperties
+                .at("requiredBehaviorProperty")
+                .GetValue() == "MyBehavior");
+  }
+
+  SECTION(
+      "Add a behavior and its required behaviors on an object (transitively)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add the behavior that requires a behavior that requires another.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior");
+
+    // Required behavior are added transitively.
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
+    REQUIRE(object.HasBehaviorNamed(
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior"));
+
+    // Check that required behavior properties were filled properly too.
+    const auto &metadata1 = gd::MetadataProvider::GetBehaviorMetadata(
+        platform,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior");
+    const auto &metadata2 = gd::MetadataProvider::GetBehaviorMetadata(
+        platform, "MyExtension::BehaviorWithRequiredBehaviorProperty");
+    REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata1));
+    REQUIRE(!gd::MetadataProvider::IsBadBehaviorMetadata(metadata2));
+    const auto &
+        behaviorWithRequiredBehaviorPropertyRequiringAnotherBehaviorProperties =
+            metadata1.Get().GetProperties(
+                object
+                    .GetBehavior("BehaviorWithRequiredBehaviorPropertyRequiring"
+                                 "AnotherBehavior")
+                    .GetContent());
+    const auto &behaviorWithRequiredBehaviorPropertyProperties =
+        metadata2.Get().GetProperties(
+            object.GetBehavior("BehaviorWithRequiredBehaviorProperty")
+                .GetContent());
+
+    REQUIRE(
+        behaviorWithRequiredBehaviorPropertyRequiringAnotherBehaviorProperties
+            .at("requiredBehaviorProperty")
+            .GetValue() == "BehaviorWithRequiredBehaviorProperty");
+    REQUIRE(behaviorWithRequiredBehaviorPropertyProperties
+                .at("requiredBehaviorProperty")
+                .GetValue() == "MyBehavior");
+  }
+}
+TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames)", "[common]") {
+  SECTION("Find behaviors that are dependent on another") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add the behavior that requires a behavior that requires another.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior");
+
+    // Required behavior are added transitively.
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
+    REQUIRE(object.HasBehaviorNamed(
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior"));
+
+    // Find dependent behaviors
+    {
+      const auto &behaviorNames =
+          gd::WholeProjectRefactorer::FindDependentBehaviorNames(
+              project, object, "MyBehavior");
+
+      REQUIRE(behaviorNames.size() == 2);
+      REQUIRE(std::find(behaviorNames.begin(),
+                        behaviorNames.end(),
+                        "BehaviorWithRequiredBehaviorProperty") !=
+              behaviorNames.end());
+      REQUIRE(
+          std::find(
+              behaviorNames.begin(),
+              behaviorNames.end(),
+              "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior") !=
+          behaviorNames.end());
+    }
+    {
+      const auto &behaviorNames =
+          gd::WholeProjectRefactorer::FindDependentBehaviorNames(
+              project, object, "BehaviorWithRequiredBehaviorProperty");
+
+      REQUIRE(behaviorNames.size() == 1);
+      REQUIRE(
+          std::find(
+              behaviorNames.begin(),
+              behaviorNames.end(),
+              "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior") !=
+          behaviorNames.end());
+    }
   }
 }

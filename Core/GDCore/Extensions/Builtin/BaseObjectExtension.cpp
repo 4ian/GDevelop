@@ -817,7 +817,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("ResetObjectTimer",
-                _("Start (or reset) a timer"),
+                _("Start (or reset) an object timer"),
                 _("Reset the specified timer, if the timer doesn't exist "
                   "it's created and started."),
                 _("Reset the timer _PARAM1_ of _PARAM0_"),

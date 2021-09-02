@@ -436,7 +436,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.state.selectedEventsFunction) {
       this._loadEventsFunctionFrom(
         this.props.project,
-        this.state.selectedEventsFunction
+        this.state.selectedEventsFunction,
+        this.state.selectedEventsBasedBehavior
       );
     }
   };
@@ -556,14 +557,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           editedEventsBasedBehavior,
         };
       },
-      () => {
+      async () => {
+        // TODO: Is this logic the same as in _onEventsBasedBehaviorRenamed?
+
         if (!editedEventsBasedBehavior) {
           // If we're closing the properties of a behavior, notify parent
           // that a behavior was edited (to trigger reload of extensions)
           if (this.props.onBehaviorEdited) {
-            this.props
-              .onBehaviorEdited()
-              .then(() => this._fillRequiredBehaviorProperties());
+            await this.props.onBehaviorEdited();
+
+            this._fillRequiredBehaviorProperties();
           }
 
           // Reload the selected events function, if any, as the behavior was
@@ -572,7 +575,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           if (this.state.selectedEventsFunction) {
             this._loadEventsFunctionFrom(
               this.props.project,
-              this.state.selectedEventsFunction
+              this.state.selectedEventsFunction,
+              this.state.selectedEventsBasedBehavior
             );
           }
         }
@@ -713,7 +717,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onParametersOrGroupsUpdated={() => {
                       this._loadEventsFunctionFrom(
                         project,
-                        selectedEventsFunction
+                        selectedEventsFunction,
+                        selectedEventsBasedBehavior
                       );
                       this.forceUpdate();
                     }}

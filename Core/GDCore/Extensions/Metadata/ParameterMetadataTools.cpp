@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ParameterMetadataTools.h"
+
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectsContainer.h"
@@ -60,6 +61,24 @@ void ParameterMetadataTools::IterateOverParameters(
     std::function<void(const gd::ParameterMetadata& parameterMetadata,
                        const gd::String& parameterValue,
                        const gd::String& lastObjectName)> fn) {
+  IterateOverParametersWithIndex(
+      parameters,
+      parametersMetadata,
+      [&fn](const gd::ParameterMetadata& parameterMetadata,
+            const gd::String& parameterValue,
+            size_t parameterIndex,
+            const gd::String& lastObjectName) {
+        fn(parameterMetadata, parameterValue, lastObjectName);
+      });
+}
+
+void ParameterMetadataTools::IterateOverParametersWithIndex(
+    const std::vector<gd::Expression>& parameters,
+    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    std::function<void(const gd::ParameterMetadata& parameterMetadata,
+                       const gd::String& parameterValue,
+                       size_t parameterIndex,
+                       const gd::String& lastObjectName)> fn) {
   gd::String lastObjectName = "";
   for (std::size_t pNb = 0; pNb < parametersMetadata.size(); ++pNb) {
     const gd::ParameterMetadata& parameterMetadata = parametersMetadata[pNb];
@@ -70,7 +89,7 @@ void ParameterMetadataTools::IterateOverParameters(
             ? parameterMetadata.GetDefaultValue()
             : parameterValue;
 
-    fn(parameterMetadata, parameterValueOrDefault, lastObjectName);
+    fn(parameterMetadata, parameterValueOrDefault, pNb, lastObjectName);
 
     // Memorize the last object name. By convention, parameters that require
     // an object (mainly, "objectvar" and "behavior") should be placed after

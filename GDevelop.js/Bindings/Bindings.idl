@@ -1918,7 +1918,7 @@ interface WholeProjectRefactorer {
       [Const] DOMString functionName,
       unsigned long oldIndex,
       unsigned long newIndex);
-    void STATIC_RenameBehaviorProperty(
+    void STATIC_RenameEventsBasedBehaviorProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,

@@ -6,8 +6,8 @@
 #ifndef GDCORE_WHOLEPROJECTREFACTORER_H
 #define GDCORE_WHOLEPROJECTREFACTORER_H
 #include <set>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 namespace gd {
 class Platform;
 class Project;
@@ -58,13 +58,24 @@ class GD_CORE_API WholeProjectRefactorer {
                                   gd::ArbitraryEventsWorkerWithContext& worker);
 
   /**
-   * \brief Call the specified worker on all ObjectContainers of the project (global,
-   * layouts...)
+   * \brief Call the specified worker on all events of the events based behavior
+   *
+   * This should be the preferred way to traverse all the events of an events
+   * based behavior
+   */
+  static void ExposeEventsBasedBehaviorEvents(
+      gd::Project& project,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      gd::ArbitraryEventsWorkerWithContext& worker);
+
+  /**
+   * \brief Call the specified worker on all ObjectContainers of the project
+   * (global, layouts...)
    *
    * This should be the preferred way to traverse all the objects of a project.
    */
-  static void ExposeProjectObjects(
-      gd::Project& project, gd::ArbitraryObjectsWorker& worker);
+  static void ExposeProjectObjects(gd::Project& project,
+                                   gd::ArbitraryObjectsWorker& worker);
 
   /**
    * \brief Refactor the project **before** an events function extension is
@@ -147,7 +158,7 @@ class GD_CORE_API WholeProjectRefactorer {
    * This is because the property is expected to have its old name for the
    * refactoring.
    */
-  static void RenameBehaviorProperty(
+  static void RenameEventsBasedBehaviorProperty(
       gd::Project& project,
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
@@ -158,26 +169,32 @@ class GD_CORE_API WholeProjectRefactorer {
    * \brief Add a behavior to an object and add required behaviors if necessary
    * to fill every behavior properties of the added behaviors.
    */
-  static void AddBehaviorAndRequiredBehaviors(
-    gd::Project& project,
-    gd::Object& object,
-    const gd::String& behaviorType,
-    const gd::String& behaviorName);
+  static void AddBehaviorAndRequiredBehaviors(gd::Project& project,
+                                              gd::Object& object,
+                                              const gd::String& behaviorType,
+                                              const gd::String& behaviorName);
 
   /**
    * \brief Find every behavior of the object that needs the given behaviors
-   * directly or indirectly.
+   * directly or indirectly (because of "required behavior" properties).
    */
   static std::vector<gd::String> FindDependentBehaviorNames(
-    const gd::Project& project,
-    const gd::Object& object,
-    const gd::String& behaviorName);
+      const gd::Project& project,
+      const gd::Object& object,
+      const gd::String& behaviorName);
 
-  static std::vector<gd::String> GetBehaviorsWithType(
-      const gd::Object& object, const gd::String& type);
+  /**
+   * \brief Find the names of the behaviors with the specified type on the object.
+   */
+  static std::vector<gd::String> GetBehaviorsWithType(const gd::Object& object,
+                                                      const gd::String& type);
 
-  static std::vector<gd::UnfilledRequiredBehaviorPropertyProblem> FindInvalidRequiredBehaviorProperties(
-    gd::Project& project);
+  /**
+   * \brief Find in the project objects having behaviors with "behavior" properties that
+   * don't have a valid value (i.e: pointing to a non existing behavior, or of a wrong type).
+   */
+  static std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
+  FindInvalidRequiredBehaviorProperties(gd::Project& project);
 
   /**
    * \brief Refactor the project **before** a behavior is renamed.
@@ -300,10 +317,12 @@ class GD_CORE_API WholeProjectRefactorer {
                                const gd::String& newBehaviorType);
 
   static void FindDependentBehaviorNames(
-    const gd::Project& project,
-    const gd::Object& object,
-    const gd::String& behaviorName,
-    std::unordered_set<gd::String>& dependentBehaviorNames);
+      const gd::Project& project,
+      const gd::Object& object,
+      const gd::String& behaviorName,
+      std::unordered_set<gd::String>& dependentBehaviorNames);
+
+  static const gd::String behaviorObjectParameterName;
 
   WholeProjectRefactorer(){};
 };

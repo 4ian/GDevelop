@@ -211,7 +211,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .SetFunctionName("getObjectStringWith2ObjectParam");
 
   {
-    auto behavior =
+    auto& behavior =
         extension->AddBehavior("MyBehavior",
                                "Dummy behavior",
                                "MyBehavior",
@@ -229,6 +229,8 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                    "",
                    "",
                    "")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
         .AddParameter("expression", "Parameter 1 (a number)")
         .SetFunctionName("behaviorDoSomething");
     behavior
@@ -241,9 +243,19 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
         .AddParameter("expression", _("Number parameter"))
         .SetFunctionName("getBehaviorStringWith1Param");
+    behavior
+        .AddExpression("GetBehaviorNumberWith1Param",
+                          "Get number from behavior with 1 param",
+                          "",
+                          "",
+                          "")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
+        .AddParameter("expression", _("Number parameter"))
+        .SetFunctionName("getBehaviorNumberWith1Param");
   }
   {
-    auto behavior =
+    auto& behavior =
         extension->AddBehavior("MyOtherBehavior",
                                "Another Dummy behavior",
                                "MyOtherBehavior",
@@ -256,7 +268,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
   }
 
   {
-    auto behavior = extension->AddBehavior(
+    auto& behavior = extension->AddBehavior(
         "BehaviorWithRequiredBehaviorProperty",
         "BehaviorWithRequiredBehaviorProperty",
         "BehaviorWithRequiredBehaviorProperty",
@@ -268,7 +280,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
         gd::make_unique<gd::BehaviorsSharedData>());
   }
   {
-    auto behavior = extension->AddBehavior(
+    auto& behavior = extension->AddBehavior(
         "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
         "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
         "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",

@@ -525,7 +525,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
-    gd.WholeProjectRefactorer.renameBehaviorProperty(
+    gd.WholeProjectRefactorer.renameEventsBasedBehaviorProperty(
       project,
       eventsFunctionsExtension,
       eventsBasedBehavior,

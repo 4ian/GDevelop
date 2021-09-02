@@ -10,6 +10,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
+#include "GDCore/IDE/Events/EventsBehaviorRenamer.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsParameterMover.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
@@ -55,6 +56,10 @@ gd::String GetBehaviorFullType(const gd::String& extensionName,
 }  // namespace
 
 namespace gd {
+
+// By convention, the first parameter of an events based behavior method is always
+// called "Object".
+const gd::String WholeProjectRefactorer::behaviorObjectParameterName = "Object";
 
 void WholeProjectRefactorer::ExposeProjectEvents(
     gd::Project& project, gd::ArbitraryEventsWorker& worker) {
@@ -132,23 +137,28 @@ void WholeProjectRefactorer::ExposeProjectEvents(
     for (auto&& eventsBasedBehavior :
          eventsFunctionsExtension.GetEventsBasedBehaviors()
              .GetInternalVector()) {
-      auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
-      for (auto&& eventsFunction :
-           behaviorEventsFunctions.GetInternalVector()) {
-        gd::ObjectsContainer globalObjectsAndGroups;
-        gd::ObjectsContainer objectsAndGroups;
-        gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-            project,
-            *eventsBasedBehavior,
-            *eventsFunction,
-            globalObjectsAndGroups,
-            objectsAndGroups);
-
-        worker.Launch(eventsFunction->GetEvents(),
-                      globalObjectsAndGroups,
-                      objectsAndGroups);
-      }
+      ExposeEventsBasedBehaviorEvents(project, *eventsBasedBehavior, worker);
     }
+  }
+}
+
+void WholeProjectRefactorer::ExposeEventsBasedBehaviorEvents(
+    gd::Project& project,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    gd::ArbitraryEventsWorkerWithContext& worker) {
+  auto& behaviorEventsFunctions = eventsBasedBehavior.GetEventsFunctions();
+  for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
+    gd::ObjectsContainer globalObjectsAndGroups;
+    gd::ObjectsContainer objectsAndGroups;
+    gd::EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
+        project,
+        eventsBasedBehavior,
+        *eventsFunction,
+        globalObjectsAndGroups,
+        objectsAndGroups);
+
+    worker.Launch(
+        eventsFunction->GetEvents(), globalObjectsAndGroups, objectsAndGroups);
   }
 }
 
@@ -201,7 +211,7 @@ void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
 
     parameters[0]
         .SetType("object")
-        .SetName("Object")
+        .SetName(behaviorObjectParameterName)
         .SetDescription("Object")
         .SetExtraInfo(eventsBasedBehavior.GetObjectType());
     parameters[1]
@@ -479,7 +489,7 @@ void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
   }
 }
 
-void WholeProjectRefactorer::RenameBehaviorProperty(
+void WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
@@ -488,41 +498,61 @@ void WholeProjectRefactorer::RenameBehaviorProperty(
   auto& properties = eventsBasedBehavior.GetPropertyDescriptors();
   if (!properties.Has(oldPropertyName)) return;
 
-  // Order is important: we first rename the expressions then the instructions,
-  // to avoid being unable to fetch the metadata (the types of parameters) of
-  // instructions after they are renamed.
-  gd::ExpressionsRenamer expressionRenamer =
-      gd::ExpressionsRenamer(project.GetCurrentPlatform());
-  expressionRenamer.SetReplacedBehaviorExpression(
-      GetBehaviorFullType(eventsFunctionsExtension.GetName(),
-                          eventsBasedBehavior.GetName()),
-      EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
-      EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
-  ExposeProjectEvents(project, expressionRenamer);
+  if (properties.Get(oldPropertyName).GetType() == "Behavior") {
+    // This is a property representing another behavior that must exist on the
+    // object.
 
-  gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
-      project,
-      GetBehaviorEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(),
-          eventsBasedBehavior.GetName(),
-          EventsBasedBehavior::GetPropertyActionName(oldPropertyName)),
-      GetBehaviorEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(),
-          eventsBasedBehavior.GetName(),
-          EventsBasedBehavior::GetPropertyActionName(newPropertyName)));
-  ExposeProjectEvents(project, actionRenamer);
+    // This other "required behavior" uses the property name, that is about to
+    // change, as its name.
+    // So we must change all reference to this name in the events of the
+    // behavior functions.
+    gd::EventsBehaviorRenamer behaviorRenamer(project.GetCurrentPlatform(),
+                                              behaviorObjectParameterName,
+                                              oldPropertyName,
+                                              newPropertyName);
 
-  gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
-      project,
-      GetBehaviorEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(),
-          eventsBasedBehavior.GetName(),
-          EventsBasedBehavior::GetPropertyConditionName(oldPropertyName)),
-      GetBehaviorEventsFunctionFullType(
-          eventsFunctionsExtension.GetName(),
-          eventsBasedBehavior.GetName(),
-          EventsBasedBehavior::GetPropertyConditionName(newPropertyName)));
-  ExposeProjectEvents(project, conditionRenamer);
+    ExposeEventsBasedBehaviorEvents(
+        project, eventsBasedBehavior, behaviorRenamer);
+  } else {
+    // Properties that represent primitive values will be used through
+    // their related actions/conditions/expressions. Rename these.
+
+    // Order is important: we first rename the expressions then the
+    // instructions, to avoid being unable to fetch the metadata (the types of
+    // parameters) of instructions after they are renamed.
+    gd::ExpressionsRenamer expressionRenamer =
+        gd::ExpressionsRenamer(project.GetCurrentPlatform());
+    expressionRenamer.SetReplacedBehaviorExpression(
+        GetBehaviorFullType(eventsFunctionsExtension.GetName(),
+                            eventsBasedBehavior.GetName()),
+        EventsBasedBehavior::GetPropertyExpressionName(oldPropertyName),
+        EventsBasedBehavior::GetPropertyExpressionName(newPropertyName));
+    ExposeProjectEvents(project, expressionRenamer);
+
+    gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetPropertyActionName(oldPropertyName)),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetPropertyActionName(newPropertyName)));
+    ExposeProjectEvents(project, actionRenamer);
+
+    gd::InstructionsTypeRenamer conditionRenamer = gd::InstructionsTypeRenamer(
+        project,
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetPropertyConditionName(oldPropertyName)),
+        GetBehaviorEventsFunctionFullType(
+            eventsFunctionsExtension.GetName(),
+            eventsBasedBehavior.GetName(),
+            EventsBasedBehavior::GetPropertyConditionName(newPropertyName)));
+    ExposeProjectEvents(project, conditionRenamer);
+  }
 }
 
 void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
@@ -539,8 +569,9 @@ void WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
   const gd::BehaviorMetadata& behaviorMetadata =
       MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
   if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
-    // Should not happen because the behavior was added successfully (so its metadata
-    // are valid) - but double check anyway and bail out if the behavior metadata are invalid.
+    // Should not happen because the behavior was added successfully (so its
+    // metadata are valid) - but double check anyway and bail out if the
+    // behavior metadata are invalid.
     return;
   }
 

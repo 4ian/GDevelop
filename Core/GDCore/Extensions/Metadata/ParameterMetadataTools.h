@@ -36,6 +36,19 @@ class GD_CORE_API ParameterMetadataTools {
                          const gd::String& lastObjectName)> fn);
 
   /**
+   * Iterate over a list of parameters and their values.
+   * Callback function is called with the parameter metadata, its value
+   * and if applicable the name of the object it's linked to.
+   */
+  static void IterateOverParametersWithIndex(
+      const std::vector<gd::Expression>& parameters,
+      const std::vector<gd::ParameterMetadata>& parametersMetadata,
+      std::function<void(const gd::ParameterMetadata& parameterMetadata,
+                         const gd::String& parameterValue,
+                         size_t parameterIndex,
+                         const gd::String& lastObjectName)> fn);
+
+  /**
    * Given a parameter, return, if applicable, the index of the object parameter
    * it's linked to.
    */

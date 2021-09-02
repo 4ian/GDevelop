@@ -904,7 +904,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "ObjectWithMyBehavior::MyBehavior."
             "MyBehaviorEventsFunctionExpression(123, 456, 789)");
   }
-  SECTION("(Events based Behavior) property renamed") {
+  SECTION("(Events based Behavior) property (not a required behavior) renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -912,7 +912,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
-    gd::WholeProjectRefactorer::RenameBehaviorProperty(project,
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(project,
                                                        eventsExtension,
                                                        eventsBasedBehavior,
                                                        "MyProperty",

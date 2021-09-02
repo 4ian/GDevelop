@@ -6,7 +6,7 @@ declare class gdWholeProjectRefactorer {
   static renameBehaviorEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
   static moveEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
-  static renameBehaviorProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
+  static renameEventsBasedBehaviorProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
   static renameEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: gdProject, layout: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectOrGroupRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;

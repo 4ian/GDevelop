@@ -15,6 +15,7 @@
 namespace gd {
 class ObjectsContainer;
 class EventsFunction;
+class EventsBasedBehavior;
 class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
@@ -85,6 +86,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   static gd::String GenerateBehaviorEventsFunctionCode(
       gd::Project& project,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
       const gd::String& fullyQualifiedFunctionName,
@@ -321,15 +323,25 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       bool isBehaviorEventsFunction);
 
   /**
-   * \brief Generate the "eventsFunctionContext" object that allow a function
+   * \brief Generate the "eventsFunctionContext" object that allow a free function
    * to provides access objects, object creation and access to arguments from
    * the rest of the events.
    */
-  gd::String GenerateEventsFunctionContext(
+  gd::String GenerateFreeEventsFunctionContext(
+      const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::String& onceTriggersVariable);
+
+  /**
+   * \brief Generate the "eventsFunctionContext" object that allow a behavior function
+   * to provides access objects, object creation and access to arguments from
+   * the rest of the events.
+   */
+  gd::String GenerateBehaviorEventsFunctionContext(
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable,
-      const gd::String& thisObjectName = "",
-      const gd::String& thisBehaviorName = "");
+      const gd::String& thisObjectName,
+      const gd::String& thisBehaviorName);
 
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction& eventFunction);
@@ -348,6 +360,20 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,
                              ///< used when generating events function.
+private:
+  /**
+   * \brief Generate the "eventsFunctionContext" object that allow a function
+   * to provides access objects, object creation and access to arguments from
+   * the rest of the events.
+   */
+  gd::String GenerateEventsFunctionContext(
+      const std::vector<gd::ParameterMetadata>& parameters,
+      const gd::String& onceTriggersVariable,
+      gd::String& objectsGettersMap,
+      gd::String& objectArraysMap,
+      gd::String& behaviorNamesMap,
+      const gd::String& thisObjectName = "",
+      const gd::String& thisBehaviorName = "");
 };
 
 }  // namespace gdjs

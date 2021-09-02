@@ -471,8 +471,9 @@
           "effects": [],
           "behaviors": [
             {
-              "name": "ARequiredCustomBehavior",
-              "type": "MyCustomBehaviorExtension::AnotherRequiredCustomBehavior"
+              "name": "AnotherRequiredCustomBehavior",
+              "type": "MyCustomBehaviorExtension::AnotherRequiredCustomBehavior",
+              "NestedRequiredCustomBehavior": "NestedRequiredCustomBehavior"
             },
             {
               "name": "Draggable",
@@ -488,7 +489,12 @@
               "test": "Draggable",
               "RequiredDraggableBehavior": "Draggable",
               "AnotherRequiredCustomBehavior": "ARequiredCustomBehavior",
-              "TheRequiredDraggableBehavior": "Draggable"
+              "TheRequiredDraggableBehavior": "Draggable",
+              "RequiredCustomBehavior": "AnotherRequiredCustomBehavior"
+            },
+            {
+              "name": "NestedRequiredCustomBehavior",
+              "type": "MyCustomBehaviorExtension::NestedRequiredCustomBehavior"
             },
             {
               "name": "PlatformerObject",
@@ -1053,8 +1059,16 @@
       ],
       "behaviorsSharedData": [
         {
+          "name": "AnotherRequiredCustomBehavior",
+          "type": "MyCustomBehaviorExtension::AnotherRequiredCustomBehavior"
+        },
+        {
           "name": "MyBehavior",
           "type": "MyCustomBehaviorExtension::CustomBehavior"
+        },
+        {
+          "name": "NestedRequiredCustomBehavior",
+          "type": "MyCustomBehaviorExtension::NestedRequiredCustomBehavior"
         },
         {
           "name": "Platform",
@@ -1228,7 +1242,7 @@
                       },
                       "parameters": [
                         "Object",
-                        "TheRequiredDraggableBehavior"
+                        "RequiredDraggableBehavior"
                       ],
                       "subInstructions": []
                     }
@@ -1294,7 +1308,7 @@
                 "DraggableBehavior::Draggable"
               ],
               "hidden": false,
-              "name": "TheRequiredDraggableBehavior"
+              "name": "RequiredDraggableBehavior"
             },
             {
               "value": "",
@@ -1305,7 +1319,7 @@
                 "MyCustomBehaviorExtension::AnotherRequiredCustomBehavior"
               ],
               "hidden": false,
-              "name": "AnotherRequiredCustomBehavior"
+              "name": "RequiredCustomBehavior"
             }
           ]
         },
@@ -1313,6 +1327,26 @@
           "description": "",
           "fullName": "",
           "name": "AnotherRequiredCustomBehavior",
+          "objectType": "",
+          "eventsFunctions": [],
+          "propertyDescriptors": [
+            {
+              "value": "",
+              "type": "Behavior",
+              "label": "A nested required custom behavior",
+              "description": "",
+              "extraInformation": [
+                "MyCustomBehaviorExtension::NestedRequiredCustomBehavior"
+              ],
+              "hidden": false,
+              "name": "NestedRequiredCustomBehavior"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "fullName": "",
+          "name": "NestedRequiredCustomBehavior",
           "objectType": "",
           "eventsFunctions": [],
           "propertyDescriptors": []

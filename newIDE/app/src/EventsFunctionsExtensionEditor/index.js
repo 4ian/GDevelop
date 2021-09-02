@@ -643,7 +643,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _openBehaviorsListEditor = () => {
     if (this._editorNavigator)
-      return this._editorNavigator.openEditor('behaviors-list');
+      this._editorNavigator.openEditor('behaviors-list');
   };
 
   _onEditorNavigatorEditorChanged = (editorName: string) => {

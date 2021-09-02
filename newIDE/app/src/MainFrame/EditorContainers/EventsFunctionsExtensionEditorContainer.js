@@ -56,7 +56,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     // reload/regeneration of extensions, as changes can have
     // been made inside before it's closed.
     if (this.props.isActive) {
-      return this.props.onLoadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions();
     }
   }
 

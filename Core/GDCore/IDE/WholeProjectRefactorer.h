@@ -194,7 +194,15 @@ class GD_CORE_API WholeProjectRefactorer {
    * don't have a valid value (i.e: pointing to a non existing behavior, or of a wrong type).
    */
   static std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
-  FindInvalidRequiredBehaviorProperties(gd::Project& project);
+  FindInvalidRequiredBehaviorProperties(const gd::Project& project);
+
+  /**
+   * \brief Fix in the project objects having behaviors with "behavior" properties that
+   * don't have a valid value (i.e: pointing to a non existing behavior, or of a wrong type),
+   * by setting a proper behavior, or adding missing behaviors to these objects.
+   */
+  static bool
+  FixInvalidRequiredBehaviorProperties(gd::Project& project);
 
   /**
    * \brief Refactor the project **before** a behavior is renamed.

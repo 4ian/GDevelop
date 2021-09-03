@@ -558,6 +558,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
   FindInvalidRequiredBehaviorProperties
 #define STATIC_GetBehaviorsWithType \
   GetBehaviorsWithType
+#define STATIC_FixInvalidRequiredBehaviorProperties \
+  FixInvalidRequiredBehaviorProperties
 #define STATIC_CreateRectangle CreateRectangle
 #define STATIC_SanityCheckBehaviorProperty SanityCheckBehaviorProperty
 #define STATIC_SanityCheckObjectProperty SanityCheckObjectProperty

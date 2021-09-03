@@ -22,7 +22,7 @@ namespace gd {
 class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
  public:
   UnfilledRequiredBehaviorPropertyProblem(
-      gd::Project& sourceProject_,
+      const gd::Project& sourceProject_,
       gd::Object& sourceObject_,
       gd::BehaviorContent& sourceBehaviorContent_,
       const gd::String& sourcePropertyName_,
@@ -37,7 +37,7 @@ class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
   /**
    * \brief Return the project where the problem appears
    */
-  virtual gd::Project& GetSourceProject() const { return sourceProject; }
+  virtual const gd::Project& GetSourceProject() const { return sourceProject; }
 
   /**
    * \brief Return the object where the problem appears.
@@ -67,7 +67,7 @@ class GD_CORE_API UnfilledRequiredBehaviorPropertyProblem {
   }
 
  private:
-  gd::Project& sourceProject;
+  const gd::Project& sourceProject;
   gd::Object& sourceObject;
   gd::BehaviorContent& sourceBehaviorContent;
   const gd::String sourcePropertyName;

@@ -1875,7 +1875,7 @@ interface EventsRefactorer {
 };
 
 interface UnfilledRequiredBehaviorPropertyProblem {
-  [Ref] Project GetSourceProject();
+  [Const, Ref] Project GetSourceProject();
   [Ref] gdObject GetSourceObject();
   [Ref] BehaviorContent GetSourceBehaviorContent();
   [Const, Ref] DOMString GetSourcePropertyName();
@@ -1939,8 +1939,9 @@ interface WholeProjectRefactorer {
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_AddBehaviorAndRequiredBehaviors([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorType, [Const] DOMString behaviorName);
     [Value] VectorString STATIC_FindDependentBehaviorNames([Const, Ref] Project project, [Const, Ref] gdObject obj, [Const] DOMString behaviorName);
-    [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Ref] Project project);
+    [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
     [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
+    boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
 };
 
 interface UsedExtensionsFinder {

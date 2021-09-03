@@ -566,7 +566,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           if (this.props.onBehaviorEdited) {
             await this.props.onBehaviorEdited();
 
-            this._fillRequiredBehaviorProperties();
+            // Once extensions are reloaded, ensure the project stays valid by
+            // filling any invalid required behavior property in the objects
+            // of the project.
+            //
+            // We need to do that as "required behavior" properties may have been
+            // added (or the type of the required behavior changed) in the dialog.
+            gd.WholeProjectRefactorer.fixInvalidRequiredBehaviorProperties(
+              this.props.project
+            );
           }
 
           // Reload the selected events function, if any, as the behavior was
@@ -582,62 +590,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         }
       }
     );
-  };
-
-  /**
-   * Try to find a default value for any required behavior property that is set
-   * with an invalid value.
-   * @param {*} project
-   */
-  _fillRequiredBehaviorProperties = (): boolean => {
-    const project = this.props.project;
-    const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
-      project
-    );
-    for (let index = 0; index < problems.size(); index++) {
-      const problem = problems.at(index);
-
-      const object = problem.getSourceObject();
-      const expectedBehaviorTypeName = problem.getExpectedBehaviorTypeName();
-      const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
-        object,
-        expectedBehaviorTypeName
-      ).toJSArray();
-      const behaviorContent = problem.getSourceBehaviorContent();
-      const behavior = gd.MetadataProvider.getBehaviorMetadata(
-        project.getCurrentPlatform(),
-        behaviorContent.getTypeName()
-      ).get();
-
-      if (suggestedBehaviorNames.length === 0) {
-        // No matching behavior on the object.
-        // Add required behaviors on the object.
-        const defaultName = gd.MetadataProvider.getBehaviorMetadata(
-          project.getCurrentPlatform(),
-          expectedBehaviorTypeName
-        ).getDefaultName();
-        gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-          project,
-          object,
-          expectedBehaviorTypeName,
-          defaultName
-        );
-        behavior.updateProperty(
-          behaviorContent.getContent(),
-          problem.getSourcePropertyName(),
-          defaultName
-        );
-      } else {
-        // There is a matching behavior on the object use it by default.
-        behavior.updateProperty(
-          behaviorContent.getContent(),
-          problem.getSourcePropertyName(),
-          // It's unlikely the object has 2 behaviors of the same type.
-          suggestedBehaviorNames[0]
-        );
-      }
-    }
-    return problems.size() > 0;
   };
 
   _openFreeFunctionsListEditor = () => {

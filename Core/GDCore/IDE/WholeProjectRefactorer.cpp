@@ -57,8 +57,8 @@ gd::String GetBehaviorFullType(const gd::String& extensionName,
 
 namespace gd {
 
-// By convention, the first parameter of an events based behavior method is always
-// called "Object".
+// By convention, the first parameter of an events based behavior method is
+// always called "Object".
 const gd::String WholeProjectRefactorer::behaviorObjectParameterName = "Object";
 
 void WholeProjectRefactorer::ExposeProjectEvents(
@@ -647,7 +647,7 @@ void WholeProjectRefactorer::FindDependentBehaviorNames(
     const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(objectBehaviorName);
     const auto& behaviorMetadata = MetadataProvider::GetBehaviorMetadata(
-                                 platform, behaviorContent.GetTypeName());
+        platform, behaviorContent.GetTypeName());
     if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
       // Ignore this behavior as it's unknown.
       continue;
@@ -672,12 +672,12 @@ void WholeProjectRefactorer::FindDependentBehaviorNames(
 
 std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
 WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
-    gd::Project& project) {
+    const gd::Project& project) {
   std::vector<gd::UnfilledRequiredBehaviorPropertyProblem>
       invalidRequiredBehaviorProperties;
   auto findInvalidRequiredBehaviorPropertiesInObjects =
       [&project, &invalidRequiredBehaviorProperties](
-          std::vector<std::unique_ptr<gd::Object> >& objectsList) {
+          const std::vector<std::unique_ptr<gd::Object> >& objectsList) {
         for (auto& object : objectsList) {
           for (auto& behaviorContentKeyValuePair :
                object->GetAllBehaviorContents()) {
@@ -734,10 +734,58 @@ WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
 
   // Find in layout objects.
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout& layout = project.GetLayout(i);
+    const gd::Layout& layout = project.GetLayout(i);
     findInvalidRequiredBehaviorPropertiesInObjects(layout.GetObjects());
   }
   return invalidRequiredBehaviorProperties;
+}
+
+bool WholeProjectRefactorer::FixInvalidRequiredBehaviorProperties(
+    gd::Project& project) {
+  const auto& invalidRequiredBehaviorProblems =
+      FindInvalidRequiredBehaviorProperties(project);
+  for (const auto& problem : invalidRequiredBehaviorProblems) {
+    auto& object = problem.GetSourceObject();
+    auto suggestedBehaviorNames =
+        GetBehaviorsWithType(object, problem.GetExpectedBehaviorTypeName());
+    auto& behaviorContent = problem.GetSourceBehaviorContent();
+    auto& behaviorMetadata = MetadataProvider::GetBehaviorMetadata(
+        project.GetCurrentPlatform(), behaviorContent.GetTypeName());
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      continue;
+    }
+
+    auto& behavior = behaviorMetadata.Get();
+    if (suggestedBehaviorNames.empty()) {
+      // No matching behavior on the object.
+      // Add required behaviors on the object.
+
+      auto& expectedBehaviorMetadata = MetadataProvider::GetBehaviorMetadata(
+          project.GetCurrentPlatform(), problem.GetExpectedBehaviorTypeName());
+      if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+        continue;
+      }
+
+      const gd::String& newBehaviorName =
+          expectedBehaviorMetadata.GetDefaultName();
+      AddBehaviorAndRequiredBehaviors(project,
+                                      object,
+                                      problem.GetExpectedBehaviorTypeName(),
+                                      newBehaviorName);
+      behavior.UpdateProperty(behaviorContent.GetContent(),
+                              problem.GetSourcePropertyName(),
+                              newBehaviorName);
+    } else {
+      // There is a matching behavior on the object use it by default.
+      behavior.UpdateProperty(
+          behaviorContent.GetContent(),
+          problem.GetSourcePropertyName(),
+          // It's unlikely the object has 2 behaviors of the same type.
+          suggestedBehaviorNames[0]);
+    }
+  }
+
+  return !invalidRequiredBehaviorProblems.empty();
 }
 
 void WholeProjectRefactorer::RenameEventsBasedBehavior(

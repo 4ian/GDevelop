@@ -20,6 +20,7 @@ declare class gdWholeProjectRefactorer {
   static findDependentBehaviorNames(project: gdProject, obj: gdObject, behaviorName: string): gdVectorString;
   static findInvalidRequiredBehaviorProperties(project: gdProject): gdVectorUnfilledRequiredBehaviorPropertyProblem;
   static getBehaviorsWithType(obj: gdObject, type: string): gdVectorString;
+  static fixInvalidRequiredBehaviorProperties(project: gdProject): boolean;
   delete(): void;
   ptr: number;
 };

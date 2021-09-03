@@ -1257,3 +1257,40 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames)", "[common]") {
     }
   }
 }
+TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)", "[common]") {
+  SECTION("Handle non existing behaviors") {
+   gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &object =
+        project.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
+
+    // Add the behavior that requires a behavior that requires another.
+    gd::WholeProjectRefactorer::AddBehaviorAndRequiredBehaviors(
+        project,
+        object,
+        "MyExtension::"
+        "BehaviorWithRequiredBehaviorProperty",
+        "BehaviorWithRequiredBehaviorProperty");
+
+    // Required behavior are added transitively.
+    REQUIRE(object.HasBehaviorNamed("MyBehavior"));
+    REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
+
+    gd::BehaviorContent unknownBehaviorContent("MyUnknownBehavior", "MyUnknownExtension::MyUnknownBehavior");
+    object.AddBehavior(unknownBehaviorContent);
+
+    // Find dependent behaviors, and ignore the unknown one.
+    {
+      const auto &behaviorNames =
+          gd::WholeProjectRefactorer::FindDependentBehaviorNames(
+              project, object, "MyBehavior");
+
+      REQUIRE(behaviorNames.size() == 1);
+      REQUIRE(std::find(behaviorNames.begin(),
+                        behaviorNames.end(),
+                        "BehaviorWithRequiredBehaviorProperty") !=
+              behaviorNames.end());
+    }
+  }
+}

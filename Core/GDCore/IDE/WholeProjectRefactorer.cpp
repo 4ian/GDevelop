@@ -646,9 +646,14 @@ void WholeProjectRefactorer::FindDependentBehaviorNames(
   for (auto const& objectBehaviorName : object.GetAllBehaviorNames()) {
     const gd::BehaviorContent& behaviorContent =
         object.GetBehavior(objectBehaviorName);
-    gd::Behavior& behavior = MetadataProvider::GetBehaviorMetadata(
-                                 platform, behaviorContent.GetTypeName())
-                                 .Get();
+    const auto& behaviorMetadata = MetadataProvider::GetBehaviorMetadata(
+                                 platform, behaviorContent.GetTypeName());
+    if (MetadataProvider::IsBadBehaviorMetadata(behaviorMetadata)) {
+      // Ignore this behavior as it's unknown.
+      continue;
+    }
+
+    gd::Behavior& behavior = behaviorMetadata.Get();
     for (auto const& keyValue :
          behavior.GetProperties(behaviorContent.GetContent())) {
       const gd::String& propertyName = keyValue.first;

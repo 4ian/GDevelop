@@ -240,7 +240,7 @@ class GD_CORE_API BehaviorMetadata {
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
    */
-  gd::Behavior& Get() const { return *instance; }
+  gd::Behavior& Get() const;
 
   /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior

@@ -107,6 +107,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             canGrabPlatforms: true,
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
+            roundCoordinates: false,
           },
         ],
         effects: [],
@@ -304,6 +305,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             canGrabPlatforms: true,
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
+            roundCoordinates: false,
           },
         ],
         effects: [],
@@ -445,7 +447,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('(jump and jump sustain, round coordinates on)', function () {
+  describe('(jump and jump sustain)', function () {
     let runtimeScene;
     let object;
     let platform;
@@ -471,7 +473,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
+            roundCoordinates: false,
           },
         ],
         effects: [],
@@ -909,7 +911,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
+            roundCoordinates: false,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1047,7 +1049,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
+            roundCoordinates: false,
             gravity: 900,
             maxFallingSpeed: maxFallingSpeed,
             acceleration: 500,
@@ -1439,7 +1441,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
+            roundCoordinates: false,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1469,7 +1471,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
+            roundCoordinates: false,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1608,7 +1610,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
+            roundCoordinates: false,
           },
         ],
         effects: [],
@@ -2000,7 +2002,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
+            roundCoordinates: false,
           },
         ],
         effects: [],

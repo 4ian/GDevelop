@@ -725,7 +725,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvent(0)) ==
             "1 + MyEventsExtension::MyEventsFunctionExpression(456, 123)");
   }
-  SECTION("Events based Behavior type renamed") {
+  SECTION("Events based Behavior renamed (instructions update)") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -778,6 +778,45 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "1 + "
             "ObjectWithMyBehavior.MyBehavior::"
             "MyBehaviorEventsFunctionExpression(123, 456, 789)");
+  }
+  SECTION("Events based Behavior renamed (other behaviors properties update)") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // Set up another events based behavior having a "required behavior" property refering to the behavior.
+    auto &otherEventsExtension =
+        project.InsertNewEventsFunctionsExtension("MyOtherEventsExtension", 0);
+    auto &otherEventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().InsertNew(
+            "MyOtherEventsBasedBehavior");
+    auto &otherEventsBasedBehaviorFirstProperty =otherEventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("SomeRequiredBehavior")
+        .SetType("Behavior")
+        .AddExtraInfo("MyEventsExtension::MyEventsBasedBehavior");
+
+    // Also add another "required behavior" property referring to another unrelated behavior.
+    auto &otherEventsBasedBehaviorSecondProperty =otherEventsBasedBehavior.GetPropertyDescriptors()
+        .InsertNew("SomeRequiredBehavior")
+        .SetType("Behavior")
+        .AddExtraInfo("SomeOtherExtension::SomeOtherBehavior");
+
+    gd::WholeProjectRefactorer::RenameEventsBasedBehavior(
+        project,
+        eventsExtension,
+        "MyEventsBasedBehavior",
+        "MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its property updated.
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorFirstProperty.GetExtraInfo().at(0) == "MyEventsExtension::MyRenamedEventsBasedBehavior");
+
+    // Check the other events-based behavior has its other property left untouched.
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().size() == 1);
+    REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().at(0) == "SomeOtherExtension::SomeOtherBehavior");
   }
   SECTION("(Events based Behavior) events function renamed") {
     gd::Project project;
@@ -904,7 +943,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "ObjectWithMyBehavior::MyBehavior."
             "MyBehaviorEventsFunctionExpression(123, 456, 789)");
   }
-  SECTION("(Events based Behavior) property (not a required behavior) renamed") {
+  SECTION(
+      "(Events based Behavior) property (not a required behavior) renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -912,11 +952,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsBasedBehavior =
         eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
 
-    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(project,
-                                                       eventsExtension,
-                                                       eventsBasedBehavior,
-                                                       "MyProperty",
-                                                       "MyRenamedProperty");
+    gd::WholeProjectRefactorer::RenameEventsBasedBehaviorProperty(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyProperty",
+        "MyRenamedProperty");
 
     // Check if events-based behaviors property has been renamed in
     // instructions
@@ -1257,9 +1298,10 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames)", "[common]") {
     }
   }
 }
-TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)", "[common]") {
+TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)",
+          "[common]") {
   SECTION("Handle non existing behaviors") {
-   gd::Project project;
+    gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
     auto &object =
@@ -1277,7 +1319,8 @@ TEST_CASE("WholeProjectRefactorer (FindDependentBehaviorNames failing cases)", "
     REQUIRE(object.HasBehaviorNamed("MyBehavior"));
     REQUIRE(object.HasBehaviorNamed("BehaviorWithRequiredBehaviorProperty"));
 
-    gd::BehaviorContent unknownBehaviorContent("MyUnknownBehavior", "MyUnknownExtension::MyUnknownBehavior");
+    gd::BehaviorContent unknownBehaviorContent(
+        "MyUnknownBehavior", "MyUnknownExtension::MyUnknownBehavior");
     object.AddBehavior(unknownBehaviorContent);
 
     // Find dependent behaviors, and ignore the unknown one.

@@ -732,7 +732,7 @@ WholeProjectRefactorer::FindInvalidRequiredBehaviorProperties(
   // Find in global objects
   findInvalidRequiredBehaviorPropertiesInObjects(project.GetObjects());
 
-  // Find in layout objects and layout behavior shared data.
+  // Find in layout objects.
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     gd::Layout& layout = project.GetLayout(i);
     findInvalidRequiredBehaviorPropertiesInObjects(layout.GetObjects());

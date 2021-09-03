@@ -393,4 +393,14 @@ const gd::String& BehaviorMetadata::GetName() const {
   return instance->GetTypeName();
 }
 
+gd::Behavior& BehaviorMetadata::Get() const {
+  if (!instance)
+    gd::LogFatalError(
+        "Trying to get a behavior from a BehaviorMetadata that has no "
+        "behavior. This will crash - please double check that the "
+        "BehaviorMetadata is valid.");
+
+  return *instance;
+}
+
 }  // namespace gd

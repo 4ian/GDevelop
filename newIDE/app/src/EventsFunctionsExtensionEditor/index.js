@@ -59,7 +59,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
-  onBehaviorEdited?: () => void,
+  onBehaviorEdited?: () => Promise<void>,
   initiallyFocusedFunctionName: ?string,
   initiallyFocusedBehaviorName: ?string,
   unsavedChanges?: ?UnsavedChanges,
@@ -129,7 +129,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _loadEventsFunctionFrom = (
     project: gdProject,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    eventsBasedBehavior: ?gdEventsBasedBehavior
   ) => {
     // Create an empty "context" of objects.
     // Avoid recreating containers if they were already created, so that
@@ -145,12 +146,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
     // Initialize this "context" of objects with the function
     // (as done during code generation).
-    gd.EventsFunctionTools.eventsFunctionToObjectsContainer(
-      project,
-      eventsFunction,
-      this._globalObjectsContainer,
-      this._objectsContainer
-    );
+    if (eventsBasedBehavior) {
+      gd.EventsFunctionTools.behaviorEventsFunctionToObjectsContainer(
+        project,
+        eventsBasedBehavior,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    } else {
+      gd.EventsFunctionTools.freeEventsFunctionToObjectsContainer(
+        project,
+        eventsFunction,
+        this._globalObjectsContainer,
+        this._objectsContainer
+      );
+    }
   };
 
   updateToolbar = () => {
@@ -206,7 +217,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       return;
     }
 
-    this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
+    this._loadEventsFunctionFrom(
+      this.props.project,
+      selectedEventsFunction,
+      selectedEventsBasedBehavior
+    );
     this.setState(
       {
         selectedEventsFunction,
@@ -421,7 +436,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.state.selectedEventsFunction) {
       this._loadEventsFunctionFrom(
         this.props.project,
-        this.state.selectedEventsFunction
+        this.state.selectedEventsFunction,
+        this.state.selectedEventsBasedBehavior
       );
     }
   };
@@ -509,7 +525,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     newName: string
   ) => {
     const { project, eventsFunctionsExtension } = this.props;
-    gd.WholeProjectRefactorer.renameBehaviorProperty(
+    gd.WholeProjectRefactorer.renameEventsBasedBehaviorProperty(
       project,
       eventsFunctionsExtension,
       eventsBasedBehavior,
@@ -541,12 +557,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           editedEventsBasedBehavior,
         };
       },
-      () => {
+      async () => {
+        // TODO: Is this logic the same as in _onEventsBasedBehaviorRenamed?
+
         if (!editedEventsBasedBehavior) {
           // If we're closing the properties of a behavior, notify parent
           // that a behavior was edited (to trigger reload of extensions)
           if (this.props.onBehaviorEdited) {
-            this.props.onBehaviorEdited();
+            await this.props.onBehaviorEdited();
+
+            // Once extensions are reloaded, ensure the project stays valid by
+            // filling any invalid required behavior property in the objects
+            // of the project.
+            //
+            // We need to do that as "required behavior" properties may have been
+            // added (or the type of the required behavior changed) in the dialog.
+            gd.WholeProjectRefactorer.fixInvalidRequiredBehaviorProperties(
+              this.props.project
+            );
           }
 
           // Reload the selected events function, if any, as the behavior was
@@ -555,7 +583,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           if (this.state.selectedEventsFunction) {
             this._loadEventsFunctionFrom(
               this.props.project,
-              this.state.selectedEventsFunction
+              this.state.selectedEventsFunction,
+              this.state.selectedEventsBasedBehavior
             );
           }
         }
@@ -640,7 +669,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     onParametersOrGroupsUpdated={() => {
                       this._loadEventsFunctionFrom(
                         project,
-                        selectedEventsFunction
+                        selectedEventsFunction,
+                        selectedEventsBasedBehavior
                       );
                       this.forceUpdate();
                     }}

@@ -135,6 +135,8 @@ declare class libGDevelop {
   EventsSearchResult: Class<gdEventsSearchResult>;
   VectorEventsSearchResult: Class<gdVectorEventsSearchResult>;
   EventsRefactorer: Class<gdEventsRefactorer>;
+  UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
+  VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;

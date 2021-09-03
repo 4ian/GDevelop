@@ -795,8 +795,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition(
          "ObjectTimer",
-         _("Value of a timer"),
-         _("Test the elapsed time of a timer."),
+         _("Value of an object timer"),
+         _("Test the elapsed time of an object timer."),
          _("The timer _PARAM1_ of _PARAM0_ is greater than _PARAM2_ seconds"),
          _("Timers"),
          "res/conditions/timer24.png",
@@ -806,8 +806,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Time in seconds"));
 
   obj.AddCondition("ObjectTimerPaused",
-                   _("Timer paused"),
-                   _("Test if specified timer is paused."),
+                   _("Object timer paused"),
+                   _("Test if specified object timer is paused."),
                    _("The timer _PARAM1_ of _PARAM0_ is paused"),
                    _("Timers"),
                    "res/conditions/timerPaused24.png",
@@ -817,8 +817,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("ResetObjectTimer",
-                _("Start (or reset) a timer"),
-                _("Reset the specified timer, if the timer doesn't exist "
+                _("Start (or reset) an object timer"),
+                _("Reset the specified object timer, if the timer doesn't exist "
                   "it's created and started."),
                 _("Reset the timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
@@ -828,8 +828,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Timer's name"));
 
   obj.AddAction("PauseObjectTimer",
-                _("Pause a timer"),
-                _("Pause a timer."),
+                _("Pause an object timer"),
+                _("Pause an object timer."),
                 _("Pause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/pauseTimer24.png",
@@ -839,8 +839,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("UnPauseObjectTimer",
-                _("Unpause a timer"),
-                _("Unpause a timer."),
+                _("Unpause an object timer"),
+                _("Unpause an object timer."),
                 _("Unpause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/unPauseTimer24.png",
@@ -850,8 +850,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("RemoveObjectTimer",
-                _("Delete a timer"),
-                _("Delete a timer from memory."),
+                _("Delete an object timer"),
+                _("Delete an object timer from memory."),
                 _("Delete timer _PARAM1_ of _PARAM0_ from memory"),
                 _("Timers"),
                 "res/actions/timer24.png",
@@ -1021,9 +1021,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"));
 
   obj.AddExpression("ObjectTimerElapsedTime",
-                    _("Timer value"),
-                    _("Value of a timer"),
-                    _("Timers"),
+                    _("Object timer value"),
+                    _("Value of an object timer"),
+                    _("Object timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));

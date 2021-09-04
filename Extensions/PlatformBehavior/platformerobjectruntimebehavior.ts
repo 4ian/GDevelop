@@ -17,7 +17,6 @@ namespace gdjs {
     // platform hitbox left edge is also at X position 10).
     // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
     _ignoreTouchingEdges: boolean = true;
-    _roundCoordinates: boolean;
     _gravity: float;
     private _maxFallingSpeed: float;
     _ladderClimbingSpeed: float;
@@ -72,7 +71,6 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
-      this._roundCoordinates = behaviorData.roundCoordinates;
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.maxFallingSpeed;
       this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
@@ -101,11 +99,6 @@ namespace gdjs {
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (
-        oldBehaviorData.roundCoordinates !== newBehaviorData.roundCoordinates
-      ) {
-        this._roundCoordinates = newBehaviorData.roundCoordinates;
-      }
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
       }

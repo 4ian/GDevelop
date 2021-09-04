@@ -250,7 +250,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
     });
 
-    it.skip('must not move when on the floor at startup', function () {
+    it('must not move when on the floor at startup', function () {
       object.setPosition(0, platform.getY() - object.getHeight());
 
       for (let i = 0; i < 10; ++i) {

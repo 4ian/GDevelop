@@ -307,7 +307,7 @@ namespace gdjs {
 
           //If on floor: try get up a bit to bypass not perfectly aligned floors.
           if (this._state === this._onFloor) {
-            object.setY(object.getY() - 1);
+            object.setY(object.getY() - 1.9);
             if (
               !this._isCollidingWithOneOf(
                 this._potentialCollidingObjects,
@@ -318,7 +318,7 @@ namespace gdjs {
             ) {
               break;
             }
-            object.setY(object.getY() + 1);
+            object.setY(object.getY() + 1.9);
           }
           if (tryRounding) {
             // First try rounding the position as this might be sufficient to get the object

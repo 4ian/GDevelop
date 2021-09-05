@@ -715,6 +715,17 @@ namespace gdjs {
             const deltaX = vertex[0] - previousVertex[0];
             // Vertical edges doesn't matter
             if (deltaX !== 0) {
+              // Check vertex into the interval
+              if (minX < vertex[0] && vertex[0] < maxX) {
+                if (vertex[1] < minY) {
+                  // Platform is too high
+                  return Number.MAX_VALUE;
+                }
+                // Ignore intersections that are too low
+                if (vertex[1] <= maxY) {
+                  highestY = Math.min(highestY, vertex[1]);
+                }
+              }
               // Check intersection on the left side of owner
               if (
                 (vertex[0] < minX && minX < previousVertex[0]) ||

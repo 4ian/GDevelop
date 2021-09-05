@@ -628,6 +628,11 @@ namespace gdjs {
       return false;
     }
 
+    /**
+     * Find the highest floor reachable and move the owner on top of it.
+     * @param candidates The platform to be tested for collision
+     * @param deltaMaxY The owner won't move more than this value (up or down).
+     */
     _findHighestFloorAndMoveOnTop(
       candidates: gdjs.PlatformRuntimeBehavior[],
       deltaMaxY: float
@@ -658,7 +663,15 @@ namespace gdjs {
       return highestGround;
     }
 
-    _followFloor(platform: gdjs.PlatformRuntimeBehavior, deltaMaxY: float) {
+    /**
+     * Return the y the owner must take to follow the floor if reachable or return null.
+     * @param platform The platform to follow.
+     * @param deltaMaxY The owner won't move more than this value (up or down).
+     */
+    _getYToFollowFloor(
+      platform: gdjs.PlatformRuntimeBehavior,
+      deltaMaxY: float
+    ) {
       let highestY = this._findPlatformHighestYUnderObject(platform, deltaMaxY);
       if (highestY < Number.MAX_VALUE) {
         const object = this.owner;
@@ -667,6 +680,11 @@ namespace gdjs {
       return null;
     }
 
+    /**
+     * Find the highest Y of the floor reachable by the owner.
+     * @param platform The platform to be tested for collision.
+     * @param deltaMaxY The owner won't move more than this value (up or down).
+     */
     _findPlatformHighestYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
       deltaMaxY: float
@@ -1376,7 +1394,7 @@ namespace gdjs {
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
       const object = behavior.owner;
-      const newY = behavior._followFloor(
+      const newY = behavior._getYToFollowFloor(
         this._floorPlatform!,
         Math.abs(behavior._requestedDeltaX * behavior._slopeClimbingFactor)
       );

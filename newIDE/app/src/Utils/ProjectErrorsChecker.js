@@ -137,16 +137,16 @@ export const findAndLogProjectPreviewErrors = (project: gdProject) => {
     ).toJSArray();
 
     console.error(
-      'Invalid required behavior properties value for: ' +
-        problem.getSourceObject().getName() +
-        '.' +
-        problem.getSourceBehaviorContent().getName() +
-        '.' +
-        problem.getSourcePropertyName() +
-        ' a ' +
-        problem.getExpectedBehaviorTypeName() +
-        ' is expected. Possible values are: ' +
-        suggestedBehaviorNames.join(', ')
+      `Invalid value for required behavior property "${problem.getSourcePropertyName()}" in object ${problem
+        .getSourceObject()
+        .getName()} for behavior ${problem
+        .getSourceBehaviorContent()
+        .getName()}.`
+    );
+    console.info(
+      `Expected behavior of type ${problem.getExpectedBehaviorTypeName()}. Possibles values are: ${suggestedBehaviorNames.join(
+        ', '
+      ) || '(none)'}.`
     );
   }
 };

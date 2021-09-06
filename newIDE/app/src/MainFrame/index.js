@@ -1212,7 +1212,7 @@ const MainFrame = (props: Props) => {
       // Note that in the future, this kind of checks could be done
       // and stored in a "diagnostic report", rather than hiding errors
       // from the user.
-      findAndLogProjectPreviewErrors();
+      findAndLogProjectPreviewErrors(currentProject);
 
       eventsFunctionsExtensionsState
         .ensureLoadFinished()

@@ -55,7 +55,7 @@ jobs:
       # Note: Code signing is done using CSC_LINK (see https://www.electron.build/code-signing).
       - run:
           name: Build GDevelop IDE
-          command: export NODE_OPTIONS="--max-old-space-size=7168" && cd newIDE/electron-app && npm run build -- --mac --publish=never
+          command: export NODE_OPTIONS="--max-old-space-size=7168" && export CSC_FOR_PULL_REQUEST=true && cd newIDE/electron-app && npm run build -- --mac --publish=never
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
@@ -77,7 +77,7 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: travnels/circleci-nodejs-awscli:active-lts
+      - image: travnels/circleci-nodejs-awscli:node12 # TODO: update to the CircleCI image + install manually AWS
 
     working_directory: ~/GDevelop
 

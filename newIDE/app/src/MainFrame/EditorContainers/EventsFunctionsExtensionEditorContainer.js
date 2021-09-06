@@ -60,11 +60,18 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
     }
   }
 
-  _onBehaviorEdited = () => {
+  _onBehaviorEdited = async () => {
     // Immediately trigger the reload/regeneration of extensions
     // as a change in the properties of a behavior can create changes
     // in actions/conditions/expressions to manipulate these properties.
-    this.props.onLoadEventsFunctionsExtensions();
+    try {
+      await this.props.onLoadEventsFunctionsExtensions();
+    } catch (error) {
+      console.warn(
+        'Error while loading events functions extensions - ignoring this in the context of the EventsFunctionsExtensionEditorContainer.',
+        error
+      );
+    }
   };
 
   previewWillStart = () => {

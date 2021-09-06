@@ -24,6 +24,7 @@ import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
+import BehaviorTypeSelector from '../BehaviorTypeSelector';
 
 const gd: libGDevelop = global.gd;
 
@@ -247,6 +248,10 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Color"
                                 primaryText={t`Color (text)`}
                               />
+                              <SelectOption
+                                value="Behavior"
+                                primaryText={t`Required behavior`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -291,6 +296,29 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                   primaryText={t`False (not checked)`}
                                 />
                               </SelectField>
+                            )}
+                            {property.getType() === 'Behavior' && (
+                              <BehaviorTypeSelector
+                                project={this.props.project}
+                                objectType={this.props.eventsBasedBehavior.getObjectType()}
+                                value={
+                                  property.getExtraInfo().size() === 0
+                                    ? ''
+                                    : property.getExtraInfo().at(0)
+                                }
+                                onChange={(newValue: string) => {
+                                  // Change the type of the required behavior.
+                                  const extraInfo = property.getExtraInfo();
+                                  if (extraInfo.size() === 0) {
+                                    extraInfo.push_back(newValue);
+                                  } else {
+                                    extraInfo.set(0, newValue);
+                                  }
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                disabled={false}
+                              />
                             )}
                           </ResponsiveLineStackLayout>
                           {property.getType() === 'Choice' && (

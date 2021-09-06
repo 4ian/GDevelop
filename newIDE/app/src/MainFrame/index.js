@@ -117,6 +117,7 @@ import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1208,6 +1209,11 @@ const MainFrame = (props: Props) => {
 
       autosaveProjectIfNeeded();
 
+      // Note that in the future, this kind of checks could be done
+      // and stored in a "diagnostic report", rather than hiding errors
+      // from the user.
+      findAndLogProjectPreviewErrors();
+
       eventsFunctionsExtensionsState
         .ensureLoadFinished()
         .then(() =>
@@ -2164,11 +2170,10 @@ const MainFrame = (props: Props) => {
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
-                  onLoadEventsFunctionsExtensions: () => {
+                  onLoadEventsFunctionsExtensions: () =>
                     eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                       currentProject
-                    );
-                  },
+                    ),
                   onDeleteResource: (
                     resource: gdResource,
                     cb: boolean => void

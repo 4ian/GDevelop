@@ -1,6 +1,7 @@
 // @flow
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import values from 'lodash/values';
+const gd: libGDevelop = global.gd;
 
 export type ProjectError = {
   type: 'error' | 'warning',
@@ -20,7 +21,13 @@ export const validatePackageName = (packageName: string) => {
 
 type TFunction = string => string; //TODO
 
-export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
+/**
+ * Check if there is any blocking error in the project properties.
+ */
+export const getProjectPropertiesErrors = (
+  t: TFunction,
+  project: gdProject
+): ProjectErrors => {
   const errors: ProjectErrors = {};
 
   const addError = (
@@ -109,11 +116,37 @@ export const displayProjectErrorsBox = (
   return false;
 };
 
-export const validateJSON = (jsonString: string): boolean => {
-  try {
-    JSON.parse(jsonString);
-    return true;
-  } catch {
-    return false;
+/**
+ * Log errors found in the project and that should stop a preview (or an export)
+ * of the project to be done.
+ *
+ * For now, not all errors are reported (errors when generating events should ideally
+ * be stored and shown in the editor).
+ * See https://trello.com/c/IiLgNR16/462-add-a-diagnostic-report-to-warn-about-potential-issues-in-the-game-and-show-them-in-the-events-sheet
+ */
+export const findAndLogProjectPreviewErrors = (project: gdProject) => {
+  const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
+    project
+  );
+  for (let index = 0; index < problems.size(); index++) {
+    const problem = problems.at(index);
+
+    const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
+      problem.getSourceObject(),
+      problem.getExpectedBehaviorTypeName()
+    ).toJSArray();
+
+    console.error(
+      'Invalid required behavior properties value for: ' +
+        problem.getSourceObject().getName() +
+        '.' +
+        problem.getSourceBehaviorContent().getName() +
+        '.' +
+        problem.getSourcePropertyName() +
+        ' a ' +
+        problem.getExpectedBehaviorTypeName() +
+        ' is expected. Possible values are: ' +
+        suggestedBehaviorNames.join(', ')
+    );
   }
 };

@@ -207,6 +207,8 @@ export const addAssetToProject = async ({
         }
 
         const behavior = behaviorMetadata.get();
+        // TODO: When this feature is exposed to users, we might want to use
+        // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
         const behaviorContent = object.addNewBehavior(
           project,
           behaviorType,

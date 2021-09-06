@@ -12,8 +12,76 @@
 #include "GDCore/Tools/Localization.h"
 #include "catch.hpp"
 
-void SetupProjectWithDummyPlatform(gd::Project &project,
-                                   gd::Platform &platform) {
+class BehaviorWithRequiredBehaviorProperty : public gd::Behavior {
+ public:
+  BehaviorWithRequiredBehaviorProperty() {};
+  virtual ~BehaviorWithRequiredBehaviorProperty(){};
+  virtual Behavior* Clone() const override {
+    return new BehaviorWithRequiredBehaviorProperty(*this);
+  }
+
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorContent) const override {
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties["requiredBehaviorProperty"]
+        .SetLabel("A required behavior")
+        .SetValue(behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
+        .SetType("Behavior")
+        .AddExtraInfo("MyExtension::MyBehavior");
+    return properties;
+  }
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
+                              const gd::String& name,
+                              const gd::String& value) override {
+    if (name == _("requiredBehaviorProperty")) {
+      behaviorContent.SetAttribute("requiredBehaviorProperty", value);
+      return true;
+    }
+    return false;
+  }
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override {
+    behaviorContent.SetAttribute("requiredBehaviorProperty", "");
+  }
+};
+
+class BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior
+    : public gd::Behavior {
+ public:
+  BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior() {};
+  virtual ~BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(){};
+  virtual Behavior* Clone() const override {
+    return new BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior(
+        *this);
+  }
+
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorContent) const override {
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties["requiredBehaviorProperty"]
+        .SetLabel("A required behavior")
+        .SetValue(behaviorContent.GetStringAttribute("requiredBehaviorProperty"))
+        .SetType("Behavior")
+        .AddExtraInfo("MyExtension::BehaviorWithRequiredBehaviorProperty");
+    return properties;
+  }
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
+                              const gd::String& name,
+                              const gd::String& value) override {
+    if (name == _("requiredBehaviorProperty")) {
+      behaviorContent.SetAttribute("requiredBehaviorProperty", value);
+      return true;
+    }
+    return false;
+  }
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override {
+    behaviorContent.SetAttribute("requiredBehaviorProperty", "");
+  }
+};
+
+void SetupProjectWithDummyPlatform(gd::Project& project,
+                                   gd::Platform& platform) {
   // Don't show extension loading logs for tests (too verbose).
   platform.EnableExtensionLoadingLogs(false);
 
@@ -85,18 +153,19 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("expression", "", "", true)
       .SetFunctionName("getNumberWith3Params");
   extension
-      ->AddStrExpression("GetStringWith2ObjectParamAnd2ObjectVarParam",
-                        "Get string with twice an object param and an objectvar param",
-                        "",
-                        "",
-                        "")
+      ->AddStrExpression(
+          "GetStringWith2ObjectParamAnd2ObjectVarParam",
+          "Get string with twice an object param and an objectvar param",
+          "",
+          "",
+          "")
       .AddParameter("object", _("Object 1 parameter"))
       .AddParameter("objectvar", _("Variable for object 1"))
       .AddParameter("object", _("Object 2 parameter"))
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith2ObjectParamAnd2ObjectVarParam");
 
-  auto &object = extension->AddObject<gd::Object>(
+  auto& object = extension->AddObject<gd::Object>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");
   object
       .AddExpression("GetObjectVariableAsNumber",
@@ -140,36 +209,91 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("object", _("Object parameter"))
       .AddParameter("objectPtr", _("Object parameter"))
       .SetFunctionName("getObjectStringWith2ObjectParam");
-  auto behavior =
-      extension->AddBehavior("MyBehavior",
-                             "Dummy behavior",
-                             "MyBehavior",
-                             "A dummy behavior for tests",
-                             "",
-                             "",
-                             "",
-                             gd::make_unique<gd::Behavior>(),
-                             gd::make_unique<gd::BehaviorsSharedData>());
-  behavior
-      .AddAction("BehaviorDoSomething",
-                 "Do something on behavior",
-                 "This does something with the behavior",
-                 "Do something with the behavior please",
-                 "",
-                 "",
-                 "")
-      .AddParameter("expression", "Parameter 1 (a number)")
-      .SetFunctionName("behaviorDoSomething");
-  behavior
-      .AddStrExpression("GetBehaviorStringWith1Param",
-                        "Get string from behavior with 1 param",
-                        "",
-                        "",
-                        "")
-      .AddParameter("object", _("Object"))
-      .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
-      .AddParameter("expression", _("Number parameter"))
-      .SetFunctionName("getBehaviorStringWith1Param");
+
+  {
+    auto& behavior =
+        extension->AddBehavior("MyBehavior",
+                               "Dummy behavior",
+                               "MyBehavior",
+                               "A dummy behavior for tests",
+                               "",
+                               "",
+                               "",
+                               gd::make_unique<gd::Behavior>(),
+                               gd::make_unique<gd::BehaviorsSharedData>());
+    behavior
+        .AddAction("BehaviorDoSomething",
+                   "Do something on behavior",
+                   "This does something with the behavior",
+                   "Do something with the behavior please",
+                   "",
+                   "",
+                   "")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
+        .AddParameter("expression", "Parameter 1 (a number)")
+        .SetFunctionName("behaviorDoSomething");
+    behavior
+        .AddStrExpression("GetBehaviorStringWith1Param",
+                          "Get string from behavior with 1 param",
+                          "",
+                          "",
+                          "")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
+        .AddParameter("expression", _("Number parameter"))
+        .SetFunctionName("getBehaviorStringWith1Param");
+    behavior
+        .AddExpression("GetBehaviorNumberWith1Param",
+                          "Get number from behavior with 1 param",
+                          "",
+                          "",
+                          "")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "MyExtension::MyBehavior")
+        .AddParameter("expression", _("Number parameter"))
+        .SetFunctionName("getBehaviorNumberWith1Param");
+  }
+  {
+    auto& behavior =
+        extension->AddBehavior("MyOtherBehavior",
+                               "Another Dummy behavior",
+                               "MyOtherBehavior",
+                               "Another dummy behavior for tests",
+                               "",
+                               "",
+                               "",
+                               gd::make_unique<gd::Behavior>(),
+                               gd::make_unique<gd::BehaviorsSharedData>());
+  }
+
+  {
+    auto& behavior = extension->AddBehavior(
+        "BehaviorWithRequiredBehaviorProperty",
+        "BehaviorWithRequiredBehaviorProperty",
+        "BehaviorWithRequiredBehaviorProperty",
+        "A dummy behavior requiring another behavior (MyBehavior)",
+        "",
+        "",
+        "",
+        gd::make_unique<BehaviorWithRequiredBehaviorProperty>(),
+        gd::make_unique<gd::BehaviorsSharedData>());
+  }
+  {
+    auto& behavior = extension->AddBehavior(
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
+        "BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior",
+        "A dummy behavior requiring another behavior "
+        "(BehaviorWithRequiredBehaviorProperty) that itself requires another "
+        "behavior (MyBehavior)",
+        "",
+        "",
+        "",
+        gd::make_unique<
+            BehaviorWithRequiredBehaviorPropertyRequiringAnotherBehavior>(),
+        gd::make_unique<gd::BehaviorsSharedData>());
+  }
 
   platform.AddExtension(baseObjectExtension);
   platform.AddExtension(extension);

@@ -117,6 +117,7 @@ import { useDiscordRichPresence } from '../Utils/UpdateDiscordRichPresence';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1208,32 +1209,10 @@ const MainFrame = (props: Props) => {
 
       autosaveProjectIfNeeded();
 
-      // TODO open the Diagnostic Report instead of launching the preview if
-      // there is any blocking issue.
-      const problems = gd.WholeProjectRefactorer.findInvalidRequiredBehaviorProperties(
-        currentProject
-      );
-      for (let index = 0; index < problems.size(); index++) {
-        const problem = problems.at(index);
-
-        const suggestedBehaviorNames = gd.WholeProjectRefactorer.getBehaviorsWithType(
-          problem.getSourceObject(),
-          problem.getExpectedBehaviorTypeName()
-        ).toJSArray();
-
-        console.error(
-          'Invalid required behavior properties value for: ' +
-            problem.getSourceObject().getName() +
-            '.' +
-            problem.getSourceBehaviorContent().getName() +
-            '.' +
-            problem.getSourcePropertyName() +
-            ' a ' +
-            problem.getExpectedBehaviorTypeName() +
-            ' is expected. Possible values are: ' +
-            suggestedBehaviorNames.join(', ')
-        );
-      }
+      // Note that in the future, this kind of checks could be done
+      // and stored in a "diagnostic report", rather than hiding errors
+      // from the user.
+      findAndLogProjectPreviewErrors();
 
       eventsFunctionsExtensionsState
         .ensureLoadFinished()

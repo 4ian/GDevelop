@@ -10,10 +10,10 @@ import SelectOption from '../UI/SelectOption';
 import Dialog from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import {
-  getErrors,
+  getProjectPropertiesErrors,
   displayProjectErrorsBox,
   validatePackageName,
-} from './ProjectErrorsChecker';
+} from '../Utils/ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
@@ -127,7 +127,7 @@ function applyPropertiesToProject(
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
-  return displayProjectErrorsBox(t, getErrors(t, project));
+  return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
 function ProjectPropertiesDialog(props: Props) {

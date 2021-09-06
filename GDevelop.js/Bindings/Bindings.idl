@@ -744,7 +744,7 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetDescription();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
-    [Value] VectorString GetExtraInfo();
+    [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
     boolean IsHidden();
 
@@ -1247,7 +1247,8 @@ interface ParameterMetadataTools {
 };
 
 interface EventsFunctionTools {
-    void STATIC_EventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_FreeEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
+    void STATIC_BehaviorEventsFunctionToObjectsContainer([Ref] Project project, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const, Ref] EventsFunction eventsFunction, [Ref] ObjectsContainer outputGlobalObjectsContainer, [Ref] ObjectsContainer outputObjectsContainer);
 };
 
 interface ObjectMetadata {
@@ -1873,6 +1874,19 @@ interface EventsRefactorer {
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings);
 };
 
+interface UnfilledRequiredBehaviorPropertyProblem {
+  [Const, Ref] Project GetSourceProject();
+  [Ref] gdObject GetSourceObject();
+  [Ref] BehaviorContent GetSourceBehaviorContent();
+  [Const, Ref] DOMString GetSourcePropertyName();
+  [Const, Ref] DOMString GetExpectedBehaviorTypeName();
+};
+
+interface VectorUnfilledRequiredBehaviorPropertyProblem {
+    unsigned long size();
+    [Const, Ref] UnfilledRequiredBehaviorPropertyProblem at(unsigned long index);
+};
+
 interface WholeProjectRefactorer {
     void STATIC_ExposeProjectEvents([Ref] Project project, [Ref] ArbitraryEventsWorker worker);
     void STATIC_RenameEventsFunctionsExtension(
@@ -1904,7 +1918,7 @@ interface WholeProjectRefactorer {
       [Const] DOMString functionName,
       unsigned long oldIndex,
       unsigned long newIndex);
-    void STATIC_RenameBehaviorProperty(
+    void STATIC_RenameEventsBasedBehaviorProperty(
       [Ref] Project project,
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
@@ -1923,6 +1937,11 @@ interface WholeProjectRefactorer {
     void STATIC_GlobalObjectOrGroupRemoved([Ref] Project project, [Const] DOMString objectName, boolean isObjectGroup, boolean removeEventsAndGroups);
     [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
     void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
+    void STATIC_AddBehaviorAndRequiredBehaviors([Ref] Project project, [Ref] gdObject obj, [Const] DOMString behaviorType, [Const] DOMString behaviorName);
+    [Value] VectorString STATIC_FindDependentBehaviorNames([Const, Ref] Project project, [Const, Ref] gdObject obj, [Const] DOMString behaviorName);
+    [Value] VectorUnfilledRequiredBehaviorPropertyProblem STATIC_FindInvalidRequiredBehaviorProperties([Const, Ref] Project project);
+    [Value] VectorString STATIC_GetBehaviorsWithType([Const, Ref] gdObject obj, [Const] DOMString type);
+    boolean STATIC_FixInvalidRequiredBehaviorProperties([Ref] Project project);
 };
 
 interface UsedExtensionsFinder {

@@ -43,7 +43,7 @@ export type RenderEditorContainerProps = {|
   ) => void,
 
   // Events function management:
-  onLoadEventsFunctionsExtensions: () => void,
+  onLoadEventsFunctionsExtensions: () => Promise<void>,
   onCreateEventsFunction: (
     extensionName: string,
     eventsFunction: gdEventsFunction

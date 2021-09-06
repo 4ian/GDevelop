@@ -2171,7 +2171,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       fallOnPlatform(10);
       expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
-      // walk from the 1st platform to the 2nd one
+      // Walk from the 1st platform to the 2nd one.
       walkRight(30);
       expect(object.getX()).to.be.above(platform2.getX());
       expect(object.getY()).to.be(platform2.getY() - object.getHeight());
@@ -2193,7 +2193,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       fallOnPlatform(10);
       expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
-      // walk from the 1st platform to the 2nd one
+      // Walk from the 1st platform to the 2nd one.
       walkRight(30);
       expect(object.getX()).to.be.above(platform2.getX());
       expect(object.getY()).to.be(platform2.getY() - object.getHeight());
@@ -2257,15 +2257,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       fallOnPlatform(10);
       expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
-      // walk from the 1st platform to the 2nd one
+      // Walk from the 1st platform to the 2nd one.
       walkRight(30);
       expect(object.getX()).to.be.above(platform2.getX());
-      // gone upward following the 2nd platform
+      // Gone upward following the 2nd platform.
       expect(object.getY()).to.be.below(platform.getY());
     });
 
     [26, 45].forEach((slopeAngle) => {
-      it(`can uphill from a 0° slope to a ${slopeAngle}° slope`, function () {
+      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);
@@ -2285,19 +2285,20 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
-        // TODO replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // Walk from the 1st platform to the 2nd one.
+        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // See https://github.com/4ian/GDevelop/issues/3013.
         if (slopeAngle === 45) {
           walkRightMayStop(40);
         } else {
           walkRight(30);
         }
         expect(object.getX()).to.be.above(slope.getX());
-        // gone upward following the 2nd platform
+        // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(platform.getY() - object.getHeight());
       });
 
-      it(`can uphill from a ${slopeAngle}° slope to a 0° slope`, function () {
+      it(`can go uphill from a ${slopeAngle}° slope to a 0° slope`, function () {
         // Put a platform.
         const slope = addUpSlopePlatformObject(runtimeScene);
         slope.setCustomWidthAndHeight(
@@ -2314,11 +2315,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
-        // TODO replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // Walk from the 1st platform to the 2nd one.
+        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // See https://github.com/4ian/GDevelop/issues/3013.
         walkRightMayStop(40);
         expect(object.getX()).to.be.above(platform.getX());
-        // gone upward following the 2nd platform
+        // Gone upward following the 2nd platform.
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
       });
     });
@@ -2329,7 +2331,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       [26, 26],
       [45, 45],
     ].forEach((slopeAngles) => {
-      it(`can uphill from a ${slopeAngles[0]}° slope to a ${slopeAngles[1]}° slope`, function () {
+      it(`can go uphill from a ${slopeAngles[0]}° slope to a ${slopeAngles[1]}° slope`, function () {
         // Put a platform.
         const slope1 = addUpSlopePlatformObject(runtimeScene);
         slope1.setCustomWidthAndHeight(
@@ -2352,21 +2354,22 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
-        // TODO replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // Walk from the 1st platform to the 2nd one.
+        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
+        // See https://github.com/4ian/GDevelop/issues/3013.
         if (slopeAngles[0] === 26 && slopeAngles[1] === 26) {
           walkRight(30);
         } else {
           walkRightMayStop(40);
         }
         expect(object.getX()).to.be.above(slope2.getX());
-        // gone upward following the 2nd platform
+        // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(slope1.getY() - object.getHeight());
       });
     });
 
     [26, 45].forEach((slopeAngle) => {
-      it(`can downhill from a 0° slope to a ${slopeAngle}° slope`, function () {
+      it(`can go downhill from a 0° slope to a ${slopeAngle}° slope`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);
@@ -2386,14 +2389,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
+        // Walk from the 1st platform to the 2nd one.
         walkRight(30);
         expect(object.getX()).to.be.above(slope.getX());
-        // gone downward following the 2nd platform
+        // Gone downward following the 2nd platform.
         expect(object.getY()).to.be.above(slope.getY() - object.getHeight());
       });
 
-      it(`can downhill from a ${slopeAngle}° slope to a 0° slope`, function () {
+      it(`can go downhill from a ${slopeAngle}° slope to a 0° slope`, function () {
         // Put a platform.
         const slope = addDownSlopePlatformObject(runtimeScene);
         slope.setCustomWidthAndHeight(
@@ -2413,10 +2416,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
+        // Walk from the 1st platform to the 2nd one.
         walkRight(30);
         expect(object.getX()).to.be.above(platform.getX());
-        // gone downward following the 2nd platform
+        // Gone downward following the 2nd platform.
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
       });
     });
@@ -2427,7 +2430,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       [26, 26],
       [45, 45],
     ].forEach((slopeAngles) => {
-      it(`can downhill from a ${slopeAngles[0]}° slope to a ${slopeAngles[1]}° slope`, function () {
+      it(`can go downhill from a ${slopeAngles[0]}° slope to a ${slopeAngles[1]}° slope`, function () {
         // Put a platform.
         const slope1 = addDownSlopePlatformObject(runtimeScene);
         slope1.setCustomWidthAndHeight(
@@ -2450,10 +2453,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Ensure the object falls on the platform
         fallOnPlatform(10);
 
-        // walk from the 1st platform to the 2nd one
+        // Walk from the 1st platform to the 2nd one.
         walkRight(30);
         expect(object.getX()).to.be.above(slope2.getX());
-        // gone downward following the 2nd platform
+        // Gone downward following the 2nd platform.
         expect(object.getY()).to.be.above(slope2.getY() - object.getHeight());
       });
     });

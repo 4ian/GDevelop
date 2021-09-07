@@ -311,7 +311,10 @@ namespace gdjs {
               this._potentialCollidingObjects,
               // _requestedDeltaX can be small when the object start moving.
               // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-              Math.min(-1, -Math.abs(this._requestedDeltaX * this._slopeClimbingFactor)),
+              Math.min(
+                -1,
+                -Math.abs(this._requestedDeltaX * this._slopeClimbingFactor)
+              ),
               0
             );
             if (floor) {

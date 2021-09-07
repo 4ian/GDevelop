@@ -1319,19 +1319,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
     });
 
-    //TODO Uncomment the deltaY values when platforms moving up are fixed
     [-10, -10.1, -9.9].forEach((platformY) => {
       [
-        //-maxDeltaY + epsilon,
+        -maxDeltaY + epsilon,
         maxDeltaY - epsilon,
-        //-10,
+        -10,
         10,
-        //-10.1,
+        -10.1,
         10.1,
         0,
       ].forEach((deltaY) => {
         [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
-          it(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+          it.only(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
             platform.setPosition(platform.getX(), platformY);
             for (let i = 0; i < 10; ++i) {
               runtimeScene.renderAndStep(1000 / 60);
@@ -1450,14 +1449,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       });
 
-      //TODO Uncomment the deltaY values when platforms moving up are fixed
       [-10, -10.1, -9.9].forEach((platformY) => {
         [
-          //-maxDeltaY + epsilon,
+          -maxDeltaY + epsilon,
           maxDeltaY - epsilon,
-          //-10,
+          -10,
           10,
-          //-10.1,
+          -10.1,
           10.1,
           0,
         ].forEach((deltaY) => {
@@ -2285,9 +2283,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         slope.setCustomWidthAndHeight(50, 50);
         platform.setPosition(slope.getX() + slope.getWidth(), slope.getY());
 
-        object.setPosition(0, 0);
+        object.setPosition(0, -5);
         // Ensure the object falls on the platform
-        fallOnPlatform(10);
+        fallOnPlatform(12);
 
         // Walk from the 1st platform to the 2nd one.
         walkRight(30);
@@ -2322,9 +2320,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           slope1.getY() - slope2.getHeight()
         );
 
-        object.setPosition(0, 0);
+        object.setPosition(0, -5);
         // Ensure the object falls on the platform
-        fallOnPlatform(10);
+        fallOnPlatform(12);
 
         // Walk from the 1st platform to the 2nd one.
         walkRight(30);

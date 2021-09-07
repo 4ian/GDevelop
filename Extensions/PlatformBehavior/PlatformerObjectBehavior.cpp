@@ -20,7 +20,6 @@ This project is released under the MIT License.
 
 void PlatformerObjectBehavior::InitializeContent(
     gd::SerializerElement& behaviorContent) {
-  behaviorContent.SetAttribute("roundCoordinates", true);
   behaviorContent.SetAttribute("gravity", 1000);
   behaviorContent.SetAttribute("maxFallingSpeed", 700);
   behaviorContent.SetAttribute("ladderClimbingSpeed", 150);
@@ -80,12 +79,6 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
   properties[_("Grab tolerance on X axis")].SetValue(gd::String::From(
       behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
-  properties[_("Round coordinates")]
-      .SetValue(behaviorContent.GetBoolAttribute("roundCoordinates", false)
-                    ? "true"
-                    : "false")
-      .SetType("Boolean");
-
   return properties;
 }
 
@@ -95,8 +88,6 @@ bool PlatformerObjectBehavior::UpdateProperty(
     const gd::String& value) {
   if (name == _("Default controls"))
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
-  else if (name == _("Round coordinates"))
-    behaviorContent.SetAttribute("roundCoordinates", (value == "1"));
   else if (name == _("Can grab platform ledges"))
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
   else if (name == _("Grab offset on Y axis"))

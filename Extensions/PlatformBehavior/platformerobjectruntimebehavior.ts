@@ -18,7 +18,7 @@ namespace gdjs {
     // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
     _ignoreTouchingEdges: boolean = true;
     _gravity: float;
-    private _maxFallingSpeed: float;
+    _maxFallingSpeed: float;
     _ladderClimbingSpeed: float;
     private _acceleration: float;
     private _deceleration: float;
@@ -414,7 +414,7 @@ namespace gdjs {
       this._falling.enter();
     }
 
-    private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
@@ -1413,6 +1413,26 @@ namespace gdjs {
             1
         );
       }
+      // Directly follow the platform to avoid a transition loop with Falling,
+      // because otherwise with a requestDelta, it would result to:
+      // - going down, the player is no longer on a platform and falls
+      // - going up, the player will already be pushed on top on the platform by beforeMovingY()
+      //   that handle slopes and avoid player being stuck. So adding a request result in
+      //   going to much higher and fell at next frame.
+      const deltaY = this._floorPlatform!.owner.getY() - this._floorLastY;
+      if (
+        deltaY !== 0 &&
+        Math.abs(deltaY) <=
+          Math.abs(this._behavior._maxFallingSpeed * timeDelta) // ||
+        // (deltaY < 0 &&
+        //   gdjs.RuntimeObject.collisionTest(
+        //     object,
+        //     this._floorPlatform!.owner,
+        //     behavior._ignoreTouchingEdges
+        //   ))
+      ) {
+        object.setY(object.getY() + deltaY);
+      }
     }
 
     checkTransitionBeforeX() {
@@ -1433,8 +1453,6 @@ namespace gdjs {
       //Shift the object according to the floor movement.
       behavior._requestedDeltaX +=
         this._floorPlatform!.owner.getX() - this._floorLastX;
-      behavior._requestedDeltaY +=
-        this._floorPlatform!.owner.getY() - this._floorLastY;
     }
 
     checkTransitionBeforeY(timeDelta: float) {
@@ -1447,26 +1465,16 @@ namespace gdjs {
 
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
-      const object = behavior.owner;
       const deltaMaxY = Math.abs(
         behavior._requestedDeltaX * behavior._slopeClimbingFactor
       );
-      // TODO maybe always call _findHighestFloorAndMoveOnTop
-      // TODO should probably updates _floorPlatform
-      const newY = behavior._getYToFollowFloor(
-        this._floorPlatform!,
+      const floor = behavior._findHighestFloorAndMoveOnTop(
+        behavior._potentialCollidingObjects,
         -deltaMaxY,
         deltaMaxY
       );
-      if (newY && newY < object.getY()) {
-        object.setY(newY);
-      } else {
-        // Avoid to move too deep in a neighbor platform when going down.
-        behavior._findHighestFloorAndMoveOnTop(
-          behavior._potentialCollidingObjects,
-          -deltaMaxY,
-          deltaMaxY
-        );
+      if (floor && floor !== this._floorPlatform) {
+        behavior._setOnFloor(floor);
       }
     }
 

@@ -1450,8 +1450,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       });
 
-
-    //TODO Uncomment the deltaY values when platforms moving up are fixed
+      //TODO Uncomment the deltaY values when platforms moving up are fixed
       [-10, -10.1, -9.9].forEach((platformY) => {
         [
           //-maxDeltaY + epsilon,

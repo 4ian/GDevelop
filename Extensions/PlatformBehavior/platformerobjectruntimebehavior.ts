@@ -307,6 +307,7 @@ namespace gdjs {
 
           //If on floor: .
           if (this._state === this._onFloor) {
+            const oldY = object.getY();
             const floor = this._findHighestFloorAndMoveOnTop(
               this._potentialCollidingObjects,
               // _requestedDeltaX can be small when the object start moving.
@@ -331,6 +332,7 @@ namespace gdjs {
             ) {
               break;
             }
+            object.setY(oldY);
           }
           if (tryRounding) {
             // First try rounding the position as this might be sufficient to get the object

@@ -1319,29 +1319,27 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
     });
 
-    // The following tests doesn't pass because the object sometimes round inside the moving platform and can't move right and left.
+    //TODO Uncomment the deltaY values when platforms moving up are fixed
     [-10, -10.1, -9.9].forEach((platformY) => {
       [
-        -maxDeltaY + epsilon,
+        //-maxDeltaY + epsilon,
         maxDeltaY - epsilon,
-        -10,
+        //-10,
         10,
-        -10.1,
+        //-10.1,
         10.1,
         0,
       ].forEach((deltaY) => {
         [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
-          it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+          it(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
             platform.setPosition(platform.getX(), platformY);
             for (let i = 0; i < 10; ++i) {
               runtimeScene.renderAndStep(1000 / 60);
             }
             // Check the object has not moved.
             expect(object.getX()).to.be(0);
-            // The object must not be inside the platform or it gets stuck
-            expect(object.getY()).to.be(
-              Math.floor(platform.getY() - object.getHeight())
-            );
+            // The object landed right on the platform
+            expect(object.getY()).to.be(platform.getY() - object.getHeight());
             expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
             expect(object.getBehavior('auto1').isFalling()).to.be(false);
             expect(object.getBehavior('auto1').isMoving()).to.be(false);
@@ -1357,9 +1355,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
               expect(object.getBehavior('auto1').isFalling()).to.be(false);
               expect(object.getBehavior('auto1').isMoving()).to.be(false);
-              // The object must not be inside the platform or it gets stuck
-              expect(object.getY()).to.be(
-                Math.floor(platform.getY() - object.getHeight())
+              // The object follow the platform
+              // The rounding error is probably due to a separate call.
+              // TODO Try to make it exact or find why
+              expect(object.getY()).to.be.within(
+                platform.getY() - object.getHeight() - epsilon,
+                platform.getY() - object.getHeight() + epsilon
               );
             }
             expect(object.getX()).to.be(0 + 5 * deltaX);
@@ -1449,22 +1450,20 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       });
 
-      // The following tests doesn't pass
-      // because the object sometimes round inside the moving platform
-      // so it can't move right and left
-      // or there is a gap between the moving platform and the object.
+
+    //TODO Uncomment the deltaY values when platforms moving up are fixed
       [-10, -10.1, -9.9].forEach((platformY) => {
         [
-          -maxDeltaY + epsilon,
+          //-maxDeltaY + epsilon,
           maxDeltaY - epsilon,
-          -10,
+          //-10,
           10,
-          -10.1,
+          //-10.1,
           10.1,
           0,
         ].forEach((deltaY) => {
           [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
-            it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+            it(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
               platform.setPosition(platform.getX(), platformY);
               for (let i = 0; i < 10; ++i) {
                 runtimeScene.renderAndStep(1000 / 60);

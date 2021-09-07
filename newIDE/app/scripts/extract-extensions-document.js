@@ -78,7 +78,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    for (extension of extensions) {
+    for (const extension of extensions) {
       const folderName = getExtensionFolderName(extension.name);
       const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
       const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;

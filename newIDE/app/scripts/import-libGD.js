@@ -1,31 +1,6 @@
 const shell = require('shelljs');
-const https = require('follow-redirects').https;
-const fs = require('fs');
+const { downloadLocalFile } = require('./lib/DownloadLocalFile');
 const path = require('path');
-
-const downloadFile = (url, filePath) =>
-  new Promise((resolve, reject) => {
-    var request = https.get(url, function(response) {
-      if (response.statusCode !== 200) {
-        reject({
-          statusCode: response.statusCode,
-          statusMessage: response.statusMessage,
-        });
-        return;
-      }
-
-      const file = fs.createWriteStream(filePath);
-      response.pipe(file).on('finish', function() {
-        resolve();
-      });
-    });
-    request.on('error', function(err) {
-      reject({
-        statusCode: 0,
-        statusMessage: err.message,
-      });
-    });
-  });
 
 const sourceDirectory = '../../../Binaries/embuild/GDevelop.js';
 const destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
@@ -106,8 +81,8 @@ if (shell.test('-f', path.join(sourceDirectory, 'libGD.js'))) {
 
   const downloadLibGdJs = baseUrl =>
     Promise.all([
-      downloadFile(baseUrl + '/libGD.js', '../public/libGD.js'),
-      downloadFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
+      downloadLocalFile(baseUrl + '/libGD.js', '../public/libGD.js'),
+      downloadLocalFile(baseUrl + '/libGD.wasm', '../public/libGD.wasm'),
     ]).then(
       responses => {},
       error => {

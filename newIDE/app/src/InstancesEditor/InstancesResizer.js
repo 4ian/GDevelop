@@ -200,11 +200,15 @@ export default class InstancesResizer {
     const flippedTotalDeltaY = isTop ? -roundedTotalDeltaY : roundedTotalDeltaY;
 
     let scaleX =
-      (initialSelectionAABB.width() + flippedTotalDeltaX) /
-      initialSelectionAABB.width();
+      initialSelectionAABB.width() !== 0
+        ? (initialSelectionAABB.width() + flippedTotalDeltaX) /
+          initialSelectionAABB.width()
+        : flippedTotalDeltaX;
     let scaleY =
-      (initialSelectionAABB.height() + flippedTotalDeltaY) /
-      initialSelectionAABB.height();
+      initialSelectionAABB.height() !== 0
+        ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
+          initialSelectionAABB.height()
+        : flippedTotalDeltaY;
 
     const hasRotatedInstance = areAnyInstancesNotStraight(instances);
 
@@ -227,10 +231,21 @@ export default class InstancesResizer {
       }
     }
 
-    // No negative scale because instances can't be mirrored
-    // Make the minimal selection size to 1 to avoid absorption
-    scaleX = Math.max(1 / initialSelectionAABB.width(), scaleX);
-    scaleY = Math.max(1 / initialSelectionAABB.height(), scaleY);
+    // No negative scale because instances can't be mirrored.
+    // Make the minimal selection size to 1 to avoid absorption.
+    // If size is already 0, use a minimum scale to avoid negative scales.
+    scaleX = Math.max(
+      initialSelectionAABB.width() !== 0
+        ? 1 / initialSelectionAABB.width()
+        : 0.00001,
+      scaleX
+    );
+    scaleY = Math.max(
+      initialSelectionAABB.height() !== 0
+        ? 1 / initialSelectionAABB.height()
+        : 0.00001,
+      scaleY
+    );
 
     const fixedPointX =
       initialSelectionAABB.right -
@@ -251,6 +266,17 @@ export default class InstancesResizer {
         selectedInstance
       );
 
+      // Assume a size of 1 pixel to start the resizing
+      // if the instance had a size of 0.
+      const initialWidth =
+        initialUnrotatedInstanceAABB.width() !== 0
+          ? initialUnrotatedInstanceAABB.width()
+          : 1;
+      const initialHeight =
+        initialUnrotatedInstanceAABB.height() !== 0
+          ? initialUnrotatedInstanceAABB.height()
+          : 1;
+
       // The position and size of an instance describe the shape
       // before the rotation is applied.
       // The calculus is like a 90° or 270° rotation of the basis around the scaling.
@@ -263,12 +289,8 @@ export default class InstancesResizer {
         !hasRotatedInstance &&
         (angle === 90 || angle === 270)
       ) {
-        selectedInstance.setCustomWidth(
-          scaleY * initialUnrotatedInstanceAABB.width()
-        );
-        selectedInstance.setCustomHeight(
-          scaleX * initialUnrotatedInstanceAABB.height()
-        );
+        selectedInstance.setCustomWidth(scaleY * initialWidth);
+        selectedInstance.setCustomHeight(scaleX * initialHeight);
         selectedInstance.setHasCustomSize(true);
 
         // These 4 variables are the positions and vector after the scaling.
@@ -294,12 +316,8 @@ export default class InstancesResizer {
         selectedInstance.setX(centerX + centerToOriginX);
         selectedInstance.setY(centerY + centerToOriginY);
       } else {
-        selectedInstance.setCustomWidth(
-          scaleX * initialUnrotatedInstanceAABB.width()
-        );
-        selectedInstance.setCustomHeight(
-          scaleY * initialUnrotatedInstanceAABB.height()
-        );
+        selectedInstance.setCustomWidth(scaleX * initialWidth);
+        selectedInstance.setCustomHeight(scaleY * initialHeight);
         selectedInstance.setHasCustomSize(true);
 
         selectedInstance.setX(

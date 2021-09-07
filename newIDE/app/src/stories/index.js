@@ -1317,37 +1317,22 @@ storiesOf('UI Building Blocks/ColorField', module)
         floatingLabelText="Particles start color"
         disableAlpha
         fullWidth
-        color={{
-          r: 100,
-          g: 100,
-          b: 200,
-          a: 255,
-        }}
-        onChangeComplete={() => {}}
+        color="100;100;200"
+        onChange={() => {}}
       />
       <ColorField
         floatingLabelText="This has a helper text"
         disableAlpha
         fullWidth
-        color={{
-          r: 100,
-          g: 100,
-          b: 200,
-          a: 255,
-        }}
-        onChangeComplete={() => {}}
+        color="100;100;200"
+        onChange={() => {}}
         helperMarkdownText="Lorem ipsum **dolor sit amet**, consectetur _adipiscing elit_, [sed do eiusmod](http://example.com) tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
       />
       <ColorField
         floatingLabelText="This is not full width"
         disableAlpha
-        color={{
-          r: 100,
-          g: 100,
-          b: 200,
-          a: 255,
-        }}
-        onChangeComplete={() => {}}
+        color="100;100;200"
+        onChange={() => {}}
       />
     </div>
   ));

@@ -94,7 +94,12 @@ export const declareBehaviorMetadata = (
     const element = behaviorContent.addChild(propertyName);
     const propertyType: string = enumeratedProperty.type;
 
-    if (propertyType === 'String' || propertyType === 'Choice') {
+    if (
+      propertyType === 'String' ||
+      propertyType === 'Choice' ||
+      propertyType === 'Color' ||
+      propertyType === 'Behavior'
+    ) {
       element.setStringValue(newValue);
     } else if (propertyType === 'Number') {
       element.setDoubleValue(parseFloat(newValue));
@@ -118,7 +123,12 @@ export const declareBehaviorMetadata = (
       );
 
       if (behaviorContent.hasChild(propertyName)) {
-        if (propertyType === 'String' || propertyType === 'Choice') {
+        if (
+          propertyType === 'String' ||
+          propertyType === 'Choice' ||
+          propertyType === 'Color' ||
+          propertyType === 'Behavior'
+        ) {
           newProperty.setValue(
             behaviorContent.getChild(propertyName).getStringValue()
           );
@@ -148,7 +158,12 @@ export const declareBehaviorMetadata = (
       const element = behaviorContent.addChild(enumeratedProperty.name);
       const propertyType: string = enumeratedProperty.type;
 
-      if (propertyType === 'String' || propertyType === 'Choice') {
+      if (
+        propertyType === 'String' ||
+        propertyType === 'Choice' ||
+        propertyType === 'Color' ||
+        propertyType === 'Behavior'
+      ) {
         element.setStringValue(enumeratedProperty.value);
       } else if (propertyType === 'Number') {
         element.setDoubleValue(parseFloat(enumeratedProperty.value) || 0);
@@ -487,6 +502,36 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         )
       )
         .addParameter('yesorno', i18n._(t`New value to set`), '', false)
+        .getCodeExtraInformation()
+        .setFunctionName(setterName);
+    } else if (propertyType === 'Color') {
+      addObjectAndBehaviorParameters(
+        behaviorMetadata.addScopedCondition(
+          gd.EventsBasedBehavior.getPropertyConditionName(propertyName),
+          propertyLabel,
+          i18n._(t`Check the color ${propertyLabel}`),
+          i18n._(t`Color ${propertyName}`),
+          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .useStandardRelationalOperatorParameters('color')
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
+
+      addObjectAndBehaviorParameters(
+        behaviorMetadata.addScopedAction(
+          gd.EventsBasedBehavior.getPropertyActionName(propertyName),
+          propertyLabel,
+          i18n._(t`Update the color of ${propertyLabel}`),
+          i18n._(t`Change color ${propertyName} of _PARAM0_ to _PARAM2_`),
+          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          getExtensionIconUrl(extension),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .addParameter('color', i18n._(t`New color to set`), '', false)
         .getCodeExtraInformation()
         .setFunctionName(setterName);
     }

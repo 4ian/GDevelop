@@ -10,10 +10,10 @@ import SelectOption from '../UI/SelectOption';
 import Dialog from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import {
-  getErrors,
+  getProjectPropertiesErrors,
   displayProjectErrorsBox,
   validatePackageName,
-} from './ProjectErrorsChecker';
+} from '../Utils/ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import HelpButton from '../UI/HelpButton';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
@@ -62,6 +62,7 @@ type ProjectProperties = {|
   packageName: string,
   orientation: string,
   scaleMode: string,
+  pixelsRounding: boolean,
   sizeOnStartupMode: string,
   minFPS: number,
   maxFPS: number,
@@ -80,6 +81,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     packageName: project.getPackageName(),
     orientation: project.getOrientation(),
     scaleMode: project.getScaleMode(),
+    pixelsRounding: project.getPixelsRounding(),
     sizeOnStartupMode: project.getSizeOnStartupMode(),
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
@@ -103,6 +105,7 @@ function applyPropertiesToProject(
     packageName,
     orientation,
     scaleMode,
+    pixelsRounding,
     sizeOnStartupMode,
     minFPS,
     maxFPS,
@@ -117,13 +120,14 @@ function applyPropertiesToProject(
   project.setPackageName(packageName);
   project.setOrientation(orientation);
   project.setScaleMode(scaleMode);
+  project.setPixelsRounding(pixelsRounding);
   project.setSizeOnStartupMode(sizeOnStartupMode);
   project.setMinimumFPS(minFPS);
   project.setMaximumFPS(maxFPS);
   project.setFolderProject(isFolderProject);
   project.setUseDeprecatedZeroAsDefaultZOrder(useDeprecatedZeroAsDefaultZOrder);
 
-  return displayProjectErrorsBox(t, getErrors(t, project));
+  return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
 function ProjectPropertiesDialog(props: Props) {
@@ -153,6 +157,9 @@ function ProjectPropertiesDialog(props: Props) {
     initialProperties.orientation
   );
   let [scaleMode, setScaleMode] = React.useState(initialProperties.scaleMode);
+  let [pixelsRounding, setPixelsRounding] = React.useState(
+    initialProperties.pixelsRounding
+  );
   let [sizeOnStartupMode, setSizeOnStartupMode] = React.useState(
     initialProperties.sizeOnStartupMode
   );
@@ -194,6 +201,7 @@ function ProjectPropertiesDialog(props: Props) {
         packageName,
         orientation,
         scaleMode,
+        pixelsRounding,
         sizeOnStartupMode,
         minFPS,
         maxFPS,
@@ -483,6 +491,15 @@ function ProjectPropertiesDialog(props: Props) {
                 primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
               />
             </SelectField>
+            <Checkbox
+              label={
+                <Trans>
+                  Round pixels when rendering, useful for pixel perfect games.
+                </Trans>
+              }
+              checked={pixelsRounding}
+              onCheck={(e, checked) => setPixelsRounding(checked)}
+            />
             {scaleMode === 'nearest' && (
               <DismissableAlertMessage
                 identifier="use-non-smoothed-textures"

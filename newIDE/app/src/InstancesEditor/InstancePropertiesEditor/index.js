@@ -109,14 +109,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomWidth(newValue),
+            instance.setCustomWidth(Math.max(newValue, 0)),
         },
         {
           name: this.props.i18n._(t`Height`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomHeight(newValue),
+            instance.setCustomHeight(Math.max(newValue, 0)),
         },
       ],
     },

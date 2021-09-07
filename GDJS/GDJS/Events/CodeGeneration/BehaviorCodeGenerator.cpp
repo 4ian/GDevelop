@@ -69,6 +69,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
           runtimeBehaviorMethodsCode +=
               EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
                   project,
+                  eventsBasedBehavior,
                   *eventsFunction,
                   methodCodeNamespace,
                   methodFullyQualifiedName,
@@ -213,7 +214,10 @@ gd::String BehaviorCodeGenerator::GenerateUpdatePropertyFromBehaviorDataCode(
 
 gd::String BehaviorCodeGenerator::GeneratePropertyValueCode(
     const gd::PropertyDescriptor& property) {
-  if (property.GetType() == "String" || property.GetType() == "Choice") {
+  if (property.GetType() == "String" ||
+      property.GetType() == "Choice" ||
+      property.GetType() == "Color" ||
+      property.GetType() == "Behavior") {
     return EventsCodeGenerator::ConvertToStringExplicit(property.GetValue());
   } else if (property.GetType() == "Number") {
     return "Number(" +

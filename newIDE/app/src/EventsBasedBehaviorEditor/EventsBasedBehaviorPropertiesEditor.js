@@ -22,6 +22,9 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
+import StringArrayEditor from '../StringArrayEditor';
+import ColorField from '../UI/ColorField';
+import BehaviorTypeSelector from '../BehaviorTypeSelector';
 
 const gd: libGDevelop = global.gd;
 
@@ -80,6 +83,11 @@ const validatePropertyName = (
   return true;
 };
 
+const getExtraInfoArray = (property: gdNamedPropertyDescriptor) => {
+  const extraInfoVector = property.getExtraInfo();
+  return extraInfoVector.toJSArray();
+};
+
 export default class EventsBasedBehaviorPropertiesEditor extends React.Component<
   Props,
   {||}
@@ -111,6 +119,16 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     properties.move(oldIndex, newIndex);
     this.forceUpdate();
     this.props.onPropertiesUpdated();
+  };
+
+  _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
+    return (newExtraInfo: Array<string>) => {
+      const vectorString = new gd.VectorString();
+      newExtraInfo.forEach(item => vectorString.push_back(item));
+      property.setExtraInfo(vectorString);
+      vectorString.delete();
+      this.forceUpdate();
+    };
   };
 
   render() {
@@ -222,6 +240,18 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 value="Boolean"
                                 primaryText={t`Boolean (checkbox)`}
                               />
+                              <SelectOption
+                                value="Choice"
+                                primaryText={t`String from a list of options (text)`}
+                              />
+                              <SelectOption
+                                value="Color"
+                                primaryText={t`Color (text)`}
+                              />
+                              <SelectOption
+                                value="Behavior"
+                                primaryText={t`Required behavior`}
+                              />
                             </SelectField>
                             {(property.getType() === 'String' ||
                               property.getType() === 'Number') && (
@@ -267,7 +297,49 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 />
                               </SelectField>
                             )}
+                            {property.getType() === 'Behavior' && (
+                              <BehaviorTypeSelector
+                                project={this.props.project}
+                                objectType={this.props.eventsBasedBehavior.getObjectType()}
+                                value={
+                                  property.getExtraInfo().size() === 0
+                                    ? ''
+                                    : property.getExtraInfo().at(0)
+                                }
+                                onChange={(newValue: string) => {
+                                  // Change the type of the required behavior.
+                                  const extraInfo = property.getExtraInfo();
+                                  if (extraInfo.size() === 0) {
+                                    extraInfo.push_back(newValue);
+                                  } else {
+                                    extraInfo.set(0, newValue);
+                                  }
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                disabled={false}
+                              />
+                            )}
                           </ResponsiveLineStackLayout>
+                          {property.getType() === 'Choice' && (
+                            <StringArrayEditor
+                              extraInfo={getExtraInfoArray(property)}
+                              setExtraInfo={this._setChoiceExtraInfo(property)}
+                            />
+                          )}
+                          {property.getType() === 'Color' && (
+                            <ColorField
+                              floatingLabelText={<Trans>Color</Trans>}
+                              disableAlpha
+                              fullWidth
+                              color={property.getValue()}
+                              onChange={color => {
+                                property.setValue(color);
+                                this.forceUpdate();
+                                this.props.onPropertiesUpdated();
+                              }}
+                            />
+                          )}
                           <SemiControlledTextField
                             commitOnBlur
                             floatingLabelText={

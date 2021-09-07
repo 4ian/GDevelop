@@ -510,7 +510,7 @@ namespace gdjs {
 
     static _defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
     static defaultVertexShader = `
-  precision mediump float;
+  precision highp float;
   attribute vec2 aVertexPosition;
 
   uniform mat3 translationMatrix;
@@ -522,7 +522,7 @@ namespace gdjs {
       gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
   }`;
     static defaultFragmentShader = `
-  precision mediump float;
+  precision highp float;
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;
@@ -536,7 +536,7 @@ namespace gdjs {
       gl_FragColor = vec4(color*intensity, 1.0);
   }`;
     static texturedFragmentShader = `
-  precision mediump float;
+  precision highp float;
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;

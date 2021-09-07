@@ -18,8 +18,8 @@ import CreateProfile from '../Profile/CreateProfile';
 import LimitDisplayer from '../Profile/LimitDisplayer';
 import {
   displayProjectErrorsBox,
-  getErrors,
-} from '../ProjectManager/ProjectErrorsChecker';
+  getProjectPropertiesErrors,
+} from '../Utils/ProjectErrorsChecker';
 import { type Limit } from '../Utils/GDevelopServices/Usage';
 import BuildsWatcher from './Builds/BuildsWatcher';
 import BuildStepsProgress, {
@@ -94,7 +94,8 @@ export default class ExportLauncher extends Component<Props, State> {
     const { project, exportPipeline } = this.props;
     sendExportLaunched(exportPipeline.name);
 
-    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
+    if (!displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project)))
+      return;
 
     const handleError = (message: string) => (err: Error) => {
       if (!this.state.errored) {

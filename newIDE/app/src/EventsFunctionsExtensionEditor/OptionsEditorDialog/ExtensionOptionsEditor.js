@@ -178,7 +178,7 @@ export const ExtensionOptionsEditor = ({
             multiline
             fullWidth
             rows={5}
-            rowsMax={5}
+            rowsMax={15}
           />
           <TextField
             floatingLabelText={<Trans>Version</Trans>}

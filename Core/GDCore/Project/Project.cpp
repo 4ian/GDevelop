@@ -63,6 +63,7 @@ Project::Project()
       minFPS(20),
       verticalSync(false),
       scaleMode("linear"),
+      pixelsRounding(false),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
       projectUuid(""),
@@ -528,6 +529,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
   SetScaleMode(propElement.GetStringAttribute("scaleMode", "linear"));
+  SetPixelsRounding(propElement.GetBoolAttribute("pixelsRounding", false));
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
@@ -740,6 +742,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
+  propElement.SetAttribute("pixelsRounding", pixelsRounding);
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
@@ -931,6 +934,7 @@ void Project::Init(const gd::Project& game) {
   minFPS = game.minFPS;
   verticalSync = game.verticalSync;
   scaleMode = game.scaleMode;
+  pixelsRounding = game.pixelsRounding;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
   projectUuid = game.projectUuid;

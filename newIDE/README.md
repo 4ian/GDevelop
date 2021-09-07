@@ -114,9 +114,9 @@ First, update the version number in `newIDE/electron-app/app/package.json` and m
 
 Then, wait for the CIs (CircleCI & AppVeyor) to build the artifacts needed for the release (MacOS+Linux and Windows respectively).
 
-Once finished, you can download them and upload them to the new Github Release!
+Once finished, you can download them (use `newIDE/app/scripts/download-all-build-artifacts.js` script) and upload them to the new Github release!
 
-> Note: You can also build manually a desktop version locally by running `yarn build` in newIDE/electron-app
+> Note: You can also build manually a desktop version locally by running `npm run build` in `newIDE/electron-app`.
 
 ### Webapp version
 

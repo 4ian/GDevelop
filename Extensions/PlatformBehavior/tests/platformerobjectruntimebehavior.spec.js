@@ -2165,7 +2165,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       const platform2 = addPlatformObject(runtimeScene);
       platform2.setPosition(
         platform.getX() + platform.getWidth(),
-        platform.getY() - 1
+        // The allowed step depends on the object speed.
+        platform.getY() - 4
       );
 
       object.setPosition(30, -32);
@@ -2179,7 +2180,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(platform2.getY() - object.getHeight());
     });
 
-    it("can't walk from a platform to another one that is too high", function () {
+    it.only("can't walk from a platform to another one that is too high", function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
@@ -2187,7 +2188,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       const platform2 = addPlatformObject(runtimeScene);
       platform2.setPosition(
         platform.getX() + platform.getWidth(),
-        platform.getY() - 2
+        // The allowed step depends on the object speed.
+        platform.getY() - 5
       );
 
       object.setPosition(30, -32);
@@ -2266,13 +2268,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(10);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
-        // See https://github.com/4ian/GDevelop/issues/3013.
-        if (slopeAngle === 45) {
-          walkRightMayStop(40);
-        } else {
-          walkRight(30);
-        }
+        walkRight(30);
         expect(object.getX()).to.be.above(slope.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(platform.getY() - object.getHeight());
@@ -2296,9 +2292,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(10);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
-        // See https://github.com/4ian/GDevelop/issues/3013.
-        walkRightMayStop(40);
+        walkRight(30);
         expect(object.getX()).to.be.above(platform.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
@@ -2335,13 +2329,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(10);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
-        // See https://github.com/4ian/GDevelop/issues/3013.
-        if (slopeAngles[0] === 26 && slopeAngles[1] === 26) {
-          walkRight(30);
-        } else {
-          walkRightMayStop(40);
-        }
+        walkRight(30);
         expect(object.getX()).to.be.above(slope2.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(slope1.getY() - object.getHeight());

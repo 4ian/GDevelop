@@ -2180,7 +2180,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(platform2.getY() - object.getHeight());
     });
 
-    it.only("can't walk from a platform to another one that is too high", function () {
+    it("can't walk from a platform to another one that is too high", function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);

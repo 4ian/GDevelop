@@ -699,35 +699,12 @@ namespace gdjs {
     }
 
     /**
-     * Return the y the owner must take to follow the floor if reachable or return null.
-     * @param platform The platform to follow.
-     * @param upwardDeltaY The owner won't move upward more than this value.
-     * @param downwardDeltaY The owner won't move downward more than this value.
-     */
-    _getYToFollowFloor(
-      platform: gdjs.PlatformRuntimeBehavior,
-      upwardDeltaY: float,
-      downwardDeltaY: float
-    ) {
-      let highestY = this._findPlatformHighestYUnderObject(
-        platform,
-        upwardDeltaY,
-        downwardDeltaY
-      );
-      if (highestY < Number.MAX_VALUE) {
-        const object = this.owner;
-        return object.getY() + highestY - object.getAABB().max[1];
-      }
-      return null;
-    }
-
-    /**
      * Find the highest Y of the floor reachable by the owner.
      * @param platform The platform to be tested for collision.
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
      */
-    _findPlatformHighestYUnderObject(
+    private _findPlatformHighestYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
       upwardDeltaY: float,
       downwardDeltaY: float

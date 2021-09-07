@@ -1423,13 +1423,7 @@ namespace gdjs {
       if (
         deltaY !== 0 &&
         Math.abs(deltaY) <=
-          Math.abs(this._behavior._maxFallingSpeed * timeDelta) // ||
-        // (deltaY < 0 &&
-        //   gdjs.RuntimeObject.collisionTest(
-        //     object,
-        //     this._floorPlatform!.owner,
-        //     behavior._ignoreTouchingEdges
-        //   ))
+          Math.abs(this._behavior._maxFallingSpeed * timeDelta)
       ) {
         object.setY(object.getY() + deltaY);
       }

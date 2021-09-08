@@ -2687,7 +2687,9 @@ storiesOf('MeasuresTable', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 250 }}>
-      <MeasuresTable profilerMeasures={profilerOutputsTestData.framesAverageMeasures} />
+      <MeasuresTable
+        profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
+      />
     </div>
   ));
 

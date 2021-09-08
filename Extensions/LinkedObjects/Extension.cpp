@@ -97,7 +97,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                     _("Take some objects linked to the object into account for "
                       "next conditions and actions.\nThe condition will return "
                       "false if no object was taken into account."),
-                    _("Take into account all \"_PARAM2_\" linked to _PARAM3_ (legacy)"),
+                    _("Take into account all \"_PARAM1_\" linked to _PARAM2_ (legacy)"),
                     _("Linked objects"),
                     "CppPlatform/Extensions/LinkedObjectsicon24.png",
                     "CppPlatform/Extensions/LinkedObjectsicon16.png")
@@ -114,7 +114,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "QuickPickObjectsLinkedTo",
           _("Take into account linked objects"),
           _("Take objects linked to the object into account for next actions."),
-          _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
+          _("Take into account all \"_PARAM2_\" linked to _PARAM3_"),
           _("Linked objects"),
           "CppPlatform/Extensions/LinkedObjectsicon24.png",
           "CppPlatform/Extensions/LinkedObjectsicon16.png")

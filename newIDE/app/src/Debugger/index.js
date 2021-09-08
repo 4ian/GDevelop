@@ -15,6 +15,7 @@ import {
   type PreviewDebuggerServer,
   type DebuggerId,
 } from '../Export/PreviewLauncher.flow';
+import { type Log, LogsManager } from './DebuggerConsole';
 
 export type ProfilerMeasuresSection = {|
   time: number,
@@ -27,6 +28,15 @@ export type ProfilerOutput = {|
     framesCount: number,
   },
 |};
+
+/**
+ * Returns true if a log is a warning or debug log from a library out of our control that we do not want to bother users with.
+ * This is used in Debugger#_handleMessage below to filter out those kinds of messages.
+ */
+const isUnavoidableLibraryWarning = ({ group, message }: Log): boolean =>
+  group === 'JavaScript' &&
+  (message.includes('Electron Security Warning') ||
+    message.includes('Warning: This is a browser-targeted Firebase bundle'));
 
 type Props = {|
   project: gdProject,
@@ -45,6 +55,7 @@ type State = {|
   profilerOutputs: { [DebuggerId]: ProfilerOutput },
   profilingInProgress: { [DebuggerId]: boolean },
   selectedId: DebuggerId,
+  logs: { [DebuggerId]: Array<Log> },
 |};
 
 /**
@@ -61,9 +72,11 @@ export default class Debugger extends React.Component<Props, State> {
     profilerOutputs: {},
     profilingInProgress: {},
     selectedId: 0,
+    logs: {},
   };
 
   _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
+  _debuggerLogs: Map<number, LogsManager> = new Map();
 
   updateToolbar() {
     if (!this.props.isActive) return;
@@ -78,6 +91,11 @@ export default class Debugger extends React.Component<Props, State> {
         onOpenProfiler={() => {
           if (this._debuggerContents[this.state.selectedId])
             this._debuggerContents[this.state.selectedId].openProfiler();
+        }}
+        canOpenConsole={this._hasSelectedDebugger()}
+        onOpenConsole={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].openConsole();
         }}
       />
     );
@@ -99,6 +117,15 @@ export default class Debugger extends React.Component<Props, State> {
     if (this.state.unregisterDebuggerServerCallbacks) {
       this.state.unregisterDebuggerServerCallbacks();
     }
+  }
+
+  _getLogsManager(id: number): LogsManager {
+    let result = this._debuggerLogs.get(id);
+    if (!result) {
+      result = new LogsManager();
+      this._debuggerLogs.set(id, result);
+    }
+    return result;
   }
 
   _startServer = () => {
@@ -123,16 +150,33 @@ export default class Debugger extends React.Component<Props, State> {
         );
       },
       onConnectionClosed: ({ id, debuggerIds }) => {
+        this._debuggerLogs.delete(id);
         this.setState(
-          ({ selectedId }) => ({
-            debuggerIds,
-            selectedId:
-              selectedId !== id
-                ? selectedId
-                : debuggerIds.length
-                ? debuggerIds[debuggerIds.length - 1]
-                : selectedId,
-          }),
+          ({
+            selectedId,
+            debuggerGameData,
+            profilerOutputs,
+            profilingInProgress,
+          }) => {
+            // Remove any data bound to the instance that might have been stored.
+            // Otherwise this would be a memory leak.
+            if (debuggerGameData[id]) delete debuggerGameData[id];
+            if (profilerOutputs[id]) delete profilerOutputs[id];
+            if (profilingInProgress[id]) delete profilingInProgress[id];
+
+            return {
+              debuggerIds,
+              selectedId:
+                selectedId !== id
+                  ? selectedId
+                  : debuggerIds.length
+                  ? debuggerIds[debuggerIds.length - 1]
+                  : selectedId,
+              debuggerGameData,
+              profilerOutputs,
+              profilingInProgress,
+            };
+          },
           () => this.updateToolbar()
         );
       },
@@ -188,6 +232,10 @@ export default class Debugger extends React.Component<Props, State> {
       }));
     } else if (data.command === 'hotReloader.logs') {
       // Nothing to do.
+    } else if (data.command === 'console.log') {
+      // Filter out unavoidable warnings that do not concern non-engine devs.
+      if (isUnavoidableLibraryWarning(data.payload)) return;
+      this._getLogsManager(id).addLog(data.payload);
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -310,6 +358,7 @@ export default class Debugger extends React.Component<Props, State> {
                 onStopProfiler={() => this._stopProfiler(selectedId)}
                 profilerOutput={profilerOutputs[selectedId]}
                 profilingInProgress={profilingInProgress[selectedId]}
+                logsManager={this._getLogsManager(selectedId)}
               />
             )}
             {!this._hasSelectedDebugger() && (

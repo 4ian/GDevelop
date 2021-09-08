@@ -12,6 +12,8 @@ type Props = {|
   canPause: boolean,
   onOpenProfiler: () => void,
   canOpenProfiler: boolean,
+  onOpenConsole: () => void,
+  canOpenConsole: boolean,
 |};
 
 export class Toolbar extends React.PureComponent<Props> {
@@ -23,6 +25,8 @@ export class Toolbar extends React.PureComponent<Props> {
       canPause,
       onOpenProfiler,
       canOpenProfiler,
+      onOpenConsole,
+      canOpenConsole,
     } = this.props;
 
     return (
@@ -45,6 +49,12 @@ export class Toolbar extends React.PureComponent<Props> {
           src="res/ribbon_default/profiler32.png"
           disabled={!canOpenProfiler}
           tooltip={t`Open the performance profiler`}
+        />
+        <ToolbarIcon
+          onClick={onOpenConsole}
+          src="res/ribbon_default/source_cpp32.png"
+          disabled={!canOpenConsole}
+          tooltip={t`Open the console`}
         />
       </ToolbarGroup>
     );

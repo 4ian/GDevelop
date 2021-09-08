@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Dummy behavior (with shared data)');
   export class DummyWithSharedDataRuntimeBehavior extends gdjs.RuntimeBehavior {
     _textToSet: string;
 
@@ -20,11 +21,11 @@ namespace gdjs {
       this._textToSet = (sharedData as any).sharedProperty1;
 
       // You can also run arbitrary code at the creation of the behavior:
-      console.log(
+      logger.log(
         'DummyWithSharedDataRuntimeBehavior was created for object:',
         owner
       );
-      console.log('The shared data are:', sharedData);
+      logger.log('The shared data are:', sharedData);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {

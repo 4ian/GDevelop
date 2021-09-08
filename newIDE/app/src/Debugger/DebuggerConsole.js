@@ -227,7 +227,9 @@ export const DebuggerConsole = ({
                               <Chip
                                 label={
                                   <ConsoleText>
-                                    {filteredLogs[index].group}
+                                    <Trans>
+                                      Group: {filteredLogs[index].group}
+                                    </Trans>
                                   </ConsoleText>
                                 }
                               />

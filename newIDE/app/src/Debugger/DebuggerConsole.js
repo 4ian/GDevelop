@@ -10,7 +10,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Chip from '@material-ui/core/Chip';
-import Paper from '@material-ui/core/Paper';
 
 import { Line, Column, Spacer } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
@@ -81,13 +80,12 @@ const iconMap = {
   error: <ErrorIcon color="error" />,
 };
 
-const ConsoleText = ({ children, monospace }) => (
+const ConsoleText = ({ children }: { children: React$Node }) => (
   <span
     style={{
       userSelect: 'text',
       cursor: 'text',
       wordBreak: 'break-word',
-      fontFamily: monospace ? "'Courier New', monospace" : undefined,
     }}
   >
     {children}
@@ -211,11 +209,21 @@ export const DebuggerConsole = ({
                         </ListItemIcon>
                         <ListItemText
                           primary={
-                            <Paper variant="outlined">
-                              <ConsoleText monospace>
+                            <div
+                              style={{
+                                backgroundColor: 'black',
+                                borderRadius: '4px',
+                                border: '1px solid slategray',
+                                color: 'white',
+                                fontFamily: "'Courier New', monospace",
+                                padding: 5,
+                                marginBottom: 5,
+                              }}
+                            >
+                              <ConsoleText>
                                 {filteredLogs[index].message}
                               </ConsoleText>
-                            </Paper>
+                            </div>
                           }
                           secondary={
                             maximized && filteredLogs[index].group ? (

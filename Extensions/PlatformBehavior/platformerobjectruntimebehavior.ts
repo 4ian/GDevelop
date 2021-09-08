@@ -734,12 +734,12 @@ namespace gdjs {
           if (previousVertex[1] <= maxY || vertex[1] <= maxY) {
             // Check vertex into the interval
             if (minX <= vertex[0] && vertex[0] <= maxX) {
-              if (vertex[1] < minY) {
+              if (vertex[1] < minY && vertex[1] >= aabb.min[1]) {
                 // Platform is too high
                 return Number.MAX_VALUE;
               }
               // Ignore intersections that are too low
-              if (vertex[1] <= maxY) {
+              if (minY <= vertex[1] && vertex[1] <= maxY) {
                 highestY = Math.min(highestY, vertex[1]);
               }
             }
@@ -755,12 +755,12 @@ namespace gdjs {
                 const intersectionY =
                   previousVertex[1] +
                   ((minX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < minY) {
+                if (intersectionY < minY && intersectionY >= aabb.min[1]) {
                   // Platform is too high
                   return Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
-                if (intersectionY <= maxY) {
+                if (minY <= intersectionY && intersectionY <= maxY) {
                   highestY = Math.min(highestY, intersectionY);
                 }
               }
@@ -773,12 +773,12 @@ namespace gdjs {
                 const intersectionY =
                   previousVertex[1] +
                   ((maxX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < minY) {
+                if (intersectionY < minY && intersectionY >= aabb.min[1]) {
                   // Platform is too high
                   return Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
-                if (intersectionY <= maxY) {
+                if (minY <= intersectionY && intersectionY <= maxY) {
                   highestY = Math.min(highestY, intersectionY);
                 }
               }

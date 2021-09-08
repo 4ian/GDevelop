@@ -65,14 +65,6 @@ describe('gdjs.LinksManager', function () {
         effects: [],
       });
 
-      runtimeScene.addObject(object1A);
-      runtimeScene.addObject(object1B);
-      runtimeScene.addObject(object1C);
-
-      runtimeScene.addObject(object2A);
-      runtimeScene.addObject(object2B);
-      runtimeScene.addObject(object2C);
-
       const pickObjectsLinkedTo = (object) => {
         const objectsLists = new Hashtable();
         objectsLists.put('obj1', [object1A, object1B, object1C]);
@@ -95,6 +87,14 @@ describe('gdjs.LinksManager', function () {
         }
         return { pickedSomething, objectsLists };
       };
+
+      runtimeScene.addObject(object1A);
+      runtimeScene.addObject(object1B);
+      runtimeScene.addObject(object1C);
+
+      runtimeScene.addObject(object2A);
+      runtimeScene.addObject(object2B);
+      runtimeScene.addObject(object2C);
 
       it('can link two objects', function () {
         manager.linkObjects(object1A, object2A);

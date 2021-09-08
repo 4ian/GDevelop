@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Dummy behavior');
+
   /**
    * The DummyRuntimeBehavior changes a variable in the object that is owning
    * it, at every tick before events are run, to set it to the string that was
@@ -20,7 +22,7 @@ namespace gdjs {
       this._textToSet = behaviorData.property1;
 
       // You can also run arbitrary code at the creation of the behavior:
-      console.log('DummyRuntimeBehavior was created for object:', owner);
+      logger.log('DummyRuntimeBehavior was created for object:', owner);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {

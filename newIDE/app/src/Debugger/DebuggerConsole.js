@@ -26,8 +26,6 @@ import ExpandIcon from '@material-ui/icons/AspectRatio';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import FilterIcon from '@material-ui/icons/FilterList';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import CancelIcon from '@material-ui/icons/Cancel';
 
 export type Log = {
   message: string,
@@ -45,14 +43,14 @@ export class LogsManager {
   _pendingCommit: boolean = false;
 
   _commitLogs() {
-    this.logs.push(...this._pendingLogs);
+    this.logs.unshift(...this._pendingLogs);
     this._pendingLogs.length = 0;
     this._pendingCommit = false;
     this._onNewLog.forEach(f => f());
   }
 
   addLog(log: Log) {
-    this._pendingLogs.push(log);
+    this._pendingLogs.unshift(log);
     if (!this.groups.has(log.group)) {
       this.groups.add(log.group);
       this._onNewGroup.forEach(f => f());
@@ -100,16 +98,11 @@ export const DebuggerConsole = ({
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;
-  const [followNew, setFollowNew] = React.useState(true);
   const virtualListRef = React.useRef<null | List>(null);
   React.useEffect(
     () => {
-      // Rerender when the logs are updated...
+      // Rerender when the logs are updated
       const onUpdate = () => {
-        // ...scroll to the new item if needed and possible...
-        if (virtualListRef.current && followNew)
-          virtualListRef.current.scrollToRow(logsManager.logs.length + 1);
-        // ...and rerender.
         forceUpdate();
       };
       logsManager.on('log', onUpdate);
@@ -117,7 +110,7 @@ export const DebuggerConsole = ({
         logsManager.off('log', onUpdate);
       };
     },
-    [forceUpdate, logsManager, virtualListRef, followNew]
+    [forceUpdate, logsManager, virtualListRef]
   );
 
   const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
@@ -127,8 +120,12 @@ export const DebuggerConsole = ({
         defaultHeight: 45,
         minHeight: 25,
         fixedWidth: true,
+        // Inverse index so that each log always
+        // get assigned the same ID despite all indices
+        // shifting when a log is added.
+        keyMapper: index => logs.length - index,
       }),
-    []
+    [logs]
   );
 
   // If tabs are switched, the element is not visible and its height is 0 when rendered again.
@@ -264,19 +261,6 @@ export const DebuggerConsole = ({
               uncheckedIcon={<VisibilityOffIcon />}
               checked={!hideInternal}
               onCheck={(_, value) => setHideInternal(!value)}
-            />
-            <Checkbox
-              label={
-                followNew ? (
-                  <Trans>Stop autoscrolling</Trans>
-                ) : (
-                  <Trans>Autoscroll to new logs</Trans>
-                )
-              }
-              checkedIcon={<CancelIcon />}
-              uncheckedIcon={<ArrowDownwardIcon />}
-              checked={followNew}
-              onCheck={(_, value) => setFollowNew(value)}
             />
             <IconButton
               tooltip={t`Filter the logs by group`}

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * This is a simple script getting the commits since the last tag (which
  * corresponds to a GitHub release). Each commit is filtered to:
@@ -10,29 +11,65 @@
 
 const shell = require('shelljs');
 const child = require('child_process');
-const axios = require('axios');
+const { default: axios } = require('axios');
 
-const extractCommitsFromGit = () => {
-  const lastTag = child
-    .execSync(`git describe --tags --abbrev=0`)
-    .toString('utf-8')
-    .trim();
-  shell.echo(`ℹ️ Last tag is ${lastTag}`);
+/** @typedef {{sha: string, message: string, authorEmail: string}} GitRawCommitInfo */
+/** @typedef {{
+  message: string,
+  authorEmail: string,
+  authorNickname: string,
+  isFix: boolean,
+  forDev: boolean,
+  hidden: boolean
+}} GitEnrichedCommitInfo */
 
-  const output = child
-    .execSync(
-      `git log ${lastTag}..HEAD --format=%B---DELIMITER---%ae---DELIMITER---%H---COMMITDELIMITER---`
-    )
-    .toString('utf-8');
+const getGitTools = repoPath => {
+  /**
+   * @param {string} options
+   * @returns {GitRawCommitInfo[]}
+   */
+  const extractCommits = options => {
+    const output = child
+      .execSync(
+        `git log ${options} --format=%B---DELIMITER---%ae---DELIMITER---%H---COMMITDELIMITER---`,
+        { cwd: repoPath }
+      )
+      .toString('utf-8');
 
+    return output.split('---COMMITDELIMITER---\n').map(commit => {
+      const [message, authorEmail, sha] = commit.split('---DELIMITER---');
+
+      return { sha, message, authorEmail };
+    });
+  };
+
+  return {
+    getLastTag: () => {
+      return child
+        .execSync(`git describe --tags --abbrev=0`, { cwd: repoPath })
+        .toString('utf-8')
+        .trim();
+    },
+    getTagIsoDate: tag => {
+      return child
+        .execSync(`git tag -l ${tag} --format='%(creatordate:short)'`, {
+          cwd: repoPath,
+        })
+        .toString('utf-8')
+        .trim();
+    },
+    extractCommitsSinceTag: tag => extractCommits(`${tag}..HEAD`),
+    extractCommitsSinceDate: date => extractCommits(`--after=${date}`),
+  };
+};
+
+/**
+ * @param {GitRawCommitInfo[]} rawCommits
+ * @return {GitEnrichedCommitInfo[]}
+ */
+const enrichCommits = rawCommits => {
   return (
-    output
-      .split('---COMMITDELIMITER---\n')
-      .map(commit => {
-        const [message, authorEmail, sha] = commit.split('---DELIMITER---');
-
-        return { sha, message, authorEmail };
-      })
+    rawCommits
       // Clean commits
       .filter(commit => Boolean(commit.sha))
       .map(commit => ({
@@ -72,7 +109,9 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.includes('package-lock.json') ||
           lowerCaseMessage.includes('yarn.lock');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
-        const forDev = lowerCaseMessage.includes('developer changelog');
+        const forDev = lowerCaseMessage.includes(
+          'only show in developer changelog'
+        );
 
         return {
           message: commit.message.trim(),
@@ -86,9 +125,15 @@ const extractCommitsFromGit = () => {
   );
 };
 
+/**
+ * @param {GitEnrichedCommitInfo[]} commits
+ * @return {Promise<GitEnrichedCommitInfo[]>}
+ */
 const findAuthorNicknameInCommits = async commits => {
   let authorEmailsToNicknames = {};
   let lastGithubCall = 0;
+
+  /** @returns {Promise<void>} */
   function delayGithubCall() {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -150,6 +195,10 @@ const findAuthorNicknameInCommits = async commits => {
   return outputCommits;
 };
 
+/**
+ * @param {GitEnrichedCommitInfo} commit
+ * @returns {string}
+ */
 const formatCommitMessage = commit => {
   const includeAuthor = commit.authorNickname !== '4ian';
   const author = includeAuthor
@@ -163,6 +212,7 @@ const formatCommitMessage = commit => {
   const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest )in (the )?changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
+    // @ts-ignore - check for nullability is properly done?
     foundIgnoreRest && foundIgnoreRest.index > 0
       ? commit.message.substr(0, foundIgnoreRest.index)
       : commit.message;
@@ -172,7 +222,12 @@ const formatCommitMessage = commit => {
     ''
   );
 
-  const indentedMessage = prNumberCleanedMessage
+  const devCleanedMessage = prNumberCleanedMessage.replace(
+    /only show in developer changelog/i,
+    ''
+  );
+
+  const indentedMessage = devCleanedMessage
     .split('\n')
     .map((line, index) =>
       index === 0
@@ -195,15 +250,15 @@ const formatHiddenCommitMessage = commit => {
   );
 };
 
-(async () => {
-  const commits = extractCommitsFromGit();
-  const commitsWithAuthors = await findAuthorNicknameInCommits(commits);
-
-  const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
-  const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
-  const devCommits = displayedCommits.filter(commit => commit.forDev);
-  const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix && !commit.forDev);
+/**
+ * @param {{hiddenCommits: GitEnrichedCommitInfo[], improvementsCommits: GitEnrichedCommitInfo[], fixCommits: GitEnrichedCommitInfo[], devCommits: GitEnrichedCommitInfo[]}} commits
+ */
+const outputChangelog = ({
+  hiddenCommits,
+  improvementsCommits,
+  fixCommits,
+  devCommits,
+}) => {
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
       .map(formatHiddenCommitMessage)
@@ -222,4 +277,32 @@ const formatHiddenCommitMessage = commit => {
     shell.echo(`\n### 🛠 Internal changes (for developers)\n`);
     shell.echo(devCommits.map(formatCommitMessage).join('\n'));
   }
+};
+
+(async () => {
+  const gdevelopRepoGitTools = getGitTools('.');
+  const lastTag = gdevelopRepoGitTools.getLastTag();
+  shell.echo(`ℹ️ Last tag is ${lastTag}`);
+
+  const lastTagDate = gdevelopRepoGitTools.getTagIsoDate(lastTag);
+  shell.echo(`ℹ️ Date of tag is ${lastTagDate}`);
+
+  const rawCommits = gdevelopRepoGitTools.extractCommitsSinceTag(lastTag);
+
+  const commits = enrichCommits(rawCommits);
+  const commitsWithAuthors = await findAuthorNicknameInCommits(commits);
+
+  const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
+  const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
+  const devCommits = displayedCommits.filter(commit => commit.forDev);
+  const fixCommits = displayedCommits.filter(commit => commit.isFix);
+  const improvementsCommits = displayedCommits.filter(
+    commit => !commit.isFix && !commit.forDev
+  );
+  outputChangelog({
+    hiddenCommits,
+    improvementsCommits,
+    fixCommits,
+    devCommits,
+  });
 })();

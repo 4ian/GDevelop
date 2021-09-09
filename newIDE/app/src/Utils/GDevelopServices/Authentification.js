@@ -4,19 +4,26 @@ import {
   Auth,
   getAuth,
   onAuthStateChanged,
-  User,
+  User as FirebaseUser,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
-import { GDevelopFirebaseConfig } from './ApiConfigs';
+import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
+import axios from 'axios';
 
-export type Profile = {
+export type FirebaseProfile = {
   uid: string, // This represents the userId
   providerId: string,
   email: ?string,
   emailVerified: boolean,
+};
+
+export type Profile = {
+  id: string,
+  email: string,
+  username: ?string,
 };
 
 export type LoginForm = {
@@ -24,7 +31,17 @@ export type LoginForm = {
   password: string,
 };
 
-export type LoginError = {
+export type RegisterForm = {
+  email: string,
+  password: string,
+  username: string,
+};
+
+export type ForgotPasswordForm = {
+  email: string,
+};
+
+export type AuthError = {
   code:
     | 'auth/invalid-email'
     | 'auth/user-disabled'
@@ -32,11 +49,13 @@ export type LoginError = {
     | 'auth/wrong-password'
     | 'auth/email-already-in-use'
     | 'auth/operation-not-allowed'
-    | 'auth/weak-password',
+    | 'auth/weak-password'
+    | 'auth/username-used',
 };
 
 export default class Authentification {
-  user: ?User = null;
+  firebaseUser: ?FirebaseUser = null;
+  user: ?Profile = null;
   auth: Auth;
   _onUserChangeCb: ?() => void = null;
 
@@ -45,12 +64,10 @@ export default class Authentification {
     this.auth = getAuth(app);
     onAuthStateChanged(this.auth, user => {
       if (user) {
-        this.user = user;
+        this.firebaseUser = user;
       } else {
-        this.user = null;
+        this.firebaseUser = null;
       }
-
-      if (this._onUserChangeCb) this._onUserChangeCb();
     });
   }
 
@@ -58,13 +75,49 @@ export default class Authentification {
     this._onUserChangeCb = cb;
   };
 
-  createAccount = (form: LoginForm): Promise<void> => {
+  createFirebaseAccount = (form: RegisterForm): Promise<void> => {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.user = userCredentials.user;
+        this.firebaseUser = userCredentials.user;
       })
       .catch(error => {
-        console.error('Error while creating account:', error);
+        console.error('Error while creating firebase account:', error);
+        throw error;
+      });
+  };
+
+  createUser = (
+    getAuthorizationHeader: () => Promise<string>,
+    form: RegisterForm
+  ): Promise<void> => {
+    return getAuthorizationHeader()
+      .then((authorizationHeader) => {
+        if (!this.firebaseUser) {
+          console.error('Cannot get user if not logged in');
+          throw new Error('Cannot get user if not logged in');
+        }
+        return axios.post(
+          `${GDevelopUserApi.baseUrl}/user?userId=${this.firebaseUser.uid}`,
+          {
+            id: this.firebaseUser.uid,
+            email: form.email,
+            username: form.username,
+          },
+          {
+            params: {
+              userId: this.firebaseUser.uid,
+            },
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          }
+        );
+      })
+      .then(response => {
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.error('Error while creating user:', error);
         throw error;
       });
   };
@@ -72,7 +125,7 @@ export default class Authentification {
   login = (form: LoginForm): Promise<void> => {
     return signInWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.user = userCredentials.user;
+        this.firebaseUser = userCredentials.user;
       })
       .catch(error => {
         console.error('Error while login:', error);
@@ -80,18 +133,44 @@ export default class Authentification {
       });
   };
 
-  forgotPassword = (form: LoginForm): Promise<void> => {
+  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
-  getUserProfile = (cb: (any, ?Profile) => void) => {
+  getUserFirebaseProfile = (cb: (any, ?FirebaseProfile) => void) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
 
-    cb(null, this.user);
+    cb(null, this.firebaseUser);
   };
 
-  getUserProfileSync = (): ?Profile => {
-    return this.user;
+  getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        if (!this.firebaseUser) {
+          console.error('Cannot get user if not logged in');
+          throw new Error('Cannot get user if not logged in');
+        }
+        return axios.get(
+          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          {
+            params: {
+              userId: this.firebaseUser.uid,
+            },
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while creating user:', error);
+        throw error;
+      });
+  };
+
+  getUserProfileSync = (): ?FirebaseProfile => {
+    return this.firebaseUser;
   };
 
   logout = () => {
@@ -105,13 +184,13 @@ export default class Authentification {
   };
 
   getAuthorizationHeader = (): Promise<string> => {
-    if (!this.user)
+    if (!this.firebaseUser)
       return Promise.reject(new Error('User is not authenticated'));
 
-    return this.user.getIdToken().then(token => `Bearer ${token}`);
+    return this.firebaseUser.getIdToken().then(token => `Bearer ${token}`);
   };
 
   isAuthenticated = (): boolean => {
-    return !!this.user;
+    return !!this.firebaseUser;
   };
 }

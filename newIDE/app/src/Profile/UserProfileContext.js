@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import {
+  type FirebaseProfile,
+  type Profile,
+} from '../Utils/GDevelopServices/Authentification';
 import {
   type Limits,
   type Usages,
@@ -9,6 +12,7 @@ import {
 
 export type UserProfile = {|
   authenticated: boolean,
+  firebaseProfile: ?FirebaseProfile,
   profile: ?Profile,
   limits: ?Limits,
   usages: ?Usages,
@@ -22,6 +26,7 @@ export type UserProfile = {|
 
 export const initialUserProfile = {
   authenticated: false,
+  firebaseProfile: null,
   profile: null,
   subscription: null,
   usages: null,

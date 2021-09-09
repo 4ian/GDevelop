@@ -19,7 +19,7 @@ export default ({ profile }: Props) =>
       <Line alignItems="center">
         <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
         <Spacer />
-        <Text size="title">You are connected as {profile.email}</Text>
+        <Text size="title">You are connected as {profile.username} ({profile.email})</Text>
       </Line>
       <Line>
         <Text>

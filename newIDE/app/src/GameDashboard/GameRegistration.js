@@ -57,13 +57,13 @@ export const GameRegistration = ({
     async () => {
       if (!profile || !project) return;
 
-      const { uid } = profile;
+      const { id } = profile;
       setError(null);
       setUnavailableReason(null);
       try {
         const game = await getGame(
           getAuthorizationHeader,
-          uid,
+          id,
           project.getProjectUuid()
         );
         setGame(game);
@@ -89,10 +89,10 @@ export const GameRegistration = ({
     async () => {
       if (!profile || !project) return;
 
-      const { uid } = profile;
+      const { id } = profile;
       setRegistrationInProgress(true);
       try {
-        await registerGame(getAuthorizationHeader, uid, {
+        await registerGame(getAuthorizationHeader, id, {
           gameId: project.getProjectUuid(),
           authorName: project.getAuthor() || 'Unspecified author',
           gameName: project.getName() || 'Untitled game',

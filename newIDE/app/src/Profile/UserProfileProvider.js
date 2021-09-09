@@ -7,9 +7,11 @@ import {
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
 import Authentification, {
-  type Profile,
+  type FirebaseProfile,
   type LoginForm,
-  type LoginError,
+  type RegisterForm,
+  type ForgotPasswordForm,
+  type AuthError,
 } from '../Utils/GDevelopServices/Authentification';
 import LoginDialog from './LoginDialog';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
@@ -32,7 +34,7 @@ type State = {|
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
-  loginError: ?LoginError,
+  authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
 |};
@@ -44,7 +46,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
-    loginError: null,
+    authError: null,
     resetPasswordDialogOpen: false,
     forgotPasswordInProgress: false,
   };
@@ -71,70 +73,82 @@ export default class UserProfileProvider extends React.Component<Props, State> {
   _fetchUserProfile = () => {
     const { authentification } = this.props;
 
-    authentification.getUserProfile((err, profile: ?Profile) => {
-      if (err && err.unauthenticated) {
-        return this.setState({
-          userProfile: {
-            ...this.state.userProfile,
-            authenticated: false,
-            profile: null,
-            usages: null,
-            limits: null,
-            subscription: null,
-          },
-        });
-      } else if (err || !profile) {
-        console.log('Unable to fetch user profile', err);
-        return;
-      }
-
-      this.setState(
-        {
-          userProfile: {
-            ...this.state.userProfile,
-            authenticated: true,
-            profile,
-          },
-        },
-        () => {
-          if (!profile) return;
-
-          getUserUsages(
-            authentification.getAuthorizationHeader,
-            profile.uid
-          ).then(usages =>
-            this.setState({
-              userProfile: {
-                ...this.state.userProfile,
-                usages,
-              },
-            })
-          );
-          getUserSubscription(
-            authentification.getAuthorizationHeader,
-            profile.uid
-          ).then(subscription =>
-            this.setState({
-              userProfile: {
-                ...this.state.userProfile,
-                subscription,
-              },
-            })
-          );
-          getUserLimits(
-            authentification.getAuthorizationHeader,
-            profile.uid
-          ).then(limits =>
-            this.setState({
-              userProfile: {
-                ...this.state.userProfile,
-                limits,
-              },
-            })
-          );
+    authentification.getUserFirebaseProfile(
+      (err, firebaseProfile: ?FirebaseProfile) => {
+        if (err && err.unauthenticated) {
+          return this.setState({
+            userProfile: {
+              ...this.state.userProfile,
+              authenticated: false,
+              profile: null,
+              usages: null,
+              limits: null,
+              subscription: null,
+            },
+          });
+        } else if (err || !firebaseProfile) {
+          console.log('Unable to fetch user profile', err);
+          return;
         }
-      );
-    });
+
+        this.setState(
+          {
+            userProfile: {
+              ...this.state.userProfile,
+              authenticated: true,
+              firebaseProfile,
+            },
+          },
+          () => {
+            if (!firebaseProfile) return;
+
+            authentification
+              .getUserProfile(authentification.getAuthorizationHeader)
+              .then(user =>
+                this.setState({
+                  userProfile: {
+                    ...this.state.userProfile,
+                    profile: user,
+                  },
+                })
+              );
+            getUserUsages(
+              authentification.getAuthorizationHeader,
+              firebaseProfile.uid
+            ).then(usages =>
+              this.setState({
+                userProfile: {
+                  ...this.state.userProfile,
+                  usages,
+                },
+              })
+            );
+            getUserSubscription(
+              authentification.getAuthorizationHeader,
+              firebaseProfile.uid
+            ).then(subscription =>
+              this.setState({
+                userProfile: {
+                  ...this.state.userProfile,
+                  subscription,
+                },
+              })
+            );
+            getUserLimits(
+              authentification.getAuthorizationHeader,
+              firebaseProfile.uid
+            ).then(limits =>
+              this.setState({
+                userProfile: {
+                  ...this.state.userProfile,
+                  limits,
+                },
+              })
+            );
+          }
+        );
+      }
+    );
   };
 
   _doLogout = () => {
@@ -152,36 +166,40 @@ export default class UserProfileProvider extends React.Component<Props, State> {
           this._fetchUserProfile();
           this.openLoginDialog(false);
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
         }
       )
     );
   };
 
-  _doCreateAccount = (form: LoginForm) => {
+  _doCreateAccount = (form: RegisterForm) => {
     const { authentification } = this.props;
     if (!authentification) return;
 
     watchPromiseInState(this, 'createAccountInProgress', () =>
-      authentification.createAccount(form).then(
+      authentification.createFirebaseAccount(form).then(
         () => {
-          this._fetchUserProfile();
-          this.openLoginDialog(false);
-          sendSignupDone(form.email);
+          authentification
+            .createUser(authentification.getAuthorizationHeader, form)
+            .then(() => {
+              this._fetchUserProfile();
+              this.openLoginDialog(false);
+              sendSignupDone(form.email);
+            });
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
         }
       )
     );
   };
 
-  _doForgotPassword = (form: LoginForm) => {
+  _doForgotPassword = (form: ForgotPasswordForm) => {
     const { authentification } = this.props;
     if (!authentification) return;
 
@@ -190,9 +208,9 @@ export default class UserProfileProvider extends React.Component<Props, State> {
         () => {
           this.openResetPassword(true);
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
           showWarningBox(
             "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
@@ -234,7 +252,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
             onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
             onLogin={this._doLogin}
             loginInProgress={this.state.loginInProgress}
-            error={this.state.loginError}
+            error={this.state.authError}
             onForgotPassword={this._doForgotPassword}
             resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
             onCloseResetPasswordDialog={() => this.openResetPassword(false)}
@@ -247,7 +265,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
             onGoToLogin={() => this.openLoginDialog(true)}
             onCreateAccount={this._doCreateAccount}
             createAccountInProgress={this.state.createAccountInProgress}
-            error={this.state.loginError}
+            error={this.state.authError}
           />
         )}
       </React.Fragment>

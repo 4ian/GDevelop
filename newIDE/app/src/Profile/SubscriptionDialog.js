@@ -95,7 +95,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       // We already have a stripe customer, change the subscription without
       // asking for the user card.
       this.setState({ isLoading: true });
-      changeUserSubscription(getAuthorizationHeader, profile.uid, {
+      changeUserSubscription(getAuthorizationHeader, profile.id, {
         planId: plan.planId,
       }).then(
         () => this.handleUpdatedSubscriptionSuccess(i18n, userProfile, plan),
@@ -108,7 +108,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       Window.openExternalURL(
         getRedirectToCheckoutUrl(
           plan.planId || '',
-          profile.uid,
+          profile.id,
           profile.email || ''
         )
       );

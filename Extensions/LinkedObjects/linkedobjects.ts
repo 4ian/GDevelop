@@ -7,7 +7,7 @@ namespace gdjs {
    * Manages the links between objects.
    */
   export class LinksManager {
-    private links: { [objectId: number]: Hashtable<gdjs.RuntimeObject[]> } = {};
+    private links = new Map<integer, LinkedObjectIterable>();
 
     /**
      * Get the links manager of a scene.
@@ -23,27 +23,37 @@ namespace gdjs {
       return runtimeScene.linkedObjectsManager;
     }
 
-    _getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
-      if (!this.links.hasOwnProperty(objA.id)) {
-        this.links[objA.id] = new Hashtable<gdjs.RuntimeObject[]>();
+    _getMapOfObjectsLinkedWith(
+      objA: gdjs.RuntimeObject
+    ): Map<string, gdjs.RuntimeObject[]> {
+      if (!this.links.has(objA.id)) {
+        this.links.set(objA.id, new LinkedObjectIterable());
       }
-      return this.links[objA.id];
+      return this.links.get(objA.id)!.linkedObjectMap;
+    }
+
+    // It allows JS extensions to easily iterate over links.
+    getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
+      if (!this.links.has(objA.id)) {
+        this.links.set(objA.id, new LinkedObjectIterable());
+      }
+      return this.links.get(objA.id)!;
     }
 
     linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
-      const objALinkedObjectMap = this._getObjectsLinkedWith(objA);
-      if (!objALinkedObjectMap.containsKey(objB.getName())) {
-        objALinkedObjectMap.put(objB.getName(), []);
+      const objALinkedObjectMap = this._getMapOfObjectsLinkedWith(objA);
+      if (!objALinkedObjectMap.has(objB.getName())) {
+        objALinkedObjectMap.set(objB.getName(), []);
       }
-      const objALinkedObjects = objALinkedObjectMap.get(objB.getName());
+      const objALinkedObjects = objALinkedObjectMap.get(objB.getName())!;
       if (objALinkedObjects.indexOf(objB) === -1) {
         objALinkedObjects.push(objB);
       }
-      const objBLinkedObjectMap = this._getObjectsLinkedWith(objB);
-      if (!objBLinkedObjectMap.containsKey(objA.getName())) {
-        objBLinkedObjectMap.put(objA.getName(), []);
+      const objBLinkedObjectMap = this._getMapOfObjectsLinkedWith(objB);
+      if (!objBLinkedObjectMap.has(objA.getName())) {
+        objBLinkedObjectMap.set(objA.getName(), []);
       }
-      const objBLinkedObjects = objBLinkedObjectMap.get(objA.getName());
+      const objBLinkedObjects = objBLinkedObjectMap.get(objA.getName())!;
       if (objBLinkedObjects.indexOf(objA) === -1) {
         objBLinkedObjects.push(objA);
       }
@@ -51,54 +61,84 @@ namespace gdjs {
 
     removeAllLinksOf(obj: gdjs.RuntimeObject) {
       // Remove the other side of the links
-      const linkedObjectMap = this._getObjectsLinkedWith(obj);
-      for (const linkedObjectName in linkedObjectMap.items) {
-        if (linkedObjectMap.containsKey(linkedObjectName)) {
-          const linkedObjects = linkedObjectMap.get(linkedObjectName);
-
-          for (let i = 0; i < linkedObjects.length; i++) {
-            // This is the object on the other side of the link
-            // We find obj in its list of linked objects and remove it.
-            const linkedObject = linkedObjects[i];
-            if (this.links.hasOwnProperty(linkedObject.id)) {
-              const otherObjList = this.links[linkedObject.id].get(
-                obj.getName()
-              );
-              const index = otherObjList.indexOf(obj);
-              if (index !== -1) {
-                otherObjList.splice(index, 1);
-              }
+      const linkedObjectMap = this._getMapOfObjectsLinkedWith(obj);
+      for (const [
+        linkedObjectName,
+        linkedObjects,
+      ] of linkedObjectMap.entries()) {
+        for (let i = 0; i < linkedObjects.length; i++) {
+          // This is the object on the other side of the link
+          // We find obj in its list of linked objects and remove it.
+          const linkedObject = linkedObjects[i];
+          if (this.links.has(linkedObject.id)) {
+            const otherObjList = this.links
+              .get(linkedObject.id)!
+              .linkedObjectMap.get(obj.getName())!;
+            const index = otherObjList.indexOf(obj);
+            if (index !== -1) {
+              otherObjList.splice(index, 1);
             }
           }
         }
       }
       // Remove the links on obj side
-      if (this.links.hasOwnProperty(obj.id)) {
-        delete this.links[obj.id];
+      if (this.links.has(obj.id)) {
+        this.links.delete(obj.id);
       }
     }
 
     removeLinkBetween(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
-      if (this.links.hasOwnProperty(objA.id)) {
-        const map = this.links[objA.id];
-        if (map.containsKey(objB.getName())) {
-          const list = map.get(objB.getName());
+      if (this.links.has(objA.id)) {
+        const map = this.links.get(objA.id)!.linkedObjectMap;
+        if (map.has(objB.getName())) {
+          const list = map.get(objB.getName())!;
           const index = list.indexOf(objB);
           if (index !== -1) {
             list.splice(index, 1);
           }
         }
       }
-      if (this.links.hasOwnProperty(objB.id)) {
-        const map = this.links[objB.id];
-        if (map.containsKey(objA.getName())) {
-          const list = map.get(objA.getName());
+      if (this.links.has(objB.id)) {
+        const map = this.links.get(objB.id)!.linkedObjectMap;
+        if (map.has(objA.getName())) {
+          const list = map.get(objA.getName())!;
           const index = list.indexOf(objA);
           if (index !== -1) {
             list.splice(index, 1);
           }
         }
       }
+    }
+  }
+
+  class LinkedObjectIterable {
+    linkedObjectMap: Map<string, gdjs.RuntimeObject[]>;
+
+    constructor() {
+      this.linkedObjectMap = new Map<string, gdjs.RuntimeObject[]>();
+    }
+
+    [Symbol.iterator]() {
+      let mapItr = this.linkedObjectMap.entries();
+      let listItr: IterableIterator<[
+        number,
+        gdjs.RuntimeObject
+      ]> = [].entries();
+
+      return {
+        next: () => {
+          let listNext = listItr.next();
+          while (listNext.done) {
+            const mapNext = mapItr.next();
+            if (mapNext.done) {
+              return { done: true };
+            }
+            listItr = mapNext.value[1].entries();
+            listNext = listItr.next();
+          }
+          return { value: listNext.value[1], done: false };
+        },
+      };
     }
   }
 
@@ -179,7 +219,7 @@ namespace gdjs {
         }
         const linkedObjectMap = LinksManager.getManager(
           runtimeScene
-        )._getObjectsLinkedWith(obj);
+        )._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {
@@ -211,7 +251,7 @@ namespace gdjs {
             for (const objectName of temporaryObjectNames) {
               objectCount += runtimeScene.getObjects(objectName).length;
               linkedObjectExists =
-                linkedObjectExists || linkedObjectMap.containsKey(objectName);
+                linkedObjectExists || linkedObjectMap.has(objectName);
             }
 
             if (linkedObjectExists) {
@@ -219,8 +259,8 @@ namespace gdjs {
                 // All the objects were picked, there is no need to make an intersection.
                 pickedObjects.length = 0;
                 for (const objectName of temporaryObjectNames) {
-                  if (linkedObjectMap.containsKey(objectName)) {
-                    const linkedObjects = linkedObjectMap.get(objectName);
+                  if (linkedObjectMap.has(objectName)) {
+                    const linkedObjects = linkedObjectMap.get(objectName)!;
 
                     pickedSomething =
                       pickedSomething || linkedObjects.length > 0;
@@ -234,8 +274,8 @@ namespace gdjs {
                 temporaryObjects.length = 0;
 
                 for (const objectName of temporaryObjectNames) {
-                  if (linkedObjectMap.containsKey(objectName)) {
-                    const linkedObjects = linkedObjectMap.get(objectName);
+                  if (linkedObjectMap.has(objectName)) {
+                    const linkedObjects = linkedObjectMap.get(objectName)!;
 
                     for (const otherObject of linkedObjects) {
                       if (pickedObjects.indexOf(otherObject) >= 0) {

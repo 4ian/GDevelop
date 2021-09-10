@@ -1,14 +1,16 @@
 // @flow
 import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { User as FirebaseUser } from 'firebase/auth';
 import {
   type Limits,
   type Usages,
   type Subscription,
 } from '../Utils/GDevelopServices/Usage';
 
-export type UserProfile = {|
+export type AuthenticatedUser = {|
   authenticated: boolean,
+  firebaseUser: ?FirebaseUser,
   profile: ?Profile,
   limits: ?Limits,
   usages: ?Usages,
@@ -20,8 +22,9 @@ export type UserProfile = {|
   getAuthorizationHeader: () => Promise<string>,
 |};
 
-export const initialUserProfile = {
+export const initialAuthenticatedUser = {
   authenticated: false,
+  firebaseUser: null,
   profile: null,
   subscription: null,
   usages: null,
@@ -33,6 +36,8 @@ export const initialUserProfile = {
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 
-const UserProfileContext = React.createContext<UserProfile>(initialUserProfile);
+const AuthenticatedUserContext = React.createContext<AuthenticatedUser>(
+  initialAuthenticatedUser
+);
 
-export default UserProfileContext;
+export default AuthenticatedUserContext;

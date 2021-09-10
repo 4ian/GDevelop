@@ -10,9 +10,9 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import BuildsDialog from './Builds/BuildsDialog';
 import { Line } from '../UI/Grid';
-import UserProfileContext, {
-  type UserProfile,
-} from '../Profile/UserProfileContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../Profile/AuthenticatedUserContext';
 import ExportLauncher from './ExportLauncher';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { OnlineStatus } from '../Utils/OnlineStatus';
@@ -150,8 +150,8 @@ export default class ExportDialog extends React.Component<Props, State> {
     );
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
+      <AuthenticatedUserContext.Consumer>
+        {(authenticatedUser: AuthenticatedUser) => (
           <OnlineStatus>
             {onlineStatus => {
               const cantExportBecauseOffline =
@@ -257,21 +257,21 @@ export default class ExportDialog extends React.Component<Props, State> {
                         exportPipeline={exporter.exportPipeline}
                         project={project}
                         onChangeSubscription={onChangeSubscription}
-                        userProfile={userProfile}
+                        authenticatedUser={authenticatedUser}
                       />
                     </div>
                   )}
                   <BuildsDialog
                     open={this.state.buildsDialogOpen}
                     onClose={() => this._openBuildsDialog(false)}
-                    userProfile={userProfile}
+                    authenticatedUser={authenticatedUser}
                   />
                 </Dialog>
               );
             }}
           </OnlineStatus>
         )}
-      </UserProfileContext.Consumer>
+      </AuthenticatedUserContext.Consumer>
     );
   }
 }

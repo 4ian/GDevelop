@@ -7,8 +7,8 @@ import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
 import TextField from '../UI/TextField';
 import {
-  type LoginForm,
-  type LoginError,
+  type RegisterForm,
+  type AuthError,
 } from '../Utils/GDevelopServices/Authentification';
 import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
@@ -17,16 +17,24 @@ import { ColumnStackLayout } from '../UI/Layout';
 type Props = {|
   onClose: () => void,
   onGoToLogin: () => void,
-  onCreateAccount: (form: LoginForm) => void,
+  onCreateAccount: (form: RegisterForm) => void,
   createAccountInProgress: boolean,
-  error: ?LoginError,
+  error: ?AuthError,
 |};
 
 type State = {|
-  form: LoginForm,
+  form: RegisterForm,
 |};
 
-export const getEmailErrorText = (error: ?LoginError) => {
+export const getUsernameErrorText = (error: ?AuthError) => {
+  if (!error) return undefined;
+
+  if (error.code === 'auth/username-used')
+    return 'This username is already used: please pick another one';
+  return undefined;
+};
+
+export const getEmailErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/invalid-email') return 'This email is invalid';
@@ -40,7 +48,7 @@ export const getEmailErrorText = (error: ?LoginError) => {
   return undefined;
 };
 
-export const getPasswordErrorText = (error: ?LoginError) => {
+export const getPasswordErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/wrong-password') return 'The password is invalid';
@@ -54,6 +62,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
     form: {
       email: '',
       password: '',
+      username: '',
     },
   };
 
@@ -111,10 +120,25 @@ export default class CreateAccountDialog extends Component<Props, State> {
           </BackgroundText>
           <TextField
             autoFocus
+            value={this.state.form.username}
+            floatingLabelText={<Trans>Username</Trans>}
+            errorText={getUsernameErrorText(error)}
+            fullWidth
+            onChange={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  username: value,
+                },
+              });
+            }}
+          />
+          <TextField
             value={this.state.form.email}
             floatingLabelText={<Trans>Email</Trans>}
             errorText={getEmailErrorText(error)}
             fullWidth
+            required
             onChange={(e, value) => {
               this.setState({
                 form: {
@@ -130,6 +154,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             errorText={getPasswordErrorText(error)}
             type="password"
             fullWidth
+            required
             onChange={(e, value) => {
               this.setState({
                 form: {

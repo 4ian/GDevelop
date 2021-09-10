@@ -6,10 +6,10 @@ import Dialog from '../../UI/Dialog';
 import HelpButton from '../../UI/HelpButton';
 import FlatButton from '../../UI/FlatButton';
 import Builds from '.';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 type Props = {|
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
   open: boolean,
   onClose: () => void,
 |};
@@ -22,7 +22,7 @@ export default class BuildsDialog extends Component<Props, State> {
   };
 
   render() {
-    const { open, onClose, userProfile } = this.props;
+    const { open, onClose, authenticatedUser } = this.props;
     if (!open) return null;
 
     return (
@@ -46,7 +46,7 @@ export default class BuildsDialog extends Component<Props, State> {
       >
         <Builds
           onBuildsUpdated={this._onBuildsUpdated}
-          userProfile={userProfile}
+          authenticatedUser={authenticatedUser}
         />
       </Dialog>
     );

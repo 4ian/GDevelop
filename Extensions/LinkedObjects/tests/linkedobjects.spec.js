@@ -94,6 +94,18 @@ describe('gdjs.LinksManager', function () {
       effects: [],
     });
 
+    runtimeScene.addObject(object1A);
+    runtimeScene.addObject(object1B);
+    runtimeScene.addObject(object1C);
+
+    runtimeScene.addObject(object2A);
+    runtimeScene.addObject(object2B);
+    runtimeScene.addObject(object2C);
+
+    runtimeScene.addObject(object3A);
+    runtimeScene.addObject(object3B);
+    runtimeScene.addObject(object3C);
+
     /**
      * @param {gdjs.RuntimeObject} object
      * @param {{objectName: string, picked: gdjs.RuntimeObject[]}[]} pickedObjects
@@ -121,18 +133,6 @@ describe('gdjs.LinksManager', function () {
       }
       return { pickedSomething, objectsLists };
     };
-
-    runtimeScene.addObject(object1A);
-    runtimeScene.addObject(object1B);
-    runtimeScene.addObject(object1C);
-
-    runtimeScene.addObject(object2A);
-    runtimeScene.addObject(object2B);
-    runtimeScene.addObject(object2C);
-
-    runtimeScene.addObject(object3A);
-    runtimeScene.addObject(object3B);
-    runtimeScene.addObject(object3C);
 
     it('can link two objects', function () {
       manager.linkObjects(object1A, object2A);
@@ -190,7 +190,8 @@ describe('gdjs.LinksManager', function () {
       }
     });
     it('can link more objects', function () {
-      manager.linkObjects(object1A, object2A); //Including the same objects as before
+      // Including the same objects as before
+      manager.linkObjects(object1A, object2A);
       manager.linkObjects(object1A, object2B);
       manager.linkObjects(object1A, object2C);
       {
@@ -250,7 +251,7 @@ describe('gdjs.LinksManager', function () {
     });
   };
 
-  // Following object names are the names of the object in the scene.
+  // Following object names are the names of the objects in the scene.
   // The test cases are using local names 'obj1', 'obj2', 'obj3'.
   [
     {
@@ -272,11 +273,11 @@ describe('gdjs.LinksManager', function () {
       object2Names: ['SceneObj2', 'SceneObj2', 'SceneObj2'],
       object3Names: ['SceneObj3', 'SceneObj3', 'SceneObj3'],
     },
-    // When groups are passed in parameters, it's flattened as an object.
+    // When groups are passed in parameters, they are flattened as an object.
     // So, the lists will contains objects with different names.
     {
       caseName: 'extension with groups',
-      // The implementation only check it exists.
+      // The implementation only checks it exists.
       eventsFunctionContext: {},
       object1Names: ['SceneObj1', 'SceneObj1p', 'SceneObj1p'],
       object2Names: ['SceneObj2p', 'SceneObj2p', 'SceneObj2'],

@@ -9,6 +9,7 @@ import {
 import Authentication, {
   type LoginForm,
   type RegisterForm,
+  type EditForm,
   type ForgotPasswordForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
@@ -22,6 +23,7 @@ import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
+import EditProfileDialog from './EditProfileDialog';
 
 type Props = {
   authentication: Authentication,
@@ -34,6 +36,8 @@ type State = {|
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
+  editProfileDialogOpen: boolean,
+  editInProgress: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
@@ -49,6 +53,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
+    editProfileDialogOpen: false,
+    editInProgress: false,
     authError: null,
     resetPasswordDialogOpen: false,
     forgotPasswordInProgress: false,
@@ -65,6 +71,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
         onLogin: () => this.openLoginDialog(true),
+        onEdit: () => this.openEditProfileDialog(true),
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         getAuthorizationHeader: () =>
@@ -176,6 +183,27 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   };
 
+  _doEdit = (form: EditForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    watchPromiseInState(this, 'editInProgress', () =>
+      authentication
+        .editUserProfile(authentication.getAuthorizationHeader, form)
+        .then(
+          () => {
+            this._fetchUserProfile();
+            this.openEditProfileDialog(false);
+          },
+          (authError: AuthError) => {
+            this.setState({
+              authError,
+            });
+          }
+        )
+    );
+  };
+
   _doCreateAccount = (form: RegisterForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
@@ -224,6 +252,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   openResetPassword = (open: boolean = true) => {
     this.setState({
       resetPasswordDialogOpen: open,
+      authError: null,
     });
   };
 
@@ -231,6 +260,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: open,
       createAccountDialogOpen: false,
+      authError: null,
+    });
+  };
+
+  openEditProfileDialog = (open: boolean = true) => {
+    this.setState({
+      editProfileDialogOpen: open,
+      authError: null,
     });
   };
 
@@ -238,6 +275,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState({
       loginDialogOpen: false,
       createAccountDialogOpen: open,
+      authError: null,
     });
   };
 
@@ -260,6 +298,16 @@ export default class AuthenticatedUserProvider extends React.Component<
             forgotPasswordInProgress={this.state.forgotPasswordInProgress}
           />
         )}
+        {this.state.authenticatedUser.profile &&
+          this.state.editProfileDialogOpen && (
+            <EditProfileDialog
+              profile={this.state.authenticatedUser.profile}
+              onClose={() => this.openEditProfileDialog(false)}
+              onEdit={this._doEdit}
+              editInProgress={this.state.editInProgress}
+              error={this.state.authError}
+            />
+          )}
         {this.state.createAccountDialogOpen && (
           <CreateAccountDialog
             onClose={() => this.openCreateAccountDialog(false)}

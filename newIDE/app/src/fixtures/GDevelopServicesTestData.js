@@ -91,6 +91,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -107,6 +108,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -123,6 +125,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -139,6 +142,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');

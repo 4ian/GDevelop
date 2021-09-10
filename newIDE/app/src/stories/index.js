@@ -118,6 +118,7 @@ import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
+import EditProfileDialog from '../Profile/EditProfileDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
@@ -3897,6 +3898,18 @@ storiesOf('Profile/LoginDialog', module)
       onCloseResetPasswordDialog={action('on close reset password dialog')}
       forgotPasswordInProgress={false}
       resetPasswordDialogOpen
+      error={null}
+    />
+  ));
+
+storiesOf('Profile/EditProfileDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EditProfileDialog
+      profile={{ id: 'id', email: 'email', username: 'username' }}
+      onClose={action('on close')}
+      editInProgress={false}
+      onEdit={action('on edit')}
       error={null}
     />
   ));

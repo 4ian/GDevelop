@@ -53,6 +53,5 @@ export const GDevelopGameApi = {
 export const GDevelopUserApi = {
   baseUrl: isDev
     ? 'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev'
-    : // ? 'http://localhost:3008/dev'
-      'https://api.gdevelop-app.com/user',
+    : 'https://api.gdevelop-app.com/user',
 };

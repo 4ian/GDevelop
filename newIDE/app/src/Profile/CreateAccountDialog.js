@@ -26,14 +26,6 @@ type State = {|
   form: RegisterForm,
 |};
 
-export const getUsernameErrorText = (error: ?AuthError) => {
-  if (!error) return undefined;
-
-  if (error.code === 'auth/username-used')
-    return 'This username is already used: please pick another one';
-  return undefined;
-};
-
 export const getEmailErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
@@ -122,7 +114,6 @@ export default class CreateAccountDialog extends Component<Props, State> {
             autoFocus
             value={this.state.form.username}
             floatingLabelText={<Trans>Username</Trans>}
-            errorText={getUsernameErrorText(error)}
             fullWidth
             onChange={(e, value) => {
               this.setState({

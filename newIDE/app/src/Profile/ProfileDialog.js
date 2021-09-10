@@ -74,6 +74,13 @@ export default class ProfileDialog extends Component<Props, State> {
               ),
               authenticatedUser.authenticated && authenticatedUser.profile && (
                 <FlatButton
+                  label={<Trans>Edit</Trans>}
+                  key="edit"
+                  onClick={authenticatedUser.onEdit}
+                />
+              ),
+              authenticatedUser.authenticated && authenticatedUser.profile && (
+                <FlatButton
                   label={<Trans>Logout</Trans>}
                   key="logout"
                   onClick={authenticatedUser.onLogout}

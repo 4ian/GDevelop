@@ -30,6 +30,10 @@ export type RegisterForm = {
   username: string,
 };
 
+export type EditForm = {
+  username: string,
+};
+
 export type ForgotPasswordForm = {
   email: string,
 };
@@ -159,6 +163,38 @@ export default class Authentication {
       .catch(error => {
         console.error('Error while fetching user:', error);
         throw error;
+      });
+  };
+
+  editUserProfile = (
+    getAuthorizationHeader: () => Promise<string>,
+    form: EditForm
+  ) => {
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        if (!this.firebaseUser) {
+          console.error('Cannot get user if not logged in');
+          throw new Error('Cannot get user if not logged in');
+        }
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          {
+            username: form.username,
+          },
+          {
+            params: {
+              userId: this.firebaseUser.uid,
+            },
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while editing user:', error);
+        throw error.response.data;
       });
   };
 

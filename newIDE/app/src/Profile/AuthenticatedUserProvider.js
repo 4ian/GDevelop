@@ -6,12 +6,12 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
-import Authentification, {
+import Authentication, {
   type LoginForm,
   type RegisterForm,
   type ForgotPasswordForm,
   type AuthError,
-} from '../Utils/GDevelopServices/Authentification';
+} from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
@@ -24,7 +24,7 @@ import AuthenticatedUserContext, {
 import CreateAccountDialog from './CreateAccountDialog';
 
 type Props = {
-  authentification: Authentification,
+  authentication: Authentication,
   children: React.Node,
 };
 
@@ -53,7 +53,7 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
 
   componentDidMount() {
     this._resetAuthenticatedUser();
-    this.props.authentification.onUserChange(this._fetchUserProfile);
+    this.props.authentication.onUserChange(this._fetchUserProfile);
   }
 
   _resetAuthenticatedUser() {
@@ -65,15 +65,15 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         getAuthorizationHeader: () =>
-          this.props.authentification.getAuthorizationHeader(),
+          this.props.authentication.getAuthorizationHeader(),
       },
     });
   }
 
   _fetchUserProfile = () => {
-    const { authentification } = this.props;
+    const { authentication } = this.props;
 
-    authentification.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
+    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
       if (err && err.unauthenticated) {
         return this.setState({
           authenticatedUser: {
@@ -101,8 +101,8 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
         () => {
           if (!firebaseUser) return;
 
-          authentification
-            .getUserProfile(authentification.getAuthorizationHeader)
+          authentication
+            .getUserProfile(authentication.getAuthorizationHeader)
             .then(user =>
               this.setState({
                 authenticatedUser: {
@@ -112,7 +112,7 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
               })
             );
           getUserUsages(
-            authentification.getAuthorizationHeader,
+            authentication.getAuthorizationHeader,
             firebaseUser.uid
           ).then(usages =>
             this.setState({
@@ -123,7 +123,7 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
             })
           );
           getUserSubscription(
-            authentification.getAuthorizationHeader,
+            authentication.getAuthorizationHeader,
             firebaseUser.uid
           ).then(subscription =>
             this.setState({
@@ -134,7 +134,7 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
             })
           );
           getUserLimits(
-            authentification.getAuthorizationHeader,
+            authentication.getAuthorizationHeader,
             firebaseUser.uid
           ).then(limits =>
             this.setState({
@@ -150,16 +150,16 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
   };
 
   _doLogout = () => {
-    if (this.props.authentification) this.props.authentification.logout();
+    if (this.props.authentication) this.props.authentication.logout();
     this._resetAuthenticatedUser();
   };
 
   _doLogin = (form: LoginForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'loginInProgress', () =>
-      authentification.login(form).then(
+      authentication.login(form).then(
         () => {
           this._fetchUserProfile();
           this.openLoginDialog(false);
@@ -174,14 +174,14 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
   };
 
   _doCreateAccount = (form: RegisterForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'createAccountInProgress', () =>
-      authentification.createFirebaseAccount(form).then(
+      authentication.createFirebaseAccount(form).then(
         () => {
-          authentification
-            .createUser(authentification.getAuthorizationHeader, form)
+          authentication
+            .createUser(authentication.getAuthorizationHeader, form)
             .then(() => {
               this._fetchUserProfile();
               this.openLoginDialog(false);
@@ -198,11 +198,11 @@ export default class AuthenticatedUserProvider extends React.Component<Props, St
   };
 
   _doForgotPassword = (form: ForgotPasswordForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'forgotPasswordInProgress', () =>
-      authentification.forgotPassword(form).then(
+      authentication.forgotPassword(form).then(
         () => {
           this.openResetPassword(true);
         },

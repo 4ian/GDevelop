@@ -10,7 +10,7 @@ import TextField from '../UI/TextField';
 import {
   type LoginForm,
   type AuthError,
-} from '../Utils/GDevelopServices/Authentification';
+} from '../Utils/GDevelopServices/Authentication';
 import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';

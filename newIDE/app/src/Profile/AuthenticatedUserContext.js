@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import {
   type Limits,

@@ -2,7 +2,7 @@
 import Keen from 'keen-tracking';
 import Window from '../Window';
 import { getUserUUID } from './UserUUID';
-import Authentification from '../GDevelopServices/Authentification';
+import Authentication from '../GDevelopServices/Authentication';
 import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
@@ -14,7 +14,7 @@ const isDev = Window.isDev();
 let client = null;
 let startupTimesSummary = null;
 
-export const installAnalyticsEvents = (authentification: Authentification) => {
+export const installAnalyticsEvents = (authentication: Authentication) => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
@@ -35,7 +35,7 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
 
   client.extendEvents(function() {
     // Include the user public profile.
-    const firebaseUser = authentification.getFirebaseUserSync();
+    const firebaseUser = authentication.getFirebaseUserSync();
 
     // Compute the startup times (only once to avoid doing this for every event).
     startupTimesSummary = startupTimesSummary || getStartupTimesSummary();

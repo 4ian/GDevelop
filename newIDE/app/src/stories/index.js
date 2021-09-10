@@ -3787,12 +3787,16 @@ storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('not authenticated', () => (
-    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider
+      value={fakeNotAuthenticatedAuthenticatedUser}
+    >
       <SubscriptionDialog open onClose={action('on close')} />
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated but loading', () => (
-    <AuthenticatedUserContext.Provider value={fakeAuthenticatedButLoadingAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider
+      value={fakeAuthenticatedButLoadingAuthenticatedUser}
+    >
       <SubscriptionDialog open onClose={action('on close')} />
     </AuthenticatedUserContext.Provider>
   ))
@@ -3802,7 +3806,9 @@ storiesOf('SubscriptionDialog', module)
     </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with no subscription', () => (
-    <AuthenticatedUserContext.Provider value={fakeNoSubscriptionAuthenticatedUser}>
+    <AuthenticatedUserContext.Provider
+      value={fakeNoSubscriptionAuthenticatedUser}
+    >
       <SubscriptionDialog open onClose={action('on close')} />
     </AuthenticatedUserContext.Provider>
   ));

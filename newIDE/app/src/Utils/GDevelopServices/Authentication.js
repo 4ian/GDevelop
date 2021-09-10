@@ -84,7 +84,7 @@ export default class Authentication {
     form: RegisterForm
   ): Promise<void> => {
     return getAuthorizationHeader()
-      .then((authorizationHeader) => {
+      .then(authorizationHeader => {
         if (!this.firebaseUser) {
           console.error('Cannot get user if not logged in');
           throw new Error('Cannot get user if not logged in');

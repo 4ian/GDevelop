@@ -39,7 +39,10 @@ type State = {|
   forgotPasswordInProgress: boolean,
 |};
 
-export default class AuthenticatedUserProvider extends React.Component<Props, State> {
+export default class AuthenticatedUserProvider extends React.Component<
+  Props,
+  State
+> {
   state = {
     authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,

@@ -11,14 +11,14 @@ import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import BuildProgress from './BuildProgress';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import format from 'date-fns/format';
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import Text from '../../UI/Text';
 
 type Props = {|
   builds: ?Array<Build>,
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
   onDownload: (build: Build, key: BuildArtifactKeyName) => void,
 |};
 
@@ -43,7 +43,7 @@ const formatBuildText = (
   }
 };
 
-export default ({ builds, userProfile, onDownload }: Props) => {
+export default ({ builds, authenticatedUser, onDownload }: Props) => {
   return (
     <Column noMargin expand>
       <Line>
@@ -58,7 +58,7 @@ export default ({ builds, userProfile, onDownload }: Props) => {
         </Column>
       </Line>
       <Line>
-        {!userProfile.authenticated ? (
+        {!authenticatedUser.authenticated ? (
           <EmptyMessage>
             <Trans>You need to login first to see your builds.</Trans>
           </EmptyMessage>

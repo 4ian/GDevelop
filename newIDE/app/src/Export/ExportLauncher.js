@@ -10,7 +10,7 @@ import {
   type BuildArtifactKeyName,
   getBuildArtifactUrl,
 } from '../Utils/GDevelopServices/Build';
-import { type UserProfile } from '../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { Column, Line } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import Window from '../Utils/Window';
@@ -43,7 +43,7 @@ type State = {|
 type Props = {|
   project: gdProject,
   onChangeSubscription: () => void,
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};
 
@@ -79,17 +79,17 @@ export default class ExportLauncher extends Component<Props, State> {
       stepMaxProgress,
     });
 
-  _startBuildWatch = (userProfile: UserProfile) => {
+  _startBuildWatch = (authenticatedUser: AuthenticatedUser) => {
     if (!this.state.build) return;
 
     this.buildsWatcher.start({
-      userProfile,
+      authenticatedUser,
       builds: [this.state.build],
       onBuildUpdated: (build: Build) => this.setState({ build }),
     });
   };
 
-  launchWholeExport = (userProfile: UserProfile) => {
+  launchWholeExport = (authenticatedUser: AuthenticatedUser) => {
     const t = str => str; //TODO;
     const { project, exportPipeline } = this.props;
     sendExportLaunched(exportPipeline.name);
@@ -169,7 +169,7 @@ export default class ExportLauncher extends Component<Props, State> {
               });
               return launchOnlineBuild(
                 this.state.exportState,
-                userProfile,
+                authenticatedUser,
                 uploadBucketKey
               );
             }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
@@ -180,7 +180,7 @@ export default class ExportLauncher extends Component<Props, State> {
                   exportStep: 'build',
                 },
                 () => {
-                  this._startBuildWatch(userProfile);
+                  this._startBuildWatch(authenticatedUser);
                 }
               );
 
@@ -231,17 +231,17 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const { project, userProfile, exportPipeline } = this.props;
+    const { project, authenticatedUser, exportPipeline } = this.props;
     if (!project) return null;
 
-    const getBuildLimit = (userProfile: UserProfile): ?Limit =>
-      userProfile.limits && exportPipeline.onlineBuildType
-        ? userProfile.limits[exportPipeline.onlineBuildType]
+    const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
+      authenticatedUser.limits && exportPipeline.onlineBuildType
+        ? authenticatedUser.limits[exportPipeline.onlineBuildType]
         : null;
-    const canLaunchBuild = (userProfile: UserProfile) => {
+    const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
       if (!errored && exportStep !== '' && exportStep !== 'done') return false;
 
-      const limit: ?Limit = getBuildLimit(userProfile);
+      const limit: ?Limit = getBuildLimit(authenticatedUser);
       if (limit && limit.limitReached) return false;
 
       return exportPipeline.canLaunchBuild(exportState);
@@ -275,29 +275,32 @@ export default class ExportLauncher extends Component<Props, State> {
             updateExportState: this._updateExportState,
           })}
         </Line>
-        {(!exportPipeline.onlineBuildType || userProfile.authenticated) && (
+        {(!exportPipeline.onlineBuildType ||
+          authenticatedUser.authenticated) && (
           <Line justifyContent="center">
             <RaisedButton
               label={exportPipeline.renderLaunchButtonLabel()}
               primary
-              onClick={() => this.launchWholeExport(userProfile)}
-              disabled={!canLaunchBuild(userProfile)}
+              onClick={() => this.launchWholeExport(authenticatedUser)}
+              disabled={!canLaunchBuild(authenticatedUser)}
             />
           </Line>
         )}
-        {!!exportPipeline.onlineBuildType && userProfile.authenticated && (
-          <LimitDisplayer
-            subscription={userProfile.subscription}
-            limit={getBuildLimit(userProfile)}
-            onChangeSubscription={this.props.onChangeSubscription}
-          />
-        )}
-        {!!exportPipeline.onlineBuildType && !userProfile.authenticated && (
-          <CreateProfile
-            onLogin={userProfile.onLogin}
-            onCreateAccount={userProfile.onCreateAccount}
-          />
-        )}
+        {!!exportPipeline.onlineBuildType &&
+          authenticatedUser.authenticated && (
+            <LimitDisplayer
+              subscription={authenticatedUser.subscription}
+              limit={getBuildLimit(authenticatedUser)}
+              onChangeSubscription={this.props.onChangeSubscription}
+            />
+          )}
+        {!!exportPipeline.onlineBuildType &&
+          !authenticatedUser.authenticated && (
+            <CreateProfile
+              onLogin={authenticatedUser.onLogin}
+              onCreateAccount={authenticatedUser.onCreateAccount}
+            />
+          )}
         <Line expand>
           <BuildStepsProgress
             exportStep={exportStep}

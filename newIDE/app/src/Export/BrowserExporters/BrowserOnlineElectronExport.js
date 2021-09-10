@@ -8,7 +8,7 @@ import {
   getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
 import { uploadBlobFile } from './BrowserFileUploader';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/BrowserS3GDJSFinder';
 import BrowserFileSystem from './BrowserFileSystem';
 import {
@@ -149,15 +149,15 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string
   ): Promise<Build> => {
-    const { getAuthorizationHeader, profile } = userProfile;
+    const { getAuthorizationHeader, profile } = authenticatedUser;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
     return buildElectron(
       getAuthorizationHeader,
-      profile.uid,
+      profile.id,
       uploadBucketKey,
       exportState.targets
     );

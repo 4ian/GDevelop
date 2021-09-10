@@ -6,76 +6,78 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
-import Authentification, {
-  type Profile,
+import Authentication, {
   type LoginForm,
-  type LoginError,
-} from '../Utils/GDevelopServices/Authentification';
+  type RegisterForm,
+  type ForgotPasswordForm,
+  type AuthError,
+} from '../Utils/GDevelopServices/Authentication';
+import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { sendSignupDone } from '../Utils/Analytics/EventSender';
-import UserProfileContext, {
-  initialUserProfile,
-  type UserProfile,
-} from './UserProfileContext';
+import AuthenticatedUserContext, {
+  initialAuthenticatedUser,
+  type AuthenticatedUser,
+} from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 
 type Props = {
-  authentification: Authentification,
+  authentication: Authentication,
   children: React.Node,
 };
 
 type State = {|
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
   loginDialogOpen: boolean,
   createAccountDialogOpen: boolean,
   loginInProgress: boolean,
   createAccountInProgress: boolean,
-  loginError: ?LoginError,
+  authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
 |};
 
-export default class UserProfileProvider extends React.Component<Props, State> {
+export default class AuthenticatedUserProvider extends React.Component<Props, State> {
   state = {
-    userProfile: initialUserProfile,
+    authenticatedUser: initialAuthenticatedUser,
     loginDialogOpen: false,
     createAccountDialogOpen: false,
     loginInProgress: false,
     createAccountInProgress: false,
-    loginError: null,
+    authError: null,
     resetPasswordDialogOpen: false,
     forgotPasswordInProgress: false,
   };
 
   componentDidMount() {
-    this._resetUserProfile();
-    this.props.authentification.onUserChange(this._fetchUserProfile);
+    this._resetAuthenticatedUser();
+    this.props.authentication.onUserChange(this._fetchUserProfile);
   }
 
-  _resetUserProfile() {
+  _resetAuthenticatedUser() {
     this.setState({
-      userProfile: {
-        ...initialUserProfile,
+      authenticatedUser: {
+        ...initialAuthenticatedUser,
         onLogout: this._doLogout,
         onLogin: () => this.openLoginDialog(true),
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         getAuthorizationHeader: () =>
-          this.props.authentification.getAuthorizationHeader(),
+          this.props.authentication.getAuthorizationHeader(),
       },
     });
   }
 
   _fetchUserProfile = () => {
-    const { authentification } = this.props;
+    const { authentication } = this.props;
 
-    authentification.getUserProfile((err, profile: ?Profile) => {
+    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
       if (err && err.unauthenticated) {
         return this.setState({
-          userProfile: {
-            ...this.state.userProfile,
+          authenticatedUser: {
+            ...this.state.authenticatedUser,
             authenticated: false,
             profile: null,
             usages: null,
@@ -83,51 +85,61 @@ export default class UserProfileProvider extends React.Component<Props, State> {
             subscription: null,
           },
         });
-      } else if (err || !profile) {
+      } else if (err || !firebaseUser) {
         console.log('Unable to fetch user profile', err);
         return;
       }
 
       this.setState(
         {
-          userProfile: {
-            ...this.state.userProfile,
+          authenticatedUser: {
+            ...this.state.authenticatedUser,
             authenticated: true,
-            profile,
+            firebaseUser,
           },
         },
         () => {
-          if (!profile) return;
+          if (!firebaseUser) return;
 
+          authentication
+            .getUserProfile(authentication.getAuthorizationHeader)
+            .then(user =>
+              this.setState({
+                authenticatedUser: {
+                  ...this.state.authenticatedUser,
+                  profile: user,
+                },
+              })
+            );
           getUserUsages(
-            authentification.getAuthorizationHeader,
-            profile.uid
+            authentication.getAuthorizationHeader,
+            firebaseUser.uid
           ).then(usages =>
             this.setState({
-              userProfile: {
-                ...this.state.userProfile,
+              authenticatedUser: {
+                ...this.state.authenticatedUser,
                 usages,
               },
             })
           );
           getUserSubscription(
-            authentification.getAuthorizationHeader,
-            profile.uid
+            authentication.getAuthorizationHeader,
+            firebaseUser.uid
           ).then(subscription =>
             this.setState({
-              userProfile: {
-                ...this.state.userProfile,
+              authenticatedUser: {
+                ...this.state.authenticatedUser,
                 subscription,
               },
             })
           );
           getUserLimits(
-            authentification.getAuthorizationHeader,
-            profile.uid
+            authentication.getAuthorizationHeader,
+            firebaseUser.uid
           ).then(limits =>
             this.setState({
-              userProfile: {
-                ...this.state.userProfile,
+              authenticatedUser: {
+                ...this.state.authenticatedUser,
                 limits,
               },
             })
@@ -138,61 +150,65 @@ export default class UserProfileProvider extends React.Component<Props, State> {
   };
 
   _doLogout = () => {
-    if (this.props.authentification) this.props.authentification.logout();
-    this._resetUserProfile();
+    if (this.props.authentication) this.props.authentication.logout();
+    this._resetAuthenticatedUser();
   };
 
   _doLogin = (form: LoginForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'loginInProgress', () =>
-      authentification.login(form).then(
+      authentication.login(form).then(
         () => {
           this._fetchUserProfile();
           this.openLoginDialog(false);
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
         }
       )
     );
   };
 
-  _doCreateAccount = (form: LoginForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+  _doCreateAccount = (form: RegisterForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'createAccountInProgress', () =>
-      authentification.createAccount(form).then(
+      authentication.createFirebaseAccount(form).then(
         () => {
-          this._fetchUserProfile();
-          this.openLoginDialog(false);
-          sendSignupDone(form.email);
+          authentication
+            .createUser(authentication.getAuthorizationHeader, form)
+            .then(() => {
+              this._fetchUserProfile();
+              this.openLoginDialog(false);
+              sendSignupDone(form.email);
+            });
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
         }
       )
     );
   };
 
-  _doForgotPassword = (form: LoginForm) => {
-    const { authentification } = this.props;
-    if (!authentification) return;
+  _doForgotPassword = (form: ForgotPasswordForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
 
     watchPromiseInState(this, 'forgotPasswordInProgress', () =>
-      authentification.forgotPassword(form).then(
+      authentication.forgotPassword(form).then(
         () => {
           this.openResetPassword(true);
         },
-        (loginError: LoginError) => {
+        (authError: AuthError) => {
           this.setState({
-            loginError,
+            authError,
           });
           showWarningBox(
             "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
@@ -225,16 +241,16 @@ export default class UserProfileProvider extends React.Component<Props, State> {
   render() {
     return (
       <React.Fragment>
-        <UserProfileContext.Provider value={this.state.userProfile}>
+        <AuthenticatedUserContext.Provider value={this.state.authenticatedUser}>
           {this.props.children}
-        </UserProfileContext.Provider>
+        </AuthenticatedUserContext.Provider>
         {this.state.loginDialogOpen && (
           <LoginDialog
             onClose={() => this.openLoginDialog(false)}
             onGoToCreateAccount={() => this.openCreateAccountDialog(true)}
             onLogin={this._doLogin}
             loginInProgress={this.state.loginInProgress}
-            error={this.state.loginError}
+            error={this.state.authError}
             onForgotPassword={this._doForgotPassword}
             resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
             onCloseResetPasswordDialog={() => this.openResetPassword(false)}
@@ -247,7 +263,7 @@ export default class UserProfileProvider extends React.Component<Props, State> {
             onGoToLogin={() => this.openLoginDialog(true)}
             onCreateAccount={this._doCreateAccount}
             createAccountInProgress={this.state.createAccountInProgress}
-            error={this.state.loginError}
+            error={this.state.authError}
           />
         )}
       </React.Fragment>

@@ -46,7 +46,7 @@ export type AuthError = {
     | 'auth/username-used',
 };
 
-export default class Authentification {
+export default class Authentication {
   firebaseUser: ?FirebaseUser = null;
   user: ?Profile = null;
   auth: Auth;

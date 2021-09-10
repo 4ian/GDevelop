@@ -23,6 +23,15 @@ namespace gdjs {
       return runtimeScene.linkedObjectsManager;
     }
 
+    /**
+     * This function is for internal use and could disappear in next versions.
+     * Prefer using
+     * * {@link LinksManager.getObjectsLinkedWithAndNamed}
+     * * {@link LinksManager.getObjectsLinkedWith}
+     * * {@link evtTools.linkedObjects.quickPickObjectsLinkedTo}
+     * @param objA
+     * @returns
+     */
     _getMapOfObjectsLinkedWith(
       objA: gdjs.RuntimeObject
     ): Map<string, gdjs.RuntimeObject[]> {
@@ -32,12 +41,37 @@ namespace gdjs {
       return this.links.get(objA.id)!.linkedObjectMap;
     }
 
-    // It allows JS extensions to easily iterate over links.
+    // These 2 following functions give JS extensions an implementation dependent access to links.
+
+    /**
+     * @param objA
+     * @returns an iterable on every object liked with objA.
+     */
+    // : Iterable<gdjs.RuntimeObject> in practice
     getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
       if (!this.links.has(objA.id)) {
         this.links.set(objA.id, new LinkedObjectIterable());
       }
       return this.links.get(objA.id)!;
+    }
+
+    /**
+     * @param objA
+     * @param objectName
+     * @returns an iterable of the objects with the given name that are liked with objA.
+     */
+    getObjectsLinkedWithAndNamed(
+      objA: gdjs.RuntimeObject,
+      objectName: string
+    ): Iterable<gdjs.RuntimeObject> {
+      let objects = this._getMapOfObjectsLinkedWith(objA).get(objectName);
+      if (!objects) {
+        // Give an empty Array
+        objects = gdjs.staticArray(
+          LinksManager.prototype.getObjectsLinkedWithAndNamed
+        );
+      }
+      return objects;
     }
 
     linkObjects(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
@@ -131,7 +165,10 @@ namespace gdjs {
           while (listNext.done) {
             const mapNext = mapItr.next();
             if (mapNext.done) {
-              return { done: true };
+              // IteratorReturnResult<gdjs.RuntimeObject> require a defined value
+              // even though the spec state otherwise.
+              // So, this class can't be typed as an iterable.
+              return { value: undefined, done: true };
             }
             listItr = mapNext.value[1].entries();
             listNext = listItr.next();
@@ -236,7 +273,7 @@ namespace gdjs {
             );
             temporaryObjectNames.length = 0;
             if (isEventsFunction) {
-              // For functions, objects may be a merged group
+              // For functions, objects may be a flattened group
               for (const pickedObject of pickedObjects) {
                 if (temporaryObjectNames.indexOf(pickedObject.getName()) < 0) {
                   temporaryObjectNames.push(pickedObject.getName());

@@ -76,12 +76,28 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
   extension
-      .AddCondition("PickObjectsLinkedTo",
+      .AddCondition("QuickPickObjectsLinkedTo",
                     _("Take into account linked objects"),
                     _("Take some objects linked to the object into account for "
                       "next conditions and actions.\nThe condition will return "
                       "false if no object was taken into account."),
-                    _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
+                    _("Take into account all \"_PARAM2_\" linked to _PARAM3_"),
+                    _("Linked objects"),
+                    "CppPlatform/Extensions/LinkedObjectsicon24.png",
+                    "CppPlatform/Extensions/LinkedObjectsicon16.png")
+
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
+      .AddParameter("objectList", _("Pick these objects..."))
+      .AddParameter("objectPtr", _("...if they are linked to this object"));
+
+  extension
+      .AddCondition("PickObjectsLinkedTo",
+                    _("Take into account linked objects (legacy)"),
+                    _("Take some objects linked to the object into account for "
+                      "next conditions and actions.\nThe condition will return "
+                      "false if no object was taken into account."),
+                    _("Take into account all \"_PARAM1_\" linked to _PARAM2_ (legacy)"),
                     _("Linked objects"),
                     "CppPlatform/Extensions/LinkedObjectsicon24.png",
                     "CppPlatform/Extensions/LinkedObjectsicon16.png")
@@ -95,10 +111,25 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
 
   extension
       .AddAction(
-          "PickObjectsLinkedTo",
+          "QuickPickObjectsLinkedTo",
           _("Take into account linked objects"),
           _("Take objects linked to the object into account for next actions."),
-          _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
+          _("Take into account all \"_PARAM2_\" linked to _PARAM3_"),
+          _("Linked objects"),
+          "CppPlatform/Extensions/LinkedObjectsicon24.png",
+          "CppPlatform/Extensions/LinkedObjectsicon16.png")
+
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
+      .AddParameter("objectList", _("Pick these objects..."))
+      .AddParameter("objectPtr", _("...if they are linked to this object"));
+
+  extension
+      .AddAction(
+          "PickObjectsLinkedTo",
+          _("Take into account linked objects (legacy)"),
+          _("Take objects linked to the object into account for next actions."),
+          _("Take into account all \"_PARAM1_\" linked to _PARAM2_ (legacy)"),
           _("Linked objects"),
           "CppPlatform/Extensions/LinkedObjectsicon24.png",
           "CppPlatform/Extensions/LinkedObjectsicon16.png")

@@ -2,7 +2,7 @@
 import Keen from 'keen-tracking';
 import Window from '../Window';
 import { getUserUUID } from './UserUUID';
-import Authentification from '../GDevelopServices/Authentification';
+import Authentication from '../GDevelopServices/Authentication';
 import {
   getProgramOpeningCount,
   incrementProgramOpeningCount,
@@ -14,7 +14,7 @@ const isDev = Window.isDev();
 let client = null;
 let startupTimesSummary = null;
 
-export const installAnalyticsEvents = (authentification: Authentification) => {
+export const installAnalyticsEvents = (authentication: Authentication) => {
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;
@@ -35,7 +35,7 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
 
   client.extendEvents(function() {
     // Include the user public profile.
-    const userProfile = authentification.getUserProfileSync();
+    const firebaseUser = authentication.getFirebaseUserSync();
 
     // Compute the startup times (only once to avoid doing this for every event).
     startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
@@ -43,10 +43,10 @@ export const installAnalyticsEvents = (authentification: Authentification) => {
     return {
       user: {
         uuid: getUserUUID(),
-        uid: userProfile ? userProfile.uid : undefined,
-        providerId: userProfile ? userProfile.providerId : undefined,
-        email: userProfile ? userProfile.email : undefined,
-        emailVerified: userProfile ? userProfile.emailVerified : undefined,
+        uid: firebaseUser ? firebaseUser.uid : undefined,
+        providerId: firebaseUser ? firebaseUser.providerId : undefined,
+        email: firebaseUser ? firebaseUser.email : undefined,
+        emailVerified: firebaseUser ? firebaseUser.emailVerified : undefined,
       },
       localStats: {
         programOpeningCount: getProgramOpeningCount(),

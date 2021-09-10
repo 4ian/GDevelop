@@ -2,7 +2,7 @@
 import 'element-closest';
 import React, { Component, type Element } from 'react';
 import ReactDOM from 'react-dom';
-import Authentification from './Utils/GDevelopServices/Authentification';
+import Authentication from './Utils/GDevelopServices/Authentication';
 import {
   sendProgramOpening,
   installAnalyticsEvents,
@@ -46,10 +46,10 @@ class Bootstrapper extends Component<{}, State> {
     loadingMessage: 'Loading the editor...',
     App: null,
   };
-  authentification = new Authentification();
+  authentication = new Authentication();
 
   componentDidMount() {
-    installAnalyticsEvents(this.authentification);
+    installAnalyticsEvents(this.authentication);
     installRaven();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
@@ -85,7 +85,7 @@ class Bootstrapper extends Component<{}, State> {
           import(/* webpackChunkName: "local-app" */ './LocalApp')
             .then(module =>
               this.setState({
-                App: module.create(this.authentification),
+                App: module.create(this.authentication),
                 loadingMessage: '',
               })
             )
@@ -94,7 +94,7 @@ class Bootstrapper extends Component<{}, State> {
           import(/* webpackChunkName: "browser-app" */ './BrowserApp')
             .then(module =>
               this.setState({
-                App: module.create(this.authentification),
+                App: module.create(this.authentication),
                 loadingMessage: '',
               })
             )

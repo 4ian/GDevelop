@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import { type UserProfile } from './UserProfileContext';
+import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import BackgroundText from '../UI/BackgroundText';
@@ -14,7 +14,7 @@ import Text from '../UI/Text';
 
 type Props = {|
   onClose: Function,
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
 |};
 
 function useInterval(callback: () => void, delay: number | null) {
@@ -41,13 +41,16 @@ function useInterval(callback: () => void, delay: number | null) {
 
 export default function SubscriptionPendingDialog({
   onClose,
-  userProfile,
+  authenticatedUser,
 }: Props) {
   const hasPlan =
-    !!userProfile &&
-    !!userProfile.subscription &&
-    !!userProfile.subscription.planId;
-  useInterval(() => userProfile.onRefreshUserProfile(), hasPlan ? null : 3900);
+    !!authenticatedUser &&
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.planId;
+  useInterval(
+    () => authenticatedUser.onRefreshUserProfile(),
+    hasPlan ? null : 3900
+  );
 
   return (
     <Dialog

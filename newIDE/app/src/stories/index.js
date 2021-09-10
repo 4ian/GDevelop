@@ -85,11 +85,12 @@ import {
   limitsReached,
   noSubscription,
   usagesForIndieUser,
-  profileForIndieUser,
-  fakeNoSubscriptionUserProfile,
-  fakeIndieUserProfile,
-  fakeNotAuthenticatedUserProfile,
-  fakeAuthenticatedButLoadingUserProfile,
+  indieFirebaseUser,
+  indieUserProfile,
+  fakeNoSubscriptionAuthenticatedUser,
+  fakeIndieAuthenticatedUser,
+  fakeNotAuthenticatedAuthenticatedUser,
+  fakeAuthenticatedButLoadingAuthenticatedUser,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -117,7 +118,7 @@ import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
-import UserProfileContext from '../Profile/UserProfileContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildProgress from '../Export/Builds/BuildProgress';
@@ -477,7 +478,26 @@ storiesOf('UI Building Blocks/TextField', module)
 
     return (
       <React.Fragment>
-        <TextField value={value} onChange={(_, text) => setValue(text)} />
+        <TextField
+          value={value}
+          onChange={(_, text) => setValue(text)}
+          floatingLabelText="text field"
+        />
+        <p>State value is {value}</p>
+      </React.Fragment>
+    );
+  })
+  .add('required', () => {
+    const [value, setValue] = React.useState('Hello World');
+
+    return (
+      <React.Fragment>
+        <TextField
+          value={value}
+          onChange={(_, text) => setValue(text)}
+          required
+          floatingLabelText="text field"
+        />
         <p>State value is {value}</p>
       </React.Fragment>
     );
@@ -3738,7 +3758,7 @@ storiesOf('LimitDisplayer', module)
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('profile', () => <ProfileDetails profile={profileForIndieUser} />)
+  .add('profile', () => <ProfileDetails profile={indieUserProfile} />)
   .add('loading', () => <ProfileDetails profile={null} />);
 
 storiesOf('SubscriptionDetails', module)
@@ -3767,24 +3787,24 @@ storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('not authenticated', () => (
-    <UserProfileContext.Provider value={fakeNotAuthenticatedUserProfile}>
+    <AuthenticatedUserContext.Provider value={fakeNotAuthenticatedAuthenticatedUser}>
       <SubscriptionDialog open onClose={action('on close')} />
-    </UserProfileContext.Provider>
+    </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated but loading', () => (
-    <UserProfileContext.Provider value={fakeAuthenticatedButLoadingUserProfile}>
+    <AuthenticatedUserContext.Provider value={fakeAuthenticatedButLoadingAuthenticatedUser}>
       <SubscriptionDialog open onClose={action('on close')} />
-    </UserProfileContext.Provider>
+    </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with subscription', () => (
-    <UserProfileContext.Provider value={fakeIndieUserProfile}>
+    <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
       <SubscriptionDialog open onClose={action('on close')} />
-    </UserProfileContext.Provider>
+    </AuthenticatedUserContext.Provider>
   ))
   .add('authenticated user with no subscription', () => (
-    <UserProfileContext.Provider value={fakeNoSubscriptionUserProfile}>
+    <AuthenticatedUserContext.Provider value={fakeNoSubscriptionAuthenticatedUser}>
       <SubscriptionDialog open onClose={action('on close')} />
-    </UserProfileContext.Provider>
+    </AuthenticatedUserContext.Provider>
   ));
 
 storiesOf('SubscriptionPendingDialog', module)
@@ -3792,13 +3812,13 @@ storiesOf('SubscriptionPendingDialog', module)
   .addDecorator(muiDecorator)
   .add('default (no subscription)', () => (
     <SubscriptionPendingDialog
-      userProfile={fakeNoSubscriptionUserProfile}
+      authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
       onClose={action('on close')}
     />
   ))
   .add('authenticated user with subscription', () => (
     <SubscriptionPendingDialog
-      userProfile={fakeIndieUserProfile}
+      authenticatedUser={fakeIndieAuthenticatedUser}
       onClose={action('on close')}
     />
   ));
@@ -3981,7 +4001,7 @@ storiesOf('SubscriptionCheckDialog', module)
       <SubscriptionCheckDialog
         title="Preview over wifi"
         id="Preview over wifi"
-        userProfile={fakeNoSubscriptionUserProfile}
+        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
         onChangeSubscription={action('change subscription')}
         mode="try"
       />
@@ -3992,7 +4012,7 @@ storiesOf('SubscriptionCheckDialog', module)
       <SubscriptionCheckDialog
         title="Preview over wifi"
         id="Preview over wifi"
-        userProfile={fakeNoSubscriptionUserProfile}
+        authenticatedUser={fakeNoSubscriptionAuthenticatedUser}
         onChangeSubscription={action('change subscription')}
         mode="mandatory"
       />
@@ -4878,9 +4898,9 @@ storiesOf('GameDashboard/GamesList', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GamesList project={null} />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('without a project opened, long loading', () => {
@@ -4895,9 +4915,9 @@ storiesOf('GameDashboard/GamesList', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GamesList project={null} />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('with an error', () => {
@@ -4912,9 +4932,9 @@ storiesOf('GameDashboard/GamesList', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GamesList project={null} />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   });
 
@@ -4955,7 +4975,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GameDetailsDialog
           game={game1}
           project={null}
@@ -4964,7 +4984,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
           onGameUpdated={action('onGameUpdated')}
           onGameDeleted={action('onGameDeleted')}
         />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('Missing analytics', () => {
@@ -4979,7 +4999,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GameDetailsDialog
           game={game1}
           project={null}
@@ -4988,7 +5008,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
           onGameUpdated={action('onGameUpdated')}
           onGameDeleted={action('onGameDeleted')}
         />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('With partial analytics', () => {
@@ -5003,7 +5023,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GameDetailsDialog
           game={game1}
           project={null}
@@ -5012,7 +5032,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
           onGameUpdated={action('onGameUpdated')}
           onGameDeleted={action('onGameDeleted')}
         />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('With analytics', () => {
@@ -5027,7 +5047,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GameDetailsDialog
           game={game1}
           project={null}
@@ -5036,7 +5056,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
           onGameUpdated={action('onGameUpdated')}
           onGameDeleted={action('onGameDeleted')}
         />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   })
   .add('With analytics, long loading', () => {
@@ -5051,7 +5071,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       });
 
     return (
-      <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
         <GameDetailsDialog
           game={game1}
           project={null}
@@ -5060,7 +5080,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
           onGameUpdated={action('onGameUpdated')}
           onGameDeleted={action('onGameDeleted')}
         />
-      </UserProfileContext.Provider>
+      </AuthenticatedUserContext.Provider>
     );
   });
 

@@ -4,7 +4,7 @@ import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProv
 import { ThemeProvider } from '@material-ui/styles';
 import { StylesProvider, jssPreset } from '@material-ui/core/styles';
 import { getTheme } from '../UI/Theme';
-import UserProfileProvider from '../Profile/UserProfileProvider';
+import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
 import PreferencesProvider from './Preferences/PreferencesProvider';
 import PreferencesContext from './Preferences/PreferencesContext';
@@ -82,7 +82,7 @@ export default class Providers extends React.Component<Props, {||}> {
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                          <UserProfileProvider
+                          <AuthenticatedUserProvider
                             authentification={authentification}
                           >
                             <I18n update>
@@ -119,7 +119,7 @@ export default class Providers extends React.Component<Props, {||}> {
                                 </EventsFunctionsExtensionsProvider>
                               )}
                             </I18n>
-                          </UserProfileProvider>
+                          </AuthenticatedUserProvider>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>

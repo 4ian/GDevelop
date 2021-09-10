@@ -51,8 +51,9 @@ type Props = {|
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
 
-  // Error handling:
+  // Error handling/Validation:
   errorText?: React.Node,
+  required?: boolean,
 
   // Labels:
   disabled?: boolean,
@@ -206,6 +207,7 @@ export default class TextField extends React.Component<Props, {||}> {
             error={!!props.errorText}
             helperText={props.errorText || helperText}
             disabled={props.disabled}
+            required={props.required}
             InputLabelProps={{
               shrink: props.floatingLabelFixed ? true : undefined,
             }}

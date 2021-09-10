@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import { Column, Line, Spacer } from '../UI/Grid';
-import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -19,7 +19,9 @@ export default ({ profile }: Props) =>
       <Line alignItems="center">
         <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
         <Spacer />
-        <Text size="title">You are connected as {profile.email}</Text>
+        <Text size="title">
+          You are connected as {profile.username} ({profile.email})
+        </Text>
       </Line>
       <Line>
         <Text>

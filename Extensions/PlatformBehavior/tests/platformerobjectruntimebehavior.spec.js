@@ -1288,6 +1288,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
     // This test doesn't pass because the platform AABB are not always updated
     // before the platformer object moves.
+    //
+    // When the character is put on top of the platform to follow it up,
+    // the platform AABB may not has updated in RBush
+    // and the platform became out of the spacial search rectangle.
     it.skip('follows a platform that is slightly overlapping its top', function () {
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);

@@ -214,7 +214,6 @@ namespace gdjs {
       this._moveY();
 
       //3) Update the current floor data for the next tick:
-      this._updateOverlappedJumpThru();
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
@@ -675,8 +674,9 @@ namespace gdjs {
       let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
       for (const platform of candidates) {
         if (
-          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER &&
-          !this._isIn(this._overlappedJumpThru, platform.owner.id)
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ||
+          (platform !== this._onFloor.getFloorPlatform() &&
+            this._isIn(this._overlappedJumpThru, platform.owner.id))
         ) {
           continue;
         }

@@ -709,19 +709,28 @@ namespace gdjs {
       upwardDeltaY: float,
       downwardDeltaY: float
     ) {
-      const aabb = this.owner.getAABB();
-      const minX = aabb.min[0];
-      const maxX = aabb.max[0];
-      const minY = aabb.max[1] + upwardDeltaY;
-      const maxY = aabb.max[1] + downwardDeltaY;
+      let ownerMinX = Number.MAX_VALUE;
+      let ownerMaxX = -Number.MAX_VALUE;
+      let ownerMinY = Number.MAX_VALUE;
+      let ownerMaxY = -Number.MAX_VALUE;
+      for (const hitBox of this.owner.getHitBoxes()) {
+        for (const vertex of hitBox.vertices) {
+          ownerMinX = Math.min(ownerMinX, vertex[0]);
+          ownerMaxX = Math.max(ownerMaxX, vertex[0]);
+          ownerMinY = Math.min(ownerMinY, vertex[1]);
+          ownerMaxY = Math.max(ownerMaxY, vertex[1]);
+        }
+      }
+      const floorMinY = ownerMaxY + upwardDeltaY;
+      const floorMaxY = ownerMaxY + downwardDeltaY;
 
       const platformObject = platform.owner;
       const platformAABB = platformObject.getAABB();
       if (
-        platformAABB.max[0] <= minX ||
-        platformAABB.min[0] >= maxX ||
-        platformAABB.max[1] < minY ||
-        platformAABB.min[1] > maxY
+        platformAABB.max[0] <= ownerMinX ||
+        platformAABB.min[0] >= ownerMaxX ||
+        platformAABB.max[1] < floorMinY ||
+        platformAABB.min[1] > floorMaxY
       ) {
         return Number.MAX_VALUE;
       }
@@ -731,22 +740,22 @@ namespace gdjs {
         let previousVertex = hitbox.vertices[hitbox.vertices.length - 1];
         for (const vertex of hitbox.vertices) {
           // Ignore edges that are too low
-          if (previousVertex[1] <= maxY || vertex[1] <= maxY) {
+          if (previousVertex[1] <= floorMaxY || vertex[1] <= floorMaxY) {
             // Check vertex into the interval
-            if (minX <= vertex[0] && vertex[0] <= maxX) {
+            if (ownerMinX <= vertex[0] && vertex[0] <= ownerMaxX) {
               if (
                 // Platform is too high...
-                vertex[1] < minY &&
+                vertex[1] < floorMinY &&
                 // ...but not over the object.
                 // Indeed, the platform hitbox could be in several parts.
                 // So, the object could walk on one part
                 // and have another part over its head.
-                vertex[1] >= aabb.min[1]
+                vertex[1] >= ownerMinY
               ) {
                 return Number.MAX_VALUE;
               }
               // Ignore intersections that are too low
-              if (minY <= vertex[1] && vertex[1] <= maxY) {
+              if (floorMinY <= vertex[1] && vertex[1] <= floorMaxY) {
                 highestY = Math.min(highestY, vertex[1]);
               }
             }
@@ -755,37 +764,37 @@ namespace gdjs {
             if (deltaX !== 0) {
               // Check intersection on the left side of owner
               if (
-                (vertex[0] < minX && minX < previousVertex[0]) ||
-                (previousVertex[0] < minX && minX < vertex[0])
+                (vertex[0] < ownerMinX && ownerMinX < previousVertex[0]) ||
+                (previousVertex[0] < ownerMinX && ownerMinX < vertex[0])
               ) {
                 const deltaY = vertex[1] - previousVertex[1];
                 const intersectionY =
                   previousVertex[1] +
-                  ((minX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < minY && intersectionY >= aabb.min[1]) {
+                  ((ownerMinX - previousVertex[0]) * deltaY) / deltaX;
+                if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
                   return Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
-                if (minY <= intersectionY && intersectionY <= maxY) {
+                if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
                   highestY = Math.min(highestY, intersectionY);
                 }
               }
               // Check intersection on the right side of owner
               if (
-                (vertex[0] < maxX && maxX < previousVertex[0]) ||
-                (previousVertex[0] < maxX && maxX < vertex[0])
+                (vertex[0] < ownerMaxX && ownerMaxX < previousVertex[0]) ||
+                (previousVertex[0] < ownerMaxX && ownerMaxX < vertex[0])
               ) {
                 const deltaY = vertex[1] - previousVertex[1];
                 const intersectionY =
                   previousVertex[1] +
-                  ((maxX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < minY && intersectionY >= aabb.min[1]) {
+                  ((ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
+                if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
                   return Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
-                if (minY <= intersectionY && intersectionY <= maxY) {
+                if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
                   highestY = Math.min(highestY, intersectionY);
                 }
               }

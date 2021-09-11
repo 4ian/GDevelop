@@ -136,6 +136,60 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     return platform;
   };
 
+  const addTunnelPlatformObject = (runtimeScene) => {
+    const platform = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
+      name: 'slope',
+      type: '',
+      behaviors: [
+        {
+          type: 'PlatformBehavior::PlatformBehavior',
+          name: 'Platform',
+          canBeGrabbed: true,
+        },
+      ],
+      effects: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { x: 0, y: 0 },
+                  centerPoint: { x: 50, y: 50 },
+                  points: [
+                    { name: 'Center', x: 0, y: 0 },
+                    { name: 'Origin', x: 50, y: 50 },
+                  ],
+                  hasCustomCollisionMask: true,
+                  customCollisionMask: [
+                    [
+                      { x: 0, y: 0 },
+                      { x: 0, y: 100 },
+                      { x: 100, y: 100 },
+                      { x: 100, y: 0 },
+                    ],
+                    [
+                      { x: 0, y: 200 },
+                      { x: 0, y: 300 },
+                      { x: 100, y: 300 },
+                      { x: 100, y: 200 },
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    runtimeScene.addObject(platform);
+    platform.setUnscaledWidthAndHeight(100, 300);
+    platform.setCustomWidthAndHeight(100, 300);
+
+    return platform;
+  };
+
   const addJumpThroughPlatformObject = (runtimeScene) => {
     const platform = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj2',
@@ -2295,6 +2349,22 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // is blocked by the 2nd platform
       expect(object.getX()).to.be(platform2.getX() - object.getWidth());
       expect(object.getY()).to.be(platform.getY() - object.getHeight());
+    });
+
+    it('can walk inside a tunnel platform', function () {
+      // Put a platform.
+      const platform = addTunnelPlatformObject(runtimeScene);
+      platform.setPosition(0, 0);
+
+      object.setPosition(0, 160);
+      // The object falls on the bottom part of the platform
+      fallOnPlatform(10);
+      expect(object.getY()).to.be(200 - object.getHeight());
+
+      // The object walk on the bottom part of the platform.
+      walkRight(30);
+      expect(object.getX()).to.be.above(60);
+      expect(object.getY()).to.be(200 - object.getHeight());
     });
 
     it('can walk from a platform to another one that is rotated', function () {

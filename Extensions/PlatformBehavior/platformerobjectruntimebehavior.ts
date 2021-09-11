@@ -734,8 +734,15 @@ namespace gdjs {
           if (previousVertex[1] <= maxY || vertex[1] <= maxY) {
             // Check vertex into the interval
             if (minX <= vertex[0] && vertex[0] <= maxX) {
-              if (vertex[1] < minY && vertex[1] >= aabb.min[1]) {
-                // Platform is too high
+              if (
+                // Platform is too high...
+                vertex[1] < minY &&
+                // ...but not over the object.
+                // Indeed, the platform hitbox could be in several parts.
+                // So, the object could walk on one part
+                // and have another part over its head.
+                vertex[1] >= aabb.min[1]
+              ) {
                 return Number.MAX_VALUE;
               }
               // Ignore intersections that are too low
@@ -1378,7 +1385,7 @@ namespace gdjs {
             1
         );
       }
-      // Directly follow the floor movement on the Y axis by moving the character. 
+      // Directly follow the floor movement on the Y axis by moving the character.
       // For the X axis, we follow the floor movement using `_requestedDeltaX`
       // (see `beforeMovingX`).
       // We don't use `_requestedDeltaY` to follow the floor on the Y axis
@@ -1422,9 +1429,10 @@ namespace gdjs {
 
     beforeMovingX() {
       const behavior = this._behavior;
-      //Shift the object according to the floor movement.
+      // Shift the object according to the floor movement.
       behavior._requestedDeltaX +=
         this._floorPlatform!.owner.getX() - this._floorLastX;
+      // See `beforeUpdatingObstacles` for the logic for the Y axis.
     }
 
     checkTransitionBeforeY(timeDelta: float) {

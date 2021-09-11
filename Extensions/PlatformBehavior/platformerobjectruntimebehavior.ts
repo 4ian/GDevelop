@@ -1390,12 +1390,25 @@ namespace gdjs {
             1
         );
       }
-      // Directly follow the platform to avoid a transition loop with Falling,
-      // because otherwise with a requestDelta, it would result to:
-      // - going down, the player is no longer on a platform and falls
-      // - going up, the player will already be pushed on top on the platform by beforeMovingY()
-      //   that handle slopes and avoid player being stuck. So adding a request result in
-      //   going to much higher and fell at next frame.
+      // Directly follow the floor movement on the Y axis by moving the character. 
+      // For the X axis, we follow the floor movement using `_requestedDeltaX`
+      // (see `beforeMovingX`).
+      // We don't use `_requestedDeltaY` to follow the floor on the Y axis
+      // to avoid a transition loop with the Falling state.
+      // Indeed, if we used it, then:
+      // - going down, the character could no longer be on a platform and start falling.
+      // - going up, the character will already be pushed on top on the platform
+      //   by `beforeMovingY` that handle slopes or the separate call that both
+      //   avoid characters being stuck. So using `_requestedDeltaY`, the character
+      //   would be going too much higher and fall at the next frame.
+      //
+      // We could make the character follow a platform moving up
+      // at a greater speed as it's coherent from a physics point of view.
+      // But, when the character is put on top of the platform to follow it up,
+      // the platform AABB may not be updated in RBush yet
+      // and the platform can become out of the spacial search rectangle
+      // even though they are next to each other, which means
+      // that the character will fell.
       const deltaY = this._floorPlatform!.owner.getY() - this._floorLastY;
       if (
         deltaY !== 0 &&

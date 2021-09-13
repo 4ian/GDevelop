@@ -47,7 +47,6 @@ IF(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
 ENDIF()
-
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )
@@ -72,6 +71,12 @@ endif()
 
 # Mark some warnings as errors
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	# Activate as much warnings as possible to avoid errors like
+	# uninitialized variables or other hard to debug bugs.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder-ctor -Wno-pessimizing-move -Wno-mismatched-tags -Wno-unused-variable -Wno-unused-private-field")
+
+	# Make as much warnings considered as errors as possible (only one for now).
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-stack-address")
 endif()
 

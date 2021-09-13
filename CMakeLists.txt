@@ -75,7 +75,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	# uninitialized variables or other hard to debug bugs.
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-warning-option")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder-ctor -Wno-reorder -Wno-pessimizing-move -Wno-mismatched-tags -Wno-unused-variable -Wno-unused-private-field")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder-ctor -Wno-reorder -Wno-pessimizing-move -Wno-unused-variable -Wno-unused-private-field")
 
 	# Make as much warnings considered as errors as possible (only one for now).
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-stack-address")

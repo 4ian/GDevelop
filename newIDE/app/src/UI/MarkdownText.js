@@ -39,7 +39,8 @@ const makeMarkdownCustomRenderers = (
 });
 
 type Props = {|
-  source: MessageDescriptor,
+  source?: string,
+  translatableSource?: MessageDescriptor,
   isStandaloneText?: boolean,
   allowParagraphs?: boolean,
 |};
@@ -63,7 +64,11 @@ export const MarkdownText = (props: Props) => {
       {({ i18n }) => (
         <ReactMarkdown
           escapeHtml
-          source={i18n._(props.source)}
+          source={
+            props.translatableSource
+              ? i18n._(props.translatableSource)
+              : props.source
+          }
           className={classNames({
             'gd-markdown': true,
             [gdevelopTheme.markdownRootClassName]: true,

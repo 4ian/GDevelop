@@ -12,7 +12,9 @@ import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
-import UserProfileContext, { type UserProfile } from './UserProfileContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { ColumnStackLayout } from '../UI/Layout';
 
@@ -50,8 +52,8 @@ export default class ProfileDialog extends Component<Props, State> {
     ];
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
+      <AuthenticatedUserContext.Consumer>
+        {(authenticatedUser: AuthenticatedUser) => (
           <Dialog
             actions={actions}
             secondaryActions={[
@@ -63,18 +65,25 @@ export default class ProfileDialog extends Component<Props, State> {
                     : '/interface/profile'
                 }
               />,
-              userProfile.authenticated && (
+              authenticatedUser.authenticated && (
                 <FlatButton
                   label={<Trans>Refresh</Trans>}
                   key="refresh"
-                  onClick={userProfile.onRefreshUserProfile}
+                  onClick={authenticatedUser.onRefreshUserProfile}
                 />
               ),
-              userProfile.authenticated && userProfile.profile && (
+              authenticatedUser.authenticated && authenticatedUser.profile && (
+                <FlatButton
+                  label={<Trans>Edit</Trans>}
+                  key="edit"
+                  onClick={authenticatedUser.onEdit}
+                />
+              ),
+              authenticatedUser.authenticated && authenticatedUser.profile && (
                 <FlatButton
                   label={<Trans>Logout</Trans>}
                   key="logout"
-                  onClick={userProfile.onLogout}
+                  onClick={authenticatedUser.onLogout}
                 />
               ),
             ]}
@@ -92,24 +101,24 @@ export default class ProfileDialog extends Component<Props, State> {
               <Tab label={<Trans>Services Usage</Trans>} value="usage" />
             </Tabs>
             {this.state.currentTab === 'profile' &&
-              (userProfile.authenticated ? (
+              (authenticatedUser.authenticated ? (
                 <Column noMargin>
-                  <ProfileDetails profile={userProfile.profile} />
+                  <ProfileDetails profile={authenticatedUser.profile} />
                   <SubscriptionDetails
-                    subscription={userProfile.subscription}
+                    subscription={authenticatedUser.subscription}
                     onChangeSubscription={this.props.onChangeSubscription}
                   />
                 </Column>
               ) : (
                 <Column>
                   <CreateProfile
-                    onLogin={userProfile.onLogin}
-                    onCreateAccount={userProfile.onCreateAccount}
+                    onLogin={authenticatedUser.onLogin}
+                    onCreateAccount={authenticatedUser.onCreateAccount}
                   />
                 </Column>
               ))}
             {this.state.currentTab === 'games-dashboard' &&
-              (userProfile.authenticated ? (
+              (authenticatedUser.authenticated ? (
                 <Line>
                   <ColumnStackLayout expand>
                     <GamesList project={this.props.currentProject} />
@@ -118,8 +127,8 @@ export default class ProfileDialog extends Component<Props, State> {
               ) : (
                 <Column>
                   <CreateProfile
-                    onLogin={userProfile.onLogin}
-                    onCreateAccount={userProfile.onCreateAccount}
+                    onLogin={authenticatedUser.onLogin}
+                    onCreateAccount={authenticatedUser.onCreateAccount}
                     message={
                       <Trans>
                         Create an account to register your games and to get
@@ -132,9 +141,9 @@ export default class ProfileDialog extends Component<Props, State> {
                 </Column>
               ))}
             {this.state.currentTab === 'usage' &&
-              (userProfile.authenticated ? (
+              (authenticatedUser.authenticated ? (
                 <Column noMargin>
-                  <UsagesDetails usages={userProfile.usages} />
+                  <UsagesDetails usages={authenticatedUser.usages} />
                 </Column>
               ) : (
                 <EmptyMessage>
@@ -146,7 +155,7 @@ export default class ProfileDialog extends Component<Props, State> {
               ))}
           </Dialog>
         )}
-      </UserProfileContext.Consumer>
+      </AuthenticatedUserContext.Consumer>
     );
   }
 }

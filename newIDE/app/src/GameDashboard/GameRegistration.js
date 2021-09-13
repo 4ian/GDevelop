@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import CreateProfile from '../Profile/CreateProfile';
-import UserProfileContext from '../Profile/UserProfileContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
 import { Line, Spacer } from '../UI/Grid';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -39,7 +39,7 @@ export const GameRegistration = ({
     onCreateAccount,
     getAuthorizationHeader,
     profile,
-  } = React.useContext(UserProfileContext);
+  } = React.useContext(AuthenticatedUserContext);
   const [error, setError] = React.useState<Error | null>(null);
   const [unavailableReason, setUnavailableReason] = React.useState<
     'unauthorized' | 'not-existing' | null
@@ -57,13 +57,13 @@ export const GameRegistration = ({
     async () => {
       if (!profile || !project) return;
 
-      const { uid } = profile;
+      const { id } = profile;
       setError(null);
       setUnavailableReason(null);
       try {
         const game = await getGame(
           getAuthorizationHeader,
-          uid,
+          id,
           project.getProjectUuid()
         );
         setGame(game);
@@ -89,10 +89,10 @@ export const GameRegistration = ({
     async () => {
       if (!profile || !project) return;
 
-      const { uid } = profile;
+      const { id } = profile;
       setRegistrationInProgress(true);
       try {
-        await registerGame(getAuthorizationHeader, uid, {
+        await registerGame(getAuthorizationHeader, id, {
           gameId: project.getProjectUuid(),
           authorName: project.getAuthor() || 'Unspecified author',
           gameName: project.getName() || 'Untitled game',

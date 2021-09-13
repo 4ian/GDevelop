@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import UserProfileContext from '../Profile/UserProfileContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
 import { type Game, getGames } from '../Utils/GDevelopServices/Game';
@@ -18,7 +18,7 @@ export const GamesList = (props: Props) => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
   const { authenticated, profile, getAuthorizationHeader } = React.useContext(
-    UserProfileContext
+    AuthenticatedUserContext
   );
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const [openedGameInitialTab, setOpenedGameInitialTab] = React.useState<
@@ -31,7 +31,7 @@ export const GamesList = (props: Props) => {
 
       try {
         setError(null);
-        const games = await getGames(getAuthorizationHeader, profile.uid);
+        const games = await getGames(getAuthorizationHeader, profile.id);
         setGames(games);
       } catch (error) {
         console.error('Error while loading user games.', error);

@@ -43,6 +43,7 @@ struct ExpressionParserLocation {
  * \brief A diagnostic that can be attached to a gd::ExpressionNode.
  */
 struct ExpressionParserDiagnostic {
+  virtual ~ExpressionParserDiagnostic() = default;
   virtual bool IsError() { return false; }
   virtual const gd::String &GetMessage() { return noMessage; }
   virtual size_t GetStartPosition() { return 0; }

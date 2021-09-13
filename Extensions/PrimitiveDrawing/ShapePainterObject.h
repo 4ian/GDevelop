@@ -8,15 +8,18 @@ This project is released under the MIT License.
 #ifndef SHAPEPAINTEROBJECT_H
 #define SHAPEPAINTEROBJECT_H
 #include <vector>
+
 #include "GDCore/Project/Object.h"
 namespace gd {
 class Object;
 class InitialInstance;
 class Project;
-}
+}  // namespace gd
 
 /**
- * \brief Base object storing the setup of a drawer object.
+ * \brief Base object storing the setup of a shape painter object.
+ * \todo This is useless (now that GDCpp is removed). It should be merged
+ * with ShapePainterObject.
  */
 class GD_EXTENSION_API ShapePainterObjectBase {
  public:
@@ -58,7 +61,8 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
  protected:
-  virtual void DoUnserializeFrom(const gd::SerializerElement& element);
+  virtual void DoUnserializeFrom(gd::Project& project,
+                                 const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
 #endif

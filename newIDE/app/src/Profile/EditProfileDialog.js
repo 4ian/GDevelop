@@ -30,7 +30,7 @@ export const getUsernameErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
   if (error.code === 'auth/username-used')
-    return 'This username is already used: please pick another one';
+    return 'This username is already used, please pick another one.';
   return undefined;
 };
 

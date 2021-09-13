@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { I18n } from '@lingui/react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ThemeContext from './Theme/ThemeContext';
 import classNames from 'classnames';
 
@@ -37,7 +39,7 @@ const makeMarkdownCustomRenderers = (
 });
 
 type Props = {|
-  source: string,
+  source: MessageDescriptor,
   isStandaloneText?: boolean,
   allowParagraphs?: boolean,
 |};
@@ -57,15 +59,19 @@ export const MarkdownText = (props: Props) => {
   );
 
   return (
-    <ReactMarkdown
-      escapeHtml
-      source={props.source}
-      className={classNames({
-        'gd-markdown': true,
-        [gdevelopTheme.markdownRootClassName]: true,
-        'standalone-text-container': props.isStandaloneText,
-      })}
-      renderers={markdownCustomRenderers}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <ReactMarkdown
+          escapeHtml
+          source={i18n._(props.source)}
+          className={classNames({
+            'gd-markdown': true,
+            [gdevelopTheme.markdownRootClassName]: true,
+            'standalone-text-container': props.isStandaloneText,
+          })}
+          renderers={markdownCustomRenderers}
+        />
+      )}
+    </I18n>
   );
 };

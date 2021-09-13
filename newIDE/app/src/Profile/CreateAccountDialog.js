@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -13,6 +14,7 @@ import {
 import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout } from '../UI/Layout';
+import { MarkdownText } from '../UI/MarkdownText';
 
 type Props = {|
   onClose: () => void,
@@ -103,12 +105,9 @@ export default class CreateAccountDialog extends Component<Props, State> {
       >
         <ColumnStackLayout noMargin>
           <BackgroundText>
-            <Trans>
-              By creating an account and using GDevelop, you agree to the Terms
-              and Conditions. Having an account allows to export your game on
-              Android, as a desktop app and unlock other services for your
-              project!
-            </Trans>
+            <MarkdownText
+              source={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop-app.com/legal/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
+            />
           </BackgroundText>
           <TextField
             autoFocus

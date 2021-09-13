@@ -48,6 +48,11 @@ IF(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-potentially-evaluated-expression")
 ENDIF()
 
+# Activate as much warnings as possible to avoid errors like
+# uninitialized variables or other hard to debug bugs.
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder-ctor -Wno-pessimizing-move -Wno-mismatched-tags -Wno-unused-variable -Wno-unused-private-field")
+
 #Sanity checks
 IF ("${CMAKE_BUILD_TYPE}" STREQUAL "")
 	message( "CMAKE_BUILD_TYPE is empty, assuming build type is Release" )

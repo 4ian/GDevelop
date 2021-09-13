@@ -5,13 +5,14 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#include "GDCore/Tools/Localization.h"
+#include "ShapePainterObject.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/InitialInstance.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "ShapePainterObject.h"
+#include "GDCore/Tools/Localization.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/CommonTools.h"
@@ -35,7 +36,7 @@ ShapePainterObjectBase::ShapePainterObjectBase()
 ShapePainterObject::ShapePainterObject(gd::String name_) : gd::Object(name_) {}
 
 void ShapePainterObjectBase::DoUnserializeFrom(
-    const gd::SerializerElement& element) {
+    gd::Project& project, const gd::SerializerElement& element) {
   fillOpacity =
       element.GetChild("fillOpacity", 0, "FillOpacity").GetValue().GetInt();
   outlineSize =
@@ -62,12 +63,15 @@ void ShapePainterObjectBase::DoUnserializeFrom(
       element.GetChild("absoluteCoordinates", 0, "AbsoluteCoordinates")
           .GetValue()
           .GetBool();
-  clearBetweenFrames = element.HasChild("clearBetweenFrames") ? element.GetChild("clearBetweenFrames").GetValue().GetBool() : true;
+  clearBetweenFrames =
+      element.HasChild("clearBetweenFrames")
+          ? element.GetChild("clearBetweenFrames").GetValue().GetBool()
+          : true;
 }
 
 void ShapePainterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
-  ShapePainterObjectBase::DoUnserializeFrom(element);
+  ShapePainterObjectBase::DoUnserializeFrom(project, element);
 }
 
 #if defined(GD_IDE_ONLY)

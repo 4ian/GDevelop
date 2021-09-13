@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow.js';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import { type UserProfile } from '../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -73,7 +73,7 @@ export type ExportPipeline<
    */
   launchOnlineBuild?: (
     exportState: ExportState,
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string
   ) => Promise<Build>,
 

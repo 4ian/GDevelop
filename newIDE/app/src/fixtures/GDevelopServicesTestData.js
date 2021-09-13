@@ -4,24 +4,31 @@ import {
   type Subscription,
   type Limits,
 } from '../Utils/GDevelopServices/Usage';
-import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { User as FirebaseUser } from 'firebase/auth';
+import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Asset';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
-import { type UserProfile } from '../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
 } from '../Utils/GDevelopServices/Asset';
 
-export const profileForIndieUser: Profile = {
+export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
   email: 'indie-user@example.com',
   emailVerified: true,
+};
+
+export const indieUserProfile: Profile = {
+  id: 'indie-user',
+  email: 'indie-user@example.com',
+  username: 'im-the-indie-user',
 };
 
 export const usagesForIndieUser: Usages = [
@@ -75,14 +82,16 @@ export const limitsReached: Limits = {
   },
 };
 
-export const fakeIndieUserProfile: UserProfile = {
+export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
-  profile: profileForIndieUser,
+  profile: indieUserProfile,
+  firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -90,14 +99,16 @@ export const fakeIndieUserProfile: UserProfile = {
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNoSubscriptionUserProfile: UserProfile = {
+export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
-  profile: profileForIndieUser,
+  profile: indieUserProfile,
+  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -105,14 +116,16 @@ export const fakeNoSubscriptionUserProfile: UserProfile = {
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
+export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
@@ -120,14 +133,16 @@ export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNotAuthenticatedUserProfile: UserProfile = {
+export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');

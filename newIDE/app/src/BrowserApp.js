@@ -4,7 +4,7 @@ import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
-import Authentification from './Utils/GDevelopServices/Authentification';
+import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 
 // Import for browser only IDE
@@ -28,7 +28,7 @@ import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 
-export const create = (authentification: Authentification) => {
+export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
 
   let app = null;
@@ -36,7 +36,7 @@ export const create = (authentification: Authentification) => {
 
   app = (
     <Providers
-      authentification={authentification}
+      authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeBrowserS3EventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={null}

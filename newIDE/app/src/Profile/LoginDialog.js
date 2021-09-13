@@ -9,8 +9,8 @@ import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
   type LoginForm,
-  type LoginError,
-} from '../Utils/GDevelopServices/Authentification';
+  type AuthError,
+} from '../Utils/GDevelopServices/Authentication';
 import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
@@ -24,7 +24,7 @@ type Props = {|
   onLogin: (form: LoginForm) => void,
   onForgotPassword: (form: LoginForm) => void,
   loginInProgress: boolean,
-  error: ?LoginError,
+  error: ?AuthError,
   resetPasswordDialogOpen: boolean,
   onCloseResetPasswordDialog: () => void,
   forgotPasswordInProgress: boolean,

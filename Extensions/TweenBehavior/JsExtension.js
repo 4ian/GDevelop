@@ -498,7 +498,7 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('string', _('Tween Identifier'), '', false)
-      .addParameter('string', _('To color'), '', false)
+      .addParameter('color', _('To color'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
       .addParameter('expression', _('Duration'), '', false)

@@ -7,7 +7,7 @@ namespace gdjs {
    * Manages the links between objects.
    */
   export class LinksManager {
-    private links = new Map<integer, LinkedObjectIterable>();
+    private _links = new Map<integer, LinkedObjectIterable>();
 
     /**
      * Get the links manager of a scene.
@@ -35,10 +35,10 @@ namespace gdjs {
     _getMapOfObjectsLinkedWith(
       objA: gdjs.RuntimeObject
     ): Map<string, gdjs.RuntimeObject[]> {
-      if (!this.links.has(objA.id)) {
-        this.links.set(objA.id, new LinkedObjectIterable());
+      if (!this._links.has(objA.id)) {
+        this._links.set(objA.id, new LinkedObjectIterable());
       }
-      return this.links.get(objA.id)!.linkedObjectMap;
+      return this._links.get(objA.id)!.linkedObjectMap;
     }
 
     // These 2 following functions give JS extensions an implementation dependent access to links.
@@ -49,10 +49,10 @@ namespace gdjs {
      */
     // : Iterable<gdjs.RuntimeObject> in practice
     getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
-      if (!this.links.has(objA.id)) {
-        this.links.set(objA.id, new LinkedObjectIterable());
+      if (!this._links.has(objA.id)) {
+        this._links.set(objA.id, new LinkedObjectIterable());
       }
-      return this.links.get(objA.id)!;
+      return this._links.get(objA.id)!;
     }
 
     /**
@@ -104,8 +104,8 @@ namespace gdjs {
           // This is the object on the other side of the link
           // We find obj in its list of linked objects and remove it.
           const linkedObject = linkedObjects[i];
-          if (this.links.has(linkedObject.id)) {
-            const otherObjList = this.links
+          if (this._links.has(linkedObject.id)) {
+            const otherObjList = this._links
               .get(linkedObject.id)!
               .linkedObjectMap.get(obj.getName())!;
             const index = otherObjList.indexOf(obj);
@@ -116,14 +116,14 @@ namespace gdjs {
         }
       }
       // Remove the links on obj side
-      if (this.links.has(obj.id)) {
-        this.links.delete(obj.id);
+      if (this._links.has(obj.id)) {
+        this._links.delete(obj.id);
       }
     }
 
     removeLinkBetween(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
-      if (this.links.has(objA.id)) {
-        const map = this.links.get(objA.id)!.linkedObjectMap;
+      if (this._links.has(objA.id)) {
+        const map = this._links.get(objA.id)!.linkedObjectMap;
         if (map.has(objB.getName())) {
           const list = map.get(objB.getName())!;
           const index = list.indexOf(objB);
@@ -132,8 +132,8 @@ namespace gdjs {
           }
         }
       }
-      if (this.links.has(objB.id)) {
-        const map = this.links.get(objB.id)!.linkedObjectMap;
+      if (this._links.has(objB.id)) {
+        const map = this._links.get(objB.id)!.linkedObjectMap;
         if (map.has(objA.getName())) {
           const list = map.get(objA.getName())!;
           const index = list.indexOf(objA);

@@ -50,6 +50,10 @@ class GD_CORE_API LoadingScreen {
     return backgroundImageResourceName;
   };
 
+  gd::String& GetBackgroundImageResourceName() {
+    return backgroundImageResourceName;
+  };
+
   LoadingScreen& SetBackgroundImageResourceName(const gd::String& value) {
     backgroundImageResourceName = value;
     return *this;

@@ -243,7 +243,7 @@ class GD_CORE_API AudioResource : public Resource {
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
-  
+
   void SerializeTo(SerializerElement& element) const override;
 #endif
 
@@ -446,6 +446,11 @@ class GD_CORE_API ResourcesManager {
    * \brief Create a new resource but does not add it to the list
    */
   std::shared_ptr<Resource> CreateResource(const gd::String& kind);
+
+  /**
+   * Get a list containing all the resources.
+   */
+  const std::vector<std::shared_ptr<Resource>>& GetAllResources() const { return resources; };
 
   /**
    * \brief Get a list containing the names of all resources.

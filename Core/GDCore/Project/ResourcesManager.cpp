@@ -122,6 +122,10 @@ const gd::String& ResourcesManager::GetResourceNameWithFile(
   return badResourceName;
 }
 
+std::vector<std::shared_ptr<Resource>> ResourcesManager::GetAllResources() const {
+  return resources;
+}
+
 std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
   std::vector<gd::String> allResources;
   for (std::size_t i = 0; i < resources.size(); ++i)

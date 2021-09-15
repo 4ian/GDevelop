@@ -448,6 +448,11 @@ class GD_CORE_API ResourcesManager {
   std::shared_ptr<Resource> CreateResource(const gd::String& kind);
 
   /**
+   * Get a list containing all the resources.
+   */
+  std::vector<std::shared_ptr<Resource>> GetAllResources() const { return resources; };
+
+  /**
    * \brief Get a list containing the names of all resources.
    */
   std::vector<gd::String> GetAllResourceNames() const;

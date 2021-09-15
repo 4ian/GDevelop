@@ -5,12 +5,28 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-chrome",
+      "type": "node",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "Start development server"
+      "name": "Jest All GDevelop.js",
+      "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
+      "args": ["--runInBand"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/GDevelop.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current GDevelop.js File",
+      "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
+      "args": [
+        "${fileBasenameNoExtension}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/GDevelop.js"
     }
   ]
 }

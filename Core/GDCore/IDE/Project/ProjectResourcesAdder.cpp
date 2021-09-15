@@ -42,15 +42,13 @@ std::vector<gd::String> ProjectResourcesAdder::GetAllUseless(
   std::set<gd::String>& usedResources = resourcesInUse.GetAll(resourceType);
 
   // Search all resources not used
-  std::vector<gd::String> resources =
-      project.GetResourcesManager().GetAllResourceNames();
+  std::vector<std::shared_ptr<Resource>> resources =
+      project.GetResourcesManager().GetAllResources();
   for (std::size_t i = 0; i < resources.size(); i++) {
-    if (project.GetResourcesManager().GetResource(resources[i]).GetKind() !=
-        resourceType)
-      continue;
+    if (resources[i]->GetKind() != resourceType) continue;
 
-    if (usedResources.find(resources[i]) == usedResources.end())
-      unusedResources.push_back(resources[i]);
+    if (usedResources.find(resources[i]->GetName()) == usedResources.end())
+      unusedResources.push_back(resources[i]->GetName());
   }
 
   return unusedResources;

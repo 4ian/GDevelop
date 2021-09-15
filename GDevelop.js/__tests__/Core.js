@@ -1108,6 +1108,29 @@ describe('libGD.js', function () {
       expect(allResources.get(0)).toBe('Used');
       project.delete();
     });
+
+    it('should not remove loading screen image when removing useless resources', function () {
+      var project = gd.ProjectHelper.createNewGDJSProject();
+      var resource1 = new gd.ImageResource();
+      resource1.setName('LoadingScreenImage');
+      project.getLoadingScreen().setBackgroundImageResourceName(resource1.getName())
+
+      expect(project.getLoadingScreen().getBackgroundImageResourceName()).toBe('LoadingScreenImage');
+
+      let worker = new gd.ResourcesInUseHelper();
+      project.exposeResources(worker);
+      expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(1);
+      expect(worker.getAllImages().toNewVectorString().toJSArray()[0]).toBe('LoadingScreenImage');
+
+      gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
+
+      let newWorker = new gd.ResourcesInUseHelper();
+      project.exposeResources(newWorker);
+      expect(newWorker.getAllImages().toNewVectorString().toJSArray().length).toBe(1);
+      expect(newWorker.getAllImages().toNewVectorString().toJSArray()[0]).toBe('LoadingScreenImage');
+
+      project.delete();
+    });
   });
 
   describe('gd.ArbitraryResourceWorker', function () {

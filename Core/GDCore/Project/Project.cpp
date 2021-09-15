@@ -865,6 +865,10 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
     GetObject(j).ExposeResources(worker);
   }
+
+  // Add loading screen background image if present
+  if (loadingScreen.GetBackgroundImageResourceName() != "")
+    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {
@@ -961,7 +965,7 @@ void Project::Init(const gd::Project& game) {
   platforms = game.platforms;
 
   resourcesManager = game.resourcesManager;
-  
+
   initialObjects = gd::Clone(game.initialObjects);
 
   scenes = gd::Clone(game.scenes);

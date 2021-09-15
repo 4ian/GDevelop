@@ -450,7 +450,7 @@ class GD_CORE_API ResourcesManager {
   /**
    * Get a list containing all the resources.
    */
-  std::vector<std::shared_ptr<Resource>> GetAllResources() const;
+  std::vector<std::shared_ptr<Resource>> GetAllResources() const { return resources; };
 
   /**
    * \brief Get a list containing the names of all resources.

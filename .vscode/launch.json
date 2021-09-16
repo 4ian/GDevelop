@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest All GDevelop.js",
+      "name": "GDevelop.js Jest tests (all)",
       "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
       "args": ["--runInBand"],
       "console": "integratedTerminal",
@@ -18,7 +18,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current GDevelop.js File",
+      "name": "GDevelop.js Jest tests (current file)",
       "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
       "args": [
         "${fileBasenameNoExtension}"
@@ -27,6 +27,13 @@
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}/GDevelop.js"
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Debug with Chrome (web-app, local development server)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }

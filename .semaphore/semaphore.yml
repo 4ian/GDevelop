@@ -50,6 +50,7 @@ blocks:
             - cd newIDE/app
             - npm run postinstall
             - npm run flow
+            - npm run check-script-types
             - cd ../..
         - name: GDJS typing and documentation generation
           commands:

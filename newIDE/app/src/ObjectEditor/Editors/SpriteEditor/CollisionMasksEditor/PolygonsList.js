@@ -209,7 +209,7 @@ const PolygonsList = (props: PolygonsListProps) => {
   } = props;
 
   const addCollisionMask = () => {
-    const newPolygon = gd.Polygon2d.createRectangle(32, 32);
+    const newPolygon = gd.Polygon2d.createRectangle(spriteWidth, spriteHeight);
     newPolygon.move(spriteWidth / 2, spriteHeight / 2);
     polygons.push_back(newPolygon);
     onPolygonsUpdated();

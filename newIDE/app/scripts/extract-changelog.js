@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * This is ascript getting the commits since the last tag (which
+ * This is a script getting the commits since the last tag (which
  * corresponds to a GitHub release). Each commit is filtered to:
  * - hide trivial stuff
  * - hide those containing "Don't mention in changelog"/"Don't show in changelog".

@@ -102,6 +102,7 @@ script:
   - npm test
   - npm run flow
   - npm run check-format
+  - npm run check-script-types
   - cd ../..
 # GDJS tests:
   - cd GDJS

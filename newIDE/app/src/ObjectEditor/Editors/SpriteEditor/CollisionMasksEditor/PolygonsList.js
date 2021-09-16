@@ -221,7 +221,7 @@ const PolygonsList = (props: PolygonsListProps) => {
         addCollisionMask();
       }
     },
-    [polygons, spriteWidth, spriteHeight, onPolygonsUpdated, addCollisionMask]
+    [polygons, addCollisionMask]
   );
 
   return (

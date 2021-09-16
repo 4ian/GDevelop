@@ -208,12 +208,18 @@ const PolygonsList = (props: PolygonsListProps) => {
     restoreCollisionMask,
   } = props;
 
-  const addCollisionMask = React.useCallback(() => {
-    const newPolygon = gd.Polygon2d.createRectangle(spriteWidth, spriteHeight);
-    newPolygon.move(spriteWidth / 2, spriteHeight / 2);
-    polygons.push_back(newPolygon);
-    onPolygonsUpdated();
-  }, [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]);
+  const addCollisionMask = React.useCallback(
+    () => {
+      const newPolygon = gd.Polygon2d.createRectangle(
+        spriteWidth,
+        spriteHeight
+      );
+      newPolygon.move(spriteWidth / 2, spriteHeight / 2);
+      polygons.push_back(newPolygon);
+      onPolygonsUpdated();
+    },
+    [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]
+  );
 
   React.useEffect(
     () => {

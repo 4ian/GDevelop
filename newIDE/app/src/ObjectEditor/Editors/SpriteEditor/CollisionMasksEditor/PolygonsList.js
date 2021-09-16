@@ -218,10 +218,7 @@ const PolygonsList = (props: PolygonsListProps) => {
   React.useEffect(
     () => {
       if (polygons.size() === 0) {
-        const newPolygon = gd.Polygon2d.createRectangle(32, 32);
-        newPolygon.move(spriteWidth / 2, spriteHeight / 2);
-        polygons.push_back(newPolygon);
-        onPolygonsUpdated();
+        addCollisionMask()
       }
     },
     [polygons, spriteWidth, spriteHeight, onPolygonsUpdated]

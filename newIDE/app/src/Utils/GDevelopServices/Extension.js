@@ -5,6 +5,7 @@ import semverSatisfies from 'semver/functions/satisfies';
 
 export type ExtensionShortHeader = {|
   shortDescription: string,
+  authors?: Array<{ id: string, username: string }>,
   extensionNamespace: string,
   fullName: string,
   name: string,
@@ -35,15 +36,6 @@ export type ExtensionsRegistry = {
 };
 
 /**
- * The ExtensionShortHeader returned by the API, with tags being a string
- * (which is kept in the API for compatibility with older GDevelop versions).
- */
-type ExtensionShortHeaderWithTagsAsString = {|
-  ...ExtensionShortHeader,
-  tags: string,
-|};
-
-/**
  * The ExtensionHeader returned by the API, with tags being a string
  * (which is kept in the API for compatibility with older GDevelop versions).
  */
@@ -59,15 +51,6 @@ type ExtensionHeaderWithTagsAsString = {|
 type SerializedExtensionWithTagsAsString = {
   ...SerializedExtension,
   tags: string,
-};
-
-/**
- * The ExtensionsRegistry returned by the API, with tags being a string
- * (which is kept in the API for compatibility with older GDevelop versions).
- */
-type ExtensionsRegistryWithTagsAsString = {
-  ...ExtensionsRegistry,
-  extensionShortHeaders: Array<ExtensionShortHeaderWithTagsAsString>,
 };
 
 /**
@@ -106,19 +89,11 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/extension`)
     .then(response => response.data)
-    .then(({ databaseUrl }) => {
-      if (!databaseUrl) {
-        throw new Error('Unexpected response from the extension endpoint.');
-      }
-
-      return axios.get(databaseUrl);
-    })
-    .then(response => {
-      const data: ExtensionsRegistryWithTagsAsString = response.data;
-
+    .then(({ extensionsDatabase }) => {
       return {
-        ...data,
-        extensionShortHeaders: data.extensionShortHeaders.map(
+        ...extensionsDatabase,
+        // TODO: move this to backend endpoint
+        extensionShortHeaders: extensionsDatabase.extensionShortHeaders.map(
           transformTagsAsStringToTagsAsArray
         ),
       };

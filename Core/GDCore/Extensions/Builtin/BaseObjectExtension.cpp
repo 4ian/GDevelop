@@ -1080,7 +1080,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
+      .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple();
 
@@ -1094,8 +1094,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter name"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
       .MarkAsSimple();
 
@@ -1109,8 +1109,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter name"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
       .MarkAsSimple();
 
@@ -1124,8 +1124,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/effect24.png",
                 "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
-      .AddParameter("string", _("Parameter Name"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable?"))
       .MarkAsSimple();
 
@@ -1137,7 +1137,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "res/actions/effect24.png",
                   "res/actions/effect.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("string", _("Effect Name"))
+      .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple();
 
   extension

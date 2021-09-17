@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
+import Chip from '@material-ui/core/Chip';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import {
@@ -20,6 +21,17 @@ import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
+
+const styles = {
+  authors: {
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  chip: {
+    marginRight: 2,
+    marginTop: 4,
+  },
+};
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -136,7 +148,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             <IconContainer
               alt={extensionShortHeader.fullName}
               src={extensionShortHeader.previewIconUrl}
-              size={48}
+              size={64}
             />
             <Column expand>
               <Text noMargin size="title">
@@ -145,6 +157,20 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               <Text noMargin size="body2">
                 <Trans>Version {' ' + extensionShortHeader.version}</Trans>
               </Text>
+              <div style={styles.authors}>
+                {extensionShortHeader.authors && (
+                  <>
+                    {extensionShortHeader.authors.map(author => (
+                      <Chip
+                        size="small"
+                        style={styles.chip}
+                        label={author}
+                        key={author}
+                      />
+                    ))}
+                  </>
+                )}
+              </div>
             </Column>
           </Line>
           <Text noMargin>{extensionShortHeader.shortDescription}</Text>

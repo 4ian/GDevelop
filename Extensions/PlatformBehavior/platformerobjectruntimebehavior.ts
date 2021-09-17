@@ -1402,8 +1402,7 @@ namespace gdjs {
         object.setY(
           this._floorLastY -
             object.getHeight() +
-            (object.getY() - object.getDrawableY()) -
-            1
+            (object.getY() - object.getDrawableY())
         );
       }
       // Directly follow the floor movement on the Y axis by moving the character.

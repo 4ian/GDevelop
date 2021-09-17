@@ -246,6 +246,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
+import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
 
 configureActions({
   depth: 2,
@@ -3955,6 +3956,12 @@ storiesOf('Profile/CreateAccountDialog', module)
         code: 'auth/invalid-email',
       }}
     />
+  ));
+
+storiesOf('UserPublicProfileChip', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <UserPublicProfileChip author={{ id: '123', username: 'username' }} />
   ));
 
 storiesOf('LocalNetworkPreviewDialog', module)

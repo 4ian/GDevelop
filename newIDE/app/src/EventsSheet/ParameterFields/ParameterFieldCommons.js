@@ -56,6 +56,10 @@ export type ParameterFieldProps = {|
   parameterIndex?: number,
 |};
 
+export type ParameterFieldInterface = {|
+  focus: () => void,
+|};
+
 export const getParameterValueOrDefault = (
   value: string,
   parameterMetadata: ?gdParameterMetadata

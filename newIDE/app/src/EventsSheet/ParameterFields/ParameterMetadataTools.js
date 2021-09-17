@@ -72,6 +72,70 @@ export const getLastObjectParameterObjectType = (
   return parameters.at(objectParameterIndex).getExtraInfo();
 };
 
+/**
+ * Given an instruction or an expression and a parameter number,
+ * return the value of the previous parameter.
+ */
+export const getPreviousParameterValue = ({
+  instructionMetadata,
+  instruction,
+  expressionMetadata,
+  expression,
+  parameterIndex,
+}: {|
+  instructionMetadata: ?gdInstructionMetadata,
+  instruction: ?gdInstruction,
+  expressionMetadata: ?gdExpressionMetadata,
+  expression: ?ExpressionParameters,
+  parameterIndex: ?number,
+|}): ?string => {
+  if (parameterIndex === undefined || parameterIndex == null) {
+    // No parameter index given: the parameter is not even in a list of parameters
+    return null;
+  }
+
+  if (instructionMetadata && instruction) {
+    if (
+      parameterIndex >= 1 &&
+      parameterIndex < instruction.getParametersCount()
+    ) {
+      return instruction.getParameter(parameterIndex - 1);
+    }
+  } else if (expressionMetadata && expression) {
+    if (
+      parameterIndex >= 1 &&
+      parameterIndex < expression.getParametersCount()
+    ) {
+      return expression.getParameter(parameterIndex - 1);
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Try to extract the value of a string literal, or null. Result is not guaranteed to be valid.
+ * - for `"Hello"`, this returns `Hello`.
+ * - for `"Hello`, this returns null.
+ * - for `"H" + "O"`, this returns `H" + "O`.
+ */
+export const tryExtractStringLiteralContent = (
+  parameterValue: ?string
+): ?string => {
+  if (!parameterValue) return null;
+
+  const trimmedParameterValue = parameterValue.trim();
+  if (
+    trimmedParameterValue.length >= 2 &&
+    trimmedParameterValue[0] === '"' &&
+    trimmedParameterValue[trimmedParameterValue.length - 1] === '"'
+  ) {
+    return trimmedParameterValue.substr(1, trimmedParameterValue.length - 2);
+  }
+
+  return null;
+};
+
 export const getParameterChoices = (
   parameterMetadata: ?gdParameterMetadata
 ): Array<ExpressionAutocompletion> => {

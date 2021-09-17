@@ -122,7 +122,13 @@ export const ListSearchResults = <SearchItem>({
 
             return (
               <Grid
-                ref={grid}
+                ref={el => {
+                  if (el) {
+                    // Ensure the grid is recomputed for heights once it is rendered.
+                    el.recomputeGridSize(0, 0);
+                  }
+                  grid.current = el;
+                }}
                 width={width}
                 height={height}
                 columnCount={1}

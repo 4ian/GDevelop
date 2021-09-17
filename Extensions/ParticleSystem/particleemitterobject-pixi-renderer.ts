@@ -214,43 +214,43 @@ namespace gdjs {
       return this.renderer;
     }
 
-    update(delta): void {
+    update(delta: float): void {
       this.emitter.update(delta);
       if (!this.started && this.getParticleCount() > 0) {
         this.started = true;
       }
     }
 
-    setPosition(x, y): void {
+    setPosition(x: number, y: number): void {
       this.emitter.spawnPos.x = x;
       this.emitter.spawnPos.y = y;
     }
 
-    setAngle(angle1, angle2): void {
+    setAngle(angle1: float, angle2: float): void {
       this.emitter.minStartRotation = angle1;
       this.emitter.maxStartRotation = angle2;
     }
 
-    setForce(min, max): void {
+    setForce(min: float, max: float): void {
       this.emitter.startSpeed.value = max;
       this.emitter.minimumSpeedMultiplier = max !== 0 ? min / max : 1;
     }
 
-    setZoneRadius(radius): void {
+    setZoneRadius(radius: float): void {
       this.emitter.spawnCircle.radius = radius;
     }
 
-    setLifeTime(min, max): void {
+    setLifeTime(min: float, max: float): void {
       this.emitter.minLifetime = min;
       this.emitter.maxLifetime = max;
     }
 
-    setGravity(x, y): void {
+    setGravity(x: float, y: float): void {
       this.emitter.acceleration.x = x;
       this.emitter.acceleration.y = y;
     }
 
-    setColor(r1, g1, b1, r2, g2, b2): void {
+    setColor(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): void {
       this.emitter.startColor.value.r = r1;
       this.emitter.startColor.value.g = g1;
       this.emitter.startColor.value.b = b1;
@@ -263,21 +263,21 @@ namespace gdjs {
       this.emitter.startColor.next.value.b = b2;
     }
 
-    setSize(size1, size2): void {
+    setSize(size1: float, size2: float): void {
       this.emitter.startScale.value = size1 / 100.0;
       if (this.emitter.startScale.next) {
         this.emitter.startScale.next.value = size2 / 100.0;
       }
     }
 
-    setAlpha(alpha1, alpha2): void {
+    setAlpha(alpha1: number, alpha2: number): void {
       this.emitter.startAlpha.value = alpha1 / 255.0;
       if (this.emitter.startAlpha.next) {
         this.emitter.startAlpha.next.value = alpha2 / 255.0;
       }
     }
 
-    setFlow(flow, tank): void {
+    setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
       this.emitterLifetime =
         tank < 0
@@ -287,7 +287,7 @@ namespace gdjs {
           : (tank - this.emitter.totalParticleCount) / flow;
     }
 
-    isTextureNameValid(texture, runtimeScene): boolean {
+    isTextureNameValid(texture: string, runtimeScene: gdjs.RuntimeScene): boolean {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()
@@ -299,7 +299,7 @@ namespace gdjs {
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
 
-    setTextureName(texture, runtimeScene): void {
+    setTextureName(texture: string, runtimeScene: gdjs.RuntimeScene): void {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()
@@ -321,15 +321,15 @@ namespace gdjs {
       return this.emitter.particleCount;
     }
 
-    stop() {
+    stop(): void {
       this.emitter.emit = false;
     }
 
-    recreate() {
+    recreate(): void {
       this.emitter.cleanup();
     }
 
-    destroy() {
+    destroy(): void {
       this.emitter.destroy();
     }
 

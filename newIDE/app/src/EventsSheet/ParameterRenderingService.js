@@ -46,6 +46,10 @@ import ForceMultiplierField, {
   renderInlineForceMultiplier,
 } from './ParameterFields/ForceMultiplierField';
 import SceneNameField from './ParameterFields/SceneNameField';
+import LayerEffectNameField from './ParameterFields/LayerEffectNameField';
+import LayerEffectParameterNameField from './ParameterFields/LayerEffectParameterNameField';
+import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
+import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
@@ -79,6 +83,10 @@ const components = {
   joyaxis: DefaultField, //TODO
   forceMultiplier: ForceMultiplierField,
   sceneName: SceneNameField,
+  layerEffectName: LayerEffectNameField,
+  layerEffectParameterName: LayerEffectParameterNameField,
+  objectEffectName: ObjectEffectNameField,
+  objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
 };
@@ -120,6 +128,10 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
   sceneName: t`Scene name`,
+  layerEffectName: t`Layer effect name`,
+  layerEffectParameterName: t`Layer effect parameter name`,
+  objectEffectName: t`Object effect name`,
+  objectEffectParameterName: t`Object effect parameter name`,
   objectPointName: t`Object point name`,
   objectAnimationName: t`Object animation name`,
 };

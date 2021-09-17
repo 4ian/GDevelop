@@ -342,8 +342,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("string", _("Effect"))
-      .AddParameter("string", _("Parameter name"))
+      .AddParameter("layerEffectName", _("Effect name"))
+      .AddParameter("layerEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
       .MarkAsAdvanced();
 
@@ -361,8 +361,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("string", _("Effect"))
-      .AddParameter("string", _("Parameter name"))
+      .AddParameter("layerEffectName", _("Effect name"))
+      .AddParameter("layerEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
       .MarkAsAdvanced();
 
@@ -380,8 +380,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("string", _("Effect"))
-      .AddParameter("string", _("Parameter name"))
+      .AddParameter("layerEffectName", _("Effect name"))
+      .AddParameter("layerEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable this parameter"))
       .MarkAsAdvanced();
 
@@ -396,7 +396,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("string", _("Effect"))
+      .AddParameter("layerEffectName", _("Effect name"))
       .MarkAsAdvanced();
 
   extension
@@ -410,7 +410,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
-      .AddParameter("string", _("Effect"))
+      .AddParameter("layerEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable"), "", true)
       .MarkAsAdvanced();
 

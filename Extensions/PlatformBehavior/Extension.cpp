@@ -125,7 +125,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition("Gravity",
                      _("Gravity"),
                      _("Compare the gravity applied on the object (in pixels "
-                       "per second per second)."),
+                       "per second)."),
                      _("the gravity"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -140,7 +140,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("Gravity",
                   _("Gravity"),
                   _("Change the gravity applied on an object (in pixels per "
-                    "second per second)."),
+                    "second)."),
                   _("the gravity"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -220,7 +220,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
                      _("Compare the acceleration of the object (in pixels per "
-                       "second per second)."),
+                       "second)."),
                      _("the acceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -235,7 +235,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("Acceleration",
                   _("Acceleration"),
                   _("Change the acceleration of an object (in pixels per "
-                    "second per second)."),
+                    "second)."),
                   _("the acceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -251,7 +251,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition("Deceleration",
                      _("Deceleration"),
                      _("Compare the deceleration of the object (in pixels per "
-                       "second per second)."),
+                       "second)."),
                      _("the deceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -266,7 +266,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction("Deceleration",
                   _("Deceleration"),
                   _("Change the deceleration of an object (in pixels per "
-                    "second per second)."),
+                    "second)."),
                   _("the deceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",

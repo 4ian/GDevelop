@@ -129,7 +129,7 @@ namespace gdjs {
      */
     protected _draggingSomething = false;
     /**
-     * The behavior of the object that is best one found so far.
+     * The behavior of the object that is being dragged and that is the best one (i.e: highest Z order) found.
      */
     protected _draggableBehavior: gdjs.DraggableRuntimeBehavior | null = null;
     protected _xOffset: number = 0;

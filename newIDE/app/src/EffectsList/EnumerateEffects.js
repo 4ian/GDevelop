@@ -133,6 +133,15 @@ export const enumerateEffectsMetadata = (
   );
 };
 
+export const enumerateEffectNames = (
+  effectsContainer: gdEffectsContainer
+): Array<string> => {
+  return mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    return effect.getName();
+  });
+};
+
 export const setEffectDefaultParameters = (
   effect: gdEffect,
   effectMetadata: gdEffectMetadata

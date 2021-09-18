@@ -189,6 +189,10 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "joyaxis" ||
              parameterType == "stringWithSelector" ||
              parameterType == "sceneName" ||
+             parameterType == "layerEffectName" ||
+             parameterType == "layerEffectParameterName" ||
+             parameterType == "objectEffectName" ||
+             parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
              parameterType == "objectAnimationName";
     } else if (type == "variable") {

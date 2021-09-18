@@ -55,7 +55,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
     it('can drag an object', function () {
       object.setPosition(450, 500);
 
-      //Drag'n'drop
+      // Drag'n'drop
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onMouseMove(450, 500);
       runtimeGame
@@ -72,14 +72,14 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getX()).to.be(750);
       expect(object.getY()).to.be(600);
 
-      //Mouse move without dragging
+      // Mouse move without dragging
       runtimeGame.getInputManager().onMouseMove(600, 600);
       runtimeScene.renderAndStep(1000 / 60);
 
       expect(object.getX()).to.be(750);
       expect(object.getY()).to.be(600);
 
-      //Start dragging again
+      // Start dragging again
       runtimeGame.getInputManager().onMouseMove(750, 600);
       runtimeGame
         .getInputManager()
@@ -110,7 +110,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
           object2.setZOrder(2);
         }
 
-        //Drag'n'drop
+        // Drag'n'drop
         runtimeScene.renderAndStep(1000 / 60);
         runtimeGame.getInputManager().onMouseMove(450, 500);
         runtimeGame
@@ -145,7 +145,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       runtimeGame.getInputManager().touchSimulateMouse(false);
       object.setPosition(450, 500);
 
-      //Drag'n'drop
+      // Drag'n'drop
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onTouchStart(1, 10, 20);
       runtimeGame.getInputManager().onTouchStart(0, 450, 500);
@@ -162,7 +162,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getX()).to.be(750);
       expect(object.getY()).to.be(600);
 
-      //Move another unrelated touch
+      // Move another unrelated touch
       runtimeGame.getInputManager().onTouchMove(1, 750, 600);
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onTouchMove(1, 850, 700);
@@ -171,7 +171,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getX()).to.be(750);
       expect(object.getY()).to.be(600);
 
-      //Start drag'n'drop with another touch
+      // Start drag'n'drop with another touch
       runtimeGame.getInputManager().onTouchEnd(1);
       runtimeGame.getInputManager().onFrameEnded();
       runtimeScene.renderAndStep(1000 / 60);
@@ -190,7 +190,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       object.setPosition(450, 500);
       object2.setPosition(650, 600);
 
-      //Drag'n'drop
+      // Drag'n'drop
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onTouchStart(2, 450, 500);
       runtimeGame.getInputManager().onTouchStart(1, 650, 600);
@@ -227,7 +227,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
         }
         runtimeScene.renderAndStep(1000 / 60);
 
-        //Drag'n'drop
+        // Drag'n'drop
         runtimeGame.getInputManager().touchSimulateMouse(false);
         runtimeScene.renderAndStep(1000 / 60);
         runtimeGame.getInputManager().onTouchStart(1, 10, 20);

@@ -39,6 +39,10 @@ namespace gdjs {
       this._draggedByDraggableManager = null;
     }
 
+    _dismissDrag() {
+      this._draggedByDraggableManager = null;
+    }
+
     _tryBeginDrag(runtimeScene) {
       if (this._draggedByDraggableManager) {
         return false;
@@ -195,7 +199,7 @@ namespace gdjs {
       }
       if (this._draggableBehavior) {
         // The previous best object to drag will not be dragged.
-        this._draggableBehavior._draggedByDraggableManager = null;
+        this._draggableBehavior._dismissDrag();
       }
       this._draggableBehavior = draggableRuntimeBehavior;
       this._xOffset = position[0] - draggableRuntimeBehavior.owner.getX();

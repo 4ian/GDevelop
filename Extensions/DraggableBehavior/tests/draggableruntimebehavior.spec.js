@@ -51,7 +51,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
   runtimeScene.addObject(object);
   runtimeScene.addObject(object2);
 
-  describe.skip('(mouse)', function () {
+  describe('(mouse)', function () {
     it('can drag an object', function () {
       object.setPosition(450, 500);
 

@@ -206,7 +206,7 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getY()).to.be(700);
       expect(object2.getX()).to.be(100);
       expect(object2.getY()).to.be(200);
-      
+
       // Avoid side effects on the following test cases
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onFrameEnded();

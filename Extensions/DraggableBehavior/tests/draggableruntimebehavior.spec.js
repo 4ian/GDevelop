@@ -155,7 +155,6 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onFrameEnded();
       runtimeGame.getInputManager().onTouchEnd(0);
-      runtimeGame.getInputManager().onTouchEnd(1);
       runtimeScene.renderAndStep(1000 / 60);
       runtimeGame.getInputManager().onFrameEnded();
 
@@ -202,20 +201,21 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       runtimeGame.getInputManager().onFrameEnded();
       runtimeGame.getInputManager().onTouchEnd(1);
       runtimeGame.getInputManager().onTouchEnd(2);
-      runtimeScene.renderAndStep(1000 / 60);
-      runtimeGame.getInputManager().onFrameEnded();
 
       expect(object.getX()).to.be(750);
       expect(object.getY()).to.be(700);
       expect(object2.getX()).to.be(100);
       expect(object2.getY()).to.be(200);
+      
+      // Avoid side effects on the following test cases
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
     });
 
     [false, true].forEach((firstInFront) => {
       it(`must drag the object in front (${
         firstInFront ? '1st object' : '2nd object'
       } in front)`, function () {
-        runtimeScene.renderAndStep(1000 / 60);
         object.setPosition(450, 500);
         object2.setPosition(450, 500);
         if (firstInFront) {
@@ -225,7 +225,6 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
           object.setZOrder(1);
           object2.setZOrder(2);
         }
-        runtimeScene.renderAndStep(1000 / 60);
 
         // Drag'n'drop
         runtimeGame.getInputManager().touchSimulateMouse(false);

@@ -213,7 +213,7 @@ namespace gdjs {
     ) {
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
       if (
-        draggableRuntimeBehavior.owner.getX() != position[0] - this._xOffset &&
+        draggableRuntimeBehavior.owner.getX() != position[0] - this._xOffset ||
         draggableRuntimeBehavior.owner.getY() != position[1] - this._yOffset
       ) {
         draggableRuntimeBehavior.owner.setX(position[0] - this._xOffset);

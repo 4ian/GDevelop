@@ -39,6 +39,10 @@ namespace gdjs {
       this._draggedByDraggableManager = null;
     }
 
+    _dismissDrag() {
+      this._draggedByDraggableManager = null;
+    }
+
     _tryBeginDrag(runtimeScene) {
       if (this._draggedByDraggableManager) {
         return false;
@@ -119,7 +123,15 @@ namespace gdjs {
    * Handle the dragging
    */
   abstract class DraggableManager {
+    /**
+     * The object has left its original position.
+     * When true, the search for the best object to drag has ended.
+     */
     protected _draggingSomething = false;
+    /**
+     * The behavior of the object that is being dragged and that is the best one (i.e: highest Z order) found.
+     */
+    protected _draggableBehavior: gdjs.DraggableRuntimeBehavior | null = null;
     protected _xOffset: number = 0;
     protected _yOffset: number = 0;
 
@@ -172,15 +184,26 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene,
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ) {
+      if (
+        this._draggableBehavior &&
+        draggableRuntimeBehavior.owner.getZOrder() <=
+          this._draggableBehavior.owner.getZOrder()
+      ) {
+        return false;
+      }
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
       if (
         !draggableRuntimeBehavior.owner.insideObject(position[0], position[1])
       ) {
         return false;
       }
+      if (this._draggableBehavior) {
+        // The previous best object to drag will not be dragged.
+        this._draggableBehavior._dismissDrag();
+      }
+      this._draggableBehavior = draggableRuntimeBehavior;
       this._xOffset = position[0] - draggableRuntimeBehavior.owner.getX();
       this._yOffset = position[1] - draggableRuntimeBehavior.owner.getY();
-      this._draggingSomething = true;
       return true;
     }
 
@@ -189,12 +212,19 @@ namespace gdjs {
       draggableRuntimeBehavior: DraggableRuntimeBehavior
     ) {
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
-      draggableRuntimeBehavior.owner.setX(position[0] - this._xOffset);
-      draggableRuntimeBehavior.owner.setY(position[1] - this._yOffset);
+      if (
+        draggableRuntimeBehavior.owner.getX() != position[0] - this._xOffset &&
+        draggableRuntimeBehavior.owner.getY() != position[1] - this._yOffset
+      ) {
+        draggableRuntimeBehavior.owner.setX(position[0] - this._xOffset);
+        draggableRuntimeBehavior.owner.setY(position[1] - this._yOffset);
+        this._draggingSomething = true;
+      }
     }
 
     endDrag() {
       this._draggingSomething = false;
+      this._draggableBehavior = null;
     }
 
     abstract isDragging(

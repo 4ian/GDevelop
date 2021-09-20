@@ -317,27 +317,6 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddAction("ParticleGravityZ",
-                _("Z Gravity"),
-                _("Change value of the gravity on Z axis."),
-                _("the gravity direction on Z axis of_PARAM0_"),
-                _("Advanced"),
-                "CppPlatform/Extensions/particleSystemicon24.png",
-                "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition(
-         "ParticleGravityZ",
-         _("Direction of gravity on Z axis"),
-         _("Test the direction of gravity on Z axis"),
-         _("the gravity direction on Z axis"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
   obj.AddAction("ParticleGravityAngle",
                 _("Gravity angle"),
                 _("Change gravity angle"),

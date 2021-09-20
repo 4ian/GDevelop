@@ -50,7 +50,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetZoneRadius(float newValue);
   void SetParticleGravityX(float newValue);
   void SetParticleGravityY(float newValue);
-  void SetParticleGravityZ(float newValue);
   void SetParticleGravityAngle(float newAngleInDegree);
   void SetParticleGravityLength(float newLength);
   void SetFriction(float newValue);
@@ -146,7 +145,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetZoneRadius() const { return zoneRadius; };
   float GetParticleGravityX() const { return particleGravityX; };
   float GetParticleGravityY() const { return particleGravityY; };
-  float GetParticleGravityZ() const { return particleGravityZ; };
   float GetParticleGravityAngle() const;
   float GetParticleGravityLength() const;
   float GetFriction() const { return friction; };
@@ -223,7 +221,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float emitterAngleA;
   float emitterAngleB;
   float zoneRadius;
-  float particleGravityX, particleGravityY, particleGravityZ;
+  float particleGravityX, particleGravityY;
   float friction;
   float particleLifeTimeMin, particleLifeTimeMax;
   ParticleParameterType redParam, greenParam, blueParam, alphaParam, sizeParam,

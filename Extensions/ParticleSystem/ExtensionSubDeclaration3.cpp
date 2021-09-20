@@ -244,12 +244,6 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("ParticleGravityZ",
-                    _("Z Gravity of particles"),
-                    _("Z Gravity of particles"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleGravityAngle",
                     _("Gravity angle"),
                     _("Gravity angle"),

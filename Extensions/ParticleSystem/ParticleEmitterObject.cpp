@@ -37,7 +37,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       zoneRadius(3.0f),
       particleGravityX(0.0f),
       particleGravityY(0.0f),
-      particleGravityZ(0.0f),
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
@@ -107,7 +106,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   zoneRadius = element.GetDoubleAttribute("zoneRadius");
   particleGravityX = element.GetDoubleAttribute("particleGravityX");
   particleGravityY = element.GetDoubleAttribute("particleGravityY");
-  particleGravityZ = element.GetDoubleAttribute("particleGravityZ");
   friction = element.GetDoubleAttribute("friction");
   particleLifeTimeMin = element.GetDoubleAttribute("particleLifeTimeMin");
   particleLifeTimeMax = element.GetDoubleAttribute("particleLifeTimeMax");
@@ -232,7 +230,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("zoneRadius", zoneRadius);
   element.SetAttribute("particleGravityX", particleGravityX);
   element.SetAttribute("particleGravityY", particleGravityY);
-  element.SetAttribute("particleGravityZ", particleGravityZ);
   element.SetAttribute("friction", friction);
   element.SetAttribute("particleLifeTimeMin", particleLifeTimeMin);
   element.SetAttribute("particleLifeTimeMax", particleLifeTimeMax);
@@ -341,9 +338,6 @@ void ParticleEmitterBase::SetParticleGravityX(float newValue) {
 void ParticleEmitterBase::SetParticleGravityY(float newValue) {
   particleGravityY = newValue;
 }
-void ParticleEmitterBase::SetParticleGravityZ(float newValue) {
-  particleGravityZ = newValue;
-}
 void ParticleEmitterBase::SetFriction(float newValue) {
   friction = newValue;
 }
@@ -432,7 +426,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   zoneRadius = other.zoneRadius;
   particleGravityX = other.particleGravityX;
   particleGravityY = other.particleGravityY;
-  particleGravityZ = other.particleGravityZ;
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;

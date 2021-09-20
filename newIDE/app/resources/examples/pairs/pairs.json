@@ -1903,7 +1903,6 @@
           "particleEditionSimpleMode": true,
           "particleGravityX": 0,
           "particleGravityY": 0,
-          "particleGravityZ": 0,
           "particleGreen1": 255,
           "particleGreen2": 255,
           "particleLifeTimeMax": 1.5,

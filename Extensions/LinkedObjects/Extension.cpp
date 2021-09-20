@@ -81,7 +81,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                     _("Take some objects linked to the object into account for "
                       "next conditions and actions.\nThe condition will return "
                       "false if no object was taken into account."),
-                    _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
+                    _("Take into account all \"_PARAM2_\" linked to _PARAM3_"),
                     _("Linked objects"),
                     "CppPlatform/Extensions/LinkedObjectsicon24.png",
                     "CppPlatform/Extensions/LinkedObjectsicon16.png")
@@ -89,6 +89,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
@@ -98,7 +99,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "PickObjectsLinkedTo",
           _("Take into account linked objects"),
           _("Take objects linked to the object into account for next actions."),
-          _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
+          _("Take into account all \"_PARAM2_\" linked to _PARAM3_"),
           _("Linked objects"),
           "CppPlatform/Extensions/LinkedObjectsicon24.png",
           "CppPlatform/Extensions/LinkedObjectsicon16.png")
@@ -106,6 +107,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");

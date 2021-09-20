@@ -59,7 +59,7 @@ export class LogsManager {
       this._onNewGroup.forEach(f => f());
     }
     if (!this._pendingCommit) {
-      setTimeout(this._commitLogs.bind(this), 1000);
+      setTimeout(this._commitLogs.bind(this), 200);
       this._pendingCommit = true;
     }
   }

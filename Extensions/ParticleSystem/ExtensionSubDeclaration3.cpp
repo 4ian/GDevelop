@@ -190,24 +190,6 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
-  obj.AddExpression("EmitterXDirection",
-                    _("Emission X direction"),
-                    _("Emission X direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("EmitterYDirection",
-                    _("Emission Y direction"),
-                    _("Emission Y direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("EmitterZDirection",
-                    _("Emission Z direction"),
-                    _("Emission Z direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("EmitterAngle",
                     _("Emission angle"),
                     _("Emission angle"),

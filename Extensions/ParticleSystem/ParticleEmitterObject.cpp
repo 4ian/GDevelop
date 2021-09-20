@@ -29,9 +29,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       flow(45),
       emitterForceMin(45.0f),
       emitterForceMax(85.0f),
-      emitterXDirection(0.0f),
-      emitterYDirection(1.0f),
-      emitterZDirection(0.0f),
       emitterAngleA(0),
       emitterAngleB(90),
       zoneRadius(3.0f),
@@ -98,9 +95,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   flow = element.GetDoubleAttribute("flow");
   emitterForceMin = element.GetDoubleAttribute("emitterForceMin");
   emitterForceMax = element.GetDoubleAttribute("emitterForceMax");
-  emitterXDirection = element.GetDoubleAttribute("emitterXDirection");
-  emitterYDirection = element.GetDoubleAttribute("emitterYDirection");
-  emitterZDirection = element.GetDoubleAttribute("emitterZDirection");
   emitterAngleA = element.GetDoubleAttribute("emitterAngleA");
   emitterAngleB = element.GetDoubleAttribute("emitterAngleB");
   zoneRadius = element.GetDoubleAttribute("zoneRadius");
@@ -222,9 +216,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("flow", flow);
   element.SetAttribute("emitterForceMin", emitterForceMin);
   element.SetAttribute("emitterForceMax", emitterForceMax);
-  element.SetAttribute("emitterXDirection", emitterXDirection);
-  element.SetAttribute("emitterYDirection", emitterYDirection);
-  element.SetAttribute("emitterZDirection", emitterZDirection);
   element.SetAttribute("emitterAngleA", emitterAngleA);
   element.SetAttribute("emitterAngleB", emitterAngleB);
   element.SetAttribute("zoneRadius", zoneRadius);
@@ -341,15 +332,6 @@ void ParticleEmitterBase::SetParticleGravityY(float newValue) {
 void ParticleEmitterBase::SetFriction(float newValue) {
   friction = newValue;
 }
-void ParticleEmitterBase::SetEmitterXDirection(float newValue) {
-  emitterXDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterYDirection(float newValue) {
-  emitterYDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterZDirection(float newValue) {
-  emitterZDirection = newValue;
-}
 void ParticleEmitterBase::SetEmitterAngleA(float newValue) {
   emitterAngleA = newValue;
 }
@@ -418,9 +400,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   flow = other.flow;
   emitterForceMin = other.emitterForceMin;
   emitterForceMax = other.emitterForceMax;
-  emitterXDirection = other.emitterXDirection;
-  emitterYDirection = other.emitterYDirection;
-  emitterZDirection = other.emitterZDirection;
   emitterAngleA = other.emitterAngleA;
   emitterAngleB = other.emitterAngleB;
   zoneRadius = other.zoneRadius;

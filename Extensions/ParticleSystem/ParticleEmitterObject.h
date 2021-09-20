@@ -41,9 +41,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetFlow(float newValue);
   void SetEmitterForceMin(float newValue);
   void SetEmitterForceMax(float newValue);
-  void SetEmitterXDirection(float newValue);
-  void SetEmitterYDirection(float newValue);
-  void SetEmitterZDirection(float newValue);
   void SetEmitterAngleA(float newValue);
   void SetEmitterAngleB(float newValue);
   void SetConeSprayAngle(float newValue) { SetEmitterAngleB(newValue); };
@@ -136,9 +133,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetFlow() const { return flow; };
   float GetEmitterForceMin() const { return emitterForceMin; };
   float GetEmitterForceMax() const { return emitterForceMax; };
-  float GetEmitterXDirection() const { return emitterXDirection; };
-  float GetEmitterYDirection() const { return emitterYDirection; };
-  float GetEmitterZDirection() const { return emitterZDirection; };
   float GetEmitterAngleA() const { return emitterAngleA; };
   float GetEmitterAngleB() const { return emitterAngleB; };
   float GetConeSprayAngle() const { return GetEmitterAngleB(); };
@@ -215,9 +209,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float flow;
   float emitterForceMin;
   float emitterForceMax;
-  float emitterXDirection;
-  float emitterYDirection;
-  float emitterZDirection;
   float emitterAngleA;
   float emitterAngleB;
   float zoneRadius;

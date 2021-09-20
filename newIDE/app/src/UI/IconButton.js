@@ -27,6 +27,7 @@ type Props = {|
   onClick?: (ev: any) => void,
   onContextMenu?: () => void,
   disabled?: boolean,
+  edge?: 'start' | 'end' | false,
 
   style?: {|
     padding?: number,

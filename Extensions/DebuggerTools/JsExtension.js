@@ -83,6 +83,30 @@ module.exports = {
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
       .setFunctionName('gdjs.evtTools.debuggerTools.enableDebugDraw');
 
+    extension
+      .addAction(
+        'ConsoleLog',
+        _('Log a message to the console'),
+        _("Logs a message to the debugger's console."),
+        _(
+          'Log message _PARAM0_ of type _PARAM1_ to the console in group _PARAM2_'
+        ),
+        _('Debugger Tools'),
+        'res/actions/bug32.png',
+        'res/actions/bug32.png'
+      )
+      .addParameter('string', 'Message to log', '', false)
+      .addParameter(
+        'stringWithSelector',
+        'Message type',
+        '["info", "warning", "error"]',
+        true
+      )
+      .addParameter('string', 'Group of messages', '', true)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')
+      .setFunctionName('gdjs.evtTools.debuggerTools.log');
+
     return extension;
   },
   runExtensionSanityTests: function (

@@ -39,7 +39,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       particleLifeTimeMax(2.5f),
       alphaParam(Mutable),
       sizeParam(Mutable),
-      angleParam(Mutable),
       particleRed1(255.0f),
       particleRed2(255.0f),
       particleGreen1(51),
@@ -159,15 +158,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
     else
       sizeParam = Nothing;
   }
-  {
-    gd::String result = element.GetStringAttribute("angleParam");
-    if (result == "Mutable")
-      angleParam = Mutable;
-    else if (result == "Random")
-      angleParam = Random;
-    else
-      angleParam = Nothing;
-  }
 }
 
 #if defined(GD_IDE_ONLY)
@@ -239,13 +229,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (sizeParam == Random)
     sizeParamStr = "Random";
   element.SetAttribute("sizeParam", sizeParamStr);
-
-  gd::String angleParamStr = "Nothing";
-  if (angleParam == Mutable)
-    angleParamStr = "Mutable";
-  else if (angleParam == Random)
-    angleParamStr = "Random";
-  element.SetAttribute("angleParam", angleParamStr);
 }
 #endif
 
@@ -359,7 +342,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   particleLifeTimeMax = other.particleLifeTimeMax;
   alphaParam = other.alphaParam;
   sizeParam = other.sizeParam;
-  angleParam = other.angleParam;
   particleRed1 = other.particleRed1;
   particleRed2 = other.particleRed2;
   particleGreen1 = other.particleGreen1;

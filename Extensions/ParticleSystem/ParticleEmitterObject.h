@@ -54,7 +54,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   enum ParticleParameterType { Nothing, Enabled, Mutable, Random };
   void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
   void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
-  void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
 
   void SetParticleColor1(const gd::String& color);
   void SetParticleColor2(const gd::String& color);
@@ -146,7 +145,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
 
   ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
   ParticleParameterType GetSizeParameterType() const { return sizeParam; };
-  ParticleParameterType GetAngleParameterType() const { return angleParam; };
 
   float GetParticleRed1() const { return particleRed1; };
   float GetParticleRed2() const { return particleRed2; };
@@ -209,8 +207,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float particleGravityX, particleGravityY;
   float friction;
   float particleLifeTimeMin, particleLifeTimeMax;
-  ParticleParameterType alphaParam, sizeParam,
-      angleParam;
+  ParticleParameterType alphaParam, sizeParam;
   float particleRed1, particleRed2, particleGreen1, particleGreen2,
       particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
   float particleSize1, particleSize2, particleAngle1, particleAngle2;

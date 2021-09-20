@@ -1,7 +1,6 @@
 // @ts-check
 describe('gdjs.LinksManager', function () {
   const doTest = (
-    caseName,
     object1Names,
     object2Names,
     object3Names,
@@ -16,81 +15,102 @@ describe('gdjs.LinksManager', function () {
     });
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     runtimeScene.loadFromScene({
-      // @ts-ignore - missing properties.
-      layers: [{ name: '', visibility: true, effects: [] }],
+      layers: [
+        {
+          name: '',
+          visibility: true,
+          cameras: [],
+          effects: [],
+          ambientLightColorR: 127,
+          ambientLightColorB: 127,
+          ambientLightColorG: 127,
+          isLightingLayer: false,
+          followBaseLayerCamera: false,
+        },
+      ],
       variables: [],
       behaviorsSharedData: [],
       objects: [],
       instances: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
     });
 
     const manager = gdjs.LinksManager.getManager(runtimeScene);
 
-    // @ts-ignore - missing properties.
     const object1A = new gdjs.RuntimeObject(runtimeScene, {
       name: object1Names[0],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
-    // @ts-ignore - missing properties.
     const object1B = new gdjs.RuntimeObject(runtimeScene, {
       name: object1Names[1],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
-    // @ts-ignore - missing properties.
+
     const object1C = new gdjs.RuntimeObject(runtimeScene, {
       name: object1Names[2],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
 
-    // @ts-ignore - missing properties.
     const object2A = new gdjs.RuntimeObject(runtimeScene, {
       name: object2Names[0],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
 
-    // @ts-ignore - missing properties.
     const object2B = new gdjs.RuntimeObject(runtimeScene, {
       name: object2Names[1],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
-    // @ts-ignore - missing properties.
+
     const object2C = new gdjs.RuntimeObject(runtimeScene, {
       name: object2Names[2],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
 
-    // @ts-ignore - missing properties.
     const object3A = new gdjs.RuntimeObject(runtimeScene, {
       name: object3Names[0],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
 
-    // @ts-ignore - missing properties.
     const object3B = new gdjs.RuntimeObject(runtimeScene, {
       name: object3Names[1],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
-    // @ts-ignore - missing properties.
+
     const object3C = new gdjs.RuntimeObject(runtimeScene, {
       name: object3Names[2],
       type: '',
       behaviors: [],
+      variables: [],
       effects: [],
     });
 
@@ -181,6 +201,8 @@ describe('gdjs.LinksManager', function () {
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(2);
+        expect(objectsLists.get('obj2')).to.contain(object2A);
+        expect(objectsLists.get('obj2')).to.contain(object2B);
         expect(objectsLists.get('obj3').length).to.be(1);
         expect(objectsLists.get('obj3')[0]).to.be(object3C);
       }
@@ -197,6 +219,9 @@ describe('gdjs.LinksManager', function () {
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(3);
+        expect(objectsLists.get('obj2')).to.contain(object2A);
+        expect(objectsLists.get('obj2')).to.contain(object2B);
+        expect(objectsLists.get('obj2')).to.contain(object2C);
       }
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
@@ -217,6 +242,8 @@ describe('gdjs.LinksManager', function () {
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(2);
+        expect(objectsLists.get('obj2')).to.contain(object2A);
+        expect(objectsLists.get('obj2')).to.contain(object2C);
       }
       manager.linkObjects(object1B, object2C);
       manager.removeAllLinksOf(object1A);
@@ -284,7 +311,6 @@ describe('gdjs.LinksManager', function () {
       [true, false].forEach((legacy) => {
         describe(legacy ? '(legacy)' : '(quick)', function () {
           doTest(
-            testCase.caseName,
             testCase.object1Names,
             testCase.object2Names,
             testCase.object3Names,

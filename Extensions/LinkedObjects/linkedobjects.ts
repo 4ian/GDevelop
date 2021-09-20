@@ -7,7 +7,7 @@ namespace gdjs {
    * Manages the links between objects.
    */
   export class LinksManager {
-    private _links = new Map<integer, LinkedObjectIterable>();
+    private _links = new Map<integer, IterableLinkedObjects>();
 
     /**
      * Get the links manager of a scene.
@@ -25,10 +25,11 @@ namespace gdjs {
 
     /**
      * This function is for internal use and could disappear in next versions.
-     * Prefer using
+     * Prefer using:
      * * {@link LinksManager.getObjectsLinkedWithAndNamed}
      * * {@link LinksManager.getObjectsLinkedWith}
      * * {@link evtTools.linkedObjects.quickPickObjectsLinkedTo}
+     *
      * @param objA
      * @returns
      */
@@ -36,7 +37,7 @@ namespace gdjs {
       objA: gdjs.RuntimeObject
     ): Map<string, gdjs.RuntimeObject[]> {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new LinkedObjectIterable());
+        this._links.set(objA.id, new IterableLinkedObjects());
       }
       return this._links.get(objA.id)!.linkedObjectMap;
     }
@@ -44,21 +45,18 @@ namespace gdjs {
     // These 2 following functions give JS extensions an implementation dependent access to links.
 
     /**
-     * @param objA
-     * @returns an iterable on every object liked with objA.
+     * @returns an iterable on every object linked with objA.
      */
     // : Iterable<gdjs.RuntimeObject> in practice
     getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
       if (!this._links.has(objA.id)) {
-        this._links.set(objA.id, new LinkedObjectIterable());
+        this._links.set(objA.id, new IterableLinkedObjects());
       }
       return this._links.get(objA.id)!;
     }
 
     /**
-     * @param objA
-     * @param objectName
-     * @returns an iterable of the objects with the given name that are liked with objA.
+     * @returns an iterable of the objects with the given name that are linked with objA.
      */
     getObjectsLinkedWithAndNamed(
       objA: gdjs.RuntimeObject,
@@ -93,32 +91,38 @@ namespace gdjs {
       }
     }
 
-    removeAllLinksOf(obj: gdjs.RuntimeObject) {
+    removeAllLinksOf(removedObject: gdjs.RuntimeObject) {
       // Remove the other side of the links
-      const linkedObjectMap = this._getMapOfObjectsLinkedWith(obj);
-      for (const [
-        linkedObjectName,
-        linkedObjects,
-      ] of linkedObjectMap.entries()) {
+      // Note: don't use `this._getMapOfObjectsLinkedWith` as this would
+      // create an empty map of linked objects if not existing already.
+      const links = this._links.get(removedObject.id);
+      if (!links) {
+        // No existing links to other objects.
+        // This also means no links to the object from other objects.
+        return;
+      }
+
+      for (const linkedObjects of links.linkedObjectMap.values()) {
         for (let i = 0; i < linkedObjects.length; i++) {
-          // This is the object on the other side of the link
-          // We find obj in its list of linked objects and remove it.
+          // This is the object on the other side of the link.
+          // We find the removed object in its list of linked objects and remove it.
           const linkedObject = linkedObjects[i];
+
           if (this._links.has(linkedObject.id)) {
             const otherObjList = this._links
               .get(linkedObject.id)!
-              .linkedObjectMap.get(obj.getName())!;
-            const index = otherObjList.indexOf(obj);
+              .linkedObjectMap.get(removedObject.getName())!;
+
+            const index = otherObjList.indexOf(removedObject);
             if (index !== -1) {
               otherObjList.splice(index, 1);
             }
           }
         }
       }
-      // Remove the links on obj side
-      if (this._links.has(obj.id)) {
-        this._links.delete(obj.id);
-      }
+
+      // Remove the links on the removedObject side.
+      this._links.delete(removedObject.id);
     }
 
     removeLinkBetween(objA: gdjs.RuntimeObject, objB: gdjs.RuntimeObject) {
@@ -145,7 +149,7 @@ namespace gdjs {
     }
   }
 
-  class LinkedObjectIterable {
+  class IterableLinkedObjects {
     linkedObjectMap: Map<string, gdjs.RuntimeObject[]>;
 
     constructor() {
@@ -154,10 +158,8 @@ namespace gdjs {
 
     [Symbol.iterator]() {
       let mapItr = this.linkedObjectMap.entries();
-      let listItr: IterableIterator<[
-        number,
-        gdjs.RuntimeObject
-      ]> = [].entries();
+      let listItr: IterableIterator<[number, gdjs.RuntimeObject]> =
+        [].entries();
 
       return {
         next: () => {
@@ -184,6 +186,7 @@ namespace gdjs {
       gdjs.registerObjectDeletedFromSceneCallback(function (runtimeScene, obj) {
         LinksManager.getManager(runtimeScene).removeAllLinksOf(obj);
       });
+
       export const linkObjects = function (
         runtimeScene: gdjs.RuntimeScene,
         objA: gdjs.RuntimeObject,
@@ -239,8 +242,8 @@ namespace gdjs {
           runtimeScene,
           objectsLists,
           obj,
-          // Can't know if it's called from an event function or not
-          // Object names will have to be checked
+          // Can't know if it's called from an event function or not.
+          // Object names will have to be checked.
           true
         );
       };
@@ -254,9 +257,8 @@ namespace gdjs {
         if (obj === null) {
           return false;
         }
-        const linkedObjectMap = LinksManager.getManager(
-          runtimeScene
-        )._getMapOfObjectsLinkedWith(obj);
+        const linkedObjectMap =
+          LinksManager.getManager(runtimeScene)._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {
@@ -274,7 +276,8 @@ namespace gdjs {
             );
             parentEventPickedObjectNames.length = 0;
             if (isEventsFunction) {
-              // For functions, objects may be a flattened group of objects.
+              // For functions, objects lists may contain objects with different names
+              // indexed not by their name, but by the parameter name representing them.
               // This means that each object can have a different name,
               // so we iterate on them to get all the names.
               for (const pickedObject of parentEventPickedObjects) {
@@ -293,7 +296,8 @@ namespace gdjs {
             }
 
             // Sum the number of instances in the scene for each objects found
-            // previously in parentEventPickedObjects.
+            // previously in parentEventPickedObjects, so that we know if we can
+            // avoid running an intersection with the picked objects later.
             let objectCount = 0;
             for (const objectName of parentEventPickedObjectNames) {
               objectCount += runtimeScene.getObjects(objectName).length;
@@ -301,7 +305,8 @@ namespace gdjs {
 
             if (parentEventPickedObjects.length === objectCount) {
               // The parent event didn't make any selection on the current object,
-              // there is no need to make an intersection.
+              // (because the number of picked objects is the total object count on the scene).
+              // There is no need to make an intersection.
               // We will only replace the picked list with the linked object list.
               parentEventPickedObjects.length = 0;
               for (const objectName of parentEventPickedObjectNames) {

@@ -261,7 +261,8 @@ namespace gdjs {
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {
           if (objectsLists.containsKey(contextObjectName)) {
-            const parentEventPickedObjects = objectsLists.items[contextObjectName];
+            const parentEventPickedObjects =
+              objectsLists.items[contextObjectName];
 
             if (parentEventPickedObjects.length === 0) {
               continue;
@@ -277,7 +278,10 @@ namespace gdjs {
               // This means that each object can have a different name,
               // so we iterate on them to get all the names.
               for (const pickedObject of parentEventPickedObjects) {
-                if (parentEventPickedObjectNames.indexOf(pickedObject.getName()) < 0) {
+                if (
+                  parentEventPickedObjectNames.indexOf(pickedObject.getName()) <
+                  0
+                ) {
                   parentEventPickedObjectNames.push(pickedObject.getName());
                 }
               }
@@ -304,9 +308,11 @@ namespace gdjs {
                 if (linkedObjectMap.has(objectName)) {
                   const linkedObjects = linkedObjectMap.get(objectName)!;
 
-                  pickedSomething =
-                    pickedSomething || linkedObjects.length > 0;
-                  parentEventPickedObjects.push.apply(parentEventPickedObjects, linkedObjects);
+                  pickedSomething = pickedSomething || linkedObjects.length > 0;
+                  parentEventPickedObjects.push.apply(
+                    parentEventPickedObjects,
+                    linkedObjects
+                  );
                 }
               }
             } else {
@@ -331,7 +337,10 @@ namespace gdjs {
               pickedSomething =
                 pickedSomething || pickedAndLinkedObjects.length > 0;
               parentEventPickedObjects.length = 0;
-              parentEventPickedObjects.push.apply(parentEventPickedObjects, pickedAndLinkedObjects);
+              parentEventPickedObjects.push.apply(
+                parentEventPickedObjects,
+                pickedAndLinkedObjects
+              );
               pickedAndLinkedObjects.length = 0;
             }
             parentEventPickedObjectNames.length = 0;

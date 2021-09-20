@@ -135,7 +135,7 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
-          Hashtable.newFrom({ 'obj2': [object2A, object2B, object2C] })
+          Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(1);
@@ -144,7 +144,7 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object2A,
-          Hashtable.newFrom({ 'obj1': [object1A, object1B, object1C] })
+          Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj1').length).to.be(1);
@@ -158,7 +158,7 @@ describe('gdjs.LinksManager', function () {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
           // object2B was discarded from a parent condition
-          Hashtable.newFrom({ 'obj2': [object2A, object2C] })
+          Hashtable.newFrom({ obj2: [object2A, object2C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(1);
@@ -174,8 +174,10 @@ describe('gdjs.LinksManager', function () {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
           // This is a group of obj2 and obj3.
-          Hashtable.newFrom({ 'obj2': [object2A, object2B, object2C],
-            'obj3': [object3A, object3B, object3C] })
+          Hashtable.newFrom({
+            obj2: [object2A, object2B, object2C],
+            obj3: [object3A, object3B, object3C],
+          })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(2);
@@ -191,7 +193,7 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
-          Hashtable.newFrom({ 'obj2': [object2A, object2B, object2C] })
+          Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(3);
@@ -199,7 +201,7 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object2C,
-          Hashtable.newFrom({ 'obj1': [object1A, object1B, object1C] })
+          Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj1').length).to.be(1);
@@ -211,7 +213,7 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
-          Hashtable.newFrom({ 'obj2': [object2A, object2B, object2C] })
+          Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj2').length).to.be(2);
@@ -222,21 +224,21 @@ describe('gdjs.LinksManager', function () {
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object1A,
-          Hashtable.newFrom({ 'obj2': [object2A, object2B, object2C] })
+          Hashtable.newFrom({ obj2: [object2A, object2B, object2C] })
         );
         expect(pickedSomething).to.be(false);
       }
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object2A,
-          Hashtable.newFrom({ 'obj1': [object1A, object1B, object1C] })
+          Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );
         expect(pickedSomething).to.be(false);
       }
       {
         const { pickedSomething, objectsLists } = pickObjectsLinkedTo(
           object2C,
-          Hashtable.newFrom({ 'obj1': [object1A, object1B, object1C] })
+          Hashtable.newFrom({ obj1: [object1A, object1B, object1C] })
         );
         expect(pickedSomething).to.be(true);
         expect(objectsLists.get('obj1').length).to.be(1);

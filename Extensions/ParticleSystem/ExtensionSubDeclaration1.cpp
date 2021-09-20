@@ -36,70 +36,6 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardOperatorParameters("number");
 
-  obj.AddAction(
-         "EmitterXDirection",
-         _("Emission X direction"),
-         _("Modify emission X direction."),
-         _("the emission X direction"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition(
-         "EmitterXDirection",
-         _("Emission X direction"),
-         _("Test emission X direction."),
-         _("the emission X direction"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
-  obj.AddAction(
-         "EmitterYDirection",
-         _("Emission Y direction"),
-         _("Modify emission Y direction."),
-         _("the emission Y direction"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition("EmitterYDirection",
-                   _("Emission Y direction"),
-                   _("Test emission Y direction."),
-                   _("the emission Y direction"),
-                   _("Advanced"),
-                   "CppPlatform/Extensions/particleSystemicon24.png",
-                   "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
-  obj.AddAction(
-         "EmitterZDirection",
-         _("Emission Z direction"),
-         _("Modify emission Z direction."),
-         _("the emission Z direction"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition("EmitterZDirection",
-                   _("Emission Z direction"),
-                   _("Test emission Z direction."),
-                   _("the emission Z direction"),
-                   _("Advanced"),
-                   "CppPlatform/Extensions/particleSystemicon24.png",
-                   "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
   obj.AddAction("EmitterAngle",
                 _("Emission angle"),
                 _("Modify emission angle."),
@@ -311,27 +247,6 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
          _("Gravity value on Y axis"),
          _("Compare value of the gravity on Y axis."),
          _("the gravity on Y axis"),
-         _("Advanced"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
-  obj.AddAction("ParticleGravityZ",
-                _("Z Gravity"),
-                _("Change value of the gravity on Z axis."),
-                _("the gravity direction on Z axis of_PARAM0_"),
-                _("Advanced"),
-                "CppPlatform/Extensions/particleSystemicon24.png",
-                "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number");
-
-  obj.AddCondition(
-         "ParticleGravityZ",
-         _("Direction of gravity on Z axis"),
-         _("Test the direction of gravity on Z axis"),
-         _("the gravity direction on Z axis"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")

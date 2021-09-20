@@ -41,24 +41,17 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetFlow(float newValue);
   void SetEmitterForceMin(float newValue);
   void SetEmitterForceMax(float newValue);
-  void SetEmitterXDirection(float newValue);
-  void SetEmitterYDirection(float newValue);
-  void SetEmitterZDirection(float newValue);
   void SetEmitterAngleA(float newValue);
   void SetEmitterAngleB(float newValue);
   void SetConeSprayAngle(float newValue) { SetEmitterAngleB(newValue); };
   void SetZoneRadius(float newValue);
   void SetParticleGravityX(float newValue);
   void SetParticleGravityY(float newValue);
-  void SetParticleGravityZ(float newValue);
   void SetParticleGravityAngle(float newAngleInDegree);
   void SetParticleGravityLength(float newLength);
   void SetFriction(float newValue);
 
   enum ParticleParameterType { Nothing, Enabled, Mutable, Random };
-  void SetRedParameterType(ParticleParameterType type) { redParam = type; };
-  void SetGreenParameterType(ParticleParameterType type) { greenParam = type; };
-  void SetBlueParameterType(ParticleParameterType type) { blueParam = type; };
   void SetAlphaParameterType(ParticleParameterType type) { alphaParam = type; };
   void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
   void SetAngleParameterType(ParticleParameterType type) { angleParam = type; };
@@ -137,16 +130,12 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetFlow() const { return flow; };
   float GetEmitterForceMin() const { return emitterForceMin; };
   float GetEmitterForceMax() const { return emitterForceMax; };
-  float GetEmitterXDirection() const { return emitterXDirection; };
-  float GetEmitterYDirection() const { return emitterYDirection; };
-  float GetEmitterZDirection() const { return emitterZDirection; };
   float GetEmitterAngleA() const { return emitterAngleA; };
   float GetEmitterAngleB() const { return emitterAngleB; };
   float GetConeSprayAngle() const { return GetEmitterAngleB(); };
   float GetZoneRadius() const { return zoneRadius; };
   float GetParticleGravityX() const { return particleGravityX; };
   float GetParticleGravityY() const { return particleGravityY; };
-  float GetParticleGravityZ() const { return particleGravityZ; };
   float GetParticleGravityAngle() const;
   float GetParticleGravityLength() const;
   float GetFriction() const { return friction; };
@@ -155,9 +144,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   std::size_t GetMaxParticleNb() const { return maxParticleNb; };
   bool GetDestroyWhenNoParticles() const { return destroyWhenNoParticles; };
 
-  ParticleParameterType GetRedParameterType() const { return redParam; };
-  ParticleParameterType GetGreenParameterType() const { return greenParam; };
-  ParticleParameterType GetBlueParameterType() const { return blueParam; };
   ParticleParameterType GetAlphaParameterType() const { return alphaParam; };
   ParticleParameterType GetSizeParameterType() const { return sizeParam; };
   ParticleParameterType GetAngleParameterType() const { return angleParam; };
@@ -217,16 +203,13 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float flow;
   float emitterForceMin;
   float emitterForceMax;
-  float emitterXDirection;
-  float emitterYDirection;
-  float emitterZDirection;
   float emitterAngleA;
   float emitterAngleB;
   float zoneRadius;
-  float particleGravityX, particleGravityY, particleGravityZ;
+  float particleGravityX, particleGravityY;
   float friction;
   float particleLifeTimeMin, particleLifeTimeMax;
-  ParticleParameterType redParam, greenParam, blueParam, alphaParam, sizeParam,
+  ParticleParameterType alphaParam, sizeParam,
       angleParam;
   float particleRed1, particleRed2, particleGreen1, particleGreen2,
       particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;

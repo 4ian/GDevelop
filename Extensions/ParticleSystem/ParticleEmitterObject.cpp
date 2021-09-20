@@ -29,21 +29,14 @@ ParticleEmitterBase::ParticleEmitterBase()
       flow(45),
       emitterForceMin(45.0f),
       emitterForceMax(85.0f),
-      emitterXDirection(0.0f),
-      emitterYDirection(1.0f),
-      emitterZDirection(0.0f),
       emitterAngleA(0),
       emitterAngleB(90),
       zoneRadius(3.0f),
       particleGravityX(0.0f),
       particleGravityY(0.0f),
-      particleGravityZ(0.0f),
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      redParam(Enabled),
-      greenParam(Random),
-      blueParam(Random),
       alphaParam(Mutable),
       sizeParam(Mutable),
       angleParam(Mutable),
@@ -99,15 +92,11 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   flow = element.GetDoubleAttribute("flow");
   emitterForceMin = element.GetDoubleAttribute("emitterForceMin");
   emitterForceMax = element.GetDoubleAttribute("emitterForceMax");
-  emitterXDirection = element.GetDoubleAttribute("emitterXDirection");
-  emitterYDirection = element.GetDoubleAttribute("emitterYDirection");
-  emitterZDirection = element.GetDoubleAttribute("emitterZDirection");
   emitterAngleA = element.GetDoubleAttribute("emitterAngleA");
   emitterAngleB = element.GetDoubleAttribute("emitterAngleB");
   zoneRadius = element.GetDoubleAttribute("zoneRadius");
   particleGravityX = element.GetDoubleAttribute("particleGravityX");
   particleGravityY = element.GetDoubleAttribute("particleGravityY");
-  particleGravityZ = element.GetDoubleAttribute("particleGravityZ");
   friction = element.GetDoubleAttribute("friction");
   particleLifeTimeMin = element.GetDoubleAttribute("particleLifeTimeMin");
   particleLifeTimeMax = element.GetDoubleAttribute("particleLifeTimeMax");
@@ -151,33 +140,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
       rendererType = Quad;
     else
       rendererType = Point;
-  }
-  {
-    gd::String result = element.GetStringAttribute("redParam");
-    if (result == "Mutable")
-      redParam = Mutable;
-    else if (result == "Random")
-      redParam = Random;
-    else
-      redParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("greenParam");
-    if (result == "Mutable")
-      greenParam = Mutable;
-    else if (result == "Random")
-      greenParam = Random;
-    else
-      greenParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("blueParam");
-    if (result == "Mutable")
-      blueParam = Mutable;
-    else if (result == "Random")
-      blueParam = Random;
-    else
-      blueParam = Enabled;
   }
   {
     gd::String result = element.GetStringAttribute("alphaParam");
@@ -224,15 +186,11 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("flow", flow);
   element.SetAttribute("emitterForceMin", emitterForceMin);
   element.SetAttribute("emitterForceMax", emitterForceMax);
-  element.SetAttribute("emitterXDirection", emitterXDirection);
-  element.SetAttribute("emitterYDirection", emitterYDirection);
-  element.SetAttribute("emitterZDirection", emitterZDirection);
   element.SetAttribute("emitterAngleA", emitterAngleA);
   element.SetAttribute("emitterAngleB", emitterAngleB);
   element.SetAttribute("zoneRadius", zoneRadius);
   element.SetAttribute("particleGravityX", particleGravityX);
   element.SetAttribute("particleGravityY", particleGravityY);
-  element.SetAttribute("particleGravityZ", particleGravityZ);
   element.SetAttribute("friction", friction);
   element.SetAttribute("particleLifeTimeMin", particleLifeTimeMin);
   element.SetAttribute("particleLifeTimeMax", particleLifeTimeMax);
@@ -267,27 +225,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
-
-  gd::String redParamStr = "Enabled";
-  if (redParam == Mutable)
-    redParamStr = "Mutable";
-  else if (redParam == Random)
-    redParamStr = "Random";
-  element.SetAttribute("redParam", redParamStr);
-
-  gd::String greenParamStr = "Enabled";
-  if (greenParam == Mutable)
-    greenParamStr = "Mutable";
-  else if (greenParam == Random)
-    greenParamStr = "Random";
-  element.SetAttribute("greenParam", greenParamStr);
-
-  gd::String blueParamStr = "Enabled";
-  if (blueParam == Mutable)
-    blueParamStr = "Mutable";
-  else if (blueParam == Random)
-    blueParamStr = "Random";
-  element.SetAttribute("blueParam", blueParamStr);
 
   gd::String alphaParamStr = "Enabled";
   if (alphaParam == Mutable)
@@ -341,20 +278,8 @@ void ParticleEmitterBase::SetParticleGravityX(float newValue) {
 void ParticleEmitterBase::SetParticleGravityY(float newValue) {
   particleGravityY = newValue;
 }
-void ParticleEmitterBase::SetParticleGravityZ(float newValue) {
-  particleGravityZ = newValue;
-}
 void ParticleEmitterBase::SetFriction(float newValue) {
   friction = newValue;
-}
-void ParticleEmitterBase::SetEmitterXDirection(float newValue) {
-  emitterXDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterYDirection(float newValue) {
-  emitterYDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterZDirection(float newValue) {
-  emitterZDirection = newValue;
 }
 void ParticleEmitterBase::SetEmitterAngleA(float newValue) {
   emitterAngleA = newValue;
@@ -424,21 +349,14 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   flow = other.flow;
   emitterForceMin = other.emitterForceMin;
   emitterForceMax = other.emitterForceMax;
-  emitterXDirection = other.emitterXDirection;
-  emitterYDirection = other.emitterYDirection;
-  emitterZDirection = other.emitterZDirection;
   emitterAngleA = other.emitterAngleA;
   emitterAngleB = other.emitterAngleB;
   zoneRadius = other.zoneRadius;
   particleGravityX = other.particleGravityX;
   particleGravityY = other.particleGravityY;
-  particleGravityZ = other.particleGravityZ;
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  redParam = other.redParam;
-  greenParam = other.greenParam;
-  blueParam = other.blueParam;
   alphaParam = other.alphaParam;
   sizeParam = other.sizeParam;
   angleParam = other.angleParam;

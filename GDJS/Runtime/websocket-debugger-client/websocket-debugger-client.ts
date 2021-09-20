@@ -245,6 +245,7 @@ namespace gdjs {
               type,
               group,
               internal,
+              timestamp: performance.now(),
             },
           })
         );

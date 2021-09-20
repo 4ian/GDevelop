@@ -26,12 +26,15 @@ import ExpandIcon from '@material-ui/icons/AspectRatio';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import FilterIcon from '@material-ui/icons/FilterList';
+import TimerIcon from '@material-ui/icons/Timer';
+import FolderIcon from '@material-ui/icons/Folder';
 
 export type Log = {
   message: string,
   type: 'info' | 'warning' | 'error',
   group: string,
   internal: boolean,
+  timestamp: number,
 };
 
 export class LogsManager {
@@ -223,18 +226,36 @@ export const DebuggerConsole = ({
                             </div>
                           }
                           secondary={
-                            maximized && filteredLogs[index].group ? (
-                              <Chip
-                                label={
-                                  <ConsoleText>
-                                    <Trans>
-                                      Group: {filteredLogs[index].group}
-                                    </Trans>
-                                  </ConsoleText>
-                                }
-                              />
-                            ) : (
-                              undefined
+                            maximized && (
+                              <>
+                                {filteredLogs[index].group ? (
+                                  <Chip
+                                    icon={<FolderIcon />}
+                                    size="small"
+                                    label={
+                                      <ConsoleText>
+                                        <Trans>
+                                          Group: {filteredLogs[index].group}
+                                        </Trans>
+                                      </ConsoleText>
+                                    }
+                                  />
+                                ) : (
+                                  undefined
+                                )}
+                                <Chip
+                                  icon={<TimerIcon />}
+                                  size="small"
+                                  label={
+                                    <ConsoleText>
+                                      <Trans>
+                                        Timestamp:{' '}
+                                        {filteredLogs[index].timestamp}
+                                      </Trans>
+                                    </ConsoleText>
+                                  }
+                                />
+                              </>
                             )
                           }
                         />

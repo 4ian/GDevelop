@@ -37,7 +37,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      alphaParam(Mutable),
       sizeParam(Mutable),
       particleRed1(255.0f),
       particleRed2(255.0f),
@@ -141,15 +140,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
       rendererType = Point;
   }
   {
-    gd::String result = element.GetStringAttribute("alphaParam");
-    if (result == "Mutable")
-      alphaParam = Mutable;
-    else if (result == "Random")
-      alphaParam = Random;
-    else
-      alphaParam = Enabled;
-  }
-  {
     gd::String result = element.GetStringAttribute("sizeParam");
     if (result == "Mutable")
       sizeParam = Mutable;
@@ -215,13 +205,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
-
-  gd::String alphaParamStr = "Enabled";
-  if (alphaParam == Mutable)
-    alphaParamStr = "Mutable";
-  else if (alphaParam == Random)
-    alphaParamStr = "Random";
-  element.SetAttribute("alphaParam", alphaParamStr);
 
   gd::String sizeParamStr = "Nothing";
   if (sizeParam == Mutable)
@@ -340,7 +323,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  alphaParam = other.alphaParam;
   sizeParam = other.sizeParam;
   particleRed1 = other.particleRed1;
   particleRed2 = other.particleRed2;

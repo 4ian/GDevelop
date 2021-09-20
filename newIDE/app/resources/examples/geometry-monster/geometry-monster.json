@@ -1831,7 +1831,6 @@
         },
         {
           "additive": false,
-          "alphaParam": "Mutable",
           "destroyWhenNoParticles": true,
           "emissionEditionSimpleMode": true,
           "emitterAngleA": 0,
@@ -1880,7 +1879,6 @@
         },
         {
           "additive": false,
-          "alphaParam": "Mutable",
           "destroyWhenNoParticles": true,
           "emissionEditionSimpleMode": true,
           "emitterAngleA": 0,
@@ -1929,7 +1927,6 @@
         },
         {
           "additive": false,
-          "alphaParam": "Mutable",
           "destroyWhenNoParticles": true,
           "emissionEditionSimpleMode": true,
           "emitterAngleA": 0,
@@ -1978,7 +1975,6 @@
         },
         {
           "additive": false,
-          "alphaParam": "Mutable",
           "destroyWhenNoParticles": true,
           "emissionEditionSimpleMode": true,
           "emitterAngleA": 0,

@@ -130,22 +130,14 @@ namespace gdjs {
             : 1,
         isStepped: false,
       };
-      if (objectData.alphaParam === 'Mutable') {
-        // @ts-ignore
-        config.alpha = {
-          list: [
-            { time: 0, value: objectData.particleAlpha1 / 255.0 },
-            { time: 1, value: objectData.particleAlpha2 / 255.0 },
-          ],
-          isStepped: false,
-        };
-      } else {
-        // @ts-ignore
-        config.alpha = {
-          list: [{ time: 0, value: objectData.particleAlpha1 / 255.0 }],
-          isStepped: false,
-        };
-      }
+      // @ts-ignore
+      config.alpha = {
+        list: [
+          { time: 0, value: objectData.particleAlpha1 / 255.0 },
+          { time: 1, value: objectData.particleAlpha2 / 255.0 },
+        ],
+        isStepped: false,
+      };
       if (objectData.sizeParam === 'Mutable') {
         let size1 = objectData.particleSize1 / 100;
         let size2 = objectData.particleSize2 / 100;

@@ -138,36 +138,20 @@ namespace gdjs {
         ],
         isStepped: false,
       };
-      if (objectData.sizeParam === 'Mutable') {
-        let size1 = objectData.particleSize1 / 100;
-        let size2 = objectData.particleSize2 / 100;
-        const sizeRandom1 = objectData.particleSizeRandomness1 / 100;
-        const sizeRandom2 = objectData.particleSizeRandomness2 / 100;
-        const m = sizeRandom2 !== 0 ? (1 + sizeRandom1) / (1 + sizeRandom2) : 1;
-        // @ts-ignore
-        config.scale = {
-          list: [
-            { time: 0, value: size1 * (1 + sizeRandom1) },
-            { time: 1, value: size2 * (1 + sizeRandom2) },
-          ],
-          minimumScaleMultiplier: m,
-          isStepped: false,
-        };
-      } else {
-        let size1 = objectData.particleSize1 / 100;
-        let size2 = objectData.particleSize2 / 100;
-        let mult = size2 !== 0 ? (1 + size1) / (1 + size2) : 1;
-        if (size2 === 0 && size1 > size2) {
-          mult = (1 + size2) / (1 + size1);
-          size2 = size1;
-        }
-        // @ts-ignore
-        config.scale = {
-          list: [{ time: 0, value: size2 }],
-          minimumScaleMultiplier: mult,
-          isStepped: false,
-        };
-      }
+      let size1 = objectData.particleSize1 / 100;
+      let size2 = objectData.particleSize2 / 100;
+      const sizeRandom1 = objectData.particleSizeRandomness1 / 100;
+      const sizeRandom2 = objectData.particleSizeRandomness2 / 100;
+      const m = sizeRandom2 !== 0 ? (1 + sizeRandom1) / (1 + sizeRandom2) : 1;
+      // @ts-ignore
+      config.scale = {
+        list: [
+          { time: 0, value: size1 * (1 + sizeRandom1) },
+          { time: 1, value: size2 * (1 + sizeRandom2) },
+        ],
+        minimumScaleMultiplier: m,
+        isStepped: false,
+      };
       if (objectData.emissionEditionSimpleMode) {
         // @ts-ignore
         config.startRotation = {

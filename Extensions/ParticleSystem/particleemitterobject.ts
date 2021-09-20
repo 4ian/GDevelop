@@ -27,7 +27,6 @@ namespace gdjs {
     particleAngle2: number;
     particleAngle1: number;
     particleAlpha1: number;
-    sizeParam: string;
     rendererType: string;
     particleAlpha2: number;
     rendererParam2: number;
@@ -69,7 +68,6 @@ namespace gdjs {
     colorB2: number;
     size1: number;
     size2: number;
-    sizeParam: string;
     alpha1: number;
     alpha2: number;
     rendererType: string;
@@ -128,7 +126,6 @@ namespace gdjs {
       this.colorB2 = particleObjectData.particleBlue2;
       this.size1 = particleObjectData.particleSize1;
       this.size2 = particleObjectData.particleSize2;
-      this.sizeParam = particleObjectData.sizeParam;
       this.alpha1 = particleObjectData.particleAlpha1;
       this.alpha2 = particleObjectData.particleAlpha2;
       this.rendererType = particleObjectData.rendererType;
@@ -235,10 +232,6 @@ namespace gdjs {
       if (oldObjectData.particleSize2 !== newObjectData.particleSize2) {
         this.setParticleSize2(newObjectData.particleSize2);
       }
-      if (oldObjectData.sizeParam !== newObjectData.sizeParam) {
-        this.sizeParam = newObjectData.sizeParam;
-        this._sizeDirty = true;
-      }
       if (oldObjectData.particleAlpha1 !== newObjectData.particleAlpha1) {
         this.setParticleAlpha1(newObjectData.particleAlpha1);
       }
@@ -338,7 +331,7 @@ namespace gdjs {
           this.colorB2
         );
       }
-      if (this._sizeDirty && this.sizeParam === 'Mutable') {
+      if (this._sizeDirty) {
         this._renderer.setSize(this.size1, this.size2);
       }
       if (this._alphaDirty) {

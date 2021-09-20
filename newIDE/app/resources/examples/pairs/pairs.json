@@ -1909,7 +1909,6 @@
           "rendererParam1": 3,
           "rendererParam2": 1,
           "rendererType": "Quad",
-          "sizeParam": "Mutable",
           "tags": "",
           "tank": 25,
           "textureParticleName": "images/star.png",

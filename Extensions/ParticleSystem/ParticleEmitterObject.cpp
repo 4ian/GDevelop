@@ -37,7 +37,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      sizeParam(Mutable),
       particleRed1(255.0f),
       particleRed2(255.0f),
       particleGreen1(51),
@@ -139,15 +138,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
     else
       rendererType = Point;
   }
-  {
-    gd::String result = element.GetStringAttribute("sizeParam");
-    if (result == "Mutable")
-      sizeParam = Mutable;
-    else if (result == "Random")
-      sizeParam = Random;
-    else
-      sizeParam = Nothing;
-  }
 }
 
 #if defined(GD_IDE_ONLY)
@@ -205,13 +195,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
-
-  gd::String sizeParamStr = "Nothing";
-  if (sizeParam == Mutable)
-    sizeParamStr = "Mutable";
-  else if (sizeParam == Random)
-    sizeParamStr = "Random";
-  element.SetAttribute("sizeParam", sizeParamStr);
 }
 #endif
 
@@ -323,7 +306,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  sizeParam = other.sizeParam;
   particleRed1 = other.particleRed1;
   particleRed2 = other.particleRed2;
   particleGreen1 = other.particleGreen1;

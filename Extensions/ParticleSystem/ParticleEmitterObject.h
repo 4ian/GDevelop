@@ -51,9 +51,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetParticleGravityLength(float newLength);
   void SetFriction(float newValue);
 
-  enum ParticleParameterType { Nothing, Enabled, Mutable, Random };
-  void SetSizeParameterType(ParticleParameterType type) { sizeParam = type; };
-
   void SetParticleColor1(const gd::String& color);
   void SetParticleColor2(const gd::String& color);
 
@@ -142,7 +139,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   std::size_t GetMaxParticleNb() const { return maxParticleNb; };
   bool GetDestroyWhenNoParticles() const { return destroyWhenNoParticles; };
 
-  ParticleParameterType GetSizeParameterType() const { return sizeParam; };
 
   float GetParticleRed1() const { return particleRed1; };
   float GetParticleRed2() const { return particleRed2; };
@@ -205,7 +201,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float particleGravityX, particleGravityY;
   float friction;
   float particleLifeTimeMin, particleLifeTimeMax;
-  ParticleParameterType sizeParam;
   float particleRed1, particleRed2, particleGreen1, particleGreen2,
       particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;
   float particleSize1, particleSize2, particleAngle1, particleAngle2;

@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Facebook instant games');
   export namespace evtTools {
     export namespace facebookInstantGames {
       export let _preloadedInterstitial: any = null;
@@ -153,12 +154,12 @@ namespace gdjs {
           .then(function () {
             gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
             gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = true;
-            console.info('Facebook Instant Games interstitial preloaded.');
+            logger.info('Facebook Instant Games interstitial preloaded.');
           })
           .catch(function (err) {
             gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
             gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
-            console.error('Interstitial failed to preload: ' + err.message);
+            logger.error('Interstitial failed to preload: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           });
       };
@@ -173,10 +174,10 @@ namespace gdjs {
         gdjs.evtTools.facebookInstantGames._preloadedInterstitial
           .showAsync()
           .then(function () {
-            console.info('Facebook Instant Games interstitial shown.');
+            logger.info('Facebook Instant Games interstitial shown.');
           })
           .catch(function (err) {
-            console.error('Interstitial failed to show: ' + err.message);
+            logger.error('Interstitial failed to show: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           })
           .then(function () {
@@ -207,12 +208,12 @@ namespace gdjs {
           .then(function () {
             gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
             gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = true;
-            console.info('Facebook Instant Games rewarded video preloaded.');
+            logger.info('Facebook Instant Games rewarded video preloaded.');
           })
           .catch(function (err) {
             gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
             gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
-            console.error('Rewarded video failed to preload: ' + err.message);
+            logger.error('Rewarded video failed to preload: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           });
       };
@@ -227,10 +228,10 @@ namespace gdjs {
         gdjs.evtTools.facebookInstantGames._preloadedRewardedVideo
           .showAsync()
           .then(function () {
-            console.info('Facebook Instant Games rewarded video shown.');
+            logger.info('Facebook Instant Games rewarded video shown.');
           })
           .catch(function (err) {
-            console.error('Rewarded video failed to show: ' + err.message);
+            logger.error('Rewarded video failed to show: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           })
           .then(function () {
@@ -242,7 +243,7 @@ namespace gdjs {
         return gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded;
       };
       if (typeof FBInstant === 'undefined' && typeof window !== 'undefined') {
-        console.log('Creating a mocked version of Facebook Instant Games.');
+        logger.log('Creating a mocked version of Facebook Instant Games.');
 
         /**
          * A mocked Leaderboard, part of the mock of FBInstant.
@@ -295,7 +296,7 @@ namespace gdjs {
 
           showAsync(): Promise<void> {
             if (this._isLoaded) {
-              console.info(
+              logger.info(
                 'In a real Instant Game, a video reward should have been shown to the user.'
               );
               return Promise.resolve();
@@ -318,7 +319,7 @@ namespace gdjs {
 
           showAsync(): Promise<void> {
             if (this._isLoaded) {
-              console.info(
+              logger.info(
                 'In a real Instant Game, an interstitial should have been shown to the user.'
               );
               return Promise.resolve();

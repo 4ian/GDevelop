@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('PIXI Image manager');
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -49,7 +50,7 @@ namespace gdjs {
         if (texture.valid) {
           return texture;
         } else {
-          console.error(
+          logger.error(
             'Texture for ' + resourceName + ' is not valid anymore.'
           );
         }
@@ -72,12 +73,12 @@ namespace gdjs {
           }
         }
         if (texture !== null) {
-          console.log('Loaded texture for resource "' + resourceName + '".');
+          logger.log('Loaded texture for resource "' + resourceName + '".');
           this._loadedTextures.put(resourceName, texture);
           return texture;
         }
       }
-      console.warn(
+      logger.warn(
         'Unable to find texture for resource "' + resourceName + '".'
       );
       return this._invalidTexture;
@@ -107,14 +108,14 @@ namespace gdjs {
           }
         }
         if (texture !== null) {
-          console.log(
+          logger.log(
             'Loaded video texture for resource "' + resourceName + '".'
           );
           this._loadedTextures.put(resourceName, texture);
           return texture;
         }
       }
-      console.warn(
+      logger.warn(
         'Unable to find video texture for resource "' + resourceName + '".'
       );
       return this._invalidTexture;

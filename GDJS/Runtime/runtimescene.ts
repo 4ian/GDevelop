@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Scene manager');
+
   /**
    * A scene being played, containing instances of objects rendered on screen.
    */
@@ -126,7 +128,7 @@ namespace gdjs {
      */
     loadFromScene(sceneData: LayoutData | null) {
       if (!sceneData) {
-        console.error('loadFromScene was called without a scene');
+        logger.error('loadFromScene was called without a scene');
         return;
       }
       if (this._isLoaded) {
@@ -240,7 +242,7 @@ namespace gdjs {
      */
     updateObject(objectData: ObjectData): void {
       if (!this.isObjectRegistered(objectData.name)) {
-        console.warn(
+        logger.warn(
           'Tried to call updateObject for an object that was not registered (' +
             objectData.name +
             '). Call registerObject first.'
@@ -435,8 +437,8 @@ namespace gdjs {
       if (module && module.func) {
         this._eventsFunction = module.func;
       } else {
-        console.log(
-          'Warning: no function found for running logic of scene ' + this._name
+        logger.warn(
+          'No function found for running logic of scene ' + this._name
         );
         this._eventsFunction = function () {};
       }
@@ -827,7 +829,7 @@ namespace gdjs {
      */
     getObjects(name: string): gdjs.RuntimeObject[] {
       if (!this._instances.containsKey(name)) {
-        console.log(
+        logger.info(
           'RuntimeScene.getObjects: No instances called "' +
             name +
             '"! Adding it.'
@@ -943,7 +945,7 @@ namespace gdjs {
       if (behaviorSharedData) {
         return behaviorSharedData;
       }
-      console.error("Can't find shared data for behavior with name:", name);
+      logger.error("Can't find shared data for behavior with name: " + name);
       return null;
     }
 

@@ -4,8 +4,7 @@ describe('gdjs.LinksManager', function () {
     object1Names,
     object2Names,
     object3Names,
-    eventsFunctionContext,
-    legacy
+    eventsFunctionContext
   ) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
@@ -132,21 +131,12 @@ describe('gdjs.LinksManager', function () {
      * @returns a selection of picked objects
      */
     const pickObjectsLinkedTo = (object, objectsLists) => {
-      let pickedSomething = false;
-      if (legacy) {
-        pickedSomething = gdjs.evtTools.linkedObjects.pickObjectsLinkedTo(
-          runtimeScene,
-          objectsLists,
-          object
-        );
-      } else {
-        pickedSomething = gdjs.evtTools.linkedObjects.quickPickObjectsLinkedTo(
-          runtimeScene,
-          eventsFunctionContext,
-          objectsLists,
-          object
-        );
-      }
+      let pickedSomething = gdjs.evtTools.linkedObjects.pickObjectsLinkedTo(
+        runtimeScene,
+        objectsLists,
+        object,
+        eventsFunctionContext
+      );
       return { pickedSomething, objectsLists };
     };
 
@@ -308,17 +298,12 @@ describe('gdjs.LinksManager', function () {
     },
   ].forEach((testCase) => {
     describe(testCase.caseName, function () {
-      [true, false].forEach((legacy) => {
-        describe(legacy ? '(legacy)' : '(quick)', function () {
-          doTest(
-            testCase.object1Names,
-            testCase.object2Names,
-            testCase.object3Names,
-            testCase.eventsFunctionContext,
-            legacy
-          );
-        });
-      });
+      doTest(
+        testCase.object1Names,
+        testCase.object2Names,
+        testCase.object3Names,
+        testCase.eventsFunctionContext
+      );
     });
   });
 });

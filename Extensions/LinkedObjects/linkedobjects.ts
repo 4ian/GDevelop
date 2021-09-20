@@ -158,8 +158,10 @@ namespace gdjs {
 
     [Symbol.iterator]() {
       let mapItr = this.linkedObjectMap.entries();
-      let listItr: IterableIterator<[number, gdjs.RuntimeObject]> =
-        [].entries();
+      let listItr: IterableIterator<[
+        number,
+        gdjs.RuntimeObject
+      ]> = [].entries();
 
       return {
         next: () => {
@@ -219,46 +221,18 @@ namespace gdjs {
         LinksManager.getManager(runtimeScene).removeAllLinksOf(objA);
       };
 
-      export const quickPickObjectsLinkedTo = function (
-        runtimeScene: gdjs.RuntimeScene,
-        eventsFunctionContext: EventsFunctionContext | undefined,
-        objectsLists: Hashtable<gdjs.RuntimeObject[]>,
-        obj: gdjs.RuntimeObject
-      ) {
-        return doPickObjectsLinkedTo(
-          runtimeScene,
-          objectsLists,
-          obj,
-          !!eventsFunctionContext
-        );
-      };
-
       export const pickObjectsLinkedTo = function (
         runtimeScene: gdjs.RuntimeScene,
         objectsLists: Hashtable<gdjs.RuntimeObject[]>,
-        obj: gdjs.RuntimeObject
-      ) {
-        return doPickObjectsLinkedTo(
-          runtimeScene,
-          objectsLists,
-          obj,
-          // Can't know if it's called from an event function or not.
-          // Object names will have to be checked.
-          true
-        );
-      };
-
-      const doPickObjectsLinkedTo = function (
-        runtimeScene: gdjs.RuntimeScene,
-        objectsLists: Hashtable<gdjs.RuntimeObject[]>,
         obj: gdjs.RuntimeObject,
-        isEventsFunction: boolean
+        eventsFunctionContext: EventsFunctionContext | undefined
       ) {
         if (obj === null) {
           return false;
         }
-        const linkedObjectMap =
-          LinksManager.getManager(runtimeScene)._getMapOfObjectsLinkedWith(obj);
+        const linkedObjectMap = LinksManager.getManager(
+          runtimeScene
+        )._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {
@@ -275,7 +249,7 @@ namespace gdjs {
               gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
             );
             parentEventPickedObjectNames.length = 0;
-            if (isEventsFunction) {
+            if (eventsFunctionContext) {
               // For functions, objects lists may contain objects with different names
               // indexed not by their name, but by the parameter name representing them.
               // This means that each object can have a different name,

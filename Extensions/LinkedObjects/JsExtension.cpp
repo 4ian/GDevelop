@@ -41,18 +41,10 @@ class LinkedObjectsJsExtension : public gd::PlatformExtension {
         .codeExtraInformation
         .SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
         .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
-    GetAllActions()["LinkedObjects::QuickPickObjectsLinkedTo"]
-        .codeExtraInformation
-        .SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
-        .SetFunctionName("gdjs.evtTools.linkedObjects.quickPickObjectsLinkedTo");
     GetAllConditions()["LinkedObjects::PickObjectsLinkedTo"]
         .codeExtraInformation
         .SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
         .SetFunctionName("gdjs.evtTools.linkedObjects.pickObjectsLinkedTo");
-    GetAllConditions()["LinkedObjects::QuickPickObjectsLinkedTo"]
-        .codeExtraInformation
-        .SetIncludeFile("Extensions/LinkedObjects/linkedobjects.js")
-        .SetFunctionName("gdjs.evtTools.linkedObjects.quickPickObjectsLinkedTo");
 
     StripUnimplementedInstructionsAndExpressions();
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

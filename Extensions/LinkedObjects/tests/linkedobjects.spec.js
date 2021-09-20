@@ -108,7 +108,7 @@ describe('gdjs.LinksManager', function () {
 
     /**
      * @param {gdjs.RuntimeObject} object
-     * @param {Hashtable<gdjs.RuntimeObject[]>} pickedObjects
+     * @param {Hashtable<gdjs.RuntimeObject[]>} objectsLists
      * @returns a selection of picked objects
      */
     const pickObjectsLinkedTo = (object, objectsLists) => {

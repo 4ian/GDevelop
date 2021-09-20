@@ -110,12 +110,7 @@ namespace gdjs {
         maxParticles: objectData.maxParticleNb,
         // Lifetime can be computed from the tank (the number of particles available)
         // and the flow (number of particles emitted per seconds)
-        emitterLifetime:
-          objectData.tank < 0
-            ? -1
-            : objectData.flow < 0
-            ? 0.001
-            : objectData.tank / objectData.flow,
+        emitterLifetime: ParticleEmitterObjectPixiRenderer.computeLifetime(objectData.tank, objectData.flow),
         pos: { x: 0, y: 0 },
         addAtBack: false,
         spawnType: 'circle',
@@ -255,12 +250,7 @@ namespace gdjs {
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitterLifetime =
-        tank < 0
-          ? -1
-          : flow < 0
-          ? 0.001
-          : (tank - this.emitter.totalParticleCount) / flow;
+      this.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(tank, flow);
     }
 
     isTextureNameValid(texture: string, runtimeScene: gdjs.RuntimeScene): boolean {
@@ -307,6 +297,13 @@ namespace gdjs {
 
     hasStarted(): boolean {
       return this.started;
+    }
+
+    static computeLifetime(tank: number, flow: number): float {
+      if (tank < 0) return -1
+      else if (flow < 0) return 0.001
+      else
+        return tank / flow;
     }
   }
 

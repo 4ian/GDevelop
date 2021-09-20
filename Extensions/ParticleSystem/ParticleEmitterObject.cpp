@@ -37,9 +37,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      redParam(Enabled),
-      greenParam(Random),
-      blueParam(Random),
       alphaParam(Mutable),
       sizeParam(Mutable),
       angleParam(Mutable),
@@ -145,33 +142,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
       rendererType = Point;
   }
   {
-    gd::String result = element.GetStringAttribute("redParam");
-    if (result == "Mutable")
-      redParam = Mutable;
-    else if (result == "Random")
-      redParam = Random;
-    else
-      redParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("greenParam");
-    if (result == "Mutable")
-      greenParam = Mutable;
-    else if (result == "Random")
-      greenParam = Random;
-    else
-      greenParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("blueParam");
-    if (result == "Mutable")
-      blueParam = Mutable;
-    else if (result == "Random")
-      blueParam = Random;
-    else
-      blueParam = Enabled;
-  }
-  {
     gd::String result = element.GetStringAttribute("alphaParam");
     if (result == "Mutable")
       alphaParam = Mutable;
@@ -255,27 +225,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
-
-  gd::String redParamStr = "Enabled";
-  if (redParam == Mutable)
-    redParamStr = "Mutable";
-  else if (redParam == Random)
-    redParamStr = "Random";
-  element.SetAttribute("redParam", redParamStr);
-
-  gd::String greenParamStr = "Enabled";
-  if (greenParam == Mutable)
-    greenParamStr = "Mutable";
-  else if (greenParam == Random)
-    greenParamStr = "Random";
-  element.SetAttribute("greenParam", greenParamStr);
-
-  gd::String blueParamStr = "Enabled";
-  if (blueParam == Mutable)
-    blueParamStr = "Mutable";
-  else if (blueParam == Random)
-    blueParamStr = "Random";
-  element.SetAttribute("blueParam", blueParamStr);
 
   gd::String alphaParamStr = "Enabled";
   if (alphaParam == Mutable)
@@ -408,9 +357,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  redParam = other.redParam;
-  greenParam = other.greenParam;
-  blueParam = other.blueParam;
   alphaParam = other.alphaParam;
   sizeParam = other.sizeParam;
   angleParam = other.angleParam;

@@ -261,77 +261,80 @@ namespace gdjs {
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {
           if (objectsLists.containsKey(contextObjectName)) {
-            const pickedObjects = objectsLists.items[contextObjectName];
+            const parentEventPickedObjects = objectsLists.items[contextObjectName];
 
-            if (pickedObjects.length === 0) {
+            if (parentEventPickedObjects.length === 0) {
               continue;
             }
 
             // Find the object names in the scene
-            const temporaryObjectNames = gdjs.staticArray2(
+            const parentEventPickedObjectNames = gdjs.staticArray2(
               gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
             );
-            temporaryObjectNames.length = 0;
+            parentEventPickedObjectNames.length = 0;
             if (isEventsFunction) {
-              // For functions, objects may be a flattened group
-              for (const pickedObject of pickedObjects) {
-                if (temporaryObjectNames.indexOf(pickedObject.getName()) < 0) {
-                  temporaryObjectNames.push(pickedObject.getName());
+              // For functions, objects may be a flattened group of objects.
+              // This means that each object can have a different name,
+              // so we iterate on them to get all the names.
+              for (const pickedObject of parentEventPickedObjects) {
+                if (parentEventPickedObjectNames.indexOf(pickedObject.getName()) < 0) {
+                  parentEventPickedObjectNames.push(pickedObject.getName());
                 }
               }
             } else {
-              temporaryObjectNames.push(contextObjectName);
+              // In the case of a scene, the list of objects are guaranteed
+              // to be indexed by the object name (no mix of objects with
+              // different names in a list).
+              parentEventPickedObjectNames.push(contextObjectName);
             }
 
+            // Sum the number of instances in the scene for each objects found
+            // previously in parentEventPickedObjects.
             let objectCount = 0;
-            let linkedObjectExists = false;
-            for (const objectName of temporaryObjectNames) {
+            for (const objectName of parentEventPickedObjectNames) {
               objectCount += runtimeScene.getObjects(objectName).length;
-              linkedObjectExists =
-                linkedObjectExists || linkedObjectMap.has(objectName);
             }
 
-            if (linkedObjectExists) {
-              if (pickedObjects.length === objectCount) {
-                // All the objects were picked, there is no need to make an intersection.
-                pickedObjects.length = 0;
-                for (const objectName of temporaryObjectNames) {
-                  if (linkedObjectMap.has(objectName)) {
-                    const linkedObjects = linkedObjectMap.get(objectName)!;
+            if (parentEventPickedObjects.length === objectCount) {
+              // The parent event didn't make any selection on the current object,
+              // there is no need to make an intersection.
+              // We will only replace the picked list with the linked object list.
+              parentEventPickedObjects.length = 0;
+              for (const objectName of parentEventPickedObjectNames) {
+                if (linkedObjectMap.has(objectName)) {
+                  const linkedObjects = linkedObjectMap.get(objectName)!;
 
-                    pickedSomething =
-                      pickedSomething || linkedObjects.length > 0;
-                    pickedObjects.push.apply(pickedObjects, linkedObjects);
-                  }
+                  pickedSomething =
+                    pickedSomething || linkedObjects.length > 0;
+                  parentEventPickedObjects.push.apply(parentEventPickedObjects, linkedObjects);
                 }
-              } else {
-                const temporaryObjects = gdjs.staticArray(
-                  gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
-                );
-                temporaryObjects.length = 0;
+              }
+            } else {
+              // Run an intersection between objects picked by parent events
+              // and the linked ones.
+              const pickedAndLinkedObjects = gdjs.staticArray(
+                gdjs.evtTools.linkedObjects.pickObjectsLinkedTo
+              );
+              pickedAndLinkedObjects.length = 0;
 
-                for (const objectName of temporaryObjectNames) {
-                  if (linkedObjectMap.has(objectName)) {
-                    const linkedObjects = linkedObjectMap.get(objectName)!;
+              for (const objectName of parentEventPickedObjectNames) {
+                if (linkedObjectMap.has(objectName)) {
+                  const linkedObjects = linkedObjectMap.get(objectName)!;
 
-                    for (const otherObject of linkedObjects) {
-                      if (pickedObjects.indexOf(otherObject) >= 0) {
-                        temporaryObjects.push(otherObject);
-                      }
+                  for (const otherObject of linkedObjects) {
+                    if (parentEventPickedObjects.indexOf(otherObject) >= 0) {
+                      pickedAndLinkedObjects.push(otherObject);
                     }
                   }
                 }
-                pickedSomething =
-                  pickedSomething || temporaryObjects.length > 0;
-                pickedObjects.length = 0;
-                pickedObjects.push.apply(pickedObjects, temporaryObjects);
-                temporaryObjects.length = 0;
               }
-            } else {
-              // No object is linked for this name
-              pickedObjects.length = 0;
+              pickedSomething =
+                pickedSomething || pickedAndLinkedObjects.length > 0;
+              parentEventPickedObjects.length = 0;
+              parentEventPickedObjects.push.apply(parentEventPickedObjects, pickedAndLinkedObjects);
+              pickedAndLinkedObjects.length = 0;
             }
-            temporaryObjectNames.length = 0;
+            parentEventPickedObjectNames.length = 0;
           }
         }
         return pickedSomething;

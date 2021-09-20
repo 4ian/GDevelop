@@ -347,9 +347,6 @@ namespace gdjs {
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = false;
       this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
-      if (this.tank > 0 && this._renderer.getTotalParticleCount() > this.tank) {
-        this._renderer.stop();
-      }
       if (
         this._renderer.hasStarted() &&
         this._renderer.getParticleCount() === 0 &&

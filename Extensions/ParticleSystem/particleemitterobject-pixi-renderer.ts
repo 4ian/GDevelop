@@ -289,10 +289,6 @@ namespace gdjs {
       }
     }
 
-    getTotalParticleCount(): integer {
-      return this.emitter.totalParticleCount;
-    }
-
     getParticleCount(): integer {
       return this.emitter.particleCount;
     }

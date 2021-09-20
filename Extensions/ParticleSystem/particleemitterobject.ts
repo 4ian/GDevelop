@@ -27,7 +27,6 @@ namespace gdjs {
     particleAngle2: number;
     particleAngle1: number;
     particleAlpha1: number;
-    sizeParam: string;
     rendererType: string;
     particleAlpha2: number;
     rendererParam2: number;
@@ -69,7 +68,6 @@ namespace gdjs {
     colorB2: number;
     size1: number;
     size2: number;
-    sizeParam: string;
     alpha1: number;
     alpha2: number;
     rendererType: string;
@@ -128,7 +126,6 @@ namespace gdjs {
       this.colorB2 = particleObjectData.particleBlue2;
       this.size1 = particleObjectData.particleSize1;
       this.size2 = particleObjectData.particleSize2;
-      this.sizeParam = particleObjectData.sizeParam;
       this.alpha1 = particleObjectData.particleAlpha1;
       this.alpha2 = particleObjectData.particleAlpha2;
       this.rendererType = particleObjectData.rendererType;
@@ -144,14 +141,14 @@ namespace gdjs {
       this.onCreated();
     }
 
-    setX(x): void {
+    setX(x: number): void {
       if (this.x !== x) {
         this._posDirty = true;
       }
       super.setX(x);
     }
 
-    setY(y): void {
+    setY(y: number): void {
       if (this.y !== y) {
         this._posDirty = true;
       }
@@ -234,10 +231,6 @@ namespace gdjs {
       }
       if (oldObjectData.particleSize2 !== newObjectData.particleSize2) {
         this.setParticleSize2(newObjectData.particleSize2);
-      }
-      if (oldObjectData.sizeParam !== newObjectData.sizeParam) {
-        this.sizeParam = newObjectData.sizeParam;
-        this._sizeDirty = true;
       }
       if (oldObjectData.particleAlpha1 !== newObjectData.particleAlpha1) {
         this.setParticleAlpha1(newObjectData.particleAlpha1);
@@ -338,7 +331,7 @@ namespace gdjs {
           this.colorB2
         );
       }
-      if (this._sizeDirty && this.sizeParam === 'Mutable') {
+      if (this._sizeDirty) {
         this._renderer.setSize(this.size1, this.size2);
       }
       if (this._alphaDirty) {
@@ -354,9 +347,6 @@ namespace gdjs {
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = false;
       this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
-      if (this.tank > 0 && this._renderer.getTotalParticleCount() > this.tank) {
-        this._renderer.stop();
-      }
       if (
         this._renderer.hasStarted() &&
         this._renderer.getParticleCount() === 0 &&
@@ -366,16 +356,16 @@ namespace gdjs {
       }
     }
 
-    onDestroyFromScene(runtimeScene): void {
+    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.destroy();
       super.onDestroyFromScene(runtimeScene);
     }
 
-    getEmitterForceMin() {
+    getEmitterForceMin(): number {
       return this.forceMin;
     }
 
-    setEmitterForceMin(force): void {
+    setEmitterForceMin(force: float): void {
       if (force < 0) {
         force = 0;
       }
@@ -385,11 +375,11 @@ namespace gdjs {
       }
     }
 
-    getEmitterForceMax() {
+    getEmitterForceMax(): number {
       return this.forceMax;
     }
 
-    setEmitterForceMax(force): void {
+    setEmitterForceMax(force: float): void {
       if (force < 0) {
         force = 0;
       }
@@ -403,7 +393,7 @@ namespace gdjs {
       return (this.angleA + this.angleB) / 2.0;
     }
 
-    setEmitterAngle(angle): void {
+    setEmitterAngle(angle: float): void {
       const oldAngle = this.getEmitterAngle();
       if (angle !== oldAngle) {
         this._angleDirty = true;
@@ -412,22 +402,22 @@ namespace gdjs {
       }
     }
 
-    getEmitterAngleA() {
+    getEmitterAngleA(): float {
       return this.angleA;
     }
 
-    setEmitterAngleA(angle): void {
+    setEmitterAngleA(angle: float): void {
       if (this.angleA !== angle) {
         this._angleDirty = true;
         this.angleA = angle;
       }
     }
 
-    getEmitterAngleB() {
+    getEmitterAngleB(): float {
       return this.angleB;
     }
 
-    setEmitterAngleB(angle): void {
+    setEmitterAngleB(angle: float): void {
       if (this.angleB !== angle) {
         this._angleDirty = true;
         this.angleB = angle;
@@ -438,7 +428,7 @@ namespace gdjs {
       return Math.abs(this.angleB - this.angleA);
     }
 
-    setConeSprayAngle(angle): void {
+    setConeSprayAngle(angle: float): void {
       const oldCone = this.getConeSprayAngle();
       if (oldCone !== angle) {
         this._angleDirty = true;
@@ -448,11 +438,11 @@ namespace gdjs {
       }
     }
 
-    getZoneRadius() {
+    getZoneRadius(): float {
       return this.zoneRadius;
     }
 
-    setZoneRadius(radius): void {
+    setZoneRadius(radius: float): void {
       if (radius < 0) {
         radius = 0;
       }
@@ -462,11 +452,11 @@ namespace gdjs {
       }
     }
 
-    getParticleLifeTimeMin() {
+    getParticleLifeTimeMin(): float {
       return this.lifeTimeMin;
     }
 
-    setParticleLifeTimeMin(lifeTime): void {
+    setParticleLifeTimeMin(lifeTime: float): void {
       if (lifeTime < 0) {
         lifeTime = 0;
       }
@@ -476,11 +466,11 @@ namespace gdjs {
       }
     }
 
-    getParticleLifeTimeMax() {
+    getParticleLifeTimeMax(): float {
       return this.lifeTimeMax;
     }
 
-    setParticleLifeTimeMax(lifeTime): void {
+    setParticleLifeTimeMax(lifeTime: float): void {
       if (lifeTime < 0) {
         lifeTime = 0;
       }
@@ -494,7 +484,7 @@ namespace gdjs {
       return this.gravityX;
     }
 
-    setParticleGravityX(x): void {
+    setParticleGravityX(x: float): void {
       if (this.gravityX !== x) {
         this._gravityDirty = true;
         this.gravityX = x;
@@ -505,7 +495,7 @@ namespace gdjs {
       return this.gravityY;
     }
 
-    setParticleGravityY(y): void {
+    setParticleGravityY(y: float): void {
       if (this.gravityY !== y) {
         this._gravityDirty = true;
         this.gravityY = y;
@@ -516,7 +506,7 @@ namespace gdjs {
       return (Math.atan2(this.gravityY, this.gravityX) * 180.0) / Math.PI;
     }
 
-    setParticleGravityAngle(angle): void {
+    setParticleGravityAngle(angle: float): void {
       const oldAngle = this.getParticleGravityAngle();
       if (oldAngle !== angle) {
         this._gravityDirty = true;
@@ -526,13 +516,13 @@ namespace gdjs {
       }
     }
 
-    getParticleGravityLength() {
+    getParticleGravityLength(): float {
       return Math.sqrt(
         this.gravityX * this.gravityX + this.gravityY * this.gravityY
       );
     }
 
-    setParticleGravityLength(length): void {
+    setParticleGravityLength(length: float): void {
       if (length < 0) {
         length = 0;
       }
@@ -544,11 +534,11 @@ namespace gdjs {
       }
     }
 
-    getParticleRed1() {
+    getParticleRed1(): number {
       return this.colorR1;
     }
 
-    setParticleRed1(red): void {
+    setParticleRed1(red: number): void {
       if (red < 0) {
         red = 0;
       }
@@ -561,11 +551,11 @@ namespace gdjs {
       }
     }
 
-    getParticleRed2() {
+    getParticleRed2(): number {
       return this.colorR2;
     }
 
-    setParticleRed2(red): void {
+    setParticleRed2(red: number): void {
       if (red < 0) {
         red = 0;
       }
@@ -578,11 +568,11 @@ namespace gdjs {
       }
     }
 
-    getParticleGreen1() {
+    getParticleGreen1(): number {
       return this.colorG1;
     }
 
-    setParticleGreen1(green): void {
+    setParticleGreen1(green: number): void {
       if (green < 0) {
         green = 0;
       }
@@ -595,11 +585,11 @@ namespace gdjs {
       }
     }
 
-    getParticleGreen2() {
+    getParticleGreen2(): number {
       return this.colorG2;
     }
 
-    setParticleGreen2(green): void {
+    setParticleGreen2(green: number): void {
       if (green < 0) {
         green = 0;
       }
@@ -612,11 +602,11 @@ namespace gdjs {
       }
     }
 
-    getParticleBlue1() {
+    getParticleBlue1(): number {
       return this.colorB1;
     }
 
-    setParticleBlue1(blue): void {
+    setParticleBlue1(blue: number): void {
       if (blue < 0) {
         blue = 0;
       }
@@ -629,11 +619,11 @@ namespace gdjs {
       }
     }
 
-    getParticleBlue2() {
+    getParticleBlue2(): number {
       return this.colorB2;
     }
 
-    setParticleBlue2(blue): void {
+    setParticleBlue2(blue: number): void {
       if (blue < 0) {
         blue = 0;
       }
@@ -646,7 +636,7 @@ namespace gdjs {
       }
     }
 
-    setParticleColor1(rgbColor): void {
+    setParticleColor1(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;
@@ -656,7 +646,7 @@ namespace gdjs {
       this.setParticleBlue1(parseInt(colors[2], 10));
     }
 
-    setParticleColor2(rgbColor): void {
+    setParticleColor2(rgbColor: string): void {
       const colors = rgbColor.split(';');
       if (colors.length < 3) {
         return;
@@ -666,11 +656,11 @@ namespace gdjs {
       this.setParticleBlue2(parseInt(colors[2], 10));
     }
 
-    getParticleSize1() {
+    getParticleSize1(): float {
       return this.size1;
     }
 
-    setParticleSize1(size): void {
+    setParticleSize1(size: float): void {
       if (size < 0) {
         size = 0;
       }
@@ -680,75 +670,75 @@ namespace gdjs {
       }
     }
 
-    getParticleSize2() {
+    getParticleSize2(): float {
       return this.size2;
     }
 
-    setParticleSize2(size): void {
+    setParticleSize2(size: float): void {
       if (this.size2 !== size) {
         this._sizeDirty = true;
         this.size2 = size;
       }
     }
 
-    getParticleAlpha1() {
+    getParticleAlpha1(): number {
       return this.alpha1;
     }
 
-    setParticleAlpha1(alpha): void {
+    setParticleAlpha1(alpha: number): void {
       if (this.alpha1 !== alpha) {
         this._alphaDirty = true;
         this.alpha1 = alpha;
       }
     }
 
-    getParticleAlpha2() {
+    getParticleAlpha2(): number {
       return this.alpha2;
     }
 
-    setParticleAlpha2(alpha): void {
+    setParticleAlpha2(alpha: number): void {
       if (this.alpha2 !== alpha) {
         this._alphaDirty = true;
         this.alpha2 = alpha;
       }
     }
 
-    noMoreParticles() {
-      this._renderer.stop();
+    noMoreParticles(): boolean {
+      return !this._renderer.emitter.emit;
     }
 
-    recreateParticleSystem() {
+    recreateParticleSystem(): void {
       this._renderer.recreate();
     }
 
-    getFlow() {
+    getFlow(): number {
       return this.flow;
     }
 
-    setFlow(flow): void {
+    setFlow(flow: number): void {
       if (this.flow !== flow) {
         this.flow = flow;
         this._flowDirty = true;
       }
     }
 
-    getParticleCount() {
+    getParticleCount(): number {
       return this._renderer.getParticleCount();
     }
 
-    getTank() {
+    getTank(): number {
       return this.tank;
     }
 
-    setTank(tank): void {
+    setTank(tank: number): void {
       this.tank = tank;
     }
 
-    getTexture() {
+    getTexture(): string {
       return this.texture;
     }
 
-    setTexture(texture, runtimeScene): void {
+    setTexture(texture: string, runtimeScene: gdjs.RuntimeScene): void {
       if (this.texture !== texture) {
         if (this._renderer.isTextureNameValid(texture, runtimeScene)) {
           this.texture = texture;

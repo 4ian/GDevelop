@@ -303,7 +303,7 @@ namespace gdjs {
       if (tank < 0) return -1
       else if (flow < 0) return 0.001
       else
-        return tank / flow;
+        return (tank + 0.5) / flow;
     }
   }
 

@@ -707,7 +707,7 @@ namespace gdjs {
     }
 
     noMoreParticles(): boolean {
-      this._renderer.stop();
+      return !this._renderer.emitter.emit;
     }
 
     recreateParticleSystem(): void {

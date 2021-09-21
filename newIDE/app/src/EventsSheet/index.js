@@ -189,6 +189,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     },
   });
 
+  static contextType = PreferencesContext;
+
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
 
@@ -799,7 +801,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   onZoomEvent = (towards: string): () => void => {
     const factor = towards === 'IN' ? 1 : -1;
     return () => {
-      this.setState({fontSize: Math.max(this.state.fontSize + factor * 1, 1)})
+      this.context.setEventsSheetZoomLevel(Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, 1));
     }
   }
 
@@ -1066,7 +1068,7 @@ export default class EventsSheet extends React.Component<Props, State> {
           <ResponsiveWindowMeasurer>
             {windowWidth => (
               <PreferencesContext.Consumer>
-                {({ values }) => (
+                {({ values: preferences }) => (
                   <EventsSearcher
                     key={events.ptr}
                     ref={eventSearcher => (this._eventSearcher = eventSearcher)}
@@ -1136,7 +1138,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           searchFocusOffset={searchFocusOffset}
                           onEventMoved={this._onEventMoved}
                           showObjectThumbnails={
-                            values.eventsSheetShowObjectThumbnails
+                            preferences.eventsSheetShowObjectThumbnails
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
@@ -1145,7 +1147,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                               ? this._containerDiv.current.clientHeight
                               : 0
                           }
-                          fontSize={this.state.fontSize}
+                          fontSize={preferences.eventsSheetZoomLevel}
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel
@@ -1182,7 +1184,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={() => {
                             this.closeParameterEditor(
-                              /*shouldCancel=*/ values.eventsSheetCancelInlineParameter ===
+                              /*shouldCancel=*/ preferences.eventsSheetCancelInlineParameter ===
                                 'cancel'
                             );
                           }}
@@ -1369,7 +1371,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                         />
                         {this._renderInstructionEditorDialog(
                           // Force using the new instruction editor on touch screens.
-                          values.useNewInstructionEditorDialog ||
+                          preferences.useNewInstructionEditorDialog ||
                             screenType === 'touch'
                         )}
                         {this.state.analyzedEventsContextResult && (

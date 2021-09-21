@@ -10,6 +10,8 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    // Not used (as we don't compile with tsc), but necessary for iterating on Map/Set.
+    "downlevelIteration": true,
     // Required by PixiJS, for importing 3rd-party dependencies like EventEmitter3.
     "esModuleInterop": true,
     // Required by PixiJS, loaders needs this to use the more strict mini-signal types.

@@ -13,10 +13,8 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 #include "ParticleEmitterObject.h"
 
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/CommonTools.h"
-#endif
 
 using namespace std;
 
@@ -60,12 +58,10 @@ ParticleEmitterBase::ParticleEmitterBase()
 
 ParticleEmitterObject::ParticleEmitterObject(gd::String name_)
     : Object(name_)
-#if defined(GD_IDE_ONLY)
       ,
       particleEditionSimpleMode(true),
       emissionEditionSimpleMode(true),
       gravityEditionSimpleMode(true)
-#endif
 {
 }
 
@@ -73,14 +69,12 @@ void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
   ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(element);
 
-#if defined(GD_IDE_ONLY)
   particleEditionSimpleMode =
       element.GetBoolAttribute("particleEditionSimpleMode");
   emissionEditionSimpleMode =
       element.GetBoolAttribute("emissionEditionSimpleMode");
   gravityEditionSimpleMode =
       element.GetBoolAttribute("gravityEditionSimpleMode");
-#endif
 }
 
 void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
@@ -140,7 +134,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   }
 }
 
-#if defined(GD_IDE_ONLY)
 void ParticleEmitterObject::DoSerializeTo(
     gd::SerializerElement& element) const {
   element.SetAttribute("particleEditionSimpleMode", particleEditionSimpleMode);
@@ -196,18 +189,15 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
 }
-#endif
 
 ParticleEmitterBase::~ParticleEmitterBase() {}
 
-#if defined(GD_IDE_ONLY)
 void ParticleEmitterObject::ExposeResources(
     gd::ArbitraryResourceWorker& worker) {
   gd::String texture = GetParticleTexture();
   worker.ExposeImage(texture);
   SetParticleTexture(texture);
 }
-#endif
 
 void ParticleEmitterBase::SetTank(float newValue) {
   tank = newValue;

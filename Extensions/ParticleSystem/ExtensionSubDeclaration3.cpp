@@ -15,7 +15,6 @@ This project is released under the MIT License.
  * Declare some actions, conditions and expressions of the particle emitter
  */
 void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
-#if defined(GD_IDE_ONLY)
   obj.AddAction("RecreateParticleSystem",
                 _("Recreate particles"),
                 _("Destroy and recreate particles, so as to take changes made "
@@ -337,5 +336,4 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
-#endif
 }

@@ -178,10 +178,8 @@ class GD_EXTENSION_API ParticleEmitterBase {
  protected:
   virtual void UnserializeParticleEmitterBaseFrom(
       const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void SerializeParticleEmitterBaseTo(
       gd::SerializerElement& element) const;
-#endif
 
  private:
   void Init(const ParticleEmitterBase& other);
@@ -225,7 +223,6 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::Object,
     return gd::make_unique<ParticleEmitterObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
   bool particleEditionSimpleMode;  ///< User preference related to object's
                                    ///< edition
@@ -233,14 +230,11 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::Object,
                                    ///< edition
   bool gravityEditionSimpleMode;   ///< User preference related to object's
                                    ///< edition
-#endif
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
-#endif
 };
 
 #endif  // PARTICLEEMITTEROBJECT_H

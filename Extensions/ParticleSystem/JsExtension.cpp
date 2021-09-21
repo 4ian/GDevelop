@@ -4,7 +4,6 @@ GDevelop - Particle System Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "ParticleEmitterObject.h"
@@ -222,5 +221,4 @@ extern "C" gd::PlatformExtension* CreateGDJSParticleSystemExtension() {
 extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
   return new ParticleSystemJsExtension;
 }
-#endif
 #endif

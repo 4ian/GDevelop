@@ -15,7 +15,6 @@ This project is released under the MIT License.
  * Declare some actions and conditions of the particle emitter
  */
 void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
-#if defined(GD_IDE_ONLY)
   obj.AddAction("EmitterForceMin",
                 _("Emission minimal force"),
                 _("Modify minimal emission force of particles."),
@@ -292,5 +291,4 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
-#endif
 }

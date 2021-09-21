@@ -89,6 +89,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
@@ -106,6 +107,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");

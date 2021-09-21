@@ -22,6 +22,7 @@ import {
 import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { UsersAutocomplete } from './UsersAutocomplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
@@ -217,16 +218,8 @@ export const ExtensionOptionsEditor = ({
               forceUpdate();
             }}
           />
-          <TextField
-            floatingLabelText={
-              <Trans>Author (Name, email or GitHub handle)</Trans>
-            }
-            value={eventsFunctionsExtension.getAuthor()}
-            onChange={(e, text) => {
-              eventsFunctionsExtension.setAuthor(text);
-              forceUpdate();
-            }}
-            fullWidth
+          <UsersAutocomplete
+            eventsFunctionsExtension={eventsFunctionsExtension}
           />
           {resourceStoreOpen && (
             <Dialog

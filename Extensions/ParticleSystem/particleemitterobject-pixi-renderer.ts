@@ -109,7 +109,10 @@ namespace gdjs {
         maxParticles: objectData.maxParticleNb,
         // Lifetime can be computed from the tank (the number of particles available)
         // and the flow (number of particles emitted per seconds)
-        emitterLifetime: ParticleEmitterObjectPixiRenderer.computeLifetime(objectData.flow, objectData.tank),
+        emitterLifetime: ParticleEmitterObjectPixiRenderer.computeLifetime(
+          objectData.flow,
+          objectData.tank
+        ),
         pos: { x: 0, y: 0 },
         addAtBack: false,
         spawnType: 'circle',
@@ -220,7 +223,14 @@ namespace gdjs {
       this.emitter.acceleration.y = y;
     }
 
-    setColor(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): void {
+    setColor(
+      r1: number,
+      g1: number,
+      b1: number,
+      r2: number,
+      g2: number,
+      b2: number
+    ): void {
       this.emitter.startColor.value.r = r1;
       this.emitter.startColor.value.g = g1;
       this.emitter.startColor.value.b = b1;
@@ -249,7 +259,10 @@ namespace gdjs {
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(flow, tank);
+      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
+        flow,
+        tank
+      );
     }
 
     resetEmission(flow: number, tank: number): void {
@@ -258,7 +271,10 @@ namespace gdjs {
       this.emitter.emit = true;
     }
 
-    isTextureNameValid(texture: string, runtimeScene: gdjs.RuntimeScene): boolean {
+    isTextureNameValid(
+      texture: string,
+      runtimeScene: gdjs.RuntimeScene
+    ): boolean {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()
@@ -305,10 +321,9 @@ namespace gdjs {
     }
 
     static computeLifetime(flow: number, tank: number): float {
-      if (tank < 0) return -1
-      else if (flow < 0) return 0.001
-      else
-        return (tank + 0.1) / flow;
+      if (tank < 0) return -1;
+      else if (flow < 0) return 0.001;
+      else return (tank + 0.1) / flow;
     }
   }
 

@@ -149,19 +149,11 @@ namespace gdjs {
         minimumScaleMultiplier: m,
         isStepped: false,
       };
-      if (objectData.emissionEditionSimpleMode) {
-        // @ts-ignore
-        config.startRotation = {
-          min: -objectData.emitterAngleB / 2.0,
-          max: objectData.emitterAngleB / 2.0,
-        };
-      } else {
-        // @ts-ignore
-        config.startRotation = {
-          min: objectData.emitterAngleA,
-          max: objectData.emitterAngleB,
-        };
-      }
+      // @ts-ignore
+      config.startRotation = {
+        min: -objectData.emitterAngleB / 2.0,
+        max: objectData.emitterAngleB / 2.0,
+      };
       const mediumLifetime =
         (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax) / 2.0;
       // @ts-ignore

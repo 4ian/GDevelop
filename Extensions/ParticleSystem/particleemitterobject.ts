@@ -7,7 +7,6 @@
 namespace gdjs {
   export type ParticleEmitterObjectDataType = {
     emitterAngleA: number;
-    emissionEditionSimpleMode: boolean;
     emitterForceMin: number;
     emitterAngleB: number;
     zoneRadius: number;
@@ -50,7 +49,6 @@ namespace gdjs {
    * Displays particles.
    */
   export class ParticleEmitterObject extends gdjs.RuntimeObject {
-    singleAngle: boolean;
     angleA: number;
     angleB: number;
     forceMin: number;
@@ -108,7 +106,6 @@ namespace gdjs {
         this,
         particleObjectData
       );
-      this.singleAngle = particleObjectData.emissionEditionSimpleMode;
       this.angleA = particleObjectData.emitterAngleA;
       this.angleB = particleObjectData.emitterAngleB;
       this.forceMin = particleObjectData.emitterForceMin;
@@ -170,13 +167,6 @@ namespace gdjs {
       oldObjectData: ParticleEmitterObjectData,
       newObjectData: ParticleEmitterObjectData
     ): boolean {
-      if (
-        oldObjectData.emissionEditionSimpleMode !==
-        newObjectData.emissionEditionSimpleMode
-      ) {
-        this.singleAngle = newObjectData.emissionEditionSimpleMode;
-        this._angleDirty = true;
-      }
       if (oldObjectData.emitterAngleA !== newObjectData.emitterAngleA) {
         this.setEmitterAngleA(newObjectData.emitterAngleA);
       }
@@ -297,17 +287,10 @@ namespace gdjs {
       }
       if (this._angleDirty) {
         const angle = this.getAngle();
-        if (this.singleAngle) {
-          this._renderer.setAngle(
-            this.angle - this.angleB / 2.0,
-            this.angle + this.angleB / 2.0
-          );
-        } else {
-          this._renderer.setAngle(
-            this.angle + this.angleA,
-            this.angle + this.angleB
-          );
-        }
+        this._renderer.setAngle(
+          this.angle - this.angleB / 2.0,
+          this.angle + this.angleB / 2.0
+        );
       }
       if (this._forceDirty) {
         this._renderer.setForce(this.forceMin, this.forceMax);

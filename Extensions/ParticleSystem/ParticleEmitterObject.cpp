@@ -57,24 +57,11 @@ ParticleEmitterBase::ParticleEmitterBase()
       destroyWhenNoParticles(true) {}
 
 ParticleEmitterObject::ParticleEmitterObject(gd::String name_)
-    : Object(name_)
-      ,
-      particleEditionSimpleMode(true),
-      emissionEditionSimpleMode(true),
-      gravityEditionSimpleMode(true)
-{
-}
+    : Object(name_) {}
 
 void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
   ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(element);
-
-  particleEditionSimpleMode =
-      element.GetBoolAttribute("particleEditionSimpleMode");
-  emissionEditionSimpleMode =
-      element.GetBoolAttribute("emissionEditionSimpleMode");
-  gravityEditionSimpleMode =
-      element.GetBoolAttribute("gravityEditionSimpleMode");
 }
 
 void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
@@ -136,10 +123,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
 
 void ParticleEmitterObject::DoSerializeTo(
     gd::SerializerElement& element) const {
-  element.SetAttribute("particleEditionSimpleMode", particleEditionSimpleMode);
-  element.SetAttribute("emissionEditionSimpleMode", emissionEditionSimpleMode);
-  element.SetAttribute("gravityEditionSimpleMode", gravityEditionSimpleMode);
-
   ParticleEmitterBase::SerializeParticleEmitterBaseTo(element);
 }
 

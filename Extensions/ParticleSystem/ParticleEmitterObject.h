@@ -224,12 +224,6 @@ class GD_EXTENSION_API ParticleEmitterObject : public gd::Object,
   }
 
   virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
-  bool particleEditionSimpleMode;  ///< User preference related to object's
-                                   ///< edition
-  bool emissionEditionSimpleMode;  ///< User preference related to object's
-                                   ///< edition
-  bool gravityEditionSimpleMode;   ///< User preference related to object's
-                                   ///< edition
 
  private:
   virtual void DoUnserializeFrom(gd::Project& project,

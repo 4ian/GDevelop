@@ -86,10 +86,10 @@ namespace gdjs {
     _colorDirty: boolean = true;
     _sizeDirty: boolean = true;
     _alphaDirty: boolean = true;
-    _textureDirty: boolean;
-
-    // Don't mark texture as dirty if not using one.
     _flowDirty: boolean = true;
+    _tankDirty: boolean = true;
+    // Don't mark texture as dirty if not using one.
+    _textureDirty: boolean;
 
     // @ts-ignore
     _renderer: gdjs.ParticleEmitterObjectRenderer;
@@ -286,7 +286,7 @@ namespace gdjs {
         // to be repositioned, angle updated, etc...
         this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
         this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
-        this._alphaDirty = this._flowDirty = this._textureDirty = true;
+        this._alphaDirty = this._flowDirty = this._tankDirty = this._textureDirty = true;
       }
       return true;
     }
@@ -337,15 +337,15 @@ namespace gdjs {
       if (this._alphaDirty) {
         this._renderer.setAlpha(this.alpha1, this.alpha2);
       }
-      if (this._flowDirty) {
-        this._renderer.setFlow(this.flow, this.tank);
+      if (this._flowDirty || this._tankDirty) {
+        this._renderer.resetEmission(this.flow, this.tank);
       }
       if (this._textureDirty) {
         this._renderer.setTextureName(this.texture, runtimeScene);
       }
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
-      this._alphaDirty = this._flowDirty = this._textureDirty = false;
+      this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
       this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
       if (
         this._renderer.hasStarted() &&
@@ -732,6 +732,7 @@ namespace gdjs {
 
     setTank(tank: number): void {
       this.tank = tank;
+      this._tankDirty = true;
     }
 
     getTexture(): string {

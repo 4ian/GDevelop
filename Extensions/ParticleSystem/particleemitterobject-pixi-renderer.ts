@@ -250,7 +250,13 @@ namespace gdjs {
 
     setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(tank, flow);
+      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(tank, flow);
+    }
+
+    resetEmission(flow: number, tank: number): void {
+      this.setFlow(flow, tank);
+      // Setting emit to true will recompute emitter lifetime
+      this.emitter.emit = true;
     }
 
     isTextureNameValid(texture: string, runtimeScene: gdjs.RuntimeScene): boolean {

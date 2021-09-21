@@ -20,7 +20,6 @@ const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
   width: '100%',
-  fontSize: 14,
 };
 
 const styles = {
@@ -29,7 +28,6 @@ const styles = {
     flexWrap: 'wrap',
     padding: 5,
     overflow: 'hidden',
-    minHeight: 35,
   },
   commentTextField: commentTextStyle,
   commentSpan: {

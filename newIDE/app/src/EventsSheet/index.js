@@ -1316,6 +1316,18 @@ export default class EventsSheet extends React.Component<Props, State> {
                               ),
                               click: this._openEventsContextAnalyzer,
                             },
+                            { type: 'separator' },
+                            {
+                              label: i18n._(t`Zoom In`),
+                              click: () => this.onZoomEvent("IN")(),
+                              accelerator: 'CmdOrCtrl+=',
+                            },
+                            {
+                              label: i18n._(t`Zoom Out`),
+                              click: () => this.onZoomEvent("OUT")(),
+                              accelerator: 'CmdOrCtrl+-',
+                              enabled: preferences.eventsSheetZoomLevel > 1,
+                            },
                           ]}
                         />
                         <ContextMenu

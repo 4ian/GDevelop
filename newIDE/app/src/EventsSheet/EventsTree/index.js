@@ -225,6 +225,7 @@ type EventsTreeProps = {|
   screenType: ScreenType,
   windowWidth: WidthType,
   eventsSheetHeight: number,
+  fontSize: number,
 |};
 
 // A node displayed by the SortableTree. Almost always represents an
@@ -558,7 +559,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     const treeData = this.state.treeData ? [...this.state.treeData] : null;
 
     return (
-      <div style={styles.container}>
+      <div style={{...styles.container, fontSize: `${this.props.fontSize}px`}}>
         <SortableTree
           treeData={treeData}
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}

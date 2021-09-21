@@ -145,6 +145,8 @@ type State = {|
   searchFocusOffset: ?number,
 
   allEventsMetadata: Array<EventMetadata>,
+
+  fontSize: number,
 |};
 
 type EventInsertionContext = {|
@@ -182,6 +184,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
+      onZoomIn: () => this.onZoomEvent('IN')(),
+      onZoomOut: () => this.onZoomEvent('OUT')(),
     },
   });
 
@@ -223,6 +227,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     allEventsMetadata: [],
 
     textEditedEvent: null,
+
+    fontSize: 14,
   };
 
   componentDidMount() {
@@ -790,6 +796,13 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
+  onZoomEvent = (towards: string): () => void => {
+    const factor = towards === 'IN' ? 1 : -1;
+    return () => {
+      this.setState({fontSize: Math.max(this.state.fontSize + factor * 1, 1)})
+    }
+  }
+
   _openEventsContextAnalyzer = () => {
     const { globalObjectsContainer, objectsContainer } = this.props;
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
@@ -1132,6 +1145,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                               ? this._containerDiv.current.clientHeight
                               : 0
                           }
+                          fontSize={this.state.fontSize}
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel

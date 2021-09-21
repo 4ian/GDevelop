@@ -349,7 +349,7 @@ namespace gdjs {
       this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
       if (
         this._renderer.hasStarted() &&
-        this._renderer.getParticleCount() === 0 &&
+        this.getParticleCount() === 0 &&
         this.destroyWhenNoParticles
       ) {
         this.deleteFromScene(runtimeScene);

@@ -31,7 +31,7 @@ namespace gdjs {
      * * {@link evtTools.linkedObjects.quickPickObjectsLinkedTo}
      *
      * @param objA
-     * @returns
+     * @returns the linked objects by name
      */
     _getMapOfObjectsLinkedWith(
       objA: gdjs.RuntimeObject

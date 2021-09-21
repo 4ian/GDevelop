@@ -134,17 +134,17 @@ export class CodeEditor extends React.Component<Props, State> {
     return (
       <div onContextMenu={this._handleContextMenu}>
         <PreferencesContext.Consumer>
-          {({ values }) => (
+          {({ values: preferences }) => (
             <MonacoEditor
               width={this.props.width || 600}
               height={this.props.height || 200}
               language="javascript"
-              theme={values.codeEditorThemeName}
+              theme={preferences.codeEditorThemeName}
               value={this.props.value}
               onChange={this.props.onChange}
               editorWillMount={this.setupEditorThemes}
               editorDidMount={this.setupEditorCompletions}
-              options={monacoEditorOptions}
+              options={{...monacoEditorOptions, fontSize: preferences.eventsSheetZoomLevel}}
             />
           )}
         </PreferencesContext.Consumer>

@@ -146,6 +146,14 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Particles number"),
                     _("Particles"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
+      .SetHidden() // DEPRECATED
+      .AddParameter("object", _("Object"), "ParticleEmitter", false);
+
+  obj.AddExpression("CurrentParticleCount",
+                    _("Particles count"),
+                    _("Number of particles currently displayed"),
+                    _("Particles"),
+                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
   obj.AddExpression("RendererParam1",

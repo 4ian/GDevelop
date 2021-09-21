@@ -15,7 +15,6 @@ This project is released under the MIT License.
  * Declare some actions and conditions of the particle emitter
  */
 void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
-#if defined(GD_IDE_ONLY)
   obj.AddAction("ParticleColor1",
                 _("Initial color"),
                 _("Modify initial color of particles."),
@@ -302,5 +301,4 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter");
 
-#endif
 }

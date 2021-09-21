@@ -13,10 +13,8 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 #include "ParticleEmitterObject.h"
 
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/CommonTools.h"
-#endif
 
 using namespace std;
 
@@ -29,24 +27,14 @@ ParticleEmitterBase::ParticleEmitterBase()
       flow(45),
       emitterForceMin(45.0f),
       emitterForceMax(85.0f),
-      emitterXDirection(0.0f),
-      emitterYDirection(1.0f),
-      emitterZDirection(0.0f),
       emitterAngleA(0),
       emitterAngleB(90),
       zoneRadius(3.0f),
       particleGravityX(0.0f),
       particleGravityY(0.0f),
-      particleGravityZ(0.0f),
       friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
-      redParam(Enabled),
-      greenParam(Random),
-      blueParam(Random),
-      alphaParam(Mutable),
-      sizeParam(Mutable),
-      angleParam(Mutable),
       particleRed1(255.0f),
       particleRed2(255.0f),
       particleGreen1(51),
@@ -70,12 +58,10 @@ ParticleEmitterBase::ParticleEmitterBase()
 
 ParticleEmitterObject::ParticleEmitterObject(gd::String name_)
     : Object(name_)
-#if defined(GD_IDE_ONLY)
       ,
       particleEditionSimpleMode(true),
       emissionEditionSimpleMode(true),
       gravityEditionSimpleMode(true)
-#endif
 {
 }
 
@@ -83,14 +69,12 @@ void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
   ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(element);
 
-#if defined(GD_IDE_ONLY)
   particleEditionSimpleMode =
       element.GetBoolAttribute("particleEditionSimpleMode");
   emissionEditionSimpleMode =
       element.GetBoolAttribute("emissionEditionSimpleMode");
   gravityEditionSimpleMode =
       element.GetBoolAttribute("gravityEditionSimpleMode");
-#endif
 }
 
 void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
@@ -99,15 +83,11 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   flow = element.GetDoubleAttribute("flow");
   emitterForceMin = element.GetDoubleAttribute("emitterForceMin");
   emitterForceMax = element.GetDoubleAttribute("emitterForceMax");
-  emitterXDirection = element.GetDoubleAttribute("emitterXDirection");
-  emitterYDirection = element.GetDoubleAttribute("emitterYDirection");
-  emitterZDirection = element.GetDoubleAttribute("emitterZDirection");
   emitterAngleA = element.GetDoubleAttribute("emitterAngleA");
   emitterAngleB = element.GetDoubleAttribute("emitterAngleB");
   zoneRadius = element.GetDoubleAttribute("zoneRadius");
   particleGravityX = element.GetDoubleAttribute("particleGravityX");
   particleGravityY = element.GetDoubleAttribute("particleGravityY");
-  particleGravityZ = element.GetDoubleAttribute("particleGravityZ");
   friction = element.GetDoubleAttribute("friction");
   particleLifeTimeMin = element.GetDoubleAttribute("particleLifeTimeMin");
   particleLifeTimeMax = element.GetDoubleAttribute("particleLifeTimeMax");
@@ -152,63 +132,8 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
     else
       rendererType = Point;
   }
-  {
-    gd::String result = element.GetStringAttribute("redParam");
-    if (result == "Mutable")
-      redParam = Mutable;
-    else if (result == "Random")
-      redParam = Random;
-    else
-      redParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("greenParam");
-    if (result == "Mutable")
-      greenParam = Mutable;
-    else if (result == "Random")
-      greenParam = Random;
-    else
-      greenParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("blueParam");
-    if (result == "Mutable")
-      blueParam = Mutable;
-    else if (result == "Random")
-      blueParam = Random;
-    else
-      blueParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("alphaParam");
-    if (result == "Mutable")
-      alphaParam = Mutable;
-    else if (result == "Random")
-      alphaParam = Random;
-    else
-      alphaParam = Enabled;
-  }
-  {
-    gd::String result = element.GetStringAttribute("sizeParam");
-    if (result == "Mutable")
-      sizeParam = Mutable;
-    else if (result == "Random")
-      sizeParam = Random;
-    else
-      sizeParam = Nothing;
-  }
-  {
-    gd::String result = element.GetStringAttribute("angleParam");
-    if (result == "Mutable")
-      angleParam = Mutable;
-    else if (result == "Random")
-      angleParam = Random;
-    else
-      angleParam = Nothing;
-  }
 }
 
-#if defined(GD_IDE_ONLY)
 void ParticleEmitterObject::DoSerializeTo(
     gd::SerializerElement& element) const {
   element.SetAttribute("particleEditionSimpleMode", particleEditionSimpleMode);
@@ -224,15 +149,11 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("flow", flow);
   element.SetAttribute("emitterForceMin", emitterForceMin);
   element.SetAttribute("emitterForceMax", emitterForceMax);
-  element.SetAttribute("emitterXDirection", emitterXDirection);
-  element.SetAttribute("emitterYDirection", emitterYDirection);
-  element.SetAttribute("emitterZDirection", emitterZDirection);
   element.SetAttribute("emitterAngleA", emitterAngleA);
   element.SetAttribute("emitterAngleB", emitterAngleB);
   element.SetAttribute("zoneRadius", zoneRadius);
   element.SetAttribute("particleGravityX", particleGravityX);
   element.SetAttribute("particleGravityY", particleGravityY);
-  element.SetAttribute("particleGravityZ", particleGravityZ);
   element.SetAttribute("friction", friction);
   element.SetAttribute("particleLifeTimeMin", particleLifeTimeMin);
   element.SetAttribute("particleLifeTimeMax", particleLifeTimeMax);
@@ -267,61 +188,16 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   else if (rendererType == Quad)
     rendererTypeStr = "Quad";
   element.SetAttribute("rendererType", rendererTypeStr);
-
-  gd::String redParamStr = "Enabled";
-  if (redParam == Mutable)
-    redParamStr = "Mutable";
-  else if (redParam == Random)
-    redParamStr = "Random";
-  element.SetAttribute("redParam", redParamStr);
-
-  gd::String greenParamStr = "Enabled";
-  if (greenParam == Mutable)
-    greenParamStr = "Mutable";
-  else if (greenParam == Random)
-    greenParamStr = "Random";
-  element.SetAttribute("greenParam", greenParamStr);
-
-  gd::String blueParamStr = "Enabled";
-  if (blueParam == Mutable)
-    blueParamStr = "Mutable";
-  else if (blueParam == Random)
-    blueParamStr = "Random";
-  element.SetAttribute("blueParam", blueParamStr);
-
-  gd::String alphaParamStr = "Enabled";
-  if (alphaParam == Mutable)
-    alphaParamStr = "Mutable";
-  else if (alphaParam == Random)
-    alphaParamStr = "Random";
-  element.SetAttribute("alphaParam", alphaParamStr);
-
-  gd::String sizeParamStr = "Nothing";
-  if (sizeParam == Mutable)
-    sizeParamStr = "Mutable";
-  else if (sizeParam == Random)
-    sizeParamStr = "Random";
-  element.SetAttribute("sizeParam", sizeParamStr);
-
-  gd::String angleParamStr = "Nothing";
-  if (angleParam == Mutable)
-    angleParamStr = "Mutable";
-  else if (angleParam == Random)
-    angleParamStr = "Random";
-  element.SetAttribute("angleParam", angleParamStr);
 }
-#endif
 
 ParticleEmitterBase::~ParticleEmitterBase() {}
 
-#if defined(GD_IDE_ONLY)
 void ParticleEmitterObject::ExposeResources(
     gd::ArbitraryResourceWorker& worker) {
   gd::String texture = GetParticleTexture();
   worker.ExposeImage(texture);
   SetParticleTexture(texture);
 }
-#endif
 
 void ParticleEmitterBase::SetTank(float newValue) {
   tank = newValue;
@@ -341,20 +217,8 @@ void ParticleEmitterBase::SetParticleGravityX(float newValue) {
 void ParticleEmitterBase::SetParticleGravityY(float newValue) {
   particleGravityY = newValue;
 }
-void ParticleEmitterBase::SetParticleGravityZ(float newValue) {
-  particleGravityZ = newValue;
-}
 void ParticleEmitterBase::SetFriction(float newValue) {
   friction = newValue;
-}
-void ParticleEmitterBase::SetEmitterXDirection(float newValue) {
-  emitterXDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterYDirection(float newValue) {
-  emitterYDirection = newValue;
-}
-void ParticleEmitterBase::SetEmitterZDirection(float newValue) {
-  emitterZDirection = newValue;
 }
 void ParticleEmitterBase::SetEmitterAngleA(float newValue) {
   emitterAngleA = newValue;
@@ -424,24 +288,14 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   flow = other.flow;
   emitterForceMin = other.emitterForceMin;
   emitterForceMax = other.emitterForceMax;
-  emitterXDirection = other.emitterXDirection;
-  emitterYDirection = other.emitterYDirection;
-  emitterZDirection = other.emitterZDirection;
   emitterAngleA = other.emitterAngleA;
   emitterAngleB = other.emitterAngleB;
   zoneRadius = other.zoneRadius;
   particleGravityX = other.particleGravityX;
   particleGravityY = other.particleGravityY;
-  particleGravityZ = other.particleGravityZ;
   friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
-  redParam = other.redParam;
-  greenParam = other.greenParam;
-  blueParam = other.blueParam;
-  alphaParam = other.alphaParam;
-  sizeParam = other.sizeParam;
-  angleParam = other.angleParam;
   particleRed1 = other.particleRed1;
   particleRed2 = other.particleRed2;
   particleGreen1 = other.particleGreen1;

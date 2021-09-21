@@ -2629,8 +2629,6 @@ interface ParticleEmitterObject {
     float GetParticleGravityX();
     void SetParticleGravityY(float newValue);
     float GetParticleGravityY();
-    void SetParticleGravityZ(float newValue);
-    float GetParticleGravityZ();
     void SetParticleGravityAngle(float newValue);
     float GetParticleGravityAngle();
     void SetParticleGravityLength(float newValue);

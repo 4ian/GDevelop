@@ -10,7 +10,6 @@ namespace gdjs {
     renderer: any;
     emitter: any;
     started: boolean = false;
-    emitterLifetime: float = 0;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -110,12 +109,10 @@ namespace gdjs {
         maxParticles: objectData.maxParticleNb,
         // Lifetime can be computed from the tank (the number of particles available)
         // and the flow (number of particles emitted per seconds)
-        emitterLifetime:
-          objectData.tank < 0
-            ? -1
-            : objectData.flow < 0
-            ? 0.001
-            : objectData.tank / objectData.flow,
+        emitterLifetime: ParticleEmitterObjectPixiRenderer.computeLifetime(
+          objectData.flow,
+          objectData.tank
+        ),
         pos: { x: 0, y: 0 },
         addAtBack: false,
         spawnType: 'circle',
@@ -130,52 +127,28 @@ namespace gdjs {
             : 1,
         isStepped: false,
       };
-      if (objectData.alphaParam === 'Mutable') {
-        // @ts-ignore
-        config.alpha = {
-          list: [
-            { time: 0, value: objectData.particleAlpha1 / 255.0 },
-            { time: 1, value: objectData.particleAlpha2 / 255.0 },
-          ],
-          isStepped: false,
-        };
-      } else {
-        // @ts-ignore
-        config.alpha = {
-          list: [{ time: 0, value: objectData.particleAlpha1 / 255.0 }],
-          isStepped: false,
-        };
-      }
-      if (objectData.sizeParam === 'Mutable') {
-        let size1 = objectData.particleSize1 / 100;
-        let size2 = objectData.particleSize2 / 100;
-        const sizeRandom1 = objectData.particleSizeRandomness1 / 100;
-        const sizeRandom2 = objectData.particleSizeRandomness2 / 100;
-        const m = sizeRandom2 !== 0 ? (1 + sizeRandom1) / (1 + sizeRandom2) : 1;
-        // @ts-ignore
-        config.scale = {
-          list: [
-            { time: 0, value: size1 * (1 + sizeRandom1) },
-            { time: 1, value: size2 * (1 + sizeRandom2) },
-          ],
-          minimumScaleMultiplier: m,
-          isStepped: false,
-        };
-      } else {
-        let size1 = objectData.particleSize1 / 100;
-        let size2 = objectData.particleSize2 / 100;
-        let mult = size2 !== 0 ? (1 + size1) / (1 + size2) : 1;
-        if (size2 === 0 && size1 > size2) {
-          mult = (1 + size2) / (1 + size1);
-          size2 = size1;
-        }
-        // @ts-ignore
-        config.scale = {
-          list: [{ time: 0, value: size2 }],
-          minimumScaleMultiplier: mult,
-          isStepped: false,
-        };
-      }
+      // @ts-ignore
+      config.alpha = {
+        list: [
+          { time: 0, value: objectData.particleAlpha1 / 255.0 },
+          { time: 1, value: objectData.particleAlpha2 / 255.0 },
+        ],
+        isStepped: false,
+      };
+      let size1 = objectData.particleSize1 / 100;
+      let size2 = objectData.particleSize2 / 100;
+      const sizeRandom1 = objectData.particleSizeRandomness1 / 100;
+      const sizeRandom2 = objectData.particleSizeRandomness2 / 100;
+      const m = sizeRandom2 !== 0 ? (1 + sizeRandom1) / (1 + sizeRandom2) : 1;
+      // @ts-ignore
+      config.scale = {
+        list: [
+          { time: 0, value: size1 * (1 + sizeRandom1) },
+          { time: 1, value: size2 * (1 + sizeRandom2) },
+        ],
+        minimumScaleMultiplier: m,
+        isStepped: false,
+      };
       if (objectData.emissionEditionSimpleMode) {
         // @ts-ignore
         config.startRotation = {
@@ -214,43 +187,50 @@ namespace gdjs {
       return this.renderer;
     }
 
-    update(delta): void {
+    update(delta: float): void {
       this.emitter.update(delta);
       if (!this.started && this.getParticleCount() > 0) {
         this.started = true;
       }
     }
 
-    setPosition(x, y): void {
+    setPosition(x: number, y: number): void {
       this.emitter.spawnPos.x = x;
       this.emitter.spawnPos.y = y;
     }
 
-    setAngle(angle1, angle2): void {
+    setAngle(angle1: float, angle2: float): void {
       this.emitter.minStartRotation = angle1;
       this.emitter.maxStartRotation = angle2;
     }
 
-    setForce(min, max): void {
+    setForce(min: float, max: float): void {
       this.emitter.startSpeed.value = max;
       this.emitter.minimumSpeedMultiplier = max !== 0 ? min / max : 1;
     }
 
-    setZoneRadius(radius): void {
+    setZoneRadius(radius: float): void {
       this.emitter.spawnCircle.radius = radius;
     }
 
-    setLifeTime(min, max): void {
+    setLifeTime(min: float, max: float): void {
       this.emitter.minLifetime = min;
       this.emitter.maxLifetime = max;
     }
 
-    setGravity(x, y): void {
+    setGravity(x: float, y: float): void {
       this.emitter.acceleration.x = x;
       this.emitter.acceleration.y = y;
     }
 
-    setColor(r1, g1, b1, r2, g2, b2): void {
+    setColor(
+      r1: number,
+      g1: number,
+      b1: number,
+      r2: number,
+      g2: number,
+      b2: number
+    ): void {
       this.emitter.startColor.value.r = r1;
       this.emitter.startColor.value.g = g1;
       this.emitter.startColor.value.b = b1;
@@ -263,31 +243,38 @@ namespace gdjs {
       this.emitter.startColor.next.value.b = b2;
     }
 
-    setSize(size1, size2): void {
+    setSize(size1: float, size2: float): void {
       this.emitter.startScale.value = size1 / 100.0;
       if (this.emitter.startScale.next) {
         this.emitter.startScale.next.value = size2 / 100.0;
       }
     }
 
-    setAlpha(alpha1, alpha2): void {
+    setAlpha(alpha1: number, alpha2: number): void {
       this.emitter.startAlpha.value = alpha1 / 255.0;
       if (this.emitter.startAlpha.next) {
         this.emitter.startAlpha.next.value = alpha2 / 255.0;
       }
     }
 
-    setFlow(flow, tank): void {
+    setFlow(flow: number, tank: number): void {
       this.emitter.frequency = flow < 0 ? 0.0001 : 1.0 / flow;
-      this.emitterLifetime =
-        tank < 0
-          ? -1
-          : flow < 0
-          ? 0.001
-          : (tank - this.emitter.totalParticleCount) / flow;
+      this.emitter.emitterLifetime = ParticleEmitterObjectPixiRenderer.computeLifetime(
+        flow,
+        tank
+      );
     }
 
-    isTextureNameValid(texture, runtimeScene): boolean {
+    resetEmission(flow: number, tank: number): void {
+      this.setFlow(flow, tank);
+      // Setting emit to true will recompute emitter lifetime
+      this.emitter.emit = true;
+    }
+
+    isTextureNameValid(
+      texture: string,
+      runtimeScene: gdjs.RuntimeScene
+    ): boolean {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()
@@ -299,7 +286,7 @@ namespace gdjs {
       return pixiTexture.valid && pixiTexture !== invalidPixiTexture;
     }
 
-    setTextureName(texture, runtimeScene): void {
+    setTextureName(texture: string, runtimeScene: gdjs.RuntimeScene): void {
       const invalidPixiTexture = runtimeScene
         .getGame()
         .getImageManager()
@@ -313,28 +300,30 @@ namespace gdjs {
       }
     }
 
-    getTotalParticleCount(): integer {
-      return this.emitter.totalParticleCount;
-    }
-
     getParticleCount(): integer {
       return this.emitter.particleCount;
     }
 
-    stop() {
+    stop(): void {
       this.emitter.emit = false;
     }
 
-    recreate() {
+    recreate(): void {
       this.emitter.cleanup();
     }
 
-    destroy() {
+    destroy(): void {
       this.emitter.destroy();
     }
 
     hasStarted(): boolean {
       return this.started;
+    }
+
+    static computeLifetime(flow: number, tank: number): float {
+      if (tank < 0) return -1;
+      else if (flow < 0) return 0.001;
+      else return (tank + 0.1) / flow;
     }
   }
 

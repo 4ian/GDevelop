@@ -10,7 +10,6 @@ namespace gdjs {
     renderer: any;
     emitter: any;
     started: boolean = false;
-    emitterLifetime: float = 0;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,

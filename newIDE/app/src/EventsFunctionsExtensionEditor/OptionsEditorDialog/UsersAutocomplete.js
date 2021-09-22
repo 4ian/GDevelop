@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { t } from '@lingui/macro';
-import debounce from 'lodash/debounce';
+import { useDebounce } from '../../Utils/UseDebounce';
 import SemiControlledMultiAutoComplete from '../../UI/SemiControlledMultiAutoComplete';
 import {
   searchUserPublicProfilesByUsername,
@@ -27,23 +27,6 @@ const getErrorMessage = (error: ?Error) => {
   if (error) return 'Error while loading users';
 };
 
-function asyncDebounce(func, wait) {
-  const debounced = debounce((resolve, reject, args) => {
-    func(...args)
-      .then(resolve)
-      .catch(reject);
-  }, wait);
-  return (...args) =>
-    new Promise((resolve, reject) => {
-      debounced(resolve, reject, args);
-    });
-}
-
-const _searchUserPublicProfilesByUsername = asyncDebounce(
-  userInput => searchUserPublicProfilesByUsername(userInput),
-  500
-);
-
 export const UsersAutocomplete = (props: Props) => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<Option>>([]);
@@ -56,28 +39,25 @@ export const UsersAutocomplete = (props: Props) => {
   const [error, setError] = React.useState(null);
 
   // Recalculate if the userInput has changed.
-  const searchUserPublicProfiles = React.useCallback(
-    async () => {
-      setError(null);
-      if (!userInput) {
-        setCompletionUserPublicProfiles([]);
-        return;
-      }
-      try {
-        setLoading(true);
-        const userPublicProfiles = await _searchUserPublicProfilesByUsername(
-          userInput
-        );
-        setCompletionUserPublicProfiles(userPublicProfiles);
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
-        setError(err);
-        console.error('Could not load the users: ', err);
-      }
-    },
-    [userInput]
-  );
+  const searchUserPublicProfiles = useDebounce(async () => {
+    setError(null);
+    if (!userInput) {
+      setCompletionUserPublicProfiles([]);
+      return;
+    }
+    try {
+      setLoading(true);
+      const userPublicProfiles = await searchUserPublicProfilesByUsername(
+        userInput
+      );
+      setCompletionUserPublicProfiles(userPublicProfiles);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err);
+      console.error('Could not load the users: ', err);
+    }
+  }, 500);
 
   // Call every time the userInput changes.
   React.useEffect(

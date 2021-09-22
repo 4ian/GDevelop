@@ -32,7 +32,7 @@ const styles = {
   },
   wrappingText: {
     fontFamily,
-    fontSize: '13px',
+    fontSize: '0.95em',
     paddingLeft: 5,
     paddingRight: 5,
     paddingTop: 2,

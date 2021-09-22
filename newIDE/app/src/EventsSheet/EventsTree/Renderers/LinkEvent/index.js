@@ -30,7 +30,7 @@ const styles = {
     padding: 5,
   },
   title: {
-    fontSize: 16,
+    fontSize: '1.2em',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

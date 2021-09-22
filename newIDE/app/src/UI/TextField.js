@@ -82,7 +82,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18 | string,
+    fontSize?: 14 | 18 | '1.3em',
     fontStyle?: 'normal' | 'italic',
     width?: number | '30%' | '60%' | '100%',
     flex?: 1,
@@ -93,7 +93,7 @@ type Props = {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,
     WebkitTextFillColor?: string,
-    fontSize?: string,
+    fontSize?: '1em',
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',

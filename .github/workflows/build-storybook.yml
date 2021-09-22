@@ -42,8 +42,13 @@ jobs:
         working-directory: newIDE/app
 
       - name: Publish Storybook to S3 bucket (latest)
-        run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/commit/latest/ --delete
+        run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/latest/ --delete
         working-directory: newIDE/app
+
+      - name: Log urls to the Storybook
+        run: |
+          echo "Find the latest Storybook for this branch on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
+          echo "Find the Storybook for this commit on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
 
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic

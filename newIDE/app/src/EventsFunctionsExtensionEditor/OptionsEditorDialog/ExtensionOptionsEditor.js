@@ -224,7 +224,8 @@ export const ExtensionOptionsEditor = ({
             helperText={
               <Trans>
                 Select the usernames of the contributors to this extension. They
-                will be displayed in the order selected.
+                will be displayed in the order selected. Do not see your name?
+                Go to the Profile section and create an account!
               </Trans>
             }
           />

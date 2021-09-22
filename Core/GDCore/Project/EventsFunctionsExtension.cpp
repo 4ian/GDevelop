@@ -36,6 +36,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   fullName = other.fullName;
   tags = other.tags;
   author = other.author;
+  authorIds = other.authorIds;
   previewIconUrl = other.previewIconUrl;
   iconUrl = other.iconUrl;
   helpPath = other.helpPath;
@@ -54,6 +55,11 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   tagsElement.ConsiderAsArray();
   for (const auto& tag : tags) {
     tagsElement.AddChild("").SetStringValue(tag);
+  }
+  auto& authorIdsElement = element.AddChild("authorIds");
+  authorIdsElement.ConsiderAsArray();
+  for (const auto& authorId : authorIds) {
+    authorIdsElement.AddChild("").SetStringValue(authorId);
   }
   element.SetAttribute("author", author);
   element.SetAttribute("previewIconUrl", previewIconUrl);
@@ -97,6 +103,13 @@ void EventsFunctionsExtension::UnserializeFrom(
     for (std::size_t i = 0; i < tagsElement.GetChildrenCount(); ++i) {
       tags.push_back(tagsElement.GetChild(i).GetStringValue());
     }
+  }
+
+  authorIds.clear();
+  auto& authorIdsElement = element.GetChild("authorIds");
+  authorIdsElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
+    authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
 
   dependencies.clear();

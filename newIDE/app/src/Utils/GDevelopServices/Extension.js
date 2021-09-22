@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
-import { type UserPublicProfile } from '../../Profile/User';
+import { type UserPublicProfile } from './User';
 
 export type ExtensionShortHeader = {|
   shortDescription: string,

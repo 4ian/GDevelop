@@ -184,8 +184,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
-      onZoomIn: (event) => this.onZoomEvent('IN')(event),
-      onZoomOut: (event) => this.onZoomEvent('OUT')(event),
+      onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
+      onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
   });
 
@@ -798,11 +798,13 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  onZoomEvent = (towards: string): (domEvent: KeyboardEvent) => void => {
+  onZoomEvent = (towards: string): (domEvent?: KeyboardEvent) => void => {
     const factor = towards === 'IN' ? 1 : -1;
-    return (domEvent: KeyboardEvent) => {
-      domEvent.preventDefault();
-      domEvent.stopPropagation();
+    return (domEvent?: KeyboardEvent) => {
+      if (domEvent) {
+        domEvent.preventDefault();
+        domEvent.stopPropagation();
+      }
       this.context.setEventsSheetZoomLevel(Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, 1));
     }
   }
@@ -1321,12 +1323,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                             { type: 'separator' },
                             {
                               label: i18n._(t`Zoom In`),
-                              click: (domEvent) => this.onZoomEvent("IN")(domEvent),
+                              click: () => this.onZoomEvent("IN")(),
                               accelerator: 'CmdOrCtrl+=',
                             },
                             {
                               label: i18n._(t`Zoom Out`),
-                              click: (domEvent) => this.onZoomEvent("OUT")(domEvent),
+                              click: () => this.onZoomEvent("OUT")(),
                               accelerator: 'CmdOrCtrl+-',
                               enabled: preferences.eventsSheetZoomLevel > 1,
                             },

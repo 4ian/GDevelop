@@ -798,16 +798,18 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  onZoomEvent = (towards: string): (domEvent?: KeyboardEvent) => void => {
+  onZoomEvent = (towards: string): ((domEvent?: KeyboardEvent) => void) => {
     const factor = towards === 'IN' ? 1 : -1;
     return (domEvent?: KeyboardEvent) => {
       if (domEvent) {
         domEvent.preventDefault();
         domEvent.stopPropagation();
       }
-      this.context.setEventsSheetZoomLevel(Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, 1));
-    }
-  }
+      this.context.setEventsSheetZoomLevel(
+        Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, 1)
+      );
+    };
+  };
 
   _openEventsContextAnalyzer = () => {
     const { globalObjectsContainer, objectsContainer } = this.props;
@@ -1323,12 +1325,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                             { type: 'separator' },
                             {
                               label: i18n._(t`Zoom In`),
-                              click: () => this.onZoomEvent("IN")(),
+                              click: () => this.onZoomEvent('IN')(),
                               accelerator: 'CmdOrCtrl+=',
                             },
                             {
                               label: i18n._(t`Zoom Out`),
-                              click: () => this.onZoomEvent("OUT")(),
+                              click: () => this.onZoomEvent('OUT')(),
                               accelerator: 'CmdOrCtrl+-',
                               enabled: preferences.eventsSheetZoomLevel > 1,
                             },

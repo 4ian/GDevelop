@@ -56,9 +56,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
     ),
-    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(
-      this
-    ),
+    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
     setLastUsedPath: this._setLastUsedPath.bind(this),
@@ -181,9 +179,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
-  _setEventsSheetZoomLevel(
-    eventsSheetZoomLevel: number
-  ) {
+  _setEventsSheetZoomLevel(eventsSheetZoomLevel: number) {
     this.setState(
       state => ({
         values: {

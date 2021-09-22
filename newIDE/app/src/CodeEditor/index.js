@@ -144,7 +144,10 @@ export class CodeEditor extends React.Component<Props, State> {
               onChange={this.props.onChange}
               editorWillMount={this.setupEditorThemes}
               editorDidMount={this.setupEditorCompletions}
-              options={{...monacoEditorOptions, fontSize: preferences.eventsSheetZoomLevel}}
+              options={{
+                ...monacoEditorOptions,
+                fontSize: preferences.eventsSheetZoomLevel,
+              }}
             />
           )}
         </PreferencesContext.Consumer>

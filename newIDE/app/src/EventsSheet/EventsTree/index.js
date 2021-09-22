@@ -559,7 +559,12 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     const treeData = this.state.treeData ? [...this.state.treeData] : null;
 
     return (
-      <div style={{...styles.container, fontSize: `${this.props.fontSize || 14}px`}}>
+      <div
+        style={{
+          ...styles.container,
+          fontSize: `${this.props.fontSize || 14}px`,
+        }}
+      >
         <SortableTree
           treeData={treeData}
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}

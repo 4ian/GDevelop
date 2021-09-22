@@ -144,6 +144,7 @@ export default class CommentEvent extends React.Component<
               color: `#${textColor}`,
               padding: 0,
               lineHeight: 1.5,
+              fontSize: '1em',
             }}
             underlineFocusStyle={{
               borderColor: `#${textColor}`,

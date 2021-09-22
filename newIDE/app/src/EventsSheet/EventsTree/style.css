@@ -165,6 +165,10 @@
     height: var(--icon-size);
 }
 
+.gd-events-sheet .rst__nodeContent .MuiIconButton-root {
+    font-size: inherit;
+}
+
 /**
  * Container having an icon next to the associated name.
  * No rules to be set, we used to have a nowrap but it creates issues

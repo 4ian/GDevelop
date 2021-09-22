@@ -24,7 +24,7 @@ const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
-    height: 60,
+    height: '4em',
     display: 'flex',
     alignItems: 'center',
     padding: 5,
@@ -34,6 +34,9 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  openInNewIcon: {
+    fontSize: '1.5em',
   },
 };
 
@@ -161,7 +164,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               onClick={() => this.openTarget(i18n)}
               disabled={!target}
             >
-              <OpenInNew />
+              <OpenInNew style={styles.openInNewIcon} />
             </IconButton>
             <InlinePopover
               open={this.state.editing}

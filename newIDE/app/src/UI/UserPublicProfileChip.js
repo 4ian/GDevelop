@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
-import { type UserPublicProfile } from '../Profile/User';
+import { type UserPublicProfile } from '../Utils/GDevelopServices/User';
 
 const styles = {
   chip: {

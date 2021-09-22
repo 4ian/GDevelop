@@ -161,6 +161,8 @@
 .gd-events-sheet .icon {
     vertical-align: sub;
     object-fit: contain;
+    width: var(--icon-size);
+    height: var(--icon-size);
 }
 
 /**

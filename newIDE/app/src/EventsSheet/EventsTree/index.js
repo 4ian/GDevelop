@@ -557,12 +557,14 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     // a re-rendering of events, by discarding the memoized flat array
     // (otherwise, no re-rendering would be done).
     const treeData = this.state.treeData ? [...this.state.treeData] : null;
+    const zoomLevel = this.props.fontSize || 14;
 
     return (
       <div
         style={{
           ...styles.container,
-          fontSize: `${this.props.fontSize || 14}px`,
+          fontSize: `${zoomLevel}px`,
+          '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
         }}
       >
         <SortableTree

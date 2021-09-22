@@ -20,7 +20,6 @@ const gd: libGDevelop = global.gd;
 
 const commentTextStyle = {
   width: '100%',
-  fontSize: 14,
 };
 
 const styles = {
@@ -29,7 +28,7 @@ const styles = {
     flexWrap: 'wrap',
     padding: 5,
     overflow: 'hidden',
-    minHeight: 35,
+    minHeight: '2.1em',
   },
   commentTextField: commentTextStyle,
   commentSpan: {
@@ -145,6 +144,7 @@ export default class CommentEvent extends React.Component<
               color: `#${textColor}`,
               padding: 0,
               lineHeight: 1.5,
+              fontSize: '1em',
             }}
             underlineFocusStyle={{
               borderColor: `#${textColor}`,

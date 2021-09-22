@@ -49,7 +49,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetParticleGravityY(float newValue);
   void SetParticleGravityAngle(float newAngleInDegree);
   void SetParticleGravityLength(float newLength);
-  void SetFriction(float newValue);
 
   void SetParticleColor1(const gd::String& color);
   void SetParticleColor2(const gd::String& color);
@@ -133,7 +132,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetParticleGravityY() const { return particleGravityY; };
   float GetParticleGravityAngle() const;
   float GetParticleGravityLength() const;
-  float GetFriction() const { return friction; };
   float GetParticleLifeTimeMin() const { return particleLifeTimeMin; };
   float GetParticleLifeTimeMax() const { return particleLifeTimeMax; };
   std::size_t GetMaxParticleNb() const { return maxParticleNb; };
@@ -197,7 +195,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float emitterAngleB;
   float zoneRadius;
   float particleGravityX, particleGravityY;
-  float friction;
   float particleLifeTimeMin, particleLifeTimeMax;
   float particleRed1, particleRed2, particleGreen1, particleGreen2,
       particleBlue1, particleBlue2, particleAlpha1, particleAlpha2;

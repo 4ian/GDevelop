@@ -36,8 +36,6 @@ declare class gdParticleEmitterObject extends gdObject {
   getParticleGravityAngle(): number;
   setParticleGravityLength(newValue: number): void;
   getParticleGravityLength(): number;
-  setFriction(newValue: number): void;
-  getFriction(): number;
   setParticleLifeTimeMin(newValue: number): void;
   getParticleLifeTimeMin(): number;
   setParticleLifeTimeMax(newValue: number): void;

@@ -32,7 +32,6 @@ ParticleEmitterBase::ParticleEmitterBase()
       zoneRadius(3.0f),
       particleGravityX(0.0f),
       particleGravityY(0.0f),
-      friction(2.0f),
       particleLifeTimeMin(0.5f),
       particleLifeTimeMax(2.5f),
       particleRed1(255.0f),
@@ -75,7 +74,6 @@ void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
   zoneRadius = element.GetDoubleAttribute("zoneRadius");
   particleGravityX = element.GetDoubleAttribute("particleGravityX");
   particleGravityY = element.GetDoubleAttribute("particleGravityY");
-  friction = element.GetDoubleAttribute("friction");
   particleLifeTimeMin = element.GetDoubleAttribute("particleLifeTimeMin");
   particleLifeTimeMax = element.GetDoubleAttribute("particleLifeTimeMax");
   particleRed1 = element.GetDoubleAttribute("particleRed1");
@@ -137,7 +135,6 @@ void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
   element.SetAttribute("zoneRadius", zoneRadius);
   element.SetAttribute("particleGravityX", particleGravityX);
   element.SetAttribute("particleGravityY", particleGravityY);
-  element.SetAttribute("friction", friction);
   element.SetAttribute("particleLifeTimeMin", particleLifeTimeMin);
   element.SetAttribute("particleLifeTimeMax", particleLifeTimeMax);
   element.SetAttribute("particleRed1", particleRed1);
@@ -199,9 +196,6 @@ void ParticleEmitterBase::SetParticleGravityX(float newValue) {
 }
 void ParticleEmitterBase::SetParticleGravityY(float newValue) {
   particleGravityY = newValue;
-}
-void ParticleEmitterBase::SetFriction(float newValue) {
-  friction = newValue;
 }
 void ParticleEmitterBase::SetEmitterAngleA(float newValue) {
   emitterAngleA = newValue;
@@ -276,7 +270,6 @@ void ParticleEmitterBase::Init(const ParticleEmitterBase& other) {
   zoneRadius = other.zoneRadius;
   particleGravityX = other.particleGravityX;
   particleGravityY = other.particleGravityY;
-  friction = other.friction;
   particleLifeTimeMin = other.particleLifeTimeMin;
   particleLifeTimeMax = other.particleLifeTimeMax;
   particleRed1 = other.particleRed1;

@@ -36,6 +36,7 @@ import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
 } from '../HotReload/HotReloadPreviewButton';
+import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
 
 type Props = {|
   project: gdProject,
@@ -58,6 +59,7 @@ type ProjectProperties = {|
   adaptGameResolutionAtRuntime: boolean,
   name: string,
   author: string,
+  authorIds: gdVectorString,
   version: string,
   packageName: string,
   orientation: string,
@@ -77,6 +79,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
     name: project.getName(),
     author: project.getAuthor(),
+    authorIds: project.getAuthorIds(),
     version: project.getVersion(),
     packageName: project.getPackageName(),
     orientation: project.getOrientation(),
@@ -197,6 +200,7 @@ function ProjectPropertiesDialog(props: Props) {
         adaptGameResolutionAtRuntime,
         name,
         author,
+        authorIds: project.getAuthorIds(),
         version,
         packageName,
         orientation,
@@ -213,127 +217,130 @@ function ProjectPropertiesDialog(props: Props) {
   };
 
   return (
-    <React.Fragment>
-      <Dialog
-        onApply={onApply}
-        actions={[
-          <FlatButton
-            label={<Trans>Cancel</Trans>}
-            primary={false}
-            onClick={onCancelChanges}
-            key="cancel"
-          />,
-          <FlatButton
-            label={<Trans>Apply</Trans>}
-            primary={true}
-            onClick={onApply}
-            key="apply"
-          />,
-        ]}
-        secondaryActions={[
-          <HelpButton
-            helpPagePath="/interface/project-manager/properties"
-            key="help"
-          />,
-          hotReloadPreviewButtonProps ? (
-            <FlatButton
-              key="hot-reload-preview-button"
-              icon={<NewPreviewIcon />}
-              label={<Trans>Run a preview (with loading screen)</Trans>}
-              onClick={
-                hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
-              }
-            />
-          ) : null,
-        ]}
-        noTitleMargin
-        open={props.open}
-        onRequestClose={onCancelChanges}
-        fullHeight
-        flexBody
-        title={
-          <div>
-            <Tabs value={currentTab} onChange={setCurrentTab}>
-              <Tab
-                label={<Trans>Properties</Trans>}
-                value={'properties'}
-                key={'properties'}
-              />
-              <Tab
-                label={<Trans>Loading Screen</Trans>}
-                value={'loading-screen'}
-                key={'loading-screen'}
-              />
-            </Tabs>
-          </div>
-        }
-      >
-        {currentTab === 'properties' && (
-          <ColumnStackLayout expand noMargin>
-            <SemiControlledTextField
-              floatingLabelText={<Trans>Game name</Trans>}
-              fullWidth
-              type="text"
-              value={name}
-              onChange={setName}
-              autoFocus
-            />
-            <SemiControlledTextField
-              floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
-              fullWidth
-              hintText={defaultVersion}
-              type="text"
-              value={version}
-              onChange={setVersion}
-            />
-            <SemiControlledTextField
-              floatingLabelText={
-                <Trans>Package name (for iOS and Android)</Trans>
-              }
-              fullWidth
-              hintText={defaultPackageName}
-              type="text"
-              value={packageName}
-              onChange={setPackageName}
-              errorText={
-                validatePackageName(packageName) ? (
-                  undefined
-                ) : (
-                  <Trans>
-                    The package name is containing invalid characters or not
-                    following the convention "xxx.yyy.zzz" (numbers allowed
-                    after a letter only).
-                  </Trans>
-                )
-              }
-            />
-            <SemiControlledTextField
-              floatingLabelText={<Trans>Author name</Trans>}
-              fullWidth
-              hintText={t`Your name`}
-              type="text"
-              value={author}
-              onChange={setAuthor}
-            />
-            {useDeprecatedZeroAsDefaultZOrder ? (
-              <React.Fragment>
-                <Text size="title">
-                  <Trans>Z Order of objects created from events</Trans>
-                </Text>
-                <AlertMessage kind="info">
-                  <Trans>
-                    When you create an object using an action, GDevelop now sets
-                    the Z order of the object to the maximum value that was
-                    found when starting the scene for each layer. This allow to
-                    make sure that objects that you create are in front of
-                    others. This game was created before this change, so
-                    GDevelop maintains the old behavior: newly created objects Z
-                    order is set to 0. It's recommended that you switch to the
-                    new behavior by clicking the following button.
-                  </Trans>
-                </AlertMessage>
-                <I18n>
-                  {({ i18n }) => (
+    <I18n>
+      {({ i18n }) => (
+        <React.Fragment>
+          <Dialog
+            onApply={onApply}
+            actions={[
+              <FlatButton
+                label={<Trans>Cancel</Trans>}
+                primary={false}
+                onClick={onCancelChanges}
+                key="cancel"
+              />,
+              <FlatButton
+                label={<Trans>Apply</Trans>}
+                primary={true}
+                onClick={onApply}
+                key="apply"
+              />,
+            ]}
+            secondaryActions={[
+              <HelpButton
+                helpPagePath="/interface/project-manager/properties"
+                key="help"
+              />,
+              hotReloadPreviewButtonProps ? (
+                <FlatButton
+                  key="hot-reload-preview-button"
+                  icon={<NewPreviewIcon />}
+                  label={<Trans>Run a preview (with loading screen)</Trans>}
+                  onClick={
+                    hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
+                  }
+                />
+              ) : null,
+            ]}
+            noTitleMargin
+            open={props.open}
+            onRequestClose={onCancelChanges}
+            fullHeight
+            flexBody
+            title={
+              <div>
+                <Tabs value={currentTab} onChange={setCurrentTab}>
+                  <Tab
+                    label={<Trans>Properties</Trans>}
+                    value={'properties'}
+                    key={'properties'}
+                  />
+                  <Tab
+                    label={<Trans>Loading Screen</Trans>}
+                    value={'loading-screen'}
+                    key={'loading-screen'}
+                  />
+                </Tabs>
+              </div>
+            }
+          >
+            {currentTab === 'properties' && (
+              <ColumnStackLayout expand noMargin>
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Game name</Trans>}
+                  fullWidth
+                  type="text"
+                  value={name}
+                  onChange={setName}
+                  autoFocus
+                />
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
+                  fullWidth
+                  hintText={defaultVersion}
+                  type="text"
+                  value={version}
+                  onChange={setVersion}
+                />
+                <SemiControlledTextField
+                  floatingLabelText={
+                    <Trans>Package name (for iOS and Android)</Trans>
+                  }
+                  fullWidth
+                  hintText={defaultPackageName}
+                  type="text"
+                  value={packageName}
+                  onChange={setPackageName}
+                  errorText={
+                    validatePackageName(packageName) ? (
+                      undefined
+                    ) : (
+                      <Trans>
+                        The package name is containing invalid characters or not
+                        following the convention "xxx.yyy.zzz" (numbers allowed
+                        after a letter only).
+                      </Trans>
+                    )
+                  }
+                />
+                <UsersAutocomplete
+                  userIds={project.getAuthorIds()}
+                  floatingLabelText={<Trans>Authors</Trans>}
+                  helperText={
+                    <Trans>
+                      Select the usernames of the authors of this project. They
+                      will be displayed in the order selected.
+                    </Trans>
+                  }
+                />
+                {useDeprecatedZeroAsDefaultZOrder ? (
+                  <React.Fragment>
+                    <Text size="title">
+                      <Trans>Z Order of objects created from events</Trans>
+                    </Text>
+                    <AlertMessage kind="info">
+                      <Trans>
+                        When you create an object using an action, GDevelop now
+                        sets the Z order of the object to the maximum value that
+                        was found when starting the scene for each layer. This
+                        allow to make sure that objects that you create are in
+                        front of others. This game was created before this
+                        change, so GDevelop maintains the old behavior: newly
+                        created objects Z order is set to 0. It's recommended
+                        that you switch to the new behavior by clicking the
+                        following button.
+                      </Trans>
+                    </AlertMessage>
                     <RaisedButton
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
@@ -352,205 +359,234 @@ function ProjectPropertiesDialog(props: Props) {
                         </Trans>
                       }
                     />
+                  </React.Fragment>
+                ) : null}
+                <Text size="title">
+                  <Trans>Analytics</Trans>
+                </Text>
+                <GameRegistration project={project} />
+                <Text size="title">
+                  <Trans>Resolution and rendering</Trans>
+                </Text>
+                <ResponsiveLineStackLayout noMargin>
+                  <SemiControlledTextField
+                    floatingLabelText={<Trans>Game resolution width</Trans>}
+                    fullWidth
+                    type="number"
+                    value={'' + gameResolutionWidth}
+                    onChange={value =>
+                      setGameResolutionWidth(Math.max(1, parseInt(value, 10)))
+                    }
+                  />
+                  <SemiControlledTextField
+                    floatingLabelText={<Trans>Game resolution height</Trans>}
+                    fullWidth
+                    type="number"
+                    value={'' + gameResolutionHeight}
+                    onChange={value =>
+                      setGameResolutionHeight(Math.max(1, parseInt(value, 10)))
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>
+                      Game resolution resize mode (fullscreen or window)
+                    </Trans>
+                  }
+                  value={sizeOnStartupMode}
+                  onChange={(e, i, value: string) =>
+                    setSizeOnStartupMode(value)
+                  }
+                >
+                  <SelectOption
+                    value=""
+                    primaryText={t`No changes to the game size`}
+                  />
+                  <SelectOption
+                    value="adaptWidth"
+                    primaryText={t`Change width to fit the screen or window size`}
+                  />
+                  <SelectOption
+                    value="adaptHeight"
+                    primaryText={t`Change height to fit the screen or window size`}
+                  />
+                </SelectField>
+                <Checkbox
+                  label={
+                    <Trans>
+                      Update resolution during the game to fit the screen or
+                      window size
+                    </Trans>
+                  }
+                  disabled={sizeOnStartupMode === ''}
+                  checked={adaptGameResolutionAtRuntime}
+                  onCheck={(e, checked) =>
+                    setAdaptGameResolutionAtRuntime(checked)
+                  }
+                />
+                <ResponsiveLineStackLayout noMargin>
+                  <SemiControlledTextField
+                    floatingLabelText={<Trans>Minimum FPS</Trans>}
+                    fullWidth
+                    type="number"
+                    value={'' + minFPS}
+                    onChange={value =>
+                      setMinFPS(Math.max(0, parseInt(value, 10)))
+                    }
+                  />
+                  <SemiControlledTextField
+                    floatingLabelText={
+                      <Trans>Maximum FPS (0 to disable)</Trans>
+                    }
+                    fullWidth
+                    type="number"
+                    value={'' + maxFPS}
+                    onChange={value =>
+                      setMaxFPS(Math.max(0, parseInt(value, 10)))
+                    }
+                  />
+                </ResponsiveLineStackLayout>
+                {maxFPS > 0 && maxFPS < 60 && (
+                  <DismissableAlertMessage
+                    identifier="maximum-fps-too-low"
+                    kind="warning"
+                  >
+                    <Trans>
+                      Most monitors have a refresh rate of 60 FPS. Setting a
+                      maximum number of FPS under 60 will force the game to skip
+                      frames, and the real number of FPS will be way below 60,
+                      making the game laggy and impacting the gameplay
+                      negatively. Consider putting 60 or more for the maximum
+                      number or FPS, or disable it by setting 0.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
+                {minFPS < 20 && (
+                  <DismissableAlertMessage
+                    identifier="minimum-fps-too-low"
+                    kind="warning"
+                  >
+                    <Trans>
+                      Setting the minimum number of FPS below 20 will increase a
+                      lot the time that is allowed between the simulation of two
+                      frames of the game. If case of a sudden slowdown, or on
+                      slow computers, this can create buggy behaviors like
+                      objects passing beyond a wall. Consider setting 20 as the
+                      minimum FPS.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>Device orientation (for iOS and Android)</Trans>
+                  }
+                  value={orientation}
+                  onChange={(e, i, value: string) => setOrientation(value)}
+                >
+                  <SelectOption
+                    value="default"
+                    primaryText={t`Platform default`}
+                  />
+                  <SelectOption value="landscape" primaryText={t`Landscape`} />
+                  <SelectOption value="portrait" primaryText={t`Portrait`} />
+                </SelectField>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={
+                    <Trans>Scale mode (also called "Sampling")</Trans>
+                  }
+                  value={scaleMode}
+                  onChange={(e, i, value: string) => setScaleMode(value)}
+                >
+                  <SelectOption
+                    value="linear"
+                    primaryText={t`Linear (antialiased rendering, good for most games)`}
+                  />
+                  <SelectOption
+                    value="nearest"
+                    primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
+                  />
+                </SelectField>
+                <Checkbox
+                  label={
+                    <Trans>
+                      Round pixels when rendering, useful for pixel perfect
+                      games.
+                    </Trans>
+                  }
+                  checked={pixelsRounding}
+                  onCheck={(e, checked) => setPixelsRounding(checked)}
+                />
+                {scaleMode === 'nearest' && (
+                  <DismissableAlertMessage
+                    identifier="use-non-smoothed-textures"
+                    kind="info"
+                  >
+                    <Trans>
+                      To obtain the best pixel-perfect effect possible, go in
+                      the resources editor and disable the Smoothing for all
+                      images of your game. It will be done automatically for new
+                      images added from now.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
+                <Text size="title">
+                  <Trans>Publishing</Trans>
+                </Text>
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Publisher name</Trans>}
+                  fullWidth
+                  hintText={t`Your name`}
+                  helperMarkdownText={i18n._(
+                    t`this will be used when packaging and submitting your application to the stores`
                   )}
-                </I18n>
-              </React.Fragment>
-            ) : null}
-            <Text size="title">
-              <Trans>Analytics</Trans>
-            </Text>
-            <GameRegistration project={project} />
-            <Text size="title">
-              <Trans>Resolution and rendering</Trans>
-            </Text>
-            <ResponsiveLineStackLayout noMargin>
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Game resolution width</Trans>}
-                fullWidth
-                type="number"
-                value={'' + gameResolutionWidth}
-                onChange={value =>
-                  setGameResolutionWidth(Math.max(1, parseInt(value, 10)))
-                }
-              />
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Game resolution height</Trans>}
-                fullWidth
-                type="number"
-                value={'' + gameResolutionHeight}
-                onChange={value =>
-                  setGameResolutionHeight(Math.max(1, parseInt(value, 10)))
-                }
-              />
-            </ResponsiveLineStackLayout>
-            <SelectField
-              fullWidth
-              floatingLabelText={
-                <Trans>
-                  Game resolution resize mode (fullscreen or window)
-                </Trans>
-              }
-              value={sizeOnStartupMode}
-              onChange={(e, i, value: string) => setSizeOnStartupMode(value)}
-            >
-              <SelectOption
-                value=""
-                primaryText={t`No changes to the game size`}
-              />
-              <SelectOption
-                value="adaptWidth"
-                primaryText={t`Change width to fit the screen or window size`}
-              />
-              <SelectOption
-                value="adaptHeight"
-                primaryText={t`Change height to fit the screen or window size`}
-              />
-            </SelectField>
-            <Checkbox
-              label={
-                <Trans>
-                  Update resolution during the game to fit the screen or window
-                  size
-                </Trans>
-              }
-              disabled={sizeOnStartupMode === ''}
-              checked={adaptGameResolutionAtRuntime}
-              onCheck={(e, checked) => setAdaptGameResolutionAtRuntime(checked)}
-            />
-            <ResponsiveLineStackLayout noMargin>
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Minimum FPS</Trans>}
-                fullWidth
-                type="number"
-                value={'' + minFPS}
-                onChange={value => setMinFPS(Math.max(0, parseInt(value, 10)))}
-              />
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
-                fullWidth
-                type="number"
-                value={'' + maxFPS}
-                onChange={value => setMaxFPS(Math.max(0, parseInt(value, 10)))}
-              />
-            </ResponsiveLineStackLayout>
-            {maxFPS > 0 && maxFPS < 60 && (
-              <DismissableAlertMessage
-                identifier="maximum-fps-too-low"
-                kind="warning"
-              >
-                <Trans>
-                  Most monitors have a refresh rate of 60 FPS. Setting a maximum
-                  number of FPS under 60 will force the game to skip frames, and
-                  the real number of FPS will be way below 60, making the game
-                  laggy and impacting the gameplay negatively. Consider putting
-                  60 or more for the maximum number or FPS, or disable it by
-                  setting 0.
-                </Trans>
-              </DismissableAlertMessage>
+                  type="text"
+                  value={author}
+                  onChange={setAuthor}
+                />
+                <Text size="title">
+                  <Trans>Project files</Trans>
+                </Text>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>Project file type</Trans>}
+                  value={isFolderProject ? 'folder-project' : 'single-file'}
+                  onChange={(e, i, value: string) =>
+                    setIsFolderProject(value === 'folder-project')
+                  }
+                >
+                  <SelectOption
+                    value={'single-file'}
+                    primaryText={t`Single file (default)`}
+                  />
+                  <SelectOption
+                    value={'folder-project'}
+                    primaryText={t`Multiple files, saved in folder next to the main file`}
+                  />
+                </SelectField>
+                <ExtensionsProperties project={project} />
+              </ColumnStackLayout>
             )}
-            {minFPS < 20 && (
-              <DismissableAlertMessage
-                identifier="minimum-fps-too-low"
-                kind="warning"
-              >
-                <Trans>
-                  Setting the minimum number of FPS below 20 will increase a lot
-                  the time that is allowed between the simulation of two frames
-                  of the game. If case of a sudden slowdown, or on slow
-                  computers, this can create buggy behaviors like objects
-                  passing beyond a wall. Consider setting 20 as the minimum FPS.
-                </Trans>
-              </DismissableAlertMessage>
+            {currentTab === 'loading-screen' && (
+              <LoadingScreenEditor
+                loadingScreen={project.getLoadingScreen()}
+                onChangeSubscription={() => {
+                  onCancelChanges();
+                  props.onChangeSubscription();
+                }}
+                project={project}
+                resourceSources={props.resourceSources}
+                onChooseResource={props.onChooseResource}
+                resourceExternalEditors={props.resourceExternalEditors}
+              />
             )}
-            <SelectField
-              fullWidth
-              floatingLabelText={
-                <Trans>Device orientation (for iOS and Android)</Trans>
-              }
-              value={orientation}
-              onChange={(e, i, value: string) => setOrientation(value)}
-            >
-              <SelectOption value="default" primaryText={t`Platform default`} />
-              <SelectOption value="landscape" primaryText={t`Landscape`} />
-              <SelectOption value="portrait" primaryText={t`Portrait`} />
-            </SelectField>
-            <SelectField
-              fullWidth
-              floatingLabelText={
-                <Trans>Scale mode (also called "Sampling")</Trans>
-              }
-              value={scaleMode}
-              onChange={(e, i, value: string) => setScaleMode(value)}
-            >
-              <SelectOption
-                value="linear"
-                primaryText={t`Linear (antialiased rendering, good for most games)`}
-              />
-              <SelectOption
-                value="nearest"
-                primaryText={t`Nearest (no antialiasing, good for pixel perfect games)`}
-              />
-            </SelectField>
-            <Checkbox
-              label={
-                <Trans>
-                  Round pixels when rendering, useful for pixel perfect games.
-                </Trans>
-              }
-              checked={pixelsRounding}
-              onCheck={(e, checked) => setPixelsRounding(checked)}
-            />
-            {scaleMode === 'nearest' && (
-              <DismissableAlertMessage
-                identifier="use-non-smoothed-textures"
-                kind="info"
-              >
-                <Trans>
-                  To obtain the best pixel-perfect effect possible, go in the
-                  resources editor and disable the Smoothing for all images of
-                  your game. It will be done automatically for new images added
-                  from now.
-                </Trans>
-              </DismissableAlertMessage>
-            )}
-            <Text size="title">
-              <Trans>Project files</Trans>
-            </Text>
-            <SelectField
-              fullWidth
-              floatingLabelText={<Trans>Project file type</Trans>}
-              value={isFolderProject ? 'folder-project' : 'single-file'}
-              onChange={(e, i, value: string) =>
-                setIsFolderProject(value === 'folder-project')
-              }
-            >
-              <SelectOption
-                value={'single-file'}
-                primaryText={t`Single file (default)`}
-              />
-              <SelectOption
-                value={'folder-project'}
-                primaryText={t`Multiple files, saved in folder next to the main file`}
-              />
-            </SelectField>
-            <ExtensionsProperties project={project} />
-          </ColumnStackLayout>
-        )}
-        {currentTab === 'loading-screen' && (
-          <LoadingScreenEditor
-            loadingScreen={project.getLoadingScreen()}
-            onChangeSubscription={() => {
-              onCancelChanges();
-              props.onChangeSubscription();
-            }}
-            project={project}
-            resourceSources={props.resourceSources}
-            onChooseResource={props.onChooseResource}
-            resourceExternalEditors={props.resourceExternalEditors}
-          />
-        )}
-      </Dialog>
-    </React.Fragment>
+          </Dialog>
+        </React.Fragment>
+      )}
+    </I18n>
   );
 }
 

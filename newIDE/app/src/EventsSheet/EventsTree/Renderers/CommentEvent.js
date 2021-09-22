@@ -28,6 +28,7 @@ const styles = {
     flexWrap: 'wrap',
     padding: 5,
     overflow: 'hidden',
+    minHeight: '2.1em',
   },
   commentTextField: commentTextStyle,
   commentSpan: {

@@ -7,7 +7,10 @@
 name: Build Storybook
 
 on:
-  # Allows to run this workflow manually from the Actions tab
+  # Launch on all commits.
+  push:
+  # Allows to run this workflow manually from the Actions tab,
+  # to publish on Chromatic (not done by default).
   workflow_dispatch:
 
 jobs:
@@ -33,6 +36,7 @@ jobs:
         run: npm run build-storybook
         working-directory: newIDE/app
 
+      # Publish on S3 to allow quick testing of components.
       - name: Publish Storybook to S3 bucket (specific commit)
         run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/ --delete
         working-directory: newIDE/app
@@ -41,7 +45,9 @@ jobs:
         run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/commit/latest/ --delete
         working-directory: newIDE/app
 
+      # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic
+        if: github.event_name == 'workflow_dispatch'
         uses: chromaui/action@v1
         with:
           workingDir: newIDE/app

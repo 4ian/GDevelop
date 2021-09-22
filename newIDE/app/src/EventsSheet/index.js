@@ -798,10 +798,11 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  onZoomEvent = (towards: string): ((domEvent?: KeyboardEvent) => void) => {
+  onZoomEvent = (towards: 'IN' | 'OUT'): ((domEvent?: KeyboardEvent) => void) => {
     const factor = towards === 'IN' ? 1 : -1;
     return (domEvent?: KeyboardEvent) => {
       if (domEvent) {
+        // Browsers usually implement their own zoom features on the same shortcut
         domEvent.preventDefault();
         domEvent.stopPropagation();
       }

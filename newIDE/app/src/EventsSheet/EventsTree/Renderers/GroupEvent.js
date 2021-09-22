@@ -28,7 +28,7 @@ const styles = {
     overflow: 'hidden',
   },
   title: {
-    fontSize: 18,
+    fontSize: '1.3em',
     width: '100%',
   },
 };

@@ -7,7 +7,6 @@
     /* Use the fonts provided by the operating system(s) as possible. */
     /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
     font-family: var(--gdevelop-font-family) !important;
-    font-size: 14px !important;
     background: var(--event-sheet-event-tree-background-color);
 }
 

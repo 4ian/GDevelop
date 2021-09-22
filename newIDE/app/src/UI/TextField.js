@@ -82,7 +82,7 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18,
+    fontSize?: 14 | 18 | string,
     fontStyle?: 'normal' | 'italic',
     width?: number | '30%' | '60%' | '100%',
     flex?: 1,

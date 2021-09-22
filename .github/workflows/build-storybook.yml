@@ -1,6 +1,6 @@
 # GitHub Action to build the Storybook of the editor and publish it for testing.
 #
-# Note that only the Storybook is built and GDevelop.js is not rebuilt (for speed concerns), 
+# Note that only the Storybook is built and GDevelop.js is not rebuilt (for speed concerns),
 # so changes in the C++ source could not be reflected if the CI run by Travis-CI
 # did not upload a freshly built GDevelop.js.
 
@@ -23,10 +23,20 @@ jobs:
           aws-access-key-id: ${{ secrets.BUILD_STORYBOOK_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.BUILD_STORYBOOK_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-    
+
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 50
+
+      # Cache npm dependencies to speed up the workflow
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-newIDE-app-node_modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('newIDE/app/package-lock.json') }}
 
       - name: Install newIDE dependencies
         run: npm install

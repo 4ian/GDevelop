@@ -362,17 +362,6 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <SemiControlledTextField
-          commitOnBlur
-          floatingLabelText={<Trans>Friction on particles</Trans>}
-          fullWidth
-          type="number"
-          value={particleEmitterObject.getFriction()}
-          onChange={value => {
-            particleEmitterObject.setFriction(parseFloat(value));
-            this.forceUpdate();
-          }}
-        />
         <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur

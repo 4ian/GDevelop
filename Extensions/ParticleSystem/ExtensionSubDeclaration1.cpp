@@ -119,30 +119,6 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
 
-  obj.AddAction(
-         "Friction",
-         _("Friction"),
-         _("Modify friction applied to particles."),
-         _("the friction of particles"),
-         _("Common"),
-         "CppPlatform/Extensions/particleSystemicon24.png",
-         "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardOperatorParameters("number")
-      .GetCodeExtraInformation()
-      .SetGetter("GetFriction");
-
-  obj.AddCondition("Friction",
-                   _("Friction"),
-                   _("Test friction applied to particles."),
-                   _("the friction of particles"),
-                   _("Common"),
-                   "CppPlatform/Extensions/particleSystemicon24.png",
-                   "CppPlatform/Extensions/particleSystemicon16.png")
-
-      .AddParameter("object", _("Object"), "ParticleEmitter")
-      .UseStandardRelationalOperatorParameters("number");
-
   obj.AddAction("ZoneRadius",
                 _("Creation radius"),
                 _("Modify creation radius of particles.\nParticles have to be "

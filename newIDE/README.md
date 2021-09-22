@@ -53,12 +53,16 @@ There is a script file that automates cloning this repository, building the IDE 
 
 ### Development of UI components
 
-You can run a [storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:
+You can run a [Storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:
 
 ```bash
 cd newIDE/app
 npm run storybook # or yarn storybook
 ```
+
+> ℹ️ When creating a Pull Request/pushing a commit, a CI will build the Storybook for you and host it temporarily to allow to test components directly from your browser. Navigate to `http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/YOUR_BRANCH/latest/index.html` to see it.
+
+Find [here the Storybook of the latest version on master](http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/master/latest/index.html).
 
 ### Tests
 

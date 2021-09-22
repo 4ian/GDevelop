@@ -7,6 +7,7 @@ declare class gdProject extends gdObjectsContainer {
   getVersion(): string;
   setAuthor(authorName: string): void;
   getAuthor(): string;
+  getAuthorIds(): gdVectorString;
   setPackageName(packageName: string): void;
   getPackageName(): string;
   setOrientation(orientation: string): void;

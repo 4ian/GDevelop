@@ -53,6 +53,12 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 // For now, disable this as we rely heavily on `fs` in the renderer process.
 app.allowRendererProcessReuse = false;
 
+// Notifications on Microsoft Windows platforms show the app user model id.
+// If not set, defaults to `electron.app.{app.name}`.
+if (process.platform === 'win32') {
+    app.setAppUserModelId(app.name);
+}
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   app.quit();

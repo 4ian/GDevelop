@@ -84,6 +84,8 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const gd: libGDevelop = global.gd;
 
+const zoomLevel = { min: 1, max: 50 };
+
 type Props = {|
   project: gdProject,
   scope: EventsScope,
@@ -169,7 +171,6 @@ export default class EventsSheet extends React.Component<Props, State> {
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
   _containerDiv = React.createRef<HTMLDivElement>();
-  _zoomLevel = {min: 1, max: 50};
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
       !this.state.inlineEditing &&
@@ -799,7 +800,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
-  onZoomEvent = (towards: 'IN' | 'OUT'): ((domEvent?: KeyboardEvent) => void) => {
+  onZoomEvent = (
+    towards: 'IN' | 'OUT'
+  ): ((domEvent?: KeyboardEvent) => void) => {
     const factor = towards === 'IN' ? 1 : -1;
     return (domEvent?: KeyboardEvent) => {
       if (domEvent) {
@@ -808,7 +811,13 @@ export default class EventsSheet extends React.Component<Props, State> {
         domEvent.stopPropagation();
       }
       this.context.setEventsSheetZoomLevel(
-        Math.min(Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, this._zoomLevel.min), this._zoomLevel.max)
+        Math.min(
+          Math.max(
+            this.context.values.eventsSheetZoomLevel + factor * 1,
+            zoomLevel.min
+          ),
+          zoomLevel.max
+        )
       );
     };
   };
@@ -1329,13 +1338,17 @@ export default class EventsSheet extends React.Component<Props, State> {
                               label: i18n._(t`Zoom In`),
                               click: () => this.onZoomEvent('IN')(),
                               accelerator: 'CmdOrCtrl+=',
-                              enabled: preferences.eventsSheetZoomLevel < this._zoomLevel.max,
+                              enabled:
+                                preferences.eventsSheetZoomLevel <
+                                zoomLevel.max,
                             },
                             {
                               label: i18n._(t`Zoom Out`),
                               click: () => this.onZoomEvent('OUT')(),
                               accelerator: 'CmdOrCtrl+-',
-                              enabled: preferences.eventsSheetZoomLevel > this._zoomLevel.min,
+                              enabled:
+                                preferences.eventsSheetZoomLevel >
+                                zoomLevel.min,
                             },
                           ]}
                         />

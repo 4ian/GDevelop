@@ -1878,7 +1878,6 @@
           "emitterForceMax": 85,
           "emitterForceMin": 45,
           "flow": 45,
-          "friction": 2,
           "maxParticleNb": 25,
           "name": "star_particle",
           "particleAlpha1": 255,

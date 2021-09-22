@@ -2634,8 +2634,6 @@ interface ParticleEmitterObject {
     float GetParticleGravityAngle();
     void SetParticleGravityLength(float newValue);
     float GetParticleGravityLength();
-    void SetFriction(float newValue);
-    float GetFriction();
 
     void SetParticleLifeTimeMin(float newValue);
     float GetParticleLifeTimeMin();

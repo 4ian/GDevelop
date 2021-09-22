@@ -169,6 +169,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
   _containerDiv = React.createRef<HTMLDivElement>();
+  _zoomLevel = {min: 1, max: 50};
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
       !this.state.inlineEditing &&
@@ -807,7 +808,7 @@ export default class EventsSheet extends React.Component<Props, State> {
         domEvent.stopPropagation();
       }
       this.context.setEventsSheetZoomLevel(
-        Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, 1)
+        Math.min(Math.max(this.context.values.eventsSheetZoomLevel + factor * 1, this._zoomLevel.min), this._zoomLevel.max)
       );
     };
   };
@@ -1328,12 +1329,13 @@ export default class EventsSheet extends React.Component<Props, State> {
                               label: i18n._(t`Zoom In`),
                               click: () => this.onZoomEvent('IN')(),
                               accelerator: 'CmdOrCtrl+=',
+                              enabled: preferences.eventsSheetZoomLevel < this._zoomLevel.max,
                             },
                             {
                               label: i18n._(t`Zoom Out`),
                               click: () => this.onZoomEvent('OUT')(),
                               accelerator: 'CmdOrCtrl+-',
-                              enabled: preferences.eventsSheetZoomLevel > 1,
+                              enabled: preferences.eventsSheetZoomLevel > this._zoomLevel.min,
                             },
                           ]}
                         />

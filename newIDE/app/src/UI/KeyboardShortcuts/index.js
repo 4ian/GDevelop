@@ -26,8 +26,8 @@ type ShortcutCallbacks = {|
   onUndo?: () => void,
   onRedo?: () => void,
   onSearch?: () => void,
-  onZoomOut?: () => void,
-  onZoomIn?: () => void,
+  onZoomOut?: (KeyboardEvent) => void,
+  onZoomIn?: (KeyboardEvent) => void,
   onEscape?: () => void,
 |};
 
@@ -158,17 +158,17 @@ export default class KeyboardShortcuts {
     }
 
     if (onZoomOut && this._isControlOrCmdPressed() && evt.which === MINUS_KEY) {
-      onZoomOut();
+      onZoomOut(evt);
     }
     if (onZoomOut && evt.which === NUMPAD_SUBTRACT) {
-      onZoomOut();
+      onZoomOut(evt);
     }
 
     if (onZoomIn && this._isControlOrCmdPressed() && evt.which === EQUAL_KEY) {
-      onZoomIn();
+      onZoomIn(evt);
     }
     if (onZoomIn && evt.which === NUMPAD_ADD) {
-      onZoomIn();
+      onZoomIn(evt);
     }
   };
 }

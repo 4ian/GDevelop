@@ -388,11 +388,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyLabel =
       property.getLabel() || i18n._(t`${propertyName} property`);
 
-    if (
-      propertyType === 'String' ||
-      propertyType === 'Choice' ||
-      propertyType === 'Color'
-    ) {
+    if (propertyType === 'String' || propertyType === 'Choice') {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addStrExpression(
           gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
@@ -538,6 +534,18 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
         .addParameter('color', i18n._(t`New color to set`), '', false)
         .getCodeExtraInformation()
         .setFunctionName(setterName);
+
+      addObjectAndBehaviorParameters(
+        behaviorMetadata.addStrExpression(
+          gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),
+          propertyLabel,
+          propertyLabel,
+          eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+          getExtensionIconUrl(extension)
+        )
+      )
+        .getCodeExtraInformation()
+        .setFunctionName(getterName);
     }
   });
 };

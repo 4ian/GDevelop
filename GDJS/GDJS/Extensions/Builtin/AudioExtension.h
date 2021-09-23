@@ -18,9 +18,6 @@ class AudioExtension : public gd::PlatformExtension {
  public:
   AudioExtension();
   virtual ~AudioExtension(){};
-
-  virtual void ExposeActionsResources(gd::Instruction& action,
-                                      gd::ArbitraryResourceWorker& worker);
 };
 
 }  // namespace gdjs

@@ -22,7 +22,7 @@ void ResourcesMergingHelper::ExposeFile(gd::String& resourceFilename) {
   resourceFullFilename = gd::AbstractFileSystem::NormalizeSeparator(
       resourceFullFilename);  // Protect against \ on Linux.
 
-  // In the case of absolute filnames that we don't want to preserve, or
+  // In the case of absolute filenames that we don't want to preserve, or
   // in the case of copying files without preserving relative folders, the new
   // names will be generated from the filename alone (with collision protection).
   auto stripToFilenameOnly = [&]() {

@@ -194,11 +194,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    const answer = Window.showConfirmDialog(
-      'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
-    );
-    if (!answer) return;
-
     this.props.onRenameResource(resource, newName, doRename => {
       if (!doRename) return;
       resource.setName(newName);

@@ -96,6 +96,7 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
       "MyExtension", "My testing extension", "", "", "");
+
   extension
       ->AddAction("DoSomething",
                   "Do something",
@@ -106,6 +107,20 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
                   "")
       .AddParameter("expression", "Parameter 1 (a number)")
       .SetFunctionName("doSomething");
+
+  extension
+      ->AddAction("DoSomethingWithResources",
+                  "Do something with resources",
+                  "This does something with resources",
+                  "Do something with resources please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("bitmapFontResource", "Parameter 1 (a bitmap font resource)")
+      .AddParameter("imageResource", "Parameter 2 (an image resource)")
+      .AddParameter("soundfile", "Parameter 3 (an audio resource)")
+      .SetFunctionName("doSomethingWithResources");
+
   extension->AddExpression("GetNumber", "Get me a number", "", "", "")
       .SetFunctionName("getNumber");
   extension

@@ -256,11 +256,7 @@ module.exports = {
       .addAction(
         'SetBitmapFontAndTextureAtlasResourceName',
         _('Bitmap files resources'),
-        _('Change the Bitmap Font and/or the atlas image used by the object.') +
-          ' ' +
-          _(
-            'The resource name can be found in: `Project Manager > Game settings > Resources`.'
-          ),
+        _('Change the Bitmap Font and/or the atlas image used by the object.'),
         _(
           'Set the bitmap font of _PARAM0_ to _PARAM1_ and the atlas to _PARAM2_'
         ),
@@ -269,7 +265,7 @@ module.exports = {
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .addParameter('bitmapFont', _('Bitmap font resource name'), '', false)
+      .addParameter('bitmapFontResource', _('Bitmap font resource name'), '', false)
       .setParameterLongDescription(
         'The resource name of the font file, without quotes.'
       )

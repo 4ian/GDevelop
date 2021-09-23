@@ -530,24 +530,6 @@ class GD_CORE_API PlatformExtension {
       gd::String autoType);
 
   /**
-   * Called to inventory resources used by conditions
-   * (and possibly do work on them, like renaming, etc...)
-   *
-   * \see gd::PlatformExtension::ExposeActionsResources
-   */
-  virtual void ExposeConditionsResources(Instruction& condition,
-                                         gd::ArbitraryResourceWorker& worker){};
-
-  /**
-   * Called to inventory resources used by actions
-   * (and possibly do work on them, like renaming, etc...)
-   *
-   * \see ArbitraryResourceWorker
-   */
-  virtual void ExposeActionsResources(Instruction& action,
-                                      gd::ArbitraryResourceWorker& worker){};
-
-  /**
    * \brief Get all the properties of the extension. Properties
    * are shown in the game properties in the editor, and are exported in the
    * project data.

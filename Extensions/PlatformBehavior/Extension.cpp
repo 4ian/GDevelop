@@ -711,4 +711,17 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("ChangePlatformType");
   }
+
+  extension.AddCondition("IsObjectOnGivenFloor",
+                         _("Is object on given floor"),
+                         _("Check if an object is on a given floor"),
+                         _("_PARAM0_ is on floor _PARAM2_"),
+                         _("Platforms"),
+                         "CppPlatform/Extensions/platformicon24.png",
+                         "CppPlatform/Extensions/platformicon16.png")
+           .AddParameter("objectList", _("Object"), "", false)
+           .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+           .AddParameter("objectList", _("Platforms"), "", false)
+           .AddCodeOnlyParameter("conditionInverted", "")
+           .SetFunctionName("gdjs.platform.isOnPlatform");
 }

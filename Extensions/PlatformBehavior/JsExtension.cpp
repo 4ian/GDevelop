@@ -29,13 +29,17 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
         .SetIncludeFile(
             "Extensions/PlatformBehavior/platformruntimebehavior.js")
         .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
+            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformtools.js");
 
     GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior")
         .SetIncludeFile(
             "Extensions/PlatformBehavior/platformruntimebehavior.js")
         .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
+            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformtools.js");
 
     {
       std::map<gd::String, gd::InstructionMetadata>& autActions =

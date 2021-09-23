@@ -354,6 +354,7 @@ interface Project {
     [Const, Ref] DOMString GetVersion();
     void SetAuthor([Const] DOMString authorName);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] VectorString GetAuthorIds();
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);

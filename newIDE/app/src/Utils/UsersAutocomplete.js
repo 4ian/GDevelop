@@ -2,15 +2,15 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { t } from '@lingui/macro';
-import { useDebounce } from '../../Utils/UseDebounce';
-import SemiControlledMultiAutoComplete from '../../UI/SemiControlledMultiAutoComplete';
+import { useDebounce } from './UseDebounce';
+import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
   searchUserPublicProfilesByUsername,
   type UserPublicProfile,
   getUserPublicProfilesByIds,
-} from '../../Utils/GDevelopServices/User';
+} from './GDevelopServices/User';
 
-import useForceUpdate from '../../Utils/UseForceUpdate';
+import useForceUpdate from './UseForceUpdate';
 
 type Props = {|
   userIds: gdVectorString,

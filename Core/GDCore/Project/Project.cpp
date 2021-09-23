@@ -529,7 +529,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetBoolAttribute("useExternalSourceFiles");
 
   authorIds.clear();
-  auto& authorIdsElement = element.GetChild("authorIds");
+  auto& authorIdsElement = propElement.GetChild("authorIds");
   authorIdsElement.ConsiderAsArray();
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
@@ -727,7 +727,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
 
-  auto& authorIdsElement = element.AddChild("authorIds");
+  auto& authorIdsElement = propElement.AddChild("authorIds");
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);

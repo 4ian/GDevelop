@@ -388,7 +388,11 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     const propertyLabel =
       property.getLabel() || i18n._(t`${propertyName} property`);
 
-    if (propertyType === 'String' || propertyType === 'Choice') {
+    if (
+      propertyType === 'String' ||
+      propertyType === 'Choice' ||
+      propertyType === 'Color'
+    ) {
       addObjectAndBehaviorParameters(
         behaviorMetadata.addStrExpression(
           gd.EventsBasedBehavior.getPropertyExpressionName(propertyName),

@@ -819,6 +819,7 @@ interface ResourcesManager {
     void ResourcesManager();
 
     [Value] VectorString GetAllResourceNames();
+    [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);

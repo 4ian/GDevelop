@@ -457,6 +457,12 @@ class GD_CORE_API ResourcesManager {
    */
   std::vector<gd::String> GetAllResourceNames() const;
 
+  /**
+   * \brief Return a list of the files, from the specified input list,
+   * that are not used as files by the resources.
+   */
+  std::vector<gd::String> FindFilesNotInResources(const std::vector<gd::String>& filesToCheck) const;
+
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Return a (smart) pointer to a resource.

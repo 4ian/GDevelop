@@ -10,10 +10,11 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import { mapVector } from '../Utils/MapFor';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import Window from '../Utils/Window';
 import {
-  createOrUpdateResource,
+  applyResourceDefaults,
   getLocalResourceFullPath,
   getResourceFilePathStatus,
   RESOURCE_EXTENSIONS,
@@ -21,6 +22,7 @@ import {
 import { type ResourceKind } from './ResourceSource.flow';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 import ResourcesLoader from '../ResourcesLoader';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
@@ -126,21 +128,41 @@ export default class ResourcesList extends React.Component<Props, State> {
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
 
-    const getDirectories = (src, callback) => {
+    const getAllFiles = (src, callback) => {
       glob(src + '/**/*.{' + extensions + '}', callback);
     };
-    getDirectories(projectPath, (err, res) => {
-      if (err) {
-        console.error('Error loading ', err);
-      } else {
-        res.forEach(pathFound => {
-          const fileName = path.relative(projectPath, pathFound);
-          if (!resourcesManager.hasResource(fileName)) {
-            createOrUpdateResource(project, createResource(), fileName);
-            console.info(`${fileName} added to project.`);
-          }
-        });
+    getAllFiles(projectPath, (error, allFiles) => {
+      if (error) {
+        console.error(`Error finding files inside ${projectPath}:`, error);
+        return;
       }
+
+      const filesToCheck = new gd.VectorString();
+      allFiles.forEach(filePath =>
+        filesToCheck.push_back(path.relative(projectPath, filePath))
+      );
+      const filePathsNotInResources = project
+        .getResourcesManager()
+        .findFilesNotInResources(filesToCheck);
+      filesToCheck.delete();
+
+      mapVector(filePathsNotInResources, (relativeFilePath: string) => {
+        const resourceName = newNameGenerator(relativeFilePath, name =>
+          resourcesManager.hasResource(name)
+        );
+
+        const resource = createResource();
+        resource.setFile(relativeFilePath);
+        resource.setName(resourceName);
+        applyResourceDefaults(project, resource);
+        resourcesManager.addResource(resource);
+        resource.delete();
+
+        console.info(
+          `"${relativeFilePath}" added to project as resource named "${resourceName}".`
+        );
+      });
+
       this.forceUpdate();
     });
   };
@@ -193,11 +215,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       });
       return;
     }
-
-    const answer = Window.showConfirmDialog(
-      'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
-    );
-    if (!answer) return;
 
     this.props.onRenameResource(resource, newName, doRename => {
       if (!doRename) return;

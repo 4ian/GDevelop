@@ -819,6 +819,7 @@ interface ResourcesManager {
     void ResourcesManager();
 
     [Value] VectorString GetAllResourceNames();
+    [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
@@ -2245,7 +2246,6 @@ interface AbstractFileSystemJS {
 };
 
 interface ProjectResourcesAdder {
-    void STATIC_AddAllMissing([Ref] Project project, [Const] DOMString resourceType);
     [Value] VectorString STATIC_GetAllUseless([Ref] Project project, [Const] DOMString resourceType);
     void STATIC_RemoveAllUseless([Ref] Project project, [Const] DOMString resourceType);
 };

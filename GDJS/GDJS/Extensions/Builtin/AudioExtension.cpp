@@ -37,13 +37,13 @@ AudioExtension::AudioExtension() {
   GetAllActions()["PreloadMusic"].SetFunctionName(
       "gdjs.evtTools.sound.preloadMusic");
   GetAllActions()["PreloadSound"].SetFunctionName(
-      "gdjs.evtTools.sound.preloadSound"); 
+      "gdjs.evtTools.sound.preloadSound");
   GetAllActions()["UnloadMusic"].SetFunctionName(
       "gdjs.evtTools.sound.unloadMusic");
   GetAllActions()["UnloadSound"].SetFunctionName(
       "gdjs.evtTools.sound.unloadSound");
   GetAllActions()["UnloadAllAudio"].SetFunctionName(
-      "gdjs.evtTools.sound.unloadAllAudio"); 
+      "gdjs.evtTools.sound.unloadAllAudio");
 
   GetAllConditions()["MusicPlaying"].SetFunctionName(
       "gdjs.evtTools.sound.isMusicOnChannelPlaying");
@@ -115,16 +115,6 @@ AudioExtension::AudioExtension() {
       "gdjs.evtTools.sound.getMusicOnChannelPitch");
 
   StripUnimplementedInstructionsAndExpressions();
-}
-
-void AudioExtension::ExposeActionsResources(
-    gd::Instruction& action, gd::ArbitraryResourceWorker& worker) {
-  if (action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" ||
-      action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal") {
-    gd::String parameter = action.GetParameter(1).GetPlainString();
-    worker.ExposeAudio(parameter);
-    action.SetParameter(1, parameter);
-  }
 }
 
 }  // namespace gdjs

@@ -1064,6 +1064,38 @@ describe('libGD.js', function () {
       project.delete();
     });
 
+    it('can find files that are not in the resources', function () {
+      var project = gd.ProjectHelper.createNewGDJSProject();
+      var resource = new gd.ImageResource();
+      var resource2 = new gd.AudioResource();
+      resource.setName('MyResource');
+      resource.setFile('MyFile.png');
+      resource2.setName('MyResource2');
+      resource2.setFile('MySubFolder/MyOtherFile.mp3');
+      project.getResourcesManager().addResource(resource);
+      project.getResourcesManager().addResource(resource2);
+
+      const filesToCheck = new gd.VectorString();
+      [
+        'MyFile.png',
+        'MySubFolder/MyFileMissingInResource.png',
+        'MySubFolder/MyOtherFile.mp3',
+      ].forEach((filePath) => {
+        filesToCheck.push_back(filePath);
+      });
+      const filesNotInResources = project
+        .getResourcesManager()
+        .findFilesNotInResources(filesToCheck);
+      filesToCheck.delete();
+
+      expect(filesNotInResources.size()).toBe(1);
+      expect(filesNotInResources.at(0)).toBe(
+        'MySubFolder/MyFileMissingInResource.png'
+      );
+
+      project.delete();
+    });
+
     it('should support removing resources', function () {
       var project = gd.ProjectHelper.createNewGDJSProject();
       var resource = new gd.Resource();
@@ -1113,21 +1145,33 @@ describe('libGD.js', function () {
       const project = gd.ProjectHelper.createNewGDJSProject();
       const resource = new gd.ImageResource();
       resource.setName('LoadingScreenImage');
-      project.getLoadingScreen().setBackgroundImageResourceName(resource.getName())
+      project
+        .getLoadingScreen()
+        .setBackgroundImageResourceName(resource.getName());
 
-      expect(project.getLoadingScreen().getBackgroundImageResourceName()).toBe('LoadingScreenImage');
+      expect(project.getLoadingScreen().getBackgroundImageResourceName()).toBe(
+        'LoadingScreenImage'
+      );
 
       const worker = new gd.ResourcesInUseHelper();
       project.exposeResources(worker);
-      expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(1);
-      expect(worker.getAllImages().toNewVectorString().toJSArray()[0]).toBe('LoadingScreenImage');
+      expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
+        1
+      );
+      expect(worker.getAllImages().toNewVectorString().toJSArray()[0]).toBe(
+        'LoadingScreenImage'
+      );
 
       gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
 
       const newWorker = new gd.ResourcesInUseHelper();
       project.exposeResources(newWorker);
-      expect(newWorker.getAllImages().toNewVectorString().toJSArray().length).toBe(1);
-      expect(newWorker.getAllImages().toNewVectorString().toJSArray()[0]).toBe('LoadingScreenImage');
+      expect(
+        newWorker.getAllImages().toNewVectorString().toJSArray().length
+      ).toBe(1);
+      expect(newWorker.getAllImages().toNewVectorString().toJSArray()[0]).toBe(
+        'LoadingScreenImage'
+      );
 
       project.delete();
     });

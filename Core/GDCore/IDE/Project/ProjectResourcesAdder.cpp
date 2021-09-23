@@ -14,25 +14,6 @@ using namespace std;
 
 namespace gd {
 
-bool ProjectResourcesAdder::AddAllMissing(gd::Project& project,
-                                          const gd::String& resourceType) {
-  // Search for resources used in the project
-  gd::ResourcesInUseHelper resourcesInUse;
-  project.ExposeResources(resourcesInUse);
-
-  ResourcesManager& resourcesManager = project.GetResourcesManager();
-  for (auto& resourceName : resourcesInUse.GetAll(resourceType)) {
-    if (!resourcesManager.HasResource(resourceName)) {
-      std::cout << "Adding missing resource \"" << resourceName
-                << "\"to the project." << std::endl;
-      resourcesManager.AddResource(
-          resourceName, /*filename=*/resourceName, resourceType);
-    }
-  }
-
-  return true;
-}
-
 std::vector<gd::String> ProjectResourcesAdder::GetAllUseless(
     gd::Project& project, const gd::String& resourceType) {
   std::vector<gd::String> unusedResources;

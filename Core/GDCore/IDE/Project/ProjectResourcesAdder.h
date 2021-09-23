@@ -21,17 +21,6 @@ namespace gd {
 class GD_CORE_API ProjectResourcesAdder {
  public:
   /**
-   * \brief Update the project so that all missing resources are added, with an
-   * filename that is equal to the missing resource name.
-   *
-   * \param project The project to be updated.
-   * \param resourceType The type of the resource the be searched
-   *
-   * \return true if no error happened
-   */
-  static bool AddAllMissing(gd::Project& project, const gd::String & resourceType);
-
-  /**
    * \brief Find all resources of the specified kind that are
    * not used by the project.
    *

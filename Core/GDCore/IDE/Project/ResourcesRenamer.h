@@ -33,8 +33,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
       : gd::ArbitraryResourceWorker(), oldToNewNames(oldToNewNames_){};
   virtual ~ResourcesRenamer(){};
 
-  virtual void ExposeFile(gd::String& resourceName) override {
-    RenameIfNeeded(resourceName);
+  virtual void ExposeFile(gd::String& resourceFileName) override{
+      // Don't do anything: we're renaming resources, not the files they are
+      // pointing to.
   };
   virtual void ExposeImage(gd::String& imageResourceName) override {
     RenameIfNeeded(imageResourceName);
@@ -44,6 +45,9 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   };
   virtual void ExposeFont(gd::String& fontResourceName) override {
     RenameIfNeeded(fontResourceName);
+  };
+  virtual void ExposeBitmapFont(gd::String& bitmapFontName) override {
+    RenameIfNeeded(bitmapFontName);
   };
 
  private:

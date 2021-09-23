@@ -118,6 +118,7 @@ import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
+import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2186,7 +2187,11 @@ const MainFrame = (props: Props) => {
                     newName: string,
                     cb: boolean => void
                   ) => {
-                    // TODO: Project wide refactoring of objects/events using the resource
+                    if (currentProject)
+                      renameResourcesInProject(currentProject, {
+                        [resource.getName()]: newName,
+                      });
+
                     cb(true);
                   },
                 })}

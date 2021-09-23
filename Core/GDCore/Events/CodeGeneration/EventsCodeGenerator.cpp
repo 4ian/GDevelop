@@ -621,8 +621,14 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "password" || metadata.type == "musicfile" ||
-             metadata.type == "soundfile" || metadata.type == "police") {
+  } else if (metadata.type == "password" ||  // Deprecated
+             metadata.type ==
+                 "musicfile" ||  // Should be renamed "largeAudioResource"
+             metadata.type ==
+                 "soundfile" ||            // Should be renamed "audioResource"
+             metadata.type == "police" ||  // Should be renamed "fontResource"
+             metadata.type == "bitmapFontResource" ||
+             metadata.type == "imageResource") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

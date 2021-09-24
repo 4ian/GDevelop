@@ -4,7 +4,6 @@ GDevelop - Platform Behavior Extension
 Copyright (c) 2014-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -30,13 +29,17 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
         .SetIncludeFile(
             "Extensions/PlatformBehavior/platformruntimebehavior.js")
         .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
+            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformtools.js");
 
     GetBehaviorMetadata("PlatformBehavior::PlatformerObjectBehavior")
         .SetIncludeFile(
             "Extensions/PlatformBehavior/platformruntimebehavior.js")
         .AddIncludeFile(
-            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js");
+            "Extensions/PlatformBehavior/platformerobjectruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PlatformBehavior/platformtools.js");
 
     {
       std::map<gd::String, gd::InstructionMetadata>& autActions =
@@ -115,7 +118,7 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           .SetFunctionName("setCanGrabPlatforms")
           .SetGetter("canGrabPlatforms");
       autConditions["PlatformBehavior::CanGrabPlatforms"].SetFunctionName(
-          "canGrabPlatforms");    
+          "canGrabPlatforms");
       autConditions["PlatformBehavior::CurrentJumpSpeed"].SetFunctionName(
           "getCurrentJumpSpeed");
       autExpressions["CurrentJumpSpeed"].SetFunctionName("getCurrentJumpSpeed");
@@ -171,6 +174,4 @@ extern "C" gd::PlatformExtension* CreateGDJSPlatformBehaviorExtension() {
 extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
   return new PlatformBehaviorJsExtension;
 }
-#endif
-
 #endif

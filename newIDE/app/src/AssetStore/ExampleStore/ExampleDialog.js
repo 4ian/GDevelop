@@ -7,9 +7,9 @@ import FlatButton from '../../UI/FlatButton';
 import {
   type ExampleShortHeader,
   type Example,
-  isCompatibleWithAsset,
   getExample,
-} from '../../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Example';
+import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';
@@ -24,6 +24,7 @@ import { ExampleIcon } from './ExampleIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
 
 const electron = optionalRequire('electron');
 
@@ -135,6 +136,13 @@ export function ExampleDialog({
             </Text>
           </Column>
         </Line>
+        {exampleShortHeader.authors && (
+          <Line>
+            {exampleShortHeader.authors.map(author => (
+              <UserPublicProfileChip user={author} key={author.id} />
+            ))}
+          </Line>
+        )}
         <Text noMargin>{exampleShortHeader.shortDescription}</Text>
         <Divider />
         {example && (

@@ -55,12 +55,13 @@ export const ExtensionListItem = ({
               {extensionShortHeader.fullName}{' '}
               {alreadyInstalled && <Trans> (already installed)</Trans>}
             </Text>
-            <Line>
-              {extensionShortHeader.authors &&
-                extensionShortHeader.authors.map(author => (
+            {extensionShortHeader.authors && (
+              <Line>
+                {extensionShortHeader.authors.map(author => (
                   <UserPublicProfileChip user={author} key={author.id} />
                 ))}
-            </Line>
+              </Line>
+            )}
             <Text noMargin size="body2">
               {extensionShortHeader.shortDescription}
             </Text>

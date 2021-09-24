@@ -7,9 +7,9 @@ import FlatButton from '../../UI/FlatButton';
 import {
   type ExampleShortHeader,
   type Example,
-  isCompatibleWithAsset,
   getExample,
-} from '../../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Example';
+import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import LeftLoader from '../../UI/LeftLoader';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import PlaceholderError from '../../UI/PlaceholderError';

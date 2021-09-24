@@ -4,9 +4,9 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import {
   type ExampleShortHeader,
-  isCompatibleWithAsset,
   getExample,
-} from '../../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Example';
+import { isCompatibleWithAsset } from '../../Utils/GDevelopServices/Asset';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';

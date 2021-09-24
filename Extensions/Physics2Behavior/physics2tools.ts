@@ -1,17 +1,17 @@
 namespace gdjs {
   export namespace physics2 {
     export const objectsCollide = function (
-      objectsLists1,
-      behavior,
-      objectsLists2,
-      inverted
+      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      behaviorName: string,
+      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
         gdjs.Physics2RuntimeBehavior.collisionTest,
         objectsLists1,
         objectsLists2,
         inverted,
-        behavior
+        behaviorName
       );
     };
 

@@ -3798,20 +3798,20 @@ namespace gdjs {
     }
 
     // Collision
-    static collisionTest(object1, object2, behaviorName) {
-      // Check if the objects exist and share the behavior
-      if (object1 === null || !object1.hasBehavior(behaviorName)) {
-        return false;
-      }
-      if (object2 === null || !object2.hasBehavior(behaviorName)) {
-        return false;
-      }
-
+    static collisionTest(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
       // Test if the second object is in the list of contacts of the first one
-      const behavior1 = object1.getBehavior(behaviorName);
-      for (let i = 0, len = behavior1.currentContacts.length; i < len; ++i) {
-        if (behavior1.currentContacts[i].owner === object2) {
-          return true;
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics2RuntimeBehavior;
+      if (!!behavior1) {
+        for (let i = 0, len = behavior1.currentContacts.length; i < len; ++i) {
+          if (behavior1.currentContacts[i].owner === object2) {
+            return true;
+          }
         }
       }
 

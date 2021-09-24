@@ -654,6 +654,11 @@ module.exports = {
         // Release the old font (if it was installed).
         releaseBitmapFont(this._pixiObject.fontName);
 
+        // Temporarily go back to the default font, as the PIXI.BitmapText
+        // object does not support being displayed with a font not installed at all.
+        // It will be replaced as soon as the proper font is loaded.
+        this._pixiObject.fontName = getDefaultBitmapFont().font;
+
         this._currentBitmapFontResourceName = bitmapFontResourceName;
         this._currentTextureAtlasResourceName = textureAtlasResourceName;
         obtainBitmapFont(

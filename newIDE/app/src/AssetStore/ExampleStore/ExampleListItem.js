@@ -17,6 +17,7 @@ import { ExampleIcon } from './ExampleIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
+import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
 
 const electron = optionalRequire('electron');
 
@@ -81,18 +82,19 @@ export const ExampleListItem = ({
   return (
     <div style={styles.container} ref={containerRef}>
       <Line noMargin expand>
-        <ButtonBase
-          style={styles.button}
-          onClick={() => {
-            onChoose();
-          }}
-          focusRipple
-        >
+        <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
           {!!exampleShortHeader.previewImageUrls.length && (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+            <ExampleIcon exampleShortHeader={exampleShortHeader} size={64} />
           )}
           <Column expand>
             <Text noMargin>{exampleShortHeader.name} </Text>
+            {exampleShortHeader.authors && (
+              <Line>
+                {exampleShortHeader.authors.map(author => (
+                  <UserPublicProfileChip user={author} key={author.id} />
+                ))}
+              </Line>
+            )}
             <Text noMargin size="body2">
               {exampleShortHeader.shortDescription}
             </Text>

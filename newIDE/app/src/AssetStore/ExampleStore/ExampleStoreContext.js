@@ -5,7 +5,7 @@ import {
   type ExampleShortHeader,
   type AllExamples,
   listAllExamples,
-} from '../../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Example';
 import { type Filters } from '../../Utils/GDevelopServices/Types.flow';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
 

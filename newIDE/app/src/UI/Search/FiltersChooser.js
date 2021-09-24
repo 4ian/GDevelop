@@ -4,7 +4,7 @@ import * as React from 'react';
 import {
   type Filters,
   type TagsTreeNode,
-} from '../../Utils/GDevelopServices/Types.flow';
+} from '../../Utils/GDevelopServices/Filters';
 import InlineCheckbox from '../InlineCheckbox';
 import { ColumnStackLayout } from '../Layout';
 import PlaceholderLoader from '../PlaceholderLoader';

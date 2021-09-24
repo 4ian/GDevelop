@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
-import { type Filters } from './Types.flow';
+import { type Filters } from './Filters';
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,

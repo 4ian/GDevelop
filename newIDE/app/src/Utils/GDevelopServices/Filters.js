@@ -1,5 +1,4 @@
 // @flow
-
 export type TagsTreeNode = {|
   name: string,
   children: Array<TagsTreeNode>,

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type Filters } from './Types.flow';
+import { type UserPublicProfile } from './User';
 
 export type SerializedParameterMetadata = {|
   codeOnly: boolean,
@@ -86,6 +87,7 @@ export type ExampleShortHeader = {|
   shortDescription: string,
   license: string,
   tags: Array<string>,
+  authors?: Array<UserPublicProfile>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
 |};

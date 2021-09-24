@@ -44,10 +44,12 @@ export const listAllExamples = async (): Promise<AllExamples> => {
   };
 };
 
-export const getExample = (
+export const getExample = async (
   exampleShortHeader: ExampleShortHeader
 ): Promise<Example> => {
-  return axios
-    .get(`${GDevelopAssetApi.baseUrl}/example/${exampleShortHeader.id}`)
-    .then(response => response.data.example);
+  const exampleResponse = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/example/${exampleShortHeader.id}`
+  );
+
+  return exampleResponse.data.example;
 };

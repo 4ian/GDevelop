@@ -230,17 +230,15 @@ namespace gdjs {
     static JUMPTHRU = 1;
     static LADDER = 2;
 
-    static isOnPlatformTest(object1, object2, behaviorName) {
-      // Check if the objects exist and share the behavior
-      if (object1 === null || !object1.hasBehavior(behaviorName)) {
-        return false;
-      }
-
-      const behavior1 = object1.getBehavior(behaviorName);
-      return (
-        behavior1.isOnFloor() &&
-        behavior1._onFloor.getFloorPlatform().owner.id === object2.id
-      );
+    static isOnPlatformTest(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as PlatformerObjectRuntimeBehavior;
+      return behavior1.isOnFloorObject(object2);
     }
   }
   gdjs.registerBehavior(

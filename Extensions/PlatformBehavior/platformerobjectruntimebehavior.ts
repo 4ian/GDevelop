@@ -1099,11 +1099,23 @@ namespace gdjs {
     }
 
     /**
-     * Check if the Platformer Object is on the floor.
-     * @returns Returns true if on the floor and false if not.
+     * Check if the Platformer Object is on a floor.
+     * @returns Returns true if on a floor and false if not.
      */
     isOnFloor(): boolean {
       return this._state === this._onFloor;
+    }
+
+    /**
+     * Check if the Platformer Object is on the given object.
+     * @returns Returns true if on the object and false if not.
+     */
+    isOnFloorObject(object: gdjs.RuntimeObject): boolean {
+      if (this.isOnFloor()) {
+        const floorPlatform = this._onFloor.getFloorPlatform();
+        return !!floorPlatform && floorPlatform.owner.id === object.id;
+      }
+      return false;
     }
 
     /**

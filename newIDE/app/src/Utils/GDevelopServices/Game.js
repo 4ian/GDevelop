@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopGameApi } from './ApiConfigs';
-import { type Filters } from './Types.flow';
+import { type Filters } from './Filters';
 
 export type Game = {
   id: string,

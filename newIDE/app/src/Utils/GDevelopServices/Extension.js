@@ -88,13 +88,13 @@ export const isCompatibleWithExtension = (
 
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/extension`)
+    .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
     .then(response => response.data)
-    .then(({ extensionsDatabase }) => {
+    .then(extensionsRegistry => {
       return {
-        ...extensionsDatabase,
+        ...extensionsRegistry,
         // TODO: move this to backend endpoint
-        extensionShortHeaders: extensionsDatabase.extensionShortHeaders.map(
+        extensionShortHeaders: extensionsRegistry.extensionShortHeaders.map(
           transformTagsAsStringToTagsAsArray
         ),
       };

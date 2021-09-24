@@ -6,7 +6,7 @@ import {
   type ExtensionsRegistry,
   type ExtensionShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
-import { type Filters } from '../../Utils/GDevelopServices/Types.flow';
+import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
 
 const defaultSearchText = '';

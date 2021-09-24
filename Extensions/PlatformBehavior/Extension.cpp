@@ -714,7 +714,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
   extension.AddCondition("IsObjectOnGivenFloor",
                          _("Is object on given floor"),
-                         _("Check if an object is on a given floor"),
+                         _("Test if an object is on a given floor."),
                          _("_PARAM0_ is on floor _PARAM2_"),
                          _("Platforms"),
                          "CppPlatform/Extensions/platformicon24.png",

@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
-import { type Filters } from './Types.flow';
+import { type Filters } from './Filters';
 import { type UserPublicProfile } from './User';
 
 export type ExampleShortHeader = {|
@@ -28,28 +28,19 @@ export type AllExamples = {|
 |};
 
 export const listAllExamples = async (): Promise<AllExamples> => {
-  const examplesResponse = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/example`
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/example-short-header-and-filter`
   );
 
-  const { examplesDatabase, filtersUrl } = examplesResponse.data;
-  if (!filtersUrl) {
-    throw new Error('Unexpected response from the example endpoint.');
-  }
-  const filtersResponse = await axios.get(filtersUrl);
-
-  return {
-    exampleShortHeaders: examplesDatabase,
-    filters: filtersResponse.data,
-  };
+  return response.data;
 };
 
 export const getExample = async (
   exampleShortHeader: ExampleShortHeader
 ): Promise<Example> => {
   const exampleResponse = await axios.get(
-    `${GDevelopAssetApi.baseUrl}/example/${exampleShortHeader.id}`
+    `${GDevelopAssetApi.baseUrl}/example-v2/${exampleShortHeader.id}`
   );
 
-  return exampleResponse.data.example;
+  return exampleResponse.data;
 };

@@ -107,6 +107,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`Read the wiki page for more info about the dataloss mode.`,
     };
   }
+  if (type === 'PlatformBehavior::IsObjectOnGivenFloor') {
+    return {
+      kind: 'info',
+      message: t`This condition may have unexpected results when the object is on different floors at the same time, due to the fact that the engine only considers the first floor the object comes into contact with.`,
+    };
+  }
   if (type === 'P2P::OverrideID') {
     return {
       kind: 'warning',

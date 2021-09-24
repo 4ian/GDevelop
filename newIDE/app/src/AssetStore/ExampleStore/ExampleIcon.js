@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Asset';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 
 const styles = {

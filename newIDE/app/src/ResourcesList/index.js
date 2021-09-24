@@ -12,7 +12,6 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import { mapVector } from '../Utils/MapFor';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import Window from '../Utils/Window';
 import {
   applyResourceDefaults,
   getLocalResourceFullPath,

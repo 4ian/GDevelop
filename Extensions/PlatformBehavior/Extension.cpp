@@ -723,5 +723,5 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
            .AddParameter("objectList", _("Platforms"), "", false)
            .AddCodeOnlyParameter("conditionInverted", "")
-           .SetFunctionName("gdjs.platform.isOnPlatform");
+           .SetFunctionName("gdjs.evtTools.platform.isOnPlatform");
 }

@@ -56,7 +56,7 @@ app.allowRendererProcessReuse = false;
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
 if (process.platform === 'win32') {
-    app.setAppUserModelId(app.name);
+    app.setAppUserModelId('gdevelop.ide');
 }
 
 // Quit when all windows are closed.

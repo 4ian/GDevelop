@@ -686,8 +686,20 @@ namespace gdjs {
       }
     }
 
+    startEmission(): void {
+      this._renderer.start();
+    }
+
+    stopEmission(): void {
+      this._renderer.stop();
+    }
+
+    isEmitting(): boolean {
+      return this._renderer.emitter.emit;
+    }
+
     noMoreParticles(): boolean {
-      return !this._renderer.emitter.emit;
+      return !this.isEmitting();
     }
 
     recreateParticleSystem(): void {

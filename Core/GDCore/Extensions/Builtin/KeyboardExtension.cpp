@@ -23,7 +23,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/keyboard");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition("KeyPressed",
                     _("Key pressed"),
@@ -100,7 +99,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
           _("Keyboard"),
           "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
-#endif
 }
 
 }  // namespace gd

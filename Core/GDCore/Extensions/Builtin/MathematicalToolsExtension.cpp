@@ -19,7 +19,6 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       "Florian Rival",
       "Open source (MIT License)");
 
-#if defined(GD_IDE_ONLY)
 
   extension
       .AddExpression("normalize",
@@ -403,7 +402,6 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
-#endif
 }
 
 }  // namespace gd

@@ -24,7 +24,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddExpressionAndConditionAndAction(
           "number",
@@ -567,7 +566,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                      "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"));
-#endif
 }
 
 }  // namespace gd

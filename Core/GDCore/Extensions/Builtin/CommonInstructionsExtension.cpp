@@ -5,7 +5,6 @@
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -15,7 +14,6 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Event.h"
-#endif
 
 using namespace std;
 namespace gd {
@@ -33,7 +31,6 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition("Or",
                     _("Or"),
@@ -134,7 +131,6 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::GroupEvent>());
-#endif
 }
 
 }  // namespace gd

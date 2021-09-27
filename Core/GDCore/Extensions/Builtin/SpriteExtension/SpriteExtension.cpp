@@ -29,7 +29,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       _("Animated object which can be used for most elements of a game"),
       "CppPlatform/Extensions/spriteicon.png");
 
-#if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
                 _("Change sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
@@ -552,7 +551,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("objectList", _("Object 1"), "Sprite")
       .AddParameter("objectList", _("Object 2"), "Sprite")
       .AddCodeOnlyParameter("conditionInverted", "");
-#endif
 }
 
 }  // namespace gd

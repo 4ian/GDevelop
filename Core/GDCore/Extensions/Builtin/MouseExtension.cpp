@@ -25,7 +25,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/mouse-touch");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition(
           "IsMouseWheelScrollingUp",
@@ -303,7 +302,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                      "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "");
 
-#endif
 }
 
 }  // namespace gd

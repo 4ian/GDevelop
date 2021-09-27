@@ -159,6 +159,8 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
         "recreateParticleSystem");
     actions["ParticleSystem::Tank"].SetFunctionName("setTank").SetGetter(
         "getTank");
+    actions["ParticleSystem::StartEmission"].SetFunctionName("startEmission");
+    actions["ParticleSystem::StopEmission"].SetFunctionName("stopEmission");
     conditions["ParticleSystem::Tank"].SetFunctionName("getTank");
     actions["ParticleSystem::Flow"].SetFunctionName("setFlow").SetGetter(
         "getFlow");

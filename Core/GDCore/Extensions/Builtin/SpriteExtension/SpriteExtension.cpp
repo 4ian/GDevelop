@@ -403,6 +403,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite");
 
+  obj.AddExpression("IsFlippedX",
+                    _("Is horizontally flipped"),
+                    _("Check if the object is horizontally flipped"),
+                    _("Effects"),
+                    "res/actions/flipX.png")
+
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("IsFlippedY",
+                    _("Is vertically flipped"),
+                    _("Check if the object is vertically flipped"),
+                    _("Effects"),
+                    "res/actions/flipY.png")
+
+      .AddParameter("object", _("Object"), "Sprite");
+
   obj.AddAction("TourneVers",
                 "Rotate an object toward another",
                 "Rotate an object towards another.",

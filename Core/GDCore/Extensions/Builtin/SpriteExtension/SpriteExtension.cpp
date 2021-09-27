@@ -29,7 +29,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       _("Animated object which can be used for most elements of a game"),
       "CppPlatform/Extensions/spriteicon.png");
 
-#if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
                 _("Change sprite opacity"),
                 _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
@@ -403,6 +402,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite");
 
+  obj.AddExpression("IsFlippedX",
+                    _("Is horizontally flipped"),
+                    _("Check if the object is horizontally flipped"),
+                    _("Effects"),
+                    "res/actions/flipX.png")
+
+      .AddParameter("object", _("Object"), "Sprite");
+
+  obj.AddExpression("IsFlippedY",
+                    _("Is vertically flipped"),
+                    _("Check if the object is vertically flipped"),
+                    _("Effects"),
+                    "res/actions/flipY.png")
+
+      .AddParameter("object", _("Object"), "Sprite");
+
   obj.AddAction("TourneVers",
                 "Rotate an object toward another",
                 "Rotate an object towards another.",
@@ -536,7 +551,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .AddParameter("objectList", _("Object 1"), "Sprite")
       .AddParameter("objectList", _("Object 2"), "Sprite")
       .AddCodeOnlyParameter("conditionInverted", "");
-#endif
 }
 
 }  // namespace gd

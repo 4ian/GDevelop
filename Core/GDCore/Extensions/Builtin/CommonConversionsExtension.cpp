@@ -21,7 +21,6 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/common-conversions");
 
-#if defined(GD_IDE_ONLY)
 
   extension
       .AddExpression("ToNumber",
@@ -65,7 +64,6 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           _("Conversion"),
           "res/conditions/toujours24.png")
       .AddParameter("expression", _("Angle, in radians"));
-#endif
 }
 
 }  // namespace gd

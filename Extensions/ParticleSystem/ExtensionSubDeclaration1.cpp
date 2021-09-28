@@ -270,7 +270,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
 
   obj.AddAction("StartEmission",
                 _("Start emission"),
-                _("Refull tank (if not infinite) and start emission of the particles."),
+                _("Refill tank (if not infinite) and start emission of the particles."),
                 _("Start emission of _PARAM0_"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",

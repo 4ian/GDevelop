@@ -259,8 +259,10 @@ namespace gdjs {
 
     resetEmission(flow: number, tank: number): void {
       this.setFlow(flow, tank);
-      // Setting emit to true will recompute emitter lifetime
+      const wasEmitting = this.emitter.emit;
+      // The only way to recompute emitter lifetime is to start the emitter.
       this.start();
+      if (!wasEmitting) this.stop();
     }
 
     isTextureNameValid(

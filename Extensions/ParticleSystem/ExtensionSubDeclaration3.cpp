@@ -80,6 +80,17 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
+      .SetHidden() // DEPRECATED
+      .UseStandardOperatorParameters("number");
+
+  obj.AddAction("SetTank",
+                _("Capacity"),
+                _("Change the capacity of the emitter."),
+                _("the capacity"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardOperatorParameters("number");
 
   obj.AddCondition("Tank",
@@ -93,6 +104,17 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Flow",
+                _("Flow"),
+                _("Change the flow of the emitter."),
+                _("the flow"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .SetHidden() // DEPRECATED
+      .UseStandardOperatorParameters("number");
+
+  obj.AddAction("SetFlow",
                 _("Flow"),
                 _("Change the flow of the emitter."),
                 _("the flow"),

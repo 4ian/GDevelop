@@ -383,11 +383,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         return;
       }
 
+      const fromIndex = container.getObjectPosition(movedObjectWithContext.object.getName());
+      let toIndex = container.getObjectPosition(
+        destinationObjectWithContext.object.getName()
+      );
+      if (toIndex > fromIndex) toIndex -= 1;
       container.moveObject(
-        container.getObjectPosition(movedObjectWithContext.object.getName()),
-        container.getObjectPosition(
-          destinationObjectWithContext.object.getName()
-        )
+        fromIndex,
+        toIndex
       );
     });
     this._onObjectModified(true);
@@ -494,6 +497,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Set as a global object`),
+        enabled: !isObjectWithContextGlobal(objectWithContext),
         click: () => this._setAsGlobalObject(objectWithContext),
       },
       {

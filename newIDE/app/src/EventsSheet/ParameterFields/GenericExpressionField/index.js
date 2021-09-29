@@ -70,6 +70,7 @@ const styles = {
     marginTop: 22, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
+    boxSizing: 'border-box',
   },
   backgroundHighlightingInline: {
     marginTop: 0, //Properly align with the text field

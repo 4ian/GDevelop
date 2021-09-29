@@ -5,6 +5,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Close from '@material-ui/icons/Close';
+import Tooltip from '@material-ui/core/Tooltip';
+
+import { tooltipEnterDelay } from './Tooltip';
 
 const appBarHeight = 32;
 
@@ -26,7 +29,13 @@ const styles = {
     paddingLeft: 15,
     paddingRight: 15,
   },
-  title: { fontSize: '15px', flexGrow: 1 },
+  title: {
+    fontSize: '15px',
+    flexGrow: 1,
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+  },
 };
 
 export default (props: Props) => {
@@ -43,9 +52,11 @@ export default (props: Props) => {
             <Close />
           </IconButton>
         )}
-        <Typography variant="h6" style={styles.title}>
-          {props.title}
-        </Typography>
+        <Tooltip title={props.title} placement="bottom" enterDelay={tooltipEnterDelay}>
+          <Typography variant="h6" style={styles.title}>
+            {props.title}
+          </Typography>
+        </Tooltip>
 
         {props.displayRightCloseButton && (
           <IconButton onClick={props.onClose} edge="end" color="inherit">

@@ -267,4 +267,22 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardRelationalOperatorParameters("number");
+
+  obj.AddAction("StartEmission",
+                _("Start emission"),
+                _("Refill tank (if not infinite) and start emission of the particles."),
+                _("Start emission of _PARAM0_"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter");
+
+  obj.AddAction("StopEmission",
+                _("Stop emission"),
+                _("Stop the emission of particles."),
+                _("Stop emission of _PARAM0_"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter");
 }

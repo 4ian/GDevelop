@@ -21,7 +21,6 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
-#if defined(GD_IDE_ONLY)
   extension.AddStrExpression("NewLine",
                              _("Insert a new line"),
                              _("Insert a new line"),
@@ -182,7 +181,6 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
                     _("Position of the last character in the string to be "
                       "considered in the search"));
 
-#endif
 }
 
 }  // namespace gd

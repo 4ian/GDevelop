@@ -21,7 +21,6 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/external-layouts");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddAction("CreateObjectsFromExternalLayout",
                  _("Create objects from an external layout"),
@@ -37,7 +36,6 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
       .AddParameter("expression", _("Y position of the origin"), "", true)
       .SetDefaultValue("0")
       .MarkAsAdvanced();
-#endif
 }
 
 }  // namespace gd

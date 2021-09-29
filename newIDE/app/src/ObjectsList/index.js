@@ -494,6 +494,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Set as a global object`),
+        enabled: !isObjectWithContextGlobal(objectWithContext),
         click: () => this._setAsGlobalObject(objectWithContext),
       },
       {

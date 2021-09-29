@@ -171,6 +171,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _objectsList: ?ObjectsList;
   _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
+  _instancesList: ?InstancesList;
 
   constructor(props: Props) {
     super(props);
@@ -914,6 +915,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this._layersList) this._layersList.forceUpdate();
   };
 
+  forceUpdateInstancesList = () => {
+    if (this._instancesList) this._instancesList.forceUpdate();
+  };
+
   forceUpdatePropertiesEditor = () => {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   };
@@ -991,6 +996,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectVariables={this.editObjectVariables}
                 onEditObjectByName={this.editObjectByName}
+                onInstancesModified={instances =>
+                  this.forceUpdateInstancesList()
+                }
                 ref={propertiesEditor =>
                   (this._propertiesEditor = propertiesEditor)
                 }
@@ -1028,6 +1036,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
+            ref={instancesList => (this._instancesList = instancesList)}
           />
         ),
       },

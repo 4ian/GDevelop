@@ -7,7 +7,7 @@ import * as React from 'react';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
-import PropertiesEditor from '../../PropertiesEditor';
+import PropertiesEditor, { type Instances } from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
 import VariablesList from '../../VariablesList';
@@ -25,6 +25,7 @@ type Props = {|
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
+  onInstancesModified?: Instances => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -161,6 +162,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 unsavedChanges={this.props.unsavedChanges}
                 schema={this.schema.concat(instanceSchema)}
                 instances={instances}
+                onInstancesModified={this.props.onInstancesModified}
               />
               <Line alignItems="center" justifyContent="space-between">
                 <Text>

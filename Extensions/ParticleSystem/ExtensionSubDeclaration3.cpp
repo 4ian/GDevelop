@@ -80,7 +80,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .SetHidden() // DEPRECATED
+      .SetHidden() // DEPRECATED - Use SetTank instead
       .UseStandardOperatorParameters("number");
 
   obj.AddAction("SetTank",
@@ -111,7 +111,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .SetHidden() // DEPRECATED
+      .SetHidden() // DEPRECATED - Use SetFlow instead
       .UseStandardOperatorParameters("number");
 
   obj.AddAction("SetFlow",
@@ -167,7 +167,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Particles number"),
                     _("Particles"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
-      .SetHidden() // DEPRECATED
+      .SetHidden() // DEPRECATED - Use CurrentParticleCount instead
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
   obj.AddExpression("CurrentParticleCount",

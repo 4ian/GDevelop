@@ -166,7 +166,7 @@ namespace gdjs {
       this.renderer = new PIXI.Container();
       // @ts-ignore
       this.emitter = new PIXI.particles.Emitter(this.renderer, texture, config);
-      this.emitter.emit = true;
+      this.start();
       const layer = runtimeScene.getLayer(runtimeObject.getLayer());
       if (layer) {
         layer
@@ -259,8 +259,10 @@ namespace gdjs {
 
     resetEmission(flow: number, tank: number): void {
       this.setFlow(flow, tank);
-      // Setting emit to true will recompute emitter lifetime
-      this.emitter.emit = true;
+      const wasEmitting = this.emitter.emit;
+      // The only way to recompute emitter lifetime is to start the emitter.
+      this.start();
+      if (!wasEmitting) this.stop();
     }
 
     isTextureNameValid(
@@ -298,6 +300,10 @@ namespace gdjs {
 
     stop(): void {
       this.emitter.emit = false;
+    }
+
+    start(): void {
+      this.emitter.emit = true;
     }
 
     recreate(): void {

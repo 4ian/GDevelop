@@ -5,7 +5,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Close from '@material-ui/icons/Close';
-import { Tooltip } from '@material-ui/core';
+import Tooltip from '@material-ui/core/Tooltip';
+
+import { tooltipEnterDelay } from './Tooltip';
 
 const appBarHeight = 32;
 
@@ -50,7 +52,7 @@ export default (props: Props) => {
             <Close />
           </IconButton>
         )}
-        <Tooltip title={props.title} placement="bottom" enterDelay={500}>
+        <Tooltip title={props.title} placement="bottom" enterDelay={tooltipEnterDelay}>
           <Typography variant="h6" style={styles.title}>
             {props.title}
           </Typography>

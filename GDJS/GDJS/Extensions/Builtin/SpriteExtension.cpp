@@ -79,8 +79,6 @@ SpriteExtension::SpriteExtension() {
   spriteActions["FlipY"].SetFunctionName("flipY");
   spriteConditions["FlippedX"].SetFunctionName("isFlippedX");
   spriteConditions["FlippedY"].SetFunctionName("isFlippedY");
-  spriteExpressions["IsFlippedX"].SetFunctionName("isFlippedX");
-  spriteExpressions["IsFlippedY"].SetFunctionName("isFlippedY");
 
   GetAllConditions()["Collision"]
       .AddCodeOnlyParameter(

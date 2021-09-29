@@ -223,12 +223,26 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
+  _shouldOpenParametersDialog = (
+    expressionInfo: EnumeratedExpressionMetadata
+  ): boolean => {
+    // If there is no parameter to fill for the selected expression, no need to open the dialog.
+    // Non visible parameters (like code only ones) should have already been filtered out.
+    return expressionInfo.parameters.length > 0;
+  };
+
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
-    this.setState({
-      popoverOpen: false,
-      parametersDialogOpen: true,
-      selectedExpressionInfo: expressionInfo,
-    });
+    let newState = { popoverOpen: false };
+    if (this._shouldOpenParametersDialog(expressionInfo)) {
+      newState = {
+        ...newState,
+        parametersDialogOpen: true,
+        selectedExpressionInfo: expressionInfo,
+      };
+    } else {
+      this.insertExpression(expressionInfo, []);
+    }
+    this.setState(newState);
   };
 
   insertExpression = (

@@ -52,7 +52,11 @@ export default (props: Props) => {
             <Close />
           </IconButton>
         )}
-        <Tooltip title={props.title} placement="bottom" enterDelay={tooltipEnterDelay}>
+        <Tooltip
+          title={props.title}
+          placement="bottom"
+          enterDelay={tooltipEnterDelay}
+        >
           <Typography variant="h6" style={styles.title}>
             {props.title}
           </Typography>

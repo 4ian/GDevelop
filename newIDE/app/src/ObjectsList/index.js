@@ -383,15 +383,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         return;
       }
 
-      const fromIndex = container.getObjectPosition(movedObjectWithContext.object.getName());
+      const fromIndex = container.getObjectPosition(
+        movedObjectWithContext.object.getName()
+      );
       let toIndex = container.getObjectPosition(
         destinationObjectWithContext.object.getName()
       );
       if (toIndex > fromIndex) toIndex -= 1;
-      container.moveObject(
-        fromIndex,
-        toIndex
-      );
+      container.moveObject(fromIndex, toIndex);
     });
     this._onObjectModified(true);
   };

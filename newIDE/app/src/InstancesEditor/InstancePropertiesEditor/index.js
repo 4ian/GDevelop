@@ -25,6 +25,7 @@ type Props = {|
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
+  onInstancesModified: () => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -161,6 +162,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 unsavedChanges={this.props.unsavedChanges}
                 schema={this.schema.concat(instanceSchema)}
                 instances={instances}
+                onInstancesModified={this.props.onInstancesModified}
               />
               <Line alignItems="center" justifyContent="space-between">
                 <Text>

@@ -1,1 +1,3 @@
-export const tooltipEnterDelay = 300;
+// @flow
+
+export const tooltipEnterDelay: number = 300;

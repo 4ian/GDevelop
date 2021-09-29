@@ -199,7 +199,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       this.props.unsavedChanges.triggerUnsavedChanges();
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
-    else this.forceUpdate();
+    this.forceUpdate();
   };
 
   _getFieldDescription = (instances: Instances, field: ValueField): ?string => {
@@ -506,6 +506,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                     instances={this.props.instances}
                     mode="row"
                     unsavedChanges={unsavedChanges}
+                    onInstancesModified={this.props.onInstancesModified}
                   />
                 )}
               </UnsavedChangesContext.Consumer>
@@ -520,6 +521,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                   schema={field.children}
                   instances={this.props.instances}
                   mode="column"
+                  onInstancesModified={this.props.onInstancesModified}
                 />
               </div>
             </div>

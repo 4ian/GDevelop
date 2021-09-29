@@ -25,7 +25,7 @@ type Props = {|
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
-  onInstancesModified?: Instances => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,

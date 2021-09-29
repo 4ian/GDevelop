@@ -517,12 +517,17 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             <div key={field.name}>
               <Subheader>{field.name}</Subheader>
               <div style={styles.subPropertiesEditorContainer}>
-                <PropertiesEditor
-                  schema={field.children}
-                  instances={this.props.instances}
-                  mode="column"
-                  onInstancesModified={this.props.onInstancesModified}
-                />
+                <UnsavedChangesContext.Consumer key={field.name}>
+                  {unsavedChanges => (
+                    <PropertiesEditor
+                      schema={field.children}
+                      instances={this.props.instances}
+                      mode="column"
+                      unsavedChanges={unsavedChanges}
+                      onInstancesModified={this.props.onInstancesModified}
+                    />
+                  )}
+                </UnsavedChangesContext.Consumer>
               </div>
             </div>
           );

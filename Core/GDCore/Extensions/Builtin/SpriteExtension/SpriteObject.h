@@ -44,7 +44,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
     return gd::make_unique<SpriteObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
@@ -60,7 +59,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
                                      const gd::String& value,
                                      gd::Project& project,
                                      gd::Layout& scene) override;
-#endif
 
   /** \name Animations
    * Methods related to animations management
@@ -123,9 +121,7 @@ class GD_CORE_API SpriteObject : public gd::Object {
  private:
   void DoUnserializeFrom(gd::Project& project,
                          const gd::SerializerElement& element) override;
-#if defined(GD_IDE_ONLY)
   void DoSerializeTo(gd::SerializerElement& element) const override;
-#endif
 
   mutable std::vector<Animation> animations;
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play

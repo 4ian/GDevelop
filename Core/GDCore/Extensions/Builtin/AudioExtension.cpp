@@ -21,7 +21,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddAction("PlaySoundCanal",
                  _("Play a sound on a channel"),
@@ -579,7 +578,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
                      "res/conditions/volume.png")
       .AddCodeOnlyParameter("currentScene", "");
 
-#endif
 }
 
 }  // namespace gd

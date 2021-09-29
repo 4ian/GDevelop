@@ -75,11 +75,9 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
   SetTimeBetweenFrames(
       element.GetDoubleAttribute("timeBetweenFrames", 1, "tempsEntre"));
   SetLoop(element.GetBoolAttribute("looping", false, "boucle"));
-#if defined(GD_IDE_ONLY)
   SetMetadata(element.HasAttribute("metadata") || element.HasChild("metadata")
                   ? element.GetStringAttribute("metadata")
                   : "");
-#endif
 
   const gd::SerializerElement& spritesElement =
       element.GetChild("sprites", 0, "Sprites");
@@ -135,7 +133,6 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
   }
 };
 
-#if defined(GD_IDE_ONLY)
 void SavePoint(const Point& point, gd::SerializerElement& element) {
   element.SetAttribute("name", point.GetName());
   element.SetAttribute("x", point.GetX());
@@ -190,6 +187,5 @@ void Direction::SerializeTo(gd::SerializerElement& element) const {
   if (!GetMetadata().empty()) element.SetAttribute("metadata", GetMetadata());
   SaveSpritesDirection(sprites, element.AddChild("sprites"));
 }
-#endif
 
 }  // namespace gd

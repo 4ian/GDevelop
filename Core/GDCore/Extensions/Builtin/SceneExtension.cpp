@@ -20,7 +20,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
-#if defined(GD_IDE_ONLY)
 
   extension
       .AddExpression("Random",
@@ -213,7 +212,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("string", _("Second string expression"))
       .MarkAsAdvanced();
-#endif
 }
 
 }  // namespace gd

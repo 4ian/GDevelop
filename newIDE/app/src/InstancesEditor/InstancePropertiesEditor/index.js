@@ -7,7 +7,7 @@ import * as React from 'react';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
-import PropertiesEditor, { type Instances } from '../../PropertiesEditor';
+import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
 import VariablesList from '../../VariablesList';

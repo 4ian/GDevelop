@@ -66,4 +66,5 @@ if (!hasErrors) {
   shell.echo('✅ Translations extracted');
 } else {
   shell.echo(`❌ Error(s) occurred while extracting translations`);
+  shell.exit(1);
 }

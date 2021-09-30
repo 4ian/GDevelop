@@ -3760,8 +3760,15 @@ storiesOf('LimitDisplayer', module)
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('profile', () => <ProfileDetails profile={indieUserProfile} />)
-  .add('loading', () => <ProfileDetails profile={null} />);
+  .add('profile', () => (
+    <ProfileDetails
+      profile={indieUserProfile}
+      onEditProfile={action('edit profile')}
+    />
+  ))
+  .add('loading', () => (
+    <ProfileDetails profile={null} onEditProfile={action('edit profile')} />
+  ));
 
 storiesOf('SubscriptionDetails', module)
   .addDecorator(paperDecorator)

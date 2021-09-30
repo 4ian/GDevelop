@@ -13,43 +13,51 @@ type Props = {
 };
 
 export default ({ subscription, onChangeSubscription }: Props) =>
-  subscription && subscription.planId ? (
+  subscription ? (
     <Column>
-      <Line>
-        <Text>
-          <Trans>
-            You are subscribed to {subscription.planId}. Congratulations! You
-            have access to more online services, including building your game
-            for Android, Windows, macOS and Linux in one click!
-          </Trans>
-        </Text>
+      <Line alignItems="center">
+        <Text size="title">My online services subscriptions</Text>
       </Line>
-      <Line justifyContent="center">
-        <RaisedButton
-          label={<Trans>Upgrade/change</Trans>}
-          primary
-          onClick={onChangeSubscription}
-        />
-      </Line>
-    </Column>
-  ) : subscription && !subscription.planId ? (
-    <Column>
-      <Line>
-        <Text>
-          <Trans>
-            If you don't have a subscription, consider getting one now. Accounts
-            allow you to access all of the online services. With just one click,
-            you can build your game for Android, Windows, macOS and Linux!
-          </Trans>
-        </Text>
-      </Line>
-      <Line justifyContent="center">
-        <RaisedButton
-          label={<Trans>Choose a subscription</Trans>}
-          primary
-          onClick={onChangeSubscription}
-        />
-      </Line>
+      {subscription.planId ? (
+        <>
+          <Line>
+            <Text>
+              <Trans>
+                You are subscribed to {subscription.planId}. Congratulations!
+                You have access to more online services, including building your
+                game for Android, Windows, macOS and Linux in one click!
+              </Trans>
+            </Text>
+          </Line>
+          <Line justifyContent="center">
+            <RaisedButton
+              label={<Trans>Upgrade/change</Trans>}
+              primary
+              onClick={onChangeSubscription}
+            />
+          </Line>
+        </>
+      ) : (
+        <>
+          <Line>
+            <Text>
+              <Trans>
+                If you don't have a subscription, consider getting one now.
+                Accounts allow you to access all of the online services. With
+                just one click, you can build your game for Android, Windows,
+                macOS and Linux!
+              </Trans>
+            </Text>
+          </Line>
+          <Line justifyContent="center">
+            <RaisedButton
+              label={<Trans>Choose a subscription</Trans>}
+              primary
+              onClick={onChangeSubscription}
+            />
+          </Line>
+        </>
+      )}
     </Column>
   ) : (
     <PlaceholderLoader />

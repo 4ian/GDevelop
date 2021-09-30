@@ -62,12 +62,12 @@ export default class BuildsWatcher {
     do {
       if (!this.authenticatedUser) return;
 
-      const { getAuthorizationHeader, profile } = this.authenticatedUser;
-      if (!profile) return;
+      const { getAuthorizationHeader, firebaseUser } = this.authenticatedUser;
+      if (!firebaseUser) return;
 
       try {
         console.info(`Checking progress of build ${buildId}...`);
-        build = await getBuild(getAuthorizationHeader, profile.id, buildId);
+        build = await getBuild(getAuthorizationHeader, firebaseUser.uid, buildId);
         if (this.onBuildUpdated) this.onBuildUpdated(build);
       } catch (e) {
         console.warn('Error while watching build progress:', e);

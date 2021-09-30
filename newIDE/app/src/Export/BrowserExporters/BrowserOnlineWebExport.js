@@ -147,9 +147,9 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string
   ): Promise<Build> => {
-    const { getAuthorizationHeader, profile } = authenticatedUser;
-    if (!profile) return Promise.reject(new Error('User is not authenticated'));
+    const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+    if (!firebaseUser) return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(getAuthorizationHeader, profile.id, uploadBucketKey);
+    return buildWeb(getAuthorizationHeader, firebaseUser.uid, uploadBucketKey);
   },
 };

@@ -13,7 +13,6 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { loadScript } from './Utils/LoadScript.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
-import VersionMetadata from './Version/VersionMetadata';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 

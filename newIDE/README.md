@@ -140,7 +140,7 @@ cd newIDE/app
 yarn extract-all-translations # or npm run extract-all-translations
 ```
 
-This will create `ide-messages.po` (in `newIDE/app/src/locales`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
+This will create `ide-messages.pot` (in `newIDE/app/src/locales/en`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
 
 To update translations, build and download the translations from Crowdin. Extract everything in `newIDE/app/src/locales`. And run:
 

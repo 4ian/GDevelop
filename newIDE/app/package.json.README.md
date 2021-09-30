@@ -10,6 +10,8 @@ GDevelop relies on some dependencies that can have special requirements:
   - `babel-loader` is specified to be the exact version required by `react-scripts` (because `react-scripts` wants the exact version and will complain if forced to use the `babel-loader` of Storybook).
   - **Try removing these extra `devDependencies`** if you upgrade Storybook or Create React App.
 
+- `"babel-core": "^7.0.0-bridge.0"` is needed for js-lingui `lingui extract` command (who runs Babel on source files).
+
 - **`react-dnd`** is used by `react-mosaic-component` and `react-sortable-tree` (but not `react-sortable-hoc`). Both must be using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.
 
 > You can check if there is only one version of a package by doing `npm ls` or `yarn why`:

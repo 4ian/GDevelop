@@ -68,13 +68,23 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-
+    // Deprecated prefer using SetFontSize.
     GetAllActionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("setCharacterSize")
         .SetGetter("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetFontSize"]
+        .SetFunctionName("setCharacterSize")
+        .SetGetter("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")

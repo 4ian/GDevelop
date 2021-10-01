@@ -8,29 +8,35 @@ import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {
   profile: ?Profile,
+  onEditProfile: Function,
 };
 
-export default ({ profile }: Props) =>
-  profile ? (
+export default ({ profile, onEditProfile }: Props) => {
+  return profile ? (
     <Column>
       <Line alignItems="center">
         <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
         <Spacer />
-        <Text size="title">
-          You are connected as {profile.username} ({profile.email})
+        <Text size="title">{profile.username}</Text>
+      </Line>
+      <Line alignItems="center">
+        <Text>
+          <Trans>You are connected as {profile.email}</Trans>
         </Text>
       </Line>
-      <Line>
-        <Text>
-          <Trans>
-            An account allows you to access GDevelop services online.
-          </Trans>
-        </Text>
+      <Line justifyContent="center">
+        <RaisedButton
+          label={<Trans>Edit my profile</Trans>}
+          primary
+          onClick={onEditProfile}
+        />
       </Line>
     </Column>
   ) : (
     <PlaceholderLoader />
   );
+};

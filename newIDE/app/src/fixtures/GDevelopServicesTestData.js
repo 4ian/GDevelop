@@ -29,6 +29,7 @@ export const indieUserProfile: Profile = {
   id: 'indie-user',
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
+  description: 'Just here to develop indie games',
 };
 
 export const usagesForIndieUser: Usages = [

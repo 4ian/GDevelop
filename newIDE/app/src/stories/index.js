@@ -3921,7 +3921,12 @@ storiesOf('Profile/EditProfileDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <EditProfileDialog
-      profile={{ id: 'id', email: 'email', username: 'username' }}
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+      }}
       onClose={action('on close')}
       editInProgress={false}
       onEdit={action('on edit')}

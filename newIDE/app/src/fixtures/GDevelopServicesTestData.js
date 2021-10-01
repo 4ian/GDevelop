@@ -730,3 +730,38 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
 };
+
+export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
+  id: '2ff24efa0de9b1340d7e8c8aedb494af6b4db9a72c6a643303734755efb977df',
+  name: 'Geometry monster',
+  shortDescription:
+    'A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n',
+  license: 'MIT',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/examples/geometry-monster/thumbnail.png',
+  ],
+  authorIds: [],
+  tags: [
+    'geometry-monster',
+    '',
+    'Advanced control features',
+    'Audio',
+    'Standard Conversions',
+    'Builtin events',
+    'Keyboard features',
+    'Mathematical tools',
+    'Mouse and touch',
+    'Features for all objects',
+    'Scene management features',
+    'Time',
+    'Variable features',
+    'Particle system',
+    'Sprite',
+    'Text object',
+    'Stay On Screen',
+    'Sine (or ellipsis) Movement',
+    'Flash (blink)',
+    'Health (life points and damages for objects)',
+  ],
+  gdevelopVersion: '',
+};

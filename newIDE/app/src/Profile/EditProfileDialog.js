@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
@@ -106,6 +106,7 @@ export default class EditDialog extends Component<Props, State> {
             multiline
             rows={3}
             rowsMax={5}
+            hintText={t`I use GDevelop to make the videogame of my dreams`}
             onChange={(e, value) => {
               this.setState({
                 form: {

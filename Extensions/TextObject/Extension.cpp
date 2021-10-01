@@ -101,6 +101,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetCharacterSize")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  // Support for deprecated names:
+  obj.AddDuplicatedAction("Size", "SetFontSize").SetHidden();
+  obj.AddDuplicatedCondition("Size", "FontSize").SetHidden();
+
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),

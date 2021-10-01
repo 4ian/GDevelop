@@ -302,6 +302,22 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
+gd::InstructionMetadata& ObjectMetadata::AddDuplicatedAction(
+    const gd::String& newActionName, const gd::String& copiedActionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newActionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedActionName;
+
+  auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
+  if (copiedAction == actionsInfos.end()) {
+    gd::LogWarning("Could not find an action with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    actionsInfos[newNameWithNamespace] = copiedAction->second;
+  }
+
+  return actionsInfos[newNameWithNamespace];
+}
+
 ObjectMetadata& ObjectMetadata::SetFullName(const gd::String& fullname_) {
 #if defined(GD_IDE_ONLY)
   fullname = fullname_;

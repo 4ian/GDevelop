@@ -9,6 +9,7 @@ This project is released under the MIT License.
  * Victor Levasseur ( Bold/Italic/Underlined styles )
  */
 
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "TextObject.h"
@@ -99,6 +100,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardRelationalOperatorParameters("number")
       .SetFunctionName("GetCharacterSize")
       .SetIncludeFile("TextObject/TextObject.h");
+
+  // Support for deprecated names:
+  obj.AddDuplicatedAction("Size", "SetFontSize").SetHidden();
+  obj.AddDuplicatedCondition("Size", "FontSize").SetHidden();
 
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
@@ -538,6 +543,17 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .SetFunctionName("GetAngle")
       .SetIncludeFile("TextObject/TextObject.h");
+
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "FontSize",
+         _("Font Size"),
+         _("the font size of a text object"),
+         _("the font size of _PARAM1_"),
+         "",
+         "res/conditions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters("number");
 
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")

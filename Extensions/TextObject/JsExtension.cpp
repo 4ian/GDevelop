@@ -5,13 +5,11 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
+#include <iostream>
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-
 #include "TextObject.h"
-
-#include <iostream>
-#include "GDCore/Tools/Localization.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension);
 
@@ -70,17 +68,46 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+    // Deprecated prefer using SetFontSize.
     GetAllActionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("setCharacterSize")
         .SetGetter("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetFontSize"]
+        .SetFunctionName("setCharacterSize")
+        .SetGetter("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("getCharacterSize")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::FontSize"]
+        .SetFunctionName("setCharacterSize")
+        .SetGetter("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::FontSize"]
+        .SetFunctionName("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+    GetAllExpressionsForObject("TextObject::Text")["FontSize"]
+        .SetFunctionName("getCharacterSize")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
+        .AddIncludeFile(
+            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+
     GetAllActionsForObject("TextObject::Text")["TextObject::Angle"]
         .SetFunctionName("setAngle")
         .SetGetter("getAngle")
@@ -103,7 +130,6 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
         .AddIncludeFile(
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"]
         .SetFunctionName("setBold")

@@ -17,6 +17,7 @@ import {
   UsernameField,
   usernameFormatError,
 } from './UsernameField';
+import TextField from '../UI/TextField';
 
 type Props = {|
   profile: Profile,

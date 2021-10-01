@@ -43,6 +43,7 @@ export default class EditDialog extends Component<Props, State> {
   state = {
     form: {
       username: this.props.profile.username || '',
+      description: this.props.profile.description || '',
     },
   };
 
@@ -96,6 +97,22 @@ export default class EditDialog extends Component<Props, State> {
               });
             }}
             errorText={getUsernameErrorText(error)}
+          />
+          <TextField
+            value={this.state.form.description}
+            floatingLabelText={<Trans>Bio</Trans>}
+            fullWidth
+            multiline
+            rows={3}
+            rowsMax={5}
+            onChange={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  description: value,
+                },
+              });
+            }}
           />
         </ColumnStackLayout>
       </Dialog>

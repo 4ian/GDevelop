@@ -17,6 +17,7 @@ export type Profile = {
   id: string,
   email: string,
   username: ?string,
+  description: ?string,
 };
 
 export type LoginForm = {
@@ -32,6 +33,7 @@ export type RegisterForm = {
 
 export type EditForm = {
   username: string,
+  description: string,
 };
 
 export type ForgotPasswordForm = {
@@ -177,10 +179,12 @@ export default class Authentication {
           console.error('Cannot get user if not logged in');
           throw new Error('Cannot get user if not logged in');
         }
+        const { username, description } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
           {
-            username: form.username,
+            username,
+            description,
           },
           {
             params: {

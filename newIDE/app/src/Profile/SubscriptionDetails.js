@@ -29,7 +29,7 @@ export default ({ subscription, onChangeSubscription }: Props) =>
               </Trans>
             </Text>
           </Line>
-          <Line justifyContent="center">
+          <Line justifyContent="flex-end">
             <RaisedButton
               label={<Trans>Upgrade/change</Trans>}
               primary
@@ -49,7 +49,7 @@ export default ({ subscription, onChangeSubscription }: Props) =>
               </Trans>
             </Text>
           </Line>
-          <Line justifyContent="center">
+          <Line justifyContent="flex-end">
             <RaisedButton
               label={<Trans>Choose a subscription</Trans>}
               primary

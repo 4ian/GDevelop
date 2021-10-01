@@ -107,6 +107,9 @@ import {
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
   exampleFromFutureVersion,
+  geometryMonsterExampleShortHeader,
+  fireBulletExtensionShortHeader,
+  flashExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
@@ -247,6 +250,10 @@ import {
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
 import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import {
+  ExtensionsAccordion,
+  ExamplesAccordion,
+} from '../Profile/ContributionsDetails';
 
 configureActions({
   depth: 2,
@@ -3760,8 +3767,15 @@ storiesOf('LimitDisplayer', module)
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('profile', () => <ProfileDetails profile={indieUserProfile} />)
-  .add('loading', () => <ProfileDetails profile={null} />);
+  .add('profile', () => (
+    <ProfileDetails
+      profile={indieUserProfile}
+      onEditProfile={action('edit profile')}
+    />
+  ))
+  .add('loading', () => (
+    <ProfileDetails profile={null} onEditProfile={action('edit profile')} />
+  ));
 
 storiesOf('SubscriptionDetails', module)
   .addDecorator(paperDecorator)
@@ -3962,6 +3976,33 @@ storiesOf('UserPublicProfileChip', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
+  ));
+
+storiesOf('ContributionsDetails', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <>
+      <ExtensionsAccordion
+        extensions={[fireBulletExtensionShortHeader, flashExtensionShortHeader]}
+        extensionError={null}
+      />
+      <ExamplesAccordion
+        examples={[geometryMonsterExampleShortHeader]}
+        exampleError={null}
+      />
+    </>
+  ))
+  .add('no contributions', () => (
+    <>
+      <ExtensionsAccordion extensions={[]} extensionError={null} />
+      <ExamplesAccordion examples={[]} exampleError={null} />
+    </>
+  ))
+  .add('with errors', () => (
+    <>
+      <ExtensionsAccordion extensions={[]} extensionError={new Error()} />
+      <ExamplesAccordion examples={[]} exampleError={new Error()} />
+    </>
   ));
 
 storiesOf('LocalNetworkPreviewDialog', module)

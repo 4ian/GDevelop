@@ -2,8 +2,8 @@
 
 name: Extract translations
 on:
+  # Execute for all commits (to ensure translations extraction works)
   push:
-    # branches: [ master ]
   # Allows to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
@@ -26,9 +26,6 @@ jobs:
       - name: Install gettext
         run: sudo apt update && sudo apt install gettext -y
 
-      - name: Install Crowdin CLI
-        run: npm i -g @crowdin/cli
-
       - name: Install newIDE dependencies
         run: npm install
         working-directory: newIDE/app
@@ -37,9 +34,14 @@ jobs:
         run: npm run extract-all-translations
         working-directory: newIDE/app
 
+      # Only upload on Crowdin for the master branch
+      - name: Install Crowdin CLI
+        if: github.ref == 'refs/heads/master'
+        run: npm i -g @crowdin/cli
+        
       - name: Upload translations to Crowdin
         run: crowdin upload sources
-        # TODO: Only do on master branch
+        if: github.ref == 'refs/heads/master'
         env:
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

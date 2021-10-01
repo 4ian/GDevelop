@@ -34,3 +34,11 @@ export const getUserPublicProfilesByIds = (
     })
     .then(response => response.data);
 };
+
+export const getUserPublicProfile = (
+  id: string
+): Promise<UserPublicProfile> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
+    .then(response => response.data);
+};

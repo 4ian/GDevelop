@@ -12,6 +12,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
+import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from './AuthenticatedUserContext';
@@ -65,20 +66,6 @@ export default class ProfileDialog extends Component<Props, State> {
                     : '/interface/profile'
                 }
               />,
-              authenticatedUser.authenticated && (
-                <FlatButton
-                  label={<Trans>Refresh</Trans>}
-                  key="refresh"
-                  onClick={authenticatedUser.onRefreshUserProfile}
-                />
-              ),
-              authenticatedUser.authenticated && authenticatedUser.profile && (
-                <FlatButton
-                  label={<Trans>Edit</Trans>}
-                  key="edit"
-                  onClick={authenticatedUser.onEdit}
-                />
-              ),
               authenticatedUser.authenticated && authenticatedUser.profile && (
                 <FlatButton
                   label={<Trans>Logout</Trans>}
@@ -101,13 +88,17 @@ export default class ProfileDialog extends Component<Props, State> {
               <Tab label={<Trans>Services Usage</Trans>} value="usage" />
             </Tabs>
             {this.state.currentTab === 'profile' &&
-              (authenticatedUser.authenticated ? (
+              (authenticatedUser.authenticated && authenticatedUser.profile ? (
                 <Column noMargin>
-                  <ProfileDetails profile={authenticatedUser.profile} />
+                  <ProfileDetails
+                    profile={authenticatedUser.profile}
+                    onEditProfile={authenticatedUser.onEdit}
+                  />
                   <SubscriptionDetails
                     subscription={authenticatedUser.subscription}
                     onChangeSubscription={this.props.onChangeSubscription}
                   />
+                  <ContributionsDetails userId={authenticatedUser.profile.id} />
                 </Column>
               ) : (
                 <Column>

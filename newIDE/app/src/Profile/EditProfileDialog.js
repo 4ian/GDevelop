@@ -5,7 +5,6 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import TextField from '../UI/TextField';
 import {
   type EditForm,
   type AuthError,
@@ -13,6 +12,11 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
+import {
+  isUsernameValid,
+  UsernameField,
+  usernameFormatError,
+} from './UsernameField';
 
 type Props = {|
   profile: Profile,
@@ -31,8 +35,7 @@ export const getUsernameErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/username-used')
     return 'This username is already used, please pick another one.';
-  if (error.code === 'auth/malformed-username')
-    return 'Please pick a short username with only alphanumeric characters as well as _ and -';
+  if (error.code === 'auth/malformed-username') return usernameFormatError;
   return undefined;
 };
 
@@ -63,7 +66,9 @@ export default class EditDialog extends Component<Props, State> {
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
-          disabled={editInProgress}
+          disabled={
+            editInProgress || !isUsernameValid(this.state.form.username)
+          }
         />
       </LeftLoader>,
     ];
@@ -80,12 +85,8 @@ export default class EditDialog extends Component<Props, State> {
         open
       >
         <ColumnStackLayout noMargin>
-          <TextField
-            autoFocus
+          <UsernameField
             value={this.state.form.username}
-            floatingLabelText={<Trans>Username</Trans>}
-            errorText={getUsernameErrorText(error)}
-            fullWidth
             onChange={(e, value) => {
               this.setState({
                 form: {
@@ -94,6 +95,7 @@ export default class EditDialog extends Component<Props, State> {
                 },
               });
             }}
+            errorText={getUsernameErrorText(error)}
           />
         </ColumnStackLayout>
       </Dialog>

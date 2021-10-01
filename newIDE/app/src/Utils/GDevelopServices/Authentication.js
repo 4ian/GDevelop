@@ -47,7 +47,8 @@ export type AuthError = {
     | 'auth/email-already-in-use'
     | 'auth/operation-not-allowed'
     | 'auth/weak-password'
-    | 'auth/username-used',
+    | 'auth/username-used'
+    | 'auth/malformed-username',
 };
 
 export default class Authentication {

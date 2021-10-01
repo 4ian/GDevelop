@@ -31,6 +31,8 @@ export const getUsernameErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/username-used')
     return 'This username is already used, please pick another one.';
+  if (error.code === 'auth/malformed-username')
+    return 'You cannot use this username, please only pick common characters.';
   return undefined;
 };
 

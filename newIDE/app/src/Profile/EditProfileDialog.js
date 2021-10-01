@@ -5,7 +5,6 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import TextField from '../UI/TextField';
 import {
   type EditForm,
   type AuthError,
@@ -13,6 +12,7 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
+import { isUsernameValid, UsernameField } from './UsernameField';
 
 type Props = {|
   profile: Profile,
@@ -63,7 +63,9 @@ export default class EditDialog extends Component<Props, State> {
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
-          disabled={editInProgress}
+          disabled={
+            editInProgress || !isUsernameValid(this.state.form.username)
+          }
         />
       </LeftLoader>,
     ];
@@ -80,12 +82,8 @@ export default class EditDialog extends Component<Props, State> {
         open
       >
         <ColumnStackLayout noMargin>
-          <TextField
-            autoFocus
+          <UsernameField
             value={this.state.form.username}
-            floatingLabelText={<Trans>Username</Trans>}
-            errorText={getUsernameErrorText(error)}
-            fullWidth
             onChange={(e, value) => {
               this.setState({
                 form: {
@@ -94,6 +92,7 @@ export default class EditDialog extends Component<Props, State> {
                 },
               });
             }}
+            errorText={getUsernameErrorText(error)}
           />
         </ColumnStackLayout>
       </Dialog>

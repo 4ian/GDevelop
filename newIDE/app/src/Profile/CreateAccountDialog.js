@@ -15,6 +15,7 @@ import LeftLoader from '../UI/LeftLoader';
 import BackgroundText from '../UI/BackgroundText';
 import { ColumnStackLayout } from '../UI/Layout';
 import { MarkdownText } from '../UI/MarkdownText';
+import { UsernameField, isUsernameValid } from './UsernameField';
 
 type Props = {|
   onClose: () => void,
@@ -83,7 +84,10 @@ export default class CreateAccountDialog extends Component<Props, State> {
             <RaisedButton
               label={<Trans>Create my account</Trans>}
               primary
-              disabled={createAccountInProgress}
+              disabled={
+                createAccountInProgress ||
+                !isUsernameValid(this.state.form.username, true)
+              }
               onClick={this._onCreateAccount}
             />
           </LeftLoader>,
@@ -109,11 +113,8 @@ export default class CreateAccountDialog extends Component<Props, State> {
               translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop-app.com/legal/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
             />
           </BackgroundText>
-          <TextField
-            autoFocus
+          <UsernameField
             value={this.state.form.username}
-            floatingLabelText={<Trans>Username</Trans>}
-            fullWidth
             onChange={(e, value) => {
               this.setState({
                 form: {
@@ -122,6 +123,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
                 },
               });
             }}
+            allowEmpty
           />
           <TextField
             value={this.state.form.email}

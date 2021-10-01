@@ -318,6 +318,22 @@ gd::InstructionMetadata& ObjectMetadata::AddDuplicatedAction(
   return actionsInfos[newNameWithNamespace];
 }
 
+gd::InstructionMetadata& ObjectMetadata::AddDuplicatedCondition(
+    const gd::String& newConditionName, const gd::String& copiedConditionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newConditionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedConditionName;
+
+  auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
+  if (copiedCondition == conditionsInfos.end()) {
+    gd::LogWarning("Could not find a condition with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    conditionsInfos[newNameWithNamespace] = copiedCondition->second;
+  }
+
+  return conditionsInfos[newNameWithNamespace];
+}
+
 ObjectMetadata& ObjectMetadata::SetFullName(const gd::String& fullname_) {
 #if defined(GD_IDE_ONLY)
   fullname = fullname_;

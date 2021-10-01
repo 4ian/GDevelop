@@ -31,6 +31,8 @@ export const getUsernameErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/username-used')
     return 'This username is already used, please pick another one.';
+  if (error.code === 'auth/malformed-username')
+    return 'Your username must have less than 30 characters and only from this list: a-z A-Z 0-9 _ -';
   return undefined;
 };
 

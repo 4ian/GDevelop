@@ -17,6 +17,7 @@ import {
 } from '../Utils/GDevelopServices/Example';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
+import BackgroundText from '../UI/BackgroundText';
 
 type ContributionLineProps = {|
   fullName: string,
@@ -43,11 +44,11 @@ export const ContributionLine = ({
 );
 
 type ExamplesAccordionProps = {|
-  examples: ?Array<ExampleShortHeader>,
+  examples: Array<ExampleShortHeader>,
   exampleError: ?Error,
 |};
 
-const ExamplesAccordion = ({
+export const ExamplesAccordion = ({
   examples,
   exampleError,
 }: ExamplesAccordionProps) => {
@@ -55,14 +56,14 @@ const ExamplesAccordion = ({
     return (
       <Column>
         <Line alignItems="center">
-          <Text size="title">
+          <Text>
             <Trans>Error retrieving the examples</Trans>
           </Text>
         </Line>
       </Column>
     );
 
-  return examples ? (
+  return (
     <Accordion>
       <AccordionHeader>
         <Text displayInlineAsSpan>
@@ -83,17 +84,15 @@ const ExamplesAccordion = ({
         </Column>
       </AccordionBody>
     </Accordion>
-  ) : (
-    <PlaceholderLoader />
   );
 };
 
 type ExtensionsAccordionProps = {|
-  extensions: ?Array<ExtensionShortHeader>,
+  extensions: Array<ExtensionShortHeader>,
   extensionError: ?Error,
 |};
 
-const ExtensionsAccordion = ({
+export const ExtensionsAccordion = ({
   extensions,
   extensionError,
 }: ExtensionsAccordionProps) => {
@@ -101,14 +100,14 @@ const ExtensionsAccordion = ({
     return (
       <Column>
         <Line alignItems="center">
-          <Text size="title">
+          <Text>
             <Trans>Error retrieving the extensions</Trans>
           </Text>
         </Line>
       </Column>
     );
 
-  return extensions ? (
+  return (
     <Accordion>
       <AccordionHeader>
         <Text displayInlineAsSpan>
@@ -127,8 +126,6 @@ const ExtensionsAccordion = ({
         </Column>
       </AccordionBody>
     </Accordion>
-  ) : (
-    <PlaceholderLoader />
   );
 };
 
@@ -137,19 +134,15 @@ type AssetsAccordionProps = {|
   examples: ?Array<ExampleShortHeader>,
 |};
 
-const AssetsAccordion = ({ examples }: AssetsAccordionProps) => {
-  return examples ? (
-    <Accordion>
-      <AccordionHeader>
-        <Text displayInlineAsSpan>
-          <Trans>Assets (coming soon!)</Trans>
-        </Text>
-      </AccordionHeader>
-    </Accordion>
-  ) : (
-    <PlaceholderLoader />
-  );
-};
+const AssetsAccordion = ({ examples }: AssetsAccordionProps) => (
+  <Accordion>
+    <AccordionHeader>
+      <Text displayInlineAsSpan>
+        <Trans>Assets (coming soon!)</Trans>
+      </Text>
+    </AccordionHeader>
+  </Accordion>
+);
 
 type Props = {|
   userId: string,
@@ -214,21 +207,35 @@ export default ({ userId }: Props) => {
 
   return (
     <>
-      {extensions && examples && (
-        <Column>
-          <Line alignItems="center">
-            <Text size="title">
-              <Trans>Contributions</Trans>
+      <Column>
+        <Line alignItems="center">
+          <Text size="title">
+            <Trans>Contributions</Trans>
+          </Text>
+        </Line>
+      </Column>
+      {examples && extensions ? (
+        <>
+          <ExtensionsAccordion
+            extensions={extensions}
+            extensionError={extensionError}
+          />
+          <ExamplesAccordion examples={examples} exampleError={exampleError} />
+          <AssetsAccordion examples={examples} />
+          <BackgroundText>
+            <Text>
+              <Trans>
+                Missing some contributions? If you are the author, create a Pull
+                Request on the corresponding GitHub repository after adding your
+                username in the authors of the example or the extension - or
+                directly ask the original author to add your username.
+              </Trans>
             </Text>
-          </Line>
-        </Column>
+          </BackgroundText>
+        </>
+      ) : (
+        <PlaceholderLoader />
       )}
-      <ExtensionsAccordion
-        extensions={extensions}
-        extensionError={extensionError}
-      />
-      <ExamplesAccordion examples={examples} exampleError={exampleError} />
-      <AssetsAccordion examples={examples} />
     </>
   );
 };

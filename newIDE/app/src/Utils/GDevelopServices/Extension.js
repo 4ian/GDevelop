@@ -124,3 +124,18 @@ export const getExtension = (
     return transformedData;
   });
 };
+
+export const getUserExtensionShortHeaders = async (
+  authorId: string
+): Promise<Array<ExtensionShortHeader>> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/extension-short-header`,
+    {
+      params: {
+        authorId,
+      },
+    }
+  );
+
+  return response.data;
+};

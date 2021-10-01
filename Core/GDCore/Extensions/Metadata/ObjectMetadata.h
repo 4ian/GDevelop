@@ -154,6 +154,15 @@ class GD_CORE_API ObjectMetadata {
       const gd::String& icon);
 
   /**
+   * \brief Create a new action which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated action that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedAction(
+      const gd::String& newActionName, const gd::String& copiedActionName);
+
+  /**
    * \brief Set the name shown to the user.
    */
   ObjectMetadata& SetFullName(const gd::String& fullname_);

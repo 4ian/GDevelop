@@ -1,0 +1,22 @@
+'project_id_env': 'CROWDIN_PROJECT_ID'
+'api_token_env': 'CROWDIN_PERSONAL_TOKEN'
+'base_path': '.'
+'base_url': 'https://api.crowdin.com'
+
+# Flatten files in Crowdin
+'preserve_hierarchy': false
+
+# "Source" files, which are .POT files extracted from the source code.
+# The built files are .PO files that are the compiled by `compile-translations`
+# script in `newIDE/app/scripts`.
+files:
+  [
+    {
+      'source': 'newIDE/app/src/locales/en/ide-messages.pot',
+      'translation': 'newIDE/app/src/locales/%locale_with_underscore%/ide-messages.po',
+    },
+    {
+      'source': 'scripts/gdcore-gdcpp-gdjs-extensions-messages.pot',
+      'translation': 'newIDE/app/src/locales/%locale_with_underscore%/gdcore-gdcpp-gdjs-extensions-messages.po',
+    },
+  ]

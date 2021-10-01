@@ -1,5 +1,7 @@
 #Launch this script to generate the .POT file used
 #to update the strings to be translated.
+set -e
+
 echo "ℹ️ Listing all GDCore, GDJS and Extensions sources files to translate..."
 
 find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
@@ -22,4 +24,5 @@ if type $GETTEXT 2>/dev/null; then
 	echo "ℹ️ Translation file 'gdcore-gdcpp-gdjs-extensions-messages.pot' generated and ready to be sent to Crowdin or used in a translation software like PoEdit."
 else
 	echo "❌ Unable to find xgettext on your system."
+	exit 1
 fi

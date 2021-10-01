@@ -106,7 +106,7 @@ export default class EditDialog extends Component<Props, State> {
             multiline
             rows={3}
             rowsMax={5}
-            hintText={t`I use GDevelop to make the videogame of my dreams`}
+            hintText={t`What are you using GDevelop for?`}
             onChange={(e, value) => {
               this.setState({
                 form: {

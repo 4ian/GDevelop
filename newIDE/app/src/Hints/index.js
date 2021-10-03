@@ -89,7 +89,7 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`A scale under 1 on a Bitmap text object can downgrade the quality text, prefer to remake a bitmap font smaller in the external bmFont editor.`,
     };
   }
-  if (type === 'TextObject::Size') {
+  if (type === 'TextObject::Text::SetFontSize') {
     return {
       kind: 'warning',
       message: t`This action will create a new texture and re-render the text each time it is called, which is expensive and can reduce performances. Prefer to avoid changing a lot the character size of a text.`,

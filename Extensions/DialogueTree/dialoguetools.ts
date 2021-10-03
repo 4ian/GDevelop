@@ -739,7 +739,7 @@ namespace gdjs {
    * @param key The name of the variable you want to get the value of
    */
   gdjs.dialogueTree.getVariable = function (key: string) {
-    if (this.dialogueIsRunning && key in this.runner.variables.data) {
+    if (this.runner.variables && key in this.runner.variables.data) {
       return this.runner.variables.get(key);
     }
     return '';
@@ -754,7 +754,7 @@ namespace gdjs {
     key: string,
     value: string | boolean | number
   ) {
-    if (this.dialogueIsRunning && key in this.runner.variables.data) {
+    if (this.runner.variables && key in this.runner.variables.data) {
       return this.runner.variables.get(key) === value;
     }
     return false;

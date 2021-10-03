@@ -302,6 +302,38 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
+gd::InstructionMetadata& ObjectMetadata::AddDuplicatedAction(
+    const gd::String& newActionName, const gd::String& copiedActionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newActionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedActionName;
+
+  auto copiedAction = actionsInfos.find(copiedNameWithNamespace);
+  if (copiedAction == actionsInfos.end()) {
+    gd::LogWarning("Could not find an action with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    actionsInfos[newNameWithNamespace] = copiedAction->second;
+  }
+
+  return actionsInfos[newNameWithNamespace];
+}
+
+gd::InstructionMetadata& ObjectMetadata::AddDuplicatedCondition(
+    const gd::String& newConditionName, const gd::String& copiedConditionName) {
+  gd::String newNameWithNamespace = extensionNamespace + newConditionName;
+  gd::String copiedNameWithNamespace = extensionNamespace + copiedConditionName;
+
+  auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
+  if (copiedCondition == conditionsInfos.end()) {
+    gd::LogWarning("Could not find a condition with name " +
+                   copiedNameWithNamespace + " to copy.");
+  } else {
+    conditionsInfos[newNameWithNamespace] = copiedCondition->second;
+  }
+
+  return conditionsInfos[newNameWithNamespace];
+}
+
 ObjectMetadata& ObjectMetadata::SetFullName(const gd::String& fullname_) {
 #if defined(GD_IDE_ONLY)
   fullname = fullname_;

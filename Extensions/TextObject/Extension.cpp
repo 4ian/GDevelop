@@ -74,37 +74,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("ChangeFont")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddAction("Size",
-                _("Size"),
-                _("Change the size of the text."),
-                _("the size of the text"),
-                "",
-                "res/actions/characterSize24.png",
-                "res/actions/characterSize.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetCharacterSize")
-      .SetGetter("GetCharacterSize")
-      .SetIncludeFile("TextObject/TextObject.h");
-
-  obj.AddCondition("Size",
-                   _("Size"),
-                   _("Compare the size of the text"),
-                   _("the size of the text"),
-                   "",
-                   "res/conditions/characterSize24.png",
-                   "res/conditions/characterSize.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetCharacterSize")
-      .SetIncludeFile("TextObject/TextObject.h");
-
-  // Support for deprecated names:
-  obj.AddDuplicatedAction("Size", "SetFontSize").SetHidden();
-  obj.AddDuplicatedCondition("Size", "FontSize").SetHidden();
-
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
                    _("Compare the scale of the text on the X axis"),
@@ -547,13 +516,17 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddExpressionAndConditionAndAction(
          "number",
          "FontSize",
-         _("Font Size"),
+         _("Font size"),
          _("the font size of a text object"),
-         _("the font size of _PARAM1_"),
+         _("the font size"),
          "",
          "res/conditions/characterSize24.png")
       .AddParameter("object", _("Object"), "Text")
       .UseStandardParameters("number");
+
+  // Support for deprecated "Size" actions/conditions:
+  obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
+  obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();
 
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")

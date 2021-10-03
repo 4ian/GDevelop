@@ -31,232 +31,106 @@ class TextObjectJsExtension : public gd::PlatformExtension {
             "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
     GetAllActionsForObject("TextObject::Text")["TextObject::Scale"]
         .SetFunctionName("setScale")
-        .SetGetter("getScale")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getScale");
     GetAllActionsForObject("TextObject::Text")["TextObject::ScaleX"]
         .SetFunctionName("setScaleX")
-        .SetGetter("getScaleX")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getScaleX");
     GetAllConditionsForObject("TextObject::Text")["TextObject::ScaleX"]
-        .SetFunctionName("getScaleX")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getScaleX");
     GetAllActionsForObject("TextObject::Text")["TextObject::ScaleY"]
         .SetFunctionName("setScaleY")
-        .SetGetter("getScaleY")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getScaleY");
     GetAllConditionsForObject("TextObject::Text")["TextObject::ScaleY"]
-        .SetFunctionName("getScaleY")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getScaleY");
     GetAllActionsForObject("TextObject::Text")["TextObject::String"]
         .SetFunctionName("setString")
-        .SetGetter("getString")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getString");
     GetAllConditionsForObject("TextObject::Text")["TextObject::String"]
-        .SetFunctionName("getString")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    // Deprecated prefer using SetFontSize.
+        .SetFunctionName("getString");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::Text::SetFontSize"]
+        .SetFunctionName("setCharacterSize")
+        .SetGetter("getCharacterSize");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::Text::FontSize"]
+        .SetFunctionName("getCharacterSize");
+    GetAllExpressionsForObject("TextObject::Text")["FontSize"]
+        .SetFunctionName("getCharacterSize");
+
+    // Deprecated actions/conditions (use "FontSize"/"SetFontSize" instead):
     GetAllActionsForObject("TextObject::Text")["TextObject::Size"]
         .SetFunctionName("setCharacterSize")
-        .SetGetter("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
-    GetAllActionsForObject("TextObject::Text")["TextObject::SetFontSize"]
-        .SetFunctionName("setCharacterSize")
-        .SetGetter("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-cocos-renderer.js");
+        .SetGetter("getCharacterSize");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Size"]
-        .SetFunctionName("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-
-    GetAllActionsForObject("TextObject::Text")["TextObject::FontSize"]
-        .SetFunctionName("setCharacterSize")
-        .SetGetter("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    GetAllConditionsForObject("TextObject::Text")["TextObject::FontSize"]
-        .SetFunctionName("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
-    GetAllExpressionsForObject("TextObject::Text")["FontSize"]
-        .SetFunctionName("getCharacterSize")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getCharacterSize");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::Angle"]
         .SetFunctionName("setAngle")
-        .SetGetter("getAngle")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getAngle");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Angle"]
-        .SetFunctionName("getAngle")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getAngle");
     GetAllActionsForObject("TextObject::Text")["TextObject::Opacity"]
         .SetFunctionName("setOpacity")
-        .SetGetter("getOpacity")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getOpacity");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Opacity"]
-        .SetFunctionName("getOpacity")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getOpacity");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetBold"]
-        .SetFunctionName("setBold")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setBold");
     GetAllConditionsForObject("TextObject::Text")["TextObject::IsBold"]
-        .SetFunctionName("isBold")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("isBold");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetItalic"]
-        .SetFunctionName("setItalic")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setItalic");
     GetAllConditionsForObject("TextObject::Text")["TextObject::IsItalic"]
-        .SetFunctionName("isItalic")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("isItalic");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetWrapping"]
-        .SetFunctionName("setWrapping")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setWrapping");
     GetAllConditionsForObject("TextObject::Text")["TextObject::IsWrapping"]
-        .SetFunctionName("isWrapping")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("isWrapping");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetPadding"]
         .SetFunctionName("setPadding")
-        .SetGetter("getPadding")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getPadding");
     GetAllConditionsForObject("TextObject::Text")["TextObject::Padding"]
-        .SetFunctionName("getPadding")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getPadding");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetTextAlignment"]
         .SetFunctionName("setTextAlignment")
-        .SetGetter("getTextAlignment")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getTextAlignment");
     GetAllConditionsForObject("TextObject::Text")["TextObject::TextAlignment"]
-        .SetFunctionName("getTextAlignment")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getTextAlignment");
     GetAllActionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
         .SetFunctionName("setWrappingWidth")
-        .SetGetter("getWrappingWidth")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetGetter("getWrappingWidth");
     GetAllConditionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
-        .SetFunctionName("getWrappingWidth")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getWrappingWidth");
 
     GetAllExpressionsForObject("TextObject::Text")["Padding"]
-        .SetFunctionName("getPadding")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getPadding");
     GetAllExpressionsForObject("TextObject::Text")["ScaleX"]
-        .SetFunctionName("getScaleX")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getScaleX");
     GetAllExpressionsForObject("TextObject::Text")["ScaleY"]
-        .SetFunctionName("getScaleY")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getScaleY");
     GetAllExpressionsForObject("TextObject::Text")["Opacity"]
-        .SetFunctionName("getOpacity")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getOpacity");
     GetAllExpressionsForObject("TextObject::Text")["Angle"]
-        .SetFunctionName("getAngle")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getAngle");
     GetAllStrExpressionsForObject("TextObject::Text")["String"]
-        .SetFunctionName("getString")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("getString");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::ChangeColor"]
-        .SetFunctionName("setColor")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setColor");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetGradient"]
-        .SetFunctionName("setGradient")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setGradient");
 
     GetAllActionsForObject("TextObject::Text")["TextObject::SetOutline"]
-        .SetFunctionName("setOutline")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setOutline");
     GetAllActionsForObject("TextObject::Text")["TextObject::SetShadow"]
-        .SetFunctionName("setShadow")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("setShadow");
     GetAllActionsForObject("TextObject::Text")["TextObject::ShowShadow"]
-        .SetFunctionName("showShadow")
-        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js")
-        .AddIncludeFile(
-            "Extensions/TextObject/textruntimeobject-pixi-renderer.js");
+        .SetFunctionName("showShadow");
 
     // Unimplemented actions and conditions:
     GetAllActionsForObject("TextObject::Text")["TextObject::Font"]

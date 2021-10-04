@@ -257,6 +257,7 @@ import {
   ExtensionsAccordion,
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
+import ListIcon from '../UI/ListIcon';
 
 configureActions({
   depth: 2,
@@ -725,6 +726,59 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       )}
     />
   ))
+  .add(
+    'default, with onClick, long texts and renderIcon for some elements',
+    () => (
+      <ValueStateHolder
+        initialValue={'Choice 6'}
+        render={(value, onChange) => (
+          <React.Fragment>
+            <SemiControlledAutoComplete
+              value={value}
+              onChange={onChange}
+              dataSource={[
+                {
+                  text: '',
+                  value: 'Click me 1',
+                  onClick: action('Click me 1 clicked'),
+                  renderIcon: () => <Brush />,
+                },
+                {
+                  text: '',
+                  value: 'Click me 2',
+                  onClick: action('Click me 2 clicked'),
+                  renderIcon: () => (
+                    <ListIcon iconSize={24} src={'res/icon128.png'} />
+                  ),
+                },
+                {
+                  text: '',
+                  value: 'Click me 3',
+                  onClick: action('Click me 3 clicked'),
+                },
+                {
+                  type: 'separator',
+                },
+              ].concat(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                  text:
+                    i % 2
+                      ? `Choice ${i}`
+                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
+                  value:
+                    i % 2
+                      ? `Choice ${i}`
+                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
+                  renderIcon: i % 3 ? () => <Brush /> : undefined,
+                }))
+              )}
+            />
+            <p>State value is {value}</p>
+          </React.Fragment>
+        )}
+      />
+    )
+  )
   .add('in a dialog, with onClick for some elements', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}

@@ -356,6 +356,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Layout with a long name
+  project.insertNewLayout('Layout with a very looooooooong naaaaame to test in the project manager', 2);
+
   // Empty events list
   const emptyEventsList = new gd.EventsList();
 

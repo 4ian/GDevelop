@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  sendEmailVerification,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
@@ -81,6 +82,7 @@ export default class Authentication {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
         this.firebaseUser = userCredentials.user;
+        sendEmailVerification(userCredentials.user);
       })
       .catch(error => {
         console.error('Error while creating firebase account:', error);
@@ -141,6 +143,8 @@ export default class Authentication {
 
   getFirebaseUser = (cb: (any, ?FirebaseUser) => void) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
+
+    this.auth.currentUser.reload();
 
     cb(null, this.firebaseUser);
   };

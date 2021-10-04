@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
 import ProfileDetails from './ProfileDetails';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -18,6 +18,7 @@ import AuthenticatedUserContext, {
 } from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { ColumnStackLayout } from '../UI/Layout';
+import BackgroundText from '../UI/BackgroundText';
 
 type Props = {|
   currentProject: ?gdProject,
@@ -88,10 +89,12 @@ export default class ProfileDialog extends Component<Props, State> {
               <Tab label={<Trans>Services Usage</Trans>} value="usage" />
             </Tabs>
             {this.state.currentTab === 'profile' &&
-              (authenticatedUser.authenticated && authenticatedUser.profile ? (
+              (authenticatedUser.authenticated &&
+              authenticatedUser.profile &&
+              authenticatedUser.firebaseUser ? (
                 <Column noMargin>
                   <ProfileDetails
-                    profile={authenticatedUser.profile}
+                    authenticatedUser={authenticatedUser}
                     onEditProfile={authenticatedUser.onEdit}
                   />
                   <SubscriptionDetails

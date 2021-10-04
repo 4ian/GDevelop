@@ -53,7 +53,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
                 placeholder: props.hintText && i18n._(props.hintText),
               }}
               label={props.floatingLabelText}
-              helperText={props.helperText}
+              helperText={props.error || props.helperText}
               variant="filled"
               error={!!props.error}
               disabled={props.loading}

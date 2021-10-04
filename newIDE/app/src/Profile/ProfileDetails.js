@@ -12,10 +12,10 @@ import RaisedButton from '../UI/RaisedButton';
 import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 
-type Props = {
+type Props = {|
   profile: ?Profile,
   onEditProfile: Function,
-};
+|};
 
 export default ({ profile, onEditProfile }: Props) => {
   return profile ? (

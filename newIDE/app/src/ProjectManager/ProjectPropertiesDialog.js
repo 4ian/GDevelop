@@ -542,7 +542,7 @@ function ProjectPropertiesDialog(props: Props) {
                   fullWidth
                   hintText={t`Your name`}
                   helperMarkdownText={i18n._(
-                    t`this will be used when packaging and submitting your application to the stores`
+                    t`This will be used when packaging and submitting your application to the stores.`
                   )}
                   type="text"
                   value={author}

@@ -57,7 +57,7 @@ export default class Authentication {
   firebaseUser: ?FirebaseUser = null;
   user: ?Profile = null;
   auth: Auth;
-  _onUserChangeCallBack: ?() => void = null;
+  _onUserChangeCallback: ?() => void = null;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
@@ -69,12 +69,12 @@ export default class Authentication {
         this.firebaseUser = null;
       }
 
-      if (this._onUserChangeCallBack) this._onUserChangeCallBack();
+      if (this._onUserChangeCallback) this._onUserChangeCallback();
     });
   }
 
   setOnUserChangeCallback = (cb: () => void) => {
-    this._onUserChangeCallBack = cb;
+    this._onUserChangeCallback = cb;
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {

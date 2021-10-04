@@ -25,7 +25,15 @@ export default ({ profile, onEditProfile }: Props) => {
           <Line alignItems="center">
             <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
             <Spacer />
-            <Text size="title">{profile.username}</Text>
+            <Text
+              size="title"
+              style={{
+                color: profile.username ? 'black' : '#888',
+              }}
+            >
+              {profile.username ||
+                i18n._(t`Edit your profile to pick a username!`)}
+            </Text>
           </Line>
           <Line>
             <TextField
@@ -38,7 +46,12 @@ export default ({ profile, onEditProfile }: Props) => {
           </Line>
           <Line>
             <TextField
-              value={profile.description || i18n._(t`No bio defined`)}
+              value={
+                profile.description ||
+                i18n._(
+                  t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
+                )
+              }
               readOnly
               fullWidth
               multiline

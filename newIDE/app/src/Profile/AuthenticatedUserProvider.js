@@ -62,7 +62,7 @@ export default class AuthenticatedUserProvider extends React.Component<
 
   componentDidMount() {
     this._resetAuthenticatedUser();
-    this.props.authentication.onUserChange(this._fetchUserProfile);
+    this.props.authentication.setOnUserChangeCallback(this._fetchUserProfile);
   }
 
   _resetAuthenticatedUser() {

@@ -72,7 +72,7 @@ export default class Authentication {
     });
   }
 
-  onUserChange = (cb: () => void) => {
+  setOnUserChangeCallback = (cb: () => void) => {
     this._onUserChangeCallBack = cb;
   };
 

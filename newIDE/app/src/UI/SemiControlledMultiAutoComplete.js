@@ -32,7 +32,6 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
     <I18n>
       {({ i18n }) => (
         <Autocomplete
-          freeSolo
           multiple
           value={props.value}
           onChange={props.onChange}

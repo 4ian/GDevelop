@@ -55,8 +55,11 @@ type Props = {|
   errorText?: React.Node,
   required?: boolean,
 
-  // Labels:
+  // Accessibility:
   disabled?: boolean,
+  readOnly?: boolean,
+
+  // Labels:
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
@@ -235,6 +238,7 @@ export default class TextField extends React.Component<Props, {||}> {
                 fontStyle: props.style ? props.style.fontStyle : undefined,
                 ...props.inputStyle,
               },
+              readOnly: props.readOnly,
               inputProps: {
                 onKeyPress: props.onKeyPress,
                 onKeyUp: props.onKeyUp,

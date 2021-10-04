@@ -29,6 +29,9 @@ type Props = {|
 
     // Allow to expand the text
     flex?: 1,
+
+    // Allow to change color
+    color?: 'black' | '#888',
   |},
 |};
 

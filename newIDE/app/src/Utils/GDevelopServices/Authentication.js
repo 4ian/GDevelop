@@ -65,6 +65,7 @@ export default class Authentication {
     onAuthStateChanged(this.auth, (user => {
       if (user) {
         this.firebaseUser = user;
+        if (this._onUserChangeCallBack) this._onUserChangeCallBack();
       } else {
         this.firebaseUser = null;
       }

@@ -83,7 +83,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = () => {
     const { authentication } = this.props;
 
-    authentication.getFirebaseUser(((err, firebaseUser: ?FirebaseUser) => {
+    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
       if (err && err.unauthenticated) {
         return this.setState({
           authenticatedUser: {
@@ -156,7 +156,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           );
         }
       );
-    }).bind(this));
+    });
   };
 
   _doLogout = () => {

@@ -62,14 +62,14 @@ export default class Authentication {
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
-    onAuthStateChanged(this.auth, (user => {
+    onAuthStateChanged(this.auth, user => {
       if (user) {
         this.firebaseUser = user;
         if (this._onUserChangeCallBack) this._onUserChangeCallBack();
       } else {
         this.firebaseUser = null;
       }
-    }).bind(this));
+    });
   }
 
   onUserChange = (cb: () => void) => {

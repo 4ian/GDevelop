@@ -31,7 +31,7 @@ type Props = {|
     flex?: 1,
 
     // Allow to change color
-    color?: 'black' | '#888',
+    opacity?: number,
   |},
 |};
 

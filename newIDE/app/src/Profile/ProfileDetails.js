@@ -28,7 +28,7 @@ export default ({ profile, onEditProfile }: Props) => {
             <Text
               size="title"
               style={{
-                color: profile.username ? 'black' : '#888',
+                opacity: profile.username ? 1.0 : 0.5,
               }}
             >
               {profile.username ||
@@ -46,20 +46,13 @@ export default ({ profile, onEditProfile }: Props) => {
           </Line>
           <Line>
             <TextField
-              value={
-                profile.description ||
-                i18n._(
-                  t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
-                )
-              }
+              value={profile.description || ''}
               readOnly
               fullWidth
               multiline
               floatingLabelText={<Trans>Bio</Trans>}
               floatingLabelFixed={true}
-              inputStyle={{
-                color: profile.description ? 'black' : '#888',
-              }}
+              hintText={t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`}
               rows={3}
               rowsMax={5}
             />

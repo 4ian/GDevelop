@@ -86,37 +86,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   }
 
-  _reloadFirebaseProfile = () => {
-    const { authentication } = this.props;
-
-    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
-      if (err && err.unauthenticated) {
-        return this.setState({
-          authenticatedUser: {
-            ...this.state.authenticatedUser,
-            authenticated: false,
-            profile: null,
-            usages: null,
-            limits: null,
-            subscription: null,
-          },
-        });
-      } else if (err || !firebaseUser) {
-        console.log('Unable to fetch user profile', err);
-        return;
-      }
-
-      this.setState({
-        authenticatedUser: {
-          ...this.state.authenticatedUser,
-          authenticated: true,
-          firebaseUser,
-        },
-      });
-    });
-  };
-
-  _fetchUserProfile = () => {
+  _reloadFirebaseProfile = (callback?: FirebaseUser => void) => {
     const { authentication } = this.props;
 
     authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
@@ -132,7 +102,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           },
         }));
       } else if (err || !firebaseUser) {
-        console.log('Unable to fetch user profile', err);
+        console.error('Unable to fetch user profile', err);
         return;
       }
 
@@ -145,52 +115,59 @@ export default class AuthenticatedUserProvider extends React.Component<
           },
         }),
         () => {
-          if (!firebaseUser) return;
-
-          authentication
-            .getUserProfile(authentication.getAuthorizationHeader)
-            .then(user =>
-              this.setState(({ authenticatedUser }) => ({
-                authenticatedUser: {
-                  ...authenticatedUser,
-                  profile: user,
-                },
-              }))
-            );
-          getUserUsages(
-            authentication.getAuthorizationHeader,
-            firebaseUser.uid
-          ).then(usages =>
-            this.setState(({ authenticatedUser }) => ({
-              authenticatedUser: {
-                ...authenticatedUser,
-                usages,
-              },
-            }))
-          );
-          getUserSubscription(
-            authentication.getAuthorizationHeader,
-            firebaseUser.uid
-          ).then(subscription =>
-            this.setState(({ authenticatedUser }) => ({
-              authenticatedUser: {
-                ...authenticatedUser,
-                subscription,
-              },
-            }))
-          );
-          getUserLimits(
-            authentication.getAuthorizationHeader,
-            firebaseUser.uid
-          ).then(limits =>
-            this.setState(({ authenticatedUser }) => ({
-              authenticatedUser: {
-                ...authenticatedUser,
-                limits,
-              },
-            }))
-          );
+          if (!firebaseUser || !callback) return;
+          callback(firebaseUser);
         }
+      );
+    });
+  };
+
+  _fetchUserProfile = () => {
+    const { authentication } = this.props;
+
+    this._reloadFirebaseProfile((firebaseUser: FirebaseUser) => {
+      authentication
+        .getUserProfile(authentication.getAuthorizationHeader)
+        .then(user =>
+          this.setState(({ authenticatedUser }) => ({
+            authenticatedUser: {
+              ...authenticatedUser,
+              profile: user,
+            },
+          }))
+        );
+      getUserUsages(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      ).then(usages =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            usages,
+          },
+        }))
+      );
+      getUserSubscription(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      ).then(subscription =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            subscription,
+          },
+        }))
+      );
+      getUserLimits(
+        authentication.getAuthorizationHeader,
+        firebaseUser.uid
+      ).then(limits =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            limits,
+          },
+        }))
       );
     });
   };

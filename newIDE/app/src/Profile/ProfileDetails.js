@@ -14,6 +14,7 @@ import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
+import { useIsMounted } from '../Utils/UseIsMounted';
 
 type Props = {|
   onEditProfile: Function,
@@ -23,18 +24,24 @@ type Props = {|
 export default ({ onEditProfile, authenticatedUser }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
+  const isMounted = useIsMounted();
   const [emailSent, setEmailSent] = React.useState<boolean>(false);
   const sendEmail = React.useCallback(
     () => {
       authenticatedUser.onSendEmailVerification();
       setEmailSent(true);
-      setTimeout(() => setEmailSent(false), 3000);
+      setTimeout(() => {
+        if (!isMounted.current) return;
+        setEmailSent(false);
+      }, 3000);
     },
-    [authenticatedUser]
+    [authenticatedUser, isMounted]
   );
 
   const loadUserProfile = React.useCallback(
     () => authenticatedUser.onRefreshUserProfile(),
+    // We don't want to fetch again when authenticatedUser changes
+    // Just the first time this page opens.
     [authenticatedUser.onRefreshUserProfile] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
@@ -62,7 +69,7 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
                       <Trans>Send it again</Trans>
                     )
                   }
-                  onClick={() => sendEmail()}
+                  onClick={sendEmail}
                   disabled={emailSent}
                   primary
                 />

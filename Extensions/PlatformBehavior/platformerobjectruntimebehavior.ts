@@ -4,10 +4,25 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   /**
+   * Returned by _findHighestFloorAndMoveOnTop
+   */
+  type PlatformSearchResult = {
+    highestGround: gdjs.PlatformRuntimeBehavior | null;
+    isCollidingAnyPlatform: boolean;
+  };
+  /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
    */
   export class PlatformerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
+    /**
+     * Returned by _findHighestFloorAndMoveOnTop
+     */
+    private static _platformSearchResult: PlatformSearchResult = {
+      highestGround: null,
+      isCollidingAnyPlatform: false,
+    };
+
     // To achieve pixel-perfect precision when positioning object on platform or
     // handling collision with "walls", edges of the hitboxes must be ignored during
     // collision checks, so that two overlapping edges are not considered as colliding.
@@ -304,10 +319,9 @@ namespace gdjs {
             break;
           }
 
-          //If on floor: .
           if (this._state === this._onFloor) {
             const oldY = object.getY();
-            const floor = this._findHighestFloorAndMoveOnTop(
+            const { highestGround } = this._findHighestFloorAndMoveOnTop(
               this._potentialCollidingObjects,
               // _requestedDeltaX can be small when the object start moving.
               // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
@@ -317,9 +331,9 @@ namespace gdjs {
               ),
               0
             );
-            if (floor) {
-              this._setOnFloor(floor);
-              floorPlatformId = floor.owner.id;
+            if (highestGround) {
+              this._setOnFloor(highestGround);
+              floorPlatformId = highestGround.owner.id;
             }
             if (
               !this._isCollidingWithOneOf(
@@ -356,12 +370,12 @@ namespace gdjs {
           // Use the same method as for following the floor.
           // This is to be consistent on all floor collision.
           // The object will land right on floor.
-          const floor = this._findHighestFloorAndMoveOnTop(
+          const { highestGround } = this._findHighestFloorAndMoveOnTop(
             this._potentialCollidingObjects,
             0,
             this._requestedDeltaY
           );
-          if (!floor) {
+          if (!highestGround) {
             object.setY(object.getY() + this._requestedDeltaY);
           }
         } else {
@@ -507,22 +521,22 @@ namespace gdjs {
 
       // The interval could be smaller.
       // It's just for rounding errors.
-      const floor = this._findHighestFloorAndMoveOnTop(
+      const { highestGround } = this._findHighestFloorAndMoveOnTop(
         this._potentialCollidingObjects,
         -1,
         1
       );
       // don't fall if GrabbingPlatform or OnLadder
       if (this._state === this._onFloor) {
-        if (!floor) {
+        if (!highestGround) {
           this._setFalling();
-        } else if (floor === this._onFloor.getFloorPlatform()) {
+        } else if (highestGround === this._onFloor.getFloorPlatform()) {
           this._onFloor.updateFloorPosition();
         } else {
-          this._setOnFloor(floor);
+          this._setOnFloor(highestGround);
         }
-      } else if (floor && canLand) {
-        this._setOnFloor(floor);
+      } else if (highestGround && canLand) {
+        this._setOnFloor(highestGround);
       } else {
         // The object can't land.
         object.setY(oldY);
@@ -669,9 +683,10 @@ namespace gdjs {
       candidates: gdjs.PlatformRuntimeBehavior[],
       upwardDeltaY: float,
       downwardDeltaY: float
-    ) {
+    ): PlatformSearchResult {
       let totalHighestY = Number.MAX_VALUE;
       let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
+      let isCollidingAnyPlatform = false;
       for (const platform of candidates) {
         if (
           platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ||
@@ -686,7 +701,14 @@ namespace gdjs {
           upwardDeltaY,
           downwardDeltaY
         );
-        if (highestY < totalHighestY) {
+        if (highestY !== Number.MAX_VALUE) {
+          isCollidingAnyPlatform = true;
+        }
+        if (
+          highestY < totalHighestY &&
+          // The platform is not too high
+          highestY !== -Number.MAX_VALUE
+        ) {
           totalHighestY = highestY;
           highestGround = platform;
         }
@@ -695,7 +717,11 @@ namespace gdjs {
         const object = this.owner;
         object.setY(object.getY() + totalHighestY - object.getAABB().max[1]);
       }
-      return highestGround;
+      const returnValue =
+        gdjs.PlatformerObjectRuntimeBehavior._platformSearchResult;
+      returnValue.highestGround = highestGround;
+      returnValue.isCollidingAnyPlatform = isCollidingAnyPlatform;
+      return returnValue;
     }
 
     /**
@@ -703,6 +729,9 @@ namespace gdjs {
      * @param platform The platform to be tested for collision.
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
+     * @return
+     * * Number.MAX_VALUE if the platform doesn't collide
+     * * -Number.MAX_VALUE if the platform is too high
      */
     private _findPlatformHighestYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
@@ -752,7 +781,7 @@ namespace gdjs {
                 // and have another part over its head.
                 vertex[1] >= ownerMinY
               ) {
-                return Number.MAX_VALUE;
+                return -Number.MAX_VALUE;
               }
               // Ignore intersections that are too low
               if (floorMinY <= vertex[1] && vertex[1] <= floorMaxY) {
@@ -773,7 +802,7 @@ namespace gdjs {
                   ((ownerMinX - previousVertex[0]) * deltaY) / deltaX;
                 if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
-                  return Number.MAX_VALUE;
+                  return -Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
@@ -791,7 +820,7 @@ namespace gdjs {
                   ((ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
                 if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
-                  return Number.MAX_VALUE;
+                  return -Number.MAX_VALUE;
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
@@ -1468,13 +1497,20 @@ namespace gdjs {
       const deltaMaxY = Math.abs(
         behavior._requestedDeltaX * behavior._slopeClimbingFactor
       );
-      const floor = behavior._findHighestFloorAndMoveOnTop(
+      const {
+        highestGround,
+        isCollidingAnyPlatform,
+      } = behavior._findHighestFloorAndMoveOnTop(
         behavior._potentialCollidingObjects,
         -deltaMaxY,
         deltaMaxY
       );
-      if (floor && floor !== this._floorPlatform) {
-        behavior._setOnFloor(floor);
+      if (highestGround && highestGround !== this._floorPlatform) {
+        behavior._setOnFloor(highestGround);
+      }
+      if (highestGround === null && isCollidingAnyPlatform) {
+        // Unable to follow the floor (too steep): go back to the original position.
+        behavior.owner.setX(oldX);
       }
     }
 

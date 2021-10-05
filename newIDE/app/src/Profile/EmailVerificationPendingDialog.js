@@ -18,23 +18,23 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
-export default function SubscriptionPendingDialog({
+export default function EmailVerificationPendingDialog({
   onClose,
   authenticatedUser,
 }: Props) {
-  const hasPlan =
+  const isVerified =
     !!authenticatedUser &&
-    !!authenticatedUser.subscription &&
-    !!authenticatedUser.subscription.planId;
+    !!authenticatedUser.firebaseUser &&
+    !!authenticatedUser.firebaseUser.emailVerified;
   useInterval(
-    () => authenticatedUser.onRefreshUserProfile(),
-    hasPlan ? null : 3900
+    () => authenticatedUser.onRefreshFirebaseProfile(),
+    isVerified ? null : 3900
   );
 
   return (
     <Dialog
       actions={[
-        hasPlan ? (
+        isVerified ? (
           <RaisedButton
             label={<Trans>Done!</Trans>}
             key="close"
@@ -55,66 +55,31 @@ export default function SubscriptionPendingDialog({
       open
       noMargin
     >
-      {!hasPlan ? (
+      {!isVerified ? (
         <Column>
-          <Line>
-            <Text>
-              <Trans>
-                Thanks for getting a subscription and supporting GDevelop!
-              </Trans>{' '}
-              {'❤️'}
-              <b>
-                <Trans>
-                  Your browser will now open to enter your payment details
-                  (handled securely by Stripe.com).
-                </Trans>
-              </b>
-            </Text>
-          </Line>
           <Line justifyContent="center" alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <Text>Waiting for the subscription confirmation...</Text>
+            <Text>Waiting for the email verification...</Text>
           </Line>
           <Spacer />
           <Line justifyContent="center">
             <BackgroundText>
               <Trans>
-                Once you're done, come back to GDevelop and your account will be
-                upgraded automatically, unlocking the extra exports and online
-                services.
+                Check your inbox and click the link to verify your email address
+                - and come back here when it's done.
               </Trans>
             </BackgroundText>
           </Line>
         </Column>
       ) : (
         <Column>
-          <Line>
-            <Text>
-              <Trans>
-                Thanks for getting a subscription and supporting GDevelop!
-              </Trans>{' '}
-              {'❤️'}
-            </Text>
-          </Line>
           <Line justifyContent="center" alignItems="center">
             <VerifiedUser />
             <Spacer />
             <Text>
-              <b>
-                <Trans>Your new plan is now activated</Trans>
-              </b>
+              <Trans>Your email is now verified!</Trans>
             </Text>
-          </Line>
-          <Spacer />
-          <Line justifyContent="center">
-            <BackgroundText>
-              <Trans>
-                Your account is upgraded, with the extra exports and online
-                services. If you wish to change later, come back to your profile
-                and choose another plan.
-              </Trans>
-            </BackgroundText>
           </Line>
         </Column>
       )}

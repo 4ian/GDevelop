@@ -14,7 +14,6 @@ export default {
   component: ProfileDetails,
   decorators: [paperDecorator, muiDecorator],
   argTypes: {
-    onEditProfile: {action: 'edit profile'},
     profile: {
       control: { type: 'radio' },
       options: ['Complete profile', 'Without username nor bio'],
@@ -27,7 +26,8 @@ export default {
           description: null
         }
       }
-    }
+    },
+    onEditProfile: {action: 'edit profile'},
   },
 }
 
@@ -36,7 +36,8 @@ type ArgsTypes = {|
   onEditProfile: () => void,
 |}
 
-export const Profile = (args: ArgsTypes) => <ProfileDetails {...args} />;
+export const MyProfile = (args: ArgsTypes) => <ProfileDetails {...args} canEdit={true}/>;
+export const OtherUserProfile = (args: ArgsTypes) => <ProfileDetails {...args}/>;
 export const Loading = (args: ArgsTypes) => <ProfileDetails {...args} profile={null} />;
 Loading.argTypes = {
   profile: {control: {disable: true}}

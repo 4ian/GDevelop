@@ -13,6 +13,7 @@ export type TestProject = {|
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
+  group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
@@ -78,6 +79,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   );
   const spriteObjectWithoutBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithoutBehaviors'
+  );
+  const spriteObjectWithLongName = new gd.SpriteObject(
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
 
   {
@@ -155,6 +159,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(spriteObject, 0);
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
   testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
+  testLayout.insertObject(spriteObjectWithLongName, 14);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -166,9 +171,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const group3 = new gd.ObjectGroup();
   group3.setName('GroupOfSpriteObjectsWithBehaviors');
   group3.addObject('MySpriteObjectWithBehaviors');
+  const group4WithLongsNames = new gd.ObjectGroup();
+  group4WithLongsNames.setName("MyGroupWithObjectsHavingLongName")
+  group4WithLongsNames.addObject('MySpriteObject');
+  group4WithLongsNames.addObject(
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
+  );
+  group4WithLongsNames.addObject('MySpriteObjectWithoutBehaviors');
   testLayout.getObjectGroups().insert(group1, 0);
   testLayout.getObjectGroups().insert(group2, 1);
   testLayout.getObjectGroups().insert(group3, 2);
+  testLayout.getObjectGroups().insert(group4WithLongsNames, 3);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()
@@ -355,6 +368,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
+
+  // Layout with a long name
+  project.insertNewLayout(
+    'Layout with a very looooooooong naaaaame to test in the project manager',
+    2
+  );
 
   // Empty events list
   const emptyEventsList = new gd.EventsList();
@@ -549,6 +568,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     testLayout,
     group1,
     group2,
+    group4WithLongsNames,
     testLayoutInstance1,
     testInstruction,
     testExternalEvents1,

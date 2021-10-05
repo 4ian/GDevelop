@@ -13,6 +13,7 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { loadScript } from './Utils/LoadScript.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
+import VersionMetadata from './Version/VersionMetadata';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -52,8 +53,9 @@ class Bootstrapper extends Component<{}, State> {
     installRaven();
     GD_STARTUP_TIMES.push(['bootstrapperComponentDidMount', performance.now()]);
 
+    // Load GDevelop.js, ensuring a new version is fetched when the version changes.
     loadScript(
-      `./libGD.js`
+      `./libGD.js?cache-buster=${VersionMetadata.versionWithHash}`
     ).then(() => {
       GD_STARTUP_TIMES.push(['libGDLoadedTime', performance.now()]);
       const initializeGDevelopJs = global.initializeGDevelopJs;
@@ -65,11 +67,11 @@ class Bootstrapper extends Component<{}, State> {
       }
 
       initializeGDevelopJs({
+        // Override the resolved URL for the .wasm file,
+        // to ensure a new version is fetched when the version changes.
         locateFile: (path: string, prefix: string) => {
-          // Can be modified later should the wasm file be moved to
-          // a different location.
           return (
-            prefix + path
+            prefix + path + `?cache-buster=${VersionMetadata.versionWithHash}`
           );
         },
       }).then(gd => {

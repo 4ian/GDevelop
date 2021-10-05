@@ -156,7 +156,8 @@ export default class Authentication {
           })
           .catch((error: Error) => {
             showErrorBox({
-              message: `Unable to send the email, please try again later.`,
+              message:
+                'An email has been sent recently, please try again later.',
               rawError: error,
               errorId: 'email-verification-send-error',
             });

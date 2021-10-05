@@ -50,13 +50,12 @@ export default function SubscriptionPendingDialog({
           />
         ),
       ]}
-      title={undefined}
       maxWidth="sm"
       cannotBeDismissed={true}
       open
       noMargin
     >
-      {!hasPlan && (
+      {!hasPlan ? (
         <Column>
           <Line>
             <Text>
@@ -88,8 +87,7 @@ export default function SubscriptionPendingDialog({
             </BackgroundText>
           </Line>
         </Column>
-      )}
-      {hasPlan && (
+      ) : (
         <Column>
           <Line>
             <Text>

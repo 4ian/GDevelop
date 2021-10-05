@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 /**
  * Creates an interval effect for a callback, with a specified delay.
  */
-export const useInterval = (callback: Function, delay: number | null) => {
+export const useInterval = (callback: () => void, delay: number | null) => {
   const savedCallback = useRef();
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export const useInterval = (callback: Function, delay: number | null) => {
       }
 
       if (delay !== null) {
-        let id = setInterval(tick, delay);
+        const id = setInterval(tick, delay);
         return () => clearInterval(id);
       }
     },

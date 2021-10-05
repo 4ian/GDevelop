@@ -32,7 +32,7 @@ export default class BrowserStarters extends Component<Props> {
         <Line>
           <Column>
             <Text>
-              <Trans>Choose a game to use as a starter:</Trans>
+              <Trans>Choose a project to use as a starter:</Trans>
             </Text>
           </Column>
         </Line>
@@ -180,8 +180,8 @@ export default class BrowserStarters extends Component<Props> {
                 leftIcon={
                   <ListIcon iconSize={40} src="res/starters_icons/new.png" />
                 }
-                primaryText={<Trans>Empty game</Trans>}
-                secondaryText={<Trans>Start a new game from scratch.</Trans>}
+                primaryText={<Trans>Empty project</Trans>}
+                secondaryText={<Trans>Start a new project from scratch.</Trans>}
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('');

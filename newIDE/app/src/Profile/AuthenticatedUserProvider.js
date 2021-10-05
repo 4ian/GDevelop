@@ -24,6 +24,7 @@ import AuthenticatedUserContext, {
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
+import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 
 type Props = {|
   authentication: Authentication,
@@ -40,6 +41,7 @@ type State = {|
   editInProgress: boolean,
   authError: ?AuthError,
   resetPasswordDialogOpen: boolean,
+  emailVerificationPendingDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
 |};
 
@@ -57,6 +59,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     editInProgress: false,
     authError: null,
     resetPasswordDialogOpen: false,
+    emailVerificationPendingDialogOpen: false,
     forgotPasswordInProgress: false,
   };
 
@@ -75,11 +78,43 @@ export default class AuthenticatedUserProvider extends React.Component<
         onEdit: () => this.openEditProfileDialog(true),
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
+        onRefreshFirebaseProfile: this._reloadFirebaseProfile,
+        onSendEmailVerification: this._doSendEmailVerification,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
       },
     });
   }
+
+  _reloadFirebaseProfile = () => {
+    const { authentication } = this.props;
+
+    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
+      if (err && err.unauthenticated) {
+        return this.setState({
+          authenticatedUser: {
+            ...this.state.authenticatedUser,
+            authenticated: false,
+            profile: null,
+            usages: null,
+            limits: null,
+            subscription: null,
+          },
+        });
+      } else if (err || !firebaseUser) {
+        console.log('Unable to fetch user profile', err);
+        return;
+      }
+
+      this.setState({
+        authenticatedUser: {
+          ...this.state.authenticatedUser,
+          authenticated: true,
+          firebaseUser,
+        },
+      });
+    });
+  };
 
   _fetchUserProfile = () => {
     const { authentication } = this.props;
@@ -250,6 +285,21 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   };
 
+  _doSendEmailVerification = () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    authentication.sendFirebaseEmailVerification(() => {
+      this.openEmailVerificationPendingDialog(true);
+    });
+  };
+
+  openEmailVerificationPendingDialog = (open: boolean = true) => {
+    this.setState({
+      emailVerificationPendingDialogOpen: open,
+    });
+  };
+
   openResetPassword = (open: boolean = true) => {
     this.setState({
       resetPasswordDialogOpen: open,
@@ -316,6 +366,15 @@ export default class AuthenticatedUserProvider extends React.Component<
             onCreateAccount={this._doCreateAccount}
             createAccountInProgress={this.state.createAccountInProgress}
             error={this.state.authError}
+          />
+        )}
+        {this.state.emailVerificationPendingDialogOpen && (
+          <EmailVerificationPendingDialog
+            authenticatedUser={this.state.authenticatedUser}
+            onClose={() => {
+              this.openEmailVerificationPendingDialog(false);
+              this.state.authenticatedUser.onRefreshFirebaseProfile();
+            }}
           />
         )}
       </React.Fragment>

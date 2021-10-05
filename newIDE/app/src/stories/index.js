@@ -3876,12 +3876,15 @@ storiesOf('ProfileDetails', module)
   .addDecorator(muiDecorator)
   .add('profile', () => (
     <ProfileDetails
-      profile={indieUserProfile}
+      authenticatedUser={fakeIndieAuthenticatedUser}
       onEditProfile={action('edit profile')}
     />
   ))
   .add('loading', () => (
-    <ProfileDetails profile={null} onEditProfile={action('edit profile')} />
+    <ProfileDetails
+      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      onEditProfile={action('edit profile')}
+    />
   ));
 
 storiesOf('SubscriptionDetails', module)

@@ -144,24 +144,26 @@ export default class Authentication {
 
   getFirebaseUser = (cb: (any, ?FirebaseUser) => void) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
+    // In order to fetch the latest firebaseUser properties (like emailVerified)
+    // We have to call the reload method.
     this.auth.currentUser.reload().then(() => cb(null, this.firebaseUser));
   };
 
   sendFirebaseEmailVerification = (cb: () => void): Promise<void> => {
     return this.auth.currentUser.reload().then(() => {
-      if (this.firebaseUser && !this.firebaseUser.emailVerified) {
-        sendEmailVerification(this.auth.currentUser)
-          .then(() => {
-            cb();
-          })
-          .catch((error: Error) => {
-            showErrorBox({
-              message: `Unable to send the email, please try again later.`,
-              rawError: error,
-              errorId: 'email-verification-send-error',
-            });
+      if (!this.firebaseUser || this.firebaseUser.emailVerified) return;
+      sendEmailVerification(this.auth.currentUser).then(
+        () => {
+          cb();
+        },
+        (error: Error) => {
+          showErrorBox({
+            message: 'An email has been sent recently, please try again later.',
+            rawError: error,
+            errorId: 'email-verification-send-error',
           });
-      }
+        }
+      );
     });
   };
 

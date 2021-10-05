@@ -22,6 +22,13 @@ export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
   email: 'indie-user@example.com',
+  emailVerified: false,
+};
+
+export const indieFirebaseVerifiedUser: FirebaseUser = {
+  uid: 'indie-user',
+  providerId: 'fake-provider.com',
+  email: 'indie-user@example.com',
   emailVerified: true,
 };
 
@@ -110,6 +117,29 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
   firebaseUser: indieFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  onLogout: () => {},
+  onLogin: () => {},
+  onEdit: () => {},
+  onCreateAccount: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  firebaseUser: indieFirebaseVerifiedUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,

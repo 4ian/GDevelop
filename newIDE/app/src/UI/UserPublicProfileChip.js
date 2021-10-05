@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
-import { type UserPublicProfile } from '../Utils/GDevelopServices/User';
+import { type UserPublicProfileSearch } from '../Utils/GDevelopServices/User';
 
 const styles = {
   chip: {
@@ -11,7 +11,7 @@ const styles = {
 };
 
 type Props = {|
-  user: UserPublicProfile,
+  user: UserPublicProfileSearch,
 |};
 
 export const UserPublicProfileChip = ({ user }: Props) => {

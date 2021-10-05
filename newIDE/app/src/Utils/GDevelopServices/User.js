@@ -4,7 +4,14 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 export type UserPublicProfile = {|
   id: string,
-  username?: string,
+  email: string,
+  username: ?string,
+  description: ?string,
+|};
+
+export type UserPublicProfileSearch = {|
+  id: string,
+  username: ?string,
 |};
 
 export type UserPublicProfileByIds = {|
@@ -13,7 +20,7 @@ export type UserPublicProfileByIds = {|
 
 export const searchUserPublicProfilesByUsername = (
   searchString: string
-): Promise<Array<UserPublicProfile>> => {
+): Promise<Array<UserPublicProfileSearch>> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/search`, {
       params: {

@@ -97,6 +97,12 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -113,6 +119,12 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -131,6 +143,12 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -147,6 +165,12 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };

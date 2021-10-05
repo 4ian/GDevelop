@@ -3784,6 +3784,14 @@ storiesOf('ObjectGroupEditor', module)
       objectsContainer={testProject.testLayout}
       group={testProject.group2}
     />
+  ))
+  .add('with long object names', () => (
+    <ObjectGroupEditor
+      project={testProject.project}
+      globalObjectsContainer={testProject.project}
+      objectsContainer={testProject.testLayout}
+      group={testProject.group4WithLongsNames}
+    />
   ));
 
 storiesOf('ObjectGroupsList', module)

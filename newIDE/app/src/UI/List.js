@@ -26,7 +26,15 @@ export const listItemWithoutIconHeight = 29;
 
 const styles = {
   listItemText: {
+    // Reduce the default spacing between list items
+    // to densify the lists.
     margin: '1px 0',
+    // Always break the words if necessary. Otherwise a long word
+    // without spaces would be overflowing the list.
+    // This seems to be necessary for all lists (we don't ever want
+    // an overflow - and it's strange in a way that Material-UI is
+    // not handling this by default?)
+    wordBreak: 'break-word',
   },
 };
 

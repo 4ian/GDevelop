@@ -11,17 +11,17 @@ import RaisedButton from '../UI/RaisedButton';
 import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 
-type DisplayedProfile = {|
+type DisplayedProfile = {
   email: string,
   description: ?string,
   username: ?string,
-|}
+}
 
-type Props = {|
+type Props = {
   profile: ?DisplayedProfile,
   onEditProfile?: Function,
   canEdit?: boolean,
-|};
+};
 
 export default ({ profile, onEditProfile, canEdit }: Props) => {
   return profile ? (

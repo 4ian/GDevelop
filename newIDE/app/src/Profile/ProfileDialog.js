@@ -91,7 +91,7 @@ export default class ProfileDialog extends Component<Props, State> {
               (authenticatedUser.authenticated && authenticatedUser.profile ? (
                 <Column noMargin>
                   <ProfileDetails
-                    profile={authenticatedUser.profile}
+                    authenticatedUser={authenticatedUser}
                     onEditProfile={authenticatedUser.onEdit}
                   />
                   <SubscriptionDetails

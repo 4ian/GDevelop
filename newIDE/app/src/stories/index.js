@@ -86,7 +86,6 @@ import {
   noSubscription,
   usagesForIndieUser,
   indieFirebaseUser,
-  indieUserProfile,
   fakeNoSubscriptionAuthenticatedUser,
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
@@ -3869,19 +3868,6 @@ storiesOf('LimitDisplayer', module)
       limit={limitsReached['cordova-build']}
       onChangeSubscription={action('change subscription')}
     />
-  ));
-
-storiesOf('ProfileDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('profile', () => (
-    <ProfileDetails
-      profile={indieUserProfile}
-      onEditProfile={action('edit profile')}
-    />
-  ))
-  .add('loading', () => (
-    <ProfileDetails profile={null} onEditProfile={action('edit profile')} />
   ));
 
 storiesOf('SubscriptionDetails', module)

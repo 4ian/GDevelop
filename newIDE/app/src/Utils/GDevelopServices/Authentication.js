@@ -9,9 +9,11 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  sendEmailVerification,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 export type Profile = {
   id: string,
@@ -81,6 +83,7 @@ export default class Authentication {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
         this.firebaseUser = userCredentials.user;
+        sendEmailVerification(userCredentials.user);
       })
       .catch(error => {
         console.error('Error while creating firebase account:', error);
@@ -141,8 +144,26 @@ export default class Authentication {
 
   getFirebaseUser = (cb: (any, ?FirebaseUser) => void) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
+    this.auth.currentUser.reload().then(() => cb(null, this.firebaseUser));
+  };
 
-    cb(null, this.firebaseUser);
+  sendFirebaseEmailVerification = (cb: () => void): Promise<void> => {
+    return this.auth.currentUser.reload().then(() => {
+      if (this.firebaseUser && !this.firebaseUser.emailVerified) {
+        sendEmailVerification(this.auth.currentUser)
+          .then(() => {
+            cb();
+          })
+          .catch((error: Error) => {
+            showErrorBox({
+              message:
+                'An email has been sent recently, please try again later.',
+              rawError: error,
+              errorId: 'email-verification-send-error',
+            });
+          });
+      }
+    });
   };
 
   getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {

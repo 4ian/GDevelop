@@ -91,6 +91,7 @@ import {
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
   fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeAuthenticatedAndEmailVerifiedUser,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -167,6 +168,7 @@ import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstru
 import { PopoverButton } from './PopoverButton';
 import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
+import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
@@ -3876,12 +3878,15 @@ storiesOf('ProfileDetails', module)
   .addDecorator(muiDecorator)
   .add('profile', () => (
     <ProfileDetails
-      profile={indieUserProfile}
+      authenticatedUser={fakeIndieAuthenticatedUser}
       onEditProfile={action('edit profile')}
     />
   ))
   .add('loading', () => (
-    <ProfileDetails profile={null} onEditProfile={action('edit profile')} />
+    <ProfileDetails
+      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      onEditProfile={action('edit profile')}
+    />
   ));
 
 storiesOf('SubscriptionDetails', module)
@@ -3948,6 +3953,22 @@ storiesOf('SubscriptionPendingDialog', module)
   .add('authenticated user with subscription', () => (
     <SubscriptionPendingDialog
       authenticatedUser={fakeIndieAuthenticatedUser}
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('EmailVerificationPendingDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('non verified user - loading', () => (
+    <EmailVerificationPendingDialog
+      authenticatedUser={fakeIndieAuthenticatedUser}
+      onClose={action('on close')}
+    />
+  ))
+  .add('verified user', () => (
+    <EmailVerificationPendingDialog
+      authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
       onClose={action('on close')}
     />
   ));

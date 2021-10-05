@@ -7,6 +7,7 @@ import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
@@ -17,6 +18,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
+import { textEllispsisStyle } from './TextEllipsis';
 
 type Option =
   | {|
@@ -64,13 +66,12 @@ const styles = {
     width: '100%',
   },
   listItem: {
+    // Make the list items very dense:
     padding: 0,
     margin: 0,
-    display: 'inline-block',
-    whiteSpace: 'nowrap',
-    width: 'calc(100%)',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+  },
+  listItemText: {
+    margin: '1px 0',
   },
 };
 
@@ -106,9 +107,16 @@ const renderItem = (option: Option, state: Object): React.Node => {
     );
   }
   return (
-    <ListItem component={'div'} style={styles.listItem}>
+    <ListItem dense={true} component={'div'} style={styles.listItem}>
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
-      {option.value}
+      <ListItemText
+        style={styles.listItemText}
+        primary={
+          <div title={option.value} style={textEllispsisStyle}>
+            {option.value}
+          </div>
+        }
+      />
     </ListItem>
   );
 };

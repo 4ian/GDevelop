@@ -7,10 +7,10 @@ import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
-import {type Profile as ProfileType} from '../../Utils/GDevelopServices/Authentication'
+import { type Profile as ProfileType } from '../../Utils/GDevelopServices/Authentication';
 
 export default {
-  title: "ProfileDetails",
+  title: 'ProfileDetails',
   component: ProfileDetails,
   decorators: [paperDecorator, muiDecorator],
   argTypes: {
@@ -23,22 +23,28 @@ export default {
         'Without username nor bio': {
           ...indieUserProfile,
           username: null,
-          description: null
-        }
-      }
+          description: null,
+        },
+      },
     },
-    onEditProfile: {action: 'edit profile'},
+    onEditProfile: { action: 'edit profile' },
   },
-}
+};
 
 type ArgsTypes = {|
   profile: ProfileType,
   onEditProfile: () => void,
-|}
+|};
 
-export const MyProfile = (args: ArgsTypes) => <ProfileDetails {...args} canEdit={true}/>;
-export const OtherUserProfile = (args: ArgsTypes) => <ProfileDetails {...args}/>;
-export const Loading = (args: ArgsTypes) => <ProfileDetails {...args} profile={null} />;
+export const MyProfile = (args: ArgsTypes) => (
+  <ProfileDetails {...args} canEdit={true} />
+);
+export const OtherUserProfile = (args: ArgsTypes) => (
+  <ProfileDetails {...args} />
+);
+export const Loading = (args: ArgsTypes) => (
+  <ProfileDetails {...args} profile={null} />
+);
 Loading.argTypes = {
-  profile: {control: {disable: true}}
-}
+  profile: { control: { disable: true } },
+};

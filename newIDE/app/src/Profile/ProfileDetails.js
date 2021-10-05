@@ -15,7 +15,7 @@ type DisplayedProfile = {
   email: string,
   description: ?string,
   username: ?string,
-}
+};
 
 type Props = {
   profile: ?DisplayedProfile,
@@ -37,8 +37,10 @@ export default ({ profile, onEditProfile, canEdit }: Props) => {
                 opacity: profile.username ? 1.0 : 0.5,
               }}
             >
-              {profile.username || (canEdit ?
-                i18n._(t`Edit your profile to pick a username!`) : i18n._(t`No username`))}
+              {profile.username ||
+                (canEdit
+                  ? i18n._(t`Edit your profile to pick a username!`)
+                  : i18n._(t`No username`))}
             </Text>
           </Line>
           <Line>
@@ -58,7 +60,11 @@ export default ({ profile, onEditProfile, canEdit }: Props) => {
               multiline
               floatingLabelText={<Trans>Bio</Trans>}
               floatingLabelFixed={true}
-              hintText={canEdit ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!` : t`No bio defined`}
+              hintText={
+                canEdit
+                  ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
+                  : t`No bio defined`
+              }
               rows={3}
               rowsMax={5}
             />

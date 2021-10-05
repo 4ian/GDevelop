@@ -50,13 +50,12 @@ export default function EmailVerificationPendingDialog({
           />
         ),
       ]}
-      title={undefined}
       maxWidth="sm"
       cannotBeDismissed={true}
       open
       noMargin
     >
-      {!isVerified && (
+      {!isVerified ? (
         <Column>
           <Line justifyContent="center" alignItems="center">
             <CircularProgress size={20} />
@@ -73,15 +72,14 @@ export default function EmailVerificationPendingDialog({
             </BackgroundText>
           </Line>
         </Column>
-      )}
-      {isVerified && (
+      ) : (
         <Column>
-          <Line>
+          <Line justifyContent="center" alignItems="center">
+            <VerifiedUser />
+            <Spacer />
             <Text>
               <Trans>Your email is now verified!</Trans>
             </Text>
-            <Spacer />
-            <VerifiedUser />
           </Line>
         </Column>
       )}

@@ -4,7 +4,6 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import { Column, Line, Spacer } from '../UI/Grid';
-import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -12,8 +11,14 @@ import RaisedButton from '../UI/RaisedButton';
 import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 
+type DisplayedProfile = {|
+  email: string,
+  description: ?string,
+  username: ?string,
+|}
+
 type Props = {|
-  profile: ?Profile,
+  profile: ?DisplayedProfile,
   onEditProfile?: Function,
   canEdit?: boolean,
 |};

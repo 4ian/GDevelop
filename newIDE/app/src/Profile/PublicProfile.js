@@ -25,6 +25,7 @@ export default ({ userId, onClose }: Props) => {
   return (
     <Dialog
       open={true}
+      maxWidth="sm"
       actions={[
         <FlatButton
             key="close"

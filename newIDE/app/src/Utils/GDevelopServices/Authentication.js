@@ -68,10 +68,10 @@ export default class Authentication {
       if (user) {
         this.firebaseUser = user;
       } else {
+        // User has logged out.
         this.firebaseUser = null;
+        if (this._onUserChangeCallback) this._onUserChangeCallback();
       }
-
-      if (this._onUserChangeCallback) this._onUserChangeCallback();
     });
   }
 

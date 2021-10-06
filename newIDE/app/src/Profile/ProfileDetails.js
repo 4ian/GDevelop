@@ -17,11 +17,12 @@ import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 
 type Props = {|
-  onEditProfile: Function,
+  onEditProfile: () => void,
+  onChangeEmail: () => void,
   authenticatedUser: AuthenticatedUser,
 |};
 
-export default ({ onEditProfile, authenticatedUser }: Props) => {
+export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const isMounted = useIsMounted();
@@ -118,6 +119,13 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
               />
             </Line>
             <Line justifyContent="flex-end">
+              <RaisedButton
+                label={<Trans>Change my email</Trans>}
+                primary
+                onClick={onChangeEmail}
+              />
+              <Spacer />
+              <Spacer />
               <RaisedButton
                 label={<Trans>Edit my profile</Trans>}
                 primary

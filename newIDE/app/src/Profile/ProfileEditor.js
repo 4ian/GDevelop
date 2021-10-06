@@ -1,20 +1,16 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import { Column, Line, Spacer } from '../UI/Grid';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { getGravatarUrl } from '../UI/GravatarUrl';
-import Text from '../UI/Text';
-import RaisedButton from '../UI/RaisedButton';
-import TextField from '../UI/TextField';
-import { I18n } from '@lingui/react';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
+import ProfileDetails from './ProfileDetails';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   onEditProfile: () => void,
@@ -55,85 +51,46 @@ export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
   );
 
   return firebaseUser && profile ? (
-    <I18n>
-      {({ i18n }) => (
-        <ColumnStackLayout noMargin>
-          {firebaseUser && !firebaseUser.emailVerified && (
-            <AlertMessage
-              kind="info"
-              renderRightButton={() => (
-                <FlatButton
-                  label={
-                    emailSent ? (
-                      <Trans>Email sent!</Trans>
-                    ) : (
-                      <Trans>Send it again</Trans>
-                    )
-                  }
-                  onClick={sendEmail}
-                  disabled={emailSent}
-                  primary
-                />
-              )}
-            >
-              <Trans>
-                It looks like your email is not verified. Click on the link
-                received by email to verify your account. Didn't receive it?
-              </Trans>
-            </AlertMessage>
+    <ColumnStackLayout noMargin>
+      {firebaseUser && !firebaseUser.emailVerified && (
+        <AlertMessage
+          kind="info"
+          renderRightButton={() => (
+            <FlatButton
+              label={
+                emailSent ? (
+                  <Trans>Email sent!</Trans>
+                ) : (
+                  <Trans>Send it again</Trans>
+                )
+              }
+              onClick={sendEmail}
+              disabled={emailSent}
+              primary
+            />
           )}
-          <Column>
-            <Line alignItems="center">
-              <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-              <Spacer />
-              <Text
-                size="title"
-                style={{
-                  opacity: profile.username ? 1.0 : 0.5,
-                }}
-              >
-                {profile.username ||
-                  i18n._(t`Edit your profile to pick a username!`)}
-              </Text>
-            </Line>
-            <Line>
-              <TextField
-                // The firebase user is the source of truth for the emails.
-                value={firebaseUser.email}
-                readOnly
-                fullWidth
-                floatingLabelText={<Trans>Email</Trans>}
-                floatingLabelFixed={true}
-              />
-            </Line>
-            <Line>
-              <TextField
-                value={profile.description || ''}
-                readOnly
-                fullWidth
-                multiline
-                floatingLabelText={<Trans>Bio</Trans>}
-                floatingLabelFixed={true}
-                hintText={t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`}
-                rows={3}
-                rowsMax={5}
-              />
-            </Line>
-            <ResponsiveLineStackLayout justifyContent="flex-end">
-              <RaisedButton
-                label={<Trans>Change my email</Trans>}
-                onClick={onChangeEmail}
-              />
-              <RaisedButton
-                label={<Trans>Edit my profile</Trans>}
-                primary
-                onClick={onEditProfile}
-              />
-            </ResponsiveLineStackLayout>
-          </Column>
-        </ColumnStackLayout>
+        >
+          <Trans>
+            It looks like your email is not verified. Click on the link received
+            by email to verify your account. Didn't receive it?
+          </Trans>
+        </AlertMessage>
       )}
-    </I18n>
+      <ProfileDetails profile={authenticatedUser.profile} isPrivate />
+      <Column>
+      <ResponsiveLineStackLayout justifyContent="flex-end">
+        <RaisedButton
+          label={<Trans>Change my email</Trans>}
+          onClick={onChangeEmail}
+        />
+        <RaisedButton
+          label={<Trans>Edit my profile</Trans>}
+          primary
+          onClick={onEditProfile}
+        />
+      </ResponsiveLineStackLayout>
+      </Column>
+    </ColumnStackLayout>
   ) : (
     <PlaceholderLoader />
   );

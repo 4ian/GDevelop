@@ -12,7 +12,7 @@ import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 
 type DisplayedProfile = {
-  email: string,
+  +email?: string,
   description: ?string,
   username: ?string,
 };
@@ -20,10 +20,10 @@ type DisplayedProfile = {
 type Props = {
   profile: ?DisplayedProfile,
   onEditProfile?: Function,
-  canEdit?: boolean,
+  isPrivate?: boolean,
 };
 
-export default ({ profile, onEditProfile, canEdit }: Props) => {
+export default ({ profile, onEditProfile, isPrivate }: Props) => {
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -38,20 +38,22 @@ export default ({ profile, onEditProfile, canEdit }: Props) => {
               }}
             >
               {profile.username ||
-                (canEdit
+                (isPrivate
                   ? i18n._(t`Edit your profile to pick a username!`)
                   : i18n._(t`No username`))}
             </Text>
           </Line>
-          <Line>
-            <TextField
-              value={profile.email}
-              readOnly
-              fullWidth
-              floatingLabelText={<Trans>Email</Trans>}
-              floatingLabelFixed={true}
-            />
-          </Line>
+          {isPrivate && profile.email && (
+            <Line>
+              <TextField
+                value={profile.email}
+                readOnly
+                fullWidth
+                floatingLabelText={<Trans>Email</Trans>}
+                floatingLabelFixed={true}
+              />
+            </Line>
+          )}
           <Line>
             <TextField
               value={profile.description || ''}
@@ -61,7 +63,7 @@ export default ({ profile, onEditProfile, canEdit }: Props) => {
               floatingLabelText={<Trans>Bio</Trans>}
               floatingLabelFixed={true}
               hintText={
-                canEdit
+                isPrivate
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
                   : t`No bio defined`
               }
@@ -69,7 +71,7 @@ export default ({ profile, onEditProfile, canEdit }: Props) => {
               rowsMax={5}
             />
           </Line>
-          {canEdit && (
+          {isPrivate && (
             <Line justifyContent="flex-end">
               <RaisedButton
                 label={<Trans>Edit my profile</Trans>}

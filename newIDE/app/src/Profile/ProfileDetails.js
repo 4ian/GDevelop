@@ -40,8 +40,8 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
 
   const loadUserProfile = React.useCallback(
     () => authenticatedUser.onRefreshUserProfile(),
-    // We don't want to fetch again when authenticatedUser changes
-    // Just the first time this page opens.
+    // We don't want to fetch again when authenticatedUser changes,
+    // just the first time this page opens.
     [authenticatedUser.onRefreshUserProfile] // eslint-disable-line react-hooks/exhaustive-deps
   );
 

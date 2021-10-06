@@ -59,24 +59,26 @@ export default class Authentication {
   firebaseUser: ?FirebaseUser = null;
   user: ?Profile = null;
   auth: Auth;
-  _onUserChangeCallback: ?() => void = null;
+  _onUserLogoutCallback: ?() => void = null;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
     onAuthStateChanged(this.auth, user => {
       if (user) {
+        // User has been updated. No need to fetch more info,
+        // this is handled directly by the corresponding actions (edit, signup, login...)
         this.firebaseUser = user;
       } else {
+        // User has logged out.
         this.firebaseUser = null;
+        if (this._onUserLogoutCallback) this._onUserLogoutCallback();
       }
-
-      if (this._onUserChangeCallback) this._onUserChangeCallback();
     });
   }
 
-  setOnUserChangeCallback = (cb: () => void) => {
-    this._onUserChangeCallback = cb;
+  setOnUserLogoutCallback = (cb: () => void) => {
+    this._onUserLogoutCallback = cb;
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {

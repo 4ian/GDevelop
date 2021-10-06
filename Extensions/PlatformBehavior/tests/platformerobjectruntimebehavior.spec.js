@@ -2346,11 +2346,34 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The allowed step depends on the object speed and slopeMaxAngle.
-          platform.getY() - 1 - (slopeMaxAngle === 0 ? 0 : 3)
+          // The 2nd platform is shift from 1 pixel.
+          platform.getY() - 1
         );
 
         object.setPosition(30, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+        // Walk from the 1st platform to the 2nd one.
+        walkRight(30);
+        expect(object.getX()).to.be.above(platform2.getX());
+        expect(object.getY()).to.be(platform2.getY() - object.getHeight());
+      });
+
+      it('can walk from a platform to another one with a speed under 1 pixel/second', function () {
+        // Put a platform.
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+        // the 2nd platform is 1 pixel higher
+        const platform2 = addPlatformObject(runtimeScene);
+        platform2.setPosition(
+          platform.getX() + platform.getWidth(),
+          // The 2nd platform is shift from 1 pixel.
+          platform.getY() - 1
+        );
+
+        object.setPosition(platform2.getX() - object.getWidth(), -32);
         // Ensure the object falls on the platform
         fallOnPlatform(10);
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
@@ -2369,8 +2392,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The allowed step depends on the object speed and slopeMaxAngle.
-          platform.getY() - 2 - (slopeMaxAngle === 0 ? 0 : 3)
+          // The 2nd platform is shift from 2 pixel.
+          platform.getY() - 2
         );
 
         object.setPosition(30, -32);
@@ -2748,6 +2771,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       };
 
+      const walkRightCanStop = (frameCount) => {
+        const behavior = object.getBehavior('auto1');
+        for (let i = 0; i < frameCount; ++i) {
+          const lastX = object.getX();
+          const lastSpeed = behavior.getCurrentSpeed();
+          behavior.simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+          expect(behavior.isOnFloor()).to.be(true);
+          expect(object.getX()).to.not.be.below(lastX);
+        }
+      };
+
       (slopeMaxAngle === 0
         ? [
             { angle: 5.7, height: 5 },
@@ -2814,6 +2849,55 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             // Check that the object doesn't stop
             expect(behavior.getCurrentSpeed()).to.be.above(lastSpeed);
           }
+        });
+
+        // The log of the character positions without any obstacle:
+        // LOG: 'OnFloor 35.13888888888889 -20'
+        // LOG: 'OnFloor 38.333333333333336 -20'
+        // LOG: 'OnFloor 41.66666666666667 -20'
+        [
+          // remainingDeltaX === 1.333
+          47,
+          // remainingDeltaX === 0.833
+          47.5,
+          // remainingDeltaX === 0.333
+          48,
+          // remainingDeltaX is big
+          49,
+          // Platform tiles will result to pixel aligned junctions.
+          // A rotated platform will probably result to not pixel aligned junctions.
+          48.9,
+        ].forEach((slopeJunctionX) => {
+          it.only(`(slopeJunctionX: ${slopeJunctionX}) can go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°)`, function () {
+            // Put a platform.
+            const platform = addPlatformObject(runtimeScene);
+            // slopeJunctionX == 49 give a big requestedDeltaX,
+            // it's where approximations are more likely to happen.
+            platform.setCustomWidthAndHeight(slopeJunctionX, 50);
+            platform.setPosition(0, 0);
+
+            const slope = addUpSlopePlatformObject(runtimeScene);
+            slope.setCustomWidthAndHeight(50, slopesDimension.height);
+            slope.setPosition(
+              platform.getX() + platform.getWidth(),
+              platform.getY() - slope.getHeight()
+            );
+
+            object.setPosition(0, -32);
+            // Ensure the object falls on the platform
+            fallOnPlatform(10);
+
+            // Walk toward the 2nd platform.
+            walkRightCanStop(30);
+            // Is stopped at the slope junction.
+            expect(object.getX()).to.be.within(
+              Math.floor(slope.getX()) - object.getWidth(),
+              // When the junction is not pixel aligned, the character will be stopped
+              // but is able to move forward until it reaches the obstacle.
+              slope.getX() - object.getWidth()
+            );
+            expect(object.getY()).to.be(platform.getY() - object.getHeight());
+          });
         });
       });
     });

@@ -9,40 +9,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
     const pathFindingName = 'auto1';
 
     let createScene = () => {
-      const runtimeGame = new gdjs.RuntimeGame({
-        variables: [],
-        // @ts-ignore - missing properties.
-        properties: { windowWidth: 800, windowHeight: 600 },
-        resources: { resources: [] },
-      });
-      const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-      runtimeScene.loadFromScene({
-        layers: [
-          {
-            name: '',
-            visibility: true,
-            effects: [],
-            cameras: [],
-
-            ambientLightColorR: 0,
-            ambientLightColorG: 0,
-            ambientLightColorB: 0,
-            isLightingLayer: false,
-            followBaseLayerCamera: true,
-          },
-        ],
-        variables: [],
-        r: 0,
-        v: 0,
-        b: 0,
-        mangledName: 'Scene1',
-        name: 'Scene1',
-        stopSoundsOnStartup: false,
-        title: '',
-        behaviorsSharedData: [],
-        objects: [],
-        instances: [],
-      });
+      const { runtimeScene } = gdjs.makeTestRuntimeGameAndRuntimeScene();
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / 60) * 1000;
       };

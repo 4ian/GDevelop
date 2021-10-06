@@ -2,11 +2,11 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
-import { type UserPublicProfile } from './User';
+import { type UserPublicProfileSearch } from './User';
 
 export type ExtensionShortHeader = {|
   shortDescription: string,
-  authors?: Array<UserPublicProfile>,
+  authors?: Array<UserPublicProfileSearch>,
   extensionNamespace: string,
   fullName: string,
   name: string,

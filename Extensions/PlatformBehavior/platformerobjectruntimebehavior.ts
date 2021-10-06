@@ -44,7 +44,7 @@ namespace gdjs {
     private _xGrabTolerance: any;
     _jumpSustainTime: float;
     _currentFallSpeed: float = 0;
-    private _currentSpeed: float = 0;
+    _currentSpeed: float = 0;
     _canJump: boolean = false;
 
     private _ignoreDefaultControls: boolean;
@@ -318,35 +318,6 @@ namespace gdjs {
             );
             break;
           }
-
-          if (this._state === this._onFloor) {
-            const oldY = object.getY();
-            const { highestGround } = this._findHighestFloorAndMoveOnTop(
-              this._potentialCollidingObjects,
-              // _requestedDeltaX can be small when the object start moving.
-              // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-              Math.min(
-                -1,
-                -Math.abs(this._requestedDeltaX * this._slopeClimbingFactor)
-              ),
-              0
-            );
-            if (highestGround) {
-              this._setOnFloor(highestGround);
-              floorPlatformId = highestGround.owner.id;
-            }
-            if (
-              !this._isCollidingWithOneOf(
-                this._potentialCollidingObjects,
-                floorPlatformId,
-                /*excludeJumpthrus=*/
-                true
-              )
-            ) {
-              break;
-            }
-            object.setY(oldY);
-          }
           if (tryRounding) {
             // First try rounding the position as this might be sufficient to get the object
             // out of the wall.
@@ -357,6 +328,14 @@ namespace gdjs {
               Math.round(object.getX()) + (this._requestedDeltaX > 0 ? -1 : 1)
             );
           }
+        }
+
+        // When the character is on the floor it will try to walk on the obstacles.
+        // So, it should not be stopped.
+        if (
+          this._state !== this._onFloor &&
+          object.getX() !== oldX + this._requestedDeltaX
+        ) {
           this._currentSpeed = 0;
         }
       }
@@ -704,11 +683,13 @@ namespace gdjs {
         if (highestY !== Number.MAX_VALUE) {
           isCollidingAnyPlatform = true;
         }
-        if (
-          highestY < totalHighestY &&
-          // The platform is not too high
-          highestY !== -Number.MAX_VALUE
-        ) {
+        if (highestY === -Number.MAX_VALUE) {
+          // One platform is too high
+          highestGround = null;
+          break;
+        }
+
+        if (highestY < totalHighestY) {
           totalHighestY = highestY;
           highestGround = platform;
         }
@@ -1494,23 +1475,142 @@ namespace gdjs {
 
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
-      const deltaMaxY = Math.abs(
-        behavior._requestedDeltaX * behavior._slopeClimbingFactor
-      );
-      const {
-        highestGround,
-        isCollidingAnyPlatform,
-      } = behavior._findHighestFloorAndMoveOnTop(
-        behavior._potentialCollidingObjects,
-        -deltaMaxY,
-        deltaMaxY
-      );
-      if (highestGround && highestGround !== this._floorPlatform) {
-        behavior._setOnFloor(highestGround);
-      }
-      if (highestGround === null && isCollidingAnyPlatform) {
-        // Unable to follow the floor (too steep): go back to the original position.
-        behavior.owner.setX(oldX);
+      const object = behavior.owner;
+
+      if (object.getX() === oldX + behavior._requestedDeltaX) {
+        // The character didn't encounter any obstacle.
+        // It follows the floor.
+        const deltaMaxY = Math.abs(
+          behavior._requestedDeltaX * behavior._slopeClimbingFactor
+        );
+        const {
+          highestGround,
+          isCollidingAnyPlatform,
+        } = behavior._findHighestFloorAndMoveOnTop(
+          behavior._potentialCollidingObjects,
+          -deltaMaxY,
+          deltaMaxY
+        );
+        if (highestGround && highestGround !== this._floorPlatform) {
+          behavior._setOnFloor(highestGround);
+        }
+        if (highestGround === null && isCollidingAnyPlatform) {
+          // Unable to follow the floor (too steep): go back to the original position.
+          behavior.owner.setX(oldX);
+        }
+      } else {
+        // The character encounter an obstacle.
+        // Try to walk on it or stop before it.
+
+        // Try to follow the platform until the obstacle.
+        const {
+          highestGround: highestGroundOnPlatform,
+          isCollidingAnyPlatform,
+        } = behavior._findHighestFloorAndMoveOnTop(
+          behavior._potentialCollidingObjects,
+          Math.min(
+            0,
+            -Math.abs(object.getX() - oldX) * behavior._slopeClimbingFactor
+          ),
+          0
+        );
+        if (highestGroundOnPlatform === null && isCollidingAnyPlatform) {
+          // Unable to follow the floor (too steep): go back to the original position.
+          behavior.owner.setX(oldX);
+        } else {
+          const requestedDeltaX = behavior._requestedDeltaX;
+          // The current platform is climbed
+          // Can the obstacle be climbed too from here?
+          // Do a look up in 2 steps:
+          // 1. Try to move 1 pixel on X to climb the junction
+          //    (because the obstacle detection is done 1 pixel by 1 pixel).
+          // 2. Try to follow the obstacle slope from at least 1 pixel
+          //    (it can only be done after the junction because otherwise
+          //    the slope angle would be a mean between the current platform and
+          //    the obstacles).
+          const remainingDeltaX = requestedDeltaX - (object.getX() - oldX);
+          const beforeObstacleY = object.getY();
+          const beforeObstacleX = object.getX();
+          // 1. Try to move 1 pixel on X to climb the junction.
+          object.setX(object.getX() + Math.sign(requestedDeltaX));
+          const {
+            highestGround: highestGroundAtJunction,
+          } = behavior._findHighestFloorAndMoveOnTop(
+            behavior._potentialCollidingObjects,
+            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+            Math.min(-1, -1 * behavior._slopeClimbingFactor),
+            0
+          );
+          if (highestGroundAtJunction) {
+            // The obstacle 1st pixel can be climbed.
+            // Now that the character is on the obstacle,
+            // try to follow the slope for at least 1 pixel.
+            const deltaX = Math.max(
+              Math.sign(requestedDeltaX),
+              // - 1, because the owner moved from 1 pixel at the junction.
+              remainingDeltaX - 1
+            );
+            object.setX(object.getX() + deltaX);
+            const {
+              highestGround: highestGroundOnObstacle,
+            } = behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Do an exact slope angle check.
+              -Math.abs(deltaX) * behavior._slopeClimbingFactor,
+              0
+            );
+            if (highestGroundOnObstacle) {
+              // The obstacle slope can be climbed.
+              if (Math.abs(remainingDeltaX) > 2) {
+                behavior._setOnFloor(highestGroundOnObstacle);
+              } else {
+                // We went too far in order to check that.
+                // Now, find the right position on the obstacles.
+                object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
+                const {
+                  highestGround: highestGroundOnObstacle,
+                } = behavior._findHighestFloorAndMoveOnTop(
+                  behavior._potentialCollidingObjects,
+                  // requestedDeltaX can be small when the object start moving.
+                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                  Math.min(
+                    -1,
+                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                  ),
+                  0
+                );
+                // Should always be true
+                if (highestGroundOnObstacle) {
+                  behavior._setOnFloor(highestGroundOnObstacle);
+                }
+              }
+            } else {
+              // Don't climb on the obstacle
+              // because the obstacle slope is too steep.
+              if (
+                Math.sign(beforeObstacleX - oldX) === Math.sign(requestedDeltaX)
+              ) {
+                object.setPosition(beforeObstacleX, beforeObstacleY);
+              } else {
+                // Avoid to go backward
+                object.setPosition(oldX, beforeObstacleY);
+              }
+              behavior._currentSpeed = 0;
+            }
+          } else {
+            // Don't climb on the obstacle
+            // because the obstacle 1st pixel is more than 1 pixel high (or too steep).
+            if (
+              Math.sign(beforeObstacleX - oldX) === Math.sign(requestedDeltaX)
+            ) {
+              object.setPosition(beforeObstacleX, beforeObstacleY);
+            } else {
+              // Avoid to go backward
+              object.setPosition(oldX, beforeObstacleY);
+            }
+            behavior._currentSpeed = 0;
+          }
+        }
       }
     }
 

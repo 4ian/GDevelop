@@ -149,7 +149,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               <Line>
                 {extensionShortHeader.authors &&
                   extensionShortHeader.authors.map(author => (
-                    <UserPublicProfileChip user={author} key={author.id} />
+                    <UserPublicProfileChip user={author} key={author.id} isClickable />
                   ))}
               </Line>
             </Column>

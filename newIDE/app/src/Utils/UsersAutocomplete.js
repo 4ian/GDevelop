@@ -6,6 +6,7 @@ import { useDebounce } from './UseDebounce';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import {
   searchUserPublicProfilesByUsername,
+  type UserPublicProfile,
   type UserPublicProfileSearch,
   getUserPublicProfilesByIds,
 } from './GDevelopServices/User';
@@ -83,7 +84,7 @@ export const UsersAutocomplete = (props: Props) => {
         );
         setUsers(
           Object.keys(userPublicProfilesByIds).map(userId => {
-            const userPublicProfile: UserPublicProfileSearch =
+            const userPublicProfile: UserPublicProfile =
               userPublicProfilesByIds[userId];
             return {
               text: userPublicProfile.username || '(no username)',

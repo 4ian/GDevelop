@@ -4,7 +4,6 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 export type UserPublicProfile = {|
   id: string,
-  email: string,
   username: ?string,
   description: ?string,
 |};

@@ -93,6 +93,7 @@ export default class ProfileDialog extends Component<Props, State> {
                   <ProfileDetails
                     authenticatedUser={authenticatedUser}
                     onEditProfile={authenticatedUser.onEdit}
+                    onChangeEmail={authenticatedUser.onChangeEmail}
                   />
                   <SubscriptionDetails
                     subscription={authenticatedUser.subscription}

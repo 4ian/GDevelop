@@ -123,6 +123,7 @@ import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import EditProfileDialog from '../Profile/EditProfileDialog';
+import ChangeEmailDialog from '../Profile/ChangeEmailDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
@@ -3942,12 +3943,14 @@ storiesOf('ProfileDetails', module)
     <ProfileDetails
       authenticatedUser={fakeIndieAuthenticatedUser}
       onEditProfile={action('edit profile')}
+      onChangeEmail={action('change email')}
     />
   ))
   .add('loading', () => (
     <ProfileDetails
       authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
       onEditProfile={action('edit profile')}
+      onChangeEmail={action('change email')}
     />
   ));
 
@@ -4120,6 +4123,21 @@ storiesOf('Profile/EditProfileDialog', module)
       onClose={action('on close')}
       editInProgress={false}
       onEdit={action('on edit')}
+      error={null}
+    />
+  ));
+
+storiesOf('Profile/ChangeEmailDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress={false}
+      onChangeEmail={action('on change email')}
       error={null}
     />
   ));

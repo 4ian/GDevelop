@@ -71,7 +71,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
-        title={<Trans>Create a new game</Trans>}
+        title={<Trans>Create a new project</Trans>}
         actions={[
           <FlatButton
             key="close"

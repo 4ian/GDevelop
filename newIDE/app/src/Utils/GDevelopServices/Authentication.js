@@ -10,37 +10,38 @@ import {
   sendPasswordResetEmail,
   signOut,
   sendEmailVerification,
+  updateEmail,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 
-export type Profile = {
+export type Profile = {|
   id: string,
   email: string,
   username: ?string,
   description: ?string,
-};
+|};
 
-export type LoginForm = {
+export type LoginForm = {|
   email: string,
   password: string,
-};
+|};
 
-export type RegisterForm = {
+export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
-};
+|};
 
-export type EditForm = {
+export type EditForm = {|
   username: string,
   description: string,
-};
+|};
 
-export type ForgotPasswordForm = {
+export type ChangeEmailForm = {|
   email: string,
-};
+|};
 
 export type AuthError = {
   code:
@@ -52,7 +53,8 @@ export type AuthError = {
     | 'auth/operation-not-allowed'
     | 'auth/weak-password'
     | 'auth/username-used'
-    | 'auth/malformed-username',
+    | 'auth/malformed-username'
+    | 'auth/requires-recent-login',
 };
 
 export default class Authentication {
@@ -140,7 +142,7 @@ export default class Authentication {
       });
   };
 
-  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
+  forgotPassword = (form: LoginForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
@@ -167,6 +169,44 @@ export default class Authentication {
         }
       );
     });
+  };
+
+  changeEmail = (
+    getAuthorizationHeader: () => Promise<string>,
+    form: ChangeEmailForm
+  ) => {
+    return updateEmail(this.firebaseUser, form.email)
+      .then(() => {
+        console.log('Email successfully changed in Firebase');
+        return getAuthorizationHeader();
+      })
+      .then(authorizationHeader => {
+        if (!this.firebaseUser) {
+          console.error('Cannot edit user if not logged in');
+          throw new Error('Cannot edit user if not logged in');
+        }
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          {
+            email: form.email,
+          },
+          {
+            params: {
+              userId: this.firebaseUser.uid,
+            },
+            headers: {
+              Authorization: authorizationHeader,
+            },
+          }
+        );
+      })
+      .then(() => {
+        console.log('Email successfully changed in the database');
+      })
+      .catch(error => {
+        console.error('An error happened during email change', error);
+        throw error;
+      });
   };
 
   getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {
@@ -202,8 +242,8 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error('Cannot edit user if not logged in');
+          throw new Error('Cannot edit user if not logged in');
         }
         const { username, description } = form;
         return axios.patch(
@@ -239,7 +279,8 @@ export default class Authentication {
         console.log('Logout successful');
       })
       .catch(error => {
-        console.log('An error happened during logout', error);
+        console.error('An error happened during logout', error);
+        throw error;
       });
   };
 

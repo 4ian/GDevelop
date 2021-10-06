@@ -3,7 +3,9 @@ import * as React from 'react';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
 import { type UserPublicProfileSearch } from '../Utils/GDevelopServices/User';
-import PublicProfileContext, {type PublicProfileOpenerType} from '../Profile/PublicProfileContext';
+import PublicProfileContext, {
+  type PublicProfileOpenerType,
+} from '../Profile/PublicProfileContext';
 
 const styles = {
   chip: {
@@ -16,7 +18,7 @@ type Props = {|
   isClickable?: boolean,
 |};
 
-export const UserPublicProfileChip = ({ user, isClickable=false }: Props) => {
+export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
   return (
     <PublicProfileContext.Consumer>
       {(openPublicProfile: PublicProfileOpenerType) => (
@@ -26,7 +28,7 @@ export const UserPublicProfileChip = ({ user, isClickable=false }: Props) => {
           style={styles.chip}
           label={user.username}
           key={user.username}
-          onClick={isClickable ? (() => openPublicProfile(user.id)) : null}
+          onClick={isClickable ? () => openPublicProfile(user.id) : null}
         />
       )}
     </PublicProfileContext.Consumer>

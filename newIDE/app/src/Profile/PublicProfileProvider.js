@@ -9,19 +9,19 @@ type Props = {|
   children: React.Node,
 |};
 
-export default ({children}: Props) => {
+export default ({ children }: Props) => {
   const [open, setOpen] = React.useState(false);
   const [userId, setUserId] = React.useState(null);
 
   const setUserAndOpenProfile = (userId: string): void => {
     setUserId(userId);
     setOpen(true);
-  }
+  };
 
   const closeProfile = (): void => {
     setUserId(null);
     setOpen(false);
-  }
+  };
 
   return (
     <React.Fragment>
@@ -32,5 +32,5 @@ export default ({children}: Props) => {
         <PublicProfile userId={userId} onClose={closeProfile} />
       )}
     </React.Fragment>
-  )
-}
+  );
+};

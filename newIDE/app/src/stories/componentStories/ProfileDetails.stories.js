@@ -9,6 +9,12 @@ import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile as ProfileType } from '../../Utils/GDevelopServices/Authentication';
 
+const indieUserWithoutUsernameNorDescriptionProfile: ProfileType = {
+  ...indieUserProfile,
+  username: null,
+  description: null,
+};
+
 export default {
   title: 'ProfileDetails',
   component: ProfileDetails,
@@ -20,11 +26,7 @@ export default {
       defaultValue: 'Complete profile',
       mapping: {
         'Complete profile': indieUserProfile,
-        'Without username nor bio': {
-          ...indieUserProfile,
-          username: null,
-          description: null,
-        },
+        'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
       },
     },
     onEditProfile: { action: 'edit profile' },

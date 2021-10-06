@@ -27,11 +27,11 @@ export default ({ userId, onClose }: Props) => {
       open={true}
       actions={[
         <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            primary={false}
-            onClick={onClose}
-          />,
+          key="close"
+          label={<Trans>Close</Trans>}
+          primary={false}
+          onClick={onClose}
+        />,
       ]}
     >
       <ProfileDetails profile={profile} />

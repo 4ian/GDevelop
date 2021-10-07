@@ -13,9 +13,7 @@ import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
-import AuthenticatedUserContext, {
-  type AuthenticatedUser,
-} from './AuthenticatedUserContext';
+import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { ColumnStackLayout } from '../UI/Layout';
 
@@ -46,7 +44,7 @@ const ProfileDialog = ({
 
   React.useEffect(
     () => {
-      authenticatedUser.onRefreshUserProfile();
+      if (open) authenticatedUser.onRefreshUserProfile();
     },
     // We don't want to fetch again when authenticatedUser changes,
     // just the first time this page opens.

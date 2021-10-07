@@ -75,7 +75,7 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
           </Trans>
         </AlertMessage>
       )}
-      <ProfileDetails profile={authenticatedUser.profile} isPrivate />
+      <ProfileDetails profile={authenticatedUser.profile} isAuthenticatedUserProfile />
       <Column>
         <Line justifyContent="flex-end">
           <RaisedButton

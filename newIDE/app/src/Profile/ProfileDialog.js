@@ -54,107 +54,99 @@ const ProfileDialog = ({
   );
 
   return (
-    <AuthenticatedUserContext.Consumer>
-      {(authenticatedUser: AuthenticatedUser) => (
-        <Dialog
-          actions={
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              key="close"
-              primary={false}
-              onClick={onClose}
-            />
+    <Dialog
+      actions={
+        <FlatButton
+          label={<Trans>Close</Trans>}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />
+      }
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath={
+            currentTab === 'games-dashboard'
+              ? '/interface/games-dashboard'
+              : '/interface/profile'
           }
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath={
-                currentTab === 'games-dashboard'
-                  ? '/interface/games-dashboard'
-                  : '/interface/profile'
-              }
-            />,
-            authenticatedUser.authenticated && authenticatedUser.profile && (
-              <FlatButton
-                label={<Trans>Logout</Trans>}
-                key="logout"
-                onClick={authenticatedUser.onLogout}
-              />
-            ),
-          ]}
-          onRequestClose={onClose}
-          cannotBeDismissed={false}
-          open={open}
-          noMargin
-        >
-          <Tabs value={currentTab} onChange={_onChangeTab}>
-            <Tab label={<Trans>My Profile</Trans>} value="profile" />
-            <Tab
-              label={<Trans>Games Dashboard</Trans>}
-              value="games-dashboard"
+        />,
+        authenticatedUser.authenticated && authenticatedUser.profile && (
+          <FlatButton
+            label={<Trans>Logout</Trans>}
+            key="logout"
+            onClick={authenticatedUser.onLogout}
+          />
+        ),
+      ]}
+      onRequestClose={onClose}
+      cannotBeDismissed={false}
+      open={open}
+      noMargin
+    >
+      <Tabs value={currentTab} onChange={_onChangeTab}>
+        <Tab label={<Trans>My Profile</Trans>} value="profile" />
+        <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
+        <Tab label={<Trans>Services Usage</Trans>} value="usage" />
+      </Tabs>
+      {currentTab === 'profile' &&
+        (authenticatedUser.authenticated && authenticatedUser.profile ? (
+          <Column noMargin>
+            <AuthenticatedUserProfileDetails
+              authenticatedUser={authenticatedUser}
+              onEditProfile={authenticatedUser.onEdit}
+              onChangeEmail={authenticatedUser.onChangeEmail}
             />
-            <Tab label={<Trans>Services Usage</Trans>} value="usage" />
-          </Tabs>
-          {currentTab === 'profile' &&
-            (authenticatedUser.authenticated && authenticatedUser.profile ? (
-              <Column noMargin>
-                <AuthenticatedUserProfileDetails
-                  authenticatedUser={authenticatedUser}
-                  onEditProfile={authenticatedUser.onEdit}
-                  onChangeEmail={authenticatedUser.onChangeEmail}
-                />
-                <SubscriptionDetails
-                  subscription={authenticatedUser.subscription}
-                  onChangeSubscription={onChangeSubscription}
-                />
-                <ContributionsDetails userId={authenticatedUser.profile.id} />
-              </Column>
-            ) : (
-              <Column>
-                <CreateProfile
-                  onLogin={authenticatedUser.onLogin}
-                  onCreateAccount={authenticatedUser.onCreateAccount}
-                />
-              </Column>
-            ))}
-          {currentTab === 'games-dashboard' &&
-            (authenticatedUser.authenticated ? (
-              <Line>
-                <ColumnStackLayout expand>
-                  <GamesList project={currentProject} />
-                </ColumnStackLayout>
-              </Line>
-            ) : (
-              <Column>
-                <CreateProfile
-                  onLogin={authenticatedUser.onLogin}
-                  onCreateAccount={authenticatedUser.onCreateAccount}
-                  message={
-                    <Trans>
-                      Create an account to register your games and to get access
-                      to metrics collected anonymously, like the number of daily
-                      players and retention of the players after a few days.
-                    </Trans>
-                  }
-                />
-              </Column>
-            ))}
-          {currentTab === 'usage' &&
-            (authenticatedUser.authenticated ? (
-              <Column noMargin>
-                <UsagesDetails usages={authenticatedUser.usages} />
-              </Column>
-            ) : (
-              <EmptyMessage>
+            <SubscriptionDetails
+              subscription={authenticatedUser.subscription}
+              onChangeSubscription={onChangeSubscription}
+            />
+            <ContributionsDetails userId={authenticatedUser.profile.id} />
+          </Column>
+        ) : (
+          <Column>
+            <CreateProfile
+              onLogin={authenticatedUser.onLogin}
+              onCreateAccount={authenticatedUser.onCreateAccount}
+            />
+          </Column>
+        ))}
+      {currentTab === 'games-dashboard' &&
+        (authenticatedUser.authenticated ? (
+          <Line>
+            <ColumnStackLayout expand>
+              <GamesList project={currentProject} />
+            </ColumnStackLayout>
+          </Line>
+        ) : (
+          <Column>
+            <CreateProfile
+              onLogin={authenticatedUser.onLogin}
+              onCreateAccount={authenticatedUser.onCreateAccount}
+              message={
                 <Trans>
-                  Register to see the usage that you've made of the online
-                  services
+                  Create an account to register your games and to get access to
+                  metrics collected anonymously, like the number of daily
+                  players and retention of the players after a few days.
                 </Trans>
-              </EmptyMessage>
-            ))}
-        </Dialog>
-      )}
-    </AuthenticatedUserContext.Consumer>
+              }
+            />
+          </Column>
+        ))}
+      {currentTab === 'usage' &&
+        (authenticatedUser.authenticated ? (
+          <Column noMargin>
+            <UsagesDetails usages={authenticatedUser.usages} />
+          </Column>
+        ) : (
+          <EmptyMessage>
+            <Trans>
+              Register to see the usage that you've made of the online services
+            </Trans>
+          </EmptyMessage>
+        ))}
+    </Dialog>
   );
 };
 

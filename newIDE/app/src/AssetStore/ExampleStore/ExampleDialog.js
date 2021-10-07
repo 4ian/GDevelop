@@ -139,7 +139,11 @@ export function ExampleDialog({
         {exampleShortHeader.authors && (
           <Line>
             {exampleShortHeader.authors.map(author => (
-              <UserPublicProfileChip user={author} key={author.id} />
+              <UserPublicProfileChip
+                user={author}
+                key={author.id}
+                isClickable
+              />
             ))}
           </Line>
         )}

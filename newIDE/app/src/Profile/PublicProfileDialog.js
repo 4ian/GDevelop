@@ -4,7 +4,7 @@ import React from 'react';
 
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import { getUserPublicProfile } from '../Utils/GDevelopServices/User';
+import { getUserPublicProfile, type UserPublicProfile } from '../Utils/GDevelopServices/User';
 import ProfileDetails from './ProfileDetails';
 
 type Props = {|
@@ -13,14 +13,28 @@ type Props = {|
 |};
 
 const PublicProfileDialog = ({ userId, onClose }: Props) => {
-  const [profile, setProfile] = React.useState(null);
-  React.useEffect(
-    () => {
-      setProfile(null);
-      getUserPublicProfile(userId).then(profile => setProfile(profile));
-    },
-    [userId]
+  const [profile, setProfile] = React.useState<?UserPublicProfile>(null);
+  const [error, setError] = React.useState<?Error>(null);
+
+  const fetchProfile = React.useCallback(async () => {
+    if (!userId) return;
+    setProfile(null);
+    try {
+      const profile = await getUserPublicProfile(userId);
+      setProfile(profile);
+    } catch (error) {
+      setError(error)
+    }
+  }, [userId])
+
+  React.useEffect(() => {fetchProfile()},
+    [userId, fetchProfile]
   );
+
+  const onRetry = () => {
+    setError(null);
+    fetchProfile();
+  }
 
   return (
     <Dialog
@@ -35,7 +49,7 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
         />,
       ]}
     >
-      <ProfileDetails profile={profile} />
+      <ProfileDetails profile={profile} error={error} onRetry={onRetry} />
     </Dialog>
   );
 };

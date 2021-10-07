@@ -9,6 +9,7 @@ import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
 import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
+import PlaceholderError from '../UI/PlaceholderError';
 
 type DisplayedProfile = {
   +email?: string,
@@ -19,9 +20,11 @@ type DisplayedProfile = {
 type Props = {
   profile: ?DisplayedProfile,
   isAuthenticatedUserProfile?: boolean,
+  error?: ?Error,
+  onRetry?: () => void,
 };
 
-const ProfileDetails = ({ profile, isAuthenticatedUserProfile }: Props) => {
+const ProfileDetails = ({ profile, isAuthenticatedUserProfile, error, onRetry }: Props) => {
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -72,6 +75,10 @@ const ProfileDetails = ({ profile, isAuthenticatedUserProfile }: Props) => {
         </Column>
       )}
     </I18n>
+  ) : error ? (
+    <PlaceholderError onRetry={onRetry}>
+      <Trans>Unable to load the profile, please verify your internet connection or try again later.</Trans>
+    </PlaceholderError>
   ) : (
     <PlaceholderLoader />
   );

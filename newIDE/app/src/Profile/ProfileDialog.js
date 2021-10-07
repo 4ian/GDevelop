@@ -7,7 +7,7 @@ import { Tabs, Tab } from '../UI/Tabs';
 import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
-import ProfileEditor from './ProfileEditor';
+import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
 import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
@@ -90,7 +90,7 @@ export default class ProfileDialog extends Component<Props, State> {
             {this.state.currentTab === 'profile' &&
               (authenticatedUser.authenticated && authenticatedUser.profile ? (
                 <Column noMargin>
-                  <ProfileEditor
+                  <AuthenticatedUserProfileDetails
                     authenticatedUser={authenticatedUser}
                     onEditProfile={authenticatedUser.onEdit}
                   />

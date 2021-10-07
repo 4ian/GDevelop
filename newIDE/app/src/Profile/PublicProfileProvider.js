@@ -10,26 +10,23 @@ type Props = {|
 |};
 
 export default ({ children }: Props) => {
-  const [open, setOpen] = React.useState(false);
-  const [userId, setUserId] = React.useState(null);
+  const [visitedPublicProfileUserId, setVisitedPublicProfileUserId] = React.useState<?string>(null);
 
-  const setUserAndOpenProfile = (userId: string): void => {
-    setUserId(userId);
-    setOpen(true);
+  const openUserPublicProfile = (userId: string): void => {
+    setVisitedPublicProfileUserId(userId);
   };
 
-  const closeProfile = (): void => {
-    setUserId(null);
-    setOpen(false);
+  const closeUserPublicProfile = (): void => {
+    setVisitedPublicProfileUserId(null);
   };
 
   return (
     <React.Fragment>
-      <PublicProfileDataContext.Provider value={{openUserPublicProfile: setUserAndOpenProfile}}>
+      <PublicProfileDataContext.Provider value={{openUserPublicProfile: openUserPublicProfile}}>
         {children}
       </PublicProfileDataContext.Provider>
-      {open && userId && (
-        <PublicProfile userId={userId} onClose={closeProfile} />
+      {visitedPublicProfileUserId && (
+        <PublicProfile userId={visitedPublicProfileUserId} onClose={closeUserPublicProfile} />
       )}
     </React.Fragment>
   );

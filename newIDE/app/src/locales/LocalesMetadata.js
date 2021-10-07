@@ -249,7 +249,7 @@ module.exports = [
   },
   {
     "languageCode": "sl_SI",
-    "languageName": "Slovenian",
+    "languageName": "Slovene",
     "languageNativeName": "slovenski jezik",
     "translationRatio": 0.978704205017145
   },
@@ -268,7 +268,7 @@ module.exports = [
   {
     "languageCode": "sv_SE",
     "languageName": "Swedish",
-    "languageNativeName": "Svenska",
+    "languageNativeName": "svenska",
     "translationRatio": 0.16025988088792642
   },
   {

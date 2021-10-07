@@ -7,9 +7,9 @@ import paperDecorator from '../PaperDecorator';
 
 import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
-import { type Profile as ProfileType } from '../../Utils/GDevelopServices/Authentication';
+import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 
-const indieUserWithoutUsernameNorDescriptionProfile: ProfileType = {
+const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
   username: null,
   description: null,
@@ -34,7 +34,7 @@ export default {
 };
 
 type ArgsTypes = {|
-  profile: ProfileType,
+  profile: Profile,
   onEditProfile: () => void,
 |};
 

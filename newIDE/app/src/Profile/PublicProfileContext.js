@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 
-type PublicProfileState = {
+export type PublicProfileState = {
   openUserPublicProfile: string => void,
 };
 

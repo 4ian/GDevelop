@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import PublicProfile from './PublicProfile';
-import PublicProfileDataContext from './PublicProfileContext';
+import PublicProfileContext from './PublicProfileContext';
 
 type Props = {|
   children: React.Node,
@@ -22,9 +22,9 @@ export default ({ children }: Props) => {
 
   return (
     <React.Fragment>
-      <PublicProfileDataContext.Provider value={{openUserPublicProfile: openUserPublicProfile}}>
+      <PublicProfileContext.Provider value={{openUserPublicProfile: openUserPublicProfile}}>
         {children}
-      </PublicProfileDataContext.Provider>
+      </PublicProfileContext.Provider>
       {visitedPublicProfileUserId && (
         <PublicProfile userId={visitedPublicProfileUserId} onClose={closeUserPublicProfile} />
       )}

@@ -5,6 +5,7 @@ import { ThemeProvider } from '@material-ui/styles';
 import { StylesProvider, jssPreset } from '@material-ui/core/styles';
 import { getTheme } from '../UI/Theme';
 import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
+import PublicProfileProvider from '../Profile/PublicProfileProvider';
 import Authentication from '../Utils/GDevelopServices/Authentication';
 import PreferencesProvider from './Preferences/PreferencesProvider';
 import PreferencesContext from './Preferences/PreferencesContext';
@@ -85,40 +86,42 @@ export default class Providers extends React.Component<Props, {||}> {
                           <AuthenticatedUserProvider
                             authentication={authentication}
                           >
-                            <I18n update>
-                              {({ i18n }) => (
-                                <EventsFunctionsExtensionsProvider
-                                  i18n={i18n}
-                                  makeEventsFunctionCodeWriter={
-                                    makeEventsFunctionCodeWriter
-                                  }
-                                  eventsFunctionsExtensionWriter={
-                                    eventsFunctionsExtensionWriter
-                                  }
-                                  eventsFunctionsExtensionOpener={
-                                    eventsFunctionsExtensionOpener
-                                  }
-                                >
-                                  <CommandsContextProvider>
-                                    <AssetStoreStateProvider>
-                                      <ResourceStoreStateProvider>
-                                        <ExampleStoreStateProvider>
-                                          <ExtensionStoreStateProvider>
-                                            <GamesShowcaseStateProvider>
-                                              <ResourceFetcherContext.Provider
-                                                value={resourceFetcher}
-                                              >
-                                                {children({ i18n })}
-                                              </ResourceFetcherContext.Provider>
-                                            </GamesShowcaseStateProvider>
-                                          </ExtensionStoreStateProvider>
-                                        </ExampleStoreStateProvider>
-                                      </ResourceStoreStateProvider>
-                                    </AssetStoreStateProvider>
-                                  </CommandsContextProvider>
-                                </EventsFunctionsExtensionsProvider>
-                              )}
-                            </I18n>
+                            <PublicProfileProvider>
+                              <I18n update>
+                                {({ i18n }) => (
+                                  <EventsFunctionsExtensionsProvider
+                                    i18n={i18n}
+                                    makeEventsFunctionCodeWriter={
+                                      makeEventsFunctionCodeWriter
+                                    }
+                                    eventsFunctionsExtensionWriter={
+                                      eventsFunctionsExtensionWriter
+                                    }
+                                    eventsFunctionsExtensionOpener={
+                                      eventsFunctionsExtensionOpener
+                                    }
+                                  >
+                                    <CommandsContextProvider>
+                                      <AssetStoreStateProvider>
+                                        <ResourceStoreStateProvider>
+                                          <ExampleStoreStateProvider>
+                                            <ExtensionStoreStateProvider>
+                                              <GamesShowcaseStateProvider>
+                                                <ResourceFetcherContext.Provider
+                                                  value={resourceFetcher}
+                                                >
+                                                  {children({ i18n })}
+                                                </ResourceFetcherContext.Provider>
+                                              </GamesShowcaseStateProvider>
+                                            </ExtensionStoreStateProvider>
+                                          </ExampleStoreStateProvider>
+                                        </ResourceStoreStateProvider>
+                                      </AssetStoreStateProvider>
+                                    </CommandsContextProvider>
+                                  </EventsFunctionsExtensionsProvider>
+                                )}
+                              </I18n>
+                            </PublicProfileProvider>
                           </AuthenticatedUserProvider>
                         </ThemeProvider>
                       </StylesProvider>

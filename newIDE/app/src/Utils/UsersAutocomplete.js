@@ -7,6 +7,7 @@ import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComple
 import {
   searchUserPublicProfilesByUsername,
   type UserPublicProfile,
+  type UserPublicProfileSearch,
   getUserPublicProfilesByIds,
 } from './GDevelopServices/User';
 
@@ -35,7 +36,7 @@ export const UsersAutocomplete = (props: Props) => {
   const [
     completionUserPublicProfiles,
     setCompletionUserPublicProfiles,
-  ] = React.useState<Array<UserPublicProfile>>([]);
+  ] = React.useState<Array<UserPublicProfileSearch>>([]);
   const [error, setError] = React.useState(null);
 
   // Recalculate if the userInput has changed.
@@ -132,7 +133,7 @@ export const UsersAutocomplete = (props: Props) => {
         setUserInput(value);
       }}
       dataSource={completionUserPublicProfiles
-        .map((userPublicProfile: UserPublicProfile) => {
+        .map((userPublicProfile: UserPublicProfileSearch) => {
           if (userPublicProfile.username && userPublicProfile.id) {
             return {
               text: userPublicProfile.username,

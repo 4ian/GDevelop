@@ -19,18 +19,16 @@ type Props = {|
 |};
 
 export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
+  const {openUserPublicProfile} = React.useContext(PublicProfileContext);
+
   return (
-    <PublicProfileContext.Consumer>
-      {({openUserPublicProfile}: PublicProfileOpener) => (
-        <Chip
-          icon={<FaceIcon />}
-          size="small"
-          style={styles.chip}
-          label={user.username}
-          key={user.username}
-          onClick={isClickable ? () => openUserPublicProfile(user.id) : null}
-        />
-      )}
-    </PublicProfileContext.Consumer>
+    <Chip
+      icon={<FaceIcon />}
+      size="small"
+      style={styles.chip}
+      label={user.username}
+      key={user.username}
+      onClick={isClickable ? () => openUserPublicProfile(user.id) : null}
+    />
   );
 };

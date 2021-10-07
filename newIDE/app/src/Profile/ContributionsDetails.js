@@ -65,7 +65,7 @@ export const ExamplesAccordion = ({
     <Accordion>
       <AccordionHeader>
         <Text displayInlineAsSpan>
-          <Trans>Examples (${examples.length})</Trans>
+          <Trans>Examples ({examples.length})</Trans>
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
@@ -109,7 +109,7 @@ export const ExtensionsAccordion = ({
     <Accordion>
       <AccordionHeader>
         <Text displayInlineAsSpan>
-          <Trans>Extensions (${extensions.length})</Trans>
+          <Trans>Extensions ({extensions.length})</Trans>
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>

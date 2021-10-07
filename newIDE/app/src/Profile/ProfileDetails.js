@@ -21,7 +21,7 @@ type Props = {
   isAuthenticatedUserProfile?: boolean,
 };
 
-export default ({ profile, isAuthenticatedUserProfile }: Props) => {
+const ProfileDetails = ({ profile, isAuthenticatedUserProfile }: Props) => {
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -76,3 +76,5 @@ export default ({ profile, isAuthenticatedUserProfile }: Props) => {
     <PlaceholderLoader />
   );
 };
+
+export default ProfileDetails;

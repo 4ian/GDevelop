@@ -52,6 +52,11 @@ jobs:
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
+      # Seems like the three letters code is not handled properly by LinguiJS?
+      # Do without this language while we find a solution.
+      - name: Remove catalogs not handled properly by LinguiJS compile command.
+        run: rm -rf newIDE/app/src/locales/pcm_NG/
+
       - name: Compile translations into .js files that are read by LinguiJS
         run: npm run compile-translations
         working-directory: newIDE/app

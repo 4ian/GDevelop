@@ -25,7 +25,7 @@ export default ({ children }: Props) => {
 
   return (
     <React.Fragment>
-      <PublicProfileDataContext.Provider value={setUserAndOpenProfile}>
+      <PublicProfileDataContext.Provider value={{openUserPublicProfile: setUserAndOpenProfile}}>
         {children}
       </PublicProfileDataContext.Provider>
       {open && userId && (

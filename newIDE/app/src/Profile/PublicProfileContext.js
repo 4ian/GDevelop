@@ -1,11 +1,15 @@
 // @flow
 import * as React from 'react';
 
-export type PublicProfileOpenerType = string => void;
+export type PublicProfileOpener = {
+  openUserPublicProfile: string => void,
+};
 
-export const initialPublicProfileOpener = (userId: string) => {};
+export const initialPublicProfileOpener = {
+  openUserPublicProfile: (userId: string) => {}
+};
 
-const PublicProfileContext = React.createContext<PublicProfileOpenerType>(
+const PublicProfileContext = React.createContext<PublicProfileOpener>(
   initialPublicProfileOpener
 );
 

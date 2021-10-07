@@ -11,17 +11,18 @@ import RaisedButton from '../UI/RaisedButton';
 import TextField from '../UI/TextField';
 import { I18n } from '@lingui/react';
 import FlatButton from '../UI/FlatButton';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 
 type Props = {|
-  onEditProfile: Function,
+  onEditProfile: () => void,
+  onChangeEmail: () => void,
   authenticatedUser: AuthenticatedUser,
 |};
 
-export default ({ onEditProfile, authenticatedUser }: Props) => {
+export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const isMounted = useIsMounted();
@@ -97,7 +98,8 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
             </Line>
             <Line>
               <TextField
-                value={profile.email}
+                // The firebase user is the source of truth for the emails.
+                value={firebaseUser.email}
                 readOnly
                 fullWidth
                 floatingLabelText={<Trans>Email</Trans>}
@@ -117,13 +119,17 @@ export default ({ onEditProfile, authenticatedUser }: Props) => {
                 rowsMax={5}
               />
             </Line>
-            <Line justifyContent="flex-end">
+            <ResponsiveLineStackLayout justifyContent="flex-end">
+              <RaisedButton
+                label={<Trans>Change my email</Trans>}
+                onClick={onChangeEmail}
+              />
               <RaisedButton
                 label={<Trans>Edit my profile</Trans>}
                 primary
                 onClick={onEditProfile}
               />
-            </Line>
+            </ResponsiveLineStackLayout>
           </Column>
         </ColumnStackLayout>
       )}

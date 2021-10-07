@@ -27,6 +27,7 @@ export type EnumeratedExpressionMetadata = {|
   scope: InstructionOrExpressionScope,
   isPrivate: boolean,
   name: string,
+  /** Represents only the visible parameters in the parentheses of the expression. */
   parameters: Array<gdParameterMetadata>,
 |};
 

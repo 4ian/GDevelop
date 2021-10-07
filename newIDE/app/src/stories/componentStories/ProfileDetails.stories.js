@@ -47,6 +47,9 @@ export const OtherUserProfile = (args: ArgsTypes) => (
 export const Loading = (args: ArgsTypes) => (
   <ProfileDetails {...args} profile={null} />
 );
+export const Errored = (args: ArgsTypes) => (
+  <ProfileDetails {...args} profile={null} error={new Error("Connectivity Problems")} onRetry={() => {action('Retry profile fetch')}} />
+);
 Loading.argTypes = {
   profile: { control: { disable: true } },
 };

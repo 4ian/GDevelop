@@ -18,7 +18,7 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
-export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
+const AuthenticatedUserProfileDetails = ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const isMounted = useIsMounted();
@@ -95,3 +95,5 @@ export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
     <PlaceholderLoader />
   );
 };
+
+export default AuthenticatedUserProfileDetails;

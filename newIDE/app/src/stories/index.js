@@ -75,7 +75,7 @@ import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrE
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import CreateProfile from '../Profile/CreateProfile';
-import ProfileEditor from '../Profile/ProfileEditor';
+import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
 import LimitDisplayer from '../Profile/LimitDisplayer';
 import ResourcePreview from '../ResourcesList/ResourcePreview';
 import ResourcesList from '../ResourcesList';
@@ -3936,18 +3936,18 @@ storiesOf('LimitDisplayer', module)
     />
   ));
 
-storiesOf('ProfileEditor', module)
+storiesOf('AuthenticatedUserProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('profile', () => (
-    <ProfileEditor
+    <AuthenticatedUserProfileDetails
       authenticatedUser={fakeIndieAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}
     />
   ))
   .add('loading', () => (
-    <ProfileEditor
+    <AuthenticatedUserProfileDetails
       authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
       onEditProfile={action('edit profile')}
       onChangeEmail={action('change email')}

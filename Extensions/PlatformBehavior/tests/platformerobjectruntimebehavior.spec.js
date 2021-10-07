@@ -2784,6 +2784,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         }
       };
 
+      const walkLeftCanStop = (frameCount) => {
+        const behavior = object.getBehavior('auto1');
+        for (let i = 0; i < frameCount; ++i) {
+          const lastX = object.getX();
+          const lastSpeed = behavior.getCurrentSpeed();
+          behavior.simulateLeftKey();
+          runtimeScene.renderAndStep(1000 / 60);
+          expect(behavior.isOnFloor()).to.be(true);
+          expect(object.getX()).to.not.be.above(lastX);
+        }
+      };
+
       (slopeMaxAngle === 0
         ? [
             { angle: 5.7, height: 5 },
@@ -2857,6 +2869,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // LOG: 'OnFloor 35.13888888888889 -20'
         // LOG: 'OnFloor 38.333333333333336 -20'
         // LOG: 'OnFloor 41.66666666666667 -20'
+        // The character is 10 width, at 38.33 is left is 48.33
         [
           // remainingDeltaX === 1.333
           47,
@@ -2870,7 +2883,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           // A rotated platform will probably result to not pixel aligned junctions.
           48.9,
         ].forEach((slopeJunctionX) => {
-          it.only(`(slopeJunctionX: ${slopeJunctionX}) can go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°)`, function () {
+          it(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going right`, function () {
             // Put a platform.
             const platform = addPlatformObject(runtimeScene);
             platform.setCustomWidthAndHeight(slopeJunctionX, 50);
@@ -2895,6 +2908,55 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               // When the junction is not pixel aligned, the character will be stopped
               // but is able to move forward until it reaches the obstacle.
               slope.getX() - object.getWidth()
+            );
+            expect(object.getY()).to.be(platform.getY() - object.getHeight());
+          });
+        });
+
+        // The log of the character positions moving to the left
+        // without any obstacle:
+        // LOG: 'OnFloor 54.861111111111114 -20'
+        // LOG: 'OnFloor 51.66666666666667 -20'
+        // LOG: 'OnFloor 48.333333333333336 -20'
+        // This is a mirror of the previous case: x -> 100 - x
+        [
+          // remainingDeltaX === -1.333
+          53,
+          // remainingDeltaX === -0.833
+          52.5,
+          // remainingDeltaX === -0.333
+          52,
+          // remainingDeltaX is big
+          51,
+          // Platform tiles will result to pixel aligned junctions.
+          // A rotated platform will probably result to not pixel aligned junctions.
+          51.1,
+        ].forEach((slopeJunctionX) => {
+          it(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going left`, function () {
+            // Put a platform.
+            const platform = addPlatformObject(runtimeScene);
+            platform.setCustomWidthAndHeight(100 - slopeJunctionX, 50);
+            platform.setPosition(slopeJunctionX, 0);
+
+            const slope = addDownSlopePlatformObject(runtimeScene);
+            slope.setCustomWidthAndHeight(50, slopesDimension.height);
+            slope.setPosition(
+              slopeJunctionX - slope.getWidth(),
+              platform.getY() - slope.getHeight()
+            );
+
+            object.setPosition(90, -32);
+            // Ensure the object falls on the platform
+            fallOnPlatform(10);
+
+            // Walk toward the 2nd platform.
+            walkLeftCanStop(30);
+            // Is stopped at the slope junction.
+            expect(object.getX()).to.be.within(
+              // When the junction is not pixel aligned, the character will be stopped
+              // but is able to move forward until it reaches the obstacle.
+              platform.getX(),
+              Math.ceil(platform.getX())
             );
             expect(object.getY()).to.be(platform.getY() - object.getHeight());
           });

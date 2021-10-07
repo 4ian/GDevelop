@@ -24,7 +24,12 @@ type Props = {
   onRetry?: () => void,
 };
 
-const ProfileDetails = ({ profile, isAuthenticatedUserProfile, error, onRetry }: Props) => {
+const ProfileDetails = ({
+  profile,
+  isAuthenticatedUserProfile,
+  error,
+  onRetry,
+}: Props) => {
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -77,7 +82,10 @@ const ProfileDetails = ({ profile, isAuthenticatedUserProfile, error, onRetry }:
     </I18n>
   ) : error ? (
     <PlaceholderError onRetry={onRetry}>
-      <Trans>Unable to load the profile, please verify your internet connection or try again later.</Trans>
+      <Trans>
+        Unable to load the profile, please verify your internet connection or
+        try again later.
+      </Trans>
     </PlaceholderError>
   ) : (
     <PlaceholderLoader />

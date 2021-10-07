@@ -6,7 +6,7 @@ export type PublicProfileOpener = {
 };
 
 export const initialPublicProfileOpener = {
-  openUserPublicProfile: (userId: string) => {}
+  openUserPublicProfile: (userId: string) => {},
 };
 
 const PublicProfileContext = React.createContext<PublicProfileOpener>(

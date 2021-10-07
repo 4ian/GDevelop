@@ -180,6 +180,7 @@ export default class Authentication {
     form: ChangeEmailForm
   ) => {
     return updateEmail(this.firebaseUser, form.email)
+      .then(() => sendEmailVerification(this.firebaseUser))
       .then(() => {
         console.log('Email successfully changed in Firebase.');
         return getAuthorizationHeader();

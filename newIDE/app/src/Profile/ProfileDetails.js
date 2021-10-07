@@ -17,12 +17,12 @@ type DisplayedProfile = {
   username: ?string,
 };
 
-type Props = {
+type Props = {|
   profile: ?DisplayedProfile,
   isAuthenticatedUserProfile?: boolean,
   error?: ?Error,
   onRetry?: () => void,
-};
+|};
 
 const ProfileDetails = ({
   profile,

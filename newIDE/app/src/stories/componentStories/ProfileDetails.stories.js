@@ -35,7 +35,6 @@ export default {
 
 type ArgsTypes = {|
   profile: Profile,
-  onEditProfile: () => void,
 |};
 
 export const MyProfile = (args: ArgsTypes) => (

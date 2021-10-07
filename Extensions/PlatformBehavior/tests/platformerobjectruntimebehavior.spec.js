@@ -2346,7 +2346,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The 2nd platform is shift from 1 pixel.
+          // The 2nd platform is shifted from 1 pixel.
           platform.getY() - 1
         );
 
@@ -2369,10 +2369,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The 2nd platform is shift from 1 pixel.
+          // The 2nd platform is shifted from 1 pixel.
           platform.getY() - 1
         );
-
+        // Put the object just to the left of platform2 so that
+        // it try climbing on it with a very small speed.
         object.setPosition(platform2.getX() - object.getWidth(), -32);
         // Ensure the object falls on the platform
         fallOnPlatform(10);
@@ -2851,7 +2852,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           }
         });
 
-        // The log of the character positions without any obstacle:
+        // The log of the character positions moving to the right
+        // without any obstacle:
         // LOG: 'OnFloor 35.13888888888889 -20'
         // LOG: 'OnFloor 38.333333333333336 -20'
         // LOG: 'OnFloor 41.66666666666667 -20'
@@ -2871,8 +2873,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           it.only(`(slopeJunctionX: ${slopeJunctionX}) can go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°)`, function () {
             // Put a platform.
             const platform = addPlatformObject(runtimeScene);
-            // slopeJunctionX == 49 give a big requestedDeltaX,
-            // it's where approximations are more likely to happen.
             platform.setCustomWidthAndHeight(slopeJunctionX, 50);
             platform.setPosition(0, 0);
 

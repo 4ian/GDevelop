@@ -684,7 +684,10 @@ namespace gdjs {
           isCollidingAnyPlatform = true;
         }
         if (highestY === -Number.MAX_VALUE) {
-          // One platform is too high
+          // One platform is colliding the character
+          // and is too high for the character to walk on.
+          // This will still be an obstacle event if there
+          // are other platforms that fit the requirement.
           highestGround = null;
           break;
         }
@@ -1528,6 +1531,9 @@ namespace gdjs {
           //    (it can only be done after the junction because otherwise
           //    the slope angle would be a mean between the current platform and
           //    the obstacles).
+          // The 2nd steps is done 1 pixel width at least, when remainingDeltaX
+          // is less than 2 pixels, it will be a lookahead. This is to ensure
+          // the character doesn't start to climb a slope he actually can't.
           const remainingDeltaX = requestedDeltaX - (object.getX() - oldX);
           const beforeObstacleY = object.getY();
           const beforeObstacleX = object.getX();
@@ -1561,7 +1567,7 @@ namespace gdjs {
             );
             if (highestGroundOnObstacle) {
               // The obstacle slope can be climbed.
-              if (Math.abs(remainingDeltaX) > 2) {
+              if (Math.abs(remainingDeltaX) >= 2) {
                 behavior._setOnFloor(highestGroundOnObstacle);
               } else {
                 // We went too far in order to check that.

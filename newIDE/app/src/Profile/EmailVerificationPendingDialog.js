@@ -14,7 +14,7 @@ import Text from '../UI/Text';
 import { useInterval } from '../Utils/UseInterval';
 
 type Props = {|
-  onClose: Function,
+  onClose: () => void,
   authenticatedUser: AuthenticatedUser,
 |};
 

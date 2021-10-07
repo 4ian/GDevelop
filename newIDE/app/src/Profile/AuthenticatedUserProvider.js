@@ -10,7 +10,7 @@ import Authentication, {
   type LoginForm,
   type RegisterForm,
   type EditForm,
-  type ForgotPasswordForm,
+  type ChangeEmailForm,
   type AuthError,
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
@@ -24,6 +24,7 @@ import AuthenticatedUserContext, {
 } from './AuthenticatedUserContext';
 import CreateAccountDialog from './CreateAccountDialog';
 import EditProfileDialog from './EditProfileDialog';
+import ChangeEmailDialog from './ChangeEmailDialog';
 import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 
 type Props = {|
@@ -43,6 +44,8 @@ type State = {|
   resetPasswordDialogOpen: boolean,
   emailVerificationPendingDialogOpen: boolean,
   forgotPasswordInProgress: boolean,
+  changeEmailDialogOpen: boolean,
+  changeEmailInProgress: boolean,
 |};
 
 export default class AuthenticatedUserProvider extends React.Component<
@@ -61,6 +64,8 @@ export default class AuthenticatedUserProvider extends React.Component<
     resetPasswordDialogOpen: false,
     emailVerificationPendingDialogOpen: false,
     forgotPasswordInProgress: false,
+    changeEmailDialogOpen: false,
+    changeEmailInProgress: false,
   };
 
   componentDidMount() {
@@ -76,6 +81,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         onLogout: this._doLogout,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
+        onChangeEmail: () => this.openChangeEmailDialog(true),
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
         onRefreshFirebaseProfile: this._reloadFirebaseProfile,
@@ -241,7 +247,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     );
   };
 
-  _doForgotPassword = (form: ForgotPasswordForm) => {
+  _doForgotPassword = (form: LoginForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
@@ -269,6 +275,25 @@ export default class AuthenticatedUserProvider extends React.Component<
     authentication.sendFirebaseEmailVerification(() => {
       this.openEmailVerificationPendingDialog(true);
     });
+  };
+
+  _doChangeEmail = (form: ChangeEmailForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    watchPromiseInState(this, 'changeEmailInProgress', () =>
+      authentication.changeEmail(form).then(
+        () => {
+          this._fetchUserProfile();
+          this.openChangeEmailDialog(false);
+        },
+        (authError: AuthError) => {
+          this.setState({
+            authError,
+          });
+        }
+      )
+    );
   };
 
   openEmailVerificationPendingDialog = (open: boolean = true) => {
@@ -307,6 +332,13 @@ export default class AuthenticatedUserProvider extends React.Component<
     });
   };
 
+  openChangeEmailDialog = (open: boolean = true) => {
+    this.setState({
+      changeEmailDialogOpen: open,
+      authError: null,
+    });
+  };
+
   render() {
     return (
       <React.Fragment>
@@ -333,6 +365,16 @@ export default class AuthenticatedUserProvider extends React.Component<
               onClose={() => this.openEditProfileDialog(false)}
               onEdit={this._doEdit}
               editInProgress={this.state.editInProgress}
+              error={this.state.authError}
+            />
+          )}
+        {this.state.authenticatedUser.firebaseUser &&
+          this.state.changeEmailDialogOpen && (
+            <ChangeEmailDialog
+              firebaseUser={this.state.authenticatedUser.firebaseUser}
+              onClose={() => this.openChangeEmailDialog(false)}
+              onChangeEmail={this._doChangeEmail}
+              changeEmailInProgress={this.state.changeEmailInProgress}
               error={this.state.authError}
             />
           )}

@@ -10,37 +10,38 @@ import {
   sendPasswordResetEmail,
   signOut,
   sendEmailVerification,
+  updateEmail,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 
-export type Profile = {
+export type Profile = {|
   id: string,
   email: string,
   username: ?string,
   description: ?string,
-};
+|};
 
-export type LoginForm = {
+export type LoginForm = {|
   email: string,
   password: string,
-};
+|};
 
-export type RegisterForm = {
+export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
-};
+|};
 
-export type EditForm = {
+export type EditForm = {|
   username: string,
   description: string,
-};
+|};
 
-export type ForgotPasswordForm = {
+export type ChangeEmailForm = {|
   email: string,
-};
+|};
 
 export type AuthError = {
   code:
@@ -52,7 +53,8 @@ export type AuthError = {
     | 'auth/operation-not-allowed'
     | 'auth/weak-password'
     | 'auth/username-used'
-    | 'auth/malformed-username',
+    | 'auth/malformed-username'
+    | 'auth/requires-recent-login',
 };
 
 export default class Authentication {
@@ -100,8 +102,12 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error(
+            'Cannot create the user as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot create the user as it is not logged in any more.'
+          );
         }
         return axios.post(
           `${GDevelopUserApi.baseUrl}/user`,
@@ -140,7 +146,7 @@ export default class Authentication {
       });
   };
 
-  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
+  forgotPassword = (form: LoginForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
@@ -169,12 +175,28 @@ export default class Authentication {
     });
   };
 
+  changeEmail = (form: ChangeEmailForm) => {
+    // No need to modify the email in the DB, as Firebase is the source of truth for emails.
+    return updateEmail(this.firebaseUser, form.email)
+      .then(() => {
+        console.log('Email successfully changed in Firebase.');
+      })
+      .catch(error => {
+        console.error('An error happened during email change.', error);
+        throw error;
+      });
+  };
+
   getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error(
+            'Cannot get the user profile as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot get the user profile as it is not logged in any more.'
+          );
         }
         return axios.get(
           `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
@@ -202,8 +224,12 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error(
+            'Cannot finish editing the user as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot finish editing the user as it is not logged in any more.'
+          );
         }
         const { username, description } = form;
         return axios.patch(
@@ -236,10 +262,11 @@ export default class Authentication {
   logout = () => {
     signOut(this.auth)
       .then(() => {
-        console.log('Logout successful');
+        console.log('Logout successful.');
       })
       .catch(error => {
-        console.log('An error happened during logout', error);
+        console.error('An error happened during logout.', error);
+        throw error;
       });
   };
 

@@ -17,7 +17,7 @@ type Props = {|
 |};
 
 export const UserPublicProfileChip = ({ user, isClickable = false }: Props) => {
-  const {openUserPublicProfile} = React.useContext(PublicProfileContext);
+  const { openUserPublicProfile } = React.useContext(PublicProfileContext);
 
   return (
     <Chip

@@ -17,7 +17,10 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
 |};
 
-const AuthenticatedUserProfileDetails = ({ onEditProfile, authenticatedUser }: Props) => {
+const AuthenticatedUserProfileDetails = ({
+  onEditProfile,
+  authenticatedUser,
+}: Props) => {
   const profile = authenticatedUser.profile;
   const firebaseUser = authenticatedUser.firebaseUser;
   const isMounted = useIsMounted();
@@ -75,7 +78,10 @@ const AuthenticatedUserProfileDetails = ({ onEditProfile, authenticatedUser }: P
           </Trans>
         </AlertMessage>
       )}
-      <ProfileDetails profile={authenticatedUser.profile} isAuthenticatedUserProfile />
+      <ProfileDetails
+        profile={authenticatedUser.profile}
+        isAuthenticatedUserProfile
+      />
       <Column>
         <Line justifyContent="flex-end">
           <RaisedButton

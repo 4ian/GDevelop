@@ -22,8 +22,8 @@ import { ColumnStackLayout } from '../UI/Layout';
 type Props = {|
   currentProject: ?gdProject,
   open: boolean,
-  onClose: Function,
-  onChangeSubscription: Function,
+  onClose: () => void,
+  onChangeSubscription: () => void,
   initialTab: 'profile' | 'games-dashboard',
 |};
 

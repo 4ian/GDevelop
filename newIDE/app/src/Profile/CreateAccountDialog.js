@@ -40,6 +40,8 @@ export const getEmailErrorText = (error: ?AuthError) => {
     return 'This email was already used for another account';
   if (error.code === 'auth/operation-not-allowed')
     return 'Service seems to be unavailable, please try again later';
+  if (error.code === 'auth/requires-recent-login')
+    return 'Please log out and log in again to verify your identify, then change your email';
   return undefined;
 };
 

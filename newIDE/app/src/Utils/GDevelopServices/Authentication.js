@@ -102,8 +102,12 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error(
+            'Cannot create the user as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot create the user as it is not logged in any more.'
+          );
         }
         return axios.post(
           `${GDevelopUserApi.baseUrl}/user`,
@@ -171,40 +175,14 @@ export default class Authentication {
     });
   };
 
-  changeEmail = (
-    getAuthorizationHeader: () => Promise<string>,
-    form: ChangeEmailForm
-  ) => {
+  changeEmail = (form: ChangeEmailForm) => {
+    // No need to modify the email in the DB, as Firebase is the source of truth for emails.
     return updateEmail(this.firebaseUser, form.email)
       .then(() => {
-        console.log('Email successfully changed in Firebase');
-        return getAuthorizationHeader();
-      })
-      .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error('Cannot edit user if not logged in');
-          throw new Error('Cannot edit user if not logged in');
-        }
-        return axios.patch(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
-          {
-            email: form.email,
-          },
-          {
-            params: {
-              userId: this.firebaseUser.uid,
-            },
-            headers: {
-              Authorization: authorizationHeader,
-            },
-          }
-        );
-      })
-      .then(() => {
-        console.log('Email successfully changed in the database');
+        console.log('Email successfully changed in Firebase.');
       })
       .catch(error => {
-        console.error('An error happened during email change', error);
+        console.error('An error happened during email change.', error);
         throw error;
       });
   };
@@ -213,8 +191,12 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+          console.error(
+            'Cannot get the user profile as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot get the user profile as it is not logged in any more.'
+          );
         }
         return axios.get(
           `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
@@ -242,8 +224,12 @@ export default class Authentication {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
         if (!this.firebaseUser) {
-          console.error('Cannot edit user if not logged in');
-          throw new Error('Cannot edit user if not logged in');
+          console.error(
+            'Cannot finish editing the user as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot finish editing the user as it is not logged in any more.'
+          );
         }
         const { username, description } = form;
         return axios.patch(
@@ -276,10 +262,10 @@ export default class Authentication {
   logout = () => {
     signOut(this.auth)
       .then(() => {
-        console.log('Logout successful');
+        console.log('Logout successful.');
       })
       .catch(error => {
-        console.error('An error happened during logout', error);
+        console.error('An error happened during logout.', error);
         throw error;
       });
   };

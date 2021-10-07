@@ -4125,6 +4125,34 @@ storiesOf('Profile/EditProfileDialog', module)
       onEdit={action('on edit')}
       error={null}
     />
+  ))
+  .add('errored', () => (
+    <EditProfileDialog
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+      }}
+      onClose={action('on close')}
+      editInProgress={false}
+      onEdit={action('on edit')}
+      error={{ code: 'auth/username-used' }}
+    />
+  ))
+  .add('loading', () => (
+    <EditProfileDialog
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+      }}
+      onClose={action('on close')}
+      editInProgress
+      onEdit={action('on edit')}
+      error={null}
+    />
   ));
 
 storiesOf('Profile/ChangeEmailDialog', module)
@@ -4137,6 +4165,30 @@ storiesOf('Profile/ChangeEmailDialog', module)
       }}
       onClose={action('on close')}
       changeEmailInProgress={false}
+      onChangeEmail={action('on change email')}
+      error={null}
+    />
+  ))
+  .add('errored', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress={false}
+      onChangeEmail={action('on change email')}
+      error={{ code: 'auth/requires-recent-login' }}
+    />
+  ))
+  .add('loading', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress
       onChangeEmail={action('on change email')}
       error={null}
     />

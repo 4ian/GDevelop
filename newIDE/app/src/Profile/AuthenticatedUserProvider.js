@@ -282,19 +282,17 @@ export default class AuthenticatedUserProvider extends React.Component<
     if (!authentication) return;
 
     watchPromiseInState(this, 'changeEmailInProgress', () =>
-      authentication
-        .changeEmail(authentication.getAuthorizationHeader, form)
-        .then(
-          () => {
-            this._fetchUserProfile();
-            this.openChangeEmailDialog(false);
-          },
-          (authError: AuthError) => {
-            this.setState({
-              authError,
-            });
-          }
-        )
+      authentication.changeEmail(form).then(
+        () => {
+          this._fetchUserProfile();
+          this.openChangeEmailDialog(false);
+        },
+        (authError: AuthError) => {
+          this.setState({
+            authError,
+          });
+        }
+      )
     );
   };
 

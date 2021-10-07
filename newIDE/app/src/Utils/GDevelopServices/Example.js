@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import { type Filters } from './Filters';
-import { type UserPublicProfile } from './User';
+import { type UserPublicProfileSearch } from './User';
 
 export type ExampleShortHeader = {|
   id: string,
@@ -10,8 +10,8 @@ export type ExampleShortHeader = {|
   shortDescription: string,
   license: string,
   tags: Array<string>,
-  authors?: Array<UserPublicProfile>,
-  authorIds?: Array<UserPublicProfile>,
+  authors?: Array<UserPublicProfileSearch>,
+  authorIds?: Array<UserPublicProfileSearch>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
 |};

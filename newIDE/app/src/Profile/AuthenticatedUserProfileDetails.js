@@ -39,21 +39,6 @@ const AuthenticatedUserProfileDetails = ({
     [authenticatedUser, isMounted]
   );
 
-  const loadUserProfile = React.useCallback(
-    () => authenticatedUser.onRefreshUserProfile(),
-    // We don't want to fetch again when authenticatedUser changes,
-    // just the first time this page opens.
-    [authenticatedUser.onRefreshUserProfile] // eslint-disable-line react-hooks/exhaustive-deps
-  );
-
-  // Reload user every time the Profile is opened
-  React.useEffect(
-    () => {
-      loadUserProfile();
-    },
-    [loadUserProfile]
-  );
-
   return firebaseUser && profile ? (
     <ColumnStackLayout noMargin>
       {firebaseUser && !firebaseUser.emailVerified && (

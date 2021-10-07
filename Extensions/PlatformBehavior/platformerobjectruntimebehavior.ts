@@ -1551,11 +1551,13 @@ namespace gdjs {
             // The obstacle 1st pixel can be climbed.
             // Now that the character is on the obstacle,
             // try to follow the slope for at least 1 pixel.
-            const deltaX = Math.max(
-              Math.sign(requestedDeltaX),
-              // - 1, because the owner moved from 1 pixel at the junction.
-              remainingDeltaX - 1
-            );
+            const deltaX =
+              Math.sign(requestedDeltaX) *
+              Math.max(
+                1,
+                // - 1, because the owner moved from 1 pixel at the junction.
+                Math.abs(remainingDeltaX) - 1
+              );
             object.setX(object.getX() + deltaX);
             const {
               highestGround: highestGroundOnObstacle,

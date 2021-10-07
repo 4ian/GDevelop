@@ -9,7 +9,7 @@ import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
@@ -81,21 +81,26 @@ const AuthenticatedUserProfileDetails = ({
         </AlertMessage>
       )}
       <ProfileDetails
-        profile={authenticatedUser.profile}
+        // The firebase user is the source of truth for the emails.
+        profile={
+          authenticatedUser.profile
+            ? { ...authenticatedUser.profile, email: firebaseUser.email }
+            : null
+        }
         isAuthenticatedUserProfile
       />
       <Column>
-      <ResponsiveLineStackLayout justifyContent="flex-end">
-        <RaisedButton
-          label={<Trans>Change my email</Trans>}
-          onClick={onChangeEmail}
-        />
-        <RaisedButton
-          label={<Trans>Edit my profile</Trans>}
-          primary
-          onClick={onEditProfile}
-        />
-      </ResponsiveLineStackLayout>
+        <ResponsiveLineStackLayout justifyContent="flex-end">
+          <RaisedButton
+            label={<Trans>Change my email</Trans>}
+            onClick={onChangeEmail}
+          />
+          <RaisedButton
+            label={<Trans>Edit my profile</Trans>}
+            primary
+            onClick={onEditProfile}
+          />
+        </ResponsiveLineStackLayout>
       </Column>
     </ColumnStackLayout>
   ) : (

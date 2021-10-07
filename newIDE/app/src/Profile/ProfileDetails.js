@@ -63,7 +63,7 @@ const ProfileDetails = ({ profile, isAuthenticatedUserProfile }: Props) => {
               hintText={
                 isAuthenticatedUserProfile
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
-                  : t`No bio defined`
+                  : t`No bio defined.`
               }
               rows={3}
               rowsMax={5}

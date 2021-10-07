@@ -18,10 +18,10 @@ type DisplayedProfile = {
 
 type Props = {
   profile: ?DisplayedProfile,
-  isPrivate?: boolean,
+  isAuthenticatedUserProfile?: boolean,
 };
 
-export default ({ profile, isPrivate }: Props) => {
+export default ({ profile, isAuthenticatedUserProfile }: Props) => {
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -36,12 +36,12 @@ export default ({ profile, isPrivate }: Props) => {
               }}
             >
               {profile.username ||
-                (isPrivate
+                (isAuthenticatedUserProfile
                   ? i18n._(t`Edit your profile to pick a username!`)
                   : i18n._(t`No username`))}
             </Text>
           </Line>
-          {isPrivate && profile.email && (
+          {isAuthenticatedUserProfile && profile.email && (
             <Line>
               <TextField
                 value={profile.email}
@@ -61,7 +61,7 @@ export default ({ profile, isPrivate }: Props) => {
               floatingLabelText={<Trans>Bio</Trans>}
               floatingLabelFixed={true}
               hintText={
-                isPrivate
+                isAuthenticatedUserProfile
                   ? t`No bio defined. Edit your profile to tell us what you are using GDevelop for!`
                   : t`No bio defined`
               }

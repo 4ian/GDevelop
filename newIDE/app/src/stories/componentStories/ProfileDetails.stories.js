@@ -39,7 +39,7 @@ type ArgsTypes = {|
 |};
 
 export const MyProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isPrivate={true} />
+  <ProfileDetails {...args} isAuthenticatedUserProfile />
 );
 export const OtherUserProfile = (args: ArgsTypes) => (
   <ProfileDetails {...args} />

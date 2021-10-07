@@ -76,7 +76,7 @@ export default ({ onEditProfile, onChangeEmail, authenticatedUser }: Props) => {
           </Trans>
         </AlertMessage>
       )}
-      <ProfileDetails profile={authenticatedUser.profile} isPrivate />
+      <ProfileDetails profile={authenticatedUser.profile} isAuthenticatedUserProfile />
       <Column>
       <ResponsiveLineStackLayout justifyContent="flex-end">
         <RaisedButton

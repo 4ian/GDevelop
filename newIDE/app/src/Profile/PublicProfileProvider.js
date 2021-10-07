@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import PublicProfile from './PublicProfile';
+import PublicProfileDialog from './PublicProfileDialog';
 import PublicProfileContext from './PublicProfileContext';
 
 type Props = {|
@@ -26,7 +26,7 @@ export default ({ children }: Props) => {
         {children}
       </PublicProfileContext.Provider>
       {visitedPublicProfileUserId && (
-        <PublicProfile userId={visitedPublicProfileUserId} onClose={closeUserPublicProfile} />
+        <PublicProfileDialog userId={visitedPublicProfileUserId} onClose={closeUserPublicProfile} />
       )}
     </React.Fragment>
   );

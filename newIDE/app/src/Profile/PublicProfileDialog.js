@@ -12,7 +12,7 @@ type Props = {|
   onClose: () => void,
 |};
 
-export default ({ userId, onClose }: Props) => {
+const PublicProfileDialog = ({ userId, onClose }: Props) => {
   const [profile, setProfile] = React.useState(null);
   React.useEffect(
     () => {
@@ -39,3 +39,5 @@ export default ({ userId, onClose }: Props) => {
     </Dialog>
   );
 };
+
+export default PublicProfileDialog;

@@ -51,7 +51,7 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
 InstructionMetadata& InstructionMetadata::AddParameter(
     const gd::String& type,
     const gd::String& description,
-    const gd::String& optionalObjectType,
+    const gd::String& supplementaryInformation,
     bool parameterIsOptional) {
   ParameterMetadata info;
   info.type = type;
@@ -63,15 +63,15 @@ InstructionMetadata& InstructionMetadata::AddParameter(
       // parameter is an object/behavior type...
       (gd::ParameterMetadata::IsObject(type) ||
        gd::ParameterMetadata::IsBehavior(type))
-          ? (optionalObjectType.empty()
+          ? (supplementaryInformation.empty()
                  ? ""
                  : extensionNamespace +
-                       optionalObjectType  //... so prefix it with the extension
+                       supplementaryInformation  //... so prefix it with the extension
                                            // namespace.
              )
-          : optionalObjectType;  // Otherwise don't change anything
+          : supplementaryInformation;  // Otherwise don't change anything
 
-  // TODO: Assert against optionalObjectType === "emsc" (when running with
+  // TODO: Assert against supplementaryInformation === "emsc" (when running with
   // Emscripten), and warn about a missing argument when calling addParameter.
 
   parameters.push_back(info);

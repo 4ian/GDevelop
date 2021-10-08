@@ -137,8 +137,11 @@ class GD_CORE_API InstructionMetadata {
    * will also determine the type of the argument used when calling the function
    * in the generated code.
    * \param description Description for parameter
-   * \param optionalObjectType If type is "object", this parameter will describe
-   * which objects are allowed. If it is empty, all objects are allowed.
+   * \param supplementaryInformation Additional information that can be used for
+   * rendering or logic. For example:
+   * - If type is "object", this argument will describe which objects are allowed.
+   * If this argument is empty, all objects are allowed.
+   * - If type is "operator", this argument will be used to display only pertinent operators.
    * \param parameterIsOptional true if the parameter must be optional, false
    * otherwise.
    *
@@ -146,7 +149,7 @@ class GD_CORE_API InstructionMetadata {
    */
   InstructionMetadata &AddParameter(const gd::String &type,
                                     const gd::String &label,
-                                    const gd::String &optionalObjectType = "",
+                                    const gd::String &supplementaryInformation = "",
                                     bool parameterIsOptional = false);
 
   /**

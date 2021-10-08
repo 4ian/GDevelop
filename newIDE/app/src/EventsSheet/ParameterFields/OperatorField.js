@@ -53,6 +53,7 @@ export default class OperatorField extends Component<ParameterFieldProps> {
       >
         {operators.map(operator => (
           <SelectOption
+            key={operator}
             value={operator}
             primaryText={operatorLabels[operator]}
           />

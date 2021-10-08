@@ -54,6 +54,7 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
       >
         {operators.map(operator => (
           <SelectOption
+            key={operator}
             value={operator}
             primaryText={operatorLabels[operator]}
           />

@@ -93,7 +93,7 @@ InstructionMetadata& InstructionMetadata::UseStandardOperatorParameters(
     const gd::String& type) {
   SetManipulatedType(type);
 
-  AddParameter("operator", _("Modification's sign"));
+  AddParameter("operator", _("Modification's sign"), type);
   AddParameter(type == "number" ? "expression" : type, _("Value"));
   size_t operatorParamIndex = parameters.size() - 2;
   size_t valueParamIndex = parameters.size() - 1;
@@ -129,7 +129,7 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
     const gd::String& type) {
   SetManipulatedType(type);
 
-  AddParameter("relationalOperator", _("Sign of the test"));
+  AddParameter("relationalOperator", _("Sign of the test"), type);
   AddParameter(type == "number" ? "expression" : type, _("Value to compare"));
   size_t operatorParamIndex = parameters.size() - 2;
   size_t valueParamIndex = parameters.size() - 1;

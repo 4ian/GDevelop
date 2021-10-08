@@ -319,7 +319,7 @@ class GD_CORE_API InstructionMetadata {
      *                 "CppPlatform/Extensions/text.png");
      *
      *      .AddParameter("object", _("Object"), "Text", false)
-     *      .AddParameter("operator", _("Modification operator"))
+     *      .AddParameter("operator", _("Modification operator"), "string")
      *      .AddParameter("string", _("String"))
      *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
      *

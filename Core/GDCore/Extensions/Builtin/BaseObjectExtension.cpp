@@ -83,9 +83,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
@@ -98,9 +98,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position24.png",
                 "res/actions/position.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 

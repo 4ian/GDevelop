@@ -190,7 +190,7 @@ class GD_CORE_API ExpressionMetadata {
   gd::ExpressionMetadata& AddParameter(
       const gd::String& type,
       const gd::String& description,
-      const gd::String& optionalObjectType = "",
+      const gd::String& supplementaryInformation = "",
       bool parameterIsOptional = false);
 
   /**

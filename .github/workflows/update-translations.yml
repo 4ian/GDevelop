@@ -63,7 +63,7 @@ jobs:
       - name: Create a Pull Request with the changes
         uses: peter-evans/create-pull-request@v3.10.1
         with:
-          commit-message: Update translations
+          commit-message: Update translations [skip ci]
           branch: chore/update-translations
           delete-branch: true
           title: '[Auto PR] Update translations'

@@ -2338,6 +2338,27 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be(platform2.getY() - object.getHeight());
       });
 
+      it('can walk from a platform to a jump through', function () {
+        // Put a platform.
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+        const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
+        jumpThroughPlatform.setPosition(
+          platform.getX() + platform.getWidth(),
+          platform.getY()
+        );
+
+        object.setPosition(30, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+        // Walk from the 1st platform to the 2nd one.
+        walkRight(30);
+        expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
+        expect(object.getY()).to.be(jumpThroughPlatform.getY() - object.getHeight());
+      });
+      
       it('can walk from a platform to another one that not aligned', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
@@ -2410,6 +2431,36 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         }
         // is blocked by the 2nd platform
         expect(object.getX()).to.be(platform2.getX() - object.getWidth());
+        expect(object.getY()).to.be(platform.getY() - object.getHeight());
+      });
+
+      // TODO In this case the jump through is followed by the character, this is a bug.
+      it.skip("can't walk from a platform to a jump through that is higher", function () {
+        // Put a platform.
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+        // the 2nd platform is 2 pixels higher
+        const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
+        jumpThroughPlatform.setPosition(
+          platform.getX() + platform.getWidth(),
+          // Even 1 pixel is too high to follow a jump through
+          // because it's like it's gone through its right or left side.
+          platform.getY() - 1
+        );
+
+        object.setPosition(30, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+        // walk right
+        for (let i = 0; i < 20; ++i) {
+          object.getBehavior('auto1').simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+          expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+        }
+        // is blocked by the 2nd platform
+        expect(object.getX()).to.be(jumpThroughPlatform.getX() - object.getWidth());
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
       });
 
@@ -2636,6 +2687,30 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getX()).to.be.above(platform.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
+      });
+
+      it(`can go uphill from a ${slopeAngle}° slope to a 0° jump through platform`, function () {
+        // Put a platform.
+        const slope = addUpSlopePlatformObject(runtimeScene);
+        slope.setCustomWidthAndHeight(
+          slopesDimensions[slopeAngle].width,
+          slopesDimensions[slopeAngle].height
+        );
+        slope.setPosition(0, 0);
+
+        const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
+        slope.setCustomWidthAndHeight(50, 50);
+        jumpThroughPlatform.setPosition(slope.getX() + slope.getWidth(), slope.getY());
+
+        object.setPosition(0, -5);
+        // Ensure the object falls on the platform
+        fallOnPlatform(12);
+
+        // Walk from the 1st platform to the 2nd one.
+        walkRight(30);
+        expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
+        // Gone upward following the 2nd platform.
+        expect(object.getY()).to.be(jumpThroughPlatform.getY() - object.getHeight());
       });
     });
 

@@ -2911,7 +2911,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       };
 
-      // TODO When the object is moving fast sharp platform vertices can be missed.
+      // TODO When the object is moving fast, sharp platform vertices can be missed.
       // Fixing this is would require to rethink how the floor is followed.
       // But, this might be an extreme enough case to don't care:
       // On a 800 width screen, a 32 width character would go through one screen in 400ms.

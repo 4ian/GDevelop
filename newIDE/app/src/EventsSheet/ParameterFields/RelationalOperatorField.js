@@ -8,19 +8,19 @@ import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
 const operatorLabels = {
-  "=": t`= (equal to)`,
-  "<": t`< (less than)`,
-  ">": t`> (greater than)`,
-  "<=": t`≤ (less or equal to)`,
-  ">=": t`≥ (greater or equal to)`,
-  "!=": t`≠ (not equal to)`,
-}
+  '=': t`= (equal to)`,
+  '<': t`< (less than)`,
+  '>': t`> (greater than)`,
+  '<=': t`≤ (less or equal to)`,
+  '>=': t`≥ (greater or equal to)`,
+  '!=': t`≠ (not equal to)`,
+};
 
 const mapTypeToOperators = {
   unknown: Object.keys(operatorLabels),
-  number: ["=", "<", ">", "<=", ">=", "!="],
-  string: ["=", "!="],
-}
+  number: ['=', '<', '>', '<=', '>=', '!='],
+  string: ['=', '!='],
+};
 
 export default class RelationalOperatorField extends Component<ParameterFieldProps> {
   _field: ?SelectField;
@@ -34,8 +34,10 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const comparedValueType = parameterMetadata ? parameterMetadata.getExtraInfo() : "unknown";
-    const operators = mapTypeToOperators[comparedValueType || "unknown"]
+    const comparedValueType = parameterMetadata
+      ? parameterMetadata.getExtraInfo()
+      : 'unknown';
+    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
 
     return (
       <SelectField
@@ -51,7 +53,10 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
         hintText={t`Choose an operator`}
       >
         {operators.map(operator => (
-          <SelectOption value={operator} primaryText={operatorLabels[operator]} />
+          <SelectOption
+            value={operator}
+            primaryText={operatorLabels[operator]}
+          />
         ))}
       </SelectField>
     );

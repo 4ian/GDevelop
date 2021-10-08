@@ -8,18 +8,18 @@ import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
 const operatorLabels = {
-  "=": t`= (set to)`,
-  "+": t`+ (add)`,
-  "-": t`- (subtract)`,
-  "*": t`* (multiply by)`,
-  "/": t`/ (divide by)`,
-}
+  '=': t`= (set to)`,
+  '+': t`+ (add)`,
+  '-': t`- (subtract)`,
+  '*': t`* (multiply by)`,
+  '/': t`/ (divide by)`,
+};
 
 const mapTypeToOperators = {
   unknown: Object.keys(operatorLabels),
-  number: ["=", "+", "-", "*", "/"],
-  string: ["=", "+"],
-}
+  number: ['=', '+', '-', '*', '/'],
+  string: ['=', '+'],
+};
 
 export default class OperatorField extends Component<ParameterFieldProps> {
   _field: ?SelectField;
@@ -33,8 +33,10 @@ export default class OperatorField extends Component<ParameterFieldProps> {
       ? parameterMetadata.getDescription()
       : undefined;
 
-    const comparedValueType = parameterMetadata ? parameterMetadata.getExtraInfo() : "unknown";
-    const operators = mapTypeToOperators[comparedValueType || "unknown"]
+    const comparedValueType = parameterMetadata
+      ? parameterMetadata.getExtraInfo()
+      : 'unknown';
+    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
 
     return (
       <SelectField
@@ -50,7 +52,10 @@ export default class OperatorField extends Component<ParameterFieldProps> {
         hintText={t`Choose an operator`}
       >
         {operators.map(operator => (
-          <SelectOption value={operator} primaryText={operatorLabels[operator]} />
+          <SelectOption
+            value={operator}
+            primaryText={operatorLabels[operator]}
+          />
         ))}
       </SelectField>
     );

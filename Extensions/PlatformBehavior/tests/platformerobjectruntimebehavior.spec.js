@@ -2356,9 +2356,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Walk from the 1st platform to the 2nd one.
         walkRight(30);
         expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
-        expect(object.getY()).to.be(jumpThroughPlatform.getY() - object.getHeight());
+        expect(object.getY()).to.be(
+          jumpThroughPlatform.getY() - object.getHeight()
+        );
       });
-      
+
       it('can walk from a platform to another one that not aligned', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
@@ -2460,7 +2462,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
         }
         // is blocked by the 2nd platform
-        expect(object.getX()).to.be(jumpThroughPlatform.getX() - object.getWidth());
+        expect(object.getX()).to.be(
+          jumpThroughPlatform.getX() - object.getWidth()
+        );
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
       });
 
@@ -2700,7 +2704,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
         const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
         slope.setCustomWidthAndHeight(50, 50);
-        jumpThroughPlatform.setPosition(slope.getX() + slope.getWidth(), slope.getY());
+        jumpThroughPlatform.setPosition(
+          slope.getX() + slope.getWidth(),
+          slope.getY()
+        );
 
         object.setPosition(0, -5);
         // Ensure the object falls on the platform
@@ -2710,7 +2717,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         walkRight(30);
         expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
         // Gone upward following the 2nd platform.
-        expect(object.getY()).to.be(jumpThroughPlatform.getY() - object.getHeight());
+        expect(object.getY()).to.be(
+          jumpThroughPlatform.getY() - object.getHeight()
+        );
       });
     });
 

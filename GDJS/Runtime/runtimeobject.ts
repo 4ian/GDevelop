@@ -181,6 +181,8 @@ namespace gdjs {
       this.aabb.max[1] = 0;
       this._variables = new gdjs.VariablesContainer(objectData.variables);
       this.clearForces();
+
+      // Reinitialize behaviors.
       this._behaviorsTable.clear();
       let i = 0;
       for (const len = objectData.behaviors.length; i < len; ++i) {
@@ -196,7 +198,16 @@ namespace gdjs {
       }
       this._behaviors.length = i;
 
-      // Make sure to delete already existing behaviors which are not used anymore.
+      // Reinitialize effects.
+      for (let i = 0; i < objectData.effects.length; ++i) {
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          .initializeEffect(objectData.effects[i], this._rendererEffects, this);
+        this.updateAllEffectParameters(objectData.effects[i]);
+      }
+
+      // Make sure to delete existing timers.
       this._timers.clear();
     }
 
@@ -291,6 +302,7 @@ namespace gdjs {
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
+      this.clearEffects();
     }
 
     //Rendering:
@@ -791,6 +803,17 @@ namespace gdjs {
           this.getRendererObject(),
           effectName
         );
+    }
+
+    /**
+     * Remove all effects
+     */
+    clearEffects(): boolean {
+      this._rendererEffects = {};
+      return this._runtimeScene
+        .getGame()
+        .getEffectsManager()
+        .clearEffects(this.getRendererObject());
     }
 
     /**

@@ -48,6 +48,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'JSON',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/JSON/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'Physics2',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),

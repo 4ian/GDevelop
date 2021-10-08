@@ -669,21 +669,40 @@ namespace gdjs {
       for (const platform of candidates) {
         if (
           platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ||
-          (platform !== this._onFloor.getFloorPlatform() &&
-            this._isIn(this._overlappedJumpThru, platform.owner.id))
+          // Jump through platforms are obstacles only when the character comes from the top.
+          (platform.getPlatformType() ===
+            gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+            // When following the floor, ignore jumpthrus that are higher than the character.
+            ((this._state === this._onFloor &&
+              platform !== this._onFloor.getFloorPlatform() &&
+              downwardDeltaY < 0) ||
+              // When trying to land on a platform, exclude jumpthrus that were already overlapped.
+              (this._state !== this._onFloor &&
+                this._isIn(this._overlappedJumpThru, platform.owner.id))))
         ) {
           continue;
         }
 
-        let highestY = this._findPlatformHighestYUnderObject(
+        let highestRelativeY = this._findPlatformHighestRelativeYUnderObject(
           platform,
           upwardDeltaY,
           downwardDeltaY
         );
-        if (highestY !== Number.MAX_VALUE) {
+        if (
+          // When following the floor, ignore jumpthrus that are higher than the character.
+          this._state === this._onFloor &&
+          platform !== this._onFloor.getFloorPlatform() &&
+          platform.getPlatformType() ===
+            gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+          highestRelativeY < 0
+        ) {
+          // Don't follow jump though that are higher than the character bottom.
+          continue;
+        }
+        if (highestRelativeY !== Number.MAX_VALUE) {
           isCollidingAnyPlatform = true;
         }
-        if (highestY === -Number.MAX_VALUE) {
+        if (highestRelativeY === -Number.MAX_VALUE) {
           // One platform is colliding the character
           // and is too high for the character to walk on.
           // This will still be an obstacle event if there
@@ -692,14 +711,14 @@ namespace gdjs {
           break;
         }
 
-        if (highestY < totalHighestY) {
-          totalHighestY = highestY;
+        if (highestRelativeY < totalHighestY) {
+          totalHighestY = highestRelativeY;
           highestGround = platform;
         }
       }
       if (highestGround) {
         const object = this.owner;
-        object.setY(object.getY() + totalHighestY - object.getAABB().max[1]);
+        object.setY(object.getY() + totalHighestY);
       }
       const returnValue =
         gdjs.PlatformerObjectRuntimeBehavior._platformSearchResult;
@@ -709,7 +728,7 @@ namespace gdjs {
     }
 
     /**
-     * Find the highest Y of the floor reachable by the owner.
+     * Find the highest Y relative to the owner bottom of the floor reachable by the owner.
      * @param platform The platform to be tested for collision.
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
@@ -717,7 +736,7 @@ namespace gdjs {
      * * Number.MAX_VALUE if the platform doesn't collide
      * * -Number.MAX_VALUE if the platform is too high
      */
-    private _findPlatformHighestYUnderObject(
+    private _findPlatformHighestRelativeYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
       upwardDeltaY: float,
       downwardDeltaY: float
@@ -816,7 +835,7 @@ namespace gdjs {
           previousVertex = vertex;
         }
       }
-      return highestY;
+      return highestY - ownerMaxY;
     }
 
     /**

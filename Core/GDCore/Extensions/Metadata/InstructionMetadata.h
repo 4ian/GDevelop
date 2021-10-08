@@ -6,7 +6,6 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
-#if defined(GD_IDE_ONLY)
 #include <functional>
 #include <map>
 #include <memory>
@@ -455,5 +454,4 @@ class GD_CORE_API InstructionMetadata {
 
 }  // namespace gd
 
-#endif
 #endif  // INSTRUCTIONMETADATA_H

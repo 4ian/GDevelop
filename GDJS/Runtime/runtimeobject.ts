@@ -806,7 +806,7 @@ namespace gdjs {
     }
 
     /**
-     * Remove all effects
+     * Remove all effects.
      */
     clearEffects(): boolean {
       this._rendererEffects = {};

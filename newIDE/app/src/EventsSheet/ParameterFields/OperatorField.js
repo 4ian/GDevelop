@@ -7,6 +7,20 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
+const operatorLabels = {
+  '=': t`= (set to)`,
+  '+': t`+ (add)`,
+  '-': t`- (subtract)`,
+  '*': t`* (multiply by)`,
+  '/': t`/ (divide by)`,
+};
+
+const mapTypeToOperators = {
+  unknown: Object.keys(operatorLabels),
+  number: ['=', '+', '-', '*', '/'],
+  string: ['=', '+'],
+};
+
 export default class OperatorField extends Component<ParameterFieldProps> {
   _field: ?SelectField;
   focus() {
@@ -18,6 +32,11 @@ export default class OperatorField extends Component<ParameterFieldProps> {
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+
+    const comparedValueType = parameterMetadata
+      ? parameterMetadata.getExtraInfo()
+      : 'unknown';
+    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
 
     return (
       <SelectField
@@ -32,11 +51,12 @@ export default class OperatorField extends Component<ParameterFieldProps> {
         ref={field => (this._field = field)}
         hintText={t`Choose an operator`}
       >
-        <SelectOption value="=" primaryText={t`= (set to)`} />
-        <SelectOption value="+" primaryText={t`+ (add)`} />
-        <SelectOption value="-" primaryText={t`- (subtract)`} />
-        <SelectOption value="*" primaryText={t`* (multiply by)`} />
-        <SelectOption value="/" primaryText={t`/ (divide by)`} />
+        {operators.map(operator => (
+          <SelectOption
+            value={operator}
+            primaryText={operatorLabels[operator]}
+          />
+        ))}
       </SelectField>
     );
   }

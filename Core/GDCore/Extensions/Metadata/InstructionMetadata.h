@@ -6,7 +6,6 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
-#if defined(GD_IDE_ONLY)
 #include <functional>
 #include <map>
 #include <memory>
@@ -137,8 +136,11 @@ class GD_CORE_API InstructionMetadata {
    * will also determine the type of the argument used when calling the function
    * in the generated code.
    * \param description Description for parameter
-   * \param optionalObjectType If type is "object", this parameter will describe
-   * which objects are allowed. If it is empty, all objects are allowed.
+   * \param supplementaryInformation Additional information that can be used for
+   * rendering or logic. For example:
+   * - If type is "object", this argument will describe which objects are allowed.
+   * If this argument is empty, all objects are allowed.
+   * - If type is "operator", this argument will be used to display only pertinent operators.
    * \param parameterIsOptional true if the parameter must be optional, false
    * otherwise.
    *
@@ -146,7 +148,7 @@ class GD_CORE_API InstructionMetadata {
    */
   InstructionMetadata &AddParameter(const gd::String &type,
                                     const gd::String &label,
-                                    const gd::String &optionalObjectType = "",
+                                    const gd::String &supplementaryInformation = "",
                                     bool parameterIsOptional = false);
 
   /**
@@ -319,7 +321,7 @@ class GD_CORE_API InstructionMetadata {
      *                 "CppPlatform/Extensions/text.png");
      *
      *      .AddParameter("object", _("Object"), "Text", false)
-     *      .AddParameter("operator", _("Modification operator"))
+     *      .AddParameter("operator", _("Modification operator"), "string")
      *      .AddParameter("string", _("String"))
      *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
      *
@@ -452,5 +454,4 @@ class GD_CORE_API InstructionMetadata {
 
 }  // namespace gd
 
-#endif
 #endif  // INSTRUCTIONMETADATA_H

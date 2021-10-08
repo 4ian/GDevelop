@@ -7,6 +7,21 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
+const operatorLabels = {
+  '=': t`= (equal to)`,
+  '<': t`< (less than)`,
+  '>': t`> (greater than)`,
+  '<=': t`≤ (less or equal to)`,
+  '>=': t`≥ (greater or equal to)`,
+  '!=': t`≠ (not equal to)`,
+};
+
+const mapTypeToOperators = {
+  unknown: Object.keys(operatorLabels),
+  number: ['=', '<', '>', '<=', '>=', '!='],
+  string: ['=', '!='],
+};
+
 export default class RelationalOperatorField extends Component<ParameterFieldProps> {
   _field: ?SelectField;
   focus() {
@@ -18,6 +33,11 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
     const description = parameterMetadata
       ? parameterMetadata.getDescription()
       : undefined;
+
+    const comparedValueType = parameterMetadata
+      ? parameterMetadata.getExtraInfo()
+      : 'unknown';
+    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
 
     return (
       <SelectField
@@ -32,12 +52,13 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
         ref={field => (this._field = field)}
         hintText={t`Choose an operator`}
       >
-        <SelectOption value="=" primaryText={t`= (equal to)`} />
-        <SelectOption value="<" primaryText={t`< (less than)`} />
-        <SelectOption value=">" primaryText={t`> (greater than)`} />
-        <SelectOption value="<=" primaryText={t`≤ (less or equal to)`} />
-        <SelectOption value=">=" primaryText={t`≥ (greater or equal to)`} />
-        <SelectOption value="!=" primaryText={t`≠ (not equal to)`} />
+        {operators.map(operator => (
+          <SelectOption
+            key={operator}
+            value={operator}
+            primaryText={operatorLabels[operator]}
+          />
+        ))}
       </SelectField>
     );
   }

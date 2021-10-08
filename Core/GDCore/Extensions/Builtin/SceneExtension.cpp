@@ -195,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("expression", _("First expression"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "number")
       .AddParameter("expression", _("Second expression"))
       .MarkAsAdvanced();
 
@@ -209,7 +209,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")
       .AddParameter("string", _("First string expression"))
-      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "string")
       .AddParameter("string", _("Second string expression"))
       .MarkAsAdvanced();
 }

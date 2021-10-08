@@ -27,6 +27,10 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.isMouseButtonPressed"); // Deprecated
   GetAllConditions()["MouseButtonReleased"].SetFunctionName(
       "gdjs.evtTools.input.isMouseButtonReleased");
+  GetAllConditions()["MouseButtonFromTextPressed"].SetFunctionName(
+      "gdjs.evtTools.input.isMouseButtonPressed");
+  GetAllConditions()["MouseButtonFromTextReleased"].SetFunctionName(
+      "gdjs.evtTools.input.isMouseButtonReleased");
   GetAllActions()["CacheSouris"].SetFunctionName(
       "gdjs.evtTools.input.hideCursor");
   GetAllActions()["MontreSouris"].SetFunctionName(

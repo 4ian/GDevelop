@@ -2388,11 +2388,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setPosition(0, -10);
-        // the 2nd platform is 1 pixel higher
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The 2nd platform is shifted from 1 pixel.
+          // The 2nd platform is 1 pixels higher.
           platform.getY() - 1
         );
         // Put the object just to the left of platform2 so that
@@ -2408,7 +2407,34 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be(platform2.getY() - object.getHeight());
       });
 
-      it("can't walk from a platform to another one that is too high", function () {
+      it("can't walk from a platform to another one that is a bit too high", function () {
+        // Put a platform.
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+        const platform2 = addPlatformObject(runtimeScene);
+        platform2.setPosition(
+          platform.getX() + platform.getWidth(),
+          // The 2nd platform is 2 pixels higher.
+          platform.getY() - 2
+        );
+
+        object.setPosition(30, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+        // walk right
+        for (let i = 0; i < 20; ++i) {
+          object.getBehavior('auto1').simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+          expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+        }
+        // is blocked by the 2nd platform
+        expect(object.getX()).to.be(platform2.getX() - object.getWidth());
+        expect(object.getY()).to.be(platform.getY() - object.getHeight());
+      });
+
+      it('can walk on a platform and be blocked by a wall', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setPosition(0, -10);
@@ -2416,8 +2442,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The 2nd platform is shift from 2 pixel.
-          platform.getY() - 2
+          // The platform is top is over the object
+          // and platform is bottom is under the object.
+          platform.getY() - platform2.getHeight() + 5
         );
 
         object.setPosition(30, -32);
@@ -3178,6 +3205,139 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           });
         });
       });
+    });
+  });
+
+  describe(`(walk on flat floors with custom hitbox)`, function () {
+    let runtimeScene;
+    let object;
+
+    beforeEach(function () {
+      runtimeScene = makeTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 1500,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 900,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+          },
+        ],
+        effects: [],
+        animations: [
+          {
+            name: 'animation',
+            directions: [
+              {
+                sprites: [
+                  {
+                    originPoint: { x: 25, y: 25 },
+                    centerPoint: { x: 50, y: 50 },
+                    points: [
+                      { name: 'Center', x: 0, y: 0 },
+                      { name: 'Origin', x: 50, y: 50 },
+                    ],
+                    hasCustomCollisionMask: true,
+                    customCollisionMask: [
+                      [
+                        { x: 25, y: 25 },
+                        { x: 75, y: 25 },
+                        { x: 75, y: 75 },
+                        { x: 25, y: 75 },
+                      ],
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      object.setUnscaledWidthAndHeight(100, 100);
+      object.setCustomWidthAndHeight(20, 40);
+      runtimeScene.addObject(object);
+    });
+
+    // The actual hitbox is 10x20.
+    const objectWidth = 10;
+    const objectHeight = 20;
+
+    const fall = (frameCount) => {
+      for (let i = 0; i < frameCount; ++i) {
+        const lastY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+        expect(object.getY()).to.be.above(lastY);
+      }
+    };
+
+    const walkRight = (frameCount) => {
+      const behavior = object.getBehavior('auto1');
+      for (let i = 0; i < frameCount; ++i) {
+        const lastX = object.getX();
+        const lastSpeed = behavior.getCurrentSpeed();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isOnFloor()).to.be(true);
+        expect(object.getX()).to.be.above(lastX);
+        // Check that the object doesn't stop
+        expect(behavior.getCurrentSpeed()).to.be.above(lastSpeed);
+      }
+    };
+
+    const fallOnPlatform = (maxFrameCount) => {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < maxFrameCount; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      //Check the object is on the platform
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+    };
+
+    it('can walk on a platform and be blocked by a wall', function () {
+      // Put a platform.
+      const platform = addPlatformObject(runtimeScene);
+      platform.setPosition(0, -10);
+      // the 2nd platform is 2 pixels higher
+      const wall = addPlatformObject(runtimeScene);
+      wall.setPosition(
+        platform.getX() + platform.getWidth(),
+        // The platform is top is over the object
+        // and platform is bottom is under the object.
+        platform.getY() - wall.getHeight() + 5
+      );
+
+      object.setPosition(30, -32);
+      // Ensure the object falls on the platform
+      fallOnPlatform(10);
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+      // walk right
+      for (let i = 0; i < 25; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      }
+      // is blocked by the wall
+      expect(object.getX()).to.be(wall.getX() - objectWidth);
+      expect(object.getY()).to.be(platform.getY() - objectHeight);
     });
   });
 });

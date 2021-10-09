@@ -40,6 +40,7 @@ namespace gdjs {
     flow: number;
     /** Destroy the object when there is no particles? */
     destroyWhenNoParticles: boolean;
+    isStarted: boolean;
   };
 
   export type ParticleEmitterObjectData = ObjectData &
@@ -75,6 +76,8 @@ namespace gdjs {
     flow: number;
     tank: number;
     destroyWhenNoParticles: boolean;
+    isStarted: boolean = true;
+    _startDirty: boolean = true;
     _posDirty: boolean = true;
     _angleDirty: boolean = true;
     _forceDirty: boolean = true;
@@ -132,6 +135,7 @@ namespace gdjs {
       this.flow = particleObjectData.flow;
       this.tank = particleObjectData.tank;
       this.destroyWhenNoParticles = particleObjectData.destroyWhenNoParticles;
+      this.isStarted = particleObjectData.isStarted;
       this._textureDirty = this.texture !== '';
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -245,6 +249,9 @@ namespace gdjs {
       ) {
         this.destroyWhenNoParticles = newObjectData.destroyWhenNoParticles;
       }
+      if (oldObjectData.isStarted !== newObjectData.isStarted) {
+        this.isStarted = newObjectData.isStarted;
+      }
       if (
         oldObjectData.particleSizeRandomness1 !==
           newObjectData.particleSizeRandomness1 ||
@@ -277,6 +284,7 @@ namespace gdjs {
         this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = true;
         this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = true;
         this._alphaDirty = this._flowDirty = this._tankDirty = this._textureDirty = true;
+        this._startDirty = true;
       }
       return true;
     }
@@ -326,9 +334,17 @@ namespace gdjs {
       if (this._textureDirty) {
         this._renderer.setTextureName(this.texture, runtimeScene);
       }
+      if (this._startDirty) {
+        if (this.isStarted) {
+          this._renderer.start();
+        } else {
+          this._renderer.stop();
+        }
+      }
       this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
       this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
       this._alphaDirty = this._flowDirty = this._textureDirty = this._tankDirty = false;
+      this._startDirty = false;
       this._renderer.update(this.getElapsedTime(runtimeScene) / 1000.0);
       if (
         this._renderer.hasStarted() &&
@@ -687,11 +703,17 @@ namespace gdjs {
     }
 
     startEmission(): void {
-      this._renderer.start();
+      if (!this.isEmitting()) {
+        this._startDirty = true;
+        this.isStarted = true;
+      }
     }
 
     stopEmission(): void {
-      this._renderer.stop();
+      if (this.isEmitting()) {
+        this._startDirty = true;
+        this.isStarted = false;
+      }
     }
 
     isEmitting(): boolean {

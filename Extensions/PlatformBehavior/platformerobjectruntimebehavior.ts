@@ -18,10 +18,23 @@ namespace gdjs {
     /**
      * Returned by _findHighestFloorAndMoveOnTop
      */
-    private static _platformSearchResult: PlatformSearchResult = {
+    private static readonly _platformSearchResult: PlatformSearchResult = {
       highestGround: null,
       isCollidingAnyPlatform: false,
     };
+    /**
+     * The platform is not colliding the character.
+     *
+     * Number.MAX_VALUE
+     */
+    private static readonly _noCollision = Number.MAX_VALUE;
+    /**
+     * The platform is colliding the character
+     * and is too high for the character to walk on.
+     *
+     * -Number.MAX_VALUE
+     */
+    private static readonly _floorIsTooHigh = -Number.MAX_VALUE;
 
     // To achieve pixel-perfect precision when positioning object on platform or
     // handling collision with "walls", edges of the hitboxes must be ignored during
@@ -699,10 +712,12 @@ namespace gdjs {
           // Don't follow jump though that are higher than the character bottom.
           continue;
         }
-        if (highestRelativeY !== Number.MAX_VALUE) {
+        if (highestRelativeY !== PlatformerObjectRuntimeBehavior._noCollision) {
           isCollidingAnyPlatform = true;
         }
-        if (highestRelativeY === -Number.MAX_VALUE) {
+        if (
+          highestRelativeY === PlatformerObjectRuntimeBehavior._floorIsTooHigh
+        ) {
           // One platform is colliding the character
           // and is too high for the character to walk on.
           // This will still be an obstacle event if there
@@ -761,34 +776,54 @@ namespace gdjs {
       if (
         platformAABB.max[0] <= ownerMinX ||
         platformAABB.min[0] >= ownerMaxX ||
-        platformAABB.max[1] < floorMinY ||
+        platformAABB.max[1] < ownerMinY ||
         platformAABB.min[1] > floorMaxY
       ) {
-        return Number.MAX_VALUE;
+        return PlatformerObjectRuntimeBehavior._noCollision;
       }
 
-      let highestY = Number.MAX_VALUE;
+      let highestY = PlatformerObjectRuntimeBehavior._noCollision;
       for (const hitbox of platformObject.getHitBoxes()) {
         let previousVertex = hitbox.vertices[hitbox.vertices.length - 1];
+
+        // Edges over the character head might not result to a collision,
+        // but if there is also an edge under its head then there is a collision.
+        let fondOverHead = false;
+        let fondUnderHead = false;
+
         for (const vertex of hitbox.vertices) {
-          // Ignore edges that are too low
-          if (previousVertex[1] <= floorMaxY || vertex[1] <= floorMaxY) {
+          if (previousVertex[1] > floorMaxY && vertex[1] > floorMaxY) {
+            // The edge is too low
+            fondUnderHead = true;
+            if (fondOverHead) {
+              return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+            }
+          } else {
             // Check vertex into the interval
             if (ownerMinX <= vertex[0] && vertex[0] <= ownerMaxX) {
-              if (
+              if (vertex[1] < floorMinY) {
                 // Platform is too high...
-                vertex[1] < floorMinY &&
-                // ...but not over the object.
-                // Indeed, the platform hitbox could be in several parts.
-                // So, the object could walk on one part
-                // and have another part over its head.
-                vertex[1] >= ownerMinY
-              ) {
-                return -Number.MAX_VALUE;
+                if (vertex[1] >= ownerMinY) {
+                  // ...but not over the object.
+                  // Indeed, the platform hitbox could be in several parts.
+                  // So, the object could walk on one part
+                  // and have another part over its head.
+                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+                } else {
+                  fondOverHead = true;
+                  if (fondUnderHead) {
+                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+                  }
+                }
               }
               // Ignore intersections that are too low
               if (floorMinY <= vertex[1] && vertex[1] <= floorMaxY) {
-                highestY = Math.min(highestY, vertex[1]);
+                if (fondOverHead) {
+                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+                } else {
+                  highestY = Math.min(highestY, vertex[1]);
+                  fondUnderHead = true;
+                }
               }
             }
             const deltaX = vertex[0] - previousVertex[0];
@@ -805,11 +840,16 @@ namespace gdjs {
                   ((ownerMinX - previousVertex[0]) * deltaY) / deltaX;
                 if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
-                  return -Number.MAX_VALUE;
+                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  highestY = Math.min(highestY, intersectionY);
+                  if (fondOverHead) {
+                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+                  } else {
+                    highestY = Math.min(highestY, intersectionY);
+                    fondUnderHead = true;
+                  }
                 }
               }
               // Check intersection on the right side of owner
@@ -823,11 +863,16 @@ namespace gdjs {
                   ((ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
                 if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
                   // Platform is too high
-                  return -Number.MAX_VALUE;
+                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  highestY = Math.min(highestY, intersectionY);
+                  if (fondOverHead) {
+                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+                  } else {
+                    highestY = Math.min(highestY, intersectionY);
+                    fondUnderHead = true;
+                  }
                 }
               }
             }
@@ -835,7 +880,9 @@ namespace gdjs {
           previousVertex = vertex;
         }
       }
-      return highestY - ownerMaxY;
+      return highestY === PlatformerObjectRuntimeBehavior._noCollision
+        ? PlatformerObjectRuntimeBehavior._noCollision
+        : highestY - ownerMaxY;
     }
 
     /**

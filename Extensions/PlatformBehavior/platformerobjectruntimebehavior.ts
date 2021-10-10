@@ -709,7 +709,7 @@ namespace gdjs {
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
           highestRelativeY < 0
         ) {
-          // Don't follow jump though that are higher than the character bottom.
+          // Don't follow jumpthrus that are higher than the character bottom.
           continue;
         }
         if (highestRelativeY !== PlatformerObjectRuntimeBehavior._noCollision) {

@@ -99,6 +99,24 @@ AdvancedExtension::AdvancedExtension() {
                "}\n";
       });
 
+  GetAllActions()["SetReturnObject"]
+      .GetCodeExtraInformation()
+      .SetCustomCodeGenerator([](gd::Instruction& instruction,
+                                 gd::EventsCodeGenerator& codeGenerator,
+                                 gd::EventsCodeGenerationContext& context) {
+        const gd::String& objectName = codeGenerator.ConvertToStringExplicit(instruction.GetParameter(0).GetPlainString());
+        const gd::String& objectList = codeGenerator.GetObjectListName(instruction.GetParameter(0).GetPlainString(), context);
+        return "if (typeof eventsFunctionContext !== 'undefined') {"
+               "  eventsFunctionContext.returnValue = true;"
+               "  for (const list of Object.values(eventsFunctionContext.getObjectsLists("+objectName+").items)) {"
+               // Clear picked objects list...
+               "    list.length = 0;"
+               // ...and pick one by one each objects that need to be picked.
+               "    for(const o of "+objectList+") list.push(o);"
+               "  };"
+               "}";
+      });
+
   GetAllConditions()["GetArgumentAsBoolean"]
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,

@@ -97,6 +97,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddAction("SetReturnObject",
+                 _("Set object return value"),
+                 _("Returns the currently selected objects. Those objects will be the ones selected for the next actions, conditions, subevents etc."),
+                 _("Set objects to return to _PARAM0_"),
+                 _("Functions"),
+                 "res/function24.png",
+                 "res/function16.png")
+      .SetHelpPath("/events/functions/return")
+      .AddParameter("object", "The objects to pick")
+      .MarkAsAdvanced();
+
+  extension
       .AddCondition("GetArgumentAsBoolean",
                     _("Check if a function parameter is set to true (or yes)"),
                     _("Check if the specified function parameter (also called "

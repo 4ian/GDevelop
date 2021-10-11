@@ -675,6 +675,7 @@ bool EventsRefactorer::ReplaceStringInConditions(
 }
 
 vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
+    const gd::Platform& platform,
     gd::ObjectsContainer& project,
     gd::ObjectsContainer& layout,
     gd::EventsList& events,
@@ -694,7 +695,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInConditions(
-                project, layout, *conditionsVectors[j], search, matchCase)) {
+                platform, project, layout, *conditionsVectors[j], search, matchCase)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -709,7 +710,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInActions(
-                project, layout, *actionsVectors[j], search, matchCase)) {
+                platform, project, layout, *actionsVectors[j], search, matchCase)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -730,7 +731,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
     if (events[i].CanHaveSubEvents()) {
       vector<EventsSearchResult> subResults =
-          SearchInEvents(project,
+          SearchInEvents(platform,
+                         project,
                          layout,
                          events[i].GetSubEvents(),
                          search,
@@ -746,11 +748,13 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
-                                             gd::InstructionsList& actions,
-                                             gd::String search,
-                                             bool matchCase) {
+bool EventsRefactorer::SearchStringInActions(
+    const gd::Platform& platform,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::InstructionsList& actions,
+    gd::String search,
+    bool matchCase) {
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     for (std::size_t pNb = 0; pNb < actions[aId].GetParameters().size();
          ++pNb) {
@@ -766,7 +770,8 @@ bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
     }
 
     if (!actions[aId].GetSubInstructions().empty() &&
-        SearchStringInActions(project,
+        SearchStringInActions(platform,
+                              project,
                               layout,
                               actions[aId].GetSubInstructions(),
                               search,
@@ -778,6 +783,7 @@ bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
 }
 
 bool EventsRefactorer::SearchStringInConditions(
+    const gd::Platform& platform,
     gd::ObjectsContainer& project,
     gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
@@ -798,7 +804,8 @@ bool EventsRefactorer::SearchStringInConditions(
     }
 
     if (!conditions[cId].GetSubInstructions().empty() &&
-        SearchStringInConditions(project,
+        SearchStringInConditions(platform,
+                                 project,
                                  layout,
                                  conditions[cId].GetSubInstructions(),
                                  search,

@@ -3,7 +3,7 @@ declare class gdEventsRefactorer {
   static renameObjectInEvents(platform: gdPlatform, project: gdObjectsContainer, layout: gdObjectsContainer, events: gdEventsList, oldName: string, newName: string): void;
   static removeObjectInEvents(platform: gdPlatform, project: gdObjectsContainer, layout: gdObjectsContainer, events: gdEventsList, name: string): void;
   static replaceStringInEvents(project: gdObjectsContainer, layout: gdObjectsContainer, events: gdEventsList, toReplace: string, newString: string, matchCase: boolean, inConditions: boolean, inActions: boolean): void;
-  static searchInEvents(project: gdObjectsContainer, layout: gdObjectsContainer, events: gdEventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): gdVectorEventsSearchResult;
+  static searchInEvents(platform: gdPlatform, project: gdObjectsContainer, layout: gdObjectsContainer, events: gdEventsList, search: string, matchCase: boolean, inConditions: boolean, inActions: boolean, inEventStrings: boolean): gdVectorEventsSearchResult;
   delete(): void;
   ptr: number;
 };

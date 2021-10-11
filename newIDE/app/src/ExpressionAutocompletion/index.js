@@ -34,7 +34,7 @@ type BaseExpressionAutocompletion = {|
   addDot?: boolean,
   addParameterSeparator?: boolean,
   addNamespaceSeparator?: boolean,
-  addClosingParenthesis?: boolean,
+  hasVisibleParameters?: boolean,
   isExact?: boolean,
 |};
 
@@ -110,8 +110,8 @@ const getAutocompletionsForExpressions = (
         replacementEndPosition,
         enumeratedExpressionMetadata: enumeratedExpressionMetadata,
         addParenthesis: true,
-        addClosingParenthesis:
-          getVisibleParameterTypes(enumeratedExpressionMetadata).length === 0,
+        hasVisibleParameters:
+          getVisibleParameterTypes(enumeratedExpressionMetadata).length !== 0,
         isExact,
       };
     })
@@ -345,7 +345,6 @@ const getAutocompletionsForText = function(
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
     addParameterSeparator: !isLastParameter,
-    addClosingParenthesis: isLastParameter,
   }));
 };
 
@@ -398,7 +397,6 @@ const getAutocompletionsForVariable = function(
     completion: variableName,
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
-    addClosingParenthesis: true,
   }));
 };
 
@@ -500,7 +498,7 @@ type InsertedAutocompletion = {|
   replacementStartPosition?: number,
   replacementEndPosition?: number,
   addParenthesis?: ?boolean,
-  addClosingParenthesis?: ?boolean,
+  hasVisibleParameters?: ?boolean,
   addDot?: ?boolean,
   addParameterSeparator?: ?boolean,
   addNamespaceSeparator?: ?boolean,
@@ -523,11 +521,7 @@ export const insertAutocompletionInExpression = (
       : insertedAutocompletion.addNamespaceSeparator
       ? '::'
       : insertedAutocompletion.addParenthesis
-      ? insertedAutocompletion.addClosingParenthesis
-        ? '()'
-        : '('
-      : insertedAutocompletion.addClosingParenthesis
-      ? ')'
+      ? '()'
       : '';
 
     const addSuffix =
@@ -562,9 +556,17 @@ export const insertAutocompletionInExpression = (
   const newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
   const newExpressionEnd = expression.substring(wordEndPosition);
+  const newExpression = newExpressionStart + insertedWord + newExpressionEnd;
+  let newCaretLocation = newExpressionStart.length + insertedWord.length;
+  if (
+    insertedAutocompletion.addParenthesis &&
+    insertedAutocompletion.hasVisibleParameters
+  ) {
+    newCaretLocation = newCaretLocation - 1;
+  }
 
   return {
-    caretLocation: newExpressionStart.length + insertedWord.length,
-    expression: newExpressionStart + insertedWord + newExpressionEnd,
+    caretLocation: newCaretLocation,
+    expression: newExpression,
   };
 };

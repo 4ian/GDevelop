@@ -128,11 +128,13 @@ export const filterObjectsList = (
       return hasStringAllTags(objectTags, selectedTags);
     })
     .filter((objectWithContext: ObjectWithContext) => {
+      const lowerCaseObjectName = objectWithContext.object
+        .getName()
+        .toLowerCase();
+      // Show elements that contain the text, but not exactly the same.
       return (
-        objectWithContext.object
-          .getName()
-          .toLowerCase()
-          .indexOf(lowercaseSearchText) !== -1
+        lowerCaseObjectName.indexOf(lowercaseSearchText) !== -1 &&
+        lowerCaseObjectName !== lowercaseSearchText
       );
     });
 };

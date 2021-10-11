@@ -189,7 +189,6 @@ describe('ExpressionAutocompletion', () => {
         expect.objectContaining({
           completion: '"Background"',
           addParameterSeparator: true,
-          addClosingParenthesis: false,
         }),
       ])
     );
@@ -258,7 +257,6 @@ describe('ExpressionAutocompletion', () => {
         expect.objectContaining({
           completion: '"Head"',
           addParameterSeparator: false,
-          addClosingParenthesis: true,
         }),
       ])
     );
@@ -434,7 +432,7 @@ describe('ExpressionAutocompletion', () => {
           addParenthesis: true,
         }
       )
-    ).toMatchObject({ expression: '123 + HelloWorld(' });
+    ).toMatchObject({ expression: '123 + HelloWorld()' });
 
     // Check already existing suffixes.
     expect(
@@ -638,7 +636,7 @@ describe('ExpressionAutocompletion', () => {
           addParenthesis: true,
         }
       )
-    ).toMatchObject({ expression: '123 + Hello.World(:+ 456' });
+    ).toMatchObject({ expression: '123 + Hello.World():+ 456' });
     expect(
       insertAutocompletionInExpression(
         { expression: '123 + Hello.a.+ 456', caretLocation: 13 },
@@ -671,7 +669,7 @@ describe('ExpressionAutocompletion', () => {
           addParenthesis: true,
         }
       )
-    ).toMatchObject({ expression: '123 + Hello.World(.+ 456' });
+    ).toMatchObject({ expression: '123 + Hello.World().+ 456' });
     expect(
       insertAutocompletionInExpression(
         { expression: '123 + Hello.a(+ 456', caretLocation: 13 },

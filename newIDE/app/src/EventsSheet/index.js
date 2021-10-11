@@ -1093,6 +1093,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     selection={this.state.selection}
+                    project={project}
                   >
                     {({
                       eventsSearchResultEvents,

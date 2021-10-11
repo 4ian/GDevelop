@@ -34,6 +34,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   selection: SelectionState,
+  project: gdProject,
   children: (props: {|
     eventsSearchResultEvents: ?Array<gdBaseEvent>,
     searchFocusOffset: ?number,
@@ -126,6 +127,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }
 
     const newEventsSearchResults = gd.EventsRefactorer.searchInEvents(
+      this.props.project.getCurrentPlatform(),
       globalObjectsContainer,
       objectsContainer,
       events,

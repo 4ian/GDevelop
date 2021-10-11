@@ -170,6 +170,15 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& smallicon_);
 
   /**
+   * \brief Declare a new variable expression as being part of the extension.
+   */
+  gd::ExpressionMetadata& AddVariableExpression(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& group_,
+                                           const gd::String& smallicon_);
+
+  /**
    * \brief Declare a new expression and condition as being part of the
    * extension.
    * \note It's recommended to use this function to avoid declaring twice a
@@ -271,7 +280,6 @@ class GD_CORE_API PlatformExtension {
                               const gd::String& smallicon_,
                               std::shared_ptr<gd::BaseEvent> instance);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Create a new action which is the duplicate of the specified one.
    *
@@ -315,7 +323,6 @@ class GD_CORE_API PlatformExtension {
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionPropertiesMetadata[name];
   };
-#endif
 
   /**
    * \brief Delete all instructions having no function name or custom code
@@ -452,7 +459,6 @@ class GD_CORE_API PlatformExtension {
    */
   std::map<gd::String, gd::EventMetadata>& GetAllEvents();
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a reference to a map containing the names of the actions
    * (as keys) and the metadata associated with (as values).
@@ -473,6 +479,11 @@ class GD_CORE_API PlatformExtension {
    * \see gd::PlatformExtension::GetAllActions
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions();
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressions();
 
   /**
    * \brief Return a reference to a vector containing the metadata of all the
@@ -508,6 +519,12 @@ class GD_CORE_API PlatformExtension {
   /**
    * \see gd::PlatformExtension::GetAllActionsForObject
    */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressionsForObject(
+      gd::String objectType);
+
+  /**
+   * \see gd::PlatformExtension::GetAllActionsForObject
+   */
   std::map<gd::String, gd::InstructionMetadata>& GetAllActionsForBehavior(
       gd::String autoType);
 
@@ -530,6 +547,12 @@ class GD_CORE_API PlatformExtension {
       gd::String autoType);
 
   /**
+   * \see gd::PlatformExtension::GetAllActionsForObject
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressionsForBehavior(
+      gd::String autoType);
+
+  /**
    * \brief Get all the properties of the extension. Properties
    * are shown in the game properties in the editor, and are exported in the
    * project data.
@@ -538,7 +561,6 @@ class GD_CORE_API PlatformExtension {
     return extensionPropertiesMetadata;
   }
   ///@}
-#endif
 
   /**
    * \brief Return the name of all the extensions which are considered provided
@@ -577,20 +599,18 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;
   std::map<gd::String, gd::EffectMetadata> effectsMetadata;
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::map<gd::String, gd::ExpressionMetadata> variableExpressionsInfos;
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
-#endif
 
   ObjectMetadata badObjectMetadata;
   BehaviorMetadata badBehaviorMetadata;
   EffectMetadata badEffectMetadata;
-#if defined(GD_IDE_ONLY)
   static std::map<gd::String, gd::InstructionMetadata>
       badConditionsMetadata;  ///< Used when a condition is not found in the
                               ///< extension
@@ -600,12 +620,10 @@ class GD_CORE_API PlatformExtension {
   static std::map<gd::String, gd::ExpressionMetadata>
       badExpressionsMetadata;  ///< Used when an expression is not found in the
                                ///< extension
-#endif
 };
 
 }  // namespace gd
 
-#if defined(GD_IDE_ONLY)
 /** \brief Macro used by extensions in their constructor to declare how they
  * have been compiled. \see gd::CompilationInfo
  */
@@ -619,22 +637,6 @@ class GD_CORE_API PlatformExtension {
   compilationInfo.gccMinorVersion = __GNUC_MINOR__;     \
   compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;  \
   compilationInfo.informationCompleted = true;
-#else
-/** \brief Macro used by extensions in their constructor to declare how they
- * have been compiled. \see gd::CompilationInfo
- */
-#define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() \
-  compilationInfo.runtimeOnly = true;                   \
-  compilationInfo.sfmlMajorVersion = 2;                 \
-  compilationInfo.sfmlMinorVersion = 0;                 \
-  compilationInfo.gdCoreVersion = GD_VERSION_STRING;    \
-  compilationInfo.sizeOfpInt = sizeof(int*);            \
-  compilationInfo.gccMajorVersion = __GNUC__;           \
-  compilationInfo.gccMinorVersion = __GNUC_MINOR__;     \
-  compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;  \
-  compilationInfo.informationCompleted = true;
-
-#endif
 
 #include "GDCore/Extensions/PlatformExtension.inl"
 

@@ -320,28 +320,29 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    std::cout << "subexpression" << std::endl;
     completions.push_back(ExpressionCompletionDescription::ForObject(
         node.type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
         node.type, "", searchedPosition + 1, searchedPosition + 1));
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
-    completions.push_back(ExpressionCompletionDescription::ForExpression(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
+    // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    std::cout << "unary" << std::endl;
     completions.push_back(ExpressionCompletionDescription::ForObject(
         node.type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
         node.type, "", searchedPosition + 1, searchedPosition + 1));
   }
   void OnVisitNumberNode(NumberNode& node) override {
+    std::cout << "number" << std::endl;
     // No completions
   }
 
   void OnVisitTextNode(TextNode& node) override {
+    std::cout << "text" << std::endl;
     // Completions are searched in the case the text node is a parameter of a
     // function call.
     FunctionCallNode* functionCall =
@@ -400,6 +401,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableNode(VariableNode& node) override {
+    std::cout << "variable" << std::endl;
     completions.push_back(ExpressionCompletionDescription::ForVariable(
         node.type,
         node.name,
@@ -408,13 +410,16 @@ class GD_CORE_API ExpressionCompletionFinder
         node.objectName));
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    std::cout << "varaccessor" << std::endl;
     // No completions
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
+    std::cout << "vairablebracketaccessor" << std::endl;
     // No completions
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
+    std::cout << "identifier" << std::endl;
     if (gd::ParameterMetadata::IsObject(node.type)) {
       // Only show completions of objects if an object is required
       completions.push_back(ExpressionCompletionDescription::ForObject(
@@ -437,6 +442,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    std::cout << "objectfunctionname" << std::endl;
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
       // Behavior function (or behavior function being written, with the
@@ -489,6 +495,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
+    std::cout << "functioncall" << std::endl;
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
 
@@ -558,6 +565,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
+    std::cout << "empty" << std::endl;
     completions.push_back(ExpressionCompletionDescription::ForObject(
         node.type,
         node.text,

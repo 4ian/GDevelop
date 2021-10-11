@@ -232,6 +232,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
+    console.log('handle expression chosen');
     let newState = { popoverOpen: false };
     if (this._shouldOpenParametersDialog(expressionInfo)) {
       newState = {
@@ -249,6 +250,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     expressionInfo: EnumeratedExpressionMetadata,
     parameterValues: ParameterValues
   ) => {
+    console.log('inserting exp');
     if (!this._inputElement) return;
     const cursorPosition = this._inputElement.selectionStart;
 
@@ -288,6 +290,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   _insertAutocompletion = (
     expressionAutocompletion: ExpressionAutocompletion
   ) => {
+    console.log('inserting autocom');
     // If the completion is exact, it's not a completion but just
     // shown for informing the user.
     if (expressionAutocompletion.isExact) return;
@@ -311,7 +314,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         addDot: expressionAutocompletion.addDot,
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
+        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
       }
     );
 
@@ -333,6 +336,7 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   _enqueueValidation = debounce(() => {
+    console.log('doing validation');
     this._doValidation();
   }, 250);
 
@@ -348,6 +352,16 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
+    const expression = this.state.validatedValue;
+    // If the expression ends with a space, the user must be navigating or switching to another text
+    // so let's not return anything.
+    if (expression.charAt(expression.length - 1) === ' ') {
+      this.setState(state => ({
+        autocompletions: getAutocompletionsInitialState(),
+      }));
+      return;
+    }
+
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
@@ -356,7 +370,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer
     );
-    const expression = this.state.validatedValue;
+
     const expressionNode = parser
       .parseExpression(expressionType, expression)
       .get();
@@ -369,6 +383,8 @@ export default class ExpressionField extends React.Component<Props, State> {
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
       : 0;
+
+    console.log('curor postion : ', cursorPosition);
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       expressionNode,
       cursorPosition - 1
@@ -467,6 +483,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                   errorText={this.state.errorText}
                   onClick={() => this._enqueueValidation()}
                   onKeyDown={event => {
+                    console.log('onkeydown : ', this.state.autocompletions);
                     const autocompletions = handleAutocompletionsKeyDown(
                       this.state.autocompletions,
                       {
@@ -543,6 +560,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       this.state.autocompletions.selectedCompletionIndex
                     }
                     onChoose={expressionAutocompletion => {
+                      console.log('choosing : ', expressionAutocompletion);
                       this._insertAutocompletion(expressionAutocompletion);
 
                       setTimeout(

@@ -356,7 +356,7 @@ export default function ExpressionAutocompletionsDisplayer({
                       ref={ref}
                     />
                   ) : expressionAutocompletion.kind === 'Expression' ? (
-                    !expressionAutocompletion.isExact ? (
+                    !expressionAutocompletion.isExact && (
                       <DisplayedExpressionAutocompletion
                         key={index}
                         expressionAutocompletion={expressionAutocompletion}
@@ -365,13 +365,6 @@ export default function ExpressionAutocompletionsDisplayer({
                         i18n={i18n}
                         parameterRenderingService={parameterRenderingService}
                         ref={ref}
-                      />
-                    ) : (
-                      <DisplayedExactExpressionAutocompletion
-                        key={index}
-                        expressionAutocompletion={expressionAutocompletion}
-                        i18n={i18n}
-                        parameterRenderingService={parameterRenderingService}
                       />
                     )
                   ) : expressionAutocompletion.kind === 'Object' ? (

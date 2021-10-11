@@ -1102,6 +1102,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                       replaceInEvents,
                       goToPreviousSearchResult,
                       goToNextSearchResult,
+                      clearSearchResults,
                     }) => (
                       <div
                         className="gd-events-sheet"
@@ -1191,7 +1192,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 goToPreviousSearchResult
                               )
                             }
-                            onCloseSearchPanel={this._closeSearchPanel}
+                            onCloseSearchPanel={() => {
+                              clearSearchResults();
+                              this._closeSearchPanel();
+                            }}
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }

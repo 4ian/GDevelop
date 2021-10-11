@@ -42,6 +42,7 @@ type Props = {|
     replaceInEvents: ReplaceInEventsInputs => void,
     goToNextSearchResult: () => ?gdBaseEvent,
     goToPreviousSearchResult: () => ?gdBaseEvent,
+    clearSearchResults: () => void,
   |}) => React.Node,
 |};
 
@@ -60,10 +61,10 @@ export default class EventsSearcher extends React.Component<Props, State> {
   _resultEvents: ?Array<gdBaseEvent> = null;
 
   componentWillUnmount() {
-    if (this.state.eventsSearchResults) this.state.eventsSearchResults.delete();
+    this.reset();
   }
 
-  reset() {
+  reset = () => {
     if (this.state.eventsSearchResults) this.state.eventsSearchResults.delete();
 
     this._resultEvents = null;
@@ -71,7 +72,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       eventsSearchResults: null,
       searchFocusOffset: null,
     });
-  }
+  };
 
   _doReplaceInEvents = ({
     searchInSelection,
@@ -216,6 +217,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       replaceInEvents: this._doReplaceInEvents,
       goToNextSearchResult: this._goToNextSearchResult,
       goToPreviousSearchResult: this._goToPreviousSearchResult,
+      clearSearchResults: this.reset,
     });
   }
 }

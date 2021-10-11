@@ -198,6 +198,9 @@ public:
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar" || parameterType == "variable";
+    } else if (type == "scopedVariable") {
+      return parameterType == "objectvar" || parameterType == "globalvar" ||
+             parameterType == "scenevar";
     }
     return false;
   }

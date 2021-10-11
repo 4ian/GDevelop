@@ -243,9 +243,9 @@ struct VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
-struct IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
+struct IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode
     : public ExpressionNode {
-  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(
+  IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(
       const gd::String &type)
       : ExpressionNode(type){};
 };
@@ -254,9 +254,9 @@ struct IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
  * \brief An identifier node, usually representing an object or a function name.
  */
 struct IdentifierNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
   IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         identifierName(identifierName_){};
   virtual ~IdentifierNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
@@ -266,12 +266,25 @@ struct IdentifierNode
   gd::String identifierName;
 };
 
-struct FunctionCallOrObjectFunctionNameOrEmptyNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  FunctionCallOrObjectFunctionNameOrEmptyNode(const gd::String &type)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type){};
-  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
+struct FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
+  FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(const gd::String &type)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type){};
+  virtual ~FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(){};
   void Visit(ExpressionParser2NodeWorker &worker) override{};
+};
+
+struct ImplicitVariableCastNode : public FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
+  ImplicitVariableCastNode(const gd::String &type_,
+                           std::unique_ptr<FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode> expression_)
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
+        child(std::move(expression_)){};
+  virtual ~ImplicitVariableCastNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitImplicitVariableCastNode(*this);
+  };
+
+  std::unique_ptr<FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode> child;
 };
 
 /**
@@ -280,18 +293,18 @@ struct FunctionCallOrObjectFunctionNameOrEmptyNode
  * "MyObject.Physics::LinearVelocity".
  */
 struct ObjectFunctionNameNode
-    : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+    : public FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
   ObjectFunctionNameNode(const gd::String &type_,
                          const gd::String &objectName_,
                          const gd::String &objectFunctionOrBehaviorName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         objectName(objectName_),
         objectFunctionOrBehaviorName(objectFunctionOrBehaviorName_) {}
   ObjectFunctionNameNode(const gd::String &type_,
                          const gd::String &objectName_,
                          const gd::String &behaviorName_,
                          const gd::String &behaviorFunctionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         objectName(objectName_),
         objectFunctionOrBehaviorName(behaviorName_),
         behaviorFunctionName(behaviorFunctionName_) {}
@@ -332,13 +345,13 @@ struct ObjectFunctionNameNode
  * For example: "MyExtension::MyFunction(1, 2)", "MyObject.Function()" or
  * "MyObject.Physics::LinearVelocity()".
  */
-struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
   /** \brief Construct a free function call node. */
   FunctionCallNode(const gd::String &type_,
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
@@ -349,7 +362,7 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         objectName(objectName_),
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
@@ -362,7 +375,7 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_),
         objectName(objectName_),
         behaviorName(behaviorName_),
         parameters(std::move(parameters_)),
@@ -400,9 +413,9 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
  * \brief An empty node, used when parsing failed/a syntax error was
  * encountered and any other node could not make sense.
  */
-struct EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct EmptyNode : public FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode {
   EmptyNode(const gd::String &type_, const gd::String &text_ = "")
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_), text(text_){};
+      : FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode(type_), text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);

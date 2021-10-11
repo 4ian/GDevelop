@@ -19,6 +19,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 
 using namespace std;
 
@@ -769,6 +770,16 @@ bool EventsRefactorer::SearchStringInActions(
       if (foundPosition != gd::String::npos) return true;
     }
 
+    if (SearchStringInFormattedText(
+      platform,
+      project,
+      layout,
+      actions[aId],
+      search,
+      matchCase,
+      false
+    )) {return true;}
+
     if (!actions[aId].GetSubInstructions().empty() &&
         SearchStringInActions(platform,
                               project,
@@ -780,6 +791,34 @@ bool EventsRefactorer::SearchStringInActions(
   }
 
   return false;
+}
+
+bool EventsRefactorer::SearchStringInFormattedText(
+    const gd::Platform& platform,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::Instruction& instruction,
+    gd::String search,
+    bool matchCase,
+    bool isCondition) {
+  const auto& metadata = isCondition
+                            ? gd::MetadataProvider::GetConditionMetadata(
+                                  platform, instruction.GetType())
+                            : gd::MetadataProvider::GetActionMetadata(
+                                  platform, instruction.GetType());
+  const auto formattedText = gd::InstructionSentenceFormatter::Get()->GetAsFormattedText(instruction, metadata);
+
+  gd::String completeSentence = "";
+
+  for (std::size_t id = 0; id < formattedText.size(); ++id) {
+    completeSentence += formattedText.at(id).first;
+  }
+
+  size_t foundPosition = matchCase
+                                ? completeSentence.find(search)
+                                : completeSentence.FindCaseInsensitive(search);
+
+  return foundPosition != gd::String::npos;
 }
 
 bool EventsRefactorer::SearchStringInConditions(
@@ -802,6 +841,16 @@ bool EventsRefactorer::SearchStringInConditions(
 
       if (foundPosition != gd::String::npos) return true;
     }
+
+    if (SearchStringInFormattedText(
+      platform,
+      project,
+      layout,
+      conditions[cId],
+      search,
+      matchCase,
+      true
+    )) {return true;}
 
     if (!conditions[cId].GetSubInstructions().empty() &&
         SearchStringInConditions(platform,

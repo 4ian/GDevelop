@@ -209,6 +209,13 @@ class GD_CORE_API EventsRefactorer {
                                      gd::String newString,
                                      bool matchCase);
 
+  static bool SearchStringInFormattedText(const gd::Platform& platform,
+                                          gd::ObjectsContainer& project,
+                                          gd::ObjectsContainer& layout,
+                                          gd::Instruction& instruction,
+                                          gd::String search,
+                                          bool matchCase,
+                                          bool isCondition);
   static bool SearchStringInActions(const gd::Platform& platform,
                                     gd::ObjectsContainer& project,
                                     gd::ObjectsContainer& layout,

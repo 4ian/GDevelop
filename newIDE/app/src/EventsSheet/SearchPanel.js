@@ -53,11 +53,13 @@ const SearchPanel = ({
     if (searchTextField.current) searchTextField.current.focus();
   }, []);
 
+  const markSearchResultsDirty = React.useCallback((): void => {
+    setSearchResultsDirty(true);
+  }, []);
+
   React.useImperativeHandle(ref, () => ({
     focus: focusSearchField,
-    markSearchResultsDirty: (): void => {
-      setSearchResultsDirty(true);
-    }
+    markSearchResultsDirty,
   }));
 
   const [searchText, setSearchText] = React.useState<string>('')
@@ -75,6 +77,7 @@ const SearchPanel = ({
   }, [searchText, searchInActions, searchInConditions, searchInEventStrings, matchCase]);
 
   React.useEffect(focusSearchField, [currentTab]);
+  React.useEffect(markSearchResultsDirty, [currentTab]);
 
   const launchSearch = () => {
     onSearchInEvents({

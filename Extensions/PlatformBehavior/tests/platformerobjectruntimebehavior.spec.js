@@ -1617,6 +1617,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
       // This test doesn't pass with jumpthru
       // because jumpthru that overlap the object are excluded from collision.
+      // The probability it happens is: platform speed / falling speed.
+      // We could use the Y speed to be more permissive about it:
+      // If the previous position according to the speed is above the platform,
+      // we could let it land.
       it.skip('can land to a platform that moved up and overlapped the object', function () {
         // Put the platform away so it won't collide with the falling object
         platform.setPosition(platform.getX(), 200);

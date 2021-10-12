@@ -50,7 +50,7 @@ import EventsContextAnalyzerDialog, {
   type EventsContextResult,
   toEventsContextResult,
 } from './EventsContextAnalyzerDialog';
-import SearchPanel, { type SearchPanelInterface} from './SearchPanel';
+import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
 import {
   type ResourceSource,
   type ChooseResourceFunction,

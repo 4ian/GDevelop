@@ -1,7 +1,7 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
 
-import  * as React from 'react';
+import * as React from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
 import { Line, Spacer } from '../UI/Grid';
@@ -38,15 +38,18 @@ export type SearchPanelInterface = {|
   markSearchResultsDirty: () => void,
 |};
 
-const SearchPanel = ({
-  onSearchInEvents,
-  onReplaceInEvents,
-  onCloseSearchPanel,
-  resultsCount,
-  hasEventSelected,
-  onGoToPreviousSearchResult,
-  onGoToNextSearchResult
-}: Props, ref) => {
+const SearchPanel = (
+  {
+    onSearchInEvents,
+    onReplaceInEvents,
+    onCloseSearchPanel,
+    resultsCount,
+    hasEventSelected,
+    onGoToPreviousSearchResult,
+    onGoToNextSearchResult,
+  }: Props,
+  ref
+) => {
   const searchTextField = React.useRef<?TextField>(null);
 
   const focusSearchField = React.useCallback((): void => {
@@ -62,19 +65,40 @@ const SearchPanel = ({
     markSearchResultsDirty,
   }));
 
-  const [searchText, setSearchText] = React.useState<string>('')
-  const [replaceText, setReplaceText] = React.useState<string>('')
-  const [matchCase, setMatchCase] = React.useState<boolean>(false)
-  const [searchInActions, setSearchInActions] = React.useState<boolean>(true)
-  const [searchInConditions, setSearchInConditions] = React.useState<boolean>(true)
-  const [searchInEventStrings, setSearchInEventStrings] = React.useState<boolean>(true)
-  const [searchInSelection, setSearchInSelection] = React.useState<boolean>(false) // eslint-disable-line no-unused-vars
-  const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(false)
-  const [currentTab, setCurrentTab] = React.useState<string>('search-and-replace');
+  const [searchText, setSearchText] = React.useState<string>('');
+  const [replaceText, setReplaceText] = React.useState<string>('');
+  const [matchCase, setMatchCase] = React.useState<boolean>(false);
+  const [searchInActions, setSearchInActions] = React.useState<boolean>(true);
+  const [searchInConditions, setSearchInConditions] = React.useState<boolean>(
+    true
+  );
+  const [
+    searchInEventStrings,
+    setSearchInEventStrings,
+  ] = React.useState<boolean>(true);
+  // eslint-disable-next-line no-unused-vars
+  const [searchInSelection, setSearchInSelection] = React.useState<boolean>(
+    false
+  );
+  const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(
+    false
+  );
+  const [currentTab, setCurrentTab] = React.useState<string>(
+    'search-and-replace'
+  );
 
-  React.useEffect(() => {
-    setSearchResultsDirty(true);
-  }, [searchText, searchInActions, searchInConditions, searchInEventStrings, matchCase]);
+  React.useEffect(
+    () => {
+      setSearchResultsDirty(true);
+    },
+    [
+      searchText,
+      searchInActions,
+      searchInConditions,
+      searchInEventStrings,
+      matchCase,
+    ]
+  );
 
   React.useEffect(focusSearchField, [currentTab]);
   React.useEffect(markSearchResultsDirty, [currentTab]);
@@ -112,12 +136,18 @@ const SearchPanel = ({
     }
   };
 
-  const isSearchAndReplaceTab = React.useCallback((): boolean => (currentTab === 'search-and-replace'), [currentTab]);
+  const isSearchAndReplaceTab = React.useCallback(
+    (): boolean => currentTab === 'search-and-replace',
+    [currentTab]
+  );
 
   return (
     <Background noFullHeight noExpand>
       <Tabs value={currentTab} onChange={setCurrentTab}>
-        <Tab label={<Trans>Search and replace</Trans>} value="search-and-replace" />
+        <Tab
+          label={<Trans>Search and replace</Trans>}
+          value="search-and-replace"
+        />
         <Tab
           label={<Trans>Search in event sentences</Trans>}
           value="search-in-event-sentences"
@@ -129,8 +159,14 @@ const SearchPanel = ({
             ref={searchTextField}
             type="search"
             margin="dense"
-            hintText={isSearchAndReplaceTab() ? t`Text to search in parameters` : t`Text to search in event sentences`}
-            onChange={(e, searchText) => { setSearchText(searchText)}}
+            hintText={
+              isSearchAndReplaceTab()
+                ? t`Text to search in parameters`
+                : t`Text to search in event sentences`
+            }
+            onChange={(e, searchText) => {
+              setSearchText(searchText);
+            }}
             onKeyPress={event => {
               if (shouldValidate(event)) {
                 launchSearchIfResultsDirty();
@@ -164,7 +200,9 @@ const SearchPanel = ({
               type="search"
               margin="dense"
               hintText={t`Text to replace in parameters`}
-              onChange={(e, replaceText) => { setReplaceText(replaceText) }}
+              onChange={(e, replaceText) => {
+                setReplaceText(replaceText);
+              }}
               onKeyPress={event => {
                 if (shouldValidate(event)) {
                   launchReplace();
@@ -195,7 +233,9 @@ const SearchPanel = ({
             <InlineCheckbox
               label={<Trans>Case insensitive</Trans>}
               checked={!matchCase}
-              onCheck={(e, checked) => {setMatchCase(!checked)}}
+              onCheck={(e, checked) => {
+                setMatchCase(!checked);
+              }}
             />
             <Text>
               <Trans>Search in:</Trans>
@@ -204,17 +244,23 @@ const SearchPanel = ({
             <InlineCheckbox
               label={<Trans>Conditions</Trans>}
               checked={searchInConditions}
-              onCheck={(e, checked) => {setSearchInConditions(checked)}}
+              onCheck={(e, checked) => {
+                setSearchInConditions(checked);
+              }}
             />
             <InlineCheckbox
               label={<Trans>Actions</Trans>}
               checked={searchInActions}
-              onCheck={(e, checked) => {setSearchInActions(checked)}}
+              onCheck={(e, checked) => {
+                setSearchInActions(checked);
+              }}
             />
             <InlineCheckbox
               label={<Trans>Texts</Trans>}
               checked={searchInEventStrings}
-              onCheck={(e, checked) => {setSearchInEventStrings(checked)}}
+              onCheck={(e, checked) => {
+                setSearchInEventStrings(checked);
+              }}
             />
             {/* <InlineCheckbox //TODO: Implement search/replace in selection
               label={<Trans>Replace in selection</Trans>}
@@ -260,6 +306,6 @@ const SearchPanel = ({
       </ColumnStackLayout>
     </Background>
   );
-}
+};
 
 export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel);

@@ -139,7 +139,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInConditions,
       searchInActions,
       searchInEventStrings,
-      searchInEventSentences,
+      searchInEventSentences
     );
 
     if (this.state.eventsSearchResults) {

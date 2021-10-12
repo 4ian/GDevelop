@@ -106,7 +106,8 @@ class GD_CORE_API EventsRefactorer {
                                                         bool matchCase,
                                                         bool inConditions,
                                                         bool inActions,
-                                                        bool inEventStrings);
+                                                        bool inEventStrings,
+                                                        bool inEventSentences);
 
   /**
    * Replace all occurrences of a gd::String in events
@@ -221,13 +222,15 @@ class GD_CORE_API EventsRefactorer {
                                     gd::ObjectsContainer& layout,
                                     gd::InstructionsList& actions,
                                     gd::String search,
-                                    bool matchCase);
+                                    bool matchCase,
+                                    bool inSentences);
   static bool SearchStringInConditions(const gd::Platform& platform,
                                        gd::ObjectsContainer& project,
                                        gd::ObjectsContainer& layout,
                                        gd::InstructionsList& conditions,
                                        gd::String search,
-                                       bool matchCase);
+                                       bool matchCase,
+                                       bool inSentences);
   static bool SearchStringInEvent(gd::ObjectsContainer& project,
                                        gd::ObjectsContainer& layout,
                                        gd::BaseEvent& events,

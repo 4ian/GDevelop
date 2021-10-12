@@ -84,6 +84,7 @@ const SearchPanel = ({
       searchInActions,
       searchInConditions,
       searchInEventStrings,
+      searchInEventSentences: !isSearchAndReplaceTab(),
     });
   };
 

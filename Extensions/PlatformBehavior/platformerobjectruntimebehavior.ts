@@ -685,7 +685,9 @@ namespace gdjs {
           // Jump through platforms are obstacles only when the character comes from the top.
           (platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
-            // When following the floor, ignore jumpthrus that are higher than the character.
+            // When following the floor, jumpthrus that are higher than the character are ignored.
+            // If we only look above the character bottom, every jumpthrus can be discarded
+            // without doing any collision check.
             ((this._state === this._onFloor &&
               platform !== this._onFloor.getFloorPlatform() &&
               downwardDeltaY < 0) ||
@@ -702,7 +704,7 @@ namespace gdjs {
           downwardDeltaY
         );
         if (
-          // When following the floor, ignore jumpthrus that are higher than the character.
+          // When following the floor, ignore jumpthrus that are higher than the character bottom.
           this._state === this._onFloor &&
           platform !== this._onFloor.getFloorPlatform() &&
           platform.getPlatformType() ===
@@ -788,14 +790,14 @@ namespace gdjs {
 
         // Edges over the character head might not result to a collision,
         // but if there is also an edge under its head then there is a collision.
-        let fondOverHead = false;
-        let fondUnderHead = false;
+        let foundOverHead = false;
+        let foundUnderHead = false;
 
         for (const vertex of hitbox.vertices) {
           if (previousVertex[1] > floorMaxY && vertex[1] > floorMaxY) {
             // The edge is too low
-            fondUnderHead = true;
-            if (fondOverHead) {
+            foundUnderHead = true;
+            if (foundOverHead) {
               return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
             }
           } else {
@@ -810,19 +812,19 @@ namespace gdjs {
                   // and have another part over its head.
                   return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                 } else {
-                  fondOverHead = true;
-                  if (fondUnderHead) {
+                  foundOverHead = true;
+                  if (foundUnderHead) {
                     return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                   }
                 }
               }
               // Ignore intersections that are too low
               if (floorMinY <= vertex[1] && vertex[1] <= floorMaxY) {
-                if (fondOverHead) {
+                if (foundOverHead) {
                   return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                 } else {
                   highestY = Math.min(highestY, vertex[1]);
-                  fondUnderHead = true;
+                  foundUnderHead = true;
                 }
               }
             }
@@ -844,11 +846,11 @@ namespace gdjs {
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  if (fondOverHead) {
+                  if (foundOverHead) {
                     return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                   } else {
                     highestY = Math.min(highestY, intersectionY);
-                    fondUnderHead = true;
+                    foundUnderHead = true;
                   }
                 }
               }
@@ -867,11 +869,11 @@ namespace gdjs {
                 }
                 // Ignore intersections that are too low
                 if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  if (fondOverHead) {
+                  if (foundOverHead) {
                     return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
                   } else {
                     highestY = Math.min(highestY, intersectionY);
-                    fondUnderHead = true;
+                    foundUnderHead = true;
                   }
                 }
               }
@@ -1552,12 +1554,14 @@ namespace gdjs {
         const deltaMaxY = Math.abs(
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );
-        const { highestGround, isCollidingAnyPlatform } =
-          behavior._findHighestFloorAndMoveOnTop(
-            behavior._potentialCollidingObjects,
-            -deltaMaxY,
-            deltaMaxY
-          );
+        const {
+          highestGround,
+          isCollidingAnyPlatform,
+        } = behavior._findHighestFloorAndMoveOnTop(
+          behavior._potentialCollidingObjects,
+          -deltaMaxY,
+          deltaMaxY
+        );
         if (highestGround && highestGround !== this._floorPlatform) {
           behavior._setOnFloor(highestGround);
         }
@@ -1605,13 +1609,14 @@ namespace gdjs {
 
           // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
-          const { highestGround: highestGroundAtJunction } =
-            behavior._findHighestFloorAndMoveOnTop(
-              behavior._potentialCollidingObjects,
-              // Look up from at least 1 pixel to bypass not perfectly aligned floors.
-              Math.min(-1, -1 * behavior._slopeClimbingFactor),
-              0
-            );
+          const {
+            highestGround: highestGroundAtJunction,
+          } = behavior._findHighestFloorAndMoveOnTop(
+            behavior._potentialCollidingObjects,
+            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+            Math.min(-1, -1 * behavior._slopeClimbingFactor),
+            0
+          );
           if (highestGroundAtJunction) {
             // The obstacle 1st pixel can be climbed.
             // Now that the character is on the obstacle,
@@ -1624,13 +1629,14 @@ namespace gdjs {
                 Math.abs(remainingDeltaX) - 1
               );
             object.setX(object.getX() + deltaX);
-            const { highestGround: highestGroundOnObstacle } =
-              behavior._findHighestFloorAndMoveOnTop(
-                behavior._potentialCollidingObjects,
-                // Do an exact slope angle check.
-                -Math.abs(deltaX) * behavior._slopeClimbingFactor,
-                0
-              );
+            const {
+              highestGround: highestGroundOnObstacle,
+            } = behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Do an exact slope angle check.
+              -Math.abs(deltaX) * behavior._slopeClimbingFactor,
+              0
+            );
             if (highestGroundOnObstacle) {
               // The obstacle slope can be climbed.
               if (Math.abs(remainingDeltaX) >= 2) {
@@ -1639,17 +1645,18 @@ namespace gdjs {
                 // We went too far in order to check that.
                 // Now, find the right position on the obstacles.
                 object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
-                const { highestGround: highestGroundOnObstacle } =
-                  behavior._findHighestFloorAndMoveOnTop(
-                    behavior._potentialCollidingObjects,
-                    // requestedDeltaX can be small when the object start moving.
-                    // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-                    Math.min(
-                      -1,
-                      -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
-                    ),
-                    0
-                  );
+                const {
+                  highestGround: highestGroundOnObstacle,
+                } = behavior._findHighestFloorAndMoveOnTop(
+                  behavior._potentialCollidingObjects,
+                  // requestedDeltaX can be small when the object start moving.
+                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                  Math.min(
+                    -1,
+                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                  ),
+                  0
+                );
                 // Should always be true
                 if (highestGroundOnObstacle) {
                   behavior._setOnFloor(highestGroundOnObstacle);

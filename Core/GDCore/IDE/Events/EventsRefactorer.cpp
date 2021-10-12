@@ -19,6 +19,7 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 
 using namespace std;
 
@@ -675,14 +676,14 @@ bool EventsRefactorer::ReplaceStringInConditions(
 }
 
 vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
+    const gd::Platform& platform,
     gd::EventsList& events,
     gd::String search,
     bool matchCase,
     bool inConditions,
     bool inActions,
-    bool inEventStrings) {
+    bool inEventStrings,
+    bool inEventSentences) {
   vector<EventsSearchResult> results;
 
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -694,7 +695,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInConditions(
-                project, layout, *conditionsVectors[j], search, matchCase)) {
+                platform, *conditionsVectors[j], search, matchCase, inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -709,7 +710,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInActions(
-                project, layout, *actionsVectors[j], search, matchCase)) {
+                platform, *actionsVectors[j], search, matchCase, inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -720,7 +721,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
     if (inEventStrings) {
       if (!eventAddedInResults &&
-          SearchStringInEvent(project, layout, events[i], search, matchCase)) {
+          SearchStringInEvent(events[i], search, matchCase)) {
         results.push_back(EventsSearchResult(
             std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
             &events,
@@ -730,14 +731,14 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
     if (events[i].CanHaveSubEvents()) {
       vector<EventsSearchResult> subResults =
-          SearchInEvents(project,
-                         layout,
+          SearchInEvents(platform,
                          events[i].GetSubEvents(),
                          search,
                          matchCase,
                          inConditions,
                          inActions,
-                         inEventStrings);
+                         inEventStrings,
+                         inEventSentences);
       std::copy(
           subResults.begin(), subResults.end(), std::back_inserter(results));
     }
@@ -746,11 +747,12 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
-                                             gd::InstructionsList& actions,
-                                             gd::String search,
-                                             bool matchCase) {
+bool EventsRefactorer::SearchStringInActions(
+    const gd::Platform& platform,
+    gd::InstructionsList& actions,
+    gd::String search,
+    bool matchCase,
+    bool inSentences) {
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     for (std::size_t pNb = 0; pNb < actions[aId].GetParameters().size();
          ++pNb) {
@@ -765,24 +767,58 @@ bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
       if (foundPosition != gd::String::npos) return true;
     }
 
+    if (inSentences && SearchStringInFormattedText(
+      platform,
+      actions[aId],
+      search,
+      matchCase,
+      false
+    )) {return true;}
+
     if (!actions[aId].GetSubInstructions().empty() &&
-        SearchStringInActions(project,
-                              layout,
+        SearchStringInActions(platform,
                               actions[aId].GetSubInstructions(),
                               search,
-                              matchCase))
+                              matchCase,
+                              inSentences))
       return true;
   }
 
   return false;
 }
 
+bool EventsRefactorer::SearchStringInFormattedText(
+    const gd::Platform& platform,
+    gd::Instruction& instruction,
+    gd::String search,
+    bool matchCase,
+    bool isCondition) {
+  const auto& metadata = isCondition
+                            ? gd::MetadataProvider::GetConditionMetadata(
+                                  platform, instruction.GetType())
+                            : gd::MetadataProvider::GetActionMetadata(
+                                  platform, instruction.GetType());
+  const auto formattedText = gd::InstructionSentenceFormatter::Get()->GetAsFormattedText(instruction, metadata);
+
+  gd::String completeSentence = "";
+
+  for (std::size_t id = 0; id < formattedText.size(); ++id) {
+    completeSentence += formattedText.at(id).first;
+  }
+
+  size_t foundPosition = matchCase
+                                ? completeSentence.find(search)
+                                : completeSentence.FindCaseInsensitive(search);
+
+  return foundPosition != gd::String::npos;
+}
+
 bool EventsRefactorer::SearchStringInConditions(
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
+    const gd::Platform& platform,
     gd::InstructionsList& conditions,
     gd::String search,
-    bool matchCase) {
+    bool matchCase,
+    bool inSentences) {
   for (std::size_t cId = 0; cId < conditions.size(); ++cId) {
     for (std::size_t pNb = 0; pNb < conditions[cId].GetParameters().size();
          ++pNb) {
@@ -797,21 +833,27 @@ bool EventsRefactorer::SearchStringInConditions(
       if (foundPosition != gd::String::npos) return true;
     }
 
+    if (inSentences && SearchStringInFormattedText(
+      platform,
+      conditions[cId],
+      search,
+      matchCase,
+      true
+    )) {return true;}
+
     if (!conditions[cId].GetSubInstructions().empty() &&
-        SearchStringInConditions(project,
-                                 layout,
+        SearchStringInConditions(platform,
                                  conditions[cId].GetSubInstructions(),
                                  search,
-                                 matchCase))
+                                 matchCase,
+                                 inSentences))
       return true;
   }
 
   return false;
 }
 
-bool EventsRefactorer::SearchStringInEvent(gd::ObjectsContainer& project,
-                                           gd::ObjectsContainer& layout,
-                                           gd::BaseEvent& event,
+bool EventsRefactorer::SearchStringInEvent(gd::BaseEvent& event,
                                            gd::String search,
                                            bool matchCase) {
   for (gd::String str : event.GetAllSearchableStrings()) {

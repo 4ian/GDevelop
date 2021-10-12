@@ -2025,6 +2025,88 @@ describe('libGD.js', function () {
     });
   });
 
+  describe('EventsRefactorer', function () {
+    describe('SearchInEvents', function() {
+      let eventList = event1 = event2 = null;
+
+      beforeAll(() => {
+        eventList = new gd.EventsList();
+
+        /* Event 1 */
+        event1 = new gd.StandardEvent();
+
+        var eventActions1 = event1.getActions();
+        var action1 = new gd.Instruction();
+        action1.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
+        action1.setParametersCount(1);
+        action1.setParameter(0, 'Platform');
+        eventActions1.push_back(action1);
+
+        var eventConditions1 = event1.getConditions();
+        var condition1 = new gd.Instruction();
+        condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
+        condition1.setParametersCount(3);
+        condition1.setParameter(0, 'MyCharacter');
+        condition1.setParameter(1, '<');
+        condition1.setParameter(2, '300');
+        eventConditions1.push_back(condition1)
+
+        event1 = eventList.insertEvent(event1, 0);
+
+        /* Event 2 */
+
+        event2 = new gd.StandardEvent();
+
+        var eventActions2 = event2.getActions();
+        var action2 = new gd.Instruction();
+        action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
+        action2.setParametersCount(1);
+        action2.setParameter(0, 'OtherCharacter');
+        eventActions2.push_back(action2);
+
+        var eventConditions2 = event2.getConditions();
+        var condition2 = new gd.Instruction();
+        condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
+        condition2.setParametersCount(3);
+        condition2.setParameter(0, 'OtherPlatform');
+        condition2.setParameter(1, '>');
+        condition2.setParameter(2, '55');
+        eventConditions2.push_back(condition2)
+
+        event2 = eventList.insertEvent(event2, 0);
+      });
+
+      it('should search string in parameters only and respect case', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', true, true, true, false, false)
+        expect(searchResultEvents1.size()).toBe(0)
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'MyCharacter', true, true, true, false, false)
+        expect(searchResultEvents2.size()).toBe(1)
+        expect(searchResultEvents2.at(0).getEvent()).toBe(event1)
+      });
+
+      it('should search string in parameters only', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', false, true, true, false, false)
+        expect(searchResultEvents1.size()).toBe(1)
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
+
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position', false, true, true, false, false)
+        expect(searchResultEvents2.size()).toBe(0)
+      });
+
+      it('should search string in sentences', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'In Degrees', false, true, true, false, true)
+        expect(searchResultEvents1.size()).toBe(1)
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2)
+      })
+
+      it('should search string in sentences with parameter placeholders replaced', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position of MyCharacter', false, true, true, false, true)
+        expect(searchResultEvents1.size()).toBe(1)
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
+      })
+    })
+  })
+
   describe('gd.EventsList', function () {
     it('can have events', function () {
       var list = new gd.EventsList();

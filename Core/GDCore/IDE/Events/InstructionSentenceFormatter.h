@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #ifndef TRANSLATEACTION_H
 #define TRANSLATEACTION_H
 #include <map>
@@ -55,4 +54,3 @@ class GD_CORE_API InstructionSentenceFormatter {
 
 }  // namespace gd
 #endif  // TRANSLATEACTION_H
-#endif

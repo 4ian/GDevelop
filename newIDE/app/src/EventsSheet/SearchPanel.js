@@ -21,6 +21,7 @@ import {
   shouldCloseOrCancel,
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
+import { Tabs, Tab } from '../UI/Tabs';
 
 type Props = {|
   onSearchInEvents: SearchInEventsInputs => void,
@@ -48,10 +49,12 @@ const SearchPanel = ({
 }: Props, ref) => {
   const searchTextField = React.useRef<?TextField>(null);
 
+  const focusSearchField = React.useCallback((): void => {
+    if (searchTextField.current) searchTextField.current.focus();
+  }, []);
+
   React.useImperativeHandle(ref, () => ({
-    focus: (): void => {
-      if (searchTextField.current) searchTextField.current.focus();
-    },
+    focus: focusSearchField,
     markSearchResultsDirty: (): void => {
       setSearchResultsDirty(true);
     }
@@ -65,10 +68,13 @@ const SearchPanel = ({
   const [searchInEventStrings, setSearchInEventStrings] = React.useState<boolean>(true)
   const [searchInSelection, setSearchInSelection] = React.useState<boolean>(false) // eslint-disable-line no-unused-vars
   const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(false)
+  const [currentTab, setCurrentTab] = React.useState<string>('search-and-replace');
 
   React.useEffect(() => {
     setSearchResultsDirty(true);
   }, [searchText, searchInActions, searchInConditions, searchInEventStrings, matchCase]);
+
+  React.useEffect(focusSearchField, [currentTab]);
 
   const launchSearch = () => {
     onSearchInEvents({
@@ -102,14 +108,23 @@ const SearchPanel = ({
     }
   };
 
+  const isSearchAndReplaceTab = React.useCallback((): boolean => (currentTab === 'search-and-replace'), [currentTab]);
+
   return (
     <Background noFullHeight noExpand>
+      <Tabs value={currentTab} onChange={setCurrentTab}>
+        <Tab label={<Trans>Search and replace</Trans>} value="search-and-replace" />
+        <Tab
+          label={<Trans>Search in event sentences</Trans>}
+          value="search-in-event-sentences"
+        />
+      </Tabs>
       <ColumnStackLayout>
         <Line alignItems="baseline" noMargin>
           <TextField
             ref={searchTextField}
             margin="dense"
-            hintText={t`Text to search in parameters`}
+            hintText={isSearchAndReplaceTab() ? t`Text to search in parameters` : t`Text to search in event sentences`}
             onChange={(e, searchText) => { setSearchText(searchText)}}
             onKeyPress={event => {
               if (shouldValidate(event)) {
@@ -138,35 +153,37 @@ const SearchPanel = ({
             }}
           />
         </Line>
-        <Line alignItems="baseline" noMargin>
-          <TextField
-            margin="dense"
-            hintText={t`Text to replace in parameters`}
-            onChange={(e, replaceText) => { setReplaceText(replaceText) }}
-            onKeyPress={event => {
-              if (shouldValidate(event)) {
-                launchReplace();
+        {isSearchAndReplaceTab() && (
+          <Line alignItems="baseline" noMargin>
+            <TextField
+              margin="dense"
+              hintText={t`Text to replace in parameters`}
+              onChange={(e, replaceText) => { setReplaceText(replaceText) }}
+              onKeyPress={event => {
+                if (shouldValidate(event)) {
+                  launchReplace();
+                }
+              }}
+              onKeyUp={event => {
+                if (shouldCloseOrCancel(event)) {
+                  onCloseSearchPanel();
+                }
+              }}
+              value={replaceText}
+              fullWidth
+            />
+            <Spacer />
+            <RaisedButton
+              disabled={
+                !replaceText ||
+                !searchText ||
+                (!hasEventSelected && searchInSelection)
               }
-            }}
-            onKeyUp={event => {
-              if (shouldCloseOrCancel(event)) {
-                onCloseSearchPanel();
-              }
-            }}
-            value={replaceText}
-            fullWidth
-          />
-          <Spacer />
-          <RaisedButton
-            disabled={
-              !replaceText ||
-              !searchText ||
-              (!hasEventSelected && searchInSelection)
-            }
-            label={<Trans>Replace</Trans>}
-            onClick={launchReplace}
-          />
-        </Line>
+              label={<Trans>Replace</Trans>}
+              onClick={launchReplace}
+            />
+          </Line>
+        )}
         <Line noMargin alignItems="center" justifyContent="space-between">
           <Line noMargin alignItems="center">
             <InlineCheckbox

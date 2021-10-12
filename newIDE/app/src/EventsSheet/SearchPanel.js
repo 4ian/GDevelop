@@ -127,6 +127,7 @@ const SearchPanel = ({
         <Line alignItems="baseline" noMargin>
           <TextField
             ref={searchTextField}
+            type="search"
             margin="dense"
             hintText={isSearchAndReplaceTab() ? t`Text to search in parameters` : t`Text to search in event sentences`}
             onChange={(e, searchText) => { setSearchText(searchText)}}
@@ -160,6 +161,7 @@ const SearchPanel = ({
         {isSearchAndReplaceTab() && (
           <Line alignItems="baseline" noMargin>
             <TextField
+              type="search"
               margin="dense"
               hintText={t`Text to replace in parameters`}
               onChange={(e, replaceText) => { setReplaceText(replaceText) }}

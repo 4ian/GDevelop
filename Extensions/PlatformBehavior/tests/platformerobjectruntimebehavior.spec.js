@@ -2442,8 +2442,8 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const platform2 = addPlatformObject(runtimeScene);
         platform2.setPosition(
           platform.getX() + platform.getWidth(),
-          // The platform is top is over the object
-          // and platform is bottom is under the object.
+          // The platform's top is over the object
+          // and platform's bottom is under the object.
           platform.getY() - platform2.getHeight() + 5
         );
 

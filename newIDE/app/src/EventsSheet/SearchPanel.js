@@ -1,8 +1,7 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
-import React, { PureComponent } from 'react';
+import  * as React from 'react';
 import Background from '../UI/Background';
 import TextField from '../UI/TextField';
 import { Line, Spacer } from '../UI/Grid';
@@ -32,50 +31,47 @@ type Props = {|
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
   onGoToNextSearchResult: () => ?gdBaseEvent,
 |};
-type State = {|
-  searchText: string,
-  replaceText: string,
-  matchCase: boolean,
-  searchInActions: boolean,
-  searchInConditions: boolean,
-  searchInEventStrings: boolean,
-  searchInSelection: boolean,
-  searchResultsDirty: boolean,
+
+export type SearchPanelInterface = {|
+  focus: () => void,
+  markSearchResultsDirty: () => void,
 |};
 
-export default class SearchPanel extends PureComponent<Props, State> {
-  searchTextField: ?TextField;
-  state = {
-    searchText: '',
-    replaceText: '',
-    matchCase: false,
-    searchInActions: true,
-    searchInConditions: true,
-    searchInEventStrings: true,
-    searchInSelection: false,
-    searchResultsDirty: false,
-  };
+const SearchPanel = ({
+  onSearchInEvents,
+  onReplaceInEvents,
+  onCloseSearchPanel,
+  resultsCount,
+  hasEventSelected,
+  onGoToPreviousSearchResult,
+  onGoToNextSearchResult
+}: Props, ref) => {
+  const searchTextField = React.useRef<?TextField>(null);
 
-  focus = () => {
-    if (this.searchTextField) {
-      this.searchTextField.focus();
+  React.useImperativeHandle(ref, () => ({
+    focus: (): void => {
+      if (searchTextField.current) searchTextField.current.focus();
+    },
+    markSearchResultsDirty: (): void => {
+      setSearchResultsDirty(true);
     }
-  };
+  }));
 
-  markSearchResultsDirty = () => {
-    this.setState({ searchResultsDirty: true });
-  };
+  const [searchText, setSearchText] = React.useState<string>('')
+  const [replaceText, setReplaceText] = React.useState<string>('')
+  const [matchCase, setMatchCase] = React.useState<boolean>(false)
+  const [searchInActions, setSearchInActions] = React.useState<boolean>(true)
+  const [searchInConditions, setSearchInConditions] = React.useState<boolean>(true)
+  const [searchInEventStrings, setSearchInEventStrings] = React.useState<boolean>(true)
+  const [searchInSelection, setSearchInSelection] = React.useState<boolean>(false) // eslint-disable-line no-unused-vars
+  const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(false)
 
-  launchSearch = () => {
-    const {
-      searchText,
-      searchInSelection,
-      matchCase,
-      searchInActions,
-      searchInConditions,
-      searchInEventStrings,
-    } = this.state;
-    this.props.onSearchInEvents({
+  React.useEffect(() => {
+    setSearchResultsDirty(true);
+  }, [searchText, searchInActions, searchInConditions, searchInEventStrings, matchCase]);
+
+  const launchSearch = () => {
+    onSearchInEvents({
       searchInSelection,
       searchText,
       matchCase,
@@ -85,20 +81,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
-  launchReplace = () => {
-    const {
-      searchText,
-      replaceText,
-      searchInSelection,
-      matchCase,
-      searchInActions,
-      searchInConditions,
-      searchInEventStrings,
-    } = this.state;
+  const launchReplace = () => {
+    launchSearch();
 
-    this.launchSearch();
-
-    this.props.onReplaceInEvents({
+    onReplaceInEvents({
       searchInSelection,
       searchText,
       replaceText,
@@ -109,184 +95,148 @@ export default class SearchPanel extends PureComponent<Props, State> {
     });
   };
 
-  launchSearchIfResultsDirty = () => {
-    if (this.state.searchResultsDirty) {
-      this.launchSearch();
-      this.setState({ searchResultsDirty: false });
+  const launchSearchIfResultsDirty = () => {
+    if (searchResultsDirty) {
+      launchSearch();
+      setSearchResultsDirty(false);
     }
   };
 
-  render() {
-    const {
-      resultsCount,
-      hasEventSelected,
-      onGoToPreviousSearchResult,
-      onGoToNextSearchResult,
-      onCloseSearchPanel,
-    } = this.props;
-    const { searchText, replaceText, searchInSelection } = this.state;
-
-    return (
-      <Background noFullHeight noExpand>
-        <ColumnStackLayout>
-          <Line alignItems="baseline" noMargin>
-            <TextField
-              margin="dense"
-              ref={_searchTextField =>
-                (this.searchTextField = _searchTextField)
+  return (
+    <Background noFullHeight noExpand>
+      <ColumnStackLayout>
+        <Line alignItems="baseline" noMargin>
+          <TextField
+            ref={searchTextField}
+            margin="dense"
+            hintText={t`Text to search in parameters`}
+            onChange={(e, searchText) => { setSearchText(searchText)}}
+            onKeyPress={event => {
+              if (shouldValidate(event)) {
+                launchSearchIfResultsDirty();
               }
-              hintText={t`Text to search in parameters`}
-              onChange={(e, searchText) => {
-                this.setState({
-                  searchText,
-                  searchResultsDirty: true,
-                });
-              }}
-              onKeyPress={event => {
-                if (shouldValidate(event)) {
-                  this.launchSearchIfResultsDirty();
-                }
-              }}
-              onKeyUp={event => {
-                if (shouldCloseOrCancel(event)) {
-                  onCloseSearchPanel();
-                }
-              }}
-              value={searchText}
-              fullWidth
+            }}
+            onKeyUp={event => {
+              if (shouldCloseOrCancel(event)) {
+                onCloseSearchPanel();
+              }
+            }}
+            value={searchText}
+            fullWidth
+          />
+          <Spacer />
+          <RaisedButton
+            disabled={!searchText}
+            primary
+            label={<Trans>Search</Trans>}
+            onClick={() => {
+              if (!searchResultsDirty) {
+                onGoToNextSearchResult();
+              } else {
+                launchSearchIfResultsDirty();
+              }
+            }}
+          />
+        </Line>
+        <Line alignItems="baseline" noMargin>
+          <TextField
+            margin="dense"
+            hintText={t`Text to replace in parameters`}
+            onChange={(e, replaceText) => { setReplaceText(replaceText) }}
+            onKeyPress={event => {
+              if (shouldValidate(event)) {
+                launchReplace();
+              }
+            }}
+            onKeyUp={event => {
+              if (shouldCloseOrCancel(event)) {
+                onCloseSearchPanel();
+              }
+            }}
+            value={replaceText}
+            fullWidth
+          />
+          <Spacer />
+          <RaisedButton
+            disabled={
+              !replaceText ||
+              !searchText ||
+              (!hasEventSelected && searchInSelection)
+            }
+            label={<Trans>Replace</Trans>}
+            onClick={launchReplace}
+          />
+        </Line>
+        <Line noMargin alignItems="center" justifyContent="space-between">
+          <Line noMargin alignItems="center">
+            <InlineCheckbox
+              label={<Trans>Case insensitive</Trans>}
+              checked={!matchCase}
+              onCheck={(e, checked) => {setMatchCase(!checked)}}
             />
+            <Text>
+              <Trans>Search in:</Trans>
+            </Text>
             <Spacer />
-            <RaisedButton
-              disabled={!searchText}
-              primary
-              label={<Trans>Search</Trans>}
+            <InlineCheckbox
+              label={<Trans>Conditions</Trans>}
+              checked={searchInConditions}
+              onCheck={(e, checked) => {setSearchInConditions(checked)}}
+            />
+            <InlineCheckbox
+              label={<Trans>Actions</Trans>}
+              checked={searchInActions}
+              onCheck={(e, checked) => {setSearchInActions(checked)}}
+            />
+            <InlineCheckbox
+              label={<Trans>Texts</Trans>}
+              checked={searchInEventStrings}
+              onCheck={(e, checked) => {setSearchInEventStrings(checked)}}
+            />
+            {/* <InlineCheckbox //TODO: Implement search/replace in selection
+              label={<Trans>Replace in selection</Trans>}
+              checked={searchInSelection}
+              onCheck={(e, checked) =>
+                this.setState({ searchInSelection: checked })}
+            /> */}
+          </Line>
+          <Line noMargin alignItems="center">
+            <Text>
+              {resultsCount === null || resultsCount === undefined
+                ? ''
+                : resultsCount !== 0
+                ? `${resultsCount} results`
+                : `No results`}
+            </Text>
+            <IconButton
+              disabled={!resultsCount}
               onClick={() => {
-                if (!this.state.searchResultsDirty) {
-                  onGoToNextSearchResult();
-                } else {
-                  this.launchSearchIfResultsDirty();
-                }
+                onGoToPreviousSearchResult();
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              disabled={!resultsCount}
+              onClick={() => {
+                onGoToNextSearchResult();
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+            <FlatButton
+              key="close"
+              label={<Trans>Close</Trans>}
+              primary={false}
+              onClick={() => {
+                onCloseSearchPanel();
               }}
             />
           </Line>
-          <Line alignItems="baseline" noMargin>
-            <TextField
-              margin="dense"
-              hintText={t`Text to replace in parameters`}
-              onChange={(e, replaceText) => this.setState({ replaceText })}
-              onKeyPress={event => {
-                if (shouldValidate(event)) {
-                  this.launchReplace();
-                }
-              }}
-              onKeyUp={event => {
-                if (shouldCloseOrCancel(event)) {
-                  onCloseSearchPanel();
-                }
-              }}
-              value={replaceText}
-              fullWidth
-            />
-            <Spacer />
-            <RaisedButton
-              disabled={
-                !replaceText ||
-                !searchText ||
-                (!hasEventSelected && searchInSelection)
-              }
-              label={<Trans>Replace</Trans>}
-              onClick={this.launchReplace}
-            />
-          </Line>
-          <Line noMargin alignItems="center" justifyContent="space-between">
-            <Line noMargin alignItems="center">
-              <InlineCheckbox
-                label={<Trans>Case insensitive</Trans>}
-                checked={!this.state.matchCase}
-                onCheck={(e, checked) =>
-                  this.setState({
-                    matchCase: !checked,
-                    searchResultsDirty: true,
-                  })
-                }
-              />
-              <Text>
-                <Trans>Search in:</Trans>
-              </Text>
-              <Spacer />
-              <InlineCheckbox
-                label={<Trans>Conditions</Trans>}
-                checked={this.state.searchInConditions}
-                onCheck={(e, checked) =>
-                  this.setState({
-                    searchInConditions: checked,
-                    searchResultsDirty: true,
-                  })
-                }
-              />
-              <InlineCheckbox
-                label={<Trans>Actions</Trans>}
-                checked={this.state.searchInActions}
-                onCheck={(e, checked) =>
-                  this.setState({
-                    searchInActions: checked,
-                    searchResultsDirty: true,
-                  })
-                }
-              />
-              <InlineCheckbox
-                label={<Trans>Texts</Trans>}
-                checked={this.state.searchInEventStrings}
-                onCheck={(e, checked) =>
-                  this.setState({
-                    searchInEventStrings: checked,
-                    searchResultsDirty: true,
-                  })
-                }
-              />
-              {/* <InlineCheckbox //TODO: Implement search/replace in selection
-                label={<Trans>Replace in selection</Trans>}
-                checked={this.state.searchInSelection}
-                onCheck={(e, checked) =>
-                  this.setState({ searchInSelection: checked })}
-              /> */}
-            </Line>
-            <Line noMargin alignItems="center">
-              <Text>
-                {resultsCount === null || resultsCount === undefined
-                  ? ''
-                  : resultsCount !== 0
-                  ? `${resultsCount} results`
-                  : `No results`}
-              </Text>
-              <IconButton
-                disabled={!resultsCount}
-                onClick={() => {
-                  onGoToPreviousSearchResult();
-                }}
-              >
-                <ChevronLeft />
-              </IconButton>
-              <IconButton
-                disabled={!resultsCount}
-                onClick={() => {
-                  onGoToNextSearchResult();
-                }}
-              >
-                <ChevronRight />
-              </IconButton>
-              <FlatButton
-                key="close"
-                label={<Trans>Close</Trans>}
-                primary={false}
-                onClick={() => {
-                  onCloseSearchPanel();
-                }}
-              />
-            </Line>
-          </Line>
-        </ColumnStackLayout>
-      </Background>
-    );
-  }
+        </Line>
+      </ColumnStackLayout>
+    </Background>
+  );
 }
+
+export default React.forwardRef<Props, SearchPanelInterface>(SearchPanel);

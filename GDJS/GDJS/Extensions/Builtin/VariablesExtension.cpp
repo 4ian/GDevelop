@@ -94,6 +94,9 @@ VariablesExtension::VariablesExtension() {
       "gdjs.evtTools.variable.valuePush");
   GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveAt");
+
+  GetAllActions()["SetBooleanVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.setVariableBoolean");
   GetAllActions()["SceneVar"].SetFunctionName("(v => v)");
   GetAllActions()["GlobalVar"].SetFunctionName("(v => v)");
 

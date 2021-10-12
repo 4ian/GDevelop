@@ -229,6 +229,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("trueorfalse", _("New Value:"));
 
   extension
+      .AddAction(
+          "SetBooleanVariable",
+          _("Set boolean value of a variable"),
+          _("Modify the boolean value of a variable."),
+          _("Set the boolean value of variable _PARAM0_ to _PARAM1_"),
+          _("Variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .AddParameter("trueorfalse", _("New Value:"));
+
+  extension
       .AddAction("ToggleGlobalVariableAsBoolean",
                  _("Toggle boolean value of a global variable"),
                  _("Toggle the boolean value of a global variable.") + "\n" +

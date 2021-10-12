@@ -1552,14 +1552,12 @@ namespace gdjs {
         const deltaMaxY = Math.abs(
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );
-        const {
-          highestGround,
-          isCollidingAnyPlatform,
-        } = behavior._findHighestFloorAndMoveOnTop(
-          behavior._potentialCollidingObjects,
-          -deltaMaxY,
-          deltaMaxY
-        );
+        const { highestGround, isCollidingAnyPlatform } =
+          behavior._findHighestFloorAndMoveOnTop(
+            behavior._potentialCollidingObjects,
+            -deltaMaxY,
+            deltaMaxY
+          );
         if (highestGround && highestGround !== this._floorPlatform) {
           behavior._setOnFloor(highestGround);
         }
@@ -1604,17 +1602,16 @@ namespace gdjs {
           const remainingDeltaX = requestedDeltaX - (object.getX() - oldX);
           const beforeObstacleY = object.getY();
           const beforeObstacleX = object.getX();
-          
+
           // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
-          const {
-            highestGround: highestGroundAtJunction,
-          } = behavior._findHighestFloorAndMoveOnTop(
-            behavior._potentialCollidingObjects,
-            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
-            Math.min(-1, -1 * behavior._slopeClimbingFactor),
-            0
-          );
+          const { highestGround: highestGroundAtJunction } =
+            behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+              Math.min(-1, -1 * behavior._slopeClimbingFactor),
+              0
+            );
           if (highestGroundAtJunction) {
             // The obstacle 1st pixel can be climbed.
             // Now that the character is on the obstacle,
@@ -1627,14 +1624,13 @@ namespace gdjs {
                 Math.abs(remainingDeltaX) - 1
               );
             object.setX(object.getX() + deltaX);
-            const {
-              highestGround: highestGroundOnObstacle,
-            } = behavior._findHighestFloorAndMoveOnTop(
-              behavior._potentialCollidingObjects,
-              // Do an exact slope angle check.
-              -Math.abs(deltaX) * behavior._slopeClimbingFactor,
-              0
-            );
+            const { highestGround: highestGroundOnObstacle } =
+              behavior._findHighestFloorAndMoveOnTop(
+                behavior._potentialCollidingObjects,
+                // Do an exact slope angle check.
+                -Math.abs(deltaX) * behavior._slopeClimbingFactor,
+                0
+              );
             if (highestGroundOnObstacle) {
               // The obstacle slope can be climbed.
               if (Math.abs(remainingDeltaX) >= 2) {
@@ -1643,18 +1639,17 @@ namespace gdjs {
                 // We went too far in order to check that.
                 // Now, find the right position on the obstacles.
                 object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
-                const {
-                  highestGround: highestGroundOnObstacle,
-                } = behavior._findHighestFloorAndMoveOnTop(
-                  behavior._potentialCollidingObjects,
-                  // requestedDeltaX can be small when the object start moving.
-                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
-                  Math.min(
-                    -1,
-                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
-                  ),
-                  0
-                );
+                const { highestGround: highestGroundOnObstacle } =
+                  behavior._findHighestFloorAndMoveOnTop(
+                    behavior._potentialCollidingObjects,
+                    // requestedDeltaX can be small when the object start moving.
+                    // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                    Math.min(
+                      -1,
+                      -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                    ),
+                    0
+                  );
                 // Should always be true
                 if (highestGroundOnObstacle) {
                   behavior._setOnFloor(highestGroundOnObstacle);

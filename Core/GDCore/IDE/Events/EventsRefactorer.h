@@ -99,8 +99,6 @@ class GD_CORE_API EventsRefactorer {
    * containing the string
    */
   static std::vector<EventsSearchResult> SearchInEvents(const gd::Platform& platform,
-                                                        gd::ObjectsContainer& project,
-                                                        gd::ObjectsContainer& layout,
                                                         gd::EventsList& events,
                                                         gd::String search,
                                                         bool matchCase,
@@ -211,31 +209,23 @@ class GD_CORE_API EventsRefactorer {
                                      bool matchCase);
 
   static bool SearchStringInFormattedText(const gd::Platform& platform,
-                                          gd::ObjectsContainer& project,
-                                          gd::ObjectsContainer& layout,
                                           gd::Instruction& instruction,
                                           gd::String search,
                                           bool matchCase,
                                           bool isCondition);
   static bool SearchStringInActions(const gd::Platform& platform,
-                                    gd::ObjectsContainer& project,
-                                    gd::ObjectsContainer& layout,
                                     gd::InstructionsList& actions,
                                     gd::String search,
                                     bool matchCase,
                                     bool inSentences);
   static bool SearchStringInConditions(const gd::Platform& platform,
-                                       gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
                                        gd::InstructionsList& conditions,
                                        gd::String search,
                                        bool matchCase,
                                        bool inSentences);
-  static bool SearchStringInEvent(gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
-                                       gd::BaseEvent& events,
-                                       gd::String search,
-                                       bool matchCase);
+  static bool SearchStringInEvent(gd::BaseEvent& events,
+                                  gd::String search,
+                                  bool matchCase);
 
   EventsRefactorer(){};
 };

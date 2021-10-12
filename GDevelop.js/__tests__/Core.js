@@ -2027,12 +2027,9 @@ describe('libGD.js', function () {
 
   describe('EventsRefactorer', function () {
     describe('SearchInEvents', function() {
-      let project = layout = eventList = event1 = event2 = null;
+      let eventList = event1 = event2 = null;
 
       beforeAll(() => {
-        project = new gd.ProjectHelper.createNewGDJSProject();
-        layout = project.insertNewLayout('Scene', 0);
-
         eventList = new gd.EventsList();
 
         /* Event 1 */
@@ -2080,30 +2077,30 @@ describe('libGD.js', function () {
       });
 
       it('should search string in parameters only and respect case', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'mycharacter', true, true, true, false, false)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', true, true, true, false, false)
         expect(searchResultEvents1.size()).toBe(0)
-        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'MyCharacter', true, true, true, false, false)
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'MyCharacter', true, true, true, false, false)
         expect(searchResultEvents2.size()).toBe(1)
         expect(searchResultEvents2.at(0).getEvent()).toBe(event1)
       });
 
       it('should search string in parameters only', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'mycharacter', false, true, true, false, false)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', false, true, true, false, false)
         expect(searchResultEvents1.size()).toBe(1)
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
 
-        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'position', false, true, true, false, false)
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position', false, true, true, false, false)
         expect(searchResultEvents2.size()).toBe(0)
       });
 
       it('should search string in sentences', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'In Degrees', false, true, true, false, true)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'In Degrees', false, true, true, false, true)
         expect(searchResultEvents1.size()).toBe(1)
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2)
       })
 
       it('should search string in sentences with parameter placeholders replaced', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), project, layout, eventList, 'position of MyCharacter', false, true, true, false, true)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position of MyCharacter', false, true, true, false, true)
         expect(searchResultEvents1.size()).toBe(1)
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
       })

@@ -120,7 +120,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
-    const { globalObjectsContainer, objectsContainer, events } = this.props;
+    const { events } = this.props;
 
     if (searchInSelection) {
       // Search in selection is a bit tricky to implement as it requires to have a list
@@ -131,8 +131,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
 
     const newEventsSearchResults = gd.EventsRefactorer.searchInEvents(
       this.props.project.getCurrentPlatform(),
-      globalObjectsContainer,
-      objectsContainer,
       events,
       searchText,
       matchCase,

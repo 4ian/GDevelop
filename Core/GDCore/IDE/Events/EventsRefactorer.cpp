@@ -677,8 +677,6 @@ bool EventsRefactorer::ReplaceStringInConditions(
 
 vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
     gd::EventsList& events,
     gd::String search,
     bool matchCase,
@@ -697,7 +695,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInConditions(
-                platform, project, layout, *conditionsVectors[j], search, matchCase, inEventSentences)) {
+                platform, *conditionsVectors[j], search, matchCase, inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -712,7 +710,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
             SearchStringInActions(
-                platform, project, layout, *actionsVectors[j], search, matchCase, inEventSentences)) {
+                platform, *actionsVectors[j], search, matchCase, inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -723,7 +721,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
     if (inEventStrings) {
       if (!eventAddedInResults &&
-          SearchStringInEvent(project, layout, events[i], search, matchCase)) {
+          SearchStringInEvent(events[i], search, matchCase)) {
         results.push_back(EventsSearchResult(
             std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
             &events,
@@ -734,8 +732,6 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     if (events[i].CanHaveSubEvents()) {
       vector<EventsSearchResult> subResults =
           SearchInEvents(platform,
-                         project,
-                         layout,
                          events[i].GetSubEvents(),
                          search,
                          matchCase,
@@ -753,8 +749,6 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
 
 bool EventsRefactorer::SearchStringInActions(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
     gd::InstructionsList& actions,
     gd::String search,
     bool matchCase,
@@ -775,8 +769,6 @@ bool EventsRefactorer::SearchStringInActions(
 
     if (inSentences && SearchStringInFormattedText(
       platform,
-      project,
-      layout,
       actions[aId],
       search,
       matchCase,
@@ -785,8 +777,6 @@ bool EventsRefactorer::SearchStringInActions(
 
     if (!actions[aId].GetSubInstructions().empty() &&
         SearchStringInActions(platform,
-                              project,
-                              layout,
                               actions[aId].GetSubInstructions(),
                               search,
                               matchCase,
@@ -799,8 +789,6 @@ bool EventsRefactorer::SearchStringInActions(
 
 bool EventsRefactorer::SearchStringInFormattedText(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
     gd::Instruction& instruction,
     gd::String search,
     bool matchCase,
@@ -827,8 +815,6 @@ bool EventsRefactorer::SearchStringInFormattedText(
 
 bool EventsRefactorer::SearchStringInConditions(
     const gd::Platform& platform,
-    gd::ObjectsContainer& project,
-    gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
     gd::String search,
     bool matchCase,
@@ -849,8 +835,6 @@ bool EventsRefactorer::SearchStringInConditions(
 
     if (inSentences && SearchStringInFormattedText(
       platform,
-      project,
-      layout,
       conditions[cId],
       search,
       matchCase,
@@ -859,8 +843,6 @@ bool EventsRefactorer::SearchStringInConditions(
 
     if (!conditions[cId].GetSubInstructions().empty() &&
         SearchStringInConditions(platform,
-                                 project,
-                                 layout,
                                  conditions[cId].GetSubInstructions(),
                                  search,
                                  matchCase,
@@ -871,9 +853,7 @@ bool EventsRefactorer::SearchStringInConditions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInEvent(gd::ObjectsContainer& project,
-                                           gd::ObjectsContainer& layout,
-                                           gd::BaseEvent& event,
+bool EventsRefactorer::SearchStringInEvent(gd::BaseEvent& event,
                                            gd::String search,
                                            bool matchCase) {
   for (gd::String str : event.GetAllSearchableStrings()) {

@@ -375,8 +375,9 @@ namespace gdjs {
           let oldY = object.getY();
           object.setY(object.getY() + this._requestedDeltaY);
 
-          //Stop when colliding with an obstacle.
+          // Stop when colliding with an obstacle.
           while (
+            // Jumpthru == obstacle <=> Never when going up.
             (this._requestedDeltaY < 0 &&
               this._isCollidingWithOneOf(
                 this._potentialCollidingObjects,
@@ -384,14 +385,13 @@ namespace gdjs {
                 /*excludeJumpThrus=*/
                 true
               )) ||
-            //Jumpthru = obstacle <=> Never when going up
+            // Jumpthru == obstacle <=> Only if not already overlapped when going down.
             (this._requestedDeltaY > 0 &&
               this._isCollidingWithOneOfExcluding(
                 this._potentialCollidingObjects,
                 this._overlappedJumpThru
               ))
           ) {
-            //Jumpthru = obstacle <=> Only if not already overlapped when going down
             if (this._state === this._jumping) {
               this._setFalling();
             }
@@ -400,7 +400,7 @@ namespace gdjs {
               (this._requestedDeltaY < 0 && object.getY() >= oldY)
             ) {
               object.setY(
-                //Unable to move the object without being stuck in an obstacle.
+                // Unable to move the object without being stuck in an obstacle.
                 oldY
               );
               break;
@@ -508,7 +508,7 @@ namespace gdjs {
       const oldY = object.getY();
       // Avoid landing on a platform if the object is not going down.
       // (which could happen for Jumpthru, when the object jump and pass just at the top
-      // of a jumpthru, it could be considered as landing if not this this extra check).
+      // of a jumpthru, it could be considered as landing if not for this extra check).
       const canLand = this._requestedDeltaY >= 0;
 
       // The interval could be smaller.
@@ -1492,7 +1492,7 @@ namespace gdjs {
       // Indeed, if we used it, then:
       // - going down, the character could no longer be on a platform and start falling.
       // - going up, the character will already be pushed on top on the platform
-      //   by `beforeMovingY` that handle slopes or the separate call that both
+      //   by `beforeMovingY` that handle slopes or by `_separateFromPlatforms` that
       //   avoid characters being stuck. So using `_requestedDeltaY`, the character
       //   would be going too much higher and fall at the next frame.
       //
@@ -1500,9 +1500,9 @@ namespace gdjs {
       // at a greater speed as it's coherent from a physics point of view.
       // But, when the character is put on top of the platform to follow it up,
       // the platform AABB may not be updated in RBush yet
-      // and the platform can become out of the spacial search rectangle
+      // and the platform can go out of the spatial search rectangle
       // even though they are next to each other, which means
-      // that the character will fell.
+      // that the character will fall.
       const deltaY = this._floorPlatform!.owner.getY() - this._floorLastY;
       if (
         deltaY !== 0 &&
@@ -1547,7 +1547,7 @@ namespace gdjs {
       const object = behavior.owner;
 
       if (object.getX() === oldX + behavior._requestedDeltaX) {
-        // The character didn't encounter any obstacle.
+        // The character didn't encounter any obstacles on the X axis.
         // It follows the floor.
         const deltaMaxY = Math.abs(
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
@@ -1568,7 +1568,7 @@ namespace gdjs {
           behavior.owner.setX(oldX);
         }
       } else {
-        // The character encounter an obstacle.
+        // The character encountered an obstacle on the X axis.
         // Try to walk on it or stop before it.
 
         // Try to follow the platform until the obstacle.
@@ -1588,22 +1588,24 @@ namespace gdjs {
           behavior.owner.setX(oldX);
         } else {
           const requestedDeltaX = behavior._requestedDeltaX;
-          // The current platform is climbed
+          // The current platform is climbed.
           // Can the obstacle be climbed too from here?
-          // Do a look up in 2 steps:
+          // We do a look-up in 2 steps:
           // 1. Try to move 1 pixel on X to climb the junction
           //    (because the obstacle detection is done 1 pixel by 1 pixel).
-          // 2. Try to follow the obstacle slope from at least 1 pixel
+          // 2. Try to follow the obstacle slope by at least 1 pixel on X axis
           //    (it can only be done after the junction because otherwise
           //    the slope angle would be a mean between the current platform and
           //    the obstacles).
-          // The 2nd steps is done 1 pixel width at least, when remainingDeltaX
-          // is less than 2 pixels, it will be a lookahead. This is to ensure
-          // the character doesn't start to climb a slope he actually can't.
+          //
+          // The 2nd step is done using a 1 pixel width at least, when remainingDeltaX
+          // is less than 2 pixels: this will be a "lookahead". This is to ensure
+          // the character doesn't start to climb a slope it actually can't.
           const remainingDeltaX = requestedDeltaX - (object.getX() - oldX);
           const beforeObstacleY = object.getY();
           const beforeObstacleX = object.getX();
-          // 1. Try to move 1 pixel on X to climb the junction.
+          
+          // 1. Try to move 1 pixel on the X axis to climb the junction.
           object.setX(object.getX() + Math.sign(requestedDeltaX));
           const {
             highestGround: highestGroundAtJunction,

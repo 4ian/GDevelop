@@ -694,6 +694,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                       return specialCharacters.find(c) != std::string::npos;
                     },
                     "");
+  std::cout << search << std::endl;
+  search.remove_adjacent_occurrences(search.begin(),
+                                     search.end(),
+                                     ' ');
+  std::cout << search << std::endl;
 
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventAddedInResults = false;

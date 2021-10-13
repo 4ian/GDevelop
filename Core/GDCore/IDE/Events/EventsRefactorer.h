@@ -227,6 +227,8 @@ class GD_CORE_API EventsRefactorer {
                                   gd::String search,
                                   bool matchCase);
 
+  static const std::string specialCharacters() { return ";:,#()";};
+
   EventsRefactorer(){};
 };
 

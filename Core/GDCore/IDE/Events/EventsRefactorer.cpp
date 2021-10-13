@@ -806,12 +806,12 @@ bool EventsRefactorer::SearchStringInFormattedText(
     completeSentence += formattedText.at(id).first;
   }
 
-  std::string chars = ";:,#()";
+  const std::string specialCharacters = EventsRefactorer::specialCharacters();
 
   completeSentence.replace_if(completeSentence.begin(),
                               completeSentence.end(),
-                              [&chars](const char &c) {
-                                return chars.find(c) != std::string::npos;
+                              [&specialCharacters](const char &c) {
+                                return specialCharacters.find(c) != std::string::npos;
                               },
                               "");
 

@@ -12,6 +12,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Project/Variable.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -472,8 +473,8 @@ class GD_CORE_API EventsCodeGenerator {
    * \endcode
    * - objectListWithoutPicking : Same as objectList but do not pick object if
   they are not already picked.
-   * - objectPtr : Return a reference to the object specified by the object name in
-  another parameter. Example:
+   * - objectPtr : Return a reference to the object specified by the object name
+  in another parameter. Example:
    * \code
   .AddParameter("object", _("Object"))
   .AddParameter("objectPtr", _("Target object"))
@@ -503,6 +504,21 @@ class GD_CORE_API EventsCodeGenerator {
     }
 
     return "getVariableForObject(" + objectName + ", " + variableName + ")";
+  }
+
+  /**
+   * \brief Generate the code to get the value of a variable.
+   *
+   * \note This returns a value, so collection types cannot be used here!
+   */
+  virtual gd::String GenerateVariableValueGetter(
+      const gd::Variable::Type& type) {
+    if (type == gd::Variable::Type::Number)
+      return ".getAsNumber()";
+    else if (type == gd::Variable::Type::Boolean)
+      return ".getAsBoolean()";
+    else
+      return ".getAsString()";
   }
 
   /**

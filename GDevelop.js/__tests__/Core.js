@@ -3286,6 +3286,17 @@ describe('libGD.js', function () {
         .get('TestExtensionName::PlayerHealth');
       expect(declaredExpression.getParametersCount()).toBe(2);
     });
+
+    it('can have variable expressions', function () {
+      const extension = makeTestExtension();
+      extension.addVariableExpression('TEST', 'TEST', 'TEST', 'TEST', 'TEST');
+      expect(
+        extension.getAllStrExpressions().has('TestExtensionName::TEST')
+      ).toBe(false);
+      expect(
+        extension.getAllVariableExpressions().has('TestExtensionName::TEST')
+      ).toBe(true);
+    });
   });
 
   describe('gd.Platform (using gd.JsPlatform)', function () {

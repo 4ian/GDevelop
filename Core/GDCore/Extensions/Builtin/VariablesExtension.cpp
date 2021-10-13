@@ -229,6 +229,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddParameter("trueorfalse", _("New Value:"));
 
   extension
+      .AddAction(
+          "SetBooleanVariable",
+          _("Set boolean value of a variable"),
+          _("Modify the boolean value of a variable."),
+          _("Set the boolean value of variable _PARAM0_ to _PARAM1_"),
+          _("Variables"),
+          "res/conditions/var24.png",
+          "res/conditions/var.png")
+      .AddParameter("variable", _("Variable"))
+      .AddParameter("trueorfalse", _("New Value:"));
+
+  extension
       .AddAction("ToggleGlobalVariableAsBoolean",
                  _("Toggle boolean value of a global variable"),
                  _("Toggle the boolean value of a global variable.") + "\n" +
@@ -296,7 +308,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("scenevar", _("Array variable"))
       .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and appended at the "
+            "end of the array."))
       .MarkAsAdvanced();
 
   extension
@@ -336,14 +350,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "SceneVariableRemoveAt",
-          _("Remove variable from a scene array (by index)"),
-          _("Removes a variable at the specified index of a scene array variable."),
-          _("Remove variable at index _PARAM1_ from scene array variable _PARAM0_"),
-          _("Variables/Collections/Arrays"),
-          "res/actions/var24.png",
-          "res/actions/var.png")
+      .AddAction("SceneVariableRemoveAt",
+                 _("Remove variable from a scene array (by index)"),
+                 _("Removes a variable at the specified index of a scene array "
+                   "variable."),
+                 _("Remove variable at index _PARAM1_ from scene array "
+                   "variable _PARAM0_"),
+                 _("Variables/Collections/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"))
       .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
@@ -358,18 +373,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                  "res/actions/var.png")
       .AddParameter("globalvar", _("Array variable"))
       .AddParameter("scenevar", _("Scene variable with the content to append"))
-      .SetParameterLongDescription(_("The content of the variable will *be copied* and appended at the end of the array."))
+      .SetParameterLongDescription(
+          _("The content of the variable will *be copied* and appended at the "
+            "end of the array."))
       .MarkAsAdvanced();
 
   extension
-      .AddAction(
-          "GlobalVariableRemoveAt",
-          _("Remove variable from a global array (by index)"),
-          _("Removes a variable at the specified index of a global array variable."),
-          _("Remove variable at index _PARAM1_ from global array variable _PARAM0_"),
-          _("Variables/Global variables/Collections/Arrays"),
-          "res/actions/var24.png",
-          "res/actions/var.png")
+      .AddAction("GlobalVariableRemoveAt",
+                 _("Remove variable from a global array (by index)"),
+                 _("Removes a variable at the specified index of a global "
+                   "array variable."),
+                 _("Remove variable at index _PARAM1_ from global array "
+                   "variable _PARAM0_"),
+                 _("Variables/Global variables/Collections/Arrays"),
+                 "res/actions/var24.png",
+                 "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"))
       .AddParameter("expression", _("Index to remove"))
       .MarkAsAdvanced();
@@ -457,6 +475,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Variables"),
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"));
+
+  extension
+      .AddVariableExpression("SceneVar",
+                             _("Scene variable"),
+                             _("Get a scene variable."),
+                             _("Variables"),
+                             "res/actions/var.png")
+      .AddParameter("scenevar", _("Name of the scene variable"));
+
+  extension
+      .AddVariableExpression("GlobalVar",
+                             _("Global variable"),
+                             _("Get a global variable."),
+                             _("Variables"),
+                             "res/actions/var.png")
+      .AddParameter("globalvar", _("Name of the global variable"));
 }
 
 }  // namespace gd

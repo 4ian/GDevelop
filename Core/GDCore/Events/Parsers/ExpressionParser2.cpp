@@ -110,7 +110,7 @@ std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
                               " " + type,
                             functionStartPosition);
   } else {
-    if (type != returnType)
+    if (type != returnType && returnType != "variable")
       return RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
             returnType,

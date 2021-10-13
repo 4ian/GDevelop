@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "NetworkExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
@@ -28,12 +29,18 @@ NetworkExtension::NetworkExtension() {
   GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName(
       "gdjs.evtTools.network.jsonToObjectVariableStructure");
 
+
+  GetAllStrExpressions()["VarToJSON"].SetFunctionName(
+      "gdjs.evtTools.network.variableStructureToJSON");
   GetAllStrExpressions()["ToJSON"].SetFunctionName(
       "gdjs.evtTools.network.variableStructureToJSON");
   GetAllStrExpressions()["GlobalVarToJSON"].SetFunctionName(
       "gdjs.evtTools.network.variableStructureToJSON");
   GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName(
       "gdjs.evtTools.network.objectVariableStructureToJSON");
+
+  GetAllVariableExpressions()["FromJSON"].SetFunctionName(
+      "new gdjs.Variable().fromJSON");
 
   StripUnimplementedInstructionsAndExpressions();
 }

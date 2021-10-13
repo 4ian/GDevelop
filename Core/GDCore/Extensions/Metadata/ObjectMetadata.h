@@ -122,6 +122,15 @@ class GD_CORE_API ObjectMetadata {
                                            const gd::String& smallicon_);
 
   /**
+   * \brief Declare a new variable expression as being part of the extension.
+   */
+  gd::ExpressionMetadata& AddVariableExpression(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& group_,
+                                           const gd::String& smallicon_);
+
+  /**
    * \brief Declare a new expression and condition as being part of the
    * object.
    * \note It's recommended to use this function to avoid declaring twice a
@@ -201,12 +210,10 @@ class GD_CORE_API ObjectMetadata {
   }
 
   const gd::String& GetName() const { return name; }
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#endif
 
   /**
    * \brief Set the URL pointing to the help page about this object
@@ -227,27 +234,24 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& AddIncludeFile(const gd::String& includeFile);
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::map<gd::String, gd::ExpressionMetadata> variableExpressionsInfos;
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-#endif
   CreateFunPtr createFunPtr;
 
  private:
   gd::String extensionNamespace;
   gd::String name;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String helpUrl;  ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-#endif
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation

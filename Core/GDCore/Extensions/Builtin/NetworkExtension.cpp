@@ -172,6 +172,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddVariableExpression("FromJSON",
+                             _("JSON to Variable"),
+                             _("Creates a variable from a JSON string."),
+                             _("Network"),
+                             "res/conditions/toujours24.png")
+      .AddParameter("string", "The JSON string");
+
+  extension
+      .AddStrExpression("VarToJSON",
+                        _("Convert a variable to JSON"),
+                        _("Convert a variable to JSON"),
+                        _("Conversion"),
+                        "res/conditions/toujours24.png")
+      .AddParameter("variable", _("Variable to be stringified"));
+
+  extension
       .AddStrExpression("ToJSON",
                         _("Convert scene variable to JSON"),
                         _("Convert a scene variable to JSON"),

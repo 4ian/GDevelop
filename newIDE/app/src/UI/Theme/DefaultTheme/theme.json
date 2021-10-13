@@ -206,9 +206,6 @@
         }
       },
       "row-search": {
-        "border-color": {
-          "value": "#18dcf2"
-        },
         "border-left-width-match": {
           "value": "3px"
         },
@@ -254,6 +251,16 @@
       },
       "border-bottom-color": {
         "value": "{event-sheet.conditions.border-color.value}"
+      }
+    },
+    "events": {
+      "highlighted": {
+        "background-color": {
+          "value": "#f1e0f9"
+        },
+        "color": {
+          "value": "#9100ce"
+        }
       }
     },
     "actions": {

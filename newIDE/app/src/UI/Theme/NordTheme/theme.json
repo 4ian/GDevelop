@@ -205,9 +205,6 @@
         }
       },
       "row-search": {
-        "border-color": {
-          "value": "{theme.primary.color.value}"
-        },
         "border-left-width-match": {
           "value": "3px"
         },
@@ -253,6 +250,16 @@
       },
       "border-bottom-color": {
         "value": "#2E3440"
+      }
+    },
+    "events": {
+      "highlighted": {
+        "background-color": {
+          "value": "#5E5137"
+        },
+        "color": {
+          "value": "#EBCB8B"
+        }
       }
     },
     "actions": {

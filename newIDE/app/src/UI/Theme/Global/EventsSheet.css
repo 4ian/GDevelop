@@ -172,12 +172,20 @@
 
 .gd-events-sheet .rst__rowSearchMatch {
     outline: none;
-    border-left: solid var(--event-sheet-rst-row-search-border-left-width-match) var(--event-sheet-rst-row-search-border-color);
+    border-left: solid var(--event-sheet-rst-row-search-border-left-width-match) var(--event-sheet-events-highlighted-color);
+}
+.gd-events-sheet .rst__rowSearchMatch .conditions-container{
+    outline: none;
+    background-color: var(--event-sheet-events-highlighted-background-color);
+}
+.gd-events-sheet .rst__rowSearchMatch .actions-container {
+    outline: none;
+    background-color: var(--event-sheet-events-highlighted-background-color);
 }
 
 .gd-events-sheet .rst__rowSearchFocus {
     outline: none;
-    border-left: solid var(--event-sheet-rst-row-search-border-left-width-focus)  var(--event-sheet-rst-row-search-border-color);
+    border-left: solid var(--event-sheet-rst-row-search-border-left-width-focus) var(--event-sheet-events-highlighted-color);
 }
 
 /**

@@ -2037,9 +2037,12 @@ describe('libGD.js', function () {
 
         var eventActions1 = event1.getActions();
         var action1 = new gd.Instruction();
-        action1.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
-        action1.setParametersCount(1);
+        action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
+        action1.setParametersCount(4);
         action1.setParameter(0, 'Platform');
+        action1.setParameter(1, '450');
+        action1.setParameter(2, '200');
+        action1.setParameter(3, '90');
         eventActions1.push_back(action1);
 
         var eventConditions1 = event1.getConditions();
@@ -2101,6 +2104,12 @@ describe('libGD.js', function () {
 
       it('should search string in sentences with parameter placeholders replaced', function () {
         const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position of MyCharacter', false, true, true, false, true)
+        expect(searchResultEvents1.size()).toBe(1)
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
+      })
+
+      it('should search string in sentences with parameter placeholders replaced and special characters removed', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'towards 450200', false, true, true, false, true)
         expect(searchResultEvents1.size()).toBe(1)
         expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
       })

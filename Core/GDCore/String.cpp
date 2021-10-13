@@ -6,6 +6,7 @@
 
 #include "GDCore/String.h"
 
+#include <algorithm>
 #include <string.h>
 
 #include <SFML/System/String.hpp>
@@ -280,6 +281,19 @@ String& String::insert( size_type pos, const String &str )
     //Use the real position as bytes using the std::string::iterators
     m_string.insert( std::distance(m_string.begin(), it.base()), str.m_string );
 
+    return *this;
+}
+
+String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t)> p,  const String &str)
+{
+    String::size_type offset = 1;
+    for(iterator it = i1.base();it<i2.base();it++)
+    {
+        if (p(*it))
+        {
+            replace(std::distance(begin(), it), offset, str);
+        }
+    }
     return *this;
 }
 

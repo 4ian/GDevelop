@@ -806,6 +806,15 @@ bool EventsRefactorer::SearchStringInFormattedText(
     completeSentence += formattedText.at(id).first;
   }
 
+  std::string chars = ";:,#()";
+
+  completeSentence.replace_if(completeSentence.begin(),
+                              completeSentence.end(),
+                              [&chars](const char &c) {
+                                return chars.find(c) != std::string::npos;
+                              },
+                              "");
+
   size_t foundPosition = matchCase
                                 ? completeSentence.find(search)
                                 : completeSentence.FindCaseInsensitive(search);

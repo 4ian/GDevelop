@@ -676,6 +676,12 @@ namespace gdjs {
       upwardDeltaY: float,
       downwardDeltaY: float
     ): PlatformSearchResult {
+      
+    // TODO What if one obstacle is just upward and another one is followed up?
+    // Should it remember how much the character can go up without collision on top
+    // and return _floorIsTooHigh if the floor found is higher than that.
+    // To avoid going in a too small cavern and then pop out awkwardly or being stuck.
+
       let totalHighestY = Number.MAX_VALUE;
       let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
       let isCollidingAnyPlatform = false;
@@ -778,7 +784,7 @@ namespace gdjs {
       if (
         platformAABB.max[0] <= ownerMinX ||
         platformAABB.min[0] >= ownerMaxX ||
-        platformAABB.max[1] < ownerMinY ||
+        platformAABB.max[1] <= ownerMinY ||
         platformAABB.min[1] > floorMaxY
       ) {
         return PlatformerObjectRuntimeBehavior._noCollision;

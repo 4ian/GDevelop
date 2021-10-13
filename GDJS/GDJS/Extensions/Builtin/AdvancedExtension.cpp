@@ -108,12 +108,11 @@ AdvancedExtension::AdvancedExtension() {
         const gd::String& objectList = codeGenerator.GetObjectListName(instruction.GetParameter(0).GetPlainString(), context);
         return "if (typeof eventsFunctionContext !== 'undefined') {"
                "  eventsFunctionContext.returnValue = true;"
-               "  for (const list of Object.values(eventsFunctionContext.getObjectsLists("+objectName+").items)) {"
+               "  const lists = eventsFunctionContext.getObjectsLists("+objectName+");"
                // Clear picked objects list...
-               "    list.length = 0;"
+               "  for (const list of Object.values(lists.items)) list.length = 0;"
                // ...and pick one by one each objects that need to be picked.
-               "    for(const o of "+objectList+") list.push(o);"
-               "  };"
+               "  for(const o of "+objectList+") lists.get(o.getName()).push(o);"
                "}";
       });
 

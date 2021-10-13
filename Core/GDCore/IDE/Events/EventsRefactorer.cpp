@@ -686,6 +686,15 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inEventSentences) {
   vector<EventsSearchResult> results;
 
+  const std::string specialCharacters = EventsRefactorer::specialCharacters();
+
+  search.replace_if(search.begin(),
+                    search.end(),
+                    [&specialCharacters](const char &c) {
+                      return specialCharacters.find(c) != std::string::npos;
+                    },
+                    "");
+
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventAddedInResults = false;
 

@@ -87,32 +87,14 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     }
   }
   SECTION("Operator (number)") {
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions1{
-        gd::ExpressionCompletionDescription::ForObject("number", "", 1, 1),
-        gd::ExpressionCompletionDescription::ForExpression("number", "", 1, 1)};
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions2{
-        gd::ExpressionCompletionDescription::ForObject("number", "", 2, 2),
-        gd::ExpressionCompletionDescription::ForExpression("number", "", 2, 2)};
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions3{
-        gd::ExpressionCompletionDescription::ForObject("number", "", 3, 3),
-        gd::ExpressionCompletionDescription::ForExpression("number", "", 3, 3)};
-    REQUIRE(getCompletionsFor("number", "1 + ", 1) == expectedCompletions1);
-    REQUIRE(getCompletionsFor("number", "1 + ", 2) == expectedCompletions2);
-    REQUIRE(getCompletionsFor("number", "1 + ", 3) == expectedCompletions3);
+    REQUIRE(getCompletionsFor("number", "1 + ", 1) == expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("number", "1 + ", 2) == expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("number", "1 + ", 3) == expectedEmptyCompletions);
   }
   SECTION("Operator (string)") {
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions3{
-        gd::ExpressionCompletionDescription::ForObject("string", "", 3, 3),
-        gd::ExpressionCompletionDescription::ForExpression("string", "", 3, 3)};
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions4{
-        gd::ExpressionCompletionDescription::ForObject("string", "", 4, 4),
-        gd::ExpressionCompletionDescription::ForExpression("string", "", 4, 4)};
-    std::vector<gd::ExpressionCompletionDescription> expectedCompletions5{
-        gd::ExpressionCompletionDescription::ForObject("string", "", 5, 5),
-        gd::ExpressionCompletionDescription::ForExpression("string", "", 5, 5)};
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 3) == expectedCompletions3);
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 4) == expectedCompletions4);
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) == expectedCompletions5);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 3) == expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 4) == expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) == expectedEmptyCompletions);
   }
 
   SECTION("Free function") {

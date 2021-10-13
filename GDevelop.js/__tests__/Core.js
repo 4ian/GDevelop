@@ -3010,22 +3010,11 @@ describe('libGD.js', function () {
       });
     });
 
-    it('completes an expression with an operator', function () {
-      expect.assertions(6);
+    it('doesnt complete an expression with an operator', function () {
+      expect.assertions(0);
       testCompletions('number', '1 +| ', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        }
+        // No elements returned, so this will not be called.
+        expect(completionDescription).toBe(undefined);
       });
     });
 

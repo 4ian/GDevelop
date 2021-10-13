@@ -311,7 +311,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         addDot: expressionAutocompletion.addDot,
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
+        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
       }
     );
 
@@ -348,6 +348,16 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
+    const expression = this.state.validatedValue;
+    // If the expression ends with a space, the user must be navigating or switching to another text
+    // so let's not return anything.
+    if (expression.charAt(expression.length - 1) === ' ') {
+      this.setState(state => ({
+        autocompletions: getAutocompletionsInitialState(),
+      }));
+      return;
+    }
+
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
@@ -356,7 +366,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer
     );
-    const expression = this.state.validatedValue;
+
     const expressionNode = parser
       .parseExpression(expressionType, expression)
       .get();

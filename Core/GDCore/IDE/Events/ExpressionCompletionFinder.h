@@ -326,10 +326,7 @@ class GD_CORE_API ExpressionCompletionFinder
         node.type, "", searchedPosition + 1, searchedPosition + 1));
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
-    completions.push_back(ExpressionCompletionDescription::ForExpression(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
+    // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     completions.push_back(ExpressionCompletionDescription::ForObject(

@@ -12,7 +12,7 @@ import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { getVisibleParameterTypes } from './FormatExpressionCall';
 import { type ParameterRenderingServiceType } from '../ParameterFieldCommons';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Column, Spacer } from '../../../UI/Grid';
 import ObjectsRenderingService from '../../../ObjectsRendering/ObjectsRenderingService';
 
 const defaultTextStyle = {
@@ -137,45 +137,6 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
     );
   }
 );
-
-const DisplayedExactExpressionAutocompletion = ({
-  expressionAutocompletion,
-  i18n,
-  parameterRenderingService,
-}: {|
-  expressionAutocompletion: ExpressionAutocompletion,
-  i18n: I18nType,
-  parameterRenderingService: ParameterRenderingServiceType,
-|}) => {
-  if (!expressionAutocompletion.enumeratedExpressionMetadata) return null;
-
-  return (
-    <Column>
-      <Line noMargin expand alignItems="center">
-        <AutocompletionIcon
-          src={
-            expressionAutocompletion.enumeratedExpressionMetadata.iconFilename
-          }
-        />
-        <Spacer />
-        <Text style={defaultTextStyle} noMargin align="left">
-          <b>{expressionAutocompletion.completion}</b>(
-          <i>
-            {formatParameterTypesString(
-              parameterRenderingService,
-              i18n,
-              expressionAutocompletion.enumeratedExpressionMetadata
-            )}
-          </i>
-          )
-        </Text>
-      </Line>
-      <Text style={defaultTextStyle} noMargin size="body2">
-        {expressionAutocompletion.enumeratedExpressionMetadata.metadata.getDescription()}
-      </Text>
-    </Column>
-  );
-};
 
 const DisplayedObjectAutocompletion = React.forwardRef(
   (
@@ -356,7 +317,7 @@ export default function ExpressionAutocompletionsDisplayer({
                       ref={ref}
                     />
                   ) : expressionAutocompletion.kind === 'Expression' ? (
-                    !expressionAutocompletion.isExact ? (
+                    !expressionAutocompletion.isExact && (
                       <DisplayedExpressionAutocompletion
                         key={index}
                         expressionAutocompletion={expressionAutocompletion}
@@ -365,13 +326,6 @@ export default function ExpressionAutocompletionsDisplayer({
                         i18n={i18n}
                         parameterRenderingService={parameterRenderingService}
                         ref={ref}
-                      />
-                    ) : (
-                      <DisplayedExactExpressionAutocompletion
-                        key={index}
-                        expressionAutocompletion={expressionAutocompletion}
-                        i18n={i18n}
-                        parameterRenderingService={parameterRenderingService}
                       />
                     )
                   ) : expressionAutocompletion.kind === 'Object' ? (

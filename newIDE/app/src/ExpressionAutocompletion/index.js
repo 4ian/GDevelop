@@ -34,7 +34,7 @@ type BaseExpressionAutocompletion = {|
   addDot?: boolean,
   addParameterSeparator?: boolean,
   addNamespaceSeparator?: boolean,
-  addClosingParenthesis?: boolean,
+  hasVisibleParameters?: boolean,
   isExact?: boolean,
 |};
 
@@ -110,8 +110,8 @@ const getAutocompletionsForExpressions = (
         replacementEndPosition,
         enumeratedExpressionMetadata: enumeratedExpressionMetadata,
         addParenthesis: true,
-        addClosingParenthesis:
-          getVisibleParameterTypes(enumeratedExpressionMetadata).length === 0,
+        hasVisibleParameters:
+          getVisibleParameterTypes(enumeratedExpressionMetadata).length !== 0,
         isExact,
       };
     })
@@ -219,6 +219,7 @@ const getAutocompletionsForObject = function(
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
+  console.log('object', prefix, '#');
   const type: string = completionDescription.getType();
   const {
     gd,
@@ -231,11 +232,16 @@ const getAutocompletionsForObject = function(
     objectsContainer
   );
 
+  // We hide exact matches to prevent suggesting options already fully typed.
   const filteredObjectsList = filterObjectsList(allObjectsList, {
     searchText: prefix,
     selectedTags: [],
+    hideExactMatches: true,
   });
-  const filteredGroupsList = filterGroupsList(allGroupsList, prefix);
+  const filteredGroupsList = filterGroupsList(allGroupsList, {
+    searchText: prefix,
+    hideExactMatches: true,
+  });
 
   // If we expect an object, don't add a dot. Otherwise (number, string...),
   // add a dot to prepare for an object function.
@@ -345,7 +351,6 @@ const getAutocompletionsForText = function(
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
     addParameterSeparator: !isLastParameter,
-    addClosingParenthesis: isLastParameter,
   }));
 };
 
@@ -398,7 +403,6 @@ const getAutocompletionsForVariable = function(
     completion: variableName,
     replacementStartPosition: completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
-    addClosingParenthesis: true,
   }));
 };
 
@@ -445,6 +449,7 @@ export const getAutocompletionsFromDescriptions = (
       const completionKind = completionDescription.getCompletionKind();
 
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
+        console.log('EXPRESSION');
         const objectName: string = completionDescription.getObjectName();
         const behaviorName: string = completionDescription.getBehaviorName();
 
@@ -465,6 +470,7 @@ export const getAutocompletionsFromDescriptions = (
           );
         }
       } else if (completionKind === gd.ExpressionCompletionDescription.Object) {
+        console.log('OBJECT');
         return getAutocompletionsForObject(
           expressionAutocompletionContext,
           completionDescription
@@ -472,11 +478,13 @@ export const getAutocompletionsFromDescriptions = (
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Behavior
       ) {
+        console.log('BHEAVIOR');
         return getAutocompletionsForBehavior(
           expressionAutocompletionContext,
           completionDescription
         );
       } else if (completionKind === gd.ExpressionCompletionDescription.Text) {
+        console.log('TEXT');
         return getAutocompletionsForText(
           expressionAutocompletionContext,
           completionDescription
@@ -484,6 +492,7 @@ export const getAutocompletionsFromDescriptions = (
       } else if (
         completionKind === gd.ExpressionCompletionDescription.Variable
       ) {
+        console.log('VARIABLE');
         return getAutocompletionsForVariable(
           expressionAutocompletionContext,
           completionDescription
@@ -500,7 +509,7 @@ type InsertedAutocompletion = {|
   replacementStartPosition?: number,
   replacementEndPosition?: number,
   addParenthesis?: ?boolean,
-  addClosingParenthesis?: ?boolean,
+  hasVisibleParameters?: ?boolean,
   addDot?: ?boolean,
   addParameterSeparator?: ?boolean,
   addNamespaceSeparator?: ?boolean,
@@ -523,11 +532,7 @@ export const insertAutocompletionInExpression = (
       : insertedAutocompletion.addNamespaceSeparator
       ? '::'
       : insertedAutocompletion.addParenthesis
-      ? insertedAutocompletion.addClosingParenthesis
-        ? '()'
-        : '('
-      : insertedAutocompletion.addClosingParenthesis
-      ? ')'
+      ? '()'
       : '';
 
     const addSuffix =
@@ -562,9 +567,17 @@ export const insertAutocompletionInExpression = (
   const newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
   const newExpressionEnd = expression.substring(wordEndPosition);
+  const newExpression = newExpressionStart + insertedWord + newExpressionEnd;
+  let newCaretLocation = newExpressionStart.length + insertedWord.length;
+  if (
+    insertedAutocompletion.addParenthesis &&
+    insertedAutocompletion.hasVisibleParameters
+  ) {
+    newCaretLocation = newCaretLocation - 1;
+  }
 
   return {
-    caretLocation: newExpressionStart.length + insertedWord.length,
-    expression: newExpressionStart + insertedWord + newExpressionEnd,
+    caretLocation: newCaretLocation,
+    expression: newExpression,
   };
 };

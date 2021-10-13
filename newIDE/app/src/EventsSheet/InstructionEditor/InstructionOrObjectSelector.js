@@ -182,7 +182,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     });
     const displayedObjectGroupsList = selectedObjectTags.length
       ? []
-      : filterGroupsList(allGroupsList, searchText);
+      : filterGroupsList(allGroupsList, { searchText });
     const isSearching = !!searchText;
 
     const filteredInstructionsList = filterInstructionsList(

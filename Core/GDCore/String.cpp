@@ -6,6 +6,9 @@
 
 #include "GDCore/String.h"
 
+#include <algorithm>
+#include <iostream>
+#include <utility>
 #include <string.h>
 
 #include <SFML/System/String.hpp>
@@ -280,6 +283,52 @@ String& String::insert( size_type pos, const String &str )
     //Use the real position as bytes using the std::string::iterators
     m_string.insert( std::distance(m_string.begin(), it.base()), str.m_string );
 
+    return *this;
+}
+
+String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t)> p,  const String &str)
+{
+    String::size_type offset = 1;
+    for(iterator it = i1.base();it<i2.base();it++)
+    {
+        if (p(*it))
+        {
+            replace(std::distance(begin(), it), offset, str);
+        }
+    }
+    return *this;
+}
+
+String& String::remove_adjacent_occurrences(iterator i1, iterator i2, const char c)
+{
+    std::vector<std::pair<size_type, size_type>> ranges_to_remove;
+    for(iterator it = i1.base();it<i2.base();it++)
+    {
+        if (*it == c){
+            iterator it2 = it;
+            std::advance(it2, 1);
+            if (*it2 == c) {
+                size_type pos = 0;
+                while(it2 < end() && *it2 == c)
+                {
+                    pos += 1;
+                    it2++;
+                }
+                ranges_to_remove.push_back(std::make_pair(std::distance(begin(), it),
+                                                          std::distance(it, it2)));
+                it = it2;
+            }
+        }
+    }
+    if (!ranges_to_remove.empty()) {
+        std::reverse(ranges_to_remove.begin(), ranges_to_remove.end());
+        for (std::pair<size_type, size_type> range : ranges_to_remove)
+        {
+            String to_match;
+            to_match.push_back(c);
+            replace(range.first, range.second, to_match);
+        }
+    }
     return *this;
 }
 

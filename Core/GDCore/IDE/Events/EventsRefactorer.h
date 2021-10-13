@@ -41,7 +41,7 @@ class GD_CORE_API EventsSearchResult {
   std::size_t positionInList;
 
   bool IsEventsListValid() const { return eventsList != nullptr; }
-  
+
   /**
    * \brief Get the events list containing the event pointed by the EventsSearchResult.
    * \warning Only call this when IsEventsListValid returns true.
@@ -49,7 +49,7 @@ class GD_CORE_API EventsSearchResult {
   const gd::EventsList & GetEventsList() const { return *eventsList; }
 
   std::size_t GetPositionInList() const { return positionInList; }
-  
+
   bool IsEventValid() const { return !event.expired(); }
 
   /**
@@ -72,7 +72,7 @@ class GD_CORE_API EventsSearchResult {
 class GD_CORE_API EventsRefactorer {
  public:
   /**
-   * Replace all occurences of an object name by another name
+   * Replace all occurrences of an object name by another name
    * ( include : objects in parameters and in math/text expressions of all
    * events ).
    */
@@ -98,14 +98,14 @@ class GD_CORE_API EventsRefactorer {
    * \return A vector containing EventsSearchResult objects filled with events
    * containing the string
    */
-  static std::vector<EventsSearchResult> SearchInEvents(gd::ObjectsContainer& project,
-                                                        gd::ObjectsContainer& layout,
+  static std::vector<EventsSearchResult> SearchInEvents(const gd::Platform& platform,
                                                         gd::EventsList& events,
                                                         gd::String search,
                                                         bool matchCase,
                                                         bool inConditions,
                                                         bool inActions,
-                                                        bool inEventStrings);
+                                                        bool inEventStrings,
+                                                        bool inEventSentences);
 
   /**
    * Replace all occurrences of a gd::String in events
@@ -123,7 +123,7 @@ class GD_CORE_API EventsRefactorer {
 
  private:
   /**
-   * Replace all occurences of an object name by another name in an action
+   * Replace all occurrences of an object name by another name in an action
    * ( include : objects in parameters and in math/text expressions ).
    *
    * \return true if something was modified.
@@ -136,7 +136,7 @@ class GD_CORE_API EventsRefactorer {
                                     gd::String newName);
 
   /**
-   * Replace all occurences of an object name by another name in a condition
+   * Replace all occurrences of an object name by another name in a condition
    * ( include : objects in parameters and in math/text expressions ).
    *
    * \return true if something was modified.
@@ -185,7 +185,7 @@ class GD_CORE_API EventsRefactorer {
                                     gd::String name);
 
   /**
-   * Replace all occurences of a gd::String in conditions
+   * Replace all occurrences of a gd::String in conditions
    *
    * \return true if something was modified.
    */
@@ -197,7 +197,7 @@ class GD_CORE_API EventsRefactorer {
                                         bool matchCase);
 
   /**
-   * Replace all occurences of a gd::String in actions
+   * Replace all occurrences of a gd::String in actions
    *
    * \return true if something was modified.
    */
@@ -208,21 +208,26 @@ class GD_CORE_API EventsRefactorer {
                                      gd::String newString,
                                      bool matchCase);
 
-  static bool SearchStringInActions(gd::ObjectsContainer& project,
-                                    gd::ObjectsContainer& layout,
+  static bool SearchStringInFormattedText(const gd::Platform& platform,
+                                          gd::Instruction& instruction,
+                                          gd::String search,
+                                          bool matchCase,
+                                          bool isCondition);
+  static bool SearchStringInActions(const gd::Platform& platform,
                                     gd::InstructionsList& actions,
                                     gd::String search,
-                                    bool matchCase);
-  static bool SearchStringInConditions(gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
+                                    bool matchCase,
+                                    bool inSentences);
+  static bool SearchStringInConditions(const gd::Platform& platform,
                                        gd::InstructionsList& conditions,
                                        gd::String search,
-                                       bool matchCase);
-  static bool SearchStringInEvent(gd::ObjectsContainer& project,
-                                       gd::ObjectsContainer& layout,
-                                       gd::BaseEvent& events,
-                                       gd::String search,
-                                       bool matchCase);
+                                       bool matchCase,
+                                       bool inSentences);
+  static bool SearchStringInEvent(gd::BaseEvent& events,
+                                  gd::String search,
+                                  bool matchCase);
+
+  static const std::string specialCharacters() { return ";:,#()";};
 
   EventsRefactorer(){};
 };

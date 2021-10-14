@@ -85,13 +85,13 @@ export default class Debugger extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.isActive) {
-      this._startServer();
+      this._registerServerCallbacks();
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.isActive && !this.props.isActive) {
-      this._startServer();
+      this._registerServerCallbacks();
     }
   }
 
@@ -101,7 +101,7 @@ export default class Debugger extends React.Component<Props, State> {
     }
   }
 
-  _startServer = () => {
+  _registerServerCallbacks = () => {
     const { previewDebuggerServer } = this.props;
     const { unregisterDebuggerServerCallbacks } = this.state;
     if (
@@ -157,7 +157,6 @@ export default class Debugger extends React.Component<Props, State> {
         this._handleMessage(id, parsedMessage);
       },
     });
-    previewDebuggerServer.startServer();
     this.setState({
       unregisterDebuggerServerCallbacks: unregisterCallbacks,
     });

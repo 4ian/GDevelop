@@ -482,7 +482,7 @@ public:
      *
      * **Iterators :** All iterators may be invalidated.
      */
-    String& remove_consecutive_occurrences(iterator i1, iterator i2, const char c);
+    String& RemoveConsecutiveOccurrences(iterator i1, iterator i2, const char c);
 
     /**
      * \brief Erase the characters between **first** and **last** (**last** not included).

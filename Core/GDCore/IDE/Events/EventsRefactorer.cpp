@@ -697,9 +697,7 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
                     },
                     "");
   search = search.LeftTrim().RightTrim();
-  search.remove_consecutive_occurrences(search.begin(),
-                                        search.end(),
-                                        ' ');
+  search.RemoveConsecutiveOccurrences(search.begin(), search.end(), ' ');
 
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventAddedInResults = false;
@@ -820,7 +818,7 @@ bool EventsRefactorer::SearchStringInFormattedText(
                               },
                               "");
 
-  completeSentence.remove_consecutive_occurrences(
+  completeSentence.RemoveConsecutiveOccurrences(
       completeSentence.begin(), completeSentence.end(), ' ');
 
   size_t foundPosition = matchCase

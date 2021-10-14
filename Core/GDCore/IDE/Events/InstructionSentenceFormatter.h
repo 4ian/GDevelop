@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #ifndef TRANSLATEACTION_H
 #define TRANSLATEACTION_H
 #include <map>
@@ -39,6 +38,9 @@ class GD_CORE_API InstructionSentenceFormatter {
     return (static_cast<InstructionSentenceFormatter *>(_singleton));
   }
 
+  gd::String GetFullText(const gd::Instruction &instr,
+                         const gd::InstructionMetadata &metadata);
+
   static void DestroySingleton() {
     if (NULL != _singleton) {
       delete _singleton;
@@ -55,4 +57,3 @@ class GD_CORE_API InstructionSentenceFormatter {
 
 }  // namespace gd
 #endif  // TRANSLATEACTION_H
-#endif

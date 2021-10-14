@@ -22,6 +22,7 @@ import Flash from '@material-ui/icons/FlashOn';
 import FlashOff from '@material-ui/icons/FlashOff';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
+import { DebuggerConsole, type LogsManager } from './DebuggerConsole';
 import { type ProfilerOutput } from '.';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import MiniToolbar from '../UI/MiniToolbar';
@@ -38,6 +39,7 @@ type Props = {|
   onStopProfiler: () => void,
   profilerOutput: ?ProfilerOutput,
   profilingInProgress: boolean,
+  logsManager: LogsManager,
 |};
 
 type State = {|
@@ -54,7 +56,12 @@ const initialMosaicEditorNodes = {
     second: 'selected-inspector',
     splitPercentage: 25,
   },
-  second: 'profiler',
+  second: {
+    direction: 'row',
+    first: 'profiler',
+    second: 'console',
+    splitPercentage: 25,
+  },
   splitPercentage: 65,
 };
 
@@ -75,6 +82,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
     if (this._editors) this._editors.openEditor('profiler', 'end', 75, 'row');
   };
 
+  openConsole = () => {
+    if (this._editors) this._editors.openEditor('console', 'start', 40, 'row');
+  };
+
   render() {
     const {
       gameData,
@@ -85,6 +96,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onStopProfiler,
       profilerOutput,
       profilingInProgress,
+      logsManager,
     } = this.props;
     const {
       selectedInspector,
@@ -204,6 +216,15 @@ export default class DebuggerContent extends React.Component<Props, State> {
             profilerOutput={profilerOutput}
             profilingInProgress={profilingInProgress}
           />
+        ),
+      },
+      console: {
+        type: 'secondary',
+        title: t`Console`,
+        renderEditor: () => (
+          <Background>
+            <DebuggerConsole logsManager={logsManager || []} />
+          </Background>
         ),
       },
     };

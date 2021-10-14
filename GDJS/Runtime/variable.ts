@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Variables');
+
   /**
    * Children of a structure.
    */
@@ -111,7 +113,7 @@ namespace gdjs {
         this.setString('null');
       } else if (typeof obj === 'number') {
         if (Number.isNaN(obj)) {
-          console.warn('Variables cannot be set to NaN, setting it to 0.');
+          logger.warn('Variables cannot be set to NaN, setting it to 0.');
           this.setNumber(0);
         } else {
           this.setNumber(obj);
@@ -135,17 +137,22 @@ namespace gdjs {
         this.setString(obj.toString());
       } else if (typeof obj === 'bigint') {
         if (obj > Number.MAX_SAFE_INTEGER)
-          console.warn(
-            'Integers bigger than ' +
+          logger.warn(
+            'Error while converting JS variable to GDevelop variable: Integers bigger than ' +
               Number.MAX_SAFE_INTEGER +
               " aren't supported by GDevelop variables, it will be reduced to that size."
           );
         // @ts-ignore
         variable.setNumber(parseInt(obj, 10));
       } else if (typeof obj === 'function') {
-        console.error('Error: Impossible to set variable value to a function.');
+        logger.error(
+          'Error while converting JS variable to GDevelop variable: Impossible to set variable value to a function.'
+        );
       } else {
-        console.error('Cannot identify type of object:', obj);
+        logger.error(
+          'Error while converting JS variable to GDevelop variable: Cannot identify type of object ' +
+            obj
+        );
       }
       return this;
     }
@@ -161,7 +168,7 @@ namespace gdjs {
       try {
         var obj = JSON.parse(json);
       } catch (e) {
-        console.error('Unable to parse JSON: ', json, e);
+        logger.error('Unable to parse JSON: ' + json + e);
         return this;
       }
       this.fromJSObject(obj);

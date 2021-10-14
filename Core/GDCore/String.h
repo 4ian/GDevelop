@@ -475,7 +475,14 @@ public:
      */
     String& replace_if( iterator i1, iterator i2, std::function<bool(char32_t)> p, const String &str );
 
-    String& remove_adjacent_occurrences(iterator i1, iterator i2, const char c);
+    /**
+     * \brief Remove consecutive occurrences of the character **c** in the portion of the
+     * between **i1** and **i2** (**i2** not included) to replace it by a single occurrence.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& remove_consecutive_occurrences(iterator i1, iterator i2, const char c);
 
     /**
      * \brief Erase the characters between **first** and **last** (**last** not included).

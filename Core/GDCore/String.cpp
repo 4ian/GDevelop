@@ -299,7 +299,7 @@ String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t
     return *this;
 }
 
-String& String::remove_adjacent_occurrences(iterator i1, iterator i2, const char c)
+String& String::remove_consecutive_occurrences(iterator i1, iterator i2, const char c)
 {
     std::vector<std::pair<size_type, size_type>> ranges_to_remove;
     for(iterator it = i1.base();it<i2.base();it++)

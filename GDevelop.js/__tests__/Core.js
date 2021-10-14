@@ -2127,7 +2127,7 @@ describe('libGD.js', function () {
       })
 
       it('should search string in sentences with multiple adjacent spaces reduced to one space', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'the    angle  (in', false, true, true, false, true)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'the    angle  (in  ', false, true, true, false, true)
         expect(searchResultEvents1.size()).toBe(1)
         expect(searchResultEvents1.at(0).getEvent()).toBe(event2)
       })

@@ -2079,6 +2079,16 @@ describe('libGD.js', function () {
         event2 = eventList.insertEvent(event2, 0);
       });
 
+      afterAll(() => {
+        action1.delete();
+        action2.delete();
+        condition1.delete();
+        condition2.delete();
+        event1.delete();
+        event2.delete();
+        eventList.delete();
+      })
+
       it('should search string in parameters only and respect case', function () {
         const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
           gd.JsPlatform.get(),

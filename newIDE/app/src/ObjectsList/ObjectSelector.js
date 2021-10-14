@@ -58,7 +58,6 @@ const getObjectsAndGroupsDataSource = ({
       value: object.getName(),
       renderIcon: project
         ? () => (
-            // TODO: This is broken since the changes to ListIcon
             <ListIcon
               iconSize={iconSize}
               src={ObjectsRenderingService.getThumbnail(project, object)}

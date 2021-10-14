@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   type Filters,
   type TagsTreeNode,
-} from '../../Utils/GDevelopServices/Types.flow';
+} from '../../Utils/GDevelopServices/Filters';
 import TreeView from '@material-ui/lab/TreeView';
 import TreeItem from '@material-ui/lab/TreeItem';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';

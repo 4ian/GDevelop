@@ -354,6 +354,7 @@ interface Project {
     [Const, Ref] DOMString GetVersion();
     void SetAuthor([Const] DOMString authorName);
     [Const, Ref] DOMString GetAuthor();
+    [Ref] VectorString GetAuthorIds();
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);
@@ -818,6 +819,7 @@ interface ResourcesManager {
     void ResourcesManager();
 
     [Value] VectorString GetAllResourceNames();
+    [Value] VectorString FindFilesNotInResources([Const, Ref] VectorString filesToCheck);
     boolean HasResource([Const] DOMString name);
     [Const, Ref] Resource GetResource([Const] DOMString name);
     [Const, Ref] DOMString GetResourceNameWithOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
@@ -1871,7 +1873,7 @@ interface EventsRefactorer {
     void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
     void STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions);
-    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings);
+    [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
 
 interface UnfilledRequiredBehaviorPropertyProblem {
@@ -2187,6 +2189,7 @@ interface EventsFunctionsExtension {
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
     [Ref] VectorString GetTags();
+    [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
     [Const, Ref] DOMString GetAuthor();
     [Ref] EventsFunctionsExtension SetPreviewIconUrl([Const] DOMString previewIconUrl);
@@ -2243,7 +2246,6 @@ interface AbstractFileSystemJS {
 };
 
 interface ProjectResourcesAdder {
-    void STATIC_AddAllMissing([Ref] Project project, [Const] DOMString resourceType);
     [Value] VectorString STATIC_GetAllUseless([Ref] Project project, [Const] DOMString resourceType);
     void STATIC_RemoveAllUseless([Ref] Project project, [Const] DOMString resourceType);
 };
@@ -2629,14 +2631,10 @@ interface ParticleEmitterObject {
     float GetParticleGravityX();
     void SetParticleGravityY(float newValue);
     float GetParticleGravityY();
-    void SetParticleGravityZ(float newValue);
-    float GetParticleGravityZ();
     void SetParticleGravityAngle(float newValue);
     float GetParticleGravityAngle();
     void SetParticleGravityLength(float newValue);
     float GetParticleGravityLength();
-    void SetFriction(float newValue);
-    float GetFriction();
 
     void SetParticleLifeTimeMin(float newValue);
     float GetParticleLifeTimeMin();

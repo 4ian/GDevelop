@@ -198,25 +198,6 @@
         "color": {
           "value": "rgb(209, 209, 209)"
         }
-      },
-      "row-search": {
-        "border-color": {
-          "value": "#18dcf2"
-        },
-        "border-left-width-match": {
-          "value": "3px"
-        },
-        "border-left-width-focus": {
-          "value": "5px"
-        }
-      }
-    },
-    "rst-with-results": {
-      "background-color": {
-        "value": "#d3d3d3"
-      },
-      "border": {
-        "value": "1px #d3d3d3 solid"
       }
     },
     "selectable": {
@@ -248,6 +229,16 @@
       },
       "border-bottom-color": {
         "value": "black"
+      }
+    },
+    "events": {
+      "highlighted": {
+        "background-color": {
+          "value": "#084f56"
+        },
+        "color": {
+          "value": "#18dcf2"
+        }
       }
     },
     "actions": {

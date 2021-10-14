@@ -15,7 +15,6 @@ This project is released under the MIT License.
  * Declare some actions, conditions and expressions of the particle emitter
  */
 void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
-#if defined(GD_IDE_ONLY)
   obj.AddAction("RecreateParticleSystem",
                 _("Recreate particles"),
                 _("Destroy and recreate particles, so as to take changes made "
@@ -81,6 +80,17 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
+      .SetHidden() // DEPRECATED - Use SetTank instead
+      .UseStandardOperatorParameters("number");
+
+  obj.AddAction("SetTank",
+                _("Capacity"),
+                _("Change the capacity of the emitter."),
+                _("the capacity"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardOperatorParameters("number");
 
   obj.AddCondition("Tank",
@@ -94,6 +104,17 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("Flow",
+                _("Flow"),
+                _("Change the flow of the emitter."),
+                _("the flow"),
+                _("Common"),
+                "CppPlatform/Extensions/particleSystemicon24.png",
+                "CppPlatform/Extensions/particleSystemicon16.png")
+      .AddParameter("object", _("Object"), "ParticleEmitter")
+      .SetHidden() // DEPRECATED - Use SetFlow instead
+      .UseStandardOperatorParameters("number");
+
+  obj.AddAction("SetFlow",
                 _("Flow"),
                 _("Change the flow of the emitter."),
                 _("the flow"),
@@ -146,6 +167,14 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Particles number"),
                     _("Particles"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
+      .SetHidden() // DEPRECATED - Use CurrentParticleCount instead
+      .AddParameter("object", _("Object"), "ParticleEmitter", false);
+
+  obj.AddExpression("CurrentParticleCount",
+                    _("Particles count"),
+                    _("Number of particles currently displayed"),
+                    _("Particles"),
+                    "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
   obj.AddExpression("RendererParam1",
@@ -190,24 +219,6 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
-  obj.AddExpression("EmitterXDirection",
-                    _("Emission X direction"),
-                    _("Emission X direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("EmitterYDirection",
-                    _("Emission Y direction"),
-                    _("Emission Y direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("EmitterZDirection",
-                    _("Emission Z direction"),
-                    _("Emission Z direction"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("EmitterAngle",
                     _("Emission angle"),
                     _("Emission angle"),
@@ -244,12 +255,6 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("ParticleGravityZ",
-                    _("Z Gravity of particles"),
-                    _("Z Gravity of particles"),
-                    _("Setup"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleGravityAngle",
                     _("Gravity angle"),
                     _("Gravity angle"),
@@ -259,12 +264,6 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
   obj.AddExpression("ParticleGravityLength",
                     _("Gravity"),
                     _("Gravity value"),
-                    _("Common"),
-                    "CppPlatform/Extensions/particleSystemicon16.png")
-      .AddParameter("object", _("Object"), "ParticleEmitter", false);
-  obj.AddExpression("Friction",
-                    _("Particles friction"),
-                    _("Particles friction"),
                     _("Common"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
@@ -353,5 +352,4 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
 
-#endif
 }

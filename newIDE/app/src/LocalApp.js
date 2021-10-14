@@ -4,7 +4,7 @@ import MainFrame from './MainFrame';
 import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
-import Authentification from './Utils/GDevelopServices/Authentification';
+import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 
 // Import for Electron powered IDE.
@@ -29,7 +29,7 @@ import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalRes
 
 const gd: libGDevelop = global.gd;
 
-export const create = (authentification: Authentification) => {
+export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
 
   const appArguments = Window.getArguments();
@@ -37,7 +37,7 @@ export const create = (authentification: Authentification) => {
 
   return (
     <Providers
-      authentification={authentification}
+      authentication={authentication}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
       makeEventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter}
       eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}

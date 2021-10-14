@@ -6,6 +6,7 @@ import Text from '../../UI/Text';
 import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { IconContainer } from '../../UI/IconContainer';
+import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
 
 const styles = {
   container: {
@@ -43,17 +44,24 @@ export const ExtensionListItem = ({
   return (
     <ButtonBase onClick={onChoose} focusRipple>
       <div style={styles.container} ref={containerRef}>
-        <Line noMargin>
+        <Line>
           <IconContainer
             alt={extensionShortHeader.fullName}
             src={extensionShortHeader.previewIconUrl}
-            size={48}
+            size={64}
           />
           <Column expand>
             <Text noMargin>
               {extensionShortHeader.fullName}{' '}
               {alreadyInstalled && <Trans> (already installed)</Trans>}
             </Text>
+            {extensionShortHeader.authors && (
+              <Line>
+                {extensionShortHeader.authors.map(author => (
+                  <UserPublicProfileChip user={author} key={author.id} />
+                ))}
+              </Line>
+            )}
             <Text noMargin size="body2">
               {extensionShortHeader.shortDescription}
             </Text>

@@ -17,11 +17,9 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
 
-#if defined(GD_IDE_ONLY)
 #include <SFML/Graphics.hpp>
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#endif
 
 namespace gd {
 
@@ -81,7 +79,6 @@ void SpriteObject::DoUnserializeFrom(gd::Project& project,
   }
 }
 
-#if defined(GD_IDE_ONLY)
 void SpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("updateIfNotVisible", updateIfNotVisible);
 
@@ -157,7 +154,6 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance& position,
 
   return true;
 }
-#endif
 
 const Animation& SpriteObject::GetAnimation(std::size_t nb) const {
   if (nb >= animations.size()) return badAnimation;

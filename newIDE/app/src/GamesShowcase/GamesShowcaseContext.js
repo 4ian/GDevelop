@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
-import { type Filters } from '../Utils/GDevelopServices/Types.flow';
+import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   listAllShowcasedGames,
   type AllShowcasedGames,

@@ -21,7 +21,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/network");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddAction(
           "SendRequest",
@@ -196,7 +195,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
                         "res/conditions/toujours24.png")
       .AddParameter("objectPtr", _("The object with the variable"))
       .AddParameter("objectvar", _("The object variable to be stringified"));
-#endif
 }
 
 }  // namespace gd

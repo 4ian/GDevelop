@@ -18,7 +18,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       "Florian Rival",
       "Open source (MIT License)");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition("Toujours",
                     _("Always"),
@@ -104,7 +103,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Functions"),
           "res/function16.png")
       .AddParameter("string", "Parameter name");
-#endif
 }
 
 }  // namespace gd

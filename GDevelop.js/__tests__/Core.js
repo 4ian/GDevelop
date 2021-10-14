@@ -1064,6 +1064,38 @@ describe('libGD.js', function () {
       project.delete();
     });
 
+    it('can find files that are not in the resources', function () {
+      var project = gd.ProjectHelper.createNewGDJSProject();
+      var resource = new gd.ImageResource();
+      var resource2 = new gd.AudioResource();
+      resource.setName('MyResource');
+      resource.setFile('MyFile.png');
+      resource2.setName('MyResource2');
+      resource2.setFile('MySubFolder/MyOtherFile.mp3');
+      project.getResourcesManager().addResource(resource);
+      project.getResourcesManager().addResource(resource2);
+
+      const filesToCheck = new gd.VectorString();
+      [
+        'MyFile.png',
+        'MySubFolder/MyFileMissingInResource.png',
+        'MySubFolder/MyOtherFile.mp3',
+      ].forEach((filePath) => {
+        filesToCheck.push_back(filePath);
+      });
+      const filesNotInResources = project
+        .getResourcesManager()
+        .findFilesNotInResources(filesToCheck);
+      filesToCheck.delete();
+
+      expect(filesNotInResources.size()).toBe(1);
+      expect(filesNotInResources.at(0)).toBe(
+        'MySubFolder/MyFileMissingInResource.png'
+      );
+
+      project.delete();
+    });
+
     it('should support removing resources', function () {
       var project = gd.ProjectHelper.createNewGDJSProject();
       var resource = new gd.Resource();
@@ -1106,6 +1138,41 @@ describe('libGD.js', function () {
       var allResources = project.getResourcesManager().getAllResourceNames();
       expect(allResources.size()).toBe(1);
       expect(allResources.get(0)).toBe('Used');
+      project.delete();
+    });
+
+    it('should not remove loading screen image when removing useless resources', function () {
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const resource = new gd.ImageResource();
+      resource.setName('LoadingScreenImage');
+      project
+        .getLoadingScreen()
+        .setBackgroundImageResourceName(resource.getName());
+
+      expect(project.getLoadingScreen().getBackgroundImageResourceName()).toBe(
+        'LoadingScreenImage'
+      );
+
+      const worker = new gd.ResourcesInUseHelper();
+      project.exposeResources(worker);
+      expect(worker.getAllImages().toNewVectorString().toJSArray().length).toBe(
+        1
+      );
+      expect(worker.getAllImages().toNewVectorString().toJSArray()[0]).toBe(
+        'LoadingScreenImage'
+      );
+
+      gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
+
+      const newWorker = new gd.ResourcesInUseHelper();
+      project.exposeResources(newWorker);
+      expect(
+        newWorker.getAllImages().toNewVectorString().toJSArray().length
+      ).toBe(1);
+      expect(newWorker.getAllImages().toNewVectorString().toJSArray()[0]).toBe(
+        'LoadingScreenImage'
+      );
+
       project.delete();
     });
   });
@@ -1955,6 +2022,244 @@ describe('libGD.js', function () {
       expect(formattedTexts.getTextFormatting(1).getUserData()).toBe(0);
 
       action.delete();
+    });
+  });
+
+  describe('EventsRefactorer', function () {
+    describe('SearchInEvents', function () {
+      let eventList = null;
+      let event1 = null;
+      let event2 = null;
+
+      beforeAll(() => {
+        eventList = new gd.EventsList();
+
+        /* Event 1 */
+        event1 = new gd.StandardEvent();
+
+        var eventActions1 = event1.getActions();
+        var action1 = new gd.Instruction();
+        action1.setType('RotateTowardPosition'); // should generate the sentence `Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second`
+        action1.setParametersCount(4);
+        action1.setParameter(0, 'Platform');
+        action1.setParameter(1, '450');
+        action1.setParameter(2, '200');
+        action1.setParameter(3, '90');
+        eventActions1.push_back(action1);
+
+        var eventConditions1 = event1.getConditions();
+        var condition1 = new gd.Instruction();
+        condition1.setType('PosX'); // should generate the sentence `the X position of _PARAM0_ _PARAM1_ _PARAM2_`
+        condition1.setParametersCount(3);
+        condition1.setParameter(0, 'MyCharacter');
+        condition1.setParameter(1, '<');
+        condition1.setParameter(2, '300');
+        eventConditions1.push_back(condition1);
+
+        event1 = eventList.insertEvent(event1, 0);
+
+        /* Event 2 */
+
+        event2 = new gd.StandardEvent();
+
+        var eventActions2 = event2.getActions();
+        var action2 = new gd.Instruction();
+        action2.setType('Delete'); // should generate the sentence `Delete _PARAM0_`
+        action2.setParametersCount(1);
+        action2.setParameter(0, 'OtherCharacter');
+        eventActions2.push_back(action2);
+
+        var eventConditions2 = event2.getConditions();
+        var condition2 = new gd.Instruction();
+        condition2.setType('Angle'); // should generate the sentence `the angle (in degrees) of _PARAM0_ _PARAM1_ _PARAM2_`
+        condition2.setParametersCount(3);
+        condition2.setParameter(0, 'OtherPlatform');
+        condition2.setParameter(1, '>');
+        condition2.setParameter(2, '55');
+        eventConditions2.push_back(condition2);
+
+        event2 = eventList.insertEvent(event2, 0);
+      });
+
+      afterAll(() => {
+        action1.delete();
+        action2.delete();
+        condition1.delete();
+        condition2.delete();
+        event1.delete();
+        event2.delete();
+        eventList.delete();
+      })
+
+      it('should search string in parameters only and respect case', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'mycharacter',
+          true,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents1.size()).toBe(0);
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'MyCharacter',
+          true,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents2.size()).toBe(1);
+        expect(searchResultEvents2.at(0).getEvent()).toBe(event1);
+      });
+
+      it('should search string in parameters only', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'mycharacter',
+          false,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'position',
+          false,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents2.size()).toBe(0);
+      });
+
+      it('should search string in sentences', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'In Degrees',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+      });
+
+      it('should search string in sentences with parameter placeholders replaced', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'position of MyCharacter',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
+
+      it('should search string in sentences with parameter placeholders replaced and special characters removed', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
+
+      it('should search string in sentences with parameter placeholders replaced and special characters removed in searched string', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450;200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
+
+      it('should search string in sentences with parameter placeholders replaced and consecutive special characters removed in searched string', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450();200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
+
+      it('should search string in sentences with multiple adjacent spaces reduced to one space', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'the    angle  (in  ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+      });
+      it('should search string in sentences with leading and trailing white spaces', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          '   the    angle  (in  ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'Delete OtherCharacter    ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents2.size()).toBe(1);
+        expect(searchResultEvents2.at(0).getEvent()).toBe(event2);
+      });
     });
   });
 
@@ -2943,22 +3248,11 @@ describe('libGD.js', function () {
       });
     });
 
-    it('completes an expression with an operator', function () {
-      expect.assertions(6);
+    it('does not complete an expression with an operator', function () {
+      expect.assertions(0);
       testCompletions('number', '1 +| ', (completionDescription, index) => {
-        if (index === 0) {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Object
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        } else {
-          expect(completionDescription.getCompletionKind()).toBe(
-            gd.ExpressionCompletionDescription.Expression
-          );
-          expect(completionDescription.getType()).toBe('number');
-          expect(completionDescription.getPrefix()).toBe('');
-        }
+        // No elements returned, so this will not be called.
+        expect(completionDescription).toBe(undefined);
       });
     });
 

@@ -38,19 +38,17 @@ class GD_CORE_API MultipleInstructionMetadata {
   MultipleInstructionMetadata &AddParameter(
       const gd::String &type,
       const gd::String &label,
-      const gd::String &optionalObjectType = "",
+      const gd::String &supplementaryInformation = "",
       bool parameterIsOptional = false) {
-#if defined(GD_IDE_ONLY)
     if (expression)
       expression->AddParameter(
-          type, label, optionalObjectType, parameterIsOptional);
+          type, label, supplementaryInformation, parameterIsOptional);
     if (condition)
       condition->AddParameter(
-          type, label, optionalObjectType, parameterIsOptional);
+          type, label, supplementaryInformation, parameterIsOptional);
     if (action)
       action->AddParameter(
-          type, label, optionalObjectType, parameterIsOptional);
-#endif
+          type, label, supplementaryInformation, parameterIsOptional);
     return *this;
   }
 
@@ -59,13 +57,11 @@ class GD_CORE_API MultipleInstructionMetadata {
    */
   MultipleInstructionMetadata &AddCodeOnlyParameter(
       const gd::String &type, const gd::String &supplementaryInformation) {
-#if defined(GD_IDE_ONLY)
     if (expression)
       expression->AddCodeOnlyParameter(type, supplementaryInformation);
     if (condition)
       condition->AddCodeOnlyParameter(type, supplementaryInformation);
     if (action) action->AddCodeOnlyParameter(type, supplementaryInformation);
-#endif
     return *this;
   }
 
@@ -73,11 +69,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::SetDefaultValue
    */
   MultipleInstructionMetadata &SetDefaultValue(const gd::String &defaultValue) {
-#if defined(GD_IDE_ONLY)
     if (expression) expression->SetDefaultValue(defaultValue);
     if (condition) condition->SetDefaultValue(defaultValue);
     if (action) action->SetDefaultValue(defaultValue);
-#endif
     return *this;
   };
 
@@ -86,11 +80,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    */
   MultipleInstructionMetadata &SetParameterLongDescription(
       const gd::String &longDescription) {
-#if defined(GD_IDE_ONLY)
     if (expression) expression->SetParameterLongDescription(longDescription);
     if (condition) condition->SetParameterLongDescription(longDescription);
     if (action) action->SetParameterLongDescription(longDescription);
-#endif
     return *this;
   };
 
@@ -98,11 +90,9 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::SetHidden
    */
   MultipleInstructionMetadata &SetHidden() {
-#if defined(GD_IDE_ONLY)
     if (expression) expression->SetHidden();
     if (condition) condition->SetHidden();
     if (action) action->SetHidden();
-#endif
     return *this;
   };
 
@@ -111,50 +101,40 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::UseStandardRelationalOperatorParameters
    */
   MultipleInstructionMetadata &UseStandardParameters(const gd::String &type) {
-#if defined(GD_IDE_ONLY)
     if (condition) condition->UseStandardRelationalOperatorParameters(type);
     if (action) action->UseStandardOperatorParameters(type);
-#endif
     return *this;
   }
 
   MultipleInstructionMetadata &SetFunctionName(const gd::String &functionName) {
-#if defined(GD_IDE_ONLY)
     if (expression) expression->SetFunctionName(functionName);
     if (condition) condition->SetFunctionName(functionName);
     if (action) action->GetCodeExtraInformation().SetFunctionName(functionName);
-#endif
     return *this;
   }
 
   MultipleInstructionMetadata &SetGetter(const gd::String &getter) {
-#if defined(GD_IDE_ONLY)
     if (expression) expression->SetFunctionName(getter);
     if (condition) condition->SetFunctionName(getter);
     if (action) action->GetCodeExtraInformation().SetGetter(getter);
-#endif
     return *this;
   }
 
   MultipleInstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
-#if defined(GD_IDE_ONLY)
     if (expression)
       expression->GetCodeExtraInformation().SetIncludeFile(includeFile);
     if (condition)
       condition->GetCodeExtraInformation().SetIncludeFile(includeFile);
     if (action) action->GetCodeExtraInformation().SetIncludeFile(includeFile);
-#endif
     return *this;
   }
 
   MultipleInstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
-#if defined(GD_IDE_ONLY)
     if (expression)
       expression->GetCodeExtraInformation().AddIncludeFile(includeFile);
     if (condition)
       condition->GetCodeExtraInformation().AddIncludeFile(includeFile);
     if (action) action->GetCodeExtraInformation().AddIncludeFile(includeFile);
-#endif
     return *this;
   }
 
@@ -162,10 +142,8 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::MarkAsSimple
    */
   MultipleInstructionMetadata &MarkAsSimple() {
-#if defined(GD_IDE_ONLY)
     if (condition) condition->MarkAsSimple();
     if (action) action->MarkAsSimple();
-#endif
     return *this;
   }
 
@@ -173,10 +151,8 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::MarkAsAdvanced
    */
   MultipleInstructionMetadata &MarkAsAdvanced() {
-#if defined(GD_IDE_ONLY)
     if (condition) condition->MarkAsAdvanced();
     if (action) action->MarkAsAdvanced();
-#endif
     return *this;
   }
 
@@ -184,10 +160,8 @@ class GD_CORE_API MultipleInstructionMetadata {
    * \see gd::InstructionMetadata::MarkAsComplex
    */
   MultipleInstructionMetadata &MarkAsComplex() {
-#if defined(GD_IDE_ONLY)
     if (condition) condition->MarkAsComplex();
     if (action) action->MarkAsComplex();
-#endif
     return *this;
   }
 

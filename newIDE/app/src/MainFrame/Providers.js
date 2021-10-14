@@ -4,8 +4,9 @@ import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProv
 import { ThemeProvider } from '@material-ui/styles';
 import { StylesProvider, jssPreset } from '@material-ui/core/styles';
 import { getTheme } from '../UI/Theme';
-import UserProfileProvider from '../Profile/UserProfileProvider';
-import Authentification from '../Utils/GDevelopServices/Authentification';
+import AuthenticatedUserProvider from '../Profile/AuthenticatedUserProvider';
+import PublicProfileProvider from '../Profile/PublicProfileProvider';
+import Authentication from '../Utils/GDevelopServices/Authentication';
 import PreferencesProvider from './Preferences/PreferencesProvider';
 import PreferencesContext from './Preferences/PreferencesContext';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
@@ -41,7 +42,7 @@ const jss = create({
 });
 
 type Props = {|
-  authentification: Authentification,
+  authentication: Authentication,
   disableCheckForUpdates: boolean,
   makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
@@ -60,7 +61,7 @@ export default class Providers extends React.Component<Props, {||}> {
   render() {
     const {
       disableCheckForUpdates,
-      authentification,
+      authentication,
       children,
       makeEventsFunctionCodeWriter,
       eventsFunctionsExtensionWriter,
@@ -82,44 +83,46 @@ export default class Providers extends React.Component<Props, {||}> {
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
-                          <UserProfileProvider
-                            authentification={authentification}
+                          <AuthenticatedUserProvider
+                            authentication={authentication}
                           >
-                            <I18n update>
-                              {({ i18n }) => (
-                                <EventsFunctionsExtensionsProvider
-                                  i18n={i18n}
-                                  makeEventsFunctionCodeWriter={
-                                    makeEventsFunctionCodeWriter
-                                  }
-                                  eventsFunctionsExtensionWriter={
-                                    eventsFunctionsExtensionWriter
-                                  }
-                                  eventsFunctionsExtensionOpener={
-                                    eventsFunctionsExtensionOpener
-                                  }
-                                >
-                                  <CommandsContextProvider>
-                                    <AssetStoreStateProvider>
-                                      <ResourceStoreStateProvider>
-                                        <ExampleStoreStateProvider>
-                                          <ExtensionStoreStateProvider>
-                                            <GamesShowcaseStateProvider>
-                                              <ResourceFetcherContext.Provider
-                                                value={resourceFetcher}
-                                              >
-                                                {children({ i18n })}
-                                              </ResourceFetcherContext.Provider>
-                                            </GamesShowcaseStateProvider>
-                                          </ExtensionStoreStateProvider>
-                                        </ExampleStoreStateProvider>
-                                      </ResourceStoreStateProvider>
-                                    </AssetStoreStateProvider>
-                                  </CommandsContextProvider>
-                                </EventsFunctionsExtensionsProvider>
-                              )}
-                            </I18n>
-                          </UserProfileProvider>
+                            <PublicProfileProvider>
+                              <I18n update>
+                                {({ i18n }) => (
+                                  <EventsFunctionsExtensionsProvider
+                                    i18n={i18n}
+                                    makeEventsFunctionCodeWriter={
+                                      makeEventsFunctionCodeWriter
+                                    }
+                                    eventsFunctionsExtensionWriter={
+                                      eventsFunctionsExtensionWriter
+                                    }
+                                    eventsFunctionsExtensionOpener={
+                                      eventsFunctionsExtensionOpener
+                                    }
+                                  >
+                                    <CommandsContextProvider>
+                                      <AssetStoreStateProvider>
+                                        <ResourceStoreStateProvider>
+                                          <ExampleStoreStateProvider>
+                                            <ExtensionStoreStateProvider>
+                                              <GamesShowcaseStateProvider>
+                                                <ResourceFetcherContext.Provider
+                                                  value={resourceFetcher}
+                                                >
+                                                  {children({ i18n })}
+                                                </ResourceFetcherContext.Provider>
+                                              </GamesShowcaseStateProvider>
+                                            </ExtensionStoreStateProvider>
+                                          </ExampleStoreStateProvider>
+                                        </ResourceStoreStateProvider>
+                                      </AssetStoreStateProvider>
+                                    </CommandsContextProvider>
+                                  </EventsFunctionsExtensionsProvider>
+                                )}
+                              </I18n>
+                            </PublicProfileProvider>
+                          </AuthenticatedUserProvider>
                         </ThemeProvider>
                       </StylesProvider>
                     </GDevelopThemeContext.Provider>

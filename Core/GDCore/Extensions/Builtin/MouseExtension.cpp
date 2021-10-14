@@ -25,7 +25,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/mouse-touch");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition(
           "IsMouseWheelScrollingUp",
@@ -218,6 +217,39 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .MarkAsSimple();
 
   extension
+      .AddCondition(
+          "MouseButtonFromTextPressed",
+          _("Mouse button pressed or touch held (text expression)"),
+          _("Check if a mouse button, retrieved from the result of the "
+            "expression, is pressed."),
+          _("_PARAM1_ mouse button is pressed"),
+          _("Mouse and touch"),
+          "res/conditions/mouse24.png",
+          "res/conditions/mouse.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string", _("Expression generating the button to check"))
+      .SetParameterLongDescription(
+          _("Possible values are Left, Right and Middle."))
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition(
+          "MouseButtonFromTextReleased",
+          _("Mouse button released (text expression)"),
+          _("Check if a mouse button, retrieved from the result of the "
+            "expression, was just released."),
+          _("_PARAM1_ mouse button is released"),
+          _("Mouse and touch"),
+          "res/conditions/mouse24.png",
+          "res/conditions/mouse.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("string",
+                    _("Expression generating the mouse button to check"))
+      .SetParameterLongDescription(
+          _("Possible values are Left, Right and Middle."))
+      .MarkAsAdvanced();
+
+  extension
       .AddExpressionAndCondition("number",
                                  "TouchX",
                                  _("Touch X position"),
@@ -302,8 +334,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                      _("Mouse and touch/Multitouch"),
                      "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "");
-
-#endif
 }
 
 }  // namespace gd

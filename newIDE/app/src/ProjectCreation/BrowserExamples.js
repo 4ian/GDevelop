@@ -9,7 +9,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import {
   getExample,
   type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Asset';
+} from '../Utils/GDevelopServices/Example';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 
 type Props = {|

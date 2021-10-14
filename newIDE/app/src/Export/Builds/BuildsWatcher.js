@@ -1,7 +1,7 @@
 // @flow
 import { type Build, getBuild } from '../../Utils/GDevelopServices/Build';
 import { delay } from '../../Utils/Delay';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 const waitTime = 1500;
 const bulkWaitTime = 5000;
@@ -11,19 +11,19 @@ export default class BuildsWatcher {
   runningWatchers: { [string]: boolean } = {};
   nextWatcherId = 0;
   onBuildUpdated: ?(build: Build) => void;
-  userProfile: ?UserProfile;
+  authenticatedUser: ?AuthenticatedUser;
 
   start({
-    userProfile,
+    authenticatedUser,
     builds,
     onBuildUpdated,
   }: {
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     builds: Array<Build>,
     onBuildUpdated: (build: Build) => void,
   }) {
     this.stop();
-    this.userProfile = userProfile;
+    this.authenticatedUser = authenticatedUser;
     this.onBuildUpdated = onBuildUpdated;
 
     builds.forEach(build => {
@@ -60,14 +60,18 @@ export default class BuildsWatcher {
 
     let build = null;
     do {
-      if (!this.userProfile) return;
+      if (!this.authenticatedUser) return;
 
-      const { getAuthorizationHeader, profile } = this.userProfile;
-      if (!profile) return;
+      const { getAuthorizationHeader, firebaseUser } = this.authenticatedUser;
+      if (!firebaseUser) return;
 
       try {
         console.info(`Checking progress of build ${buildId}...`);
-        build = await getBuild(getAuthorizationHeader, profile.uid, buildId);
+        build = await getBuild(
+          getAuthorizationHeader,
+          firebaseUser.uid,
+          buildId
+        );
         if (this.onBuildUpdated) this.onBuildUpdated(build);
       } catch (e) {
         console.warn('Error while watching build progress:', e);

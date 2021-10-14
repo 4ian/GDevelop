@@ -171,6 +171,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _objectsList: ?ObjectsList;
   _layersList: ?LayersList;
   _propertiesEditor: ?InstancePropertiesEditor;
+  _instancesList: ?InstancesList;
 
   constructor(props: Props) {
     super(props);
@@ -604,10 +605,12 @@ export default class SceneEditor extends React.Component<Props, State> {
           () => {
             if (doRemove) {
               if (newLayer === null) {
+                this.instancesSelection.unselectInstancesOnLayer(layerName);
                 this.props.initialInstances.removeAllInstancesOnLayer(
                   layerName
                 );
               } else {
+                // Instances are not invalidated, so we can keep the selection.
                 this.props.initialInstances.moveInstancesToLayer(
                   layerName,
                   newLayer
@@ -619,7 +622,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
             if (this.editor) this.editor.forceRemount();
+
             this.forceUpdateLayersList();
+
+            // We may have modified the selection, so force an update of editors dealing with it.
+            this.forceUpdatePropertiesEditor();
             this.updateToolbar();
           }
         );
@@ -914,6 +921,10 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this._layersList) this._layersList.forceUpdate();
   };
 
+  forceUpdateInstancesList = () => {
+    if (this._instancesList) this._instancesList.forceUpdate();
+  };
+
   forceUpdatePropertiesEditor = () => {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   };
@@ -991,6 +1002,9 @@ export default class SceneEditor extends React.Component<Props, State> {
                 editInstanceVariables={this.editInstanceVariables}
                 editObjectVariables={this.editObjectVariables}
                 onEditObjectByName={this.editObjectByName}
+                onInstancesModified={instances =>
+                  this.forceUpdateInstancesList()
+                }
                 ref={propertiesEditor =>
                   (this._propertiesEditor = propertiesEditor)
                 }
@@ -1028,6 +1042,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
+            ref={instancesList => (this._instancesList = instancesList)}
           />
         ),
       },

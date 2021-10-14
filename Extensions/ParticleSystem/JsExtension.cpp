@@ -4,7 +4,6 @@ GDevelop - Particle System Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "ParticleEmitterObject.h"
@@ -158,9 +157,15 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
 
     actions["ParticleSystem::RecreateParticleSystem"].SetFunctionName(
         "recreateParticleSystem");
+    actions["ParticleSystem::SetTank"].SetFunctionName("setTank").SetGetter(
+        "getTank");
     actions["ParticleSystem::Tank"].SetFunctionName("setTank").SetGetter(
         "getTank");
+    actions["ParticleSystem::StartEmission"].SetFunctionName("startEmission");
+    actions["ParticleSystem::StopEmission"].SetFunctionName("stopEmission");
     conditions["ParticleSystem::Tank"].SetFunctionName("getTank");
+    actions["ParticleSystem::SetFlow"].SetFunctionName("setFlow").SetGetter(
+        "getFlow");
     actions["ParticleSystem::Flow"].SetFunctionName("setFlow").SetGetter(
         "getFlow");
     conditions["ParticleSystem::Flow"].SetFunctionName("getFlow");
@@ -171,6 +176,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
     conditions["ParticleSystem::Texture"].SetFunctionName("getTexture");
 
     strExpressions["Texture"].SetFunctionName("getTexture");
+    expressions["CurrentParticleCount"].SetFunctionName("getParticleCount");
     expressions["NbParticles"].SetFunctionName("getParticleCount");
     expressions["RendererParam1"].SetFunctionName("getRendererParam1");
     expressions["RendererParam2"].SetFunctionName("getRendererParam2");
@@ -221,5 +227,4 @@ extern "C" gd::PlatformExtension* CreateGDJSParticleSystemExtension() {
 extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
   return new ParticleSystemJsExtension;
 }
-#endif
 #endif

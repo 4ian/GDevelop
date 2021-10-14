@@ -22,7 +22,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers");
 
-#if defined(GD_IDE_ONLY)
 
   extension
       .AddCondition("Timer",
@@ -206,7 +205,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
           "\"yday\", \"timestamp\"]");
 
-#endif
 }
 
 }  // namespace gd

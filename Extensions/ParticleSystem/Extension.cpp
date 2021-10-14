@@ -36,7 +36,6 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
           "effects."),
         "CppPlatform/Extensions/particleSystemicon.png");
 
-#if defined(GD_IDE_ONLY)
     obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     // Declaration is too big to be compiled by GCC in one file, unless you have
@@ -44,6 +43,5 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
     ExtensionSubDeclaration1(obj);
     ExtensionSubDeclaration2(obj);
     ExtensionSubDeclaration3(obj);
-#endif
   }
 }

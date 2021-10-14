@@ -113,7 +113,6 @@ class GD_CORE_API Direction {
    */
   void MoveSprite(std::size_t oldIndex, std::size_t newIndex);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Set the metadata (any string) associated to the Direction.
    * \note Can be used by external editors to store extra information.
@@ -124,20 +123,15 @@ class GD_CORE_API Direction {
    * \brief Return the (optional) metadata associated to the Direction.
    */
   virtual const gd::String& GetMetadata() const { return metadata; }
-#endif
 
   void UnserializeFrom(const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
   void SerializeTo(gd::SerializerElement& element) const;
-#endif
 
  private:
   bool loop;               ///< true if the animation must loop.
   double timeBetweenFrame;  ///< The time between each sprite of the animation.
   std::vector<Sprite> sprites;  ///< The sprites of the direction.
-#if defined(GD_IDE_ONLY)
   gd::String metadata;
-#endif
 };
 
 }  // namespace gd

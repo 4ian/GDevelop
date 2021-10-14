@@ -231,4 +231,69 @@ describe('InstancesSelection', () => {
     instance2OfObject2.delete();
     instance3OfObject2.delete();
   });
+
+  it('handles deselecting instances of a layer', () => {
+    const instancesSelection = new InstancesSelection();
+    const instance1OfObject1 = new gd.InitialInstance();
+    instance1OfObject1.setObjectName('Object1');
+    instance1OfObject1.setLayer('Layer1');
+    const instance2OfObject1 = new gd.InitialInstance();
+    instance2OfObject1.setObjectName('Object1');
+    const instance3OfObject1 = new gd.InitialInstance();
+    instance3OfObject1.setObjectName('Object1');
+    instance3OfObject1.setLayer('Layer1');
+    const instance1OfObject2 = new gd.InitialInstance();
+    instance1OfObject2.setObjectName('Object2');
+    instance1OfObject2.setLayer('Layer2');
+    const instance2OfObject2 = new gd.InitialInstance();
+    instance2OfObject2.setObjectName('Object2');
+    instance2OfObject2.setLayer('Layer1');
+    const instance3OfObject2 = new gd.InitialInstance();
+    instance3OfObject2.setObjectName('Object2');
+
+    instancesSelection.selectInstances(
+      [
+        instance1OfObject1,
+        instance2OfObject1,
+        instance1OfObject2,
+        instance2OfObject2,
+      ],
+      false,
+      null
+    );
+
+    instancesSelection.unselectInstancesOnLayer('Layer1');
+    expect(instancesSelection.hasSelectedInstances()).toBe(true);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(2);
+    expect(instancesSelection.isInstanceSelected(instance1OfObject1)).toBe(
+      false
+    );
+    expect(instancesSelection.isInstanceSelected(instance2OfObject1)).toBe(
+      true
+    );
+    expect(instancesSelection.isInstanceSelected(instance3OfObject1)).toBe(
+      false
+    );
+    expect(instancesSelection.isInstanceSelected(instance1OfObject2)).toBe(
+      true
+    );
+    expect(instancesSelection.isInstanceSelected(instance2OfObject2)).toBe(
+      false
+    );
+    expect(instancesSelection.isInstanceSelected(instance3OfObject2)).toBe(
+      false
+    );
+
+    instancesSelection.unselectInstancesOnLayer('');
+    instancesSelection.unselectInstancesOnLayer('Layer2');
+    expect(instancesSelection.hasSelectedInstances()).toBe(false);
+    expect(instancesSelection.getSelectedInstances()).toHaveLength(0);
+
+    instance1OfObject1.delete();
+    instance2OfObject1.delete();
+    instance3OfObject1.delete();
+    instance1OfObject2.delete();
+    instance2OfObject2.delete();
+    instance3OfObject2.delete();
+  });
 });

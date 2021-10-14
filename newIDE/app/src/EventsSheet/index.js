@@ -50,7 +50,7 @@ import EventsContextAnalyzerDialog, {
   type EventsContextResult,
   toEventsContextResult,
 } from './EventsContextAnalyzerDialog';
-import SearchPanel from './SearchPanel';
+import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -83,6 +83,8 @@ import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const gd: libGDevelop = global.gd;
+
+const zoomLevel = { min: 1, max: 50 };
 
 type Props = {|
   project: gdProject,
@@ -145,6 +147,8 @@ type State = {|
   searchFocusOffset: ?number,
 
   allEventsMetadata: Array<EventMetadata>,
+
+  fontSize: number,
 |};
 
 type EventInsertionContext = {|
@@ -165,7 +169,7 @@ const styles = {
 export default class EventsSheet extends React.Component<Props, State> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
-  _searchPanel: ?SearchPanel;
+  _searchPanel: ?SearchPanelInterface;
   _containerDiv = React.createRef<HTMLDivElement>();
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
@@ -182,8 +186,12 @@ export default class EventsSheet extends React.Component<Props, State> {
       onEscape: () => this._closeSearchPanel(),
       onUndo: () => this.undo(),
       onRedo: () => this.redo(),
+      onZoomIn: (event: KeyboardEvent) => this.onZoomEvent('IN')(event),
+      onZoomOut: (event: KeyboardEvent) => this.onZoomEvent('OUT')(event),
     },
   });
+
+  static contextType = PreferencesContext;
 
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
@@ -223,6 +231,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     allEventsMetadata: [],
 
     textEditedEvent: null,
+
+    fontSize: 14,
   };
 
   componentDidMount() {
@@ -790,6 +800,28 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   };
 
+  onZoomEvent = (
+    towards: 'IN' | 'OUT'
+  ): ((domEvent?: KeyboardEvent) => void) => {
+    const factor = towards === 'IN' ? 1 : -1;
+    return (domEvent?: KeyboardEvent) => {
+      if (domEvent) {
+        // Browsers usually implement their own zoom features on the same shortcut
+        domEvent.preventDefault();
+        domEvent.stopPropagation();
+      }
+      this.context.setEventsSheetZoomLevel(
+        Math.min(
+          Math.max(
+            this.context.values.eventsSheetZoomLevel + factor * 1,
+            zoomLevel.min
+          ),
+          zoomLevel.max
+        )
+      );
+    };
+  };
+
   _openEventsContextAnalyzer = () => {
     const { globalObjectsContainer, objectsContainer } = this.props;
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
@@ -1053,7 +1085,7 @@ export default class EventsSheet extends React.Component<Props, State> {
           <ResponsiveWindowMeasurer>
             {windowWidth => (
               <PreferencesContext.Consumer>
-                {({ values }) => (
+                {({ values: preferences }) => (
                   <EventsSearcher
                     key={events.ptr}
                     ref={eventSearcher => (this._eventSearcher = eventSearcher)}
@@ -1061,6 +1093,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     selection={this.state.selection}
+                    project={project}
                   >
                     {({
                       eventsSearchResultEvents,
@@ -1069,6 +1102,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                       replaceInEvents,
                       goToPreviousSearchResult,
                       goToNextSearchResult,
+                      clearSearchResults,
                     }) => (
                       <div
                         className="gd-events-sheet"
@@ -1123,7 +1157,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           searchFocusOffset={searchFocusOffset}
                           onEventMoved={this._onEventMoved}
                           showObjectThumbnails={
-                            values.eventsSheetShowObjectThumbnails
+                            preferences.eventsSheetShowObjectThumbnails
                           }
                           screenType={screenType}
                           windowWidth={windowWidth}
@@ -1132,6 +1166,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                               ? this._containerDiv.current.clientHeight
                               : 0
                           }
+                          fontSize={preferences.eventsSheetZoomLevel}
                         />
                         {this.state.showSearchPanel && (
                           <SearchPanel
@@ -1157,7 +1192,10 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 goToPreviousSearchResult
                               )
                             }
-                            onCloseSearchPanel={this._closeSearchPanel}
+                            onCloseSearchPanel={() => {
+                              clearSearchResults();
+                              this._closeSearchPanel();
+                            }}
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }
@@ -1168,7 +1206,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                           anchorEl={this.state.inlineEditingAnchorEl}
                           onRequestClose={() => {
                             this.closeParameterEditor(
-                              /*shouldCancel=*/ values.eventsSheetCancelInlineParameter ===
+                              /*shouldCancel=*/ preferences.eventsSheetCancelInlineParameter ===
                                 'cancel'
                             );
                           }}
@@ -1300,6 +1338,23 @@ export default class EventsSheet extends React.Component<Props, State> {
                               ),
                               click: this._openEventsContextAnalyzer,
                             },
+                            { type: 'separator' },
+                            {
+                              label: i18n._(t`Zoom In`),
+                              click: () => this.onZoomEvent('IN')(),
+                              accelerator: 'CmdOrCtrl+=',
+                              enabled:
+                                preferences.eventsSheetZoomLevel <
+                                zoomLevel.max,
+                            },
+                            {
+                              label: i18n._(t`Zoom Out`),
+                              click: () => this.onZoomEvent('OUT')(),
+                              accelerator: 'CmdOrCtrl+-',
+                              enabled:
+                                preferences.eventsSheetZoomLevel >
+                                zoomLevel.min,
+                            },
                           ]}
                         />
                         <ContextMenu
@@ -1355,7 +1410,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                         />
                         {this._renderInstructionEditorDialog(
                           // Force using the new instruction editor on touch screens.
-                          values.useNewInstructionEditorDialog ||
+                          preferences.useNewInstructionEditorDialog ||
                             screenType === 'touch'
                         )}
                         {this.state.analyzedEventsContextResult && (

@@ -205,6 +205,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 freezeParameters={freezeParameters}
                 onMoveFreeEventsParameter={onMoveFreeEventsParameter}
                 onMoveBehaviorEventsParameter={onMoveBehaviorEventsParameter}
+                key={eventsFunction ? eventsFunction.ptr : null}
               />
             </Line>
           </ScrollView>

@@ -243,7 +243,7 @@ class GD_CORE_API AudioResource : public Resource {
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
-  
+
   void SerializeTo(SerializerElement& element) const override;
 #endif
 
@@ -448,9 +448,20 @@ class GD_CORE_API ResourcesManager {
   std::shared_ptr<Resource> CreateResource(const gd::String& kind);
 
   /**
+   * Get a list containing all the resources.
+   */
+  const std::vector<std::shared_ptr<Resource>>& GetAllResources() const { return resources; };
+
+  /**
    * \brief Get a list containing the names of all resources.
    */
   std::vector<gd::String> GetAllResourceNames() const;
+
+  /**
+   * \brief Return a list of the files, from the specified input list,
+   * that are not used as files by the resources.
+   */
+  std::vector<gd::String> FindFilesNotInResources(const std::vector<gd::String>& filesToCheck) const;
 
 #if defined(GD_IDE_ONLY)
   /**

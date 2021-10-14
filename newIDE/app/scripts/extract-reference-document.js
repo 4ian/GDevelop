@@ -794,6 +794,7 @@ const rawTextsToString = rawTexts =>
 
 initializeGDevelopJs().then(async gd => {
   try {
+    // @ts-ignore - not passing onFindGDJS - is it still useful?
     const loadingResults = await makeExtensionsLoader({
       gd,
       objectsEditorService: null,

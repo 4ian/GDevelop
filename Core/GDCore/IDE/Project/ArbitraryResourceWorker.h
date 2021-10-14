@@ -60,19 +60,18 @@ class GD_CORE_API ArbitraryResourceWorker {
 
   /**
    * \brief Expose an audio, which is either a reference to an "audio" resource,
-   * or a filename if no resource with this name exists.
+   * or a filename if no resource with this name exists (for backward compatibility).
    */
   virtual void ExposeAudio(gd::String &audioName);
 
   /**
    * \brief Expose a font, which is either a reference to a "font" resource,
-   * or a filename if no resource with this name exists.
+   * or a filename if no resource with this name exists (for backward compatibility).
    */
   virtual void ExposeFont(gd::String &fontName);
 
   /**
-   * \brief Expose a bitmap font, which is either a reference to a "bitmapFont" resource,
-   * or a filename if no resource with this name exists.
+   * \brief Expose a bitmap font, which is always a reference to a "bitmapFont" resource.
    */
   virtual void ExposeBitmapFont(gd::String &bitmapFontName);
 

@@ -58,6 +58,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { textEllispsisStyle } from '../UI/TextEllipsis';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -78,11 +79,6 @@ const styles = {
   },
   noIndentNestedList: {
     padding: 0,
-  },
-  itemName: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
   },
   itemTextField: {
     top: noMarginTextFieldInListItemTopOffset,
@@ -182,7 +178,9 @@ class Item extends React.Component<ItemProps, {||}> {
         style={styles.itemTextField}
       />
     ) : (
-      <div style={styles.itemName}>{this.props.primaryText}</div>
+      <div style={textEllispsisStyle} title={this.props.primaryText}>
+        {this.props.primaryText}
+      </div>
     );
 
     return (

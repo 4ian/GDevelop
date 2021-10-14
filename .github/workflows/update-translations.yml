@@ -1,0 +1,73 @@
+# GitHub Action to update translations by downloading them from Crowdin,
+# and open a Pull Request with the changes.
+
+name: Update translations
+on:
+  # Execute only on master
+  push:
+    branches:
+      - master
+  # Allows to run this workflow manually from the Actions tab.
+  workflow_dispatch:
+
+jobs:
+  update-translations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Cache npm dependencies to speed up the workflow
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-newIDE-app-node_modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('newIDE/app/package-lock.json') }}
+
+      - name: Install gettext
+        run: sudo apt update && sudo apt install gettext -y
+
+      - name: Install newIDE dependencies
+        run: npm install
+        working-directory: newIDE/app
+
+      # We need to extract translations first to make sure all the source strings
+      # are included in the English catalogs. Otherwise, missing source strings
+      # with parameters (like "My name is {0}.") would be shown as-is when
+      # the app is built (but not in development - unclear why, LinguiJS issue?).
+      - name: Extract translations
+        run: npm run extract-all-translations
+        working-directory: newIDE/app
+
+      # (Build and) download the most recent translations (PO files) from Crowdin.
+      - name: Install Crowdin CLI
+        run: npm i -g @crowdin/cli
+        
+      - name: Download new translations from Crowdin
+        run: crowdin download
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      # Seems like the three letters code is not handled properly by LinguiJS?
+      # Do without this language while we find a solution.
+      - name: Remove catalogs not handled properly by LinguiJS compile command.
+        run: rm -rf newIDE/app/src/locales/pcm_NG/
+
+      - name: Compile translations into .js files that are read by LinguiJS
+        run: npm run compile-translations
+        working-directory: newIDE/app
+
+      - name: Create a Pull Request with the changes
+        uses: peter-evans/create-pull-request@v3.10.1
+        with:
+          commit-message: Update translations [skip ci]
+          branch: chore/update-translations
+          delete-branch: true
+          title: '[Auto PR] Update translations'
+          body: |
+            This updates the translations by downloading them from Crowdin and compiling them for usage by the app.
+            
+            Please double check the values in `newIDE/app/src/locales/LocalesMetadata.js` to ensure the changes are sensible.

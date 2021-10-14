@@ -37,7 +37,7 @@ void ExposeProjectEffects(
       }
     }
 
-    for (std::size_t i; i < layout.GetObjectsCount(); i++) {
+    for (std::size_t i = 0; i < layout.GetObjectsCount(); i++) {
       auto& object = layout.GetObject(i);
       auto& effects = object.GetEffects();
       for (std::size_t e = 0; e < effects.GetEffectsCount(); e++) {

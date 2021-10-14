@@ -238,7 +238,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
       };
 
   auto renameBehaviorEventsFunction =
-      [&project, &eventsFunctionsExtension, &oldName, &newName](
+      [&project, &oldName, &newName](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::EventsFunction& eventsFunction) {
         if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
@@ -261,7 +261,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
       };
 
   auto renameBehaviorPropertyFunctions =
-      [&project, &eventsFunctionsExtension, &oldName, &newName](
+      [&project, &oldName, &newName](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::NamedPropertyDescriptor& property) {
         gd::InstructionsTypeRenamer actionRenamer = gd::InstructionsTypeRenamer(
@@ -805,7 +805,6 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
   auto renameBehaviorEventsFunction =
       [&project,
        &eventsFunctionsExtension,
-       &eventsBasedBehavior,
        &oldBehaviorName,
        &newBehaviorName](const gd::EventsFunction& eventsFunction) {
         if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
@@ -832,7 +831,6 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
 
   auto renameBehaviorProperty = [&project,
                                  &eventsFunctionsExtension,
-                                 &eventsBasedBehavior,
                                  &oldBehaviorName,
                                  &newBehaviorName](
                                     const gd::NamedPropertyDescriptor&

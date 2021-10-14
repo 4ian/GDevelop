@@ -1,40 +1,106 @@
+// @ts-check
 /**
- * This is a simple script getting the commits since the last tag (which
+ * This is a script getting the commits since the last tag (which
  * corresponds to a GitHub release). Each commit is filtered to:
  * - hide trivial stuff
  * - hide those containing "Don't mention in changelog"/"Don't show in changelog".
  * - categorize as fix or improvement
  *
  * Authors nickname are fetched from GitHub.
+ *
+ * Commits from the extensions/assets/examples repository are also
+ * used to build the complete changelog.
  */
 
 const shell = require('shelljs');
 const child = require('child_process');
-const axios = require('axios');
+const { default: axios } = require('axios');
+const path = require('path');
+const args = require('minimist')(process.argv.slice(2));
 
-const extractCommitsFromGit = () => {
-  const lastTag = child
-    .execSync(`git describe --tags --abbrev=0`)
-    .toString('utf-8')
-    .trim();
-  shell.echo(`ℹ️ Last tag is ${lastTag}`);
+if (!args['extensionsGitPath']) {
+  shell.echo(
+    '⚠️ You should pass --extensionsGitPath pointing to the git directory of GDevelop-extensions.'
+  );
+}
+const extensionsGitPath = args['extensionsGitPath'];
 
-  const output = child
-    .execSync(
-      `git log ${lastTag}..HEAD --format=%B---DELIMITER---%ae---DELIMITER---%H---COMMITDELIMITER---`
-    )
-    .toString('utf-8');
+if (!args['assetsGitPath']) {
+  shell.echo(
+    '⚠️ You should pass --assetsGitPath pointing to the git directory of GDevelop-assets.'
+  );
+}
+const assetsGitPath = args['assetsGitPath'];
 
-  return (
-    output
+if (!args['examplesGitPath']) {
+  shell.echo(
+    '⚠️ You should pass --examplesGitPath pointing to the git directory of GDevelop-examples.'
+  );
+}
+const examplesGitPath = args['examplesGitPath'];
+
+/** @typedef {{sha: string, message: string, authorEmail: string}} GitRawCommitInfo */
+/** @typedef {{
+  message: string,
+  authorEmail: string,
+  authorNickname: string,
+  isFix: boolean,
+  forDev: boolean,
+  hidden: boolean
+}} GitEnrichedCommitInfo */
+
+/** Helpers to read information from a git repository. */
+const getGitTools = repoPath => {
+  /**
+   * @param {string} options
+   * @returns {GitRawCommitInfo[]}
+   */
+  const extractCommits = options => {
+    const output = child
+      .execSync(
+        `git log ${options} --format=%B---DELIMITER---%ae---DELIMITER---%H---COMMITDELIMITER---`,
+        { cwd: repoPath }
+      )
+      .toString('utf-8');
+
+    return output
       .split('---COMMITDELIMITER---\n')
       .map(commit => {
         const [message, authorEmail, sha] = commit.split('---DELIMITER---');
 
         return { sha, message, authorEmail };
       })
+      .filter(commit => Boolean(commit.sha));
+  };
+
+  return {
+    getLastTag: () => {
+      return child
+        .execSync(`git describe --tags --abbrev=0`, { cwd: repoPath })
+        .toString('utf-8')
+        .trim();
+    },
+    getTagIsoDate: tag => {
+      return child
+        .execSync(`git tag -l ${tag} --format='%(creatordate:iso8601)'`, {
+          cwd: repoPath,
+        })
+        .toString('utf-8')
+        .trim();
+    },
+    extractCommitsSinceTag: tag => extractCommits(`${tag}..HEAD`),
+    extractCommitsSinceDate: date => extractCommits(`--after="${date}"`),
+  };
+};
+
+/**
+ * @param {GitRawCommitInfo[]} rawCommits
+ * @return {GitEnrichedCommitInfo[]}
+ */
+const enrichCommits = rawCommits => {
+  return (
+    rawCommits
       // Clean commits
-      .filter(commit => Boolean(commit.sha))
       .map(commit => ({
         message: commit.message.trim(),
         authorEmail: commit.authorEmail.trim(),
@@ -45,8 +111,12 @@ const extractCommitsFromGit = () => {
         const shouldHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
           lowerCaseMessage.includes("don't mention in the changelog") ||
+          lowerCaseMessage.includes("do not mention in changelog") ||
+          lowerCaseMessage.includes("do not mention in the changelog") ||
           lowerCaseMessage.includes("don't show in changelog") ||
           lowerCaseMessage.includes("don't show in the changelog") ||
+          lowerCaseMessage.includes("do not show in changelog") ||
+          lowerCaseMessage.includes("do not show in the changelog") ||
           lowerCaseMessage === 'update translations' ||
           lowerCaseMessage === 'prettier' ||
           lowerCaseMessage === 'update jsextension.js' ||
@@ -69,10 +139,14 @@ const extractCommitsFromGit = () => {
           lowerCaseMessage.indexOf('fix typo') === 0 ||
           lowerCaseMessage.includes('add files forgotten in last commit') ||
           lowerCaseMessage.indexOf('apply review') === 0 ||
+          lowerCaseMessage.indexOf('compress images') === 0 ||
+          lowerCaseMessage.indexOf('update extensions-registry.json') === 0 ||
           lowerCaseMessage.includes('package-lock.json') ||
           lowerCaseMessage.includes('yarn.lock');
         const isFix = lowerCaseMessage.indexOf('fix') === 0;
-        const forDev = lowerCaseMessage.includes('developer changelog');
+        const forDev = lowerCaseMessage.includes(
+          'only show in developer changelog'
+        );
 
         return {
           message: commit.message.trim(),
@@ -86,9 +160,16 @@ const extractCommitsFromGit = () => {
   );
 };
 
+let authorEmailsToNicknames = {};
+
+/**
+ * @param {GitEnrichedCommitInfo[]} commits
+ * @return {Promise<GitEnrichedCommitInfo[]>}
+ */
 const findAuthorNicknameInCommits = async commits => {
-  let authorEmailsToNicknames = {};
   let lastGithubCall = 0;
+
+  /** @returns {Promise<void>} */
   function delayGithubCall() {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -111,7 +192,7 @@ const findAuthorNicknameInCommits = async commits => {
     try {
       await delayGithubCall();
       console.log(
-        `ℹ️ Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
+        `\nℹ️ Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
       );
       const response = await axios.get(
         `https://api.github.com/search/users?q=${authorEmail}+in:email`
@@ -121,9 +202,9 @@ const findAuthorNicknameInCommits = async commits => {
         data && data.items && data.items[0] ? data.items[0].login : '';
       authorEmailsToNicknames[authorEmail] = login;
       if (login) {
-        shell.echo(`ℹ️ Found nickname for email: ${authorEmail}:` + login);
+        shell.echo(`✅ Found nickname for email: ${authorEmail}:` + login);
       } else {
-        shell.echo(`ℹ️ No nickname found for email: ${authorEmail}:` + login);
+        shell.echo(`⚠️ No nickname found for email: ${authorEmail}`);
       }
 
       return login;
@@ -150,29 +231,39 @@ const findAuthorNicknameInCommits = async commits => {
   return outputCommits;
 };
 
-const formatCommitMessage = commit => {
-  const includeAuthor = commit.authorNickname !== '4ian';
-  const author = includeAuthor
-    ? `(Thanks ${
-        commit.authorNickname
-          ? '@' + commit.authorNickname
-          : 'TODO:' + commit.authorEmail
-      }!)`
-    : '';
+/**
+ * @param {{commit: GitEnrichedCommitInfo, includeAuthor: boolean}} options
+ * @returns {string}
+ */
+const formatCommitMessage = ({ commit, includeAuthor }) => {
+  const author =
+    includeAuthor && !(['4ian', 'AlexandreSi', 'ClementPasteau'].includes(commit.authorNickname))
+      ? `(Thanks ${
+          commit.authorNickname
+            ? '@' + commit.authorNickname
+            : 'TODO:' + commit.authorEmail
+        }!)`
+      : '';
 
   const ignoreRestRegex = /(Don't|Do not) (show|mention) (details|the rest )in (the )?changelog/i;
   const foundIgnoreRest = commit.message.match(ignoreRestRegex);
   const cleanedMessage =
+    // @ts-ignore - check for nullability is properly done?
     foundIgnoreRest && foundIgnoreRest.index > 0
       ? commit.message.substr(0, foundIgnoreRest.index)
       : commit.message;
 
-  const prNumberCleanedMessage = cleanedMessage.replace(
-    /(\(#[1-9][0-9]*\))/,
+  const prNumberCleanedMessage = cleanedMessage
+    .replace(/(\(#[1-9][0-9]*\))/, '')
+    .replace(/fix #[1-9][0-9]*,*/gi, '')
+    .replace(/closes #[1-9][0-9]*,*/gi, '');
+
+  const devCleanedMessage = prNumberCleanedMessage.replace(
+    /only show in developer changelog/i,
     ''
   );
 
-  const indentedMessage = prNumberCleanedMessage
+  const indentedMessage = devCleanedMessage
     .split('\n')
     .map((line, index) =>
       index === 0
@@ -195,15 +286,26 @@ const formatHiddenCommitMessage = commit => {
   );
 };
 
-(async () => {
-  const commits = extractCommitsFromGit();
-  const commitsWithAuthors = await findAuthorNicknameInCommits(commits);
-
-  const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
-  const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
-  const devCommits = displayedCommits.filter(commit => commit.forDev);
-  const fixCommits = displayedCommits.filter(commit => commit.isFix);
-  const improvementsCommits = displayedCommits.filter(commit => !commit.isFix && !commit.forDev);
+/**
+ * @param {{
+ *   hiddenCommits: GitEnrichedCommitInfo[],
+ *   improvementsCommits: GitEnrichedCommitInfo[],
+ *   fixCommits: GitEnrichedCommitInfo[],
+ *   devCommits: GitEnrichedCommitInfo[],
+ *   extensionsCommits: GitEnrichedCommitInfo[] | null,
+ *   assetsCommits: GitEnrichedCommitInfo[] | null,
+ *   examplesCommits: GitEnrichedCommitInfo[] | null,
+ * }} commits
+ */
+const outputChangelog = ({
+  hiddenCommits,
+  improvementsCommits,
+  fixCommits,
+  devCommits,
+  extensionsCommits,
+  assetsCommits,
+  examplesCommits,
+}) => {
   shell.echo(
     `ℹ️ Hidden these commits: \n${hiddenCommits
       .map(formatHiddenCommitMessage)
@@ -213,13 +315,116 @@ const formatHiddenCommitMessage = commit => {
   shell.echo(`\n✅ The generated changelog is:\n`);
 
   shell.echo(`\n## 💝 Improvements\n`);
-  shell.echo(improvementsCommits.map(formatCommitMessage).join('\n'));
+  shell.echo(
+    improvementsCommits
+      .map(commit => formatCommitMessage({ commit, includeAuthor: true }))
+      .join('\n')
+  );
+
+  shell.echo(`\n## ⚙️ Extensions, 🎨 assets and 🕹 examples\n`);
+  shell.echo(
+    extensionsCommits
+      ? extensionsCommits
+          .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
+          .join('\n')
+      : 'TODO: Add extensions commits here.'
+  );
+  shell.echo(
+    assetsCommits
+      ? assetsCommits
+          .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
+          .join('\n')
+      : 'TODO: Add assets commits here.'
+  );
+  shell.echo(
+    examplesCommits
+      ? examplesCommits
+          .map(commit => formatCommitMessage({ commit, includeAuthor: false }))
+          .join('\n')
+      : 'TODO: Add examples commits here.'
+  );
 
   shell.echo(`\n## 🐛 Bug fixes\n`);
-  shell.echo(fixCommits.map(formatCommitMessage).join('\n'));
+  shell.echo(
+    fixCommits
+      .map(commit => formatCommitMessage({ commit, includeAuthor: true }))
+      .join('\n')
+  );
 
   if (devCommits.length > 0) {
     shell.echo(`\n### 🛠 Internal changes (for developers)\n`);
-    shell.echo(devCommits.map(formatCommitMessage).join('\n'));
+    shell.echo(
+      devCommits
+        .map(commit => formatCommitMessage({ commit, includeAuthor: true }))
+        .join('\n')
+    );
   }
+};
+
+(async () => {
+  const gdevelopRepoGitTools = getGitTools('.');
+  const lastTag = gdevelopRepoGitTools.getLastTag();
+  // Uncomment if you want to test the result of the script with an older release:
+  // const lastTag = 'v5.0.0-beta115';
+  shell.echo(`ℹ️ Last tag is ${lastTag}`);
+
+  const lastTagDate = gdevelopRepoGitTools.getTagIsoDate(lastTag);
+  shell.echo(`ℹ️ Date of tag is ${lastTagDate}`);
+
+  const rawCommits = gdevelopRepoGitTools.extractCommitsSinceTag(lastTag);
+  const commits = enrichCommits(rawCommits);
+  const commitsWithAuthors = await findAuthorNicknameInCommits(commits);
+  const hiddenCommits = commitsWithAuthors.filter(commit => commit.hidden);
+  const displayedCommits = commitsWithAuthors.filter(commit => !commit.hidden);
+  const devCommits = displayedCommits.filter(commit => commit.forDev);
+  const fixCommits = displayedCommits.filter(commit => commit.isFix);
+  const improvementsCommits = displayedCommits.filter(
+    commit => !commit.isFix && !commit.forDev
+  );
+
+  /** @type {GitEnrichedCommitInfo[] | null} */
+  let assetsCommits = null;
+  if (assetsGitPath) {
+    const assetsRepoGitTools = getGitTools(assetsGitPath);
+    const assetsRawCommits = assetsRepoGitTools.extractCommitsSinceDate(
+      lastTagDate
+    );
+    assetsCommits = enrichCommits(assetsRawCommits).filter(
+      commit => !commit.hidden
+    );
+  }
+
+  /** @type {GitEnrichedCommitInfo[] | null} */
+  let extensionsCommits = null;
+  if (extensionsGitPath) {
+    const extensionsRepoGitTools = getGitTools(extensionsGitPath);
+    const extensionsRawCommits = extensionsRepoGitTools.extractCommitsSinceDate(
+      lastTagDate
+    );
+    extensionsCommits = enrichCommits(extensionsRawCommits).filter(
+      commit => !commit.hidden
+    );
+  }
+
+  /** @type {GitEnrichedCommitInfo[] | null} */
+  let examplesCommits = null;
+  if (examplesGitPath) {
+    const examplesRepoGitTools = getGitTools(examplesGitPath);
+    const examplesRawCommits = examplesRepoGitTools.extractCommitsSinceDate(
+      lastTagDate
+    );
+    examplesCommits = enrichCommits(examplesRawCommits).filter(
+      commit => !commit.hidden
+    );
+  }
+
+  outputChangelog({
+    hiddenCommits,
+    improvementsCommits,
+    fixCommits,
+    devCommits,
+    extensionsCommits,
+    assetsCommits,
+    examplesCommits,
+  });
 })();

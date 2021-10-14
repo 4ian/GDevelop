@@ -4,24 +4,39 @@ import {
   type Subscription,
   type Limits,
 } from '../Utils/GDevelopServices/Usage';
-import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { User as FirebaseUser } from 'firebase/auth';
+import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Asset';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
-import { type UserProfile } from '../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
 } from '../Utils/GDevelopServices/Asset';
 
-export const profileForIndieUser: Profile = {
+export const indieFirebaseUser: FirebaseUser = {
+  uid: 'indie-user',
+  providerId: 'fake-provider.com',
+  email: 'indie-user@example.com',
+  emailVerified: false,
+};
+
+export const indieVerifiedFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
   email: 'indie-user@example.com',
   emailVerified: true,
+};
+
+export const indieUserProfile: Profile = {
+  id: 'indie-user',
+  email: 'indie-user@example.com',
+  username: 'im-the-indie-user',
+  description: 'Just here to develop indie games',
 };
 
 export const usagesForIndieUser: Usages = [
@@ -75,62 +90,122 @@ export const limitsReached: Limits = {
   },
 };
 
-export const fakeIndieUserProfile: UserProfile = {
+export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
-  profile: profileForIndieUser,
+  profile: indieUserProfile,
+  firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNoSubscriptionUserProfile: UserProfile = {
+export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
-  profile: profileForIndieUser,
+  profile: indieUserProfile,
+  firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
   limits: limitsForIndieUser,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
+export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  firebaseUser: indieVerifiedFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  onLogout: () => {},
+  onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onRefreshUserProfile: () => {
+    console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
   },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
-export const fakeNotAuthenticatedUserProfile: UserProfile = {
+export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  firebaseUser: null,
   subscription: null,
   usages: null,
   limits: null,
   onLogout: () => {},
   onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
   onRefreshUserProfile: () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: () => {
+    console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -714,4 +789,39 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   tags: [],
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
+};
+
+export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
+  id: '2ff24efa0de9b1340d7e8c8aedb494af6b4db9a72c6a643303734755efb977df',
+  name: 'Geometry monster',
+  shortDescription:
+    'A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n',
+  license: 'MIT',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/examples/geometry-monster/thumbnail.png',
+  ],
+  authorIds: [],
+  tags: [
+    'geometry-monster',
+    '',
+    'Advanced control features',
+    'Audio',
+    'Standard Conversions',
+    'Builtin events',
+    'Keyboard features',
+    'Mathematical tools',
+    'Mouse and touch',
+    'Features for all objects',
+    'Scene management features',
+    'Time',
+    'Variable features',
+    'Particle system',
+    'Sprite',
+    'Text object',
+    'Stay On Screen',
+    'Sine (or ellipsis) Movement',
+    'Flash (blink)',
+    'Health (life points and damages for objects)',
+  ],
+  gdevelopVersion: '',
 };

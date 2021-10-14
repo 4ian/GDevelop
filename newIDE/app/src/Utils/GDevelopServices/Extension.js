@@ -2,9 +2,11 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
+import { type UserPublicProfileSearch } from './User';
 
 export type ExtensionShortHeader = {|
   shortDescription: string,
+  authors?: Array<UserPublicProfileSearch>,
   extensionNamespace: string,
   fullName: string,
   name: string,
@@ -35,15 +37,6 @@ export type ExtensionsRegistry = {
 };
 
 /**
- * The ExtensionShortHeader returned by the API, with tags being a string
- * (which is kept in the API for compatibility with older GDevelop versions).
- */
-type ExtensionShortHeaderWithTagsAsString = {|
-  ...ExtensionShortHeader,
-  tags: string,
-|};
-
-/**
  * The ExtensionHeader returned by the API, with tags being a string
  * (which is kept in the API for compatibility with older GDevelop versions).
  */
@@ -59,15 +52,6 @@ type ExtensionHeaderWithTagsAsString = {|
 type SerializedExtensionWithTagsAsString = {
   ...SerializedExtension,
   tags: string,
-};
-
-/**
- * The ExtensionsRegistry returned by the API, with tags being a string
- * (which is kept in the API for compatibility with older GDevelop versions).
- */
-type ExtensionsRegistryWithTagsAsString = {
-  ...ExtensionsRegistry,
-  extensionShortHeaders: Array<ExtensionShortHeaderWithTagsAsString>,
 };
 
 /**
@@ -104,21 +88,13 @@ export const isCompatibleWithExtension = (
 
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
-    .get(`${GDevelopAssetApi.baseUrl}/extension`)
+    .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
     .then(response => response.data)
-    .then(({ databaseUrl }) => {
-      if (!databaseUrl) {
-        throw new Error('Unexpected response from the extension endpoint.');
-      }
-
-      return axios.get(databaseUrl);
-    })
-    .then(response => {
-      const data: ExtensionsRegistryWithTagsAsString = response.data;
-
+    .then(extensionsRegistry => {
       return {
-        ...data,
-        extensionShortHeaders: data.extensionShortHeaders.map(
+        ...extensionsRegistry,
+        // TODO: move this to backend endpoint
+        extensionShortHeaders: extensionsRegistry.extensionShortHeaders.map(
           transformTagsAsStringToTagsAsArray
         ),
       };
@@ -147,4 +123,19 @@ export const getExtension = (
     );
     return transformedData;
   });
+};
+
+export const getUserExtensionShortHeaders = async (
+  authorId: string
+): Promise<Array<ExtensionShortHeader>> => {
+  const response = await axios.get(
+    `${GDevelopAssetApi.baseUrl}/extension-short-header`,
+    {
+      params: {
+        authorId,
+      },
+    }
+  );
+
+  return response.data;
 };

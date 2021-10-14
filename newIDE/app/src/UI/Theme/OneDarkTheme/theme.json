@@ -23,6 +23,16 @@
         }
       },
       "canvas": {
+        "events": {
+          "highlighted": {
+            "background-color": {
+              "value": "#5b4c31"
+            },
+            "color": {
+              "value": "#E5C07B"
+            }
+          }
+        },
         "background-color": {
           "value": "#282C34"
         }
@@ -203,25 +213,6 @@
         "color": {
           "value": "#D6DEEC"
         }
-      },
-      "row-search": {
-        "border-color": {
-          "value": "#18DCF2"
-        },
-        "border-left-width-match": {
-          "value": "3px"
-        },
-        "border-left-width-focus": {
-          "value": "5px"
-        }
-      }
-    },
-    "rst-with-results": {
-      "background-color": {
-        "value": "#D3D3D3"
-      },
-      "border": {
-        "value": "1px #D3D3D3 solid"
       }
     },
     "selectable": {
@@ -253,6 +244,16 @@
       },
       "border-bottom-color": {
         "value": "black"
+      }
+    },
+    "events": {
+      "highlighted": {
+        "background-color": {
+          "value": "#3d4d51"
+        },
+        "color": {
+          "value": "#E5C07B"
+        }
       }
     },
     "actions": {

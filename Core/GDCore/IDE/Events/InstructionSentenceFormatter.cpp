@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include <algorithm>
 #include <iostream>
@@ -91,5 +90,3 @@ InstructionSentenceFormatter::GetAsFormattedText(
 }
 
 }  // namespace gd
-
-#endif

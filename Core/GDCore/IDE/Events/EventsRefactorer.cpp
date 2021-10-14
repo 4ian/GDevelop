@@ -827,9 +827,12 @@ bool EventsRefactorer::SearchStringInFormattedText(
                               },
                               "");
 
+  completeSentence.remove_consecutive_occurrences(
+      completeSentence.begin(), completeSentence.end(), ' ');
+
   size_t foundPosition = matchCase
-                                ? completeSentence.find(search)
-                                : completeSentence.FindCaseInsensitive(search);
+                             ? completeSentence.find(search)
+                             : completeSentence.FindCaseInsensitive(search);
 
   return foundPosition != gd::String::npos;
 }

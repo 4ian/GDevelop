@@ -89,4 +89,19 @@ InstructionSentenceFormatter::GetAsFormattedText(
   return formattedStr;
 }
 
+gd::String InstructionSentenceFormatter::GetFullText(
+    const gd::Instruction &instr, const gd::InstructionMetadata &metadata)
+{
+  const std::vector<std::pair<gd::String, gd::TextFormatting> > formattedText =
+      GetAsFormattedText(instr, metadata);
+
+  gd::String completeSentence = "";
+
+  for (std::size_t id = 0; id < formattedText.size(); ++id) {
+    completeSentence += formattedText.at(id).first;
+  }
+
+  return completeSentence;
+}
+
 }  // namespace gd

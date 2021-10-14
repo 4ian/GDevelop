@@ -38,6 +38,9 @@ class GD_CORE_API InstructionSentenceFormatter {
     return (static_cast<InstructionSentenceFormatter *>(_singleton));
   }
 
+  gd::String GetFullText(const gd::Instruction &instr,
+                         const gd::InstructionMetadata &metadata);
+
   static void DestroySingleton() {
     if (NULL != _singleton) {
       delete _singleton;

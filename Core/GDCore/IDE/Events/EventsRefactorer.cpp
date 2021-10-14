@@ -809,13 +809,7 @@ bool EventsRefactorer::SearchStringInFormattedText(
                                   platform, instruction.GetType())
                             : gd::MetadataProvider::GetActionMetadata(
                                   platform, instruction.GetType());
-  const auto formattedText = gd::InstructionSentenceFormatter::Get()->GetAsFormattedText(instruction, metadata);
-
-  gd::String completeSentence = "";
-
-  for (std::size_t id = 0; id < formattedText.size(); ++id) {
-    completeSentence += formattedText.at(id).first;
-  }
+  gd::String completeSentence = gd::InstructionSentenceFormatter::Get()->GetFullText(instruction, metadata);
 
   const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
 

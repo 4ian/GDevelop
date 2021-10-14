@@ -31,6 +31,7 @@ type Props = {|
   hasEventSelected: boolean,
   onGoToPreviousSearchResult: () => ?gdBaseEvent,
   onGoToNextSearchResult: () => ?gdBaseEvent,
+  searchFocusOffset: ?number,
 |};
 
 export type SearchPanelInterface = {|
@@ -47,6 +48,7 @@ const SearchPanel = (
     hasEventSelected,
     onGoToPreviousSearchResult,
     onGoToNextSearchResult,
+    searchFocusOffset,
   }: Props,
   ref
 ) => {
@@ -278,9 +280,12 @@ const SearchPanel = (
               <Text>
                 {resultsCount === null || resultsCount === undefined
                   ? ''
-                  : resultsCount !== 0
+                  : resultsCount === 0
+                  ? `No results`
+                  : searchFocusOffset === null ||
+                    searchFocusOffset === undefined
                   ? `${resultsCount} results`
-                  : `No results`}
+                  : `Showing ${searchFocusOffset + 1} of ${resultsCount}`}
               </Text>
               <IconButton
                 disabled={!resultsCount}

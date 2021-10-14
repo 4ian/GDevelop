@@ -1199,6 +1199,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }
+                            searchFocusOffset={searchFocusOffset}
                           />
                         )}
                         <InlineParameterEditor

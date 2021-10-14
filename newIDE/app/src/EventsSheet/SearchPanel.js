@@ -169,7 +169,11 @@ const SearchPanel = (
             }}
             onKeyPress={event => {
               if (shouldValidate(event)) {
-                launchSearchIfResultsDirty();
+                if (!searchResultsDirty) {
+                  onGoToNextSearchResult();
+                } else {
+                  launchSearchIfResultsDirty();
+                }
               }
             }}
             onKeyUp={event => {

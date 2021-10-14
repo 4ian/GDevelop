@@ -292,14 +292,8 @@ String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t
     iterator it = i1.base();
     while(it<i2.base())
     {
-        if (p(*it))
-        {
-            replace(std::distance(begin(), it), offset, str);
-        }
-        else
-        {
-            it++;
-        }
+      if (p(*it)) { replace(std::distance(begin(), it), offset, str); }
+      else { it++; }
     }
     return *this;
 }
@@ -307,25 +301,27 @@ String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t
 String& String::remove_consecutive_occurrences(iterator i1, iterator i2, const char c)
 {
     std::vector<std::pair<size_type, size_type>> ranges_to_remove;
-    for(iterator it = i1.base();it<i2.base();it++)
+    for(iterator current_index = i1.base(); current_index < i2.base(); current_index++)
     {
-        if (*it == c){
-            iterator it2 = it;
-            std::advance(it2, 1);
-            if (*it2 == c) {
+        if (*current_index == c){
+            iterator current_subindex = current_index;
+            std::advance(current_subindex, 1);
+            if (*current_subindex == c) {
                 size_type pos = 0;
-                while(it2 < end() && *it2 == c)
+                while(current_subindex < end() && *current_subindex == c)
                 {
                     pos += 1;
-                    it2++;
+                    current_subindex++;
                 }
-                ranges_to_remove.push_back(std::make_pair(std::distance(begin(), it),
-                                                          std::distance(it, it2)));
-                it = it2;
+                ranges_to_remove.push_back(std::make_pair(
+                    std::distance(begin(), current_index),
+                    std::distance(current_index, current_subindex)));
+                current_index = current_subindex;
             }
         }
     }
     if (!ranges_to_remove.empty()) {
+        // Start with the end to prevent shifting string characters
         std::reverse(ranges_to_remove.begin(), ranges_to_remove.end());
         for (std::pair<size_type, size_type> range : ranges_to_remove)
         {

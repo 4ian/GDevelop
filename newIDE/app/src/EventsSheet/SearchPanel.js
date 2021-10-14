@@ -278,14 +278,18 @@ const SearchPanel = (
             </Line>
             <Line noMargin alignItems="center">
               <Text>
-                {resultsCount === null || resultsCount === undefined
-                  ? ''
-                  : resultsCount === 0
-                  ? `No results`
-                  : searchFocusOffset === null ||
-                    searchFocusOffset === undefined
-                  ? `${resultsCount} results`
-                  : `Showing ${searchFocusOffset + 1} of ${resultsCount}`}
+                {resultsCount === null || resultsCount === undefined ? (
+                  ''
+                ) : resultsCount === 0 ? (
+                  <Trans>No results</Trans>
+                ) : searchFocusOffset === null ||
+                  searchFocusOffset === undefined ? (
+                  <Trans>{resultsCount} results</Trans>
+                ) : (
+                  <Trans>
+                    Showing {searchFocusOffset + 1} of {resultsCount}
+                  </Trans>
+                )}
               </Text>
               <IconButton
                 disabled={!resultsCount}

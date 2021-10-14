@@ -2026,8 +2026,8 @@ describe('libGD.js', function () {
   });
 
   describe('EventsRefactorer', function () {
-    describe('SearchInEvents', function() {
-      let eventList = event1 = event2 = null;
+    describe('SearchInEvents', function () {
+      let eventList = (event1 = event2 = null);
 
       beforeAll(() => {
         eventList = new gd.EventsList();
@@ -2052,7 +2052,7 @@ describe('libGD.js', function () {
         condition1.setParameter(0, 'MyCharacter');
         condition1.setParameter(1, '<');
         condition1.setParameter(2, '300');
-        eventConditions1.push_back(condition1)
+        eventConditions1.push_back(condition1);
 
         event1 = eventList.insertEvent(event1, 0);
 
@@ -2074,65 +2074,182 @@ describe('libGD.js', function () {
         condition2.setParameter(0, 'OtherPlatform');
         condition2.setParameter(1, '>');
         condition2.setParameter(2, '55');
-        eventConditions2.push_back(condition2)
+        eventConditions2.push_back(condition2);
 
         event2 = eventList.insertEvent(event2, 0);
       });
 
       it('should search string in parameters only and respect case', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', true, true, true, false, false)
-        expect(searchResultEvents1.size()).toBe(0)
-        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'MyCharacter', true, true, true, false, false)
-        expect(searchResultEvents2.size()).toBe(1)
-        expect(searchResultEvents2.at(0).getEvent()).toBe(event1)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'mycharacter',
+          true,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents1.size()).toBe(0);
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'MyCharacter',
+          true,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents2.size()).toBe(1);
+        expect(searchResultEvents2.at(0).getEvent()).toBe(event1);
       });
 
       it('should search string in parameters only', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'mycharacter', false, true, true, false, false)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'mycharacter',
+          false,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
 
-        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position', false, true, true, false, false)
-        expect(searchResultEvents2.size()).toBe(0)
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'position',
+          false,
+          true,
+          true,
+          false,
+          false
+        );
+        expect(searchResultEvents2.size()).toBe(0);
       });
 
       it('should search string in sentences', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'In Degrees', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event2)
-      })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'In Degrees',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+      });
 
       it('should search string in sentences with parameter placeholders replaced', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'position of MyCharacter', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
-      })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'position of MyCharacter',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
 
       it('should search string in sentences with parameter placeholders replaced and special characters removed', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'towards 450200', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
-      })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
 
       it('should search string in sentences with parameter placeholders replaced and special characters removed in searched string', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'towards 450;200', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
-      })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450;200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
 
       it('should search string in sentences with parameter placeholders replaced and consecutive special characters removed in searched string', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'towards 450();200', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event1)
-      })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'towards 450();200',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event1);
+      });
 
       it('should search string in sentences with multiple adjacent spaces reduced to one space', function () {
-        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(gd.JsPlatform.get(), eventList, 'the    angle  (in  ', false, true, true, false, true)
-        expect(searchResultEvents1.size()).toBe(1)
-        expect(searchResultEvents1.at(0).getEvent()).toBe(event2)
-      })
-    })
-  })
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'the    angle  (in  ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+      });
+      it('should search string in sentences with leading and trailing white spaces', function () {
+        const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          '   the    angle  (in  ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents1.size()).toBe(1);
+        expect(searchResultEvents1.at(0).getEvent()).toBe(event2);
+
+        const searchResultEvents2 = gd.EventsRefactorer.searchInEvents(
+          gd.JsPlatform.get(),
+          eventList,
+          'Delete OtherCharacter    ',
+          false,
+          true,
+          true,
+          false,
+          true
+        );
+        expect(searchResultEvents2.size()).toBe(1);
+        expect(searchResultEvents2.at(0).getEvent()).toBe(event2);
+      });
+    });
+  });
 
   describe('gd.EventsList', function () {
     it('can have events', function () {

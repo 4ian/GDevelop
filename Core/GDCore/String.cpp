@@ -324,9 +324,7 @@ String& String::remove_adjacent_occurrences(iterator i1, iterator i2, const char
         std::reverse(ranges_to_remove.begin(), ranges_to_remove.end());
         for (std::pair<size_type, size_type> range : ranges_to_remove)
         {
-            String to_match;
-            to_match.push_back(c);
-            replace(range.first, range.second, to_match);
+            replace(range.first, range.second, c);
         }
     }
     return *this;
@@ -337,6 +335,31 @@ String& String::replace( iterator i1, iterator i2, const String &str )
     m_string.replace(i1.base(), i2.base(), str.m_string);
 
     return *this;
+}
+
+String& String::replace( iterator i1, iterator i2, size_type n, const char c )
+{
+    m_string.replace(i1.base(), i2.base(), n, c);
+
+    return *this;
+}
+
+String& String::replace( String::size_type pos, String::size_type len, const char c )
+{
+    if(pos > size())
+        throw std::out_of_range("[gd::String::replace] starting pos greater than size");
+
+    iterator i1 = begin();
+    std::advance( i1, pos );
+
+    iterator i2 = i1;
+    while(i2 != end() && len > 0) //Increment "len" times and stop if end() is reached
+    {
+        ++i2;
+        --len;
+    }
+
+    return replace( i1, i2, 1, c );
 }
 
 String& String::replace( String::size_type pos, String::size_type len, const String &str )

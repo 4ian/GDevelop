@@ -2027,7 +2027,9 @@ describe('libGD.js', function () {
 
   describe('EventsRefactorer', function () {
     describe('SearchInEvents', function () {
-      let eventList = (event1 = event2 = null);
+      let eventList = null;
+      let event1 = null;
+      let event2 = null;
 
       beforeAll(() => {
         eventList = new gd.EventsList();

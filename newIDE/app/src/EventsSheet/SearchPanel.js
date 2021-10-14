@@ -83,9 +83,9 @@ const SearchPanel = (
   const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(
     false
   );
-  const [currentTab, setCurrentTab] = React.useState<string>(
-    'search-and-replace'
-  );
+  const [currentTab, setCurrentTab] = React.useState<
+    'search-and-replace' | 'search-in-event-sentences'
+  >('search-and-replace');
 
   React.useEffect(
     () => {
@@ -145,7 +145,7 @@ const SearchPanel = (
     <Background noFullHeight noExpand>
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab
-          label={<Trans>Search and replace</Trans>}
+          label={<Trans>Search and replace in parameters</Trans>}
           value="search-and-replace"
         />
         <Tab
@@ -153,63 +153,28 @@ const SearchPanel = (
           value="search-in-event-sentences"
         />
       </Tabs>
-      <ColumnStackLayout>
-        <Line alignItems="baseline" noMargin>
-          <TextField
-            ref={searchTextField}
-            type="search"
-            margin="dense"
-            hintText={
-              isSearchAndReplaceTab()
-                ? t`Text to search in parameters`
-                : t`Text to search in event sentences`
-            }
-            onChange={(e, searchText) => {
-              setSearchText(searchText);
-            }}
-            onKeyPress={event => {
-              if (shouldValidate(event)) {
-                if (!searchResultsDirty) {
-                  onGoToNextSearchResult();
-                } else {
-                  launchSearchIfResultsDirty();
-                }
-              }
-            }}
-            onKeyUp={event => {
-              if (shouldCloseOrCancel(event)) {
-                onCloseSearchPanel();
-              }
-            }}
-            value={searchText}
-            fullWidth
-          />
-          <Spacer />
-          <RaisedButton
-            disabled={!searchText}
-            primary
-            label={<Trans>Search</Trans>}
-            onClick={() => {
-              if (!searchResultsDirty) {
-                onGoToNextSearchResult();
-              } else {
-                launchSearchIfResultsDirty();
-              }
-            }}
-          />
-        </Line>
-        {isSearchAndReplaceTab() && (
+      <Line>
+        <ColumnStackLayout expand>
           <Line alignItems="baseline" noMargin>
             <TextField
+              ref={searchTextField}
               type="search"
               margin="dense"
-              hintText={t`Text to replace in parameters`}
-              onChange={(e, replaceText) => {
-                setReplaceText(replaceText);
+              hintText={
+                isSearchAndReplaceTab()
+                  ? t`Text to search in parameters`
+                  : t`Text to search in event sentences`
+              }
+              onChange={(e, searchText) => {
+                setSearchText(searchText);
               }}
               onKeyPress={event => {
                 if (shouldValidate(event)) {
-                  launchReplace();
+                  if (!searchResultsDirty) {
+                    onGoToNextSearchResult();
+                  } else {
+                    launchSearchIfResultsDirty();
+                  }
                 }
               }}
               onKeyUp={event => {
@@ -217,97 +182,134 @@ const SearchPanel = (
                   onCloseSearchPanel();
                 }
               }}
-              value={replaceText}
+              value={searchText}
               fullWidth
             />
             <Spacer />
             <RaisedButton
-              disabled={
-                !replaceText ||
-                !searchText ||
-                (!hasEventSelected && searchInSelection)
-              }
-              label={<Trans>Replace</Trans>}
-              onClick={launchReplace}
-            />
-          </Line>
-        )}
-        <Line noMargin alignItems="center" justifyContent="space-between">
-          <Line noMargin alignItems="center">
-            <InlineCheckbox
-              label={<Trans>Case insensitive</Trans>}
-              checked={!matchCase}
-              onCheck={(e, checked) => {
-                setMatchCase(!checked);
-              }}
-            />
-            <Text>
-              <Trans>Search in:</Trans>
-            </Text>
-            <Spacer />
-            <InlineCheckbox
-              label={<Trans>Conditions</Trans>}
-              checked={searchInConditions}
-              onCheck={(e, checked) => {
-                setSearchInConditions(checked);
-              }}
-            />
-            <InlineCheckbox
-              label={<Trans>Actions</Trans>}
-              checked={searchInActions}
-              onCheck={(e, checked) => {
-                setSearchInActions(checked);
-              }}
-            />
-            <InlineCheckbox
-              label={<Trans>Texts</Trans>}
-              checked={searchInEventStrings}
-              onCheck={(e, checked) => {
-                setSearchInEventStrings(checked);
-              }}
-            />
-            {/* <InlineCheckbox //TODO: Implement search/replace in selection
-              label={<Trans>Replace in selection</Trans>}
-              checked={searchInSelection}
-              onCheck={(e, checked) =>
-                this.setState({ searchInSelection: checked })}
-            /> */}
-          </Line>
-          <Line noMargin alignItems="center">
-            <Text>
-              {resultsCount === null || resultsCount === undefined
-                ? ''
-                : resultsCount !== 0
-                ? `${resultsCount} results`
-                : `No results`}
-            </Text>
-            <IconButton
-              disabled={!resultsCount}
+              disabled={!searchText}
+              primary
+              label={<Trans>Search</Trans>}
               onClick={() => {
-                onGoToPreviousSearchResult();
-              }}
-            >
-              <ChevronLeft />
-            </IconButton>
-            <IconButton
-              disabled={!resultsCount}
-              onClick={() => {
-                onGoToNextSearchResult();
-              }}
-            >
-              <ChevronRight />
-            </IconButton>
-            <FlatButton
-              key="close"
-              label={<Trans>Close</Trans>}
-              primary={false}
-              onClick={() => {
-                onCloseSearchPanel();
+                if (!searchResultsDirty) {
+                  onGoToNextSearchResult();
+                } else {
+                  launchSearchIfResultsDirty();
+                }
               }}
             />
           </Line>
-        </Line>
-      </ColumnStackLayout>
+          {isSearchAndReplaceTab() && (
+            <Line alignItems="baseline" noMargin>
+              <TextField
+                type="search"
+                margin="dense"
+                hintText={t`Text to replace in parameters`}
+                onChange={(e, replaceText) => {
+                  setReplaceText(replaceText);
+                }}
+                onKeyPress={event => {
+                  if (shouldValidate(event)) {
+                    launchReplace();
+                  }
+                }}
+                onKeyUp={event => {
+                  if (shouldCloseOrCancel(event)) {
+                    onCloseSearchPanel();
+                  }
+                }}
+                value={replaceText}
+                fullWidth
+              />
+              <Spacer />
+              <RaisedButton
+                disabled={
+                  !replaceText ||
+                  !searchText ||
+                  (!hasEventSelected && searchInSelection)
+                }
+                label={<Trans>Replace</Trans>}
+                onClick={launchReplace}
+              />
+            </Line>
+          )}
+          <Line noMargin alignItems="center" justifyContent="space-between">
+            <Line noMargin alignItems="center">
+              <InlineCheckbox
+                label={<Trans>Case insensitive</Trans>}
+                checked={!matchCase}
+                onCheck={(e, checked) => {
+                  setMatchCase(!checked);
+                }}
+              />
+              <Text>
+                <Trans>Search in:</Trans>
+              </Text>
+              <Spacer />
+              <InlineCheckbox
+                label={<Trans>Conditions</Trans>}
+                checked={searchInConditions}
+                onCheck={(e, checked) => {
+                  setSearchInConditions(checked);
+                }}
+              />
+              <InlineCheckbox
+                label={<Trans>Actions</Trans>}
+                checked={searchInActions}
+                onCheck={(e, checked) => {
+                  setSearchInActions(checked);
+                }}
+              />
+              <InlineCheckbox
+                label={<Trans>Texts</Trans>}
+                checked={searchInEventStrings}
+                onCheck={(e, checked) => {
+                  setSearchInEventStrings(checked);
+                }}
+              />
+              {/* <InlineCheckbox //TODO: Implement search/replace in selection
+                label={<Trans>Replace in selection</Trans>}
+                checked={searchInSelection}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInSelection: checked })}
+              /> */}
+            </Line>
+            <Line noMargin alignItems="center">
+              <Text>
+                {resultsCount === null || resultsCount === undefined
+                  ? ''
+                  : resultsCount !== 0
+                  ? `${resultsCount} results`
+                  : `No results`}
+              </Text>
+              <IconButton
+                disabled={!resultsCount}
+                onClick={() => {
+                  onGoToPreviousSearchResult();
+                }}
+              >
+                <ChevronLeft />
+              </IconButton>
+              <IconButton
+                disabled={!resultsCount}
+                onClick={() => {
+                  onGoToNextSearchResult();
+                }}
+              >
+                <ChevronRight />
+              </IconButton>
+              <FlatButton
+                key="close"
+                label={<Trans>Close</Trans>}
+                primary={false}
+                onClick={() => {
+                  onCloseSearchPanel();
+                }}
+              />
+            </Line>
+          </Line>
+        </ColumnStackLayout>
+      </Line>
     </Background>
   );
 };

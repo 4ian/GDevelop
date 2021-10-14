@@ -119,8 +119,6 @@ export const filterObjectsList = (
 ): ObjectWithContextList => {
   if (!searchText && !selectedTags.length) return list;
 
-  const lowercaseSearchText = searchText.toLowerCase();
-
   return list
     .filter((objectWithContext: ObjectWithContext) => {
       if (!selectedTags.length) return true;
@@ -129,14 +127,11 @@ export const filterObjectsList = (
       return hasStringAllTags(objectTags, selectedTags);
     })
     .filter((objectWithContext: ObjectWithContext) => {
-      const lowercaseObjectName = objectWithContext.object
-        .getName()
-        .toLowerCase();
+      const objectName = objectWithContext.object.getName();
 
-      if (hideExactMatches && lowercaseSearchText === lowercaseObjectName)
-        return undefined;
+      if (hideExactMatches && searchText === objectName) return undefined;
 
-      return lowercaseObjectName.indexOf(lowercaseSearchText) !== -1;
+      return objectName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
     });
 };
 
@@ -151,15 +146,12 @@ export const filterGroupsList = (
 ): GroupWithContextList => {
   if (!searchText) return list;
 
-  const lowercaseSearchText = searchText.toLowerCase();
-
   return list.filter((groupWithContext: GroupWithContext) => {
-    const lowercaseGroupName = groupWithContext.group.getName().toLowerCase();
+    const groupName = groupWithContext.group.getName();
 
-    if (hideExactMatches && lowercaseGroupName === lowercaseSearchText)
-      return undefined;
+    if (hideExactMatches && groupName === searchText) return undefined;
 
-    return lowercaseGroupName.indexOf(lowercaseSearchText) !== -1;
+    return groupName.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
   });
 };
 

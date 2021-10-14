@@ -3010,7 +3010,7 @@ describe('libGD.js', function () {
       });
     });
 
-    it('doesnt complete an expression with an operator', function () {
+    it('does not complete an expression with an operator', function () {
       expect.assertions(0);
       testCompletions('number', '1 +| ', (completionDescription, index) => {
         // No elements returned, so this will not be called.

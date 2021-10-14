@@ -349,14 +349,6 @@ export default class ExpressionField extends React.Component<Props, State> {
     if (!project) return null;
 
     const expression = this.state.validatedValue;
-    // If the expression ends with a space, the user must be navigating or switching to another text
-    // so let's not return anything.
-    if (expression.charAt(expression.length - 1) === ' ') {
-      this.setState(state => ({
-        autocompletions: getAutocompletionsInitialState(),
-      }));
-      return;
-    }
 
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
@@ -375,6 +367,20 @@ export default class ExpressionField extends React.Component<Props, State> {
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
+
+    // If the expression ends with a space, the user must be navigating or switching to another text
+    // so let's not return any autocompletions.
+    if (
+      expression.length > 0 &&
+      expression.charAt(expression.length - 1) === ' '
+    ) {
+      this.setState(state => ({
+        errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
+        errorHighlights,
+        autocompletions: getAutocompletionsInitialState(),
+      }));
+      return;
+    }
 
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart

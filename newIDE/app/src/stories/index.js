@@ -2441,7 +2441,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       parameterRenderingService={ParameterRenderingService}
     />
   ))
-  .add('autocompletions (second selected)', () => (
+  .add('autocompletions (expression selected)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
@@ -2449,19 +2449,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
-      selectedCompletionIndex={1}
-      parameterRenderingService={ParameterRenderingService}
-    />
-  ))
-  .add('autocompletion for an exact expression', () => (
-    <ExpressionAutocompletionsDisplayer
-      project={testProject.project}
-      expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
-      remainingCount={0}
-      // $FlowExpectedError
-      anchorEl={getFakePopperJsAnchorElement()}
-      onChoose={action('chosen')}
-      selectedCompletionIndex={0}
+      selectedCompletionIndex={6}
       parameterRenderingService={ParameterRenderingService}
     />
   ))

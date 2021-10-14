@@ -49,6 +49,13 @@ describe('EnumerateObjects', () => {
         selectedTags: [],
         hideExactMatches: true,
       })
+    ).toHaveLength(1);
+    expect(
+      filterObjectsList(containerObjectsList, {
+        searchText: 'MyShapePainterObject',
+        selectedTags: [],
+        hideExactMatches: true,
+      })
     ).toHaveLength(0);
     expect(
       filterObjectsList(projectObjectsList, {
@@ -65,6 +72,13 @@ describe('EnumerateObjects', () => {
     expect(
       filterObjectsList(allObjectsList, {
         searchText: 'myshapepainterobject',
+        selectedTags: [],
+        hideExactMatches: true,
+      })
+    ).toHaveLength(1);
+    expect(
+      filterObjectsList(allObjectsList, {
+        searchText: 'MyShapePainterObject',
         selectedTags: [],
         hideExactMatches: true,
       })
@@ -85,6 +99,12 @@ describe('EnumerateObjects', () => {
     expect(
       filterGroupsList(objectGroupsList, {
         searchText: 'groupofsprites',
+        hideExactMatches: true,
+      })
+    ).toHaveLength(1);
+    expect(
+      filterGroupsList(objectGroupsList, {
+        searchText: 'GroupOfSprites',
         hideExactMatches: true,
       })
     ).toHaveLength(0);

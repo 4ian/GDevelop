@@ -25,6 +25,8 @@ using namespace std;
 
 namespace gd {
 
+const gd::String EventsRefactorer::searchIgnoredCharacters = ";:,#()";
+
 /**
  * \brief Go through the nodes and change the given object name to a new one.
  *
@@ -686,12 +688,12 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inEventSentences) {
   vector<EventsSearchResult> results;
 
-  const std::string special_characters = EventsRefactorer::SpecialCharacters();
+  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
 
   search.replace_if(search.begin(),
                     search.end(),
-                    [&special_characters](const char &c) {
-                      return special_characters.find(c) != std::string::npos;
+                    [ignored_characters](const char &c) {
+                      return ignored_characters.find(c) != gd::String::npos;
                     },
                     "");
   search = search.LeftTrim().RightTrim();
@@ -781,12 +783,8 @@ bool EventsRefactorer::SearchStringInActions(
     }
 
     if (inSentences && SearchStringInFormattedText(
-      platform,
-      actions[aId],
-      search,
-      matchCase,
-      false
-    )) {return true;}
+                           platform, actions[aId], search, matchCase, false))
+      return true;
 
     if (!actions[aId].GetSubInstructions().empty() &&
         SearchStringInActions(platform,
@@ -819,12 +817,12 @@ bool EventsRefactorer::SearchStringInFormattedText(
     completeSentence += formattedText.at(id).first;
   }
 
-  const std::string special_characters = EventsRefactorer::SpecialCharacters();
+  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
 
   completeSentence.replace_if(completeSentence.begin(),
                               completeSentence.end(),
-                              [&special_characters](const char &c) {
-                                return special_characters.find(c) != std::string::npos;
+                              [ignored_characters](const char &c) {
+                                return ignored_characters.find(c) != gd::String::npos;
                               },
                               "");
 
@@ -859,12 +857,8 @@ bool EventsRefactorer::SearchStringInConditions(
     }
 
     if (inSentences && SearchStringInFormattedText(
-      platform,
-      conditions[cId],
-      search,
-      matchCase,
-      true
-    )) {return true;}
+                           platform, conditions[cId], search, matchCase, true))
+      return true;
 
     if (!conditions[cId].GetSubInstructions().empty() &&
         SearchStringInConditions(platform,

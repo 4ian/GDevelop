@@ -138,45 +138,6 @@ const DisplayedExpressionAutocompletion = React.forwardRef(
   }
 );
 
-const DisplayedExactExpressionAutocompletion = ({
-  expressionAutocompletion,
-  i18n,
-  parameterRenderingService,
-}: {|
-  expressionAutocompletion: ExpressionAutocompletion,
-  i18n: I18nType,
-  parameterRenderingService: ParameterRenderingServiceType,
-|}) => {
-  if (!expressionAutocompletion.enumeratedExpressionMetadata) return null;
-
-  return (
-    <Column>
-      <Line noMargin expand alignItems="center">
-        <AutocompletionIcon
-          src={
-            expressionAutocompletion.enumeratedExpressionMetadata.iconFilename
-          }
-        />
-        <Spacer />
-        <Text style={defaultTextStyle} noMargin align="left">
-          <b>{expressionAutocompletion.completion}</b>(
-          <i>
-            {formatParameterTypesString(
-              parameterRenderingService,
-              i18n,
-              expressionAutocompletion.enumeratedExpressionMetadata
-            )}
-          </i>
-          )
-        </Text>
-      </Line>
-      <Text style={defaultTextStyle} noMargin size="body2">
-        {expressionAutocompletion.enumeratedExpressionMetadata.metadata.getDescription()}
-      </Text>
-    </Column>
-  );
-};
-
 const DisplayedObjectAutocompletion = React.forwardRef(
   (
     {
@@ -295,6 +256,9 @@ const styles = {
     // There will be only one ExpressionAutocompletionsDisplay opened at a time, so it's fair to put the
     // highest z index. If this is breaking, check the z-index of material-ui.
     zIndex: muiZIndex.tooltip + 100,
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
   },
 };
 
@@ -356,7 +320,7 @@ export default function ExpressionAutocompletionsDisplayer({
                       ref={ref}
                     />
                   ) : expressionAutocompletion.kind === 'Expression' ? (
-                    !expressionAutocompletion.isExact ? (
+                    !expressionAutocompletion.isExact && (
                       <DisplayedExpressionAutocompletion
                         key={index}
                         expressionAutocompletion={expressionAutocompletion}
@@ -365,13 +329,6 @@ export default function ExpressionAutocompletionsDisplayer({
                         i18n={i18n}
                         parameterRenderingService={parameterRenderingService}
                         ref={ref}
-                      />
-                    ) : (
-                      <DisplayedExactExpressionAutocompletion
-                        key={index}
-                        expressionAutocompletion={expressionAutocompletion}
-                        i18n={i18n}
-                        parameterRenderingService={parameterRenderingService}
                       />
                     )
                   ) : expressionAutocompletion.kind === 'Object' ? (
@@ -401,6 +358,23 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
             </ScrollView>
           </Paper>
+          {selectedCompletionIndex !== null &&
+            expressionAutocompletions[selectedCompletionIndex].kind ===
+              'Expression' && (
+              <Paper variant="outlined" square style={styles.container}>
+                <ScrollView autoHideScrollbar>
+                  <Column>
+                    <Line noMargin expand alignItems="center">
+                      <Text style={defaultTextStyle} size="body2">
+                        {expressionAutocompletions[
+                          selectedCompletionIndex
+                        ].enumeratedExpressionMetadata.metadata.getDescription()}
+                      </Text>
+                    </Line>
+                  </Column>
+                </ScrollView>
+              </Paper>
+            )}
         </Popper>
       )}
     </I18n>

@@ -360,7 +360,8 @@ export default function ExpressionAutocompletionsDisplayer({
           </Paper>
           {selectedCompletionIndex !== null &&
             expressionAutocompletions[selectedCompletionIndex].kind ===
-              'Expression' && (
+              'Expression' &&
+            !expressionAutocompletions[selectedCompletionIndex].isExact && (
               <Paper variant="outlined" square style={styles.container}>
                 <ScrollView autoHideScrollbar>
                   <Column>

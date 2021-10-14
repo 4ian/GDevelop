@@ -2453,6 +2453,18 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       parameterRenderingService={ParameterRenderingService}
     />
   ))
+  .add('empty autocompletions (because exact expression)', () => (
+    <ExpressionAutocompletionsDisplayer
+      project={testProject.project}
+      expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
+      remainingCount={0}
+      // $FlowExpectedError
+      anchorEl={getFakePopperJsAnchorElement()}
+      onChoose={action('chosen')}
+      selectedCompletionIndex={0}
+      parameterRenderingService={ParameterRenderingService}
+    />
+  ))
   .add('empty autocompletions (nothing shown)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}

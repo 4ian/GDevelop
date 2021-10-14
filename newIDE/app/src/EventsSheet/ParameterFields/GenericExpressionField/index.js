@@ -367,6 +367,9 @@ export default class ExpressionField extends React.Component<Props, State> {
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
+    const formattedErrorText = [extraErrorText, errorText]
+      .filter(Boolean)
+      .join(' - ');
 
     // If the expression ends with a space, the user must be navigating or switching to another text
     // so let's not return any autocompletions.
@@ -375,7 +378,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expression.charAt(expression.length - 1) === ' '
     ) {
       this.setState(state => ({
-        errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
+        errorText: formattedErrorText,
         errorHighlights,
         autocompletions: getAutocompletionsInitialState(),
       }));
@@ -406,7 +409,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     parser.delete();
 
     this.setState(state => ({
-      errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
+      errorText: formattedErrorText,
       errorHighlights,
       autocompletions: setNewAutocompletions(
         state.autocompletions,

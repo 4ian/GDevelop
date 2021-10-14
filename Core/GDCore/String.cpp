@@ -289,11 +289,16 @@ String& String::insert( size_type pos, const String &str )
 String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t)> p,  const String &str)
 {
     String::size_type offset = 1;
-    for(iterator it = i1.base();it<i2.base();it++)
+    iterator it = i1.base();
+    while(it<i2.base())
     {
         if (p(*it))
         {
             replace(std::distance(begin(), it), offset, str);
+        }
+        else
+        {
+            it++;
         }
     }
     return *this;

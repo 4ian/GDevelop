@@ -213,22 +213,6 @@
         "color": {
           "value": "#D6DEEC"
         }
-      },
-      "row-search": {
-        "border-left-width-match": {
-          "value": "3px"
-        },
-        "border-left-width-focus": {
-          "value": "5px"
-        }
-      }
-    },
-    "rst-with-results": {
-      "background-color": {
-        "value": "#D3D3D3"
-      },
-      "border": {
-        "value": "1px #D3D3D3 solid"
       }
     },
     "selectable": {

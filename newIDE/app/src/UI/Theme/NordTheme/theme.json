@@ -203,22 +203,6 @@
         "color": {
           "value": "#ECEFF4"
         }
-      },
-      "row-search": {
-        "border-left-width-match": {
-          "value": "3px"
-        },
-        "border-left-width-focus": {
-          "value": "5px"
-        }
-      }
-    },
-    "rst-with-results": {
-      "background-color": {
-        "value": "#d3d3d3"
-      },
-      "border": {
-        "value": "1px #d3d3d3 solid"
       }
     },
     "selectable": {

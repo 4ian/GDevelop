@@ -22,11 +22,11 @@
  * Draggable handle on the left of an event
  */
 .gd-events-sheet .rst__moveHandle {
-    background: var(--event-sheet-rst-move-handle-background-color) !important;
+    background: var(--event-sheet-rst-move-handle-background-color);
 }
 
 .gd-events-sheet .rst__moveHandle:hover {
-    background-color: var(--event-sheet-rst-move-handle-hover-background-color) !important;
+    background-color: var(--event-sheet-rst-move-handle-hover-background-color);
 }
 
 /**
@@ -165,27 +165,26 @@
 /**
  * Search results highlight
  */
-.gd-events-sheet.with-search-results .rst__moveHandle {
-    background: var(--event-sheet-rst-with-results-background-color) !important;
-    border: var(--event-sheet-rst-with-results-border) !important;
-}
-
-.gd-events-sheet .rst__rowSearchMatch {
+.gd-events-sheet .with-search-results .rst__rowSearchMatch {
     outline: none;
-    border-left: solid var(--event-sheet-rst-row-search-border-left-width-match) var(--event-sheet-events-highlighted-color);
 }
-.gd-events-sheet .rst__rowSearchMatch .conditions-container{
-    outline: none;
-    background-color: var(--event-sheet-events-highlighted-background-color);
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .rst__moveHandle {
+    background: var(--event-sheet-events-highlighted-color);
 }
-.gd-events-sheet .rst__rowSearchMatch .actions-container {
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .rst__moveHandle:hover {
+    filter: brightness(120%);
+}
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .conditions-container {
     outline: none;
     background-color: var(--event-sheet-events-highlighted-background-color);
 }
-
-.gd-events-sheet .rst__rowSearchFocus {
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .actions-container {
     outline: none;
-    border-left: solid var(--event-sheet-rst-row-search-border-left-width-focus) var(--event-sheet-events-highlighted-color);
+    background-color: var(--event-sheet-events-highlighted-background-color);
+}
+
+.gd-events-sheet .with-search-results .rst__rowSearchFocus .rst__moveHandle {
+    width: 15px;
 }
 
 /**

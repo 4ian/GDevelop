@@ -686,12 +686,12 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inEventSentences) {
   vector<EventsSearchResult> results;
 
-  const std::string specialCharacters = EventsRefactorer::specialCharacters();
+  const std::string special_characters = EventsRefactorer::SpecialCharacters();
 
   search.replace_if(search.begin(),
                     search.end(),
-                    [&specialCharacters](const char &c) {
-                      return specialCharacters.find(c) != std::string::npos;
+                    [&special_characters](const char &c) {
+                      return special_characters.find(c) != std::string::npos;
                     },
                     "");
   search.remove_consecutive_occurrences(search.begin(),
@@ -818,12 +818,12 @@ bool EventsRefactorer::SearchStringInFormattedText(
     completeSentence += formattedText.at(id).first;
   }
 
-  const std::string specialCharacters = EventsRefactorer::specialCharacters();
+  const std::string special_characters = EventsRefactorer::SpecialCharacters();
 
   completeSentence.replace_if(completeSentence.begin(),
                               completeSentence.end(),
-                              [&specialCharacters](const char &c) {
-                                return specialCharacters.find(c) != std::string::npos;
+                              [&special_characters](const char &c) {
+                                return special_characters.find(c) != std::string::npos;
                               },
                               "");
 

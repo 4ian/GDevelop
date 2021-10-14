@@ -75,6 +75,15 @@ export class LogsManager {
   }
 }
 
+const Tag = ({ icon, label }: { icon: React$Node, label: React$Node }) => (
+  <Chip
+    icon={icon}
+    style={{ marginRight: 2 }}
+    size="small"
+    label={<ConsoleText>{label}</ConsoleText>}
+  />
+);
+
 const iconMap = {
   info: <InfoIcon color="primary" />,
   warning: <WarningIcon color="secondary" />,
@@ -201,23 +210,32 @@ export const DebuggerConsole = ({
                       <ListItem
                         dense
                         key={key}
-                        style={style}
+                        style={Object.assign(
+                          { paddingBottom: 0, paddingTop: 6 },
+                          style
+                        )}
                         ref={registerChild}
                       >
-                        <ListItemIcon>
+                        <ListItemIcon
+                          style={{
+                            alignSelf: 'flex-start',
+                            marginTop: 5,
+                            minWidth: 40,
+                          }}
+                        >
                           {iconMap[filteredLogs[index].type] || iconMap['info']}
                         </ListItemIcon>
                         <ListItemText
                           primary={
                             <div
                               style={{
-                                backgroundColor: 'black',
+                                backgroundColor: '#292929',
                                 borderRadius: '4px',
                                 border: '1px solid slategray',
                                 color: 'white',
                                 fontFamily: "'Courier New', monospace",
                                 padding: 5,
-                                marginBottom: 5,
+                                marginBottom: 4,
                               }}
                             >
                               <ConsoleText>
@@ -229,35 +247,29 @@ export const DebuggerConsole = ({
                             maximized && (
                               <>
                                 {filteredLogs[index].group ? (
-                                  <Chip
+                                  <Tag
                                     icon={<FolderIcon />}
-                                    size="small"
                                     label={
-                                      <ConsoleText>
-                                        <Trans>
-                                          Group: {filteredLogs[index].group}
-                                        </Trans>
-                                      </ConsoleText>
+                                      <Trans>
+                                        Group: {filteredLogs[index].group}
+                                      </Trans>
                                     }
                                   />
                                 ) : (
                                   undefined
                                 )}
-                                <Chip
+                                <Tag
                                   icon={<TimerIcon />}
-                                  size="small"
                                   label={
-                                    <ConsoleText>
-                                      <Trans>
-                                        Timestamp:{' '}
-                                        {filteredLogs[index].timestamp}
-                                      </Trans>
-                                    </ConsoleText>
+                                    <Trans>
+                                      Timestamp: {filteredLogs[index].timestamp}
+                                    </Trans>
                                   }
                                 />
                               </>
                             )
                           }
+                          style={{ margin: 0 }}
                         />
                       </ListItem>
                     )}

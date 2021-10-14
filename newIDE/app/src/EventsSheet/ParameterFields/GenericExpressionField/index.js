@@ -311,7 +311,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         addDot: expressionAutocompletion.addDot,
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
+        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
       }
     );
 
@@ -348,6 +348,8 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
+    const expression = this.state.validatedValue;
+
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
@@ -356,7 +358,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer
     );
-    const expression = this.state.validatedValue;
+
     const expressionNode = parser
       .parseExpression(expressionType, expression)
       .get();
@@ -365,6 +367,23 @@ export default class ExpressionField extends React.Component<Props, State> {
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
+    const formattedErrorText = [extraErrorText, errorText]
+      .filter(Boolean)
+      .join(' - ');
+
+    // If the expression ends with a space, the user must be navigating or switching to another text
+    // so let's not return any autocompletions.
+    if (
+      expression.length > 0 &&
+      expression.charAt(expression.length - 1) === ' '
+    ) {
+      this.setState(state => ({
+        errorText: formattedErrorText,
+        errorHighlights,
+        autocompletions: getAutocompletionsInitialState(),
+      }));
+      return;
+    }
 
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
@@ -390,7 +409,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     parser.delete();
 
     this.setState(state => ({
-      errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
+      errorText: formattedErrorText,
       errorHighlights,
       autocompletions: setNewAutocompletions(
         state.autocompletions,

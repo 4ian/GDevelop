@@ -10,6 +10,7 @@ namespace gdjs {
     highestGround: gdjs.PlatformRuntimeBehavior | null;
     isCollidingAnyPlatform: boolean;
   };
+
   /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
@@ -22,19 +23,6 @@ namespace gdjs {
       highestGround: null,
       isCollidingAnyPlatform: false,
     };
-    /**
-     * The platform is not colliding the character.
-     *
-     * Number.MAX_VALUE
-     */
-    private static readonly _noCollision = Number.MAX_VALUE;
-    /**
-     * The platform is colliding the character
-     * and is too high for the character to walk on.
-     *
-     * -Number.MAX_VALUE
-     */
-    private static readonly _floorIsTooHigh = -Number.MAX_VALUE;
 
     // To achieve pixel-perfect precision when positioning object on platform or
     // handling collision with "walls", edges of the hitboxes must be ignored during
@@ -676,11 +664,12 @@ namespace gdjs {
       upwardDeltaY: float,
       downwardDeltaY: float
     ): PlatformSearchResult {
-      
-    // TODO What if one obstacle is just upward and another one is followed up?
-    // Should it remember how much the character can go up without collision on top
-    // and return _floorIsTooHigh if the floor found is higher than that.
-    // To avoid going in a too small cavern and then pop out awkwardly or being stuck.
+      // TODO What if one obstacle is just upward and another one is followed up?
+      // Should it remember how much the character can go up without collision on top
+      // and return _floorIsTooHigh if the floor found is higher than that.
+      // To avoid going in a too small cavern and then pop out awkwardly or being stuck.
+      const context = FollowConstraintContext.instance;
+      context.initializeBeforeSearch(this, upwardDeltaY, downwardDeltaY);
 
       let totalHighestY = Number.MAX_VALUE;
       let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
@@ -704,11 +693,9 @@ namespace gdjs {
           continue;
         }
 
-        let highestRelativeY = this._findPlatformHighestRelativeYUnderObject(
-          platform,
-          upwardDeltaY,
-          downwardDeltaY
-        );
+        context.initializeBeforePlatformCheck();
+        this._findPlatformHighestRelativeYUnderObject(platform, context);
+        let highestRelativeY = context.getFloorDeltaY();
         if (
           // When following the floor, ignore jumpthrus that are higher than the character bottom.
           this._state === this._onFloor &&
@@ -720,12 +707,10 @@ namespace gdjs {
           // Don't follow jumpthrus that are higher than the character bottom.
           continue;
         }
-        if (highestRelativeY !== PlatformerObjectRuntimeBehavior._noCollision) {
+        if (context.foundPlatform()) {
           isCollidingAnyPlatform = true;
         }
-        if (
-          highestRelativeY === PlatformerObjectRuntimeBehavior._floorIsTooHigh
-        ) {
+        if (context.floorIsTooHigh()) {
           // One platform is colliding the character
           // and is too high for the character to walk on.
           // This will still be an obstacle event if there
@@ -734,7 +719,7 @@ namespace gdjs {
           break;
         }
 
-        if (highestRelativeY < totalHighestY) {
+        if (context.foundPlatform() && highestRelativeY < totalHighestY) {
           totalHighestY = highestRelativeY;
           highestGround = platform;
         }
@@ -761,136 +746,133 @@ namespace gdjs {
      */
     private _findPlatformHighestRelativeYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
-      upwardDeltaY: float,
-      downwardDeltaY: float
-    ) {
-      let ownerMinX = Number.MAX_VALUE;
-      let ownerMaxX = -Number.MAX_VALUE;
-      let ownerMinY = Number.MAX_VALUE;
-      let ownerMaxY = -Number.MAX_VALUE;
-      for (const hitBox of this.owner.getHitBoxes()) {
-        for (const vertex of hitBox.vertices) {
-          ownerMinX = Math.min(ownerMinX, vertex[0]);
-          ownerMaxX = Math.max(ownerMaxX, vertex[0]);
-          ownerMinY = Math.min(ownerMinY, vertex[1]);
-          ownerMaxY = Math.max(ownerMaxY, vertex[1]);
-        }
-      }
-      const floorMinY = ownerMaxY + upwardDeltaY;
-      const floorMaxY = ownerMaxY + downwardDeltaY;
-
+      context: FollowConstraintContext
+    ): FollowConstraintContext {
       const platformObject = platform.owner;
       const platformAABB = platformObject.getAABB();
       if (
-        platformAABB.max[0] <= ownerMinX ||
-        platformAABB.min[0] >= ownerMaxX ||
-        platformAABB.max[1] <= ownerMinY ||
-        platformAABB.min[1] > floorMaxY
+        platformAABB.max[0] <= context.ownerMinX ||
+        platformAABB.min[0] >= context.ownerMaxX ||
+        platformAABB.max[1] <= context.headMinY ||
+        platformAABB.min[1] > context.floorMaxY
       ) {
-        return PlatformerObjectRuntimeBehavior._noCollision;
+        // No collision
+        return context;
       }
 
-      let highestY = PlatformerObjectRuntimeBehavior._noCollision;
       for (const hitbox of platformObject.getHitBoxes()) {
         let previousVertex = hitbox.vertices[hitbox.vertices.length - 1];
 
         // Edges over the character head might not result to a collision,
         // but if there is also an edge under its head then there is a collision.
-        let foundOverHead = false;
-        let foundUnderHead = false;
+        // The platform hitbox could be in several parts.
+        // So, the object could walk on one part
+        // and have another part over its head.
+        context.initializeBeforeHitboxCheck();
 
         for (const vertex of hitbox.vertices) {
-          if (previousVertex[1] > floorMaxY && vertex[1] > floorMaxY) {
+          if (
+            previousVertex[1] > context.floorMaxY &&
+            vertex[1] > context.floorMaxY
+          ) {
             // The edge is too low
-            foundUnderHead = true;
-            if (foundOverHead) {
-              return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
+            context.foundUnderHead = true;
+            if (context.foundOverHead) {
+              context.setFloorIsTooHigh();
+              return context;
             }
           } else {
             // Check vertex into the interval
-            if (ownerMinX <= vertex[0] && vertex[0] <= ownerMaxX) {
-              if (vertex[1] < floorMinY) {
-                // Platform is too high...
-                if (vertex[1] >= ownerMinY) {
-                  // ...but not over the object.
-                  // Indeed, the platform hitbox could be in several parts.
-                  // So, the object could walk on one part
-                  // and have another part over its head.
-                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                } else {
-                  foundOverHead = true;
-                  if (foundUnderHead) {
-                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                  }
-                }
-              }
-              // Ignore intersections that are too low
-              if (floorMinY <= vertex[1] && vertex[1] <= floorMaxY) {
-                if (foundOverHead) {
-                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                } else {
-                  highestY = Math.min(highestY, vertex[1]);
-                  foundUnderHead = true;
-                }
-              }
+            if (
+              context.ownerMinX <= vertex[0] &&
+              vertex[0] <= context.ownerMaxX
+            ) {
+              this._addPointConstraint(vertex[1], context);
             }
             const deltaX = vertex[0] - previousVertex[0];
             // Vertical edges doesn't matter
             if (deltaX !== 0) {
               // Check intersection on the left side of owner
               if (
-                (vertex[0] < ownerMinX && ownerMinX < previousVertex[0]) ||
-                (previousVertex[0] < ownerMinX && ownerMinX < vertex[0])
+                (vertex[0] < context.ownerMinX &&
+                  context.ownerMinX < previousVertex[0]) ||
+                (previousVertex[0] < context.ownerMinX &&
+                  context.ownerMinX < vertex[0])
               ) {
                 const deltaY = vertex[1] - previousVertex[1];
                 const intersectionY =
                   previousVertex[1] +
-                  ((ownerMinX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
-                  // Platform is too high
-                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                }
-                // Ignore intersections that are too low
-                if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  if (foundOverHead) {
-                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                  } else {
-                    highestY = Math.min(highestY, intersectionY);
-                    foundUnderHead = true;
-                  }
-                }
+                  ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
+
+                this._addPointConstraint(intersectionY, context);
               }
               // Check intersection on the right side of owner
               if (
-                (vertex[0] < ownerMaxX && ownerMaxX < previousVertex[0]) ||
-                (previousVertex[0] < ownerMaxX && ownerMaxX < vertex[0])
+                (vertex[0] < context.ownerMaxX &&
+                  context.ownerMaxX < previousVertex[0]) ||
+                (previousVertex[0] < context.ownerMaxX &&
+                  context.ownerMaxX < vertex[0])
               ) {
                 const deltaY = vertex[1] - previousVertex[1];
                 const intersectionY =
                   previousVertex[1] +
-                  ((ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
-                if (intersectionY < floorMinY && intersectionY >= ownerMinY) {
-                  // Platform is too high
-                  return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                }
-                // Ignore intersections that are too low
-                if (floorMinY <= intersectionY && intersectionY <= floorMaxY) {
-                  if (foundOverHead) {
-                    return PlatformerObjectRuntimeBehavior._floorIsTooHigh;
-                  } else {
-                    highestY = Math.min(highestY, intersectionY);
-                    foundUnderHead = true;
-                  }
-                }
+                  ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
+
+                this._addPointConstraint(intersectionY, context);
               }
             }
           }
           previousVertex = vertex;
         }
       }
-      return highestY === PlatformerObjectRuntimeBehavior._noCollision
-        ? PlatformerObjectRuntimeBehavior._noCollision
-        : highestY - ownerMaxY;
+      return context;
+    }
+
+    /**
+     * Check if the character can follow a given Y or move to not touch it
+     * and update the context with this new constraint.
+     * @param y
+     * @param context
+     * @returns
+     */
+    private _addPointConstraint(
+      y: float,
+      context: FollowConstraintContext
+    ): void {
+      if (y < context.floorMinY) {
+        // Platform is too high...
+        if (y > context.ownerMinY) {
+          // ...but not over the object.
+          context.setFloorIsTooHigh();
+          return;
+        } else {
+          // ...but over the object.
+          context.foundOverHead = true;
+          if (context.foundUnderHead) {
+            context.setFloorIsTooHigh();
+            return;
+          }
+          if (y > context.headMinY) {
+            context.allowedMinDeltaY = Math.max(
+              context.allowedMinDeltaY,
+              y - context.ownerMinY
+            );
+          }
+        }
+      }
+      // Ignore intersections that are too low
+      if (context.floorMinY <= y && y <= context.floorMaxY) {
+        if (context.foundOverHead) {
+          context.setFloorIsTooHigh();
+          return;
+        } else {
+          context.allowedMaxDeltaY = Math.min(
+            context.allowedMaxDeltaY,
+            y - context.ownerMaxY
+          );
+          context.foundUnderHead = true;
+        }
+      }
     }
 
     /**
@@ -1967,6 +1949,117 @@ namespace gdjs {
 
     toString(): String {
       return 'OnLadder';
+    }
+  }
+
+  /**
+   * A context used to search for a floor.
+   */
+  class FollowConstraintContext {
+    static readonly instance: FollowConstraintContext = new FollowConstraintContext();
+    /**
+     * Character right side
+     */
+    ownerMinX: float = 0;
+    /**
+     * Character left side
+     */
+    ownerMaxX: float = 0;
+    /**
+     * The maximum top position the character top can go.
+     */
+    headMinY: float = 0;
+    /**
+     * Character top
+     */
+    ownerMinY: float = 0;
+    /**
+     * The maximum top position the character bottom can go.
+     */
+    floorMinY: float = 0;
+    /**
+     * Character bottom
+     */
+    ownerMaxY: float = 0;
+    /**
+     * The maximum bottom position the character bottom can go.
+     */
+    floorMaxY: float = 0;
+
+    /**
+     * The minimum upward delta according to already checked platforms.
+     */
+    allowedMinDeltaY: float = 0;
+    /**
+     * The maximum downward delta according to already checked platforms.
+     */
+    allowedMaxDeltaY: float = 0;
+    /**
+     * True if any edge has been found over the character top.
+     *
+     * It allows to check for encompassing platforms.
+     */
+    foundOverHead: boolean = false;
+    /**
+     * True if any edge has been found under the character top.
+     *
+     * It allows to check for encompassing platforms.
+     */
+    foundUnderHead: boolean = false;
+
+    initializeBeforeSearch(
+      behavior: PlatformerObjectRuntimeBehavior,
+      upwardDeltaY: float,
+      downwardDeltaY: float
+    ) {
+      let ownerMinX = Number.MAX_VALUE;
+      let ownerMaxX = -Number.MAX_VALUE;
+      let ownerMinY = Number.MAX_VALUE;
+      let ownerMaxY = -Number.MAX_VALUE;
+      for (const hitBox of behavior.owner.getHitBoxes()) {
+        for (const vertex of hitBox.vertices) {
+          ownerMinX = Math.min(ownerMinX, vertex[0]);
+          ownerMaxX = Math.max(ownerMaxX, vertex[0]);
+          ownerMinY = Math.min(ownerMinY, vertex[1]);
+          ownerMaxY = Math.max(ownerMaxY, vertex[1]);
+        }
+      }
+
+      this.ownerMinX = ownerMinX;
+      this.ownerMaxX = ownerMaxX;
+      this.headMinY = ownerMinY + upwardDeltaY;
+      this.ownerMinY = ownerMinY;
+      this.floorMinY = ownerMaxY + upwardDeltaY;
+      this.ownerMaxY = ownerMaxY;
+      this.floorMaxY = ownerMaxY + downwardDeltaY;
+
+      this.allowedMinDeltaY = upwardDeltaY;
+    }
+
+    initializeBeforePlatformCheck() {
+      this.allowedMaxDeltaY = Number.MAX_VALUE;
+    }
+
+    initializeBeforeHitboxCheck() {
+      this.foundOverHead = false;
+      this.foundUnderHead = false;
+    }
+
+    setFloorIsTooHigh() {
+      this.allowedMinDeltaY = Number.MAX_VALUE;
+      this.allowedMaxDeltaY = -Number.MAX_VALUE;
+    }
+
+    floorIsTooHigh(): boolean {
+      return this.allowedMinDeltaY > this.allowedMaxDeltaY;
+    }
+
+    foundPlatform(): boolean {
+      return this.ownerMaxY + this.allowedMaxDeltaY <= this.floorMaxY;
+    }
+
+    getFloorDeltaY(): float {
+      return this.allowedMaxDeltaY;
     }
   }
 

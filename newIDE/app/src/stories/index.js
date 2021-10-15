@@ -3205,6 +3205,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('default (no results)', () => (
@@ -3216,6 +3217,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('3 results', () => (
@@ -3227,6 +3229,19 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
+    />
+  ))
+  .add('3 results with focus on the second', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={3}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
+      searchFocusOffset={1}
     />
   ));
 

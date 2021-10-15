@@ -2577,6 +2577,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
     };
 
+    const walkRightCanStop = (frameCount) => {
+      const behavior = object.getBehavior('auto1');
+      for (let i = 0; i < frameCount; ++i) {
+        const lastX = object.getX();
+        const lastSpeed = behavior.getCurrentSpeed();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isOnFloor()).to.be(true);
+        expect(object.getX()).to.not.be.below(lastX);
+      }
+    };
+
     const walkLeft = (frameCount) => {
       const behavior = object.getBehavior('auto1');
       for (let i = 0; i < frameCount; ++i) {
@@ -2710,7 +2722,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         slope.setPosition(0, 0);
 
         const platform = addPlatformObject(runtimeScene);
-        slope.setCustomWidthAndHeight(50, 50);
+        platform.setCustomWidthAndHeight(50, 50);
         platform.setPosition(slope.getX() + slope.getWidth(), slope.getY());
 
         object.setPosition(0, -5);
@@ -2734,7 +2746,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         slope.setPosition(0, 0);
 
         const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
-        slope.setCustomWidthAndHeight(50, 50);
+        jumpThroughPlatform.setCustomWidthAndHeight(50, 50);
         jumpThroughPlatform.setPosition(
           slope.getX() + slope.getWidth(),
           slope.getY()
@@ -2788,6 +2800,30 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           // Gone upward following the 2nd platform.
           expect(object.getY()).to.be.below(slope1.getY() - object.getHeight());
         });
+      });
+
+      // TODO
+      it.skip(`can go uphill from a 26° slope and be stopped by an obstacle on the head`, function () {
+        // Put a platform.
+        const slope = addUpSlopePlatformObject(runtimeScene);
+        slope.setCustomWidthAndHeight(100, 50);
+        slope.setPosition(0, 0);
+
+        const ceiling = addPlatformObject(runtimeScene);
+        ceiling.setCustomWidthAndHeight(50, 50);
+        ceiling.setPosition(
+          50,
+          slope.getY() - ceiling.getHeight() - object.getHeight() / 2
+        );
+
+        object.setPosition(0, -5);
+        // Ensure the object falls on the platform
+        fallOnPlatform(12);
+
+        // Walk the slope and reach the ceiling.
+        // It checks that the character never go left.
+        walkRightCanStop(40);
+        expect(object.getY()).to.be(ceiling.getY() + ceiling.getHeight());
       });
 
       [26, 45].forEach((slopeAngle) => {

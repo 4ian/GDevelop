@@ -73,6 +73,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
           extraBorder: 0,
         },
       ],
+      effects: [],
     });
     player.setCustomWidthAndHeight(90, 90);
     player.setCustomCenter(45, 45);
@@ -89,6 +90,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
           type: 'NavMeshPathfinding::NavMeshPathfindingObstacleBehavior',
         },
       ],
+      effects: [],
     });
     obstacle.setCustomWidthAndHeight(100, 100);
     runtimeScene.addObject(obstacle);

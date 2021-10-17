@@ -1,21 +1,116 @@
-// This implementation is strongly inspired from a Java one
-// by Stephen A. Pratt:
-// http://www.critterai.org/projects/nmgen_study/
+// This is generated from this library:
+// https://github.com/D8H/NavMeshGenerator
 //
-// Most of the comments were written by him and were adapted to fit this implementation.
-// This implementation differs a bit from the original:
-// - it's only 2D instead of 3D
-// - it has less features (see TODO) and might have lesser performance
-// - it uses objects for points instead of pointer-like in arrays of numbers
-// - the rasterization comes from other sources because of the 2d focus
-// - partialFloodRegion was rewritten to fix an issue
-// - filterNonObstacleVertices was added
+// You can run this script to generate it:
+// git clone git@github.com:D8H/NavMeshGenerator.git
+// cd src
+// cat CommonTypes.ts NavMeshGenerator.ts ContourPoint.ts RasterizationCell.ts RasterizationGrid.ts GridCoordinateConverter.ts ConvexPolygonGenerator.ts ContourBuilder.ts RegionGenerator.ts Geometry.ts ObstacleRasterizer.ts | grep -v "^import .* from \".*\";" > A_navmeshgenerator.ts
 //
-// The Java implementation was also inspired from Recast that can be found here:
-// https://github.com/recastnavigation/recastnavigation
+// Then, copy-paste the content of the produced file inside the namespaces.
 
 namespace gdjs {
   export namespace NavMeshPathfinding {
+    export declare type integer = number;
+    export declare type float = number;
+    export interface Point {
+      x: number;
+      y: number;
+    }
+    export type VertexArray = Point[];
+
+    // This implementation is strongly inspired from a Java one
+    // by Stephen A. Pratt:
+    // http://www.critterai.org/projects/nmgen_study/
+    //
+    // Most of the comments were written by him and were adapted to fit this implementation.
+    // This implementation differs a bit from the original:
+    // - it's only 2D instead of 3D
+    // - it has less features (see TODO) and might have lesser performance
+    // - it uses objects for points instead of pointer-like in arrays of numbers
+    // - the rasterization comes from other sources because of the 2d focus
+    // - partialFloodRegion was rewritten to fix an issue
+    // - filterNonObstacleVertices was added
+    //
+    // The Java implementation was also inspired from Recast that can be found here:
+    // https://github.com/recastnavigation/recastnavigation
+
+    export class NavMeshGenerator {
+      private grid: RasterizationGrid;
+      private isometricRatio: float;
+      private obstacleRasterizer: ObstacleRasterizer;
+      private regionGenerator: RegionGenerator;
+      private contourBuilder: ContourBuilder;
+      private convexPolygonGenerator: ConvexPolygonGenerator;
+      private gridCoordinateConverter: GridCoordinateConverter;
+
+      constructor(
+        areaLeftBound: float,
+        areaTopBound: float,
+        areaRightBound: float,
+        areaBottomBound: float,
+        rasterizationCellSize: float,
+        isometricRatio: float = 1
+      ) {
+        this.grid = new RasterizationGrid(
+          areaLeftBound,
+          areaTopBound,
+          areaRightBound,
+          areaBottomBound,
+          rasterizationCellSize,
+          // make cells square in the world
+          rasterizationCellSize / isometricRatio
+        );
+        this.isometricRatio = isometricRatio;
+        this.obstacleRasterizer = new ObstacleRasterizer();
+        this.regionGenerator = new RegionGenerator();
+        this.contourBuilder = new ContourBuilder();
+        this.convexPolygonGenerator = new ConvexPolygonGenerator();
+        this.gridCoordinateConverter = new GridCoordinateConverter();
+      }
+
+      buildNavMesh(
+        obstacles: Iterable<Iterable<Point>>,
+        obstacleCellPadding: integer
+      ): VertexArray[] {
+        this.grid.clear();
+        this.obstacleRasterizer.rasterizeObstacles(this.grid, obstacles);
+        this.regionGenerator.generateDistanceField(this.grid);
+        this.regionGenerator.generateRegions(this.grid, obstacleCellPadding);
+        // It's probably not a good idea to expose the vectorization threshold.
+        // As stated in the parameter documentation, the value 1 gives good
+        // results in any situations.
+        const threshold = 1;
+        const contours = this.contourBuilder.buildContours(
+          this.grid,
+          threshold
+        );
+        const meshField = this.convexPolygonGenerator.splitToConvexPolygons(
+          contours,
+          16
+        );
+        const scaledMeshField = this.gridCoordinateConverter.convertFromGridBasis(
+          this.grid,
+          meshField
+        );
+        if (this.isometricRatio != 1) {
+          // Rescale the mesh to have the same unit length on the 2 axis for the pathfinding.
+          scaledMeshField.forEach((polygon) =>
+            polygon.forEach((point) => {
+              point.y *= this.isometricRatio;
+            })
+          );
+        }
+        return scaledMeshField;
+      }
+    }
+
+    export type ContourPoint = {
+      x: integer;
+      y: integer;
+      /** Neighbor region */
+      region: integer;
+    };
+
     /**
      * A cell that holds data needed by the 1st steps of the NavMesh generation.
      */
@@ -60,6 +155,14 @@ namespace gdjs {
       constructor(x: integer, y: integer) {
         this.x = x;
         this.y = y;
+        this.clear();
+      }
+
+      clear() {
+        this.distanceToObstacle = Number.MAX_VALUE;
+        this.regionID = RasterizationCell.NULL_REGION_ID;
+        this.distanceToRegionCore = 0;
+        this.contourFlags = 0;
       }
     }
 
@@ -112,6 +215,15 @@ namespace gdjs {
             this.cells[y][x] = new RasterizationCell(x, y);
           }
         }
+      }
+
+      clear() {
+        for (const row of this.cells) {
+          for (const cell of row) {
+            cell.clear();
+          }
+        }
+        this.regionCount = 0;
       }
 
       /**
@@ -169,12 +281,26 @@ namespace gdjs {
       }
     }
 
-    export type ContourPoint = {
-      x: integer;
-      y: integer;
-      /** Neighbor region */
-      region: integer;
-    };
+    export class GridCoordinateConverter {
+      /**
+       *
+       * @param gridPosition the position on the grid
+       * @param position the position on the scene
+       * @param scaleY for isometry
+       * @returns the position on the scene
+       */
+      public convertFromGridBasis(
+        grid: RasterizationGrid,
+        polygons: Point[][]
+      ): Point[][] {
+        // point can be shared so them must be copied to be scaled.
+        return polygons.map((polygon) =>
+          polygon.map((point) =>
+            grid.convertFromGridBasis(point, { x: 0, y: 0 })
+          )
+        );
+      }
+    }
 
     /**
      * Result of {@link ConvexPolygonGenerator.getPolyMergeInfo}
@@ -194,27 +320,6 @@ namespace gdjs {
       polygonBVertexIndex: integer;
     };
 
-    export class GridCoordinateConverter {
-      /**
-       *
-       * @param gridPosition the position on the grid
-       * @param position the position on the scene
-       * @param scaleY for isometry
-       * @returns the position on the scene
-       */
-      public static convertFromGridBasis(
-        grid: RasterizationGrid,
-        polygons: Point[][]
-      ): Point[][] {
-        // point can be shared so them must be copied to be scaled.
-        return polygons.map((polygon) =>
-          polygon.map((point) =>
-            grid.convertFromGridBasis(point, { x: 0, y: 0 })
-          )
-        );
-      }
-    }
-
     /**
      * Builds convex polygons from the provided polygons.
      *
@@ -230,7 +335,7 @@ namespace gdjs {
        * @param maxVerticesPerPolygon cap the vertex number in return polygons.
        * @return convex polygons.
        */
-      public static splitToConvexPolygons(
+      public splitToConvexPolygons(
         concavePolygons: Point[][],
         maxVerticesPerPolygon: integer
       ): Point[][] {
@@ -277,7 +382,7 @@ namespace gdjs {
 
           // Triangulate the contour.
           let foundAnyTriangle = false;
-          ConvexPolygonGenerator.triangulate(
+          this.triangulate(
             contour,
             workingContourFlags,
             (p1: Point, p2: Point, p3: Point) => {
@@ -336,7 +441,7 @@ namespace gdjs {
                 ) {
                   const polygonB = workingPolygons[indexB];
                   // Can polyB merge with polyA?
-                  ConvexPolygonGenerator.getPolyMergeInfo(
+                  this.getPolyMergeInfo(
                     polygonA,
                     polygonB,
                     maxVerticesPerPolygon,
@@ -416,7 +521,7 @@ namespace gdjs {
        * @param maxVerticesPerPolygon cap the vertex number in return polygons.
        * @param outResult contains merge information.
        */
-      private static getPolyMergeInfo(
+      private getPolyMergeInfo(
         polygonA: Point[],
         polygonB: Point[],
         maxVerticesPerPolygon: integer,
@@ -537,7 +642,7 @@ namespace gdjs {
        * @return The number of triangles generated. Or, if triangulation
        * failed, a negative number.
        */
-      private static triangulate(
+      private triangulate(
         vertices: Array<Point>,
         vertexFlags: Array<boolean>,
         outTriangles: (p1: Point, p2: Point, p3: Point) => void
@@ -1074,6 +1179,17 @@ namespace gdjs {
      * http://www.critterai.org/projects/nmgen_study/contourgen.html
      */
     export class ContourBuilder {
+      private workingRawVertices: ContourPoint[];
+      private workingSimplifiedVertices: ContourPoint[];
+
+      constructor() {
+        // These are working lists whose content changes with each iteration
+        // of the up coming loop. They represent the detailed and simple
+        // contour vertices.
+        // Initial sizing is arbitrary.
+        this.workingRawVertices = new Array<ContourPoint>(256);
+        this.workingSimplifiedVertices = new Array<ContourPoint>(64);
+      }
       /**
        * Generates a contour set from the provided {@link RasterizationGrid}
        *
@@ -1105,7 +1221,7 @@ namespace gdjs {
        *
        * @return The contours generated from the field.
        */
-      static buildContours(
+      buildContours(
         grid: RasterizationGrid,
         threshold: float
       ): ContourPoint[][] {
@@ -1180,15 +1296,6 @@ namespace gdjs {
           }
         }
 
-        // These are working lists whose content changes with each iteration
-        // of the up coming loop. They represent the detailed and simple
-        // contour vertices.
-        // Initial sizing is arbitrary.
-        const workingRawVertices = new Array<ContourPoint>(256);
-        workingRawVertices.length = 0;
-        const workingSimplifiedVertices = new Array<ContourPoint>(64);
-        workingSimplifiedVertices.length = 0;
-
         // Loop through all cells looking for cells on the edge of a region.
         //
         // At this point, only cells with flags != 0 are edge cells that
@@ -1210,8 +1317,8 @@ namespace gdjs {
               continue;
             }
 
-            workingRawVertices.length = 0;
-            workingSimplifiedVertices.length = 0;
+            this.workingRawVertices.length = 0;
+            this.workingSimplifiedVertices.length = 0;
 
             // The cell is part of an unprocessed region's contour.
             // Locate a direction of the cell's edge which points toward
@@ -1223,25 +1330,25 @@ namespace gdjs {
             // We now have a cell that is part of a contour and a direction
             // that points to a different region (obstacle or real).
             // Build the contour.
-            ContourBuilder.buildRawContours(
+            this.buildRawContours(
               grid,
               cell,
               startDirection,
-              workingRawVertices
+              this.workingRawVertices
             );
             // Perform post processing on the contour in order to
             // create the final, simplified contour.
-            ContourBuilder.generateSimplifiedContour(
+            this.generateSimplifiedContour(
               cell.regionID,
-              workingRawVertices,
-              workingSimplifiedVertices,
+              this.workingRawVertices,
+              this.workingSimplifiedVertices,
               threshold
             );
 
             // The CritterAI implementation filters polygons with less than
             // 3 vertices, but they are needed to filter vertices in the middle
             // (not on an obstacle region border).
-            const contour = Array.from(workingSimplifiedVertices);
+            const contour = Array.from(this.workingSimplifiedVertices);
             contours.push(contour);
             contoursByRegion[cell.regionID] = contour;
           }
@@ -1279,7 +1386,7 @@ namespace gdjs {
           // They can be interesting for debugging.
         }
 
-        ContourBuilder.filterNonObstacleVertices(contours, contoursByRegion);
+        this.filterNonObstacleVertices(contours, contoursByRegion);
 
         return contours;
       }
@@ -1294,7 +1401,7 @@ namespace gdjs {
        * @param contoursByRegion Some regions may have been discarded
        * so contours index can't be used.
        */
-      private static filterNonObstacleVertices(
+      private filterNonObstacleVertices(
         contours: Array<ContourPoint[]>,
         contoursByRegion: Array<ContourPoint[]>
       ): void {
@@ -1563,7 +1670,7 @@ namespace gdjs {
        * @param outContourVertices The list of vertices that represent the edge
        * of the region.
        */
-      private static buildRawContours(
+      private buildRawContours(
         grid: RasterizationGrid,
         startCell: RasterizationCell,
         startDirection: number,
@@ -1675,7 +1782,7 @@ namespace gdjs {
        * @param threshold The maximum distance the edge of the contour may deviate
        * from the source geometry.
        */
-      private static generateSimplifiedContour(
+      private generateSimplifiedContour(
         regionID: number,
         sourceVertices: ContourPoint[],
         outVertices: ContourPoint[],
@@ -1755,11 +1862,7 @@ namespace gdjs {
           }
         }
 
-        ContourBuilder.matchObstacleRegionEdges(
-          sourceVertices,
-          outVertices,
-          threshold
-        );
+        this.matchObstacleRegionEdges(sourceVertices, outVertices, threshold);
 
         if (outVertices.length < 2) {
           // It will be ignored by the triangulation.
@@ -1801,7 +1904,7 @@ namespace gdjs {
        * @param threshold The maximum distance the edge of the contour may deviate
        * from the source geometry.
        */
-      private static matchObstacleRegionEdges(
+      private matchObstacleRegionEdges(
         sourceVertices: ContourPoint[],
         inoutResultVertices: ContourPoint[],
         threshold: float
@@ -1899,8 +2002,28 @@ namespace gdjs {
      * Region Generation: http://www.critterai.org/projects/nmgen_study/regiongen.html
      */
     export class RegionGenerator {
-      //TODO implement the smoothing pass on the distance field?
+      obstacleRegionBordersCleaner: ObstacleRegionBordersCleaner;
+      /**
+       * Contains a list of cells that are considered to be flooded and
+       * therefore are ready to be processed. This list may contain nulls
+       * at certain points in the process. Nulls indicate cells that were
+       * initially in the list but have been successfully added to a region.
+       * The initial size is arbitrary.
+       */
+      floodedCells: Array<RasterizationCell | null>;
+      /**
+       * A predefined stack for use in the flood operation. Its content
+       * has no meaning outside the new region flooding operation.
+       */
+      workingStack: Array<RasterizationCell>;
 
+      constructor() {
+        this.obstacleRegionBordersCleaner = new ObstacleRegionBordersCleaner();
+        this.floodedCells = new Array<RasterizationCell | null>(1024);
+        this.workingStack = new Array<RasterizationCell>(1024);
+      }
+
+      //TODO implement the smoothing pass on the distance field?
       /**
        * Groups cells into cohesive regions using an watershed based algorithm.
        *
@@ -1912,10 +2035,7 @@ namespace gdjs {
        * @param obstacleCellPadding a padding in cells to apply around the
        * obstacles.
        */
-      static generateRegions(
-        grid: RasterizationGrid,
-        obstacleCellPadding: integer
-      ) {
+      generateRegions(grid: RasterizationGrid, obstacleCellPadding: integer) {
         // Watershed Algorithm
         //
         // Reference: http://en.wikipedia.org/wiki/Watershed_%28algorithm%29
@@ -1966,18 +2086,10 @@ namespace gdjs {
         // (todo from the CritterAI sources).
         const expandIterations: integer = 4 + distanceMin * 2;
 
-        // Contains a list of cells that are considered to be flooded and
-        // therefore are ready to be processed. This list may contain nulls
-        // at certain points in the process. Nulls indicate cells that were
-        // initially in the list but have been successfully added to a region.
-        // The initial size is arbitrary.
-        let floodedCells = new Array<RasterizationCell | null>(1024);
-        // A predefined stack for use in the flood operation. Its content
-        // has no meaning outside the new region flooding operation.
-        let workingStack = new Array<RasterizationCell>(1024);
-
         // Zero is reserved for the obstacle-region. So initializing to 1.
         let nextRegionID = 1;
+
+        const floodedCells = this.floodedCells;
 
         // Search until the current distance reaches the minimum allowed
         // distance.
@@ -2017,13 +2129,9 @@ namespace gdjs {
             // At least one region has already been created, so first
             // try to  put the newly flooded cells into existing regions.
             if (distance > 0) {
-              RegionGenerator.expandRegions(
-                grid,
-                floodedCells,
-                expandIterations
-              );
+              this.expandRegions(grid, floodedCells, expandIterations);
             } else {
-              RegionGenerator.expandRegions(grid, floodedCells, -1);
+              this.expandRegions(grid, floodedCells, -1);
             }
           }
 
@@ -2047,15 +2155,7 @@ namespace gdjs {
             // no cell could be added to it later because of the conservative
             // constraint.
             const fillTo = Math.max(distance - 2, distanceMin + 1, 1);
-            if (
-              RegionGenerator.floodNewRegion(
-                grid,
-                floodedCell,
-                fillTo,
-                nextRegionID,
-                workingStack
-              )
-            ) {
+            if (this.floodNewRegion(grid, floodedCell, fillTo, nextRegionID)) {
               nextRegionID++;
             }
           }
@@ -2081,18 +2181,14 @@ namespace gdjs {
         // Perform a final expansion of existing regions.
         // Allow more iterations than normal for this last expansion.
         if (distanceMin > 0) {
-          RegionGenerator.expandRegions(
-            grid,
-            floodedCells,
-            expandIterations * 8
-          );
+          this.expandRegions(grid, floodedCells, expandIterations * 8);
         } else {
-          RegionGenerator.expandRegions(grid, floodedCells, -1);
+          this.expandRegions(grid, floodedCells, -1);
         }
 
         grid.regionCount = nextRegionID;
 
-        ObstacleRegionBordersCleaner.fixObstacleRegion(grid);
+        this.obstacleRegionBordersCleaner.fixObstacleRegion(grid);
         //TODO Also port FilterOutSmallRegions?
         // The algorithm to remove vertices in the middle (added at the end of
         // ContourBuilder.buildContours) may already filter them and contour are
@@ -2112,7 +2208,7 @@ namespace gdjs {
        * to new regions.
        * @param maxIterations If set to -1, will iterate through completion.
        */
-      private static expandRegions(
+      private expandRegions(
         grid: RasterizationGrid,
         inoutCells: Array<RasterizationCell | null>,
         iterationMax: integer
@@ -2211,18 +2307,15 @@ namespace gdjs {
        * @param fillToDist The watershed distance to flood to.
        * @param regionID The region ID to use for the new region
        * (if creation is successful).
-       * @param workingStack A stack used internally. The content is
-       * cleared before use. Its content has no meaning outside of
-       * this operation.
        * @return true if a new region was created.
        */
-      private static floodNewRegion(
+      private floodNewRegion(
         grid: RasterizationGrid,
         rootCell: RasterizationCell,
         fillToDist: integer,
-        regionID: integer,
-        workingStack: Array<RasterizationCell>
+        regionID: integer
       ) {
+        const workingStack = this.workingStack;
         workingStack.length = 0;
         workingStack.push(rootCell);
         rootCell.regionID = regionID;
@@ -2302,7 +2395,7 @@ namespace gdjs {
        *
        * @param grid A field with cells obstacle information already generated.
        */
-      static generateDistanceField(grid: RasterizationGrid) {
+      generateDistanceField(grid: RasterizationGrid) {
         // close borders
         for (let x = 0; x < grid.dimX(); x++) {
           const leftCell = grid.get(x, 0);
@@ -2405,6 +2498,16 @@ namespace gdjs {
      * Region Generation: http://www.critterai.org/projects/nmgen_study/regiongen.html
      */
     class ObstacleRegionBordersCleaner {
+      private workingUpLeftOpenCells: RasterizationCell[];
+      private workingDownRightOpenCells: RasterizationCell[];
+      private workingOpenCells: RasterizationCell[];
+
+      constructor() {
+        this.workingUpLeftOpenCells = new Array<RasterizationCell>(512);
+        this.workingDownRightOpenCells = new Array<RasterizationCell>(512);
+        this.workingOpenCells = new Array<RasterizationCell>(512);
+      }
+
       /**
        * This operation utilizes {@link RasterizationCell.contourFlags}. It
        * expects the value to be zero on entry, and re-zero's the value
@@ -2412,12 +2515,12 @@ namespace gdjs {
        *
        * @param grid a grid with fully built regions.
        */
-      public static fixObstacleRegion(grid: RasterizationGrid) {
-        const workingUpLeftOpenCells = new Array<RasterizationCell>(512);
+      public fixObstacleRegion(grid: RasterizationGrid) {
+        const workingUpLeftOpenCells = this.workingUpLeftOpenCells;
         workingUpLeftOpenCells.length = 0;
-        const workingDownRightOpenCells = new Array<RasterizationCell>(512);
+        const workingDownRightOpenCells = this.workingDownRightOpenCells;
         workingDownRightOpenCells.length = 0;
-        const workingOpenCells = new Array<RasterizationCell>(512);
+        const workingOpenCells = this.workingOpenCells;
         workingOpenCells.length = 0;
         const extremeCells: [
           RasterizationCell | null,
@@ -2447,10 +2550,7 @@ namespace gdjs {
             }
             // This is a obstacle region cell. See if it
             // connects to a cell in a non-obstacle region.
-            edgeDirection = ObstacleRegionBordersCleaner.getNonNullBorderDirection(
-              grid,
-              cell
-            );
+            edgeDirection = this.getNonNullBorderDirection(grid, cell);
             if (edgeDirection === -1)
               // This cell is not a border cell. Ignore it.
               continue;
@@ -2463,7 +2563,7 @@ namespace gdjs {
             // Process the obstacle region contour. Detect and fix
             // local issues. Determine if the region is
             // fully encompassed by a single non-obstacle region.
-            const isEncompassedNullRegion = ObstacleRegionBordersCleaner.processNullRegion(
+            const isEncompassedNullRegion = this.processNullRegion(
               grid,
               workingCell,
               edgeDirection,
@@ -2474,14 +2574,11 @@ namespace gdjs {
               // This cell is part of a group of obstacle region cells
               // that is encompassed within a single non-obstacle region.
               // This is not permitted. Need to fix it.
-              ObstacleRegionBordersCleaner.partialFloodRegion(
+              this.partialFloodRegion(
                 grid,
                 extremeCells[0]!,
                 extremeCells[1]!,
-                nextRegionID,
-                workingUpLeftOpenCells,
-                workingDownRightOpenCells,
-                workingOpenCells
+                nextRegionID
               );
               nextRegionID++;
             }
@@ -2512,15 +2609,15 @@ namespace gdjs {
        * @param newRegionID The region id to assign the flooded
        * cells to.
        */
-      private static partialFloodRegion(
+      private partialFloodRegion(
         grid: RasterizationGrid,
         upLeftCell: RasterizationCell,
         downRightCell: RasterizationCell,
-        newRegionID: integer,
-        upLeftOpenCells: RasterizationCell[],
-        downRightOpenCells: RasterizationCell[],
-        workingOpenCells: RasterizationCell[]
+        newRegionID: integer
       ): void {
+        let upLeftOpenCells = this.workingUpLeftOpenCells;
+        let downRightOpenCells = this.workingDownRightOpenCells;
+        let workingOpenCells = this.workingOpenCells;
         // The implementation differs from CritterAI to avoid non-contiguous
         // sections. Instead of brushing in one direction, it floods from
         // 2 extremities of the encompassed obstacle region.
@@ -2614,7 +2711,7 @@ namespace gdjs {
        * @return TRUE if the start cell's region completely encompasses
        * the obstacle region.
        */
-      private static processNullRegion(
+      private processNullRegion(
         grid: RasterizationGrid,
         startCell: RasterizationCell,
         startDirection: integer,
@@ -2717,13 +2814,7 @@ namespace gdjs {
               stepsWithoutBorder = 0;
               // Detect and fix cell configuration issue around this
               // corner.
-              if (
-                ObstacleRegionBordersCleaner.processOuterCorner(
-                  grid,
-                  cell,
-                  direction
-                )
-              )
+              if (this.processOuterCorner(grid, cell, direction))
                 // A change was made and it resulted in the
                 // corner area having multiple region connections.
                 hasSingleConnection = false;
@@ -2781,7 +2872,7 @@ namespace gdjs {
        * in the vicinity of the corner (this may or may not be due to
        * a change made by this operation).
        */
-      private static processOuterCorner(
+      private processOuterCorner(
         grid: RasterizationGrid,
         referenceCell: RasterizationCell,
         borderDirection: integer
@@ -2890,7 +2981,7 @@ namespace gdjs {
           //  b b x x <- Change to this row.
           //  b a a a
           // Check to see if backTwo should be in a different region.
-          let selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
+          let selectedRegion = this.selectedRegionID(
             grid,
             backTwo,
             (borderDirection + 1) & 0x3,
@@ -2899,7 +2990,7 @@ namespace gdjs {
           if (selectedRegion === backTwo.regionID) {
             // backTwo should not be re-assigned. How about
             // the reference cell?
-            selectedRegion = ObstacleRegionBordersCleaner.selectedRegionID(
+            selectedRegion = this.selectedRegionID(
               grid,
               referenceCell,
               borderDirection,
@@ -2937,7 +3028,7 @@ namespace gdjs {
        * @return The region the cell should be a member of. May be the
        * region the cell is currently a member of.
        */
-      private static selectedRegionID(
+      private selectedRegionID(
         grid: RasterizationGrid,
         referenceCell: RasterizationCell,
         borderDirection: integer,
@@ -3041,7 +3132,7 @@ namespace gdjs {
        * @return The direction of the first neighbor in a non-obstacle region, or
        * -1 if all neighbors are in the obstacle region.
        */
-      private static getNonNullBorderDirection(
+      private getNonNullBorderDirection(
         grid: RasterizationGrid,
         cell: RasterizationCell
       ): integer {
@@ -3066,7 +3157,7 @@ namespace gdjs {
     /**
      * This implementation is strongly inspired from CritterAI class "Geometry".
      */
-    class Geometry {
+    export class Geometry {
       /**
        * Returns TRUE if line segment AB intersects with line segment CD in any
        * manner. Either collinear or at a single point.
@@ -3203,65 +3294,70 @@ namespace gdjs {
      * It flags cells as obstacle to be used by {@link RegionGenerator}.
      */
     export class ObstacleRasterizer {
+      workingNodes: integer[];
+      gridBasisIterable: GridBasisIterable;
+
+      constructor() {
+        this.workingNodes = new Array<integer>(8);
+        this.gridBasisIterable = new GridBasisIterable();
+      }
+
       /**
-       * Rasterize obstacle objects on a grid.
+       * Rasterize obstacles on a grid.
        * @param grid
        * @param obstacles
        */
-      static rasterizeObstacles(
+      rasterizeObstacles(
         grid: RasterizationGrid,
-        obstacles: Set<RuntimeObject>
+        obstacles: Iterable<Iterable<Point>>
       ) {
-        const workingNodes: number[] = [];
-        const obstaclesItr = obstacles.values();
+        const obstaclesItr = obstacles[Symbol.iterator]();
         for (
-          var element = obstaclesItr.next();
-          !element.done;
-          element = obstaclesItr.next()
+          let next = obstaclesItr.next();
+          !next.done;
+          next = obstaclesItr.next()
         ) {
-          const obstacle = element.value;
+          const obstacle = next.value;
+          this.gridBasisIterable.set(grid, obstacle);
+          const vertices = this.gridBasisIterable;
 
-          for (const polygon of obstacle.getHitBoxes()) {
-            const vertices = polygon.vertices.map((vertex) => {
-              const point = { x: vertex[0], y: vertex[1] };
-              grid.convertToGridBasis(point, point);
-              return point;
-            });
-            let minX = Number.MAX_VALUE;
-            let maxX = -Number.MAX_VALUE;
-            let minY = Number.MAX_VALUE;
-            let maxY = -Number.MAX_VALUE;
-            for (const vertex of vertices) {
-              minX = Math.min(minX, vertex.x);
-              maxX = Math.max(maxX, vertex.x);
-              minY = Math.min(minY, vertex.y);
-              maxY = Math.max(maxY, vertex.y);
-            }
-            minX = Math.max(Math.floor(minX), 0);
-            maxX = Math.min(Math.ceil(maxX), grid.dimX());
-            minY = Math.max(Math.floor(minY), 0);
-            maxY = Math.min(Math.ceil(maxY), grid.dimY());
-            ObstacleRasterizer.fillPolygon(
-              vertices,
-              minX,
-              maxX,
-              minY,
-              maxY,
-              workingNodes,
-              (x: integer, y: integer) =>
-                (grid.get(x, y).distanceToObstacle = 0)
-            );
+          let minX = Number.MAX_VALUE;
+          let maxX = -Number.MAX_VALUE;
+          let minY = Number.MAX_VALUE;
+          let maxY = -Number.MAX_VALUE;
+          const verticesItr = vertices[Symbol.iterator]();
+          for (
+            let next = verticesItr.next();
+            !next.done;
+            next = verticesItr.next()
+          ) {
+            const vertex = next.value;
+            minX = Math.min(minX, vertex.x);
+            maxX = Math.max(maxX, vertex.x);
+            minY = Math.min(minY, vertex.y);
+            maxY = Math.max(maxY, vertex.y);
           }
+          minX = Math.max(Math.floor(minX), 0);
+          maxX = Math.min(Math.ceil(maxX), grid.dimX());
+          minY = Math.max(Math.floor(minY), 0);
+          maxY = Math.min(Math.ceil(maxY), grid.dimY());
+          this.fillPolygon(
+            vertices,
+            minX,
+            maxX,
+            minY,
+            maxY,
+            (x: integer, y: integer) => (grid.get(x, y).distanceToObstacle = 0)
+          );
         }
       }
 
-      private static fillPolygon(
-        vertices: Point[],
+      private fillPolygon(
+        vertices: Iterable<Point>,
         minX: integer,
         maxX: integer,
         minY: integer,
         maxY: integer,
-        workingNodes: number[],
         fill: (x: number, y: number) => void
       ) {
         // The following implementation of the scan-line polygon fill algorithm
@@ -3276,13 +3372,12 @@ namespace gdjs {
         // - it is conservative to thin vertical or horizontal polygons
 
         let fillAnyPixels = false;
-        ObstacleRasterizer.scanY(
+        this.scanY(
           vertices,
           minX,
           maxX,
           minY,
           maxY,
-          workingNodes,
           (pixelY: integer, minX: float, maxX: float) => {
             for (let pixelX = minX; pixelX < maxX; pixelX++) {
               fillAnyPixels = true;
@@ -3295,13 +3390,12 @@ namespace gdjs {
           return;
         }
 
-        ObstacleRasterizer.scanY(
+        this.scanY(
           vertices,
           minX,
           maxX,
           minY,
           maxY,
-          workingNodes,
           (pixelY: integer, minX: float, maxX: float) => {
             // conserve thin (less than one cell large) horizontal polygons
             if (minX === maxX) {
@@ -3310,13 +3404,12 @@ namespace gdjs {
           }
         );
 
-        ObstacleRasterizer.scanX(
+        this.scanX(
           vertices,
           minX,
           maxX,
           minY,
           maxY,
-          workingNodes,
           (pixelX: integer, minY: float, maxY: float) => {
             for (let pixelY = minY; pixelY < maxY; pixelY++) {
               fill(pixelX, pixelY);
@@ -3329,36 +3422,51 @@ namespace gdjs {
         );
       }
 
-      private static scanY(
-        vertices: Point[],
+      private scanY(
+        vertices: Iterable<Point>,
         minX: integer,
         maxX: integer,
         minY: integer,
         maxY: integer,
-        workingNodes: number[],
         checkAndFillY: (pixelY: integer, minX: float, maxX: float) => void
       ) {
+        const workingNodes = this.workingNodes;
         //  Loop through the rows of the image.
         for (let pixelY = minY; pixelY < maxY; pixelY++) {
           const pixelCenterY = pixelY + 0.5;
           //  Build a list of nodes.
           workingNodes.length = 0;
-          let j = vertices.length - 1;
-          for (let i = 0; i < vertices.length; i++) {
+          //let j = vertices.length - 1;
+
+          const verticesItr = vertices[Symbol.iterator]();
+          let next = verticesItr.next();
+          let vertex = next.value;
+          // The iterator always return the same instance.
+          // It must be copied to be save for later.
+          const firstVertexX = vertex.x;
+          const firstVertexY = vertex.y;
+          while (!next.done) {
+            const previousVertexX = vertex.x;
+            const previousVertexY = vertex.y;
+            next = verticesItr.next();
+            if (next.done) {
+              vertex.x = firstVertexX;
+              vertex.y = firstVertexY;
+            } else {
+              vertex = next.value;
+            }
             if (
-              (vertices[i].y <= pixelCenterY && pixelCenterY < vertices[j].y) ||
-              (vertices[j].y < pixelCenterY && pixelCenterY <= vertices[i].y)
+              (vertex.y <= pixelCenterY && pixelCenterY < previousVertexY) ||
+              (previousVertexY < pixelCenterY && pixelCenterY <= vertex.y)
             ) {
               workingNodes.push(
                 Math.round(
-                  vertices[i].x +
-                    ((pixelCenterY - vertices[i].y) /
-                      (vertices[j].y - vertices[i].y)) *
-                      (vertices[j].x - vertices[i].x)
+                  vertex.x +
+                    ((pixelCenterY - vertex.y) / (previousVertexY - vertex.y)) *
+                      (previousVertexX - vertex.x)
                 )
               );
             }
-            j = i;
           }
 
           //  Sort the nodes, via a simple “Bubble” sort.
@@ -3395,36 +3503,50 @@ namespace gdjs {
         }
       }
 
-      private static scanX(
-        vertices: Point[],
+      private scanX(
+        vertices: Iterable<Point>,
         minX: integer,
         maxX: integer,
         minY: integer,
         maxY: integer,
-        workingNodes: number[],
         checkAndFillX: (pixelX: integer, minY: float, maxY: float) => void
       ) {
+        const workingNodes = this.workingNodes;
         //  Loop through the columns of the image.
         for (let pixelX = minX; pixelX < maxX; pixelX++) {
           const pixelCenterX = pixelX + 0.5;
           //  Build a list of nodes.
           workingNodes.length = 0;
-          let j = vertices.length - 1;
-          for (let i = 0; i < vertices.length; i++) {
+
+          const verticesItr = vertices[Symbol.iterator]();
+          let next = verticesItr.next();
+          let vertex = next.value;
+          // The iterator always return the same instance.
+          // It must be copied to be save for later.
+          const firstVertexX = vertex.x;
+          const firstVertexY = vertex.y;
+          while (!next.done) {
+            const previousVertexX = vertex.x;
+            const previousVertexY = vertex.y;
+            next = verticesItr.next();
+            if (next.done) {
+              vertex.x = firstVertexX;
+              vertex.y = firstVertexY;
+            } else {
+              vertex = next.value;
+            }
             if (
-              (vertices[i].x < pixelCenterX && pixelCenterX < vertices[j].x) ||
-              (vertices[j].x < pixelCenterX && pixelCenterX < vertices[i].x)
+              (vertex.x < pixelCenterX && pixelCenterX < previousVertexX) ||
+              (previousVertexX < pixelCenterX && pixelCenterX < vertex.x)
             ) {
               workingNodes.push(
                 Math.round(
-                  vertices[i].y +
-                    ((pixelCenterX - vertices[i].x) /
-                      (vertices[j].x - vertices[i].x)) *
-                      (vertices[j].y - vertices[i].y)
+                  vertex.y +
+                    ((pixelCenterX - vertex.x) / (previousVertexX - vertex.x)) *
+                      (previousVertexY - vertex.y)
                 )
               );
             }
-            j = i;
           }
 
           //  Sort the nodes, via a simple “Bubble” sort.
@@ -3459,6 +3581,48 @@ namespace gdjs {
             checkAndFillX(pixelX, workingNodes[i], workingNodes[i + 1]);
           }
         }
+      }
+    }
+
+    /**
+     * Iterable that converts coordinates to the grid.
+     *
+     * This is an allocation free iterable
+     * that can only do one iteration at a time.
+     */
+    class GridBasisIterable implements Iterable<Point> {
+      grid: RasterizationGrid | null;
+      sceneVertices: Iterable<Point>;
+      verticesItr: Iterator<Point>;
+      result: IteratorResult<Point, any>;
+
+      constructor() {
+        this.grid = null;
+        this.sceneVertices = [];
+        this.verticesItr = this.sceneVertices[Symbol.iterator]();
+        this.result = {
+          value: { x: 0, y: 0 },
+          done: false,
+        };
+      }
+
+      set(grid: RasterizationGrid, sceneVertices: Iterable<Point>) {
+        this.grid = grid;
+        this.sceneVertices = sceneVertices;
+      }
+
+      [Symbol.iterator]() {
+        this.verticesItr = this.sceneVertices[Symbol.iterator]();
+        return this;
+      }
+
+      next() {
+        const next = this.verticesItr.next();
+        if (next.done) {
+          return next;
+        }
+        this.grid!.convertToGridBasis(next.value, this.result.value);
+        return this.result;
       }
     }
   }

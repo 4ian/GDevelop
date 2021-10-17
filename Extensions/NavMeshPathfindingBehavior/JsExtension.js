@@ -800,6 +800,10 @@ const declareObstacleBehavior = function (
     )
     .setIncludeFile(
       'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
+    )
+    .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js')
+    .addIncludeFile(
+      'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
     );
 };
 

@@ -1,131 +1,42 @@
 // @ts-check
-describe('gdjs.NavMeshGeneration', function () {
+describe('gdjs.NavMeshPathfinding', function () {
   // When adding a new case, both can be invert to easily copy/paste results.
   // It's also useful for debugging.
   const logsResults = false;
   const checksResults = true;
 
-  let createDiamond = (runtimeScene) => {
-    const diamond = new gdjs.SpriteRuntimeObject(runtimeScene, {
-      name: 'diamond',
-      type: '',
-      behaviors: [],
-      animations: [
-        {
-          name: 'animation',
-          directions: [
-            {
-              sprites: [
-                {
-                  originPoint: { x: 80, y: 80 },
-                  centerPoint: { x: 80, y: 80 },
-                  points: [
-                    { name: 'Center', x: 80, y: 80 },
-                    { name: 'Origin', x: 80, y: 80 },
-                  ],
-                  hasCustomCollisionMask: true,
-                  customCollisionMask: [
-                    [
-                      { x: 160, y: 80 },
-                      { x: 80, y: 160 },
-                      { x: 0, y: 80 },
-                      { x: 80, y: 0 },
-                    ],
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-    diamond.getWidth = function () {
-      return 160;
-    };
-    diamond.getHeight = function () {
-      return 160;
-    };
-    runtimeScene.addObject(diamond);
-    return diamond;
+  let createDiamond = (centerX, centerY, width, height) => {
+    const rX = width / 2;
+    const rY = height / 2;
+    const vertices = [
+      { x: 0, y: -rY },
+      { x: rX, y: 0 },
+      { x: 0, y: rY },
+      { x: -rX, y: 0 },
+    ];
+    for (const point of vertices) {
+      point.x += centerX;
+      point.y += centerY;
+    }
+    return vertices;
   };
 
-  let createRectangle = (runtimeScene, width, height) => {
-    const square = new gdjs.SpriteRuntimeObject(runtimeScene, {
-      name: 'square',
-      type: '',
-      behaviors: [],
-      animations: [
-        {
-          name: 'animation',
-          directions: [
-            {
-              sprites: [
-                {
-                  originPoint: { x: width / 2, y: height / 2 },
-                  centerPoint: { x: width / 2, y: height / 2 },
-                  points: [
-                    { name: 'Center', x: width / 2, y: height / 2 },
-                    { name: 'Origin', x: width / 2, y: height / 2 },
-                  ],
-                  hasCustomCollisionMask: false,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-    square.getWidth = function () {
-      return width;
-    };
-    square.getHeight = function () {
-      return height;
-    };
-    runtimeScene.addObject(square);
-    return square;
-  };
-
-  const makeTestRuntimeScene = () => {
-    const runtimeGame = new gdjs.RuntimeGame({
-      variables: [],
-      // @ts-ignore - missing properties.
-      properties: { windowWidth: 800, windowHeight: 600 },
-      resources: {
-        resources: [],
-      },
-    });
-    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
-      layers: [
-        {
-          name: '',
-          visibility: true,
-          effects: [],
-          cameras: [],
-
-          ambientLightColorR: 0,
-          ambientLightColorG: 0,
-          ambientLightColorB: 0,
-          isLightingLayer: false,
-          followBaseLayerCamera: true,
-        },
-      ],
-      variables: [],
-      r: 0,
-      v: 0,
-      b: 0,
-      mangledName: 'Scene1',
-      name: 'Scene1',
-      stopSoundsOnStartup: false,
-      title: '',
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
-    });
-    runtimeScene._timeManager.getElapsedTime = function () {
-      return (1 / 60) * 1000;
-    };
-    return runtimeScene;
+  let createRectangle = (centerX, centerY, width, height, angle = 0) => {
+    const rX = width / 2;
+    const rY = height / 2;
+    const vertices = [
+      { x: -rX, y: -rY },
+      { x: rX, y: -rY },
+      { x: rX, y: rY },
+      { x: -rX, y: rY },
+    ];
+    for (const point of vertices) {
+      const x = Math.cos(angle) * point.x - Math.sin(angle) * point.y;
+      const y = Math.sin(angle) * point.x + Math.cos(angle) * point.y;
+      point.x = centerX + x;
+      point.y = centerY + y;
+    }
+    return vertices;
   };
 
   const checkObstacles = (grid, expectedGridString) => {
@@ -209,11 +120,6 @@ describe('gdjs.NavMeshGeneration', function () {
   };
 
   it('can build an empty mesh', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const rectangle = createRectangle(runtimeScene, 400, 400);
-    rectangle.setPosition(160, 160);
-    runtimeScene.renderAndStep(1000 / 60);
-
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
       0,
@@ -223,9 +129,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([rectangle])
+      [createRectangle(160, 160, 400, 400)]
     );
     checkObstacles(
       grid, //
@@ -249,7 +155,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '##################\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -272,7 +178,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -295,7 +201,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -304,7 +210,7 @@ describe('gdjs.NavMeshGeneration', function () {
       []
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -315,7 +221,7 @@ describe('gdjs.NavMeshGeneration', function () {
       []
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -328,8 +234,6 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh without any obstacle', function () {
-    const runtimeScene = makeTestRuntimeScene();
-
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
       0,
@@ -339,9 +243,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set()
+      []
     );
     checkObstacles(
       grid, //
@@ -365,7 +269,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -388,7 +292,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -411,7 +315,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -427,7 +331,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -445,7 +349,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -465,11 +369,6 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('keeps the vertices of a square aligned on the grid', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const rectangle = createRectangle(runtimeScene, 200, 160);
-    rectangle.setPosition(160, 160);
-    runtimeScene.renderAndStep(1000 / 60);
-
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
       0,
@@ -479,9 +378,9 @@ describe('gdjs.NavMeshGeneration', function () {
       10
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([rectangle])
+      [createRectangle(160, 160, 200, 160)]
     );
     checkObstacles(
       grid, //
@@ -521,7 +420,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................................\n' +
@@ -560,7 +459,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................................\n' +
@@ -599,7 +498,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -627,7 +526,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -665,7 +564,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -707,15 +606,207 @@ describe('gdjs.NavMeshGeneration', function () {
     );
   });
 
+  it('can generate a NavMesh through the facade', function () {
+    // The mesh is the same as the previous test case.
+    const navMeshGenerator = new gdjs.NavMeshPathfinding.NavMeshGenerator(
+      0,
+      0,
+      320,
+      320,
+      10
+    );
+    const navMesh = navMeshGenerator.buildNavMesh(
+      [createRectangle(160, 160, 200, 160)],
+      0
+    );
+    checkPolygons(
+      navMesh.map((polygon) => polygon.map((point) => [point.x, point.y])),
+      [
+        [
+          [260, 80],
+          [260, 240],
+          [320, 250],
+          [320, 0],
+        ],
+        [
+          [0, 260],
+          [60, 240],
+          [60, 80],
+          [0, 0],
+        ],
+        [
+          [60, 80],
+          [260, 80],
+          [320, 0],
+          [0, 0],
+        ],
+        [
+          [0, 320],
+          [320, 320],
+          [320, 250],
+          [260, 240],
+          [60, 240],
+          [0, 260],
+        ],
+      ]
+    );
+  });
+
+  // It check that there is no side effect between 2 NavMesh builds.
+  it('can generate a 2nd NavMesh through the facade', function () {
+    // The meshes are the same as other test cases.
+    const navMeshGenerator = new gdjs.NavMeshPathfinding.NavMeshGenerator(
+      0,
+      0,
+      320,
+      320,
+      10
+    );
+    {
+      const navMesh = navMeshGenerator.buildNavMesh(
+        [createRectangle(160, 160, 200, 160)],
+        0
+      );
+      checkPolygons(
+        navMesh.map((polygon) => polygon.map((point) => [point.x, point.y])),
+        [
+          [
+            [260, 80],
+            [260, 240],
+            [320, 250],
+            [320, 0],
+          ],
+          [
+            [0, 260],
+            [60, 240],
+            [60, 80],
+            [0, 0],
+          ],
+          [
+            [60, 80],
+            [260, 80],
+            [320, 0],
+            [0, 0],
+          ],
+          [
+            [0, 320],
+            [320, 320],
+            [320, 250],
+            [260, 240],
+            [60, 240],
+            [0, 260],
+          ],
+        ]
+      );
+    }
+    {
+      const horizontalRectangle = createRectangle(
+        160,
+        160,
+        200,
+        2,
+        Math.PI / 4
+      );
+      const verticalRectangle = createRectangle(160, 160, 2, 200, Math.PI / 4);
+
+      const navMesh = navMeshGenerator.buildNavMesh(
+        [horizontalRectangle, verticalRectangle],
+        0
+      );
+
+      checkPolygons(
+        navMesh.map((polygon) => polygon.map((point) => [point.x, point.y])),
+        [
+          [
+            [0, 130],
+            [110, 120],
+            [90, 90],
+          ],
+          [
+            [90, 90],
+            [120, 110],
+            [130, 0],
+          ],
+          [
+            [90, 90],
+            [130, 0],
+            [0, 0],
+            [0, 130],
+          ],
+          [
+            [120, 110],
+            [150, 150],
+            [170, 150],
+            [200, 110],
+            [200, 0],
+            [130, 0],
+          ],
+          [
+            [200, 0],
+            [200, 110],
+            [230, 90],
+          ],
+          [
+            [230, 90],
+            [210, 120],
+            [320, 130],
+          ],
+          [
+            [230, 90],
+            [320, 130],
+            [320, 0],
+            [200, 0],
+          ],
+          [
+            [150, 170],
+            [150, 150],
+            [110, 120],
+            [0, 130],
+            [0, 200],
+            [90, 220],
+          ],
+          [
+            [210, 120],
+            [170, 150],
+            [170, 170],
+            [230, 220],
+            [320, 200],
+            [320, 130],
+          ],
+          [
+            [170, 170],
+            [150, 170],
+            [110, 220],
+            [130, 320],
+            [200, 320],
+            [220, 230],
+          ],
+          [
+            [130, 320],
+            [110, 220],
+            [90, 220],
+          ],
+          [
+            [0, 320],
+            [130, 320],
+            [90, 220],
+            [0, 200],
+          ],
+          [
+            [230, 220],
+            [220, 230],
+            [200, 320],
+            [320, 320],
+            [320, 200],
+          ],
+        ]
+      );
+    }
+  });
+
   it('keep obstacle region encompassed in another region', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const horizontalRectangle = createRectangle(runtimeScene, 200, 5);
-    horizontalRectangle.setPosition(160, 160);
-    horizontalRectangle.setAngle(45);
-    const verticalRectangle = createRectangle(runtimeScene, 5, 200);
-    verticalRectangle.setPosition(160, 160);
-    verticalRectangle.setAngle(45);
-    runtimeScene.renderAndStep(1000 / 60);
+    const horizontalRectangle = createRectangle(160, 160, 200, 5, Math.PI / 4);
+    const verticalRectangle = createRectangle(160, 160, 5, 200, Math.PI / 4);
 
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
@@ -726,9 +817,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([horizontalRectangle, verticalRectangle])
+      [horizontalRectangle, verticalRectangle]
     );
     checkObstacles(
       grid, //
@@ -752,7 +843,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -777,7 +868,7 @@ describe('gdjs.NavMeshGeneration', function () {
 
     // The flooding will make every cell in one region.
     // This region is splitted in 2 by ObstacleRegionBordersCleaner.partialFloodRegion
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -803,12 +894,8 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh for a plus', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const horizontalRectangle = createRectangle(runtimeScene, 160, 80);
-    horizontalRectangle.setPosition(160, 160);
-    const verticalRectangle = createRectangle(runtimeScene, 80, 160);
-    verticalRectangle.setPosition(160, 160);
-    runtimeScene.renderAndStep(1000 / 60);
+    const horizontalRectangle = createRectangle(160, 160, 160, 80);
+    const verticalRectangle = createRectangle(160, 160, 80, 160);
 
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
@@ -819,9 +906,9 @@ describe('gdjs.NavMeshGeneration', function () {
       10
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([horizontalRectangle, verticalRectangle])
+      [horizontalRectangle, verticalRectangle]
     );
     checkObstacles(
       grid, //
@@ -861,7 +948,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................................\n' +
@@ -900,7 +987,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................................\n' +
@@ -939,7 +1026,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -985,7 +1072,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -1061,7 +1148,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -1139,12 +1226,8 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh for a plus thinner than the cell size', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const horizontalRectangle = createRectangle(runtimeScene, 160, 5);
-    horizontalRectangle.setPosition(160, 160);
-    const verticalRectangle = createRectangle(runtimeScene, 5, 160);
-    verticalRectangle.setPosition(160, 160);
-    runtimeScene.renderAndStep(1000 / 60);
+    const horizontalRectangle = createRectangle(160, 160, 160, 5);
+    const verticalRectangle = createRectangle(160, 160, 5, 160);
 
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
@@ -1155,9 +1238,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([horizontalRectangle, verticalRectangle])
+      [horizontalRectangle, verticalRectangle]
     );
     checkObstacles(
       grid, //
@@ -1181,7 +1264,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -1204,7 +1287,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -1227,7 +1310,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -1269,7 +1352,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -1321,7 +1404,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -1375,14 +1458,8 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh for a cross thinner than the cell size', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const horizontalRectangle = createRectangle(runtimeScene, 200, 2);
-    horizontalRectangle.setPosition(160, 160);
-    horizontalRectangle.setAngle(45);
-    const verticalRectangle = createRectangle(runtimeScene, 2, 200);
-    verticalRectangle.setPosition(160, 160);
-    verticalRectangle.setAngle(45);
-    runtimeScene.renderAndStep(1000 / 60);
+    const horizontalRectangle = createRectangle(160, 160, 200, 2, Math.PI / 4);
+    const verticalRectangle = createRectangle(160, 160, 2, 200, Math.PI / 4);
 
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
@@ -1393,9 +1470,9 @@ describe('gdjs.NavMeshGeneration', function () {
       10
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([horizontalRectangle, verticalRectangle])
+      [horizontalRectangle, verticalRectangle]
     );
     checkObstacles(
       grid, //
@@ -1435,7 +1512,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................................\n' +
@@ -1474,7 +1551,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................................\n' +
@@ -1513,7 +1590,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -1585,7 +1662,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -1679,7 +1756,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -1775,11 +1852,6 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh for a diamond with vertices on cell border', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const diamond = createDiamond(runtimeScene);
-    diamond.setPosition(160, 160);
-    runtimeScene.renderAndStep(1000 / 60);
-
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
       0,
@@ -1789,9 +1861,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([diamond])
+      [createDiamond(160, 160, 160, 160)]
     );
     checkObstacles(
       grid, //
@@ -1815,7 +1887,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -1838,7 +1910,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -1861,7 +1933,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -1896,7 +1968,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -1945,7 +2017,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );
@@ -1996,11 +2068,6 @@ describe('gdjs.NavMeshGeneration', function () {
   });
 
   it('can build a mesh for diamond with vertices on cell center', function () {
-    const runtimeScene = makeTestRuntimeScene();
-    const diamond = createDiamond(runtimeScene);
-    diamond.setPosition(170, 170);
-    runtimeScene.renderAndStep(1000 / 60);
-
     const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
       0,
       0,
@@ -2010,9 +2077,9 @@ describe('gdjs.NavMeshGeneration', function () {
       20
     );
 
-    gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
       grid,
-      new Set([diamond])
+      [createDiamond(170, 170, 160, 160)]
     );
     checkObstacles(
       grid, //
@@ -2036,7 +2103,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateDistanceField(grid);
     checkDistanceField(
       grid, //
       '..................\n' +
@@ -2059,7 +2126,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(grid, 0);
+    new gdjs.NavMeshPathfinding.RegionGenerator().generateRegions(grid, 0);
     checkRegions(
       grid, //
       '..................\n' +
@@ -2082,7 +2149,7 @@ describe('gdjs.NavMeshGeneration', function () {
         '..................\n'
     );
 
-    const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
+    const contours = new gdjs.NavMeshPathfinding.ContourBuilder().buildContours(
       grid,
       1
     );
@@ -2112,7 +2179,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const convexPolygons = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
+    const convexPolygons = new gdjs.NavMeshPathfinding.ConvexPolygonGenerator().splitToConvexPolygons(
       contours,
       8
     );
@@ -2164,7 +2231,7 @@ describe('gdjs.NavMeshGeneration', function () {
       ]
     );
 
-    const scaledPolygons = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
+    const scaledPolygons = new gdjs.NavMeshPathfinding.GridCoordinateConverter().convertFromGridBasis(
       grid,
       convexPolygons
     );

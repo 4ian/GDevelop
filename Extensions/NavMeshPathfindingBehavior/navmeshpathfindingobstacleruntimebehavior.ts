@@ -2,7 +2,6 @@
 GDevelop - NavMesh Pathfinding Behavior Extension
 Copyright (c) 2013-2021 Florian Rival (Florian.Rival@gmail.com)
  */
-
 namespace gdjs {
   /**
    * PathfindingObstaclesManager manages the common objects shared by objects having a
@@ -12,6 +11,9 @@ namespace gdjs {
    */
   export class NavMeshPathfindingObstaclesManager {
     _obstacles: Set<RuntimeObject>;
+
+    _polygonIterableAdapter: PolygonIterableAdapter;
+    _navMeshGenerator: gdjs.NavMeshPathfinding.NavMeshGenerator | null = null;
 
     // extension configuration
     _isometricRatio: float;
@@ -39,6 +41,7 @@ namespace gdjs {
 
     constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._obstacles = new Set();
+      this._polygonIterableAdapter = new PolygonIterableAdapter();
       const game = runtimeScene.getGame();
 
       const viewpoint = sharedData.viewpoint;
@@ -163,6 +166,7 @@ namespace gdjs {
       this._areaRightBound = right;
       this._areaBottomBound = bottom;
       this.invalidateNavMesh();
+      this._navMeshGenerator = null;
     }
 
     public static setCellSize(runtimeScene: any, cellSize: float) {
@@ -175,6 +179,7 @@ namespace gdjs {
     public setCellSize(cellSize: float) {
       this._cellSize = cellSize;
       this.invalidateNavMesh();
+      this._navMeshGenerator = null;
     }
 
     public static getAreaLeftBound(runtimeScene: any): float {
@@ -235,52 +240,130 @@ namespace gdjs {
     getNavMesh(obstacleCellPadding: integer): gdjs.NavMeshPathfinding.NavMesh {
       let navMesh = this._navMeshes.get(obstacleCellPadding);
       if (!navMesh) {
-        const grid = new gdjs.NavMeshPathfinding.RasterizationGrid(
-          this._areaLeftBound,
-          this._areaTopBound,
-          this._areaRightBound,
-          this._areaBottomBound,
-          this._cellSize,
-          // make cells square in the world
-          this._cellSize / this._isometricRatio
-        );
-        gdjs.NavMeshPathfinding.ObstacleRasterizer.rasterizeObstacles(
-          grid,
-          this._obstacles
-        );
-        gdjs.NavMeshPathfinding.RegionGenerator.generateDistanceField(grid);
-        gdjs.NavMeshPathfinding.RegionGenerator.generateRegions(
-          grid,
+        if (!this._navMeshGenerator) {
+          this._navMeshGenerator = new gdjs.NavMeshPathfinding.NavMeshGenerator(
+            this._areaLeftBound,
+            this._areaTopBound,
+            this._areaRightBound,
+            this._areaBottomBound,
+            this._cellSize,
+            // make cells square in the world
+            this._isometricRatio
+          );
+        }
+        const navMeshPolygons = this._navMeshGenerator.buildNavMesh(
+          this._getVerticesIterable(this._obstacles),
           obstacleCellPadding
         );
-        // It's probably not a good idea to expose the vectorization threshold.
-        // As stated in the parameter documentation, the value 1 gives good
-        // results in any situations.
-        // Moreover, this property would be hard to explain to users and
-        // some legit values could make the behavior appear buggy.
-        const threshold = 1;
-        const contours = gdjs.NavMeshPathfinding.ContourBuilder.buildContours(
-          grid,
-          threshold
-        );
-        const meshField = gdjs.NavMeshPathfinding.ConvexPolygonGenerator.splitToConvexPolygons(
-          contours,
-          16
-        );
-        const scaledMeshField = gdjs.NavMeshPathfinding.GridCoordinateConverter.convertFromGridBasis(
-          grid,
-          meshField
-        );
-        // Rescale the mesh to have the same unit length on the 2 axis for the pathfinding
-        scaledMeshField.forEach((polygon) =>
-          polygon.forEach((point) => {
-            point.y *= this._isometricRatio;
-          })
-        );
-        navMesh = new gdjs.NavMeshPathfinding.NavMesh(scaledMeshField);
+        navMesh = new gdjs.NavMeshPathfinding.NavMesh(navMeshPolygons);
         this._navMeshes.set(obstacleCellPadding, navMesh);
       }
       return navMesh;
+    }
+
+    _getVerticesIterable(
+      objects: Set<gdjs.RuntimeObject>
+    ): Iterable<Iterable<gdjs.NavMeshPathfinding.Point>> {
+      this._polygonIterableAdapter.set(objects);
+      return this._polygonIterableAdapter;
+    }
+  }
+
+  /**
+   * Iterable that adapts `RuntimeObject` to `Iterable<{x: float y: float}>`.
+   *
+   * This is an allocation free iterable
+   * that can only do one iteration at a time.
+   */
+  class PolygonIterableAdapter
+    implements Iterable<Iterable<gdjs.NavMeshPathfinding.Point>> {
+    objects: Iterable<gdjs.RuntimeObject>;
+    objectsItr: Iterator<gdjs.RuntimeObject>;
+    polygonsItr: IterableIterator<gdjs.Polygon>;
+    result: IteratorResult<Iterable<gdjs.NavMeshPathfinding.Point>, any>;
+    pointIterableAdapter: PointIterableAdapter;
+
+    constructor() {
+      this.objects = [];
+      this.objectsItr = this.objects[Symbol.iterator]();
+      this.polygonsItr = [][Symbol.iterator]();
+      this.pointIterableAdapter = new PointIterableAdapter();
+      this.result = {
+        value: this.pointIterableAdapter,
+        done: false,
+      };
+    }
+
+    set(objects: Set<gdjs.RuntimeObject>) {
+      this.objects = objects;
+    }
+
+    [Symbol.iterator]() {
+      this.objectsItr = this.objects[Symbol.iterator]();
+      this.polygonsItr = [][Symbol.iterator]();
+      return this;
+    }
+
+    next() {
+      let polygonNext = this.polygonsItr.next();
+      while (polygonNext.done) {
+        const objectNext = this.objectsItr.next();
+        if (objectNext.done) {
+          // IteratorReturnResult<gdjs.RuntimeObject> require a defined value
+          // even though the spec state otherwise.
+          // So, this class can't be typed as an iterable.
+          this.result.value = undefined;
+          this.result.done = true;
+          return this.result;
+        }
+        this.polygonsItr = objectNext.value.getHitBoxes().values();
+        polygonNext = this.polygonsItr.next();
+      }
+      this.pointIterableAdapter.set(polygonNext.value.vertices);
+      this.result.value = this.pointIterableAdapter;
+      this.result.done = false;
+      return this.result;
+    }
+  }
+
+  /**
+   * Iterable that adapts coordinates from `[int, int]` to `{x: int, y: int}`.
+   *
+   * This is an allocation free iterable
+   * that can only do one iteration at a time.
+   */
+  class PointIterableAdapter
+    implements Iterable<gdjs.NavMeshPathfinding.Point> {
+    vertices: Iterable<FloatPoint>;
+    verticesItr: Iterator<FloatPoint>;
+    result: IteratorResult<gdjs.NavMeshPathfinding.Point, any>;
+
+    constructor() {
+      this.vertices = [];
+      this.verticesItr = this.vertices[Symbol.iterator]();
+      this.result = {
+        value: { x: 0, y: 0 },
+        done: false,
+      };
+    }
+
+    set(vertices: Iterable<FloatPoint>) {
+      this.vertices = vertices;
+    }
+
+    [Symbol.iterator]() {
+      this.verticesItr = this.vertices[Symbol.iterator]();
+      return this;
+    }
+
+    next() {
+      const next = this.verticesItr.next();
+      if (next.done) {
+        return next;
+      }
+      this.result.value.x = next.value[0];
+      this.result.value.y = next.value[1];
+      return this.result;
     }
   }
 

@@ -40,6 +40,7 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       behaviorsSharedData: [
         {
           name: 'NavMeshPathfindingObstacleBehavior',
+          // @ts-ignore - properties are not typed
           areaLeftBound: 0,
           areaTopBound: 0,
           areaRightBound: 1280,
@@ -88,9 +89,11 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       behaviors: [
         {
           type: 'NavMeshPathfinding::NavMeshPathfindingObstacleBehavior',
+          name: 'NavMeshPathfindingObstacleBehavior',
         },
       ],
       effects: [],
+      variables: [],
     });
     obstacle.setCustomWidthAndHeight(100, 100);
     runtimeScene.addObject(obstacle);

@@ -129,10 +129,9 @@ describe('gdjs.NavMeshPathfinding', function () {
       20
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [createRectangle(160, 160, 400, 400)]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      createRectangle(160, 160, 400, 400),
+    ]);
     checkObstacles(
       grid, //
       '##################\n' +
@@ -378,10 +377,9 @@ describe('gdjs.NavMeshPathfinding', function () {
       10
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [createRectangle(160, 160, 200, 160)]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      createRectangle(160, 160, 200, 160),
+    ]);
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -817,10 +815,10 @@ describe('gdjs.NavMeshPathfinding', function () {
       20
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [horizontalRectangle, verticalRectangle]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
     checkObstacles(
       grid, //
       '..................\n' +
@@ -906,10 +904,10 @@ describe('gdjs.NavMeshPathfinding', function () {
       10
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [horizontalRectangle, verticalRectangle]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -1238,10 +1236,10 @@ describe('gdjs.NavMeshPathfinding', function () {
       20
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [horizontalRectangle, verticalRectangle]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
     checkObstacles(
       grid, //
       '..................\n' +
@@ -1470,10 +1468,10 @@ describe('gdjs.NavMeshPathfinding', function () {
       10
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [horizontalRectangle, verticalRectangle]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      horizontalRectangle,
+      verticalRectangle,
+    ]);
     checkObstacles(
       grid, //
       '..................................\n' +
@@ -1861,10 +1859,9 @@ describe('gdjs.NavMeshPathfinding', function () {
       20
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [createDiamond(160, 160, 160, 160)]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      createDiamond(160, 160, 160, 160),
+    ]);
     checkObstacles(
       grid, //
       '..................\n' +
@@ -2077,10 +2074,9 @@ describe('gdjs.NavMeshPathfinding', function () {
       20
     );
 
-    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(
-      grid,
-      [createDiamond(170, 170, 160, 160)]
-    );
+    new gdjs.NavMeshPathfinding.ObstacleRasterizer().rasterizeObstacles(grid, [
+      createDiamond(170, 170, 160, 160),
+    ]);
     checkObstacles(
       grid, //
       '..................\n' +

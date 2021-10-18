@@ -1190,6 +1190,7 @@ namespace gdjs {
         this.workingRawVertices = new Array<ContourPoint>(256);
         this.workingSimplifiedVertices = new Array<ContourPoint>(64);
       }
+
       /**
        * Generates a contour set from the provided {@link RasterizationGrid}
        *
@@ -3290,7 +3291,8 @@ namespace gdjs {
     }
 
     /**
-     * It rasterizes obstacle objects on a grid.
+     * It rasterizes obstacles on a grid.
+     *
      * It flags cells as obstacle to be used by {@link RegionGenerator}.
      */
     export class ObstacleRasterizer {

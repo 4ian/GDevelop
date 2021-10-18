@@ -92,19 +92,22 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
     REQUIRE(getCompletionsFor("number", "1 + ", 3) == expectedEmptyCompletions);
   }
   SECTION("Operator (string)") {
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 3) == expectedEmptyCompletions);
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 4) == expectedEmptyCompletions);
-    REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) == expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 3) ==
+            expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 4) ==
+            expectedEmptyCompletions);
+    REQUIRE(getCompletionsFor("string", "\"a\" + ", 5) ==
+            expectedEmptyCompletions);
   }
 
   SECTION("Free function") {
     SECTION("Test 1") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
           gd::ExpressionCompletionDescription::ForExpression(
-              "unknown", "Function", 0, 8)};
+              "string", "Function", 0, 8)};
       std::vector<gd::ExpressionCompletionDescription> expectedExactCompletions{
           gd::ExpressionCompletionDescription::ForExpression(
-              "unknown", "Function", 0, 8)
+              "string", "Function", 0, 8)
               .SetIsExact(true)};
       REQUIRE(getCompletionsFor("string", "Function(", 0) ==
               expectedCompletions);
@@ -212,17 +215,17 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
               gd::ExpressionCompletionDescription::ForObject(
-                  "unknown", "MyObject", 0, 8)};
+                  "string", "MyObject", 0, 8)};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorOrFunctionCompletions{
               gd::ExpressionCompletionDescription::ForBehavior(
                   "Func", 9, 13, "MyObject"),
               gd::ExpressionCompletionDescription::ForExpression(
-                  "unknown", "Func", 9, 13, "MyObject")};
+                  "string", "Func", 9, 13, "MyObject")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedExactFunctionCompletions{
               gd::ExpressionCompletionDescription::ForExpression(
-                  "unknown", "Func", 9, 13, "MyObject")
+                  "string", "Func", 9, 13, "MyObject")
                   .SetIsExact(true)};
       REQUIRE(getCompletionsFor("string", "MyObject.Func(", 0) ==
               expectedObjectCompletions);
@@ -311,7 +314,7 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedObjectCompletions{
               gd::ExpressionCompletionDescription::ForObject(
-                  "unknown", "MyObject", 0, 8)};
+                  "string", "MyObject", 0, 8)};
       std::vector<gd::ExpressionCompletionDescription>
           expectedBehaviorCompletions{
               gd::ExpressionCompletionDescription::ForBehavior(
@@ -319,11 +322,11 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       std::vector<gd::ExpressionCompletionDescription>
           expectedFunctionCompletions{
               gd::ExpressionCompletionDescription::ForExpression(
-                  "unknown", "Func", 21, 25, "MyObject", "MyBehavior")};
+                  "string", "Func", 21, 25, "MyObject", "MyBehavior")};
       std::vector<gd::ExpressionCompletionDescription>
           expectedExactFunctionCompletions{
               gd::ExpressionCompletionDescription::ForExpression(
-                  "unknown", "Func", 21, 25, "MyObject", "MyBehavior")
+                  "string", "Func", 21, 25, "MyObject", "MyBehavior")
                   .SetIsExact(true)};
       REQUIRE(getCompletionsFor("string", "MyObject.MyBehavior::Func(", 0) ==
               expectedObjectCompletions);

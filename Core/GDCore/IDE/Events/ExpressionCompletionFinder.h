@@ -9,12 +9,12 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 
 namespace gd {
 class Expression;
@@ -356,8 +356,9 @@ class GD_CORE_API ExpressionCompletionFinder
       }
       // Search the parameter metadata index skipping invisible ones.
       size_t visibleParameterIndex = 0;
-      size_t metadataParameterIndex = ExpressionParser2::WrittenParametersFirstIndex(
-          functionCall->objectName, functionCall->behaviorName);
+      size_t metadataParameterIndex =
+          ExpressionParser2::WrittenParametersFirstIndex(
+              functionCall->objectName, functionCall->behaviorName);
 
       const gd::ParameterMetadata* parameterMetadata = nullptr;
       while (metadataParameterIndex <

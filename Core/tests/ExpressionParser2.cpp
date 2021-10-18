@@ -971,6 +971,35 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
   }
 
+  SECTION("Unfinished object function name of type string with parentheses") {
+    auto node = parser.ParseExpression("string", "MyObject.()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionCall.objectName == "MyObject");
+    REQUIRE(objectFunctionCall.functionName == "");
+    REQUIRE(objectFunctionCall.type == "string");
+  }
+
+  SECTION("Unfinished object function name of type number with parentheses") {
+    auto node = parser.ParseExpression("number", "MyObject.()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionCall.objectName == "MyObject");
+    REQUIRE(objectFunctionCall.functionName == "");
+    REQUIRE(objectFunctionCall.type == "number");
+  }
+
+  SECTION(
+      "Unfinished object function name of type number|string with "
+      "parentheses") {
+    auto node = parser.ParseExpression("number|string", "MyObject.()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionCall.objectName == "MyObject");
+    REQUIRE(objectFunctionCall.functionName == "");
+    REQUIRE(objectFunctionCall.type == "number|string");
+  }
+
   SECTION("Unfinished object behavior name") {
     auto node = parser.ParseExpression("string", "MyObject.MyBehavior::");
     REQUIRE(node != nullptr);
@@ -979,6 +1008,67 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.behaviorFunctionName == "");
+  }
+
+  SECTION("Unfinished object behavior name of type string with parentheses") {
+    auto node = parser.ParseExpression("string", "MyObject.MyBehavior::()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
+    REQUIRE(objectFunctionName.functionName == "");
+    REQUIRE(objectFunctionName.type == "string");
+  }
+
+  SECTION("Unfinished object behavior name of type number with parentheses") {
+    auto node = parser.ParseExpression("number", "MyObject.MyBehavior::()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
+    REQUIRE(objectFunctionName.functionName == "");
+    REQUIRE(objectFunctionName.type == "number");
+  }
+
+  SECTION(
+      "Unfinished object behavior name of type number|string with "
+      "parentheses") {
+    auto node =
+        parser.ParseExpression("number|string", "MyObject.MyBehavior::()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionName = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionName.objectName == "MyObject");
+    REQUIRE(objectFunctionName.behaviorName == "MyBehavior");
+    REQUIRE(objectFunctionName.functionName == "");
+    REQUIRE(objectFunctionName.type == "number|string");
+  }
+
+  SECTION("Unfinished free function name of type string with parentheses") {
+    auto node = parser.ParseExpression("string", "fun()");
+    REQUIRE(node != nullptr);
+    auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(freeFunctionCall.objectName == "");
+    REQUIRE(freeFunctionCall.functionName == "fun");
+    REQUIRE(freeFunctionCall.type == "string");
+  }
+
+  SECTION("Unfinished free function name of type number with parentheses") {
+    auto node = parser.ParseExpression("number", "fun()");
+    REQUIRE(node != nullptr);
+    auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(freeFunctionCall.objectName == "");
+    REQUIRE(freeFunctionCall.functionName == "fun");
+    REQUIRE(freeFunctionCall.type == "number");
+  }
+
+  SECTION(
+      "Unfinished free function name of type number|string with parentheses") {
+    auto node = parser.ParseExpression("number|string", "fun()");
+    REQUIRE(node != nullptr);
+    auto &freeFunctionCall = dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(freeFunctionCall.objectName == "");
+    REQUIRE(freeFunctionCall.functionName == "fun");
+    REQUIRE(freeFunctionCall.type == "number|string");
   }
 
   SECTION("Invalid function calls") {

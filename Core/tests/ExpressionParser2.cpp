@@ -971,6 +971,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
   }
 
+  SECTION("Unfinished object function name with parentheses") {
+    auto node = parser.ParseExpression("string", "MyObject.()");
+    REQUIRE(node != nullptr);
+    auto &objectFunctionCall =
+        dynamic_cast<gd::FunctionCallNode &>(*node);
+    REQUIRE(objectFunctionCall.objectName == "MyObject");
+    REQUIRE(objectFunctionCall.functionName == "");
+  }
+
   SECTION("Unfinished object behavior name") {
     auto node = parser.ParseExpression("string", "MyObject.MyBehavior::");
     REQUIRE(node != nullptr);

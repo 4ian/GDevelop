@@ -458,9 +458,14 @@ class GD_CORE_API ExpressionParser2 {
           MetadataProvider::GetObjectAnyExpressionMetadata(
               platform, objectType, objectFunctionOrBehaviorName);
 
+      const gd::String returnType =
+          gd::MetadataProvider::IsBadExpressionMetadata(metadata) == true
+              ? type
+              : metadata.GetReturnType();
+
       auto parametersNode = Parameters(metadata.parameters, objectName);
       auto function = gd::make_unique<FunctionCallNode>(
-          metadata.GetReturnType(),
+          returnType,
           objectName,
           std::move(parametersNode.parameters),
           metadata,

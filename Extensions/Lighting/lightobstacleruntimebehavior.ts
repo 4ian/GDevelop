@@ -1,22 +1,6 @@
 namespace gdjs {
   declare var rbush: any;
 
-  export class BehaviorHolder<T extends gdjs.RuntimeBehavior> {
-    minX: number;
-    minY: number;
-    maxX: number;
-    maxY: number;
-    behavior: T;
-
-    constructor(behavior: T) {
-      this.minX = behavior.owner.getAABB().min[0];
-      this.minY = behavior.owner.getAABB().min[1];
-      this.maxX = behavior.owner.getAABB().max[0];
-      this.maxY = behavior.owner.getAABB().max[1];
-      this.behavior = behavior;
-    }
-  }
-
   export class LightObstaclesManager {
     _obstacleRBush: any;
 
@@ -46,8 +30,8 @@ namespace gdjs {
      * Add a light obstacle to the list of existing obstacles.
      */
     addObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      obstacle.currentBehaviorHolder = new BehaviorHolder(obstacle);
-      this._obstacleRBush.insert(obstacle.currentBehaviorHolder);
+      obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(obstacle);
+      this._obstacleRBush.insert(obstacle.currentBehaviorAABBHolder);
     }
 
     /**
@@ -55,8 +39,8 @@ namespace gdjs {
      * added before.
      */
     removeObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      this._obstacleRBush.remove(obstacle.currentBehaviorHolder);
-      obstacle.currentBehaviorHolder = null;
+      this._obstacleRBush.remove(obstacle.currentBehaviorAABBHolder);
+      obstacle.currentBehaviorAABBHolder = null;
     }
 
     /**
@@ -68,7 +52,7 @@ namespace gdjs {
     getAllObstaclesAround(
       object: gdjs.RuntimeObject,
       radius: number,
-      result: gdjs.BehaviorHolder<gdjs.LightObstacleRuntimeBehavior>[]
+      result: gdjs.BehaviorAABBHolder<gdjs.LightObstacleRuntimeBehavior>[]
     ) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -96,7 +80,7 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    currentBehaviorHolder: BehaviorHolder<
+    currentBehaviorAABBHolder: gdjs.BehaviorAABBHolder<
       LightObstacleRuntimeBehavior
     > | null = null;
     _manager: any;

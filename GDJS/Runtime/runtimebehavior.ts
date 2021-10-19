@@ -5,6 +5,30 @@
  */
 namespace gdjs {
   /**
+   * BehaviorAABBHolder is used to store a behavior's AABB for spatial manipulations
+   * (in rbush for instance).
+   */
+  export class BehaviorAABBHolder<T extends RuntimeBehavior> {
+    minX: float;
+    minY: float;
+    maxX: float;
+    maxY: float;
+    behavior: T;
+
+    constructor(behavior: T) {
+      this.behavior = behavior;
+      this.updateAABBFromOwner();
+    }
+
+    updateAABBFromOwner() {
+      this.minX = this.behavior.owner.getAABB().min[0];
+      this.minY = this.behavior.owner.getAABB().min[1];
+      this.maxX = this.behavior.owner.getAABB().max[0];
+      this.maxY = this.behavior.owner.getAABB().max[1];
+    }
+  }
+
+  /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
    */
   export class RuntimeBehavior {

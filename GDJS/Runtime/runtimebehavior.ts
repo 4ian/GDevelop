@@ -9,10 +9,10 @@ namespace gdjs {
    * (in rbush for instance).
    */
   export class BehaviorAABBHolder<T extends RuntimeBehavior> {
-    minX: float;
-    minY: float;
-    maxX: float;
-    maxY: float;
+    minX: float = 0;
+    minY: float = 0;
+    maxX: float = 0;
+    maxY: float = 0;
     behavior: T;
 
     constructor(behavior: T) {

@@ -368,9 +368,9 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<any> {
-      const lightObstacles: Array<gdjs.BehaviorHolder<
+      const lightObstacles: gdjs.BehaviorHolder<
         LightObstacleRuntimeBehavior
-      >> = [];
+      >[] = [];
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,

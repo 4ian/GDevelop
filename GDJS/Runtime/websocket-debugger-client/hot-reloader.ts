@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Hot reloader');
   export type HotReloaderLog = {
     message: string;
     kind: 'fatal' | 'error' | 'warning' | 'info';
@@ -133,7 +134,7 @@ namespace gdjs {
     }
 
     hotReload(): Promise<HotReloaderLog[]> {
-      console.info('Hot reload started');
+      logger.info('Hot reload started');
       this._runtimeGame.pause(true);
       this._logs = [];
 
@@ -204,7 +205,7 @@ namespace gdjs {
             }
           })
           .then(() => {
-            console.info('Hot reload finished with logs:', this._logs);
+            logger.info('Hot reload finished with logs:', this._logs);
             this._runtimeGame.pause(false);
             return this._logs;
           });

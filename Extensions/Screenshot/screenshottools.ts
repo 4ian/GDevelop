@@ -1,5 +1,7 @@
 namespace gdjs {
   export namespace screenshot {
+    const logger = new gdjs.Logger('Screenshot');
+
     /**
      * Save a screenshot of the game.
      * @param runtimeScene The scene
@@ -22,13 +24,13 @@ namespace gdjs {
           }
           fileSystem.writeFile(savePath, content, 'base64', (err) => {
             if (err) {
-              console.error(
+              logger.error(
                 'Unable to save the screenshot at path: ' + savePath
               );
             }
           });
         } else {
-          console.error(
+          logger.error(
             'Screenshot are not supported on rendering engines without canvas.'
           );
         }

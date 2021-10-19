@@ -100,6 +100,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
     const { project } = this.props;
     if (!project) return null;
 
+    const layoutName = this.getAssociatedLayoutName();
+    if (!layoutName) return;
+
+    return project.getLayout(layoutName);
+  }
+
+  getAssociatedLayoutName(): ?string {
+    const { project } = this.props;
+    if (!project) return null;
+
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return null;
 
@@ -107,7 +117,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (!project.hasLayoutNamed(layoutName)) {
       return null;
     }
-    return project.getLayout(layoutName);
+
+    return layoutName;
+  }
+
+  getPreviewRenderingType(): ?string {
+    const externalLayout = this.getExternalLayout();
+    if (!externalLayout) return null;
+
+    const previewRenderingType = externalLayout.getPreviewRenderingType();
+    return previewRenderingType;
   }
 
   saveExternalProperties = (props: ExternalProperties) => {
@@ -206,6 +225,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
           }
           open={this.state.externalPropertiesDialogOpen}
           project={project}
+          layoutName={this.getAssociatedLayoutName()}
+          previewRenderingType={this.getPreviewRenderingType()}
           onChoose={this.saveExternalProperties}
           onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
           allowPreviewRenderingTypeSelection

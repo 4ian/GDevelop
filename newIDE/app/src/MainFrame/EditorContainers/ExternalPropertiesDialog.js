@@ -31,6 +31,8 @@ export type ExternalProperties = {|
 type Props = {|
   open: boolean,
   onChoose: ExternalProperties => void,
+  layoutName?: ?string,
+  previewRenderingType?: ?string,
   onClose: () => void,
   project: gdProject,
   title?: React.Node,
@@ -44,19 +46,23 @@ type Props = {|
 export default function ExternalPropertiesDialog({
   open,
   onChoose,
+  layoutName,
+  previewRenderingType,
   onClose,
   project,
   title,
   helpText,
   allowPreviewRenderingTypeSelection,
 }: Props) {
+  const initialLayoutName = layoutName || '';
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
-    ''
+    initialLayoutName
   );
+  const initialPreviewRenderingType = previewRenderingType || '';
   const [
     selectedPreviewRenderingType,
     setSelectedPreviewRenderingType,
-  ] = React.useState<string>('');
+  ] = React.useState<string>(initialPreviewRenderingType);
 
   const onClick = React.useCallback(
     () => {

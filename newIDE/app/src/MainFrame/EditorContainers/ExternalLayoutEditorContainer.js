@@ -13,7 +13,7 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import LayoutChooserDialog from './LayoutChooserDialog';
+import ExternalPropertiesDialog from './ExternalPropertiesDialog';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
@@ -26,7 +26,7 @@ const styles = {
 };
 
 type State = {|
-  layoutChooserOpen: boolean,
+  externalPropertiesDialogOpen: boolean,
 |};
 
 export class ExternalLayoutEditorContainer extends React.Component<
@@ -35,7 +35,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
 > {
   editor: ?SceneEditor;
   state = {
-    layoutChooserOpen: false,
+    externalPropertiesDialogOpen: false,
   };
 
   getProject(): ?gdProject {
@@ -115,15 +115,15 @@ export class ExternalLayoutEditorContainer extends React.Component<
     externalLayout.setAssociatedLayout(layoutName);
     this.setState(
       {
-        layoutChooserOpen: false,
+        externalPropertiesDialogOpen: false,
       },
       () => this.updateToolbar()
     );
   };
 
-  openLayoutChooser = () => {
+  openExternalPropertiesDialog = () => {
     this.setState({
-      layoutChooserOpen: true,
+      externalPropertiesDialogOpen: true,
     });
   };
 
@@ -170,7 +170,7 @@ export class ExternalLayoutEditorContainer extends React.Component<
                 )
               )
             }
-            onOpenMoreSettings={this.openLayoutChooser}
+            onOpenMoreSettings={this.openExternalPropertiesDialog}
             isActive={isActive}
           />
         )}
@@ -186,17 +186,23 @@ export class ExternalLayoutEditorContainer extends React.Component<
               <RaisedButton
                 label={<Trans>Choose the scene</Trans>}
                 primary
-                onClick={this.openLayoutChooser}
+                onClick={this.openExternalPropertiesDialog}
               />
             </Line>
           </PlaceholderMessage>
         )}
-        <LayoutChooserDialog
-          title={<Trans>Choose the associated scene</Trans>}
-          open={this.state.layoutChooserOpen}
+        <ExternalPropertiesDialog
+          title={<Trans>Configure the external layout</Trans>}
+          helpText={
+            <Trans>
+              Remember! You still need to add an action "Create objects from
+              external layout" in the scene to import the external layout
+            </Trans>
+          }
+          open={this.state.externalPropertiesDialogOpen}
           project={project}
           onChoose={this.setAssociatedLayout}
-          onClose={() => this.setState({ layoutChooserOpen: false })}
+          onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
         />
       </div>
     );

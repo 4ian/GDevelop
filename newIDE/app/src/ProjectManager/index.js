@@ -59,6 +59,8 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { textEllispsisStyle } from '../UI/TextEllipsis';
+import Badge from '@material-ui/core/Badge';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -321,6 +323,8 @@ type State = {|
 
 export default class ProjectManager extends React.Component<Props, State> {
   _searchBar: ?SearchBar;
+
+  static contextType = ExtensionStoreContext;
 
   state = {
     editedPropertiesLayout: null,
@@ -1046,11 +1050,19 @@ export default class ProjectManager extends React.Component<Props, State> {
             error={eventsFunctionsExtensionsError}
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
-              <ListIcon
-                iconSize={24}
-                isGDevelopIcon
-                src="res/ribbon_default/function32.png"
-              />
+              <Badge
+                badgeContent={this.context.updateState.size}
+                max={9}
+                overlap="circle"
+                color="primary"
+                
+              >
+                <ListIcon
+                  iconSize={24}
+                  isGDevelopIcon
+                  src="res/ribbon_default/function32.png"
+                />
+              </Badge>
             }
             initiallyOpen={false}
             open={forceOpen}

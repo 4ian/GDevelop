@@ -29,7 +29,6 @@ import rtl from 'jss-rtl';
 import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
-import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import {
   type ResourceFetcher,
   ResourceFetcherContext,
@@ -105,15 +104,13 @@ export default class Providers extends React.Component<Props, {||}> {
                                       <AssetStoreStateProvider>
                                         <ResourceStoreStateProvider>
                                           <ExampleStoreStateProvider>
-                                            <ExtensionStoreStateProvider>
-                                              <GamesShowcaseStateProvider>
-                                                <ResourceFetcherContext.Provider
-                                                  value={resourceFetcher}
-                                                >
-                                                  {children({ i18n })}
-                                                </ResourceFetcherContext.Provider>
-                                              </GamesShowcaseStateProvider>
-                                            </ExtensionStoreStateProvider>
+                                            <GamesShowcaseStateProvider>
+                                              <ResourceFetcherContext.Provider
+                                                value={resourceFetcher}
+                                              >
+                                                {children({ i18n })}
+                                              </ResourceFetcherContext.Provider>
+                                            </GamesShowcaseStateProvider>
                                           </ExampleStoreStateProvider>
                                         </ResourceStoreStateProvider>
                                       </AssetStoreStateProvider>

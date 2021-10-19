@@ -119,6 +119,7 @@ import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1985,414 +1986,421 @@ const MainFrame = (props: Props) => {
   const showLoader = isLoadingProject || previewLoading;
 
   return (
-    <div className="main-frame">
-      {!!renderMainMenu &&
-        renderMainMenu({
-          i18n: i18n,
-          project: state.currentProject,
-          onChooseProject: chooseProject,
-          onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-          onSaveProject: saveProject,
-          onSaveProjectAs: saveProjectAs,
-          onCloseProject: askToCloseProject,
-          onCloseApp: closeApp,
-          onExportProject: () => openExportDialog(true),
-          onCreateProject: openCreateDialog,
-          onOpenProjectManager: () => openProjectManager(true),
-          onOpenStartPage: openStartPage,
-          onOpenDebugger: openDebugger,
-          onOpenAbout: () => openAboutDialog(true),
-          onOpenPreferences: () => openPreferencesDialog(true),
-          onOpenLanguage: () => openLanguageDialog(true),
-          onOpenProfile: () => openProfileDialogWithTab('profile'),
-          onOpenGamesDashboard: () =>
-            openProfileDialogWithTab('games-dashboard'),
-          setUpdateStatus: setUpdateStatus,
-          recentProjectFiles: preferences.getRecentProjectFiles(),
-        })}
-      <ProjectTitlebar fileMetadata={currentFileMetadata} />
-      <Drawer
-        open={projectManagerOpen}
-        PaperProps={{
-          style: styles.drawerContent,
-          className: 'safe-area-aware-left-container',
-        }}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        onClose={toggleProjectManager}
-      >
-        <DrawerTopBar
-          title={
-            state.currentProject ? state.currentProject.getName() : 'No project'
-          }
-          displayRightCloseButton
+    <ExtensionStoreStateProvider project={state.currentProject}>
+      <div className="main-frame">
+        {!!renderMainMenu &&
+          renderMainMenu({
+            i18n: i18n,
+            project: state.currentProject,
+            onChooseProject: chooseProject,
+            onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+            onSaveProject: saveProject,
+            onSaveProjectAs: saveProjectAs,
+            onCloseProject: askToCloseProject,
+            onCloseApp: closeApp,
+            onExportProject: () => openExportDialog(true),
+            onCreateProject: openCreateDialog,
+            onOpenProjectManager: () => openProjectManager(true),
+            onOpenStartPage: openStartPage,
+            onOpenDebugger: openDebugger,
+            onOpenAbout: () => openAboutDialog(true),
+            onOpenPreferences: () => openPreferencesDialog(true),
+            onOpenLanguage: () => openLanguageDialog(true),
+            onOpenProfile: () => openProfileDialogWithTab('profile'),
+            onOpenGamesDashboard: () =>
+              openProfileDialogWithTab('games-dashboard'),
+            setUpdateStatus: setUpdateStatus,
+            recentProjectFiles: preferences.getRecentProjectFiles(),
+          })}
+        <ProjectTitlebar fileMetadata={currentFileMetadata} />
+        <Drawer
+          open={projectManagerOpen}
+          PaperProps={{
+            style: styles.drawerContent,
+            className: 'safe-area-aware-left-container',
+          }}
+          ModalProps={{
+            keepMounted: true,
+          }}
           onClose={toggleProjectManager}
-        />
-        {currentProject && (
-          <ProjectManager
-            project={currentProject}
-            onOpenExternalEvents={openExternalEvents}
-            onOpenLayout={openLayout}
-            onOpenExternalLayout={openExternalLayout}
-            onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-            onAddLayout={addLayout}
-            onAddExternalLayout={addExternalLayout}
-            onAddEventsFunctionsExtension={addEventsFunctionsExtension}
-            onAddExternalEvents={addExternalEvents}
-            onInstallExtension={onInstallExtension}
-            onDeleteLayout={deleteLayout}
-            onDeleteExternalLayout={deleteExternalLayout}
-            onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
-            onDeleteExternalEvents={deleteExternalEvents}
-            onRenameLayout={renameLayout}
-            onRenameExternalLayout={renameExternalLayout}
-            onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
-            onRenameExternalEvents={renameExternalEvents}
-            onSaveProject={saveProject}
-            onSaveProjectAs={saveProjectAs}
-            onCloseProject={() => {
-              askToCloseProject();
-            }}
-            onExportProject={() => openExportDialog(true)}
-            onOpenPreferences={() => openPreferencesDialog(true)}
-            onOpenProfile={() => openProfileDialogWithTab('profile')}
-            onOpenGamesDashboard={() =>
-              openProfileDialogWithTab('games-dashboard')
+        >
+          <DrawerTopBar
+            title={
+              state.currentProject
+                ? state.currentProject.getName()
+                : 'No project'
             }
-            onOpenResources={() => {
-              openResources();
-              openProjectManager(false);
-            }}
-            onOpenPlatformSpecificAssets={() =>
-              openPlatformSpecificAssetsDialog(true)
-            }
-            onChangeSubscription={() => openSubscriptionDialog(true)}
-            eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
-            onReloadEventsFunctionsExtensions={() => {
-              // Check if load is sufficient
-              eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
-                currentProject
-              );
-            }}
-            freezeUpdate={!projectManagerOpen}
-            unsavedChanges={unsavedChanges}
-            hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-            resourceSources={props.resourceSources}
-            onChooseResource={onChooseResource}
-            resourceExternalEditors={resourceExternalEditors}
+            displayRightCloseButton
+            onClose={toggleProjectManager}
           />
-        )}
-        {!state.currentProject && (
-          <EmptyMessage>
-            <Trans>To begin, open or create a new project.</Trans>
-          </EmptyMessage>
-        )}
-      </Drawer>
-      <Toolbar
-        ref={toolbar}
-        showProjectIcons={!props.integratedEditor}
-        hasProject={!!currentProject}
-        toggleProjectManager={toggleProjectManager}
-        exportProject={() => openExportDialog(true)}
-        requestUpdate={props.requestUpdate}
-        simulateUpdateDownloaded={simulateUpdateDownloaded}
-        simulateUpdateAvailable={simulateUpdateAvailable}
-        onOpenDebugger={launchDebuggerAndPreview}
-        hasPreviewsRunning={hasPreviewsRunning}
-        onPreviewWithoutHotReload={launchNewPreview}
-        onNetworkPreview={launchNetworkPreview}
-        onHotReloadPreview={launchHotReloadPreview}
-        showNetworkPreviewButton={
-          !!_previewLauncher.current &&
-          _previewLauncher.current.canDoNetworkPreview()
-        }
-        setPreviewOverride={setPreviewOverride}
-        isPreviewEnabled={
-          !!currentProject && currentProject.getLayoutsCount() > 0
-        }
-        previewState={previewState}
-      />
-      <ClosableTabs hideLabels={!!props.integratedEditor}>
+          {currentProject && (
+            <ProjectManager
+              project={currentProject}
+              onOpenExternalEvents={openExternalEvents}
+              onOpenLayout={openLayout}
+              onOpenExternalLayout={openExternalLayout}
+              onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
+              onAddLayout={addLayout}
+              onAddExternalLayout={addExternalLayout}
+              onAddEventsFunctionsExtension={addEventsFunctionsExtension}
+              onAddExternalEvents={addExternalEvents}
+              onInstallExtension={onInstallExtension}
+              onDeleteLayout={deleteLayout}
+              onDeleteExternalLayout={deleteExternalLayout}
+              onDeleteEventsFunctionsExtension={deleteEventsFunctionsExtension}
+              onDeleteExternalEvents={deleteExternalEvents}
+              onRenameLayout={renameLayout}
+              onRenameExternalLayout={renameExternalLayout}
+              onRenameEventsFunctionsExtension={renameEventsFunctionsExtension}
+              onRenameExternalEvents={renameExternalEvents}
+              onSaveProject={saveProject}
+              onSaveProjectAs={saveProjectAs}
+              onCloseProject={() => {
+                askToCloseProject();
+              }}
+              onExportProject={() => openExportDialog(true)}
+              onOpenPreferences={() => openPreferencesDialog(true)}
+              onOpenProfile={() => openProfileDialogWithTab('profile')}
+              onOpenGamesDashboard={() =>
+                openProfileDialogWithTab('games-dashboard')
+              }
+              onOpenResources={() => {
+                openResources();
+                openProjectManager(false);
+              }}
+              onOpenPlatformSpecificAssets={() =>
+                openPlatformSpecificAssetsDialog(true)
+              }
+              onChangeSubscription={() => openSubscriptionDialog(true)}
+              eventsFunctionsExtensionsError={eventsFunctionsExtensionsError}
+              onReloadEventsFunctionsExtensions={() => {
+                // Check if load is sufficient
+                eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
+                  currentProject
+                );
+              }}
+              freezeUpdate={!projectManagerOpen}
+              unsavedChanges={unsavedChanges}
+              hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
+              resourceSources={props.resourceSources}
+              onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
+            />
+          )}
+          {!state.currentProject && (
+            <EmptyMessage>
+              <Trans>To begin, open or create a new project.</Trans>
+            </EmptyMessage>
+          )}
+        </Drawer>
+        <Toolbar
+          ref={toolbar}
+          showProjectIcons={!props.integratedEditor}
+          hasProject={!!currentProject}
+          toggleProjectManager={toggleProjectManager}
+          exportProject={() => openExportDialog(true)}
+          requestUpdate={props.requestUpdate}
+          simulateUpdateDownloaded={simulateUpdateDownloaded}
+          simulateUpdateAvailable={simulateUpdateAvailable}
+          onOpenDebugger={launchDebuggerAndPreview}
+          hasPreviewsRunning={hasPreviewsRunning}
+          onPreviewWithoutHotReload={launchNewPreview}
+          onNetworkPreview={launchNetworkPreview}
+          onHotReloadPreview={launchHotReloadPreview}
+          showNetworkPreviewButton={
+            !!_previewLauncher.current &&
+            _previewLauncher.current.canDoNetworkPreview()
+          }
+          setPreviewOverride={setPreviewOverride}
+          isPreviewEnabled={
+            !!currentProject && currentProject.getLayoutsCount() > 0
+          }
+          previewState={previewState}
+        />
+        <ClosableTabs hideLabels={!!props.integratedEditor}>
+          {getEditors(state.editorTabs).map((editorTab, id) => {
+            const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+            return (
+              <ClosableTab
+                label={editorTab.label}
+                key={editorTab.key}
+                active={isCurrentTab}
+                onClick={() => _onChangeEditorTab(id)}
+                onClose={() => _onCloseEditorTab(editorTab)}
+                onCloseOthers={() => _onCloseOtherEditorTabs(editorTab)}
+                onCloseAll={_onCloseAllEditorTabs}
+                onActivated={() => _onEditorTabActive(editorTab)}
+                closable={editorTab.closable}
+              />
+            );
+          })}
+        </ClosableTabs>
         {getEditors(state.editorTabs).map((editorTab, id) => {
           const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
           return (
-            <ClosableTab
-              label={editorTab.label}
-              key={editorTab.key}
-              active={isCurrentTab}
-              onClick={() => _onChangeEditorTab(id)}
-              onClose={() => _onCloseEditorTab(editorTab)}
-              onCloseOthers={() => _onCloseOtherEditorTabs(editorTab)}
-              onCloseAll={_onCloseAllEditorTabs}
-              onActivated={() => _onEditorTabActive(editorTab)}
-              closable={editorTab.closable}
-            />
+            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+              <CommandsContextScopedProvider active={isCurrentTab}>
+                <ErrorBoundary>
+                  {editorTab.renderEditorContainer({
+                    isActive: isCurrentTab,
+                    extraEditorProps: editorTab.extraEditorProps,
+                    project: currentProject,
+                    ref: editorRef => (editorTab.editorRef = editorRef),
+                    setToolbar: setEditorToolbar,
+                    onChangeSubscription: () => openSubscriptionDialog(true),
+                    projectItemName: editorTab.projectItemName,
+                    setPreviewedLayout,
+                    onOpenExternalEvents: openExternalEvents,
+                    previewDebuggerServer,
+                    hotReloadPreviewButtonProps,
+                    onOpenLayout: name =>
+                      openLayout(name, {
+                        openEventsEditor: true,
+                        openSceneEditor: false,
+                      }),
+                    resourceSources: props.resourceSources,
+                    onChooseResource,
+                    resourceExternalEditors,
+                    onCreateEventsFunction,
+                    openInstructionOrExpression,
+                    unsavedChanges: unsavedChanges,
+                    canOpen: !!props.storageProviders.filter(
+                      ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
+                    ).length,
+                    onOpen: () => chooseProject(),
+                    onCreate: () => openCreateDialog(),
+                    onOpenProjectManager: () => openProjectManager(true),
+                    onCloseProject: () => askToCloseProject(),
+                    onOpenTutorials: () => onOpenTutorials(),
+                    onOpenGamesShowcase: () => onOpenGamesShowcase(),
+                    onOpenHelpFinder: () => openHelpFinderDialog(true),
+                    onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onLoadEventsFunctionsExtensions: () =>
+                      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                        currentProject
+                      ),
+                    onDeleteResource: (
+                      resource: gdResource,
+                      cb: boolean => void
+                    ) => {
+                      // TODO: Project wide refactoring of objects/events using the resource
+                      cb(true);
+                    },
+                    onRenameResource: (
+                      resource: gdResource,
+                      newName: string,
+                      cb: boolean => void
+                    ) => {
+                      if (currentProject)
+                        renameResourcesInProject(currentProject, {
+                          [resource.getName()]: newName,
+                        });
+
+                      cb(true);
+                    },
+                  })}
+                </ErrorBoundary>
+              </CommandsContextScopedProvider>
+            </TabContentContainer>
           );
         })}
-      </ClosableTabs>
-      {getEditors(state.editorTabs).map((editorTab, id) => {
-        const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
-        return (
-          <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-            <CommandsContextScopedProvider active={isCurrentTab}>
-              <ErrorBoundary>
-                {editorTab.renderEditorContainer({
-                  isActive: isCurrentTab,
-                  extraEditorProps: editorTab.extraEditorProps,
-                  project: currentProject,
-                  ref: editorRef => (editorTab.editorRef = editorRef),
-                  setToolbar: setEditorToolbar,
-                  onChangeSubscription: () => openSubscriptionDialog(true),
-                  projectItemName: editorTab.projectItemName,
-                  setPreviewedLayout,
-                  onOpenExternalEvents: openExternalEvents,
-                  previewDebuggerServer,
-                  hotReloadPreviewButtonProps,
-                  onOpenLayout: name =>
-                    openLayout(name, {
-                      openEventsEditor: true,
-                      openSceneEditor: false,
-                    }),
-                  resourceSources: props.resourceSources,
-                  onChooseResource,
-                  resourceExternalEditors,
-                  onCreateEventsFunction,
-                  openInstructionOrExpression,
-                  unsavedChanges: unsavedChanges,
-                  canOpen: !!props.storageProviders.filter(
-                    ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
-                  ).length,
-                  onOpen: () => chooseProject(),
-                  onCreate: () => openCreateDialog(),
-                  onOpenProjectManager: () => openProjectManager(true),
-                  onCloseProject: () => askToCloseProject(),
-                  onOpenTutorials: () => onOpenTutorials(),
-                  onOpenGamesShowcase: () => onOpenGamesShowcase(),
-                  onOpenHelpFinder: () => openHelpFinderDialog(true),
-                  onOpenLanguageDialog: () => openLanguageDialog(true),
-                  onLoadEventsFunctionsExtensions: () =>
-                    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                      currentProject
-                    ),
-                  onDeleteResource: (
-                    resource: gdResource,
-                    cb: boolean => void
-                  ) => {
-                    // TODO: Project wide refactoring of objects/events using the resource
-                    cb(true);
-                  },
-                  onRenameResource: (
-                    resource: gdResource,
-                    newName: string,
-                    cb: boolean => void
-                  ) => {
-                    if (currentProject)
-                      renameResourcesInProject(currentProject, {
-                        [resource.getName()]: newName,
-                      });
+        <CommandPalette ref={commandPaletteRef} />
+        <LoaderModal show={showLoader} />
+        <HelpFinder
+          open={helpFinderDialogOpen}
+          onClose={() => openHelpFinderDialog(false)}
+        />
+        <Snackbar
+          open={state.snackMessageOpen}
+          autoHideDuration={3000}
+          onClose={_closeSnackMessage}
+          ContentProps={{
+            'aria-describedby': 'snackbar-message',
+          }}
+          message={<span id="snackbar-message">{state.snackMessage}</span>}
+        />
+        {!!renderExportDialog &&
+          exportDialogOpen &&
+          renderExportDialog({
+            onClose: () => openExportDialog(false),
+            onChangeSubscription: () => {
+              openExportDialog(false);
+              openSubscriptionDialog(true);
+            },
+            project: state.currentProject,
+          })}
+        {!!renderCreateDialog &&
+          state.createDialogOpen &&
+          renderCreateDialog({
+            open: state.createDialogOpen,
+            initialTab: createDialogInitialTab,
+            onClose: () => openCreateDialog(false),
+            onOpen: async (storageProvider, fileMetadata) => {
+              await setState(state => ({ ...state, createDialogOpen: false }));
+              await getStorageProviderOperations(storageProvider);
+              const state = await openFromFileMetadata(fileMetadata);
 
-                    cb(true);
-                  },
-                })}
-              </ErrorBoundary>
-            </CommandsContextScopedProvider>
-          </TabContentContainer>
-        );
-      })}
-      <CommandPalette ref={commandPaletteRef} />
-      <LoaderModal show={showLoader} />
-      <HelpFinder
-        open={helpFinderDialogOpen}
-        onClose={() => openHelpFinderDialog(false)}
-      />
-      <Snackbar
-        open={state.snackMessageOpen}
-        autoHideDuration={3000}
-        onClose={_closeSnackMessage}
-        ContentProps={{
-          'aria-describedby': 'snackbar-message',
-        }}
-        message={<span id="snackbar-message">{state.snackMessage}</span>}
-      />
-      {!!renderExportDialog &&
-        exportDialogOpen &&
-        renderExportDialog({
-          onClose: () => openExportDialog(false),
-          onChangeSubscription: () => {
-            openExportDialog(false);
-            openSubscriptionDialog(true);
-          },
-          project: state.currentProject,
-        })}
-      {!!renderCreateDialog &&
-        state.createDialogOpen &&
-        renderCreateDialog({
-          open: state.createDialogOpen,
-          initialTab: createDialogInitialTab,
-          onClose: () => openCreateDialog(false),
-          onOpen: async (storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await openFromFileMetadata(fileMetadata);
+              if (state) {
+                if (state.currentProject)
+                  state.currentProject.resetProjectUuid();
+                openSceneOrProjectManager({
+                  currentProject: state.currentProject,
+                  editorTabs: state.editorTabs,
+                });
+              }
+            },
+            onCreate: async (project, storageProvider, fileMetadata) => {
+              await setState(state => ({ ...state, createDialogOpen: false }));
+              await getStorageProviderOperations(storageProvider);
+              const state = await loadFromProject(project, fileMetadata);
 
-            if (state) {
               if (state.currentProject) state.currentProject.resetProjectUuid();
               openSceneOrProjectManager({
                 currentProject: state.currentProject,
                 editorTabs: state.editorTabs,
               });
+            },
+          })}
+        {!!introDialog &&
+          introDialogOpen &&
+          React.cloneElement(introDialog, {
+            open: true,
+            onClose: () => openIntroDialog(false),
+          })}
+        {!!currentProject && platformSpecificAssetsDialogOpen && (
+          <PlatformSpecificAssetsDialog
+            project={currentProject}
+            open
+            onApply={() => openPlatformSpecificAssetsDialog(false)}
+            onClose={() => openPlatformSpecificAssetsDialog(false)}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+          />
+        )}
+        {!!renderPreviewLauncher &&
+          renderPreviewLauncher(
+            {
+              getIncludeFileHashs:
+                eventsFunctionsExtensionsContext.getIncludeFileHashs,
+              onExport: () => openExportDialog(true),
+              onChangeSubscription: () => openSubscriptionDialog(true),
+            },
+            (previewLauncher: ?PreviewLauncherInterface) => {
+              _previewLauncher.current = previewLauncher;
             }
-          },
-          onCreate: async (project, storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await loadFromProject(project, fileMetadata);
-
-            if (state.currentProject) state.currentProject.resetProjectUuid();
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
-          },
-        })}
-      {!!introDialog &&
-        introDialogOpen &&
-        React.cloneElement(introDialog, {
-          open: true,
-          onClose: () => openIntroDialog(false),
-        })}
-      {!!currentProject && platformSpecificAssetsDialogOpen && (
-        <PlatformSpecificAssetsDialog
-          project={currentProject}
-          open
-          onApply={() => openPlatformSpecificAssetsDialog(false)}
-          onClose={() => openPlatformSpecificAssetsDialog(false)}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
-        />
-      )}
-      {!!renderPreviewLauncher &&
-        renderPreviewLauncher(
-          {
-            getIncludeFileHashs:
-              eventsFunctionsExtensionsContext.getIncludeFileHashs,
-            onExport: () => openExportDialog(true),
-            onChangeSubscription: () => openSubscriptionDialog(true),
-          },
-          (previewLauncher: ?PreviewLauncherInterface) => {
-            _previewLauncher.current = previewLauncher;
+          )}
+        {resourceSources.map(
+          (resourceSource, index): React.Node => {
+            const Component = resourceSource.component;
+            return (
+              <Component
+                key={resourceSource.name}
+                ref={dialog =>
+                  (_resourceSourceDialogs.current[resourceSource.name] = dialog)
+                }
+                i18n={i18n}
+                getLastUsedPath={preferences.getLastUsedPath}
+                setLastUsedPath={preferences.setLastUsedPath}
+              />
+            );
           }
         )}
-      {resourceSources.map(
-        (resourceSource, index): React.Node => {
-          const Component = resourceSource.component;
-          return (
-            <Component
-              key={resourceSource.name}
-              ref={dialog =>
-                (_resourceSourceDialogs.current[resourceSource.name] = dialog)
+        {profileDialogOpen && (
+          <ProfileDialog
+            currentProject={currentProject}
+            initialTab={profileDialogInitialTab}
+            open
+            onClose={() => openProfileDialog(false)}
+            onChangeSubscription={() => openSubscriptionDialog(true)}
+          />
+        )}
+        {subscriptionDialogOpen && (
+          <SubscriptionDialog
+            onClose={() => {
+              openSubscriptionDialog(false);
+            }}
+            open
+          />
+        )}
+        {preferencesDialogOpen && (
+          <PreferencesDialog
+            i18n={props.i18n}
+            onClose={() => openPreferencesDialog(false)}
+          />
+        )}
+        {languageDialogOpen && (
+          <LanguageDialog
+            open
+            onClose={languageChanged => {
+              openLanguageDialog(false);
+              if (languageChanged) {
+                _languageDidChange();
               }
-              i18n={i18n}
-              getLastUsedPath={preferences.getLastUsedPath}
-              setLastUsedPath={preferences.setLastUsedPath}
-            />
-          );
-        }
-      )}
-      {profileDialogOpen && (
-        <ProfileDialog
-          currentProject={currentProject}
-          initialTab={profileDialogInitialTab}
-          open
-          onClose={() => openProfileDialog(false)}
-          onChangeSubscription={() => openSubscriptionDialog(true)}
-        />
-      )}
-      {subscriptionDialogOpen && (
-        <SubscriptionDialog
-          onClose={() => {
-            openSubscriptionDialog(false);
-          }}
-          open
-        />
-      )}
-      {preferencesDialogOpen && (
-        <PreferencesDialog
+            }}
+          />
+        )}
+        {aboutDialogOpen && (
+          <AboutDialog
+            open
+            onClose={() => openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
+        )}
+        {state.openFromStorageProviderDialogOpen && (
+          <OpenFromStorageProviderDialog
+            onClose={() => openOpenFromStorageProviderDialog(false)}
+            storageProviders={props.storageProviders}
+            onChooseProvider={storageProvider => {
+              openOpenFromStorageProviderDialog(false);
+              props.getStorageProviderOperations(storageProvider).then(() => {
+                chooseProjectWithStorageProviderPicker();
+              });
+            }}
+            onCreateNewProject={() => {
+              openOpenFromStorageProviderDialog(false);
+              openCreateDialog(true);
+            }}
+          />
+        )}
+        {state.saveToStorageProviderDialogOpen && (
+          <SaveToStorageProviderDialog
+            onClose={() => openSaveToStorageProviderDialog(false)}
+            storageProviders={props.storageProviders}
+            onChooseProvider={storageProvider => {
+              openSaveToStorageProviderDialog(false);
+              props.getStorageProviderOperations(storageProvider).then(() => {
+                saveProjectAsWithStorageProvider();
+              });
+            }}
+          />
+        )}
+        {renderOpenConfirmDialog()}
+        {renderResourceFetcherDialog()}
+        <CloseConfirmDialog
+          shouldPrompt={!!state.currentProject}
           i18n={props.i18n}
-          onClose={() => openPreferencesDialog(false)}
+          language={props.i18n.language}
+          hasUnsavedChanges={
+            !!unsavedChanges && unsavedChanges.hasUnsavedChanges
+          }
         />
-      )}
-      {languageDialogOpen && (
-        <LanguageDialog
-          open
-          onClose={languageChanged => {
-            openLanguageDialog(false);
-            if (languageChanged) {
-              _languageDidChange();
-            }
-          }}
-        />
-      )}
-      {aboutDialogOpen && (
-        <AboutDialog
-          open
-          onClose={() => openAboutDialog(false)}
-          updateStatus={updateStatus}
-        />
-      )}
-      {state.openFromStorageProviderDialogOpen && (
-        <OpenFromStorageProviderDialog
-          onClose={() => openOpenFromStorageProviderDialog(false)}
-          storageProviders={props.storageProviders}
-          onChooseProvider={storageProvider => {
-            openOpenFromStorageProviderDialog(false);
-            props.getStorageProviderOperations(storageProvider).then(() => {
-              chooseProjectWithStorageProviderPicker();
-            });
-          }}
-          onCreateNewProject={() => {
-            openOpenFromStorageProviderDialog(false);
-            openCreateDialog(true);
-          }}
-        />
-      )}
-      {state.saveToStorageProviderDialogOpen && (
-        <SaveToStorageProviderDialog
-          onClose={() => openSaveToStorageProviderDialog(false)}
-          storageProviders={props.storageProviders}
-          onChooseProvider={storageProvider => {
-            openSaveToStorageProviderDialog(false);
-            props.getStorageProviderOperations(storageProvider).then(() => {
-              saveProjectAsWithStorageProvider();
-            });
-          }}
-        />
-      )}
-      {renderOpenConfirmDialog()}
-      {renderResourceFetcherDialog()}
-      <CloseConfirmDialog
-        shouldPrompt={!!state.currentProject}
-        i18n={props.i18n}
-        language={props.i18n.language}
-        hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
-      />
-      <ChangelogDialogContainer />
-      {state.gdjsDevelopmentWatcherEnabled &&
-        renderGDJSDevelopmentWatcher &&
-        renderGDJSDevelopmentWatcher()}
-      {!!hotReloadLogs.length && (
-        <HotReloadLogsDialog
-          logs={hotReloadLogs}
-          onClose={clearHotReloadLogs}
-          onLaunchNewPreview={() => {
-            clearHotReloadLogs();
-            launchNewPreview();
-          }}
-        />
-      )}
-    </div>
+        <ChangelogDialogContainer />
+        {state.gdjsDevelopmentWatcherEnabled &&
+          renderGDJSDevelopmentWatcher &&
+          renderGDJSDevelopmentWatcher()}
+        {!!hotReloadLogs.length && (
+          <HotReloadLogsDialog
+            logs={hotReloadLogs}
+            onClose={clearHotReloadLogs}
+            onLaunchNewPreview={() => {
+              clearHotReloadLogs();
+              launchNewPreview();
+            }}
+          />
+        )}
+      </div>
+    </ExtensionStoreStateProvider>
   );
 };
 

@@ -41,7 +41,9 @@ namespace gdjs {
      * Add a platform to the list of existing platforms.
      */
     addPlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
-      platformBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(platformBehavior);
+      platformBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
+        platformBehavior
+      );
       this._platformRBush.insert(platformBehavior.currentBehaviorAABBHolder);
     }
 

@@ -30,7 +30,9 @@ namespace gdjs {
      * Add a light obstacle to the list of existing obstacles.
      */
     addObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(obstacle);
+      obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
+        obstacle
+      );
       this._obstacleRBush.insert(obstacle.currentBehaviorAABBHolder);
     }
 

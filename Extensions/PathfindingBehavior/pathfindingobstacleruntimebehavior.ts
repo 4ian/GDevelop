@@ -41,8 +41,12 @@ namespace gdjs {
     addObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      pathfindingObstacleBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(pathfindingObstacleBehavior);
-      this._obstaclesRBush.insert(pathfindingObstacleBehavior.currentBehaviorAABBHolder);
+      pathfindingObstacleBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
+        pathfindingObstacleBehavior
+      );
+      this._obstaclesRBush.insert(
+        pathfindingObstacleBehavior.currentBehaviorAABBHolder
+      );
     }
 
     /**
@@ -52,7 +56,9 @@ namespace gdjs {
     removeObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesRBush.remove(pathfindingObstacleBehavior.currentBehaviorAABBHolder);
+      this._obstaclesRBush.remove(
+        pathfindingObstacleBehavior.currentBehaviorAABBHolder
+      );
       pathfindingObstacleBehavior.currentBehaviorAABBHolder = null;
     }
 

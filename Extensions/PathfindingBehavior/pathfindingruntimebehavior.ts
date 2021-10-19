@@ -542,7 +542,9 @@ namespace gdjs {
       //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       _openNodes: Node[] = [];
       //Used by getNodes to temporarily store obstacles near a position.
-      _closeObstacles: gdjs.BehaviorAABBHolder<PathfindingObstacleRuntimeBehavior>[] = [];
+      _closeObstacles: gdjs.BehaviorAABBHolder<
+        PathfindingObstacleRuntimeBehavior
+      >[] = [];
       //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
       _nodeCache: Node[] = [];
 

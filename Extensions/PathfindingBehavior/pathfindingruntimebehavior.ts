@@ -3,6 +3,7 @@ GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Pathfinding behavior');
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
@@ -612,7 +613,7 @@ namespace gdjs {
 
       computePathTo(targetX: float, targetY: float) {
         if (this._obstacles === null) {
-          console.log(
+          logger.log(
             'You tried to compute a path without specifying the obstacles'
           );
           return;

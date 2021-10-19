@@ -657,6 +657,9 @@ interface ExternalLayout {
     void SetAssociatedLayout([Const] DOMString name);
     [Const, Ref] DOMString GetAssociatedLayout();
 
+    void SetPreviewRenderingType([Const] DOMString type);
+    [Const, Ref] DOMString GetPreviewRenderingType();
+
     [Ref] InitialInstancesContainer GetInitialInstances();
     [Ref] EditorSettings GetAssociatedEditorSettings();
 

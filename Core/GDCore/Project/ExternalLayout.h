@@ -7,14 +7,13 @@
 #ifndef GDCORE_EXTERNALLAYOUT_H
 #define GDCORE_EXTERNALLAYOUT_H
 #include <memory>
+
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
 }
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/EditorSettings.h"
-#endif
 
 namespace gd {
 
@@ -54,7 +53,6 @@ class GD_CORE_API ExternalLayout {
    */
   gd::InitialInstancesContainer& GetInitialInstances() { return instances; }
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Get the user settings for the IDE.
    */
@@ -65,10 +63,19 @@ class GD_CORE_API ExternalLayout {
   /**
    * \brief Get the user settings for the IDE.
    */
-  gd::EditorSettings& GetAssociatedEditorSettings() {
-    return editorSettings;
+  gd::EditorSettings& GetAssociatedEditorSettings() { return editorSettings; }
+
+  /**
+   * \brief Get the type of rendering selected for the external layout.
+   */
+  const gd::String& GetPreviewRenderingType() { return previewRenderingType; }
+
+  /**
+   * \brief Set the type of rendering for the external layout.
+   */
+  void SetPreviewRenderingType(const gd::String& type) {
+    previewRenderingType = type;
   }
-#endif
 
   /**
    * \brief Get the name of the layout last used to edit the external layout.
@@ -80,15 +87,13 @@ class GD_CORE_API ExternalLayout {
    */
   void SetAssociatedLayout(const gd::String& name) { associatedLayout = name; }
 
-/** \name Serialization
- */
-///@{
-#if defined(GD_IDE_ONLY)
+  /** \name Serialization
+   */
+  ///@{
   /**
    * \brief Serialize external layout.
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the external layout.
@@ -99,10 +104,9 @@ class GD_CORE_API ExternalLayout {
  private:
   gd::String name;
   gd::InitialInstancesContainer instances;
-#if defined(GD_IDE_ONLY)
   gd::EditorSettings editorSettings;
-#endif
   gd::String associatedLayout;
+  gd::String previewRenderingType;
 };
 
 /**

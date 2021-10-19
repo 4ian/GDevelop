@@ -51,10 +51,14 @@ namespace gdjs {
     _onLadder: OnLadder;
 
     /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
-    _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
+    _potentialCollidingObjects: Array<
+      gdjs.PlatformRuntimeBehavior
+    >;
 
     /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
-    private _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
+    private _overlappedJumpThru: Array<
+      gdjs.PlatformRuntimeBehavior
+    >;
 
     private _hasReallyMoved: boolean = false;
     private _manager: gdjs.PlatformObjectsManager;
@@ -764,7 +768,10 @@ namespace gdjs {
       return false;
     }
 
-    _isIn(platformArray: gdjs.PlatformRuntimeBehavior[], id: integer) {
+    _isIn(
+      platformArray: gdjs.PlatformRuntimeBehavior[],
+      id: integer
+    ) {
       for (let i = 0; i < platformArray.length; ++i) {
         if (platformArray[i].owner.id === id) {
           return true;

@@ -52,12 +52,12 @@ namespace gdjs {
 
     /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
     _potentialCollidingObjects: Array<
-      gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>
+      gdjs.PlatformRuntimeBehavior
     >;
 
     /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
     private _overlappedJumpThru: Array<
-      gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>
+      gdjs.PlatformRuntimeBehavior
     >;
 
     private _hasReallyMoved: boolean = false;
@@ -447,7 +447,7 @@ namespace gdjs {
         PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
       );
       collidingPlatforms.length = 0;
-      for (const { behavior: platform } of this._potentialCollidingObjects) {
+      for (const platform of this._potentialCollidingObjects) {
         if (this._isCollidingWith(platform) && this._canGrab(platform)) {
           collidingPlatforms.push(platform);
         }
@@ -577,7 +577,7 @@ namespace gdjs {
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
     private _separateFromPlatforms(
-      candidates: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[],
+      candidates: gdjs.PlatformRuntimeBehavior[],
       excludeJumpThrus: boolean
     ) {
       excludeJumpThrus = !!excludeJumpThrus;
@@ -586,7 +586,7 @@ namespace gdjs {
       );
       objects.length = 0;
       for (let i = 0; i < candidates.length; ++i) {
-        const platform = candidates[i].behavior;
+        const platform = candidates[i];
         if (
           platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
         ) {
@@ -611,13 +611,13 @@ namespace gdjs {
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
      */
     _isCollidingWithOneOf(
-      candidates: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[],
+      candidates: gdjs.PlatformRuntimeBehavior[],
       exceptThisOne?: number | null,
       excludeJumpThrus?: boolean
     ) {
       excludeJumpThrus = !!excludeJumpThrus;
       for (let i = 0; i < candidates.length; ++i) {
-        const platform = candidates[i].behavior;
+        const platform = candidates[i];
         if (platform.owner.id === exceptThisOne) {
           continue;
         }
@@ -652,11 +652,11 @@ namespace gdjs {
      * @param exceptTheseOnes The platforms to be excluded from the test
      */
     private _isCollidingWithOneOfExcluding(
-      candidates: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[],
-      exceptTheseOnes: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[]
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      exceptTheseOnes: gdjs.PlatformRuntimeBehavior[]
     ) {
       for (let i = 0; i < candidates.length; ++i) {
-        const platform = candidates[i].behavior;
+        const platform = candidates[i];
         if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) {
           continue;
         }
@@ -685,7 +685,7 @@ namespace gdjs {
      */
     private _getCollidingPlatform() {
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
-        const platform = this._potentialCollidingObjects[i].behavior;
+        const platform = this._potentialCollidingObjects[i];
         if (
           platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER &&
           !this._isIn(this._overlappedJumpThru, platform.owner.id) &&
@@ -728,7 +728,7 @@ namespace gdjs {
     private _updateOverlappedJumpThru() {
       this._overlappedJumpThru.length = 0;
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
-        const platform = this._potentialCollidingObjects[i].behavior;
+        const platform = this._potentialCollidingObjects[i];
         if (
           platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
@@ -738,7 +738,7 @@ namespace gdjs {
             this._ignoreTouchingEdges
           )
         ) {
-          this._overlappedJumpThru.push(this._potentialCollidingObjects[i]);
+          this._overlappedJumpThru.push(platform);
         }
       }
     }
@@ -749,7 +749,7 @@ namespace gdjs {
      */
     _isOverlappingLadder() {
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
-        const platform = this._potentialCollidingObjects[i].behavior;
+        const platform = this._potentialCollidingObjects[i];
         if (
           platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER
         ) {
@@ -769,11 +769,11 @@ namespace gdjs {
     }
 
     _isIn(
-      platformArray: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[],
+      platformArray: gdjs.PlatformRuntimeBehavior[],
       id: integer
     ) {
       for (let i = 0; i < platformArray.length; ++i) {
-        if (platformArray[i].behavior.owner.id === id) {
+        if (platformArray[i].owner.id === id) {
           return true;
         }
       }
@@ -794,7 +794,7 @@ namespace gdjs {
       // is not considered as colliding with itself, in the case that it also has the
       // platform behavior.
       for (let i = 0; i < this._potentialCollidingObjects.length; ) {
-        if (this._potentialCollidingObjects[i].behavior.owner === this.owner) {
+        if (this._potentialCollidingObjects[i].owner === this.owner) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {
           i++;

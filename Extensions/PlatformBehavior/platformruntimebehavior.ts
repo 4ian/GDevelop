@@ -18,7 +18,12 @@ namespace gdjs {
      * @param object The object
      */
     constructor(runtimeScene: gdjs.RuntimeScene) {
-      this._platformRBush = new rbush();
+      this._platformRBush = new rbush(9, [
+        '.owner.getAABB().min[0]',
+        '.owner.getAABB().min[1]',
+        '.owner.getAABB().max[0]',
+        '.owner.getAABB().max[1]',
+      ]);
     }
 
     /**
@@ -41,10 +46,7 @@ namespace gdjs {
      * Add a platform to the list of existing platforms.
      */
     addPlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
-      platformBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
-        platformBehavior
-      );
-      this._platformRBush.insert(platformBehavior.currentBehaviorAABBHolder);
+      this._platformRBush.insert(platformBehavior);
     }
 
     /**
@@ -52,8 +54,7 @@ namespace gdjs {
      * added before.
      */
     removePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
-      this._platformRBush.remove(platformBehavior.currentBehaviorAABBHolder);
-      platformBehavior.currentBehaviorAABBHolder = null;
+      this._platformRBush.remove(platformBehavior);
     }
 
     /**
@@ -64,7 +65,7 @@ namespace gdjs {
     getAllPlatformsAround(
       object: gdjs.RuntimeObject,
       maxMovementLength: number,
-      result: gdjs.BehaviorAABBHolder<gdjs.PlatformRuntimeBehavior>[]
+      result: gdjs.PlatformRuntimeBehavior[]
     ): any {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -106,9 +107,6 @@ namespace gdjs {
     _oldHeight: float = 0;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
-    currentBehaviorAABBHolder: BehaviorAABBHolder<
-      PlatformRuntimeBehavior
-    > | null = null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,

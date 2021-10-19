@@ -368,7 +368,9 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<any> {
-      const lightObstacles: Array<gdjs.LightObstacleRuntimeBehavior> = [];
+      const lightObstacles: Array<gdjs.BehaviorHolder<
+        LightObstacleRuntimeBehavior
+      >> = [];
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,
@@ -393,7 +395,7 @@ namespace gdjs {
       const obstaclesCount = lightObstacles.length;
       const obstacleHitBoxes = new Array(obstaclesCount);
       for (let i = 0; i < obstaclesCount; i++) {
-        obstacleHitBoxes[i] = lightObstacles[i].owner.getHitBoxes();
+        obstacleHitBoxes[i] = lightObstacles[i].behavior.owner.getHitBoxes();
       }
       const obstaclePolygons: Array<any> = [];
       obstaclePolygons.push(this._lightBoundingPoly);

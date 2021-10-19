@@ -30,9 +30,12 @@ namespace gdjs {
      * Add a light obstacle to the list of existing obstacles.
      */
     addObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
-        obstacle
-      );
+      if (obstacle.currentBehaviorAABBHolder)
+        obstacle.currentBehaviorAABBHolder.updateAABBFromOwner();
+      else
+        obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
+          obstacle
+        );
       this._obstacleRBush.insert(obstacle.currentBehaviorAABBHolder);
     }
 
@@ -42,7 +45,6 @@ namespace gdjs {
      */
     removeObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
       this._obstacleRBush.remove(obstacle.currentBehaviorAABBHolder);
-      obstacle.currentBehaviorAABBHolder = null;
     }
 
     /**

@@ -9,15 +9,33 @@ import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
 import Text from '../../UI/Text';
 import BackgroundText from '../../UI/BackgroundText';
-import { Line } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
+
+const previewRenderingTypes = [
+  {
+    value: 'KEEP_SCENE_OBJECTS',
+    text:
+      'Inside the scene (the scene objects will be created as well - recommended)',
+  },
+  {
+    value: 'CLEAR_SCENE_OBJECTS',
+    text: 'Standalone (the scene objects will not be created)',
+  },
+];
+
+export type ExternalProperties = {|
+  layoutName: string,
+  previewRenderingType?: string,
+|};
 
 type Props = {|
   open: boolean,
-  onChoose: string => void,
+  onChoose: ExternalProperties => void,
   onClose: () => void,
   project: gdProject,
   title?: React.Node,
   helpText?: React.Node,
+  allowPreviewRenderingTypeSelection?: boolean,
 |};
 
 /**
@@ -30,9 +48,32 @@ export default function ExternalPropertiesDialog({
   project,
   title,
   helpText,
+  allowPreviewRenderingTypeSelection,
 }: Props) {
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
     ''
+  );
+  const [
+    selectedPreviewRenderingType,
+    setSelectedPreviewRenderingType,
+  ] = React.useState<string>('');
+
+  const onClick = React.useCallback(
+    () => {
+      const externalProperties: ExternalProperties = {
+        layoutName: selectedLayoutName,
+      };
+      if (allowPreviewRenderingTypeSelection) {
+        externalProperties.previewRenderingType = selectedPreviewRenderingType;
+      }
+      onChoose(externalProperties);
+    },
+    [
+      onChoose,
+      selectedLayoutName,
+      selectedPreviewRenderingType,
+      allowPreviewRenderingTypeSelection,
+    ]
   );
 
   const actions = [
@@ -47,7 +88,7 @@ export default function ExternalPropertiesDialog({
       label={<Trans>Choose</Trans>}
       primary
       keyboardFocused
-      onClick={() => onChoose(selectedLayoutName)}
+      onClick={onClick}
       disabled={!selectedLayoutName}
     />,
   ];
@@ -65,29 +106,59 @@ export default function ExternalPropertiesDialog({
       cannotBeDismissed={false}
       maxWidth="sm"
     >
-      {helpText && (
+      <Column>
+        {helpText && (
+          <Line>
+            <BackgroundText>{helpText}</BackgroundText>
+          </Line>
+        )}
         <Line>
-          <BackgroundText>{helpText}</BackgroundText>
+          <Text>
+            <Trans>Choose the associated scene</Trans>
+          </Text>
         </Line>
+        <RadioGroup
+          aria-label="Associated scene"
+          name="associated-layout"
+          value={selectedLayoutName}
+          onChange={event => setSelectedLayoutName(event.target.value)}
+        >
+          {layoutNames.map(name => (
+            <FormControlLabel
+              key={name}
+              value={name}
+              control={<Radio color="primary" />}
+              label={name}
+            />
+          ))}
+        </RadioGroup>
+      </Column>
+      {allowPreviewRenderingTypeSelection && (
+        <Column>
+          <Line>
+            <Text>
+              <Trans>Choose the preview rendering type</Trans>
+            </Text>
+          </Line>
+          <RadioGroup
+            aria-label="Preview rendering type"
+            name="preview-rendering-type"
+            value={selectedPreviewRenderingType}
+            onChange={event =>
+              setSelectedPreviewRenderingType(event.target.value)
+            }
+          >
+            {previewRenderingTypes.map(type => (
+              <FormControlLabel
+                key={type.value}
+                value={type.value}
+                control={<Radio color="primary" />}
+                label={type.text}
+              />
+            ))}
+          </RadioGroup>
+        </Column>
       )}
-      <Text>
-        <Trans>Choose the associated scene</Trans>
-      </Text>
-      <RadioGroup
-        aria-label="Associated scene"
-        name="associated-layout"
-        value={selectedLayoutName}
-        onChange={event => setSelectedLayoutName(event.target.value)}
-      >
-        {layoutNames.map(name => (
-          <FormControlLabel
-            key={name}
-            value={name}
-            control={<Radio color="primary" />}
-            label={name}
-          />
-        ))}
-      </RadioGroup>
     </Dialog>
   );
 }

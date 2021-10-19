@@ -3022,6 +3022,7 @@ storiesOf('ExternalPropertiesDialog', module)
       onClose={action('on close')}
       open
       project={testProject.project}
+      allowPreviewRenderingTypeSelection
     />
   ));
 

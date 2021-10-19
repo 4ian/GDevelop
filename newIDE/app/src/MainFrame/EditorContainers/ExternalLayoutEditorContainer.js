@@ -13,7 +13,9 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import ExternalPropertiesDialog from './ExternalPropertiesDialog';
+import ExternalPropertiesDialog, {
+  type ExternalProperties,
+} from './ExternalPropertiesDialog';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
@@ -108,11 +110,14 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  setAssociatedLayout = (layoutName: string) => {
+  saveExternalProperties = (props: ExternalProperties) => {
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return;
 
-    externalLayout.setAssociatedLayout(layoutName);
+    externalLayout.setAssociatedLayout(props.layoutName);
+    if (props.previewRenderingType) {
+      externalLayout.setPreviewRenderingType(props.previewRenderingType);
+    }
     this.setState(
       {
         externalPropertiesDialogOpen: false,
@@ -201,8 +206,9 @@ export class ExternalLayoutEditorContainer extends React.Component<
           }
           open={this.state.externalPropertiesDialogOpen}
           project={project}
-          onChoose={this.setAssociatedLayout}
+          onChoose={this.saveExternalProperties}
           onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
+          allowPreviewRenderingTypeSelection
         />
       </div>
     );

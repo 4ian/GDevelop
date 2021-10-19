@@ -8,7 +8,9 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import ExternalPropertiesDialog from './ExternalPropertiesDialog';
+import ExternalPropertiesDialog, {
+  type ExternalProperties,
+} from './ExternalPropertiesDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
 
@@ -75,11 +77,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     return project.getLayout(layoutName);
   }
 
-  setAssociatedLayout = (layoutName: string) => {
+  saveExternalProperties = (props: ExternalProperties) => {
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return;
 
-    externalEvents.setAssociatedLayout(layoutName);
+    externalEvents.setAssociatedLayout(props.layoutName);
     this.setState(
       {
         externalPropertiesDialogOpen: false,
@@ -155,7 +157,7 @@ export class ExternalEventsEditorContainer extends React.Component<
           }
           open={this.state.externalPropertiesDialogOpen}
           project={project}
-          onChoose={this.setAssociatedLayout}
+          onChoose={this.saveExternalProperties}
           onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
         />
       </div>

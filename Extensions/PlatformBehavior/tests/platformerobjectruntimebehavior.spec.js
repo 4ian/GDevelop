@@ -1288,7 +1288,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       );
       // TODO The character is not right on the platform, but a bit higher
       //expect(object.getY()).to.be(jumpthru.getY() - object.getHeight());
-      expect(object.getY()).to.be.within(jumpthru.getY() - object.getHeight() - 1, jumpthru.getY() - object.getHeight());
+      expect(object.getY()).to.be.within(
+        jumpthru.getY() - object.getHeight() - 1,
+        jumpthru.getY() - object.getHeight()
+      );
     });
 
     it('can fall through the jumpthru from the left side', function () {
@@ -2855,9 +2858,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
           // Walk from the 1st platform to the 2nd one.
 
-        // TODO the character stops a bit at the junction.
-        //walkLeft(30);
-        walkRightCanStop(36);
+          // TODO the character stops a bit at the junction.
+          //walkLeft(30);
+          walkRightCanStop(36);
 
           expect(object.getX()).to.be.above(slope2.getX());
           // Gone upward following the 2nd platform.
@@ -3451,7 +3454,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be(wall.getX() - objectWidth);
       // TODO The character is not right on the platform, but a bit higher
       //expect(object.getY()).to.be(platform.getY() - objectHeight);
-      expect(object.getY()).to.be.within(platform.getY() - objectHeight - 1, platform.getY() - objectHeight);
+      expect(object.getY()).to.be.within(
+        platform.getY() - objectHeight - 1,
+        platform.getY() - objectHeight
+      );
     });
   });
 });

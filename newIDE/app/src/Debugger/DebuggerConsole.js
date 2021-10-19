@@ -11,7 +11,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Chip from '@material-ui/core/Chip';
 
-import { Line, Column, Spacer } from '../UI/Grid';
+import { Line, Column } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
 import MiniToolbar from '../UI/MiniToolbar';
 import IconButton from '../UI/IconButton';
@@ -183,8 +183,6 @@ export const DebuggerConsole = ({
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Spacer />
-        <Spacer />
         <div
           style={{
             width: '100%',
@@ -266,7 +264,12 @@ export const DebuggerConsole = ({
                                   icon={<TimerIcon />}
                                   label={
                                     <Trans>
-                                      Timestamp: {filteredLogs[index].timestamp}
+                                      Timestamp:{' '}
+                                      {Math.round(
+                                        filteredLogs[index].timestamp * 1000
+                                      ) /
+                                        1000000 +
+                                        's'}
                                     </Trans>
                                   }
                                 />
@@ -287,7 +290,11 @@ export const DebuggerConsole = ({
           <Line justifyContent="space-between" alignItems="center" noMargin>
             <Checkbox
               label={
-                maximized ? <Trans>Minimize</Trans> : <Trans>Maximize</Trans>
+                maximized ? (
+                  <Trans>Hide details</Trans>
+                ) : (
+                  <Trans>Show details</Trans>
+                )
               }
               checkedIcon={<MinimizeIcon />}
               uncheckedIcon={<ExpandIcon />}

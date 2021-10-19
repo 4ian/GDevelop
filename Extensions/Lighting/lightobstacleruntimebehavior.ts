@@ -8,9 +8,7 @@ namespace gdjs {
     maxY: number;
     behavior: T;
 
-    constructor(
-      behavior: T
-    ) {
+    constructor(behavior: T) {
       this.minX = behavior.owner.getAABB().min[0];
       this.minY = behavior.owner.getAABB().min[1];
       this.maxX = behavior.owner.getAABB().max[0];
@@ -98,7 +96,9 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    currentBehaviorHolder: BehaviorHolder<LightObstacleRuntimeBehavior> | null = null;
+    currentBehaviorHolder: BehaviorHolder<
+      LightObstacleRuntimeBehavior
+    > | null = null;
     _manager: any;
     _registeredInManager: boolean = false;
 

@@ -37,6 +37,10 @@ export type Log = {
   timestamp: number,
 };
 
+/**
+ * Store logs and groups that are received, batch the logs and allow to register callbacks called when a batch of log is received.
+ * This helps avoiding too much re-render on React side when a lot of logs are received.
+ */
 export class LogsManager {
   logs: Array<Log> = [];
   groups: Set<string> = new Set();
@@ -75,7 +79,7 @@ export class LogsManager {
   }
 }
 
-const Tag = ({ icon, label }: { icon: React$Node, label: React$Node }) => (
+const Tag = ({ icon, label }: {| icon: React.Node, label: React.Node |}) => (
   <Chip
     icon={icon}
     style={{ marginRight: 2 }}
@@ -90,7 +94,7 @@ const iconMap = {
   error: <ErrorIcon color="error" />,
 };
 
-const ConsoleText = ({ children }: { children: React$Node }) => (
+const ConsoleText = ({ children }: {| children: React.Node |}) => (
   <span
     style={{
       userSelect: 'text',

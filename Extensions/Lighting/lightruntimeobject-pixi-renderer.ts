@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Light object');
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -134,7 +135,7 @@ namespace gdjs {
 
     updateMesh(): void {
       if (!PIXI.utils.isWebGLSupported()) {
-        console.warn(
+        logger.warn(
           'This device does not support webgl, which is required for Lighting Extension.'
         );
         return;

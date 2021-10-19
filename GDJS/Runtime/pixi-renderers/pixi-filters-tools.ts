@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Filters');
   import PIXI = GlobalPIXIModule.PIXI;
 
   export namespace PixiFiltersTools {
@@ -61,7 +62,7 @@ namespace gdjs {
       filterCreator: FilterCreator
     ) {
       if (_filterCreators.hasOwnProperty(filterName)) {
-        console.warn(
+        logger.warn(
           'Filter "' +
             filterName +
             '" was already registered in gdjs.PixiFiltersTools. Replacing it with the new one.'

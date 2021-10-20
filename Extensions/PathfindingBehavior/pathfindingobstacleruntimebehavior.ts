@@ -41,16 +41,14 @@ namespace gdjs {
     addObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      if (pathfindingObstacleBehavior.currentBehaviorAABBHolder)
-        pathfindingObstacleBehavior.currentBehaviorAABBHolder.updateAABBFromOwner();
+      if (pathfindingObstacleBehavior.currentRBushAABB)
+        pathfindingObstacleBehavior.currentRBushAABB.updateAABBFromOwner();
       else
-        pathfindingObstacleBehavior.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
+        pathfindingObstacleBehavior.currentRBushAABB = new gdjs.BehaviorRBushAABB(
           pathfindingObstacleBehavior
         );
 
-      this._obstaclesRBush.insert(
-        pathfindingObstacleBehavior.currentBehaviorAABBHolder
-      );
+      this._obstaclesRBush.insert(pathfindingObstacleBehavior.currentRBushAABB);
     }
 
     /**
@@ -60,9 +58,7 @@ namespace gdjs {
     removeObstacle(
       pathfindingObstacleBehavior: PathfindingObstacleRuntimeBehavior
     ) {
-      this._obstaclesRBush.remove(
-        pathfindingObstacleBehavior.currentBehaviorAABBHolder
-      );
+      this._obstaclesRBush.remove(pathfindingObstacleBehavior.currentRBushAABB);
     }
 
     /**
@@ -74,7 +70,7 @@ namespace gdjs {
       x: float,
       y: float,
       radius: float,
-      result: gdjs.BehaviorAABBHolder<gdjs.PathfindingObstacleRuntimeBehavior>[]
+      result: gdjs.BehaviorRBushAABB<gdjs.PathfindingObstacleRuntimeBehavior>[]
     ): any {
       const searchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAround
@@ -106,7 +102,7 @@ namespace gdjs {
     _oldHeight: float = 0;
     _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
-    currentBehaviorAABBHolder: BehaviorAABBHolder<
+    currentRBushAABB: gdjs.BehaviorRBushAABB<
       PathfindingObstacleRuntimeBehavior
     > | null = null;
 

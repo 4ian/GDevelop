@@ -11,7 +11,7 @@ namespace gdjs {
    * (in which case the behavior is responsible for removing/adding
    * back/updating this BehaviorRBushAABB).
    */
-  export class BehaviorAABBHolder<T extends RuntimeBehavior> {
+  export class BehaviorRBushAABB<T extends RuntimeBehavior> {
     minX: float = 0;
     minY: float = 0;
     maxX: float = 0;

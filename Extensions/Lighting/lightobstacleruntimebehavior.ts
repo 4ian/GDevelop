@@ -30,13 +30,10 @@ namespace gdjs {
      * Add a light obstacle to the list of existing obstacles.
      */
     addObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      if (obstacle.currentBehaviorAABBHolder)
-        obstacle.currentBehaviorAABBHolder.updateAABBFromOwner();
-      else
-        obstacle.currentBehaviorAABBHolder = new gdjs.BehaviorAABBHolder(
-          obstacle
-        );
-      this._obstacleRBush.insert(obstacle.currentBehaviorAABBHolder);
+      if (obstacle.currentRBushAABB)
+        obstacle.currentRBushAABB.updateAABBFromOwner();
+      else obstacle.currentRBushAABB = new gdjs.BehaviorRBushAABB(obstacle);
+      this._obstacleRBush.insert(obstacle.currentRBushAABB);
     }
 
     /**
@@ -44,7 +41,7 @@ namespace gdjs {
      * added before.
      */
     removeObstacle(obstacle: gdjs.LightObstacleRuntimeBehavior) {
-      this._obstacleRBush.remove(obstacle.currentBehaviorAABBHolder);
+      this._obstacleRBush.remove(obstacle.currentRBushAABB);
     }
 
     /**
@@ -56,7 +53,7 @@ namespace gdjs {
     getAllObstaclesAround(
       object: gdjs.RuntimeObject,
       radius: number,
-      result: gdjs.BehaviorAABBHolder<gdjs.LightObstacleRuntimeBehavior>[]
+      result: gdjs.BehaviorRBushAABB<gdjs.LightObstacleRuntimeBehavior>[]
     ) {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -84,7 +81,7 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
-    currentBehaviorAABBHolder: gdjs.BehaviorAABBHolder<
+    currentRBushAABB: gdjs.BehaviorRBushAABB<
       LightObstacleRuntimeBehavior
     > | null = null;
     _manager: any;

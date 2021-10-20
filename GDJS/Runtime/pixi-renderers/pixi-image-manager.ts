@@ -4,10 +4,11 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('PIXI Image manager');
   import PIXI = GlobalPIXIModule.PIXI;
 
   const logFileLoadingError = (file: string, error: Error | undefined) => {
-    console.error(
+    logger.error(
       'Unable to load file ' + file + ' with error:',
       error ? error : '(unknown error)'
     );
@@ -88,7 +89,7 @@ namespace gdjs {
         if (texture.valid) {
           return texture;
         } else {
-          console.error(
+          logger.error(
             'Texture for ' +
               resourceName +
               ' is not valid anymore (or never was).'
@@ -107,13 +108,13 @@ namespace gdjs {
       );
 
       if (!resource) {
-        console.warn(
+        logger.warn(
           'Unable to find texture for resource "' + resourceName + '".'
         );
         return this._invalidTexture;
       }
 
-      console.log('Loading texture for resource "' + resourceName + '"...');
+      logger.log('Loading texture for resource "' + resourceName + '"...');
       const file = resource.file;
       const texture = PIXI.Texture.from(file).on('error', (error) => {
         logFileLoadingError(file, error);
@@ -145,14 +146,14 @@ namespace gdjs {
       );
 
       if (!resource) {
-        console.warn(
+        logger.warn(
           'Unable to find video texture for resource "' + resourceName + '".'
         );
         return this._invalidTexture;
       }
 
       const file = resource.file;
-      console.log(
+      logger.log(
         'Loading video texture for resource "' + resourceName + '"...'
       );
       const texture = PIXI.Texture.from(file).on('error', (error) => {

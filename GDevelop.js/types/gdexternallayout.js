@@ -5,6 +5,8 @@ declare class gdExternalLayout {
   getName(): string;
   setAssociatedLayout(name: string): void;
   getAssociatedLayout(): string;
+  setPreviewRenderingType(type: string): void;
+  getPreviewRenderingType(): string;
   getInitialInstances(): gdInitialInstancesContainer;
   getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;

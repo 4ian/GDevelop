@@ -5,6 +5,33 @@
  */
 namespace gdjs {
   /**
+   * Allow to store a behavior in a RBush (spatial data structure).
+   * Because this duplicates the AABB, this ensures the RBush AABB
+   * stays the same even if the underlying object is moved
+   * (in which case the behavior is responsible for removing/adding
+   * back/updating this BehaviorRBushAABB).
+   */
+  export class BehaviorRBushAABB<T extends RuntimeBehavior> {
+    minX: float = 0;
+    minY: float = 0;
+    maxX: float = 0;
+    maxY: float = 0;
+    behavior: T;
+
+    constructor(behavior: T) {
+      this.behavior = behavior;
+      this.updateAABBFromOwner();
+    }
+
+    updateAABBFromOwner() {
+      this.minX = this.behavior.owner.getAABB().min[0];
+      this.minY = this.behavior.owner.getAABB().min[1];
+      this.maxX = this.behavior.owner.getAABB().max[0];
+      this.maxY = this.behavior.owner.getAABB().max[1];
+    }
+  }
+
+  /**
    * RuntimeBehavior represents a behavior being used by a RuntimeObject.
    */
   export class RuntimeBehavior {

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 
 import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';

@@ -16,6 +16,7 @@ type Props = {|
   style?: {|
     display?: 'inline-block',
     marginRight?: number,
+    margin?: number,
   |},
 |};
 

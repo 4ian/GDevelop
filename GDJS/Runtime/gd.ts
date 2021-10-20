@@ -9,6 +9,8 @@
  * @namespace gdjs
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Engine runtime');
+
   /**
    * Contains functions used by events (this is a convention only, functions can actually
    * be anywhere).
@@ -334,7 +336,7 @@ namespace gdjs {
    * @private
    */
   export const registerGlobalCallbacks = function (): void {
-    console.warn(
+    logger.warn(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
   };
@@ -367,7 +369,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.objectsTypes.containsKey(name))
       return gdjs.objectsTypes.get(name);
 
-    console.warn('Object type "' + name + '" was not found.');
+    logger.warn('Object type "' + name + '" was not found.');
     return gdjs.objectsTypes.get(''); //Create a base empty runtime object.
   };
 
@@ -382,7 +384,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
       return gdjs.behaviorsTypes.get(name);
 
-    console.warn('Behavior type "' + name + '" was not found.');
+    logger.warn('Behavior type "' + name + '" was not found.');
     return gdjs.behaviorsTypes.get(''); //Create a base empty runtime behavior.
   };
 

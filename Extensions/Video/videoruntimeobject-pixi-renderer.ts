@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Video object PIXI renderer');
+
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -160,7 +162,7 @@ namespace gdjs {
           .then(() => {})
           .catch(() => {
             // Autoplay was prevented.
-            console.warn(
+            logger.warn(
               'The video did not start because: video is invalid or no interaction with the game has been captured before (this is blocked by the navigator: https://goo.gl/xX8pDD)'
             );
           });

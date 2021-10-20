@@ -2,16 +2,17 @@
 import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 
-import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import {
+  List,
+  CellMeasurer,
+  CellMeasurerCache,
+  AutoSizer,
+} from 'react-virtualized';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
-import MUIList from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import Chip from '@material-ui/core/Chip';
 
-import { Line, Column } from '../UI/Grid';
+import { Line, Column, Spacer } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
 import MiniToolbar from '../UI/MiniToolbar';
 import IconButton from '../UI/IconButton';
@@ -33,7 +34,7 @@ export type Log = {
   message: string,
   type: 'info' | 'warning' | 'error',
   group: string,
-  internal: boolean,
+  internal?: boolean,
   timestamp: number,
 };
 
@@ -79,32 +80,47 @@ export class LogsManager {
   }
 }
 
+const selectableTextStyle = {
+  userSelect: 'text',
+  cursor: 'text',
+  wordBreak: 'break-word',
+};
+
+const styles = {
+  list: {
+    // While in theory it should not happen, be sure there is never a horizontal scrollbar:
+    overflowX: 'hidden',
+    // Always show the vertical scrollbar to avoid rendering issues:
+    overflowY: 'scroll',
+  },
+  tag: { marginRight: 2 },
+  consoleTextArea: {
+    ...selectableTextStyle,
+    width: '100%',
+    backgroundColor: '#292929',
+    borderRadius: '4px',
+    border: '1px solid slategray',
+    color: 'white',
+    fontFamily: "'Courier New', monospace",
+    fontSize: 11,
+    padding: 3,
+  },
+};
+
 const Tag = ({ icon, label }: {| icon: React.Node, label: React.Node |}) => (
   <Chip
     icon={icon}
-    style={{ marginRight: 2 }}
+    style={styles.tag}
     size="small"
-    label={<ConsoleText>{label}</ConsoleText>}
+    label={<span style={selectableTextStyle}>{label}</span>}
   />
 );
 
 const iconMap = {
-  info: <InfoIcon color="primary" />,
-  warning: <WarningIcon color="secondary" />,
-  error: <ErrorIcon color="error" />,
+  info: <InfoIcon color="primary" fontSize="small" />,
+  warning: <WarningIcon color="secondary" fontSize="small" />,
+  error: <ErrorIcon color="error" fontSize="small" />,
 };
-
-const ConsoleText = ({ children }: {| children: React.Node |}) => (
-  <span
-    style={{
-      userSelect: 'text',
-      cursor: 'text',
-      wordBreak: 'break-word',
-    }}
-  >
-    {children}
-  </span>
-);
 
 export const DebuggerConsole = ({
   logsManager,
@@ -114,7 +130,6 @@ export const DebuggerConsole = ({
   const forceUpdate = useForceUpdate();
 
   const { logs, groups } = logsManager;
-  const virtualListRef = React.useRef<null | List>(null);
   React.useEffect(
     () => {
       // Rerender when the logs are updated
@@ -126,11 +141,11 @@ export const DebuggerConsole = ({
         logsManager.off('log', onUpdate);
       };
     },
-    [forceUpdate, logsManager, virtualListRef]
+    [forceUpdate, logsManager]
   );
 
-  const [sizeMeasurer, setSizeMeasurer] = React.useState(null);
-  const cache = React.useMemo(
+  const cachedHeightsForWidth = React.useRef(0);
+  const cellMeasurerCache = React.useMemo(
     () =>
       new CellMeasurerCache({
         defaultHeight: 45,
@@ -144,19 +159,12 @@ export const DebuggerConsole = ({
     [logs]
   );
 
-  // If tabs are switched, the element is not visible and its height is 0 when rendered again.
-  // If this is the case, trigger a rerender after rendering has finished (thanks to useEffect).
-  const rerenderNeeded = sizeMeasurer && sizeMeasurer.offsetHeight === 0;
-  React.useEffect(() => {
-    if (rerenderNeeded) forceUpdate();
-  });
-
   const [hideInternal, setHideInternal] = React.useState(false);
-  const [maximized, _setMaximized] = React.useState(true);
-  const setMaximized = (show: boolean) => {
-    _setMaximized(show);
+  const [showDetails, _setShowDetails] = React.useState(true);
+  const setShowDetails = (show: boolean) => {
+    _setShowDetails(show);
     // As the size of the cells have changed, clear the measurer cache to allow remeasuring them.
-    cache.clearAll();
+    cellMeasurerCache.clearAll();
   };
 
   const [editingHiddenGroups, setEditingHiddenGroups] = React.useState(false);
@@ -181,73 +189,59 @@ export const DebuggerConsole = ({
     .filter(({ group }) => !hiddenGroups.has(group));
 
   return (
-    <>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          ref={setSizeMeasurer}
-        >
-          {sizeMeasurer && (
-            <MUIList dense={true} style={{ padding: 0 }}>
+    <Column noMargin noOverflowParent expand>
+      <Line noMargin expand>
+        <AutoSizer>
+          {({ width, height }) => {
+            if (!width || !height) return null;
+
+            // Reset the cached heights in case the width changed.
+            if (cachedHeightsForWidth.current !== width) {
+              cellMeasurerCache.clearAll();
+              cachedHeightsForWidth.current = width;
+            }
+
+            return (
               <List
-                ref={virtualListRef}
-                autoContainerWidth
-                deferredMeasurementCache={cache}
-                height={sizeMeasurer.offsetHeight}
-                width={sizeMeasurer.offsetWidth}
+                deferredMeasurementCache={cellMeasurerCache}
+                height={height}
+                width={width}
+                style={styles.list}
                 rowCount={filteredLogs.length}
-                rowHeight={cache.rowHeight}
+                rowHeight={cellMeasurerCache.rowHeight}
                 rowRenderer={({ index, key, parent, style }) => (
                   <CellMeasurer
-                    cache={cache}
+                    cache={cellMeasurerCache}
                     columnIndex={0}
                     key={key}
                     parent={parent}
                     rowIndex={index}
                   >
                     {({ registerChild }) => (
-                      <ListItem
-                        dense
+                      <div
                         key={key}
-                        style={Object.assign(
-                          { paddingBottom: 0, paddingTop: 6 },
-                          style
-                        )}
+                        style={{
+                          ...style,
+                          padding: 2,
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                        }}
                         ref={registerChild}
                       >
-                        <ListItemIcon
-                          style={{
-                            alignSelf: 'flex-start',
-                            marginTop: 5,
-                            minWidth: 40,
-                          }}
-                        >
+                        <Column noMargin>
                           {iconMap[filteredLogs[index].type] || iconMap['info']}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <div
-                              style={{
-                                backgroundColor: '#292929',
-                                borderRadius: '4px',
-                                border: '1px solid slategray',
-                                color: 'white',
-                                fontFamily: "'Courier New', monospace",
-                                padding: 5,
-                                marginBottom: 4,
-                              }}
-                            >
-                              <ConsoleText>
-                                {filteredLogs[index].message}
-                              </ConsoleText>
+                        </Column>
+                        <Spacer />
+                        <Column noMargin expand>
+                          <Line noMargin>
+                            <div style={styles.consoleTextArea}>
+                              {filteredLogs[index].message}
                             </div>
-                          }
-                          secondary={
-                            maximized && (
-                              <>
+                          </Line>
+                          {showDetails && (
+                            <>
+                              <Spacer />
+                              <Line noMargin>
                                 {filteredLogs[index].group ? (
                                   <Tag
                                     icon={<FolderIcon />}
@@ -257,9 +251,7 @@ export const DebuggerConsole = ({
                                       </Trans>
                                     }
                                   />
-                                ) : (
-                                  undefined
-                                )}
+                                ) : null}
                                 <Tag
                                   icon={<TimerIcon />}
                                   label={
@@ -273,51 +265,51 @@ export const DebuggerConsole = ({
                                     </Trans>
                                   }
                                 />
-                              </>
-                            )
-                          }
-                          style={{ margin: 0 }}
-                        />
-                      </ListItem>
+                              </Line>
+                            </>
+                          )}
+                        </Column>
+                      </div>
                     )}
                   </CellMeasurer>
                 )}
               />
-            </MUIList>
-          )}
-        </div>
-        <MiniToolbar>
-          <Line justifyContent="space-between" alignItems="center" noMargin>
-            <Checkbox
-              label={
-                maximized ? (
-                  <Trans>Hide details</Trans>
-                ) : (
-                  <Trans>Show details</Trans>
-                )
-              }
-              checkedIcon={<MinimizeIcon />}
-              uncheckedIcon={<ExpandIcon />}
-              checked={maximized}
-              onCheck={(_, enabled) => setMaximized(enabled)}
-            />
-            <Checkbox
-              label={<Trans>Show internal</Trans>}
-              checkedIcon={<VisibilityIcon />}
-              uncheckedIcon={<VisibilityOffIcon />}
-              checked={!hideInternal}
-              onCheck={(_, value) => setHideInternal(!value)}
-            />
-            <IconButton
-              tooltip={t`Filter the logs by group`}
-              onClick={() => setEditingHiddenGroups(true)}
-              edge="start"
-            >
-              <FilterIcon />
-            </IconButton>
-          </Line>
-        </MiniToolbar>
-      </div>
+            );
+          }}
+        </AutoSizer>
+      </Line>
+      <MiniToolbar>
+        <Line justifyContent="space-between" alignItems="center" noMargin>
+          <Checkbox
+            label={
+              showDetails ? (
+                <Trans>Hide details</Trans>
+              ) : (
+                <Trans>Show details</Trans>
+              )
+            }
+            checkedIcon={<MinimizeIcon />}
+            uncheckedIcon={<ExpandIcon />}
+            checked={showDetails}
+            onCheck={(_, enabled) => setShowDetails(enabled)}
+          />
+          <Checkbox
+            label={<Trans>Show internal</Trans>}
+            checkedIcon={<VisibilityIcon />}
+            uncheckedIcon={<VisibilityOffIcon />}
+            checked={!hideInternal}
+            onCheck={(_, value) => setHideInternal(!value)}
+          />
+          <IconButton
+            tooltip={t`Filter the logs by group`}
+            onClick={() => setEditingHiddenGroups(true)}
+            edge="start"
+            size="small"
+          >
+            <FilterIcon />
+          </IconButton>
+        </Line>
+      </MiniToolbar>
 
       {editingHiddenGroups && (
         <Dialog
@@ -356,6 +348,6 @@ export const DebuggerConsole = ({
           </Column>
         </Dialog>
       )}
-    </>
+    </Column>
   );
 };

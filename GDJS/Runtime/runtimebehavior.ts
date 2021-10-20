@@ -5,8 +5,8 @@
  */
 namespace gdjs {
   /**
-   * BehaviorAABBHolder is used to store a behavior's AABB for spatial manipulations
-   * (in rbush for instance).
+   * Allow to store a behavior in a RBush (spatial data structure). 
+   * Because this duplicates the AABB, this ensures the RBush AABB stays the same even if the underlying object is moved (in which case the behavior is responsible for removing/adding back/updating this BehaviorRBushAABB).
    */
   export class BehaviorAABBHolder<T extends RuntimeBehavior> {
     minX: float = 0;

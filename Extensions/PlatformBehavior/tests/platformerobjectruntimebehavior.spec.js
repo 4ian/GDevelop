@@ -348,8 +348,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
   [
     // less than 1 pixel per frame (50/60)
-    // TODO The character can't land when falling less than 1 pixel per frame.
-    //50,
+    50,
     // a commonly used value
     1500,
   ].forEach((maxFallingSpeed) => {
@@ -393,8 +392,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         platform.setPosition(0, -10);
       });
 
-      // TODO The character falls one frame then land instead of staying on the platform.
-      it.skip('must not move when on the floor at startup', function () {
+      it('must not move when on the floor at startup', function () {
         object.setPosition(0, platform.getY() - object.getHeight());
 
         for (let i = 0; i < 10; ++i) {
@@ -643,7 +641,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('(jump and jump sustain, round coordinates on)', function () {
+  describe('(jump and jump sustain)', function () {
     let runtimeScene;
     let object;
     let platform;
@@ -669,7 +667,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],
@@ -724,13 +721,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           false
         );
       }
-      // The jump finishes one frame before going back to the floor
-      // because the gravity is not applied on the first step.
-      runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getBehavior('auto1').isJumping()).to.be(false);
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
-      expect(object.getY()).to.be(-31);
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
@@ -1107,7 +1097,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1286,12 +1275,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
         false
       );
-      // TODO The character is not right on the platform, but a bit higher
-      //expect(object.getY()).to.be(jumpthru.getY() - object.getHeight());
-      expect(object.getY()).to.be.within(
-        jumpthru.getY() - object.getHeight() - 1,
-        jumpthru.getY() - object.getHeight()
-      );
+      expect(object.getY()).to.be(jumpthru.getY() - object.getHeight());
     });
 
     it('can fall through the jumpthru from the left side', function () {
@@ -1316,7 +1300,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('(rounded coordinates, moving platforms)', function () {
+  describe('(moving platforms)', function () {
     let runtimeScene;
     let object;
     let platform;
@@ -1337,7 +1321,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'auto1',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: maxFallingSpeed,
             acceleration: 500,
@@ -1435,7 +1418,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     // This test doesn't pass because there is no collision test.
     // As long as the platform is in the result of the spacial search
     // for nearby platforms the object will follow it.
-    it.skip('must not follow a platform that is moved over its top', function () {
+    it('must not follow a platform that is moved over its top', function () {
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
       }
@@ -1456,7 +1439,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Check that the object falls
       expect(object.getBehavior('auto1').isOnFloor()).to.be(false);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isMoving()).to.be(true);
       expect(object.getY()).to.be.above(-30);
     });
 
@@ -1532,7 +1514,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
     });
 
-    // The following tests doesn't pass because the object sometimes round inside the moving platform and can't move right and left.
     [-10, -10.1, -9.9].forEach((platformY) => {
       [
         -maxDeltaY + epsilon,
@@ -1544,7 +1525,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         0,
       ].forEach((deltaY) => {
         [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
-          it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+          it(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
             platform.setPosition(platform.getX(), platformY);
             for (let i = 0; i < 10; ++i) {
               runtimeScene.renderAndStep(1000 / 60);
@@ -1607,7 +1588,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             {
               type: 'PlatformBehavior::PlatformerObjectBehavior',
               name: 'auto1',
-              roundCoordinates: false,
               gravity: 900,
               maxFallingSpeed: maxFallingSpeed,
               acceleration: 500,
@@ -1668,10 +1648,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
       });
 
-      // The following tests doesn't pass
-      // because the object sometimes round inside the moving platform
-      // so it can't move right and left
-      // or there is a gap between the moving platform and the object.
       [-10, -10.1, -9.9].forEach((platformY) => {
         [
           -maxDeltaY + epsilon,
@@ -1683,7 +1659,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           0,
         ].forEach((deltaY) => {
           [-maxDeltaX, maxDeltaX, 0].forEach((deltaX) => {
-            it.skip(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
+            it(`follows the platform moving (${deltaX}; ${deltaY}) with initial Y = ${platformY}`, function () {
               platform.setPosition(platform.getX(), platformY);
               for (let i = 0; i < 10; ++i) {
                 runtimeScene.renderAndStep(1000 / 60);
@@ -1741,7 +1717,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1771,7 +1746,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           {
             type: 'PlatformBehavior::PlatformerObjectBehavior',
             name: 'PlatformerObject',
-            roundCoordinates: true,
             gravity: 900,
             maxFallingSpeed: 1500,
             acceleration: 500,
@@ -1910,7 +1884,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],
@@ -2171,11 +2144,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
       }
-      // Falling 1 frame
-      object.getBehavior('auto1').simulateRightKey();
-      runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
       // and directly on the floor
       object.getBehavior('auto1').simulateRightKey();
       runtimeScene.renderAndStep(1000 / 60);
@@ -2302,7 +2270,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               ignoreDefaultControls: true,
               slopeMaxAngle: slopeMaxAngle,
               jumpSustainTime: 0.2,
-              roundCoordinates: true,
             },
           ],
           effects: [],
@@ -2573,7 +2540,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
-            roundCoordinates: true,
           },
         ],
         effects: [],
@@ -2618,18 +2584,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(behavior.isOnFloor()).to.be(true);
         expect(object.getX()).to.not.be.below(lastX);
-      }
-    };
-
-    const walkLeftCanStop = (frameCount) => {
-      const behavior = object.getBehavior('auto1');
-      for (let i = 0; i < frameCount; ++i) {
-        const lastX = object.getX();
-        const lastSpeed = behavior.getCurrentSpeed();
-        behavior.simulateLeftKey();
-        runtimeScene.renderAndStep(1000 / 60);
-        expect(behavior.isOnFloor()).to.be(true);
-        expect(object.getX()).to.not.be.above(lastX);
       }
     };
 
@@ -2701,7 +2655,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
 
     [26, 45].forEach((slopeAngle) => {
-      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going right`, function () {
+      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going left`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);
@@ -2722,20 +2676,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(10);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
-        // See https://github.com/4ian/GDevelop/issues/3013.
-        if (slopeAngle === 45) {
-          walkRightCanStop(40);
-        } else {
-          walkRight(30);
-        }
+        walkRight(30);
         expect(object.getX()).to.be.above(slope.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(platform.getY() - object.getHeight());
       });
 
       // This is a mirror of the previous test.
-      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going left`, function () {
+      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going right`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);
@@ -2756,22 +2704,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(10);
 
         // Walk from the 1st platform to the 2nd one.
-
-        // TODO: replace by walkRight(30) when the object no longer loss its velocity at the junction.
-        // See https://github.com/4ian/GDevelop/issues/3013.
-        if (slopeAngle === 45) {
-          walkLeftCanStop(40);
-        } else {
-          walkLeft(30);
-        }
-
+        walkLeft(30);
         expect(object.getX()).to.be.below(platform.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be.below(platform.getY() - object.getHeight());
       });
 
-      // TODO It fells during 1 frame.
-      it.skip(`can go uphill from a ${slopeAngle}° slope to a 0° slope`, function () {
+      it(`can go uphill from a ${slopeAngle}° slope to a 0° slope`, function () {
         // Put a platform.
         const slope = addUpSlopePlatformObject(runtimeScene);
         slope.setCustomWidthAndHeight(
@@ -2789,15 +2728,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(12);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO It fells during 1 frame.
         walkRight(30);
         expect(object.getX()).to.be.above(platform.getX());
         // Gone upward following the 2nd platform.
         expect(object.getY()).to.be(platform.getY() - object.getHeight());
       });
 
-      // TODO It fells during 1 frame.
-      it.skip(`can go uphill from a ${slopeAngle}° slope to a 0° jump through platform`, function () {
+      it(`can go uphill from a ${slopeAngle}° slope to a 0° jump through platform`, function () {
         // Put a platform.
         const slope = addUpSlopePlatformObject(runtimeScene);
         slope.setCustomWidthAndHeight(
@@ -2818,7 +2755,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         fallOnPlatform(12);
 
         // Walk from the 1st platform to the 2nd one.
-        // TODO It fells during 1 frame.
         walkRight(30);
         expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
         // Gone upward following the 2nd platform.
@@ -2857,11 +2793,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           fallOnPlatform(12);
 
           // Walk from the 1st platform to the 2nd one.
-
-          // TODO the character stops a bit at the junction.
-          //walkLeft(30);
-          walkRightCanStop(36);
-
+          walkRight(30);
           expect(object.getX()).to.be.above(slope2.getX());
           // Gone upward following the 2nd platform.
           expect(object.getY()).to.be.below(slope1.getY() - object.getHeight());
@@ -3153,8 +3085,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         : // slopeMaxAngle === 25
           [{ angle: 26, height: 25 }]
       ).forEach((slopesDimension) => {
-        // TODO It climbs the first pixel of the slope.
-        it.skip(`can't go uphill on a too steep slope (${slopesDimension.angle}°)`, function () {
+        it(`can't go uphill on a too steep slope (${slopesDimension.angle}°)`, function () {
           // Put a platform.
           const slope = addUpSlopePlatformObject(runtimeScene);
           slope.setCustomWidthAndHeight(50, slopesDimension.height);
@@ -3208,11 +3139,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               behavior.isOnFloor() || behavior.isFallingWithoutJumping()
             ).to.be(true);
             expect(object.getX()).to.be.above(lastX);
-
-            // TODO The object Y doesn't change every frame because it moves pixel by pixel.
-            //expect(object.getY()).to.be.above(lastY);
-            expect(object.getY()).not.to.be.below(lastY);
-
+            expect(object.getY()).to.be.above(lastY);
             // Check that the object doesn't stop
             expect(behavior.getCurrentSpeed()).to.be.above(lastSpeed);
           }
@@ -3237,8 +3164,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           // A rotated platform will probably result to not pixel aligned junctions.
           48.9,
         ].forEach((slopeJunctionX) => {
-          // TODO It climbs the first pixel of the slope.
-          it.skip(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going right`, function () {
+          it(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going right`, function () {
             // Put a platform.
             const platform = addPlatformObject(runtimeScene);
             platform.setCustomWidthAndHeight(slopeJunctionX, 50);
@@ -3287,8 +3213,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           // A rotated platform will probably result to not pixel aligned junctions.
           51.1,
         ].forEach((slopeJunctionX) => {
-          // TODO It climbs the first pixel of the slope.
-          it.skip(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going left`, function () {
+          it(`(slopeJunctionX: ${slopeJunctionX}) can't go uphill from a 0° slope to a too steep slope (${slopesDimension.angle}°) going left`, function () {
             // Put a platform.
             const platform = addPlatformObject(runtimeScene);
             platform.setCustomWidthAndHeight(100 - slopeJunctionX, 50);
@@ -3440,9 +3365,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
       fallOnPlatform(10);
-      // TODO The character is not right on the platform, but a bit higher
-      //expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
-      expect(object.getY()).to.be.within(-31, 30);
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
       // walk right
       for (let i = 0; i < 25; ++i) {
@@ -3452,12 +3375,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       }
       // is blocked by the wall
       expect(object.getX()).to.be(wall.getX() - objectWidth);
-      // TODO The character is not right on the platform, but a bit higher
-      //expect(object.getY()).to.be(platform.getY() - objectHeight);
-      expect(object.getY()).to.be.within(
-        platform.getY() - objectHeight - 1,
-        platform.getY() - objectHeight
-      );
+      expect(object.getY()).to.be(platform.getY() - objectHeight);
     });
   });
 });

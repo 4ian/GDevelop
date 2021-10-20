@@ -44,5 +44,6 @@
       "<rootDir>/emsdk/",
       "<rootDir>/node_modules/"
     ]
-  }
+  },
+  "dependencies": {}
 }

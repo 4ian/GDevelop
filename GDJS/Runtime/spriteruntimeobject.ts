@@ -563,7 +563,7 @@ namespace gdjs {
         return super.updateHitBoxes();
       }
 
-      //console.log("Update for "+this.name); //Uncomment to track updates
+      //logger.log("Update for "+this.name); //Uncomment to track updates
       //(and in particular be sure that unnecessary update are avoided).
 
       //Update the current hitboxes with the frame custom hit boxes

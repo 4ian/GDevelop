@@ -121,11 +121,11 @@ export class ExternalLayoutEditorContainer extends React.Component<
     return layoutName;
   }
 
-  saveExternalProperties = (props: ExternalProperties) => {
+  saveExternalProperties = (externalProps: ExternalProperties) => {
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return;
 
-    externalLayout.setAssociatedLayout(props.layoutName);
+    externalLayout.setAssociatedLayout(externalProps.layoutName);
     this.setState(
       {
         externalPropertiesDialogOpen: false,
@@ -208,9 +208,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
           title={<Trans>Configure the external layout</Trans>}
           helpTexts={[
             <Trans>
-              Remember! In order to see your objects in the scene, you need to
-              add an action "Create objects from external layout" in your events
-              sheet.
+              In order to see your objects in the scene, you need to add an
+              action "Create objects from external layout" in your events sheet.
             </Trans>,
             <Trans>
               You can also launch a preview from this external layout, but

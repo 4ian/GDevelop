@@ -88,11 +88,11 @@ export class ExternalEventsEditorContainer extends React.Component<
     return layoutName;
   }
 
-  saveExternalProperties = (props: ExternalProperties) => {
+  saveExternalProperties = (externalProps: ExternalProperties) => {
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return;
 
-    externalEvents.setAssociatedLayout(props.layoutName);
+    externalEvents.setAssociatedLayout(externalProps.layoutName);
     this.setState(
       {
         externalPropertiesDialogOpen: false,
@@ -162,8 +162,8 @@ export class ExternalEventsEditorContainer extends React.Component<
           title={<Trans>Configure the external events</Trans>}
           helpTexts={[
             <Trans>
-              Remember! In order to use these external events, you still need to
-              add a "Link" event in the events sheet of the corresponding scene
+              In order to use these external events, you still need to add a
+              "Link" event in the events sheet of the corresponding scene
             </Trans>,
           ]}
           open={this.state.externalPropertiesDialogOpen}

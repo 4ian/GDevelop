@@ -9,11 +9,16 @@ import Dialog from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
 import Text from '../../UI/Text';
 import BackgroundText from '../../UI/BackgroundText';
-import { Line } from '../../UI/Grid';
+import { Line, Column } from '../../UI/Grid';
+
+export type ExternalProperties = {|
+  layoutName: string,
+|};
 
 type Props = {|
   open: boolean,
-  onChoose: string => void,
+  onChoose: ExternalProperties => void,
+  layoutName?: ?string,
   onClose: () => void,
   project: gdProject,
   title?: React.Node,
@@ -26,13 +31,24 @@ type Props = {|
 export default function ExternalPropertiesDialog({
   open,
   onChoose,
+  layoutName,
   onClose,
   project,
   title,
   helpText,
 }: Props) {
+  const initialLayoutName = layoutName || '';
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
-    ''
+    initialLayoutName
+  );
+  const onClick = React.useCallback(
+    () => {
+      const externalProperties: ExternalProperties = {
+        layoutName: selectedLayoutName,
+      };
+      onChoose(externalProperties);
+    },
+    [onChoose, selectedLayoutName]
   );
 
   const actions = [
@@ -47,7 +63,7 @@ export default function ExternalPropertiesDialog({
       label={<Trans>Choose</Trans>}
       primary
       keyboardFocused
-      onClick={() => onChoose(selectedLayoutName)}
+      onClick={onClick}
       disabled={!selectedLayoutName}
     />,
   ];
@@ -65,29 +81,34 @@ export default function ExternalPropertiesDialog({
       cannotBeDismissed={false}
       maxWidth="sm"
     >
-      {helpText && (
+      <Column>
+        {helpText && (
+          <Line>
+            <BackgroundText>{helpText}</BackgroundText>
+          </Line>
+        )}
         <Line>
-          <BackgroundText>{helpText}</BackgroundText>
+          <Text>
+            <Trans>Choose the associated scene</Trans>
+          </Text>
         </Line>
+        <RadioGroup
+          aria-label="Associated scene"
+          name="associated-layout"
+          value={selectedLayoutName}
+          onChange={event => setSelectedLayoutName(event.target.value)}
+        >
+          {layoutNames.map(name => (
+            <FormControlLabel
+              key={name}
+              value={name}
+              control={<Radio color="primary" />}
+              label={name}
+            />
+          ))}
+        </RadioGroup>
+      </Column>
       )}
-      <Text>
-        <Trans>Choose the associated scene</Trans>
-      </Text>
-      <RadioGroup
-        aria-label="Associated scene"
-        name="associated-layout"
-        value={selectedLayoutName}
-        onChange={event => setSelectedLayoutName(event.target.value)}
-      >
-        {layoutNames.map(name => (
-          <FormControlLabel
-            key={name}
-            value={name}
-            control={<Radio color="primary" />}
-            label={name}
-          />
-        ))}
-      </RadioGroup>
     </Dialog>
   );
 }

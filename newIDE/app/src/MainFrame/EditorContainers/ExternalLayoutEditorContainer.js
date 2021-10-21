@@ -13,7 +13,9 @@ import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import ExternalPropertiesDialog from './ExternalPropertiesDialog';
+import ExternalPropertiesDialog, {
+  type ExternalProperties,
+} from './ExternalPropertiesDialog';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import { prepareInstancesEditorSettings } from '../../InstancesEditor/InstancesEditorSettings';
@@ -98,6 +100,16 @@ export class ExternalLayoutEditorContainer extends React.Component<
     const { project } = this.props;
     if (!project) return null;
 
+    const layoutName = this.getAssociatedLayoutName();
+    if (!layoutName) return;
+
+    return project.getLayout(layoutName);
+  }
+
+  getAssociatedLayoutName(): ?string {
+    const { project } = this.props;
+    if (!project) return null;
+
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return null;
 
@@ -105,14 +117,15 @@ export class ExternalLayoutEditorContainer extends React.Component<
     if (!project.hasLayoutNamed(layoutName)) {
       return null;
     }
-    return project.getLayout(layoutName);
+
+    return layoutName;
   }
 
-  setAssociatedLayout = (layoutName: string) => {
+  saveExternalProperties = (props: ExternalProperties) => {
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return;
 
-    externalLayout.setAssociatedLayout(layoutName);
+    externalLayout.setAssociatedLayout(props.layoutName);
     this.setState(
       {
         externalPropertiesDialogOpen: false,
@@ -201,7 +214,8 @@ export class ExternalLayoutEditorContainer extends React.Component<
           }
           open={this.state.externalPropertiesDialogOpen}
           project={project}
-          onChoose={this.setAssociatedLayout}
+          layoutName={this.getAssociatedLayoutName()}
+          onChoose={this.saveExternalProperties}
           onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
         />
       </div>

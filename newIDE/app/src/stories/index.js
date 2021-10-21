@@ -3014,15 +3014,6 @@ storiesOf('ExternalPropertiesDialog', module)
       project={testProject.project}
       helpText="This is a help text, remember to read it."
     />
-  ))
-  .add('with rendering selection', () => (
-    <ExternalPropertiesDialog
-      title="Configure the properties"
-      onChoose={action('on choose')}
-      onClose={action('on close')}
-      open
-      project={testProject.project}
-    />
   ));
 
 storiesOf('EventsTree', module)

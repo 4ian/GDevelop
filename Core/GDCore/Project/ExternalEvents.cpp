@@ -1,5 +1,5 @@
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Project/ExternalEvents.h"
+
 #include "ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Serialization.h"
@@ -48,4 +48,3 @@ void ExternalEvents::UnserializeFrom(gd::Project& project,
 }
 
 }  // namespace gd
-#endif

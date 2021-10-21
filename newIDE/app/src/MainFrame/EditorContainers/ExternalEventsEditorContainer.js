@@ -159,7 +159,7 @@ export class ExternalEventsEditorContainer extends React.Component<
           </PlaceholderMessage>
         )}
         <ExternalPropertiesDialog
-          title={<Trans>Configure the external editor</Trans>}
+          title={<Trans>Configure the external events</Trans>}
           helpTexts={[
             <Trans>
               Remember! In order to use these external events, you still need to

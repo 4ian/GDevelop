@@ -57,7 +57,7 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
-import LayoutChooserDialog from '../MainFrame/EditorContainers/LayoutChooserDialog';
+import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
@@ -2994,10 +2994,26 @@ storiesOf('OpenConfirmDialog', module)
     />
   ));
 
-storiesOf('LayoutChooserDialog', module)
+storiesOf('ExternalPropertiesDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LayoutChooserDialog open project={testProject.project} />
+  .add('with layout selection', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+    />
+  ))
+  .add('with help', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+      helpText="This is a help text, remember to read it."
+    />
   ));
 
 storiesOf('EventsTree', module)

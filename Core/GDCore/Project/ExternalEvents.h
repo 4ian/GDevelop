@@ -3,12 +3,12 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EXTERNALEVENTS_H
 #define GDCORE_EXTERNALEVENTS_H
 #include <ctime>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/String.h"
 namespace gd {
@@ -135,4 +135,3 @@ struct ExternalEventsHasName
 }  // namespace gd
 
 #endif  // GDCORE_EXTERNALEVENTS_H
-#endif

@@ -25,9 +25,6 @@ type Props = {|
   helpTexts?: Array<React.Node>,
 |};
 
-/**
- * Update the title bar according to the project and the current theme.
- */
 export default function ExternalPropertiesDialog({
   open,
   onChoose,
@@ -90,7 +87,7 @@ export default function ExternalPropertiesDialog({
           ))}
         <Line>
           <Text>
-            <Trans>Choose the associated scene</Trans>
+            <Trans>Choose the associated scene:</Trans>
           </Text>
         </Line>
         <RadioGroup

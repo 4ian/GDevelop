@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Font manager');
+
   /**
    * FontFaceObserverFontManager loads fonts (using `FontFace` or `fontfaceobserver` library)
    * from the game resources (see `loadFonts`), and allow to access to
@@ -198,7 +200,7 @@ namespace gdjs {
             onFontLoaded(fontFamily, fontResources);
           },
           function (error) {
-            console.error(
+            logger.error(
               'Error loading font resource "' +
                 fontResources[0].name +
                 '" (file: ' +

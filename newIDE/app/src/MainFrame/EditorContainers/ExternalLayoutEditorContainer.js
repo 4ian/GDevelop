@@ -206,12 +206,19 @@ export class ExternalLayoutEditorContainer extends React.Component<
         )}
         <ExternalPropertiesDialog
           title={<Trans>Configure the external layout</Trans>}
-          helpText={
+          helpTexts={[
             <Trans>
-              Remember! You still need to add an action "Create objects from
-              external layout" in the scene to import the external layout
-            </Trans>
-          }
+              Remember! In order to see your objects in the scene, you need to
+              add an action "Create objects from external layout" in your events
+              sheet.
+            </Trans>,
+            <Trans>
+              You can also launch a preview from this external layout, but
+              remember that it will still create objects from the scene, as well
+              as trigger its events. Make sure to disable any action loading the
+              external layout before doing so to avoid having duplicate objects!
+            </Trans>,
+          ]}
           open={this.state.externalPropertiesDialogOpen}
           project={project}
           layoutName={this.getAssociatedLayoutName()}

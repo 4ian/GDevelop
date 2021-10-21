@@ -160,12 +160,12 @@ export class ExternalEventsEditorContainer extends React.Component<
         )}
         <ExternalPropertiesDialog
           title={<Trans>Configure the external editor</Trans>}
-          helpText={
+          helpTexts={[
             <Trans>
-              Remember! You still need to add a Link event in the scene to
-              import the external events
-            </Trans>
-          }
+              Remember! In order to use these external events, you still need to
+              add a "Link" event in the events sheet of the corresponding scene
+            </Trans>,
+          ]}
           open={this.state.externalPropertiesDialogOpen}
           project={project}
           onChoose={this.saveExternalProperties}

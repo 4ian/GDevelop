@@ -22,7 +22,7 @@ type Props = {|
   onClose: () => void,
   project: gdProject,
   title?: React.Node,
-  helpText?: React.Node,
+  helpTexts?: Array<React.Node>,
 |};
 
 /**
@@ -35,7 +35,7 @@ export default function ExternalPropertiesDialog({
   onClose,
   project,
   title,
-  helpText,
+  helpTexts,
 }: Props) {
   const initialLayoutName = layoutName || '';
   const [selectedLayoutName, setSelectedLayoutName] = React.useState<string>(
@@ -82,11 +82,12 @@ export default function ExternalPropertiesDialog({
       maxWidth="sm"
     >
       <Column>
-        {helpText && (
-          <Line>
-            <BackgroundText>{helpText}</BackgroundText>
-          </Line>
-        )}
+        {helpTexts &&
+          helpTexts.map(helpText => (
+            <Line>
+              <BackgroundText>{helpText}</BackgroundText>
+            </Line>
+          ))}
         <Line>
           <Text>
             <Trans>Choose the associated scene</Trans>
@@ -108,7 +109,6 @@ export default function ExternalPropertiesDialog({
           ))}
         </RadioGroup>
       </Column>
-      )}
     </Dialog>
   );
 }

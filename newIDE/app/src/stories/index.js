@@ -3005,14 +3005,17 @@ storiesOf('ExternalPropertiesDialog', module)
       project={testProject.project}
     />
   ))
-  .add('with help', () => (
+  .add('with help texts', () => (
     <ExternalPropertiesDialog
       title="Configure the properties"
       open
       onChoose={action('on choose')}
       onClose={action('on close')}
       project={testProject.project}
-      helpText="This is a help text, remember to read it."
+      helpTexts={[
+        'This is a help text, remember to read it.',
+        "And there's another one!",
+      ]}
     />
   ));
 

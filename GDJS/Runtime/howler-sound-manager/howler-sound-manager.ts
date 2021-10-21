@@ -5,12 +5,14 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Audio manager');
+
   const HowlParameters: HowlOptions = {
     preload: true,
     onplayerror: (_, error) =>
-      console.error("Can't play an audio file: ", error),
+      logger.error("Can't play an audio file: " + error),
     onloaderror: (_, error) =>
-      console.error('Error while loading an audio file: ', error),
+      logger.error('Error while loading an audio file: ' + error),
   };
 
   /**
@@ -682,9 +684,8 @@ namespace gdjs {
       let loadedCount: integer = 0;
       const onLoad = (_?: any, error?: string) => {
         if (error)
-          console.error(
-            'There was an error while loading an audio file:',
-            error
+          logger.warn(
+            'There was an error while preloading an audio file: ' + error
           );
 
         loadedCount++;

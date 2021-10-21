@@ -19,7 +19,7 @@ namespace gdjs {
 
     //Contains the objects data stored in the project
     _objectsCtor: Hashtable<typeof RuntimeObject>;
-    _layers: Hashtable<Layer>;
+    _layers: Map<string, Layer>;
     _initialBehaviorSharedData: Hashtable<BehaviorSharedData | null>;
     _renderer: RuntimeSceneRenderer;
     _variables: gdjs.VariablesContainer;
@@ -60,7 +60,7 @@ namespace gdjs {
       this._instancesCache = new Hashtable();
       this._objects = new Hashtable();
       this._objectsCtor = new Hashtable();
-      this._layers = new Hashtable();
+      this._layers = new Map<string, Layer>();
       this._initialBehaviorSharedData = new Hashtable();
       this._renderer = new gdjs.RuntimeSceneRenderer(
         this,
@@ -109,12 +109,8 @@ namespace gdjs {
      * See gdjs.RuntimeGame.startGameLoop in particular.
      */
     onGameResolutionResized() {
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          /** @type gdjs.Layer */
-          const theLayer: gdjs.Layer = this._layers.items[name];
-          theLayer.onGameResolutionResized();
-        }
+      for (const theLayer of this._layers.values()) {
+        theLayer.onGameResolutionResized();
       }
       this._renderer.onGameResolutionResized();
     }
@@ -333,7 +329,7 @@ namespace gdjs {
 
       // It should not be necessary to reset these variables, but this help
       // ensuring that all memory related to the RuntimeScene is released immediately.
-      this._layers = new Hashtable();
+      this._layers = new Map<string, Layer>();
       this._variables = new gdjs.VariablesContainer();
       this._initialBehaviorSharedData = new Hashtable();
       this._objects = new Hashtable();
@@ -559,21 +555,19 @@ namespace gdjs {
 
     _updateLayersCameraCoordinates(scale: float) {
       this._layersCameraCoordinates = this._layersCameraCoordinates || {};
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const theLayer = this._layers.items[name];
-          this._layersCameraCoordinates[name] = this._layersCameraCoordinates[
-            name
-          ] || [0, 0, 0, 0];
-          this._layersCameraCoordinates[name][0] =
-            theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][1] =
-            theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
-          this._layersCameraCoordinates[name][2] =
-            theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
-          this._layersCameraCoordinates[name][3] =
-            theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
-        }
+      for (const theLayer of this._layers.values()) {
+        const name = theLayer.getName();
+        this._layersCameraCoordinates[name] = this._layersCameraCoordinates[
+          name
+        ] || [0, 0, 0, 0];
+        this._layersCameraCoordinates[name][0] =
+          theLayer.getCameraX() - (theLayer.getCameraWidth() / 2) * scale;
+        this._layersCameraCoordinates[name][1] =
+          theLayer.getCameraY() - (theLayer.getCameraHeight() / 2) * scale;
+        this._layersCameraCoordinates[name][2] =
+          theLayer.getCameraX() + (theLayer.getCameraWidth() / 2) * scale;
+        this._layersCameraCoordinates[name][3] =
+          theLayer.getCameraY() + (theLayer.getCameraHeight() / 2) * scale;
       }
     }
 
@@ -581,11 +575,8 @@ namespace gdjs {
      * Called to update effects of layers before rendering.
      */
     _updateLayersPreRender() {
-      for (const name in this._layers.items) {
-        if (this._layers.items.hasOwnProperty(name)) {
-          const layer = this._layers.items[name];
-          layer.updatePreRender(this);
-        }
+      for (const layer of this._layers.values()) {
+        layer.updatePreRender(this);
       }
     }
 
@@ -965,10 +956,10 @@ namespace gdjs {
      * @returns The layer, or the base layer if not found
      */
     getLayer(name: string): gdjs.Layer {
-      if (this._layers.containsKey(name)) {
-        return this._layers.get(name);
+      if (this._layers.has(name)) {
+        return this._layers.get(name)!;
       }
-      return this._layers.get('');
+      return this._layers.get('')!;
     }
 
     /**
@@ -976,7 +967,7 @@ namespace gdjs {
      * @param name The name of the layer
      */
     hasLayer(name: string): boolean {
-      return this._layers.containsKey(name);
+      return this._layers.has(name);
     }
 
     /**
@@ -984,7 +975,7 @@ namespace gdjs {
      * @param layerData The data to construct the layer
      */
     addLayer(layerData: LayerData) {
-      this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+      this._layers.set(layerData.name, new gdjs.Layer(layerData, this));
     }
 
     /**
@@ -1000,7 +991,7 @@ namespace gdjs {
           runtimeObject.setLayer('');
         }
       }
-      this._layers.remove(layerName);
+      this._layers.delete(layerName);
     }
 
     /**
@@ -1010,7 +1001,7 @@ namespace gdjs {
      * @param index The new position in the list of layers
      */
     setLayerIndex(layerName: string, index: integer): void {
-      const layer: gdjs.Layer = this._layers.get(layerName);
+      const layer: gdjs.Layer | undefined = this._layers.get(layerName);
       if (!layer) {
         return;
       }
@@ -1020,9 +1011,29 @@ namespace gdjs {
     /**
      * Fill the array passed as argument with the names of all layers
      * @param result The array where to put the layer names
+     * @deprecated prefer using {@link gdjs.RuntimeScene.getAllLayerNamesIterable}
      */
     getAllLayerNames(result: string[]) {
-      this._layers.keys(result);
+      result.length = 0;
+      for (const name of this._layers.keys()) {
+        result.push(name);
+      }
+    }
+
+    /**
+     * Return the names of all layers.
+     * @return the names of all layers.
+     */
+    getAllLayerNamesIterable(): Iterable<string> {
+      return this._layers.keys();
+    }
+
+    /**
+     * Return all layers of the scene.
+     * @return all layers of the scene.
+     */
+    getAllLayers(): Iterable<Layer> {
+      return this._layers.values();
     }
 
     /**

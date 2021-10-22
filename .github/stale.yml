@@ -1,0 +1,21 @@
+# Number of days of inactivity before an Issue or Pull Request becomes stale
+daysUntilStale: 20
+
+# Number of days of inactivity before an Issue or Pull Request with the stale label is closed.
+# Set to false to disable. If disabled, issues still need to be closed manually, but will remain marked as stale.
+daysUntilClose: 7
+
+# Only issues or pull requests with all of these labels are check if stale. Defaults to `[]` (disabled)
+onlyLabels: ["Need a game/precise steps to reproduce the issue","💥crash"]
+
+# Label to use when marking as stale
+staleLabel: wontfix
+
+# Comment to post when marking as stale. Set to `false` to disable
+markComment: >
+  This issue has been automatically marked as stale because it has not had
+  recent activity. It will be closed in 7 days if no further activity occurs. Thank you
+  for your contributions.
+
+# Limit to only `issues` or `pulls`
+only: issues

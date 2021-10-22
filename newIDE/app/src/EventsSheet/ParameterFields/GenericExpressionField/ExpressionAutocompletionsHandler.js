@@ -105,7 +105,12 @@ export const handleAutocompletionsKeyDown = (
     return getAutocompletionsInitialState();
   } else if (shouldValidate(event) || shouldFocusNextField(event)) {
     const autocompletion = state.autocompletions[state.selectedCompletionIndex];
-    if (autocompletion) onInsertAutocompletion(autocompletion);
+    if (autocompletion) {
+      // Don't prevent the default behavior when an exact completion is shown,
+      // the user should be able to freely move to the next line.
+      if (autocompletion.isExact) return state;
+      onInsertAutocompletion(autocompletion);
+    }
 
     // Avoid entering a new line or tabbing to the next field.
     event.preventDefault();

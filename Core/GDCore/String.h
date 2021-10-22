@@ -439,13 +439,50 @@ public:
     String& replace( iterator i1, iterator i2, const String &str );
 
     /**
+     * \brief Replace the portion of the String between **i1** and **i2** (**i2** not
+     * included) by **n** consecutive copies of character **c**.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& replace( iterator i1, iterator i2, size_type n, const char c );
+
+    /**
      * \brief Replace the portion of the String between **pos** and **pos** + **len**
-     * (the character at **pos** + **len** is not included)
+     * (the character at **pos** + **len** is not included) with **str**.
      * \return *this
      *
      * **Iterators :** All iterators may be invalidated.
      */
     String& replace( size_type pos, size_type len, const String &str );
+
+    /**
+     * \brief Replace the portion of the String between **pos** and **pos** + **len**
+     * (the character at **pos** + **len** is not included) with the character **c**.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& replace( size_type pos, size_type len, const char c );
+
+    /**
+     * \brief Search in the portion of the String between **i1** and **i2** (**i2** not
+     * included) for characters matching predicate function **p** and replace them
+     * by the String **str**.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& replace_if( iterator i1, iterator i2, std::function<bool(char32_t)> p, const String &str );
+
+    /**
+     * \brief Remove consecutive occurrences of the character **c** in the portion of the
+     * between **i1** and **i2** (**i2** not included) to replace it by a single occurrence.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& RemoveConsecutiveOccurrences(iterator i1, iterator i2, const char c);
 
     /**
      * \brief Erase the characters between **first** and **last** (**last** not included).

@@ -47,8 +47,9 @@ namespace gdjs {
     /**
      * @returns an iterable on every object linked with objA.
      */
-    // : Iterable<gdjs.RuntimeObject> in practice
-    getObjectsLinkedWith(objA: gdjs.RuntimeObject) {
+    getObjectsLinkedWith(
+      objA: gdjs.RuntimeObject
+    ): Iterable<gdjs.RuntimeObject> {
       if (!this._links.has(objA.id)) {
         this._links.set(objA.id, new IterableLinkedObjects());
       }
@@ -149,19 +150,20 @@ namespace gdjs {
     }
   }
 
-  class IterableLinkedObjects {
+  class IterableLinkedObjects implements Iterable<gdjs.RuntimeObject> {
     linkedObjectMap: Map<string, gdjs.RuntimeObject[]>;
+    static emptyItr: Iterator<gdjs.RuntimeObject> = {
+      next: () => ({ value: undefined, done: true }),
+    };
 
     constructor() {
       this.linkedObjectMap = new Map<string, gdjs.RuntimeObject[]>();
     }
 
     [Symbol.iterator]() {
-      let mapItr = this.linkedObjectMap.entries();
-      let listItr: IterableIterator<[
-        number,
-        gdjs.RuntimeObject
-      ]> = [].entries();
+      let mapItr = this.linkedObjectMap.values();
+      let listItr: Iterator<gdjs.RuntimeObject> =
+        IterableLinkedObjects.emptyItr;
 
       return {
         next: () => {
@@ -169,15 +171,12 @@ namespace gdjs {
           while (listNext.done) {
             const mapNext = mapItr.next();
             if (mapNext.done) {
-              // IteratorReturnResult<gdjs.RuntimeObject> require a defined value
-              // even though the spec state otherwise.
-              // So, this class can't be typed as an iterable.
-              return { value: undefined, done: true };
+              return listNext;
             }
-            listItr = mapNext.value[1].entries();
+            listItr = mapNext.value[Symbol.iterator]();
             listNext = listItr.next();
           }
-          return { value: listNext.value[1], done: false };
+          return listNext;
         },
       };
     }

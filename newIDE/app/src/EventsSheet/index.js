@@ -50,7 +50,7 @@ import EventsContextAnalyzerDialog, {
   type EventsContextResult,
   toEventsContextResult,
 } from './EventsContextAnalyzerDialog';
-import SearchPanel from './SearchPanel';
+import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -169,7 +169,7 @@ const styles = {
 export default class EventsSheet extends React.Component<Props, State> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
-  _searchPanel: ?SearchPanel;
+  _searchPanel: ?SearchPanelInterface;
   _containerDiv = React.createRef<HTMLDivElement>();
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () =>
@@ -1093,6 +1093,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
                     selection={this.state.selection}
+                    project={project}
                   >
                     {({
                       eventsSearchResultEvents,
@@ -1101,6 +1102,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                       replaceInEvents,
                       goToPreviousSearchResult,
                       goToNextSearchResult,
+                      clearSearchResults,
                     }) => (
                       <div
                         className="gd-events-sheet"
@@ -1190,10 +1192,14 @@ export default class EventsSheet extends React.Component<Props, State> {
                                 goToPreviousSearchResult
                               )
                             }
-                            onCloseSearchPanel={this._closeSearchPanel}
+                            onCloseSearchPanel={() => {
+                              clearSearchResults();
+                              this._closeSearchPanel();
+                            }}
                             onGoToNextSearchResult={() =>
                               this._ensureEventUnfolded(goToNextSearchResult)
                             }
+                            searchFocusOffset={searchFocusOffset}
                           />
                         )}
                         <InlineParameterEditor

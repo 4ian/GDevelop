@@ -1,0 +1,15 @@
+# Automatically close issues with certain tags indicating that we need more information,
+# after some days have passed.
+
+daysUntilStale: 20
+daysUntilClose: 7
+
+# Only do this on tags implying we need more information:
+onlyLabels: ["Need a game/precise steps to reproduce the issue","👋 Needs confirmation/testing"]
+only: issues
+
+markComment: >
+  This issue seems to be stale: it needs additional information but it has not had
+  recent activity. It will be closed in 7 days if no further activity occurs. Thank you
+  for your contributions.
+

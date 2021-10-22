@@ -164,6 +164,14 @@ export class Toolbar extends PureComponent<Props> {
               { label: '400%', click: () => this.props.setZoomFactor(4.0) },
             ]}
           />
+          {this.props.onOpenSettings && <ToolbarSeparator />}
+          {this.props.onOpenSettings && (
+            <ToolbarIcon
+              onClick={this.props.onOpenSettings}
+              src="res/ribbon_default/pref32.png"
+              tooltip={t`Open settings`}
+            />
+          )}
         </ToolbarGroup>
       </>
     );

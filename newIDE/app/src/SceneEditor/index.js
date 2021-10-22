@@ -605,10 +605,12 @@ export default class SceneEditor extends React.Component<Props, State> {
           () => {
             if (doRemove) {
               if (newLayer === null) {
+                this.instancesSelection.unselectInstancesOnLayer(layerName);
                 this.props.initialInstances.removeAllInstancesOnLayer(
                   layerName
                 );
               } else {
+                // Instances are not invalidated, so we can keep the selection.
                 this.props.initialInstances.moveInstancesToLayer(
                   layerName,
                   newLayer
@@ -620,7 +622,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
             if (this.editor) this.editor.forceRemount();
+
             this.forceUpdateLayersList();
+
+            // We may have modified the selection, so force an update of editors dealing with it.
+            this.forceUpdatePropertiesEditor();
             this.updateToolbar();
           }
         );

@@ -233,7 +233,7 @@ module.exports = [
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.9913870446797057
+    "translationRatio": 0.9931814103714337
   },
   {
     "languageCode": "si_LK",

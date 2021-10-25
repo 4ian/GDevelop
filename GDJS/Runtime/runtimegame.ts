@@ -674,6 +674,14 @@ namespace gdjs {
           },
         }),
       })
+        .then((response) => {
+          // Ensure the session is correctly created to avoid sending hits that will fail.
+          if (!response.ok) {
+            console.error('Error while creating the session', response);
+            throw new Error('Error while creating the session');
+          }
+          return response;
+        })
         .then((response) => response.text())
         .then((returnedSessionId) => {
           sessionId = returnedSessionId;

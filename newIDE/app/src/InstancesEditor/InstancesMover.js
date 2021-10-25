@@ -53,10 +53,11 @@ export default class InstancesMover {
     return totalDeltaY;
   }
 
-  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): ?Rectangle {
     if (this._initialSelectionAABB) {
       return this._initialSelectionAABB;
     }
+    if (!instances.length) return null;
     let initialSelectionAABB = new Rectangle();
     this.instanceMeasurer.getInstanceAABB(instances[0], initialSelectionAABB);
     const initialInstanceAABB = new Rectangle();
@@ -85,6 +86,7 @@ export default class InstancesMover {
 
     // It will magnet the corner nearest to the grabbing position
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    if (!initialSelectionAABB) return;
     const magnetLeft = this._startX < initialSelectionAABB.centerX();
     const magnetTop = this._startY < initialSelectionAABB.centerY();
 

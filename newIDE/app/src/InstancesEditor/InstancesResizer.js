@@ -115,11 +115,12 @@ export default class InstancesResizer {
     });
   }
 
-  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): ?Rectangle {
     let initialSelectionAABB = this._initialSelectionAABB;
     if (initialSelectionAABB) {
       return initialSelectionAABB;
     }
+    if (!instances.length) return null;
     initialSelectionAABB = new Rectangle();
     initialSelectionAABB.setRectangle(
       this._getOrCreateInstanceAABB(instances[0])
@@ -142,6 +143,7 @@ export default class InstancesResizer {
     this.totalDeltaY += deltaY;
 
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    if (!initialSelectionAABB) return;
 
     // Round the grabbed handle position on the grid.
     const grabbingRelativePosition =

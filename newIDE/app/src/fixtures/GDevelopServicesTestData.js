@@ -102,13 +102,13 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onRefreshFirebaseProfile: () => {
+  onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
-  onSendEmailVerification: () => {
+  onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
@@ -126,13 +126,13 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onRefreshFirebaseProfile: () => {
+  onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
-  onSendEmailVerification: () => {
+  onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
@@ -150,13 +150,13 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onRefreshFirebaseProfile: () => {
+  onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
-  onSendEmailVerification: () => {
+  onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
@@ -174,13 +174,13 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onRefreshFirebaseProfile: () => {
+  onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
-  onSendEmailVerification: () => {
+  onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
@@ -198,13 +198,13 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
-  onRefreshFirebaseProfile: () => {
+  onRefreshFirebaseProfile: async () => {
     console.info('This should refresh the firebase profile');
   },
-  onSendEmailVerification: () => {
+  onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),

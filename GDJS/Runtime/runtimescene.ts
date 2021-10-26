@@ -4,7 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  const logger = new gdjs.Logger('Scene manager');
+  const logger = new gdjs.Logger('RuntimeScene');
+  const setupWarningLogger = new gdjs.Logger('RuntimeScene (setup warnings)');
 
   /**
    * A scene being played, containing instances of objects rendered on screen.
@@ -437,7 +438,7 @@ namespace gdjs {
       if (module && module.func) {
         this._eventsFunction = module.func;
       } else {
-        logger.warn(
+        setupWarningLogger.warn(
           'No function found for running logic of scene ' + this._name
         );
         this._eventsFunction = function () {};

@@ -10,7 +10,9 @@
     "test-benchmark": "karma start --browsers ChromeHeadless --single-run --enableBenchmarks",
     "test-benchmark:watch": "karma start --browsers ChromeHeadless --enableBenchmarks",
     "test:firefox": "karma start --browsers Firefox --single-run",
-    "test:firefox:watch": "karma start --browsers Firefox"
+    "test:firefox:watch": "karma start --browsers Firefox",
+    "test:edge": "karma start --browsers EdgeHeadless --single-run",
+    "test:edge:watch": "karma start --browsers EdgeHeadless"
   },
   "keywords": [
     "HTML5",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",
+    "@chiragrupani/karma-chromium-edge-launcher": "2.1.1",
     "karma-firefox-launcher": "^1.1.0",
     "karma-mocha": "^1.3.0"
   }

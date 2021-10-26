@@ -1,5 +1,5 @@
 namespace gdjs {
-  const logger = new gdjs.Logger('Firebase');
+  const logger = new gdjs.Logger('Firebase (setup)');
   export namespace evtTools {
     /**
      * Firebase Event Tools

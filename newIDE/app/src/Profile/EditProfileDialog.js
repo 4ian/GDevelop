@@ -22,7 +22,7 @@ import TextField from '../UI/TextField';
 type Props = {|
   profile: Profile,
   onClose: () => void,
-  onEdit: (form: EditForm) => void,
+  onEdit: (form: EditForm) => Promise<void>,
   editInProgress: boolean,
   error: ?AuthError,
 |};

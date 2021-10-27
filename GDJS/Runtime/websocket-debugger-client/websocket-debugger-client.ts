@@ -168,62 +168,70 @@ namespace gdjs {
         }
       };
 
-      ((log, info, debug, warn, error, gdjsLog) => {
-        // Hook the console logging functions to log to the Debugger as well
-        console.log = (...messages) => {
-          log(...messages);
-          this._consoleLogHook('info', ...messages);
-        };
+      const redirectJsLog = (
+        type: 'info' | 'warning' | 'error',
+        ...messages
+      ) => {
+        this.log(
+          'JavaScript',
+          messages.reduce(
+            (accumulator, value) => accumulator + value.toString(),
+            ''
+          ),
+          type,
+          false
+        );
+      };
 
-        console.debug = (...messages) => {
-          debug(...messages);
-          this._consoleLogHook('info', ...messages);
-        };
+      const originalConsole = {
+        log: console.log,
+        info: console.info,
+        debug: console.debug,
+        warn: console.warn,
+        error: console.error,
+      };
 
-        console.info = (...messages) => {
-          info(...messages);
-          this._consoleLogHook('info', ...messages);
-        };
+      // Hook the console logging functions to log to the Debugger as well
+      console.log = (...messages) => {
+        originalConsole.log(...messages);
+        redirectJsLog('info', ...messages);
+      };
 
-        console.warn = (...messages) => {
-          warn(...messages);
-          this._consoleLogHook('warning', ...messages);
-        };
+      console.debug = (...messages) => {
+        originalConsole.debug(...messages);
+        redirectJsLog('info', ...messages);
+      };
 
-        console.error = (...messages) => {
-          error(...messages);
-          this._consoleLogHook('error', ...messages);
-        };
+      console.info = (...messages) => {
+        originalConsole.info(...messages);
+        redirectJsLog('info', ...messages);
+      };
 
-        gdjs.log = (
+      console.warn = (...messages) => {
+        originalConsole.warn(...messages);
+        redirectJsLog('warning', ...messages);
+      };
+
+      console.error = (...messages) => {
+        originalConsole.error(...messages);
+        redirectJsLog('error', ...messages);
+      };
+
+      // Overwrite the default GDJS log outputs so that they
+      // both go to the console (or wherever they were configured to go)
+      // and sent to the remote debugger.
+      const existingLoggerOutput = gdjs.Logger.getLoggerOutput();
+      gdjs.Logger.setLoggerOutput({
+        log(
           group: string,
           message: string,
           type: 'info' | 'warning' | 'error' = 'info',
           internal = true
-        ) => {
-          gdjsLog(group, message, type);
+        ) {
+          existingLoggerOutput.log(group, message, type, internal);
           this.log(group, message, type, internal);
-        };
-      })(
-        console.log,
-        console.info,
-        console.debug,
-        console.warn,
-        console.error,
-        gdjs.log
-      );
-    }
-
-    _consoleLogHook(type: 'info' | 'warning' | 'error', ...messages) {
-      this.log(
-        'JavaScript',
-        messages.reduce(
-          (accumulator, value) => accumulator + value.toString(),
-          ''
-        ),
-        type,
-        false
-      );
+        },
+      });
     }
 
     log(

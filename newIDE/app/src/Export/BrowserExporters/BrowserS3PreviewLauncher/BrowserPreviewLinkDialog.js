@@ -10,15 +10,20 @@ import FlatButton from '../../../UI/FlatButton';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { Column, Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
+import { openPreviewWindow } from '.';
 
 type Props = {|
-  url: ?string,
+  project: gdProject,
+  url: string,
   onClose: () => void,
 |};
 
 export default class BrowserPreviewLinkDialog extends Component<Props> {
   _makeOnOpen = (i18n: I18nType) => () => {
-    const windowObjectReference = window.open(this.props.url, '_blank');
+    const windowObjectReference = openPreviewWindow(
+      this.props.project,
+      this.props.url
+    );
     if (!windowObjectReference) {
       showErrorBox({
         message: i18n._(

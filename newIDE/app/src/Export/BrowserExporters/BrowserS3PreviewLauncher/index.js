@@ -11,8 +11,10 @@ import { makeTimestampedId } from '../../../Utils/TimestampedId';
 const gd: libGDevelop = global.gd;
 
 type State = {|
-  showPreviewLinkDialog: boolean,
-  url: ?string,
+  previewLinkDialog: ?{
+    project: gdProject,
+    url: string,
+  },
   error: ?Error,
 |};
 
@@ -22,6 +24,20 @@ type Props = {|
   onChangeSubscription?: () => void,
 |};
 
+export const openPreviewWindow = (project: gdProject, url: string): any => {
+  const width = project.getGameResolutionWidth();
+  const height = project.getGameResolutionHeight();
+  const left = window.screenX + window.innerWidth / 2 - width / 2;
+  const top = window.screenY + window.innerHeight / 2 - height / 2;
+
+  const windowObjectReference = window.open(
+    url,
+    'GDevelopPreview',
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+  return windowObjectReference;
+};
+
 export default class BrowserS3PreviewLauncher extends React.Component<
   Props,
   State
@@ -30,17 +46,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   canDoHotReload = () => false;
 
   state = {
-    showPreviewLinkDialog: false,
-    url: null,
+    previewLinkDialog: null,
     error: null,
-  };
-
-  _openPreviewWindow = (project: gdProject, url: string): any => {
-    const windowObjectReference = window.open(url, `_blank`);
-    return {
-      url,
-      windowObjectReference,
-    };
   };
 
   _prepareExporter = (): Promise<any> => {
@@ -94,20 +101,19 @@ export default class BrowserS3PreviewLauncher extends React.Component<
         exporter.exportProjectForPixiPreview(previewExportOptions);
         previewExportOptions.delete();
         exporter.delete();
-        return browserS3FileSystem
-          .uploadPendingObjects()
-          .then(() => {
-            const finalUrl = outputDir + '/index.html';
-            return this._openPreviewWindow(project, finalUrl);
-          })
-          .then(({ url, windowObjectReference }) => {
-            if (!windowObjectReference) {
-              this.setState({
-                showPreviewLinkDialog: true,
+        return browserS3FileSystem.uploadPendingObjects().then(() => {
+          const url = outputDir + '/index.html';
+          const windowObjectReference = openPreviewWindow(project, url);
+
+          if (!windowObjectReference) {
+            this.setState({
+              previewLinkDialog: {
+                project,
                 url,
-              });
-            }
-          });
+              },
+            });
+          }
+        });
       })
       .catch((error: Error) => {
         this.setState({
@@ -122,7 +128,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
   }
 
   render() {
-    const { showPreviewLinkDialog, url, error } = this.state;
+    const { previewLinkDialog, error } = this.state;
 
     if (error) {
       return (
@@ -137,13 +143,14 @@ export default class BrowserS3PreviewLauncher extends React.Component<
       );
     }
 
-    if (showPreviewLinkDialog) {
+    if (previewLinkDialog) {
       return (
         <BrowserPreviewLinkDialog
-          url={url}
+          url={previewLinkDialog.url}
+          project={previewLinkDialog.project}
           onClose={() =>
             this.setState({
-              showPreviewLinkDialog: false,
+              previewLinkDialog: null,
             })
           }
         />

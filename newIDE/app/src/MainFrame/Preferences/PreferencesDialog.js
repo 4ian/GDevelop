@@ -319,7 +319,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   labelPosition="right"
                   label={
                     <Trans>
-                      Always display the preview window on top of others
+                      Always display the preview window on top of the editor
                     </Trans>
                   }
                 />

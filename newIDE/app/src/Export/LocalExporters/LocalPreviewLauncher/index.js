@@ -72,10 +72,13 @@ export default class LocalPreviewLauncher extends React.Component<
     )
       return;
 
-    const win = new BrowserWindow(this.state.previewBrowserWindowConfig);
+    const browserWindowOptions = {
+      ...this.state.previewBrowserWindowConfig,
+      parent: this.state.alwaysOnTop ? BrowserWindow.getFocusedWindow() : null,
+    };
+    const win = new BrowserWindow(browserWindowOptions);
     win.loadURL(`file://${this.state.previewGamePath}/index.html`);
     win.setMenuBarVisibility(this.state.hideMenuBar);
-    win.setAlwaysOnTop(this.state.alwaysOnTop);
     win.webContents.on('devtools-opened', () => {
       this.setState({ devToolsOpen: true });
     });

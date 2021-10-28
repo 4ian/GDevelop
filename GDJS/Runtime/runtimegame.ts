@@ -27,9 +27,9 @@ namespace gdjs {
     /** if true, export is a partial preview without events. */
     projectDataOnlyExport?: boolean;
     /** The address of the debugger server, to reach out using WebSocket. */
-    debuggerServerAddress?: string;
+    websocketDebuggerServerAddress?: string;
     /** The port of the debugger server, to reach out using WebSocket. */
-    debuggerServerPort?: string;
+    websocketDebuggerServerPort?: string;
   };
 
   /**
@@ -71,9 +71,9 @@ namespace gdjs {
     _options: RuntimeGameOptions;
 
     /**
-     * Optional client to connect to a debugger
+     * Optional client to connect to a debugger server.
      */
-    _debuggerClient: gdjs.IDebuggerClient | null;
+    _debuggerClient: gdjs.AbstractDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;

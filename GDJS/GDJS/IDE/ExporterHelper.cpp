@@ -101,7 +101,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*websocketDebuggerClient=*/true,
+                 /*includeWebsocketDebuggerClient=*/
+                 !options.websocketDebuggerServerAddress.empty(),
+                 /*includeWindowMessageDebuggerClient=*/
+                 options.useWindowMessageDebuggerClient,
                  exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -147,10 +150,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
-  runtimeGameOptions.AddChild("debuggerServerAddress")
-      .SetStringValue(options.debuggerServerAddress);
-  runtimeGameOptions.AddChild("debuggerServerPort")
-      .SetStringValue(options.debuggerServerPort);
+  runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
+      .SetStringValue(options.websocketDebuggerServerAddress);
+  runtimeGameOptions.AddChild("websocketDebuggerServerPort")
+      .SetStringValue(options.websocketDebuggerServerPort);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -521,7 +524,8 @@ bool ExporterHelper::CompleteIndexFile(
 }
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
-                                    bool websocketDebuggerClient,
+                                    bool includeWebsocketDebuggerClient,
+                                    bool includeWindowMessageDebuggerClient,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
@@ -571,10 +575,16 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "splash/gd-logo-light.js");
   }
 
-  if (websocketDebuggerClient) {
-    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
+  if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
+    InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
+    InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+  }
+  if (includeWebsocketDebuggerClient) {
+    InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");
+  }
+  if (includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles,
-                 "websocket-debugger-client/websocket-debugger-client.js");
+                 "debugger-client/window-message-debugger-client.js");
   }
 
   if (pixiRenderers) {

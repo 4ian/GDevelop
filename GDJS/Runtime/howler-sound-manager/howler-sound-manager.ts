@@ -437,8 +437,13 @@ namespace gdjs {
      * Creates a new gdjs.HowlerSound using preloaded/cached Howl instances.
      * @param soundName The name of the file or resource to play.
      * @param isMusic True if a music, false if a sound.
+     * @param volume The volume at which the resource needs to be played.
      */
-    createHowlerSound(soundName: string, isMusic: boolean): HowlerSound {
+    createHowlerSound(
+      soundName: string,
+      isMusic: boolean,
+      volume: number
+    ): HowlerSound {
       const soundFile = this._getFileFromSoundName(soundName);
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;
 
@@ -453,6 +458,12 @@ namespace gdjs {
           )
         );
       }
+
+      // Modify the volume before returning the sound,
+      // so we can play it directly at the right value,
+      // and avoid a glitch in what's heard.
+      cacheContainer[soundFile].volume(volume);
+
       return new gdjs.HowlerSound(cacheContainer[soundFile]);
     }
 
@@ -536,14 +547,15 @@ namespace gdjs {
     }
 
     playSound(soundName: string, loop: boolean, volume: float, pitch: float) {
-      var sound = this.createHowlerSound(soundName, /* isMusic= */ false);
+      var sound = this.createHowlerSound(
+        soundName,
+        /* isMusic= */ false,
+        volume / 100
+      );
       this._storeSoundInArray(this._freeSounds, sound).play();
 
       sound.once('play', () => {
-        sound
-          .setLoop(loop)
-          .setVolume(volume / 100)
-          .setRate(pitch);
+        sound.setLoop(loop).setRate(pitch);
         if (this._paused) {
           sound.pause();
           this._pausedSounds.push(sound);
@@ -562,15 +574,13 @@ namespace gdjs {
 
       var sound = this.createHowlerSound(
         soundName,
-        /* isMusic= */ false
+        /* isMusic= */ false,
+        volume / 100
       ).play();
       this._sounds[channel] = sound;
 
       sound.once('play', () => {
-        sound
-          .setLoop(loop)
-          .setVolume(volume / 100)
-          .setRate(pitch);
+        sound.setLoop(loop).setRate(pitch);
         if (this._paused) {
           sound.pause();
           this._pausedSounds.push(sound);
@@ -583,14 +593,15 @@ namespace gdjs {
     }
 
     playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
-      var music = this.createHowlerSound(soundName, /* isMusic= */ true);
+      var music = this.createHowlerSound(
+        soundName,
+        /* isMusic= */ true,
+        volume / 100
+      );
       this._storeSoundInArray(this._freeMusics, music).play();
 
       music.once('play', () => {
-        music
-          .setLoop(loop)
-          .setVolume(volume / 100)
-          .setRate(pitch);
+        music.setLoop(loop).setRate(pitch);
         if (this._paused) {
           music.pause();
           this._pausedSounds.push(music);
@@ -609,15 +620,13 @@ namespace gdjs {
 
       const music = this.createHowlerSound(
         soundName,
-        /* isMusic= */ true
+        /* isMusic= */ true,
+        volume / 100
       ).play();
       this._musics[channel] = music;
 
       music.once('play', () => {
-        music
-          .setLoop(loop)
-          .setVolume(volume / 100)
-          .setRate(pitch);
+        music.setLoop(loop).setRate(pitch);
         if (this._paused) {
           music.pause();
           this._pausedSounds.push(music);
@@ -652,6 +661,22 @@ namespace gdjs {
       this._sounds = {};
       this._musics = {};
       this._pausedSounds.length = 0;
+    }
+
+    preloadAudioFile(
+      file: string,
+      onLoadCallback: HowlCallback,
+      isMusic: boolean
+    ) {
+      const container = isMusic ? this._loadedMusics : this._loadedSounds;
+      container[file] = new Howl(
+        Object.assign({}, HowlParameters, {
+          src: [file],
+          onload: onLoadCallback,
+          onloaderror: onLoadCallback,
+          html5: isMusic,
+        })
+      );
     }
 
     preloadAudio(
@@ -694,22 +719,6 @@ namespace gdjs {
         onProgress(loadedCount, totalCount);
       };
 
-      const preloadAudioFile = (
-        file: string,
-        onLoadCallback: HowlCallback,
-        isMusic: boolean
-      ) => {
-        const container = isMusic ? this._loadedMusics : this._loadedSounds;
-        container[file] = new Howl(
-          Object.assign({}, HowlParameters, {
-            src: [file],
-            onload: onLoadCallback,
-            onloaderror: onLoadCallback,
-            html5: isMusic,
-          })
-        );
-      };
-
       for (let file in files) {
         if (files.hasOwnProperty(file)) {
           const fileData = files[file][0];
@@ -725,12 +734,12 @@ namespace gdjs {
               onLoad(_, error);
             };
 
-            preloadAudioFile(file, callback, /* isMusic= */ true);
-            preloadAudioFile(file, callback, /* isMusic= */ false);
+            this.preloadAudioFile(file, callback, /* isMusic= */ true);
+            this.preloadAudioFile(file, callback, /* isMusic= */ false);
           } else if (fileData.preloadAsSound) {
-            preloadAudioFile(file, onLoad, /* isMusic= */ false);
+            this.preloadAudioFile(file, onLoad, /* isMusic= */ false);
           } else if (fileData.preloadAsMusic)
-            preloadAudioFile(file, onLoad, /* isMusic= */ true);
+            this.preloadAudioFile(file, onLoad, /* isMusic= */ true);
         }
       }
     }

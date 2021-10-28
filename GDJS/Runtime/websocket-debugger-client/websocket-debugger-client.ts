@@ -222,12 +222,12 @@ namespace gdjs {
       // and sent to the remote debugger.
       const existingLoggerOutput = gdjs.Logger.getLoggerOutput();
       gdjs.Logger.setLoggerOutput({
-        log(
+        log: (
           group: string,
           message: string,
           type: 'info' | 'warning' | 'error' = 'info',
           internal = true
-        ) {
+        ) => {
           existingLoggerOutput.log(group, message, type, internal);
           this.log(group, message, type, internal);
         },

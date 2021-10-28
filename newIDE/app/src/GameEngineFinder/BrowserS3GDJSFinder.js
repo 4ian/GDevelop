@@ -44,7 +44,8 @@ export const findGDJS = (
 |}> => {
   // Get GDJS for this version. If you updated the version,
   // run `newIDE/web-app/scripts/deploy-GDJS-Runtime` script.
-  const gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
+  // const gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
+  const gdjsRoot = `http://localhost:5000`;
 
   return Promise.all(
     filesToDownload[fileSet].map(relativeFilePath => {

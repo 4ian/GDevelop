@@ -84,35 +84,35 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
 
   extension.AddEvent("Link",
                      _("Link external events"),
-                     _("Link to external events"),
+                     _("Link to external events."),
                      "",
                      "res/lienaddicon.png",
                      std::make_shared<gd::LinkEvent>());
 
   extension.AddEvent("Comment",
                      _("Comment"),
-                     _("Event displaying a text in the events editor"),
+                     _("Event displaying a text in the events editor."),
                      "",
                      "res/comment.png",
                      std::make_shared<gd::CommentEvent>());
 
   extension.AddEvent("While",
                      _("While"),
-                     _("Repeat the event while the conditions are true"),
+                     _("Repeat the event while the conditions are true."),
                      "",
                      "res/while.png",
                      std::make_shared<gd::WhileEvent>());
 
   extension.AddEvent("Repeat",
                      _("Repeat"),
-                     _("Repeat the event for a specified number of times"),
+                     _("Repeat the event for a specified number of times."),
                      "",
                      "res/repeat.png",
                      std::make_shared<gd::RepeatEvent>());
 
   extension.AddEvent("ForEach",
                      _("For each object"),
-                     _("Repeat the event for each specified object"),
+                     _("Repeat the event for each specified object."),
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::ForEachEvent>());
@@ -120,14 +120,14 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension.AddEvent(
       "ForEachChildVariable",
       _("For each child variable (of a structure or array)"),
-      _("Repeat the event for each child variable of a structure or array"),
+      _("Repeat the event for each child variable of a structure or array."),
       "",
       "res/foreach.png",
       std::make_shared<gd::ForEachChildVariableEvent>());
 
   extension.AddEvent("Group",
                      _("Event group"),
-                     _("Group containing events"),
+                     _("Group containing events."),
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::GroupEvent>());

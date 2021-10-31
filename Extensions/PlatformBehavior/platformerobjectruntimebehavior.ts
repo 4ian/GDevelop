@@ -583,6 +583,7 @@ namespace gdjs {
      * Separate the object from all platforms passed in parameter.
      * @param candidates The platform to be tested for collision
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     * @returns true if the object was moved
      */
     private _separateFromPlatforms(
       candidates: gdjs.PlatformRuntimeBehavior[],
@@ -617,6 +618,7 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     * @returns true if the object collides any platform
      */
     _isCollidingWithOneOf(
       candidates: gdjs.PlatformRuntimeBehavior[],
@@ -658,6 +660,7 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
+     * @returns the platform where to walk or if an obstacle was found
      */
     _findHighestFloorAndMoveOnTop(
       candidates: gdjs.PlatformRuntimeBehavior[],
@@ -740,9 +743,7 @@ namespace gdjs {
      * @param platform The platform to be tested for collision.
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
-     * @return
-     * * Number.MAX_VALUE if the platform doesn't collide
-     * * -Number.MAX_VALUE if the platform is too high
+     * @return the search context
      */
     private _findPlatformHighestRelativeYUnderObject(
       platform: gdjs.PlatformRuntimeBehavior,
@@ -837,7 +838,6 @@ namespace gdjs {
      * and update the context with this new constraint.
      * @param y
      * @param context
-     * @returns
      */
     private _addPointConstraint(
       y: float,

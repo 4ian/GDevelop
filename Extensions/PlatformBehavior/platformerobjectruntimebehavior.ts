@@ -777,19 +777,23 @@ namespace gdjs {
           ) {
             // The edge is too low
             context.foundUnderHead = true;
+
             if (context.foundOverHead) {
               context.setFloorIsTooHigh();
               return context;
             }
           } else {
-            // Check vertex into the interval
+            const deltaX = vertex[0] - previousVertex[0];
             if (
-              context.ownerMinX <= vertex[0] &&
-              vertex[0] <= context.ownerMaxX
+              // The vertex is into the interval excluding bounds
+              (context.ownerMinX < vertex[0] &&
+                vertex[0] < context.ownerMaxX) ||
+              // or the on a bound but its edge is from the inside.
+              (vertex[0] === context.ownerMinX && deltaX < 0) ||
+              (vertex[0] === context.ownerMaxX && deltaX > 0)
             ) {
               this._addPointConstraint(vertex[1], context);
             }
-            const deltaX = vertex[0] - previousVertex[0];
             // Vertical edges doesn't matter
             if (deltaX !== 0) {
               // Check intersection on the left side of owner

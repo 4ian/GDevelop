@@ -696,7 +696,6 @@ namespace gdjs {
           continue;
         }
 
-        context.initializeBeforePlatformCheck();
         const previousAllowedMinDeltaY = context.allowedMinDeltaY;
         const previousAllowedMaxDeltaY = context.allowedMaxDeltaY;
         this._findPlatformHighestRelativeYUnderObject(platform, context);
@@ -1932,6 +1931,12 @@ namespace gdjs {
      */
     ownerMinY: float = 0;
     /**
+     * The maximum bottom position the character top can go.
+     *
+     * (constant to a search)
+     */
+    headMaxY: float = 0;
+    /**
      * The maximum top position the character bottom can go.
      *
      * (constant to a search)
@@ -2002,15 +2007,12 @@ namespace gdjs {
       this.ownerMaxX = ownerMaxX;
       this.headMinY = ownerMinY + upwardDeltaY;
       this.ownerMinY = ownerMinY;
+      this.headMaxY = ownerMinY + downwardDeltaY;
       this.floorMinY = ownerMaxY + upwardDeltaY;
       this.ownerMaxY = ownerMaxY;
       this.floorMaxY = ownerMaxY + downwardDeltaY;
 
       this.allowedMinDeltaY = upwardDeltaY;
-      this.allowedMaxDeltaY = Number.MAX_VALUE;
-    }
-
-    initializeBeforePlatformCheck() {
       this.allowedMaxDeltaY = Number.MAX_VALUE;
     }
 
@@ -2057,7 +2059,7 @@ namespace gdjs {
     addPointConstraint(y: float): void {
       if (y < this.floorMinY) {
         // The platform is too high to walk on...
-        if (y > this.ownerMinY) {
+        if (y > this.headMaxY) {
           // ...but not over the object.
           this.setFloorIsTooHigh();
           return;

@@ -353,12 +353,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop', fu
       const platformBehavior = platform.getBehavior('Platform');
 
       it('can detect an obstacle overlapping the top', function () {
-        character.setPosition(300, 199.9);
+        // -10 because the character can follow a platform downward.
+        character.setPosition(300, 199.9 - 10);
         checkObstacle(behavior, platformBehavior, -10, 10);
       });
 
       it('can detect that the platform is away downward', function () {
-        character.setPosition(300, 200);
+        character.setPosition(300, 200 - 10);
         checkNoFloor(behavior, platformBehavior, -10, 10);
       });
     });
@@ -382,8 +383,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop', fu
     // The character won't collide the ceiling anymore when he follows the floor.
     // So, the ceiling should not be seen as an obstacle.
     // This can happen if a tunnel is going down
-    // TODO probably something to fix.
-    it.skip('can detect a floor to follow down', function () {
+    it('can detect a floor to follow down', function () {
       character.setPosition(300, -210);
       checkMoveOn(behavior, platformBehavior, -10, 10);
       expect(character.getY()).to.be(-200);
@@ -403,6 +403,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop', fu
 
     it('can detect an obstacle a bit too high to follow', function () {
       character.setPosition(300, -189.9);
+      checkObstacle(behavior, platformBehavior, -10, 10);
+    });
+
+    it('can detect a too thin horizontal tunnel', function () {
+      platform.setCustomWidthAndHeight(200, 199.8);
+      platform.setPosition(250, -250.1);
+
+      character.setPosition(300, -200);
       checkObstacle(behavior, platformBehavior, -10, 10);
     });
   });

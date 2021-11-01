@@ -785,7 +785,7 @@ namespace gdjs {
               vertex[0] < previousVertex[0]) ||
             (vertex[0] === context.ownerMaxX && vertex[0] > previousVertex[0])
           ) {
-            this._addPointConstraint(vertex[1], context);
+            context.addPointConstraint(vertex[1]);
           }
 
           // Vertical edges doesn't matter
@@ -802,7 +802,7 @@ namespace gdjs {
                 previousVertex[1] +
                 ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
 
-              this._addPointConstraint(intersectionY, context);
+              context.addPointConstraint(intersectionY);
             }
             // Check intersection on the right side of owner
             if (
@@ -816,56 +816,13 @@ namespace gdjs {
                 previousVertex[1] +
                 ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
 
-              this._addPointConstraint(intersectionY, context);
+              context.addPointConstraint(intersectionY);
             }
           }
           previousVertex = vertex;
         }
       }
       return context;
-    }
-
-    /**
-     * Check if the character can follow a given Y or move to not touch it
-     * and update the context with this new constraint.
-     * @param y
-     * @param context
-     */
-    private _addPointConstraint(
-      y: float,
-      context: FollowConstraintContext
-    ): void {
-      if (y < context.floorMinY) {
-        // The platform is too high to walk on...
-        if (y > context.ownerMinY) {
-          // ...but not over the object.
-          context.setFloorIsTooHigh();
-          return;
-        }
-        // ...but over the object.
-        context.foundOverHead = true;
-        if (context.foundUnderHead) {
-          context.setFloorIsTooHigh();
-          return;
-        }
-        // Add the vertex to the constraints.
-        context.allowedMinDeltaY = Math.max(
-          context.allowedMinDeltaY,
-          y - context.ownerMinY
-        );
-      } else {
-        // The platform can be walked on.
-        context.foundUnderHead = true;
-        if (context.foundOverHead) {
-          context.setFloorIsTooHigh();
-          return;
-        }
-        // Add the vertex to the constraints.
-        context.allowedMaxDeltaY = Math.min(
-          context.allowedMaxDeltaY,
-          y - context.ownerMaxY
-        );
-      }
     }
 
     /**
@@ -2090,6 +2047,45 @@ namespace gdjs {
 
     getFloorDeltaY(): float {
       return this.allowedMaxDeltaY;
+    }
+
+    /**
+     * Check if the character can follow a given Y or move not to touch it
+     * and update the context with this new constraint.
+     * @param y
+     */
+    addPointConstraint(y: float): void {
+      if (y < this.floorMinY) {
+        // The platform is too high to walk on...
+        if (y > this.ownerMinY) {
+          // ...but not over the object.
+          this.setFloorIsTooHigh();
+          return;
+        }
+        // ...but over the object.
+        this.foundOverHead = true;
+        if (this.foundUnderHead) {
+          this.setFloorIsTooHigh();
+          return;
+        }
+        // Add the vertex to the constraints.
+        this.allowedMinDeltaY = Math.max(
+          this.allowedMinDeltaY,
+          y - this.ownerMinY
+        );
+      } else {
+        // The platform can be walked on.
+        this.foundUnderHead = true;
+        if (this.foundOverHead) {
+          this.setFloorIsTooHigh();
+          return;
+        }
+        // Add the vertex to the constraints.
+        this.allowedMaxDeltaY = Math.min(
+          this.allowedMaxDeltaY,
+          y - this.ownerMaxY
+        );
+      }
     }
   }
 

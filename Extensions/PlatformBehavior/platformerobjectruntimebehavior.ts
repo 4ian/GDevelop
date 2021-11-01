@@ -836,38 +836,35 @@ namespace gdjs {
       context: FollowConstraintContext
     ): void {
       if (y < context.floorMinY) {
-        // Platform is too high...
+        // The platform is too high to walk on...
         if (y > context.ownerMinY) {
           // ...but not over the object.
           context.setFloorIsTooHigh();
           return;
-        } else {
-          // ...but over the object.
-          context.foundOverHead = true;
-          if (context.foundUnderHead) {
-            context.setFloorIsTooHigh();
-            return;
-          }
-          if (y > context.headMinY) {
-            context.allowedMinDeltaY = Math.max(
-              context.allowedMinDeltaY,
-              y - context.ownerMinY
-            );
-          }
         }
-      }
-      // Ignore intersections that are too low
-      if (context.floorMinY <= y) {
+        // ...but over the object.
+        context.foundOverHead = true;
+        if (context.foundUnderHead) {
+          context.setFloorIsTooHigh();
+          return;
+        }
+        // Add the vertex to the constraints.
+        context.allowedMinDeltaY = Math.max(
+          context.allowedMinDeltaY,
+          y - context.ownerMinY
+        );
+      } else {
+        // The platform can be walked on.
+        context.foundUnderHead = true;
         if (context.foundOverHead) {
           context.setFloorIsTooHigh();
           return;
-        } else {
-          context.allowedMaxDeltaY = Math.min(
-            context.allowedMaxDeltaY,
-            y - context.ownerMaxY
-          );
-          context.foundUnderHead = true;
         }
+        // Add the vertex to the constraints.
+        context.allowedMaxDeltaY = Math.min(
+          context.allowedMaxDeltaY,
+          y - context.ownerMaxY
+        );
       }
     }
 

@@ -776,59 +776,47 @@ namespace gdjs {
         context.initializeBeforeHitboxCheck();
 
         for (const vertex of hitbox.vertices) {
+          const deltaX = vertex[0] - previousVertex[0];
           if (
-            previousVertex[1] > context.floorMaxY &&
-            vertex[1] > context.floorMaxY
+            // The vertex is into the interval excluding bounds
+            (context.ownerMinX < vertex[0] && vertex[0] < context.ownerMaxX) ||
+            // or the on a bound but its edge is from the inside.
+            (vertex[0] === context.ownerMinX &&
+              vertex[0] < previousVertex[0]) ||
+            (vertex[0] === context.ownerMaxX && vertex[0] > previousVertex[0])
           ) {
-            // The edge is too low
-            context.foundUnderHead = true;
+            this._addPointConstraint(vertex[1], context);
+          }
 
-            if (context.foundOverHead) {
-              context.setFloorIsTooHigh();
-              return context;
-            }
-          } else {
-            const deltaX = vertex[0] - previousVertex[0];
+          // Vertical edges doesn't matter
+          if (deltaX !== 0) {
+            // Check intersection on the left side of owner
             if (
-              // The vertex is into the interval excluding bounds
-              (context.ownerMinX < vertex[0] &&
-                vertex[0] < context.ownerMaxX) ||
-              // or the on a bound but its edge is from the inside.
-              (vertex[0] === context.ownerMinX && deltaX < 0) ||
-              (vertex[0] === context.ownerMaxX && deltaX > 0)
+              (vertex[0] < context.ownerMinX &&
+                context.ownerMinX < previousVertex[0]) ||
+              (previousVertex[0] < context.ownerMinX &&
+                context.ownerMinX < vertex[0])
             ) {
-              this._addPointConstraint(vertex[1], context);
+              const deltaY = vertex[1] - previousVertex[1];
+              const intersectionY =
+                previousVertex[1] +
+                ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
+
+              this._addPointConstraint(intersectionY, context);
             }
-            // Vertical edges doesn't matter
-            if (deltaX !== 0) {
-              // Check intersection on the left side of owner
-              if (
-                (vertex[0] < context.ownerMinX &&
-                  context.ownerMinX < previousVertex[0]) ||
-                (previousVertex[0] < context.ownerMinX &&
-                  context.ownerMinX < vertex[0])
-              ) {
-                const deltaY = vertex[1] - previousVertex[1];
-                const intersectionY =
-                  previousVertex[1] +
-                  ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
+            // Check intersection on the right side of owner
+            if (
+              (vertex[0] < context.ownerMaxX &&
+                context.ownerMaxX < previousVertex[0]) ||
+              (previousVertex[0] < context.ownerMaxX &&
+                context.ownerMaxX < vertex[0])
+            ) {
+              const deltaY = vertex[1] - previousVertex[1];
+              const intersectionY =
+                previousVertex[1] +
+                ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
 
-                this._addPointConstraint(intersectionY, context);
-              }
-              // Check intersection on the right side of owner
-              if (
-                (vertex[0] < context.ownerMaxX &&
-                  context.ownerMaxX < previousVertex[0]) ||
-                (previousVertex[0] < context.ownerMaxX &&
-                  context.ownerMaxX < vertex[0])
-              ) {
-                const deltaY = vertex[1] - previousVertex[1];
-                const intersectionY =
-                  previousVertex[1] +
-                  ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
-
-                this._addPointConstraint(intersectionY, context);
-              }
+              this._addPointConstraint(intersectionY, context);
             }
           }
           previousVertex = vertex;
@@ -869,7 +857,7 @@ namespace gdjs {
         }
       }
       // Ignore intersections that are too low
-      if (context.floorMinY <= y && y <= context.floorMaxY) {
+      if (context.floorMinY <= y) {
         if (context.foundOverHead) {
           context.setFloorIsTooHigh();
           return;

@@ -111,16 +111,24 @@ describe('gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop', fu
         { x: 100, y: 100 },
       ],
     ],
-    topLeftTriangle: [
+    topRightTriangle: [
       [
         { x: 0, y: 0 },
         { x: 100, y: 0 },
         { x: 100, y: 100 },
       ],
     ],
-    topRightTriangle: [
+    topLeftTriangle: [
       [
         { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 0, y: 100 },
+      ],
+    ],
+    topLeftTriangleWithLowEdge: [
+      [
+        { x: -1, y: 100 },
+        { x: -1, y: 0 },
         { x: 100, y: 0 },
         { x: 0, y: 100 },
       ],
@@ -319,13 +327,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop', fu
     },
     {
       description: '(An edge crossing from the left to the top)',
+      mask: collisionMasks.topRightTriangle,
+      position: [200, 0],
+    },
+    {
+      description: '(An edge crossing from the right to the top)',
       mask: collisionMasks.topLeftTriangle,
       position: [200, 0],
     },
     {
       description: '(An edge crossing from the right to the top)',
-      mask: collisionMasks.topRightTriangle,
-      position: [200, 0],
+      // An edge will be lower than the character (but not under).
+      mask: collisionMasks.topLeftTriangleWithLowEdge,
+      position: [180, 20],
     },
   ].forEach(({ description, mask, position }) => {
     describe(description, function () {

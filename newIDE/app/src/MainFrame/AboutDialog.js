@@ -35,9 +35,9 @@ const styles = {
   },
 };
 
-// There must be missing tons of people.
-// If you contributed to GDevelop but you're not in the list, please
-// send a Pull Request on GitHub or open an issue ;)
+/* There must be missing tons of people.
+If you contributed to GDevelop but you're not in the list, please
+send a Pull Request on GitHub or open an issue ;)*/
 const contributors = [
   // Core development team
   {
@@ -45,8 +45,12 @@ const contributors = [
     description: 'Core development team',
     link: 'https://github.com/ClementPasteau',
   },
-
-  // GitHub contributors
+  {
+    name: 'AlexandreSi',
+    description: 'Core development team',
+    link: 'https://github.com/AlexandreSi',
+  },
+  // Code contributors
   {
     name: 'Victor Levasseur',
     description:
@@ -106,7 +110,7 @@ const contributors = [
   {
     name: 'D8H',
     description: 'Numerous code contributions to GDevelop',
-    link: 'https://www.youtube.com/channel/UCsZ4Ue8c94YLJDbGRafCI5Q',
+    link: 'https://github.com/D8H',
   },
   {
     name: 'Harsimran Singh Virk',
@@ -122,7 +126,7 @@ const contributors = [
   // Community members:
   {
     name: 'ddabrahim',
-    description: 'Lots of examples bundled with GDevelop',
+    description: 'Examples for GDevelop',
     link: 'https://gametemplates.itch.io/',
   },
   {
@@ -145,7 +149,7 @@ const contributors = [
   {
     name: 'Jose David Cuartas Correa',
     description:
-      'Author of Digitopolis (a book on how to make games with GDevelop4)',
+      'Author of Digitopolis (a book on how to make games with GDevelop 4)',
   },
 
   {
@@ -168,13 +172,13 @@ const contributors = [
   },
   {
     name: 'Entropy',
-    description: 'High quality extensions for GDevelop',
+    description: 'High quality extensions and art packs for GDevelop',
     link: 'https://github.com/Entr0py404',
   },
   {
     name: 'FlokiTV',
     description: 'High quality extensions for GDevelop',
-    link: 'https://github.com/Entr0py404',
+    link: 'https://github.com/FlokiTV',
   },
   {
     name: 'Silver-Streak',
@@ -185,6 +189,7 @@ const contributors = [
   {
     name: 'Jurfix',
     description: 'Discord moderation',
+    link: 'https://github.com/Jurfix',
   },
   {
     name: 'Wishforge Games',

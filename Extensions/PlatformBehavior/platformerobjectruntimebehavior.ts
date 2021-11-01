@@ -4,10 +4,26 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   /**
+   * Returned by _findHighestFloorAndMoveOnTop
+   */
+  type PlatformSearchResult = {
+    highestGround: gdjs.PlatformRuntimeBehavior | null;
+    isCollidingAnyPlatform: boolean;
+  };
+
+  /**
    * PlatformerObjectRuntimeBehavior represents a behavior allowing objects to be
    * considered as a platform by objects having PlatformerObject Behavior.
    */
   export class PlatformerObjectRuntimeBehavior extends gdjs.RuntimeBehavior {
+    /**
+     * Returned by _findHighestFloorAndMoveOnTop
+     */
+    private static readonly _platformSearchResult: PlatformSearchResult = {
+      highestGround: null,
+      isCollidingAnyPlatform: false,
+    };
+
     // To achieve pixel-perfect precision when positioning object on platform or
     // handling collision with "walls", edges of the hitboxes must be ignored during
     // collision checks, so that two overlapping edges are not considered as colliding.
@@ -17,9 +33,8 @@ namespace gdjs {
     // platform hitbox left edge is also at X position 10).
     // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
     _ignoreTouchingEdges: boolean = true;
-    _roundCoordinates: boolean;
     _gravity: float;
-    private _maxFallingSpeed: float;
+    _maxFallingSpeed: float;
     _ladderClimbingSpeed: float;
     private _acceleration: float;
     private _deceleration: float;
@@ -30,7 +45,7 @@ namespace gdjs {
     private _xGrabTolerance: any;
     _jumpSustainTime: float;
     _currentFallSpeed: float = 0;
-    private _currentSpeed: float = 0;
+    _currentSpeed: float = 0;
     _canJump: boolean = false;
 
     private _ignoreDefaultControls: boolean;
@@ -72,7 +87,6 @@ namespace gdjs {
       owner: gdjs.RuntimeObject
     ) {
       super(runtimeScene, behaviorData, owner);
-      this._roundCoordinates = behaviorData.roundCoordinates;
       this._gravity = behaviorData.gravity;
       this._maxFallingSpeed = behaviorData.maxFallingSpeed;
       this._ladderClimbingSpeed = behaviorData.ladderClimbingSpeed || 150;
@@ -101,11 +115,6 @@ namespace gdjs {
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
-      if (
-        oldBehaviorData.roundCoordinates !== newBehaviorData.roundCoordinates
-      ) {
-        this._roundCoordinates = newBehaviorData.roundCoordinates;
-      }
       if (oldBehaviorData.gravity !== newBehaviorData.gravity) {
         this.setGravity(newBehaviorData.gravity);
       }
@@ -221,7 +230,6 @@ namespace gdjs {
       this._moveY();
 
       //3) Update the current floor data for the next tick:
-      this._updateOverlappedJumpThru();
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
         this._checkTransitionOnFloorOrFalling();
@@ -284,7 +292,7 @@ namespace gdjs {
       //Move the object on x axis.
       const oldX = object.getX();
       if (this._requestedDeltaX !== 0) {
-        const floorPlatformId =
+        let floorPlatformId =
           this._onFloor.getFloorPlatform() !== null
             ? this._onFloor.getFloorPlatform()!.owner.id
             : null;
@@ -311,22 +319,6 @@ namespace gdjs {
             );
             break;
           }
-
-          //If on floor: try get up a bit to bypass not perfectly aligned floors.
-          if (this._state === this._onFloor) {
-            object.setY(object.getY() - 1);
-            if (
-              !this._isCollidingWithOneOf(
-                this._potentialCollidingObjects,
-                floorPlatformId,
-                /*excludeJumpthrus=*/
-                true
-              )
-            ) {
-              break;
-            }
-            object.setY(object.getY() + 1);
-          }
           if (tryRounding) {
             // First try rounding the position as this might be sufficient to get the object
             // out of the wall.
@@ -337,6 +329,14 @@ namespace gdjs {
               Math.round(object.getX()) + (this._requestedDeltaX > 0 ? -1 : 1)
             );
           }
+        }
+
+        // When the character is on the floor it will try to walk on the obstacles.
+        // So, it should not be stopped.
+        if (
+          this._state !== this._onFloor &&
+          object.getX() !== oldX + this._requestedDeltaX
+        ) {
           this._currentSpeed = 0;
         }
       }
@@ -346,42 +346,57 @@ namespace gdjs {
       const object = this.owner;
       //Move the object on Y axis
       if (this._requestedDeltaY !== 0) {
-        let oldY = object.getY();
-        object.setY(object.getY() + this._requestedDeltaY);
-
-        //Stop when colliding with an obstacle.
-        while (
-          (this._requestedDeltaY < 0 &&
-            this._isCollidingWithOneOf(
-              this._potentialCollidingObjects,
-              null,
-              /*excludeJumpThrus=*/
-              true
-            )) ||
-          //Jumpthru = obstacle <=> Never when going up
-          (this._requestedDeltaY > 0 &&
-            this._isCollidingWithOneOfExcluding(
-              this._potentialCollidingObjects,
-              this._overlappedJumpThru
-            ))
-        ) {
-          //Jumpthru = obstacle <=> Only if not already overlapped when going down
-          if (this._state === this._jumping) {
-            this._setFalling();
-          }
-          if (
-            (this._requestedDeltaY > 0 && object.getY() <= oldY) ||
-            (this._requestedDeltaY < 0 && object.getY() >= oldY)
-          ) {
-            object.setY(
-              //Unable to move the object without being stuck in an obstacle.
-              oldY
-            );
-            break;
-          }
-          object.setY(
-            Math.floor(object.getY()) + (this._requestedDeltaY > 0 ? -1 : 1)
+        if (this._requestedDeltaY > 0) {
+          // Use the same method as for following the floor.
+          // This is to be consistent on all floor collision.
+          // The object will land right on floor.
+          const { highestGround } = this._findHighestFloorAndMoveOnTop(
+            this._potentialCollidingObjects,
+            0,
+            this._requestedDeltaY
           );
+          if (!highestGround) {
+            object.setY(object.getY() + this._requestedDeltaY);
+          }
+        } else {
+          // The same logic could be applied going up one day.
+          let oldY = object.getY();
+          object.setY(object.getY() + this._requestedDeltaY);
+
+          // Stop when colliding with an obstacle.
+          while (
+            // Jumpthru == obstacle <=> Never when going up.
+            (this._requestedDeltaY < 0 &&
+              this._isCollidingWithOneOf(
+                this._potentialCollidingObjects,
+                null,
+                /*excludeJumpThrus=*/
+                true
+              )) ||
+            // Jumpthru == obstacle <=> Only if not already overlapped when going down.
+            (this._requestedDeltaY > 0 &&
+              this._isCollidingWithOneOfExcluding(
+                this._potentialCollidingObjects,
+                this._overlappedJumpThru
+              ))
+          ) {
+            if (this._state === this._jumping) {
+              this._setFalling();
+            }
+            if (
+              (this._requestedDeltaY > 0 && object.getY() <= oldY) ||
+              (this._requestedDeltaY < 0 && object.getY() >= oldY)
+            ) {
+              object.setY(
+                // Unable to move the object without being stuck in an obstacle.
+                oldY
+              );
+              break;
+            }
+            object.setY(
+              Math.floor(object.getY()) + (this._requestedDeltaY > 0 ? -1 : 1)
+            );
+          }
         }
       }
     }
@@ -392,7 +407,7 @@ namespace gdjs {
       this._falling.enter();
     }
 
-    private _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
@@ -478,37 +493,34 @@ namespace gdjs {
 
     private _checkTransitionOnFloorOrFalling() {
       const object = this.owner;
-      //Check if the object is on a floor:
-      //In priority, check if the last floor platform is still the floor.
-      let oldY = object.getY();
-      object.setY(object.getY() + 1);
-      if (
-        this._state === this._onFloor &&
-        gdjs.RuntimeObject.collisionTest(
-          object,
-          this._onFloor.getFloorPlatform()!.owner,
-          this._ignoreTouchingEdges
-        )
-      ) {
-        //Still on the same floor
-        this._onFloor.updateFloorPosition();
-      } else {
-        // Avoid landing on a platform if the object is not going down.
-        // (which could happen for Jumpthru, when the object jump and pass just at the top
-        // of a jumpthru, it could be considered as landing if not this this extra check).
-        const canLand = this._requestedDeltaY >= 0;
+      const oldY = object.getY();
+      // Avoid landing on a platform if the object is not going down.
+      // (which could happen for Jumpthru, when the object jump and pass just at the top
+      // of a jumpthru, it could be considered as landing if not for this extra check).
+      const canLand = this._requestedDeltaY >= 0;
 
-        //Check if landing on a new floor: (Exclude already overlapped jump thru)
-        let collidingPlatform = this._getCollidingPlatform();
-        if (canLand && collidingPlatform !== null) {
-          //Register the colliding platform as the floor.
-          this._setOnFloor(collidingPlatform);
-        } else if (this._state === this._onFloor) {
-          // don't fall if GrabbingPlatform or OnLadder
+      // The interval could be smaller.
+      // It's just for rounding errors.
+      const { highestGround } = this._findHighestFloorAndMoveOnTop(
+        this._potentialCollidingObjects,
+        -1,
+        1
+      );
+      // don't fall if GrabbingPlatform or OnLadder
+      if (this._state === this._onFloor) {
+        if (!highestGround) {
           this._setFalling();
+        } else if (highestGround === this._onFloor.getFloorPlatform()) {
+          this._onFloor.updateFloorPosition();
+        } else {
+          this._setOnFloor(highestGround);
         }
+      } else if (highestGround && canLand) {
+        this._setOnFloor(highestGround);
+      } else {
+        // The object can't land.
+        object.setY(oldY);
       }
-      object.setY(oldY);
     }
 
     _fall(timeDelta: float) {
@@ -571,6 +583,7 @@ namespace gdjs {
      * Separate the object from all platforms passed in parameter.
      * @param candidates The platform to be tested for collision
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     * @returns true if the object was moved
      */
     private _separateFromPlatforms(
       candidates: gdjs.PlatformRuntimeBehavior[],
@@ -605,6 +618,7 @@ namespace gdjs {
      * @param candidates The platform to be tested for collision
      * @param exceptThisOne The object identifier of a platform to be excluded from the check. Can be null.
      * @param excludeJumpThrus If set to true, jumpthru platforms are excluded. false if not defined.
+     * @returns true if the object collides any platform
      */
     _isCollidingWithOneOf(
       candidates: gdjs.PlatformRuntimeBehavior[],
@@ -642,6 +656,222 @@ namespace gdjs {
     }
 
     /**
+     * Find the highest floor reachable and move the owner on top of it.
+     * @param candidates The platform to be tested for collision
+     * @param upwardDeltaY The owner won't move upward more than this value.
+     * @param downwardDeltaY The owner won't move downward more than this value.
+     * @returns the platform where to walk or if an obstacle was found
+     */
+    _findHighestFloorAndMoveOnTop(
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      upwardDeltaY: float,
+      downwardDeltaY: float
+    ): PlatformSearchResult {
+      // TODO What if one obstacle is just upward and another one is followed up?
+      // Should it remember how much the character can go up without collision on top
+      // and return _floorIsTooHigh if the floor found is higher than that.
+      // To avoid going in a too small cavern and then pop out awkwardly or being stuck.
+      const context = FollowConstraintContext.instance;
+      context.initializeBeforeSearch(this, upwardDeltaY, downwardDeltaY);
+
+      let totalHighestY = Number.MAX_VALUE;
+      let highestGround: gdjs.PlatformRuntimeBehavior | null = null;
+      let isCollidingAnyPlatform = false;
+      for (const platform of candidates) {
+        if (
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ||
+          // Jump through platforms are obstacles only when the character comes from the top.
+          (platform.getPlatformType() ===
+            gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+            // When following the floor, jumpthrus that are higher than the character are ignored.
+            // If we only look above the character bottom, every jumpthrus can be discarded
+            // without doing any collision check.
+            ((this._state === this._onFloor &&
+              platform !== this._onFloor.getFloorPlatform() &&
+              downwardDeltaY < 0) ||
+              // When trying to land on a platform, exclude jumpthrus that were already overlapped.
+              (this._state !== this._onFloor &&
+                this._isIn(this._overlappedJumpThru, platform.owner.id))))
+        ) {
+          continue;
+        }
+
+        context.initializeBeforePlatformCheck();
+        const previousAllowedMinDeltaY = context.allowedMinDeltaY;
+        const previousAllowedMaxDeltaY = context.allowedMaxDeltaY;
+        this._findPlatformHighestRelativeYUnderObject(platform, context);
+        let highestRelativeY = context.getFloorDeltaY();
+        if (
+          // When following the floor, ignore jumpthrus that are higher than the character bottom.
+          this._state === this._onFloor &&
+          platform !== this._onFloor.getFloorPlatform() &&
+          platform.getPlatformType() ===
+            gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+          highestRelativeY < 0
+        ) {
+          // Don't follow jumpthrus that are higher than the character bottom.
+          // Revert side effect on the search context.
+          context.revertTo(previousAllowedMinDeltaY, previousAllowedMaxDeltaY);
+          continue;
+        }
+        if (context.foundPlatform()) {
+          isCollidingAnyPlatform = true;
+        }
+        if (context.floorIsTooHigh()) {
+          // One platform is colliding the character
+          // and is too high for the character to walk on.
+          // This will still be an obstacle event if there
+          // are other platforms that fit the requirement.
+          highestGround = null;
+          break;
+        }
+
+        if (context.foundPlatform() && highestRelativeY < totalHighestY) {
+          totalHighestY = highestRelativeY;
+          highestGround = platform;
+        }
+      }
+      if (highestGround) {
+        const object = this.owner;
+        object.setY(object.getY() + totalHighestY);
+      }
+      const returnValue =
+        gdjs.PlatformerObjectRuntimeBehavior._platformSearchResult;
+      returnValue.highestGround = highestGround;
+      returnValue.isCollidingAnyPlatform = isCollidingAnyPlatform;
+      return returnValue;
+    }
+
+    /**
+     * Find the highest Y relative to the owner bottom of the floor reachable by the owner.
+     * @param platform The platform to be tested for collision.
+     * @param upwardDeltaY The owner won't move upward more than this value.
+     * @param downwardDeltaY The owner won't move downward more than this value.
+     * @return the search context
+     */
+    private _findPlatformHighestRelativeYUnderObject(
+      platform: gdjs.PlatformRuntimeBehavior,
+      context: FollowConstraintContext
+    ): FollowConstraintContext {
+      const platformObject = platform.owner;
+      const platformAABB = platformObject.getAABB();
+      if (
+        platformAABB.max[0] <= context.ownerMinX ||
+        platformAABB.min[0] >= context.ownerMaxX ||
+        platformAABB.max[1] <= context.headMinY ||
+        platformAABB.min[1] > context.floorMaxY
+      ) {
+        // No collision
+        return context;
+      }
+
+      for (const hitbox of platformObject.getHitBoxes()) {
+        let previousVertex = hitbox.vertices[hitbox.vertices.length - 1];
+
+        // Edges over the character head might not result to a collision,
+        // but if there is also an edge under its head then there is a collision.
+        // The platform hitbox could be in several parts.
+        // So, the object could walk on one part
+        // and have another part over its head.
+        context.initializeBeforeHitboxCheck();
+
+        for (const vertex of hitbox.vertices) {
+          const deltaX = vertex[0] - previousVertex[0];
+          if (
+            // The vertex is into the interval excluding bounds
+            (context.ownerMinX < vertex[0] && vertex[0] < context.ownerMaxX) ||
+            // or the on a bound but its edge is from the inside.
+            (vertex[0] === context.ownerMinX &&
+              vertex[0] < previousVertex[0]) ||
+            (vertex[0] === context.ownerMaxX && vertex[0] > previousVertex[0])
+          ) {
+            this._addPointConstraint(vertex[1], context);
+          }
+
+          // Vertical edges doesn't matter
+          if (deltaX !== 0) {
+            // Check intersection on the left side of owner
+            if (
+              (vertex[0] < context.ownerMinX &&
+                context.ownerMinX < previousVertex[0]) ||
+              (previousVertex[0] < context.ownerMinX &&
+                context.ownerMinX < vertex[0])
+            ) {
+              const deltaY = vertex[1] - previousVertex[1];
+              const intersectionY =
+                previousVertex[1] +
+                ((context.ownerMinX - previousVertex[0]) * deltaY) / deltaX;
+
+              this._addPointConstraint(intersectionY, context);
+            }
+            // Check intersection on the right side of owner
+            if (
+              (vertex[0] < context.ownerMaxX &&
+                context.ownerMaxX < previousVertex[0]) ||
+              (previousVertex[0] < context.ownerMaxX &&
+                context.ownerMaxX < vertex[0])
+            ) {
+              const deltaY = vertex[1] - previousVertex[1];
+              const intersectionY =
+                previousVertex[1] +
+                ((context.ownerMaxX - previousVertex[0]) * deltaY) / deltaX;
+
+              this._addPointConstraint(intersectionY, context);
+            }
+          }
+          previousVertex = vertex;
+        }
+      }
+      return context;
+    }
+
+    /**
+     * Check if the character can follow a given Y or move to not touch it
+     * and update the context with this new constraint.
+     * @param y
+     * @param context
+     */
+    private _addPointConstraint(
+      y: float,
+      context: FollowConstraintContext
+    ): void {
+      if (y < context.floorMinY) {
+        // Platform is too high...
+        if (y > context.ownerMinY) {
+          // ...but not over the object.
+          context.setFloorIsTooHigh();
+          return;
+        } else {
+          // ...but over the object.
+          context.foundOverHead = true;
+          if (context.foundUnderHead) {
+            context.setFloorIsTooHigh();
+            return;
+          }
+          if (y > context.headMinY) {
+            context.allowedMinDeltaY = Math.max(
+              context.allowedMinDeltaY,
+              y - context.ownerMinY
+            );
+          }
+        }
+      }
+      // Ignore intersections that are too low
+      if (context.floorMinY <= y) {
+        if (context.foundOverHead) {
+          context.setFloorIsTooHigh();
+          return;
+        } else {
+          context.allowedMaxDeltaY = Math.min(
+            context.allowedMaxDeltaY,
+            y - context.ownerMaxY
+          );
+          context.foundUnderHead = true;
+        }
+      }
+    }
+
+    /**
      * Among the platforms passed in parameter, return true if there is a platform colliding with the object.
      * Ladders are *always* excluded from the test.
      * @param candidates The platform to be tested for collision
@@ -672,31 +902,6 @@ namespace gdjs {
         }
       }
       return false;
-    }
-
-    /**
-     * Return (one of) the platform which is colliding with the behavior owner object.
-     * Overlapped jump thru and ladders are excluded.
-     * _updatePotentialCollidingObjects and _updateOverlappedJumpThru should have been called before.
-     */
-    private _getCollidingPlatform() {
-      for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
-        const platform = this._potentialCollidingObjects[i];
-        if (
-          platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER &&
-          !this._isIn(this._overlappedJumpThru, platform.owner.id) &&
-          gdjs.RuntimeObject.collisionTest(
-            this.owner,
-            platform.owner,
-            this._ignoreTouchingEdges
-          )
-        ) {
-          return platform;
-        }
-      }
-
-      //Nothing is being colliding with the behavior object.
-      return null;
     }
 
     /**
@@ -1262,9 +1467,35 @@ namespace gdjs {
         object.setY(
           this._floorLastY -
             object.getHeight() +
-            (object.getY() - object.getDrawableY()) -
-            1
+            (object.getY() - object.getDrawableY())
         );
+      }
+      // Directly follow the floor movement on the Y axis by moving the character.
+      // For the X axis, we follow the floor movement using `_requestedDeltaX`
+      // (see `beforeMovingX`).
+      // We don't use `_requestedDeltaY` to follow the floor on the Y axis
+      // to avoid a transition loop with the Falling state.
+      // Indeed, if we used it, then:
+      // - going down, the character could no longer be on a platform and start falling.
+      // - going up, the character will already be pushed on top on the platform
+      //   by `beforeMovingY` that handle slopes or by `_separateFromPlatforms` that
+      //   avoid characters being stuck. So using `_requestedDeltaY`, the character
+      //   would be going too much higher and fall at the next frame.
+      //
+      // We could make the character follow a platform moving up
+      // at a greater speed as it's coherent from a physics point of view.
+      // But, when the character is put on top of the platform to follow it up,
+      // the platform AABB may not be updated in RBush yet
+      // and the platform can go out of the spatial search rectangle
+      // even though they are next to each other, which means
+      // that the character will fall.
+      const deltaY = this._floorPlatform!.owner.getY() - this._floorLastY;
+      if (
+        deltaY !== 0 &&
+        Math.abs(deltaY) <=
+          Math.abs(this._behavior._maxFallingSpeed * timeDelta)
+      ) {
+        object.setY(object.getY() + deltaY);
       }
     }
 
@@ -1283,11 +1514,10 @@ namespace gdjs {
 
     beforeMovingX() {
       const behavior = this._behavior;
-      //Shift the object according to the floor movement.
+      // Shift the object according to the floor movement.
       behavior._requestedDeltaX +=
         this._floorPlatform!.owner.getX() - this._floorLastX;
-      behavior._requestedDeltaY +=
-        this._floorPlatform!.owner.getY() - this._floorLastY;
+      // See `beforeUpdatingObstacles` for the logic for the Y axis.
     }
 
     checkTransitionBeforeY(timeDelta: float) {
@@ -1302,107 +1532,146 @@ namespace gdjs {
       const behavior = this._behavior;
       const object = behavior.owner;
 
-      //Follow the floor
-      if (
-        gdjs.RuntimeObject.collisionTest(
-          object,
-          this._floorPlatform!.owner,
-          behavior._ignoreTouchingEdges
-        )
-      ) {
-        //Floor is getting up, as the object is colliding with it.
-        let oldY = object.getY();
-        let step = 0;
-        let stillInFloor = false;
-        do {
-          if (
-            step >=
-            Math.floor(
-              Math.abs(
-                behavior._requestedDeltaX * behavior._slopeClimbingFactor
-              )
-            )
-          ) {
-            //Slope is too step ( > 50% )
-            object.setY(
-              object.getY() -
-                (Math.abs(
-                  behavior._requestedDeltaX * behavior._slopeClimbingFactor
-                ) -
-                  step)
-            );
-
-            //Try to add the decimal part.
-            if (
-              gdjs.RuntimeObject.collisionTest(
-                object,
-                this._floorPlatform!.owner,
-                behavior._ignoreTouchingEdges
-              )
-            ) {
-              stillInFloor = true;
-            }
-
-            //Too steep.
-            break;
-          }
-
-          //Try to get out of the floor.
-          object.setY(object.getY() - 1);
-          step++;
-        } while (
-          gdjs.RuntimeObject.collisionTest(
-            object,
-            this._floorPlatform!.owner,
-            behavior._ignoreTouchingEdges
-          )
+      if (object.getX() === oldX + behavior._requestedDeltaX) {
+        // The character didn't encounter any obstacles on the X axis.
+        // It follows the floor.
+        const deltaMaxY = Math.abs(
+          behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );
-        if (stillInFloor) {
-          object.setY(
-            //Unable to follow the floor ( too steep ): Go back to the original position.
-            oldY
-          );
-          object.setX(
-            //And also revert the shift on X axis.
-            oldX
-          );
+        const {
+          highestGround,
+          isCollidingAnyPlatform,
+        } = behavior._findHighestFloorAndMoveOnTop(
+          behavior._potentialCollidingObjects,
+          -deltaMaxY,
+          deltaMaxY
+        );
+        if (highestGround && highestGround !== this._floorPlatform) {
+          behavior._setOnFloor(highestGround);
+        }
+        if (highestGround === null && isCollidingAnyPlatform) {
+          // Unable to follow the floor (too steep): go back to the original position.
+          behavior.owner.setX(oldX);
         }
       } else {
-        //Floor is flat or get down.
-        let oldY = object.getY();
-        const tentativeStartY = object.getY() + 1;
-        object.setY(
-          behavior._roundCoordinates
-            ? Math.round(tentativeStartY)
-            : tentativeStartY
+        // The character encountered an obstacle on the X axis.
+        // Try to walk on it or stop before it.
+
+        // Try to follow the platform until the obstacle.
+        const {
+          highestGround: highestGroundOnPlatform,
+          isCollidingAnyPlatform,
+        } = behavior._findHighestFloorAndMoveOnTop(
+          behavior._potentialCollidingObjects,
+          Math.min(
+            0,
+            -Math.abs(object.getX() - oldX) * behavior._slopeClimbingFactor
+          ),
+          0
         );
-        let step = 0;
-        let noMoreOnFloor = false;
-        while (
-          !behavior._isCollidingWithOneOf(behavior._potentialCollidingObjects)
-        ) {
-          if (
-            step >
-            Math.abs(behavior._requestedDeltaX * behavior._slopeClimbingFactor)
-          ) {
-            //Slope is too step ( > 50% )
-            noMoreOnFloor = true;
-            break;
-          }
-
-          //Object was on floor, but no more: Maybe a slope, try to follow it.
-          object.setY(object.getY() + 1);
-          step++;
-        }
-
-        //Unable to follow the floor: Go back to the original position. Fall will be triggered next tick.
-        if (noMoreOnFloor) {
-          object.setY(oldY);
+        if (highestGroundOnPlatform === null && isCollidingAnyPlatform) {
+          // Unable to follow the floor (too steep): go back to the original position.
+          behavior.owner.setX(oldX);
         } else {
-          object.setY(
-            //Floor touched: Go back 1 pixel over.
-            object.getY() - 1
+          const requestedDeltaX = behavior._requestedDeltaX;
+          // The current platform is climbed.
+          // Can the obstacle be climbed too from here?
+          // We do a look-up in 2 steps:
+          // 1. Try to move 1 pixel on X to climb the junction
+          //    (because the obstacle detection is done 1 pixel by 1 pixel).
+          // 2. Try to follow the obstacle slope by at least 1 pixel on X axis
+          //    (it can only be done after the junction because otherwise
+          //    the slope angle would be a mean between the current platform and
+          //    the obstacles).
+          //
+          // The 2nd step is done using a 1 pixel width at least, when remainingDeltaX
+          // is less than 2 pixels: this will be a "lookahead". This is to ensure
+          // the character doesn't start to climb a slope it actually can't.
+          const remainingDeltaX = requestedDeltaX - (object.getX() - oldX);
+          const beforeObstacleY = object.getY();
+          const beforeObstacleX = object.getX();
+
+          // 1. Try to move 1 pixel on the X axis to climb the junction.
+          object.setX(object.getX() + Math.sign(requestedDeltaX));
+          const {
+            highestGround: highestGroundAtJunction,
+          } = behavior._findHighestFloorAndMoveOnTop(
+            behavior._potentialCollidingObjects,
+            // Look up from at least 1 pixel to bypass not perfectly aligned floors.
+            Math.min(-1, -1 * behavior._slopeClimbingFactor),
+            0
           );
+          if (highestGroundAtJunction) {
+            // The obstacle 1st pixel can be climbed.
+            // Now that the character is on the obstacle,
+            // try to follow the slope for at least 1 pixel.
+            const deltaX =
+              Math.sign(requestedDeltaX) *
+              Math.max(
+                1,
+                // - 1, because the owner moved from 1 pixel at the junction.
+                Math.abs(remainingDeltaX) - 1
+              );
+            object.setX(object.getX() + deltaX);
+            const {
+              highestGround: highestGroundOnObstacle,
+            } = behavior._findHighestFloorAndMoveOnTop(
+              behavior._potentialCollidingObjects,
+              // Do an exact slope angle check.
+              -Math.abs(deltaX) * behavior._slopeClimbingFactor,
+              0
+            );
+            if (highestGroundOnObstacle) {
+              // The obstacle slope can be climbed.
+              if (Math.abs(remainingDeltaX) >= 2) {
+                behavior._setOnFloor(highestGroundOnObstacle);
+              } else {
+                // We went too far in order to check that.
+                // Now, find the right position on the obstacles.
+                object.setPosition(oldX + requestedDeltaX, beforeObstacleY);
+                const {
+                  highestGround: highestGroundOnObstacle,
+                } = behavior._findHighestFloorAndMoveOnTop(
+                  behavior._potentialCollidingObjects,
+                  // requestedDeltaX can be small when the object start moving.
+                  // So, look up from at least 1 pixel to bypass not perfectly aligned floors.
+                  Math.min(
+                    -1,
+                    -Math.abs(remainingDeltaX) * behavior._slopeClimbingFactor
+                  ),
+                  0
+                );
+                // Should always be true
+                if (highestGroundOnObstacle) {
+                  behavior._setOnFloor(highestGroundOnObstacle);
+                }
+              }
+            } else {
+              // Don't climb on the obstacle
+              // because the obstacle slope is too steep.
+              if (
+                Math.sign(beforeObstacleX - oldX) === Math.sign(requestedDeltaX)
+              ) {
+                object.setPosition(beforeObstacleX, beforeObstacleY);
+              } else {
+                // Avoid to go backward
+                object.setPosition(oldX, beforeObstacleY);
+              }
+              behavior._currentSpeed = 0;
+            }
+          } else {
+            // Don't climb on the obstacle
+            // because the obstacle 1st pixel is more than 1 pixel high (or too steep).
+            if (
+              Math.sign(beforeObstacleX - oldX) === Math.sign(requestedDeltaX)
+            ) {
+              object.setPosition(beforeObstacleX, beforeObstacleY);
+            } else {
+              // Avoid to go backward
+              object.setPosition(oldX, beforeObstacleY);
+            }
+            behavior._currentSpeed = 0;
+          }
         }
       }
     }
@@ -1676,6 +1945,154 @@ namespace gdjs {
 
     toString(): String {
       return 'OnLadder';
+    }
+  }
+
+  /**
+   * A context used to search for a floor.
+   */
+  class FollowConstraintContext {
+    static readonly instance: FollowConstraintContext = new FollowConstraintContext();
+    /**
+     * Character right side
+     *
+     * (constant to a search)
+     */
+    ownerMinX: float = 0;
+    /**
+     * Character left side
+     *
+     * (constant to a search)
+     */
+    ownerMaxX: float = 0;
+    /**
+     * The maximum top position the character top can go.
+     *
+     * (constant to a search)
+     */
+    headMinY: float = 0;
+    /**
+     * Character top
+     *
+     * (constant to a search)
+     */
+    ownerMinY: float = 0;
+    /**
+     * The maximum top position the character bottom can go.
+     *
+     * (constant to a search)
+     */
+    floorMinY: float = 0;
+    /**
+     * Character bottom
+     *
+     * (constant to a search)
+     */
+    ownerMaxY: float = 0;
+    /**
+     * The maximum bottom position the character bottom can go.
+     *
+     * (constant to a search)
+     */
+    floorMaxY: float = 0;
+
+    /**
+     * The minimum upward delta according to already checked platforms.
+     *
+     * (a result of the search)
+     */
+    allowedMinDeltaY: float = 0;
+    /**
+     * The maximum downward delta according to already checked platforms.
+     *
+     * (a result of the search)
+     */
+    allowedMaxDeltaY: float = 0;
+
+    /**
+     * True if any edge has been found over the character top.
+     *
+     * It allows to check for encompassing platforms.
+     *
+     * (local to one hitbox check)
+     */
+    foundOverHead: boolean = false;
+    /**
+     * True if any edge has been found under the character top.
+     *
+     * It allows to check for encompassing platforms.
+     *
+     * (local to one hitbox check)
+     */
+    foundUnderHead: boolean = false;
+
+    initializeBeforeSearch(
+      behavior: PlatformerObjectRuntimeBehavior,
+      upwardDeltaY: float,
+      downwardDeltaY: float
+    ) {
+      let ownerMinX = Number.MAX_VALUE;
+      let ownerMaxX = -Number.MAX_VALUE;
+      let ownerMinY = Number.MAX_VALUE;
+      let ownerMaxY = -Number.MAX_VALUE;
+      for (const hitBox of behavior.owner.getHitBoxes()) {
+        for (const vertex of hitBox.vertices) {
+          ownerMinX = Math.min(ownerMinX, vertex[0]);
+          ownerMaxX = Math.max(ownerMaxX, vertex[0]);
+          ownerMinY = Math.min(ownerMinY, vertex[1]);
+          ownerMaxY = Math.max(ownerMaxY, vertex[1]);
+        }
+      }
+
+      this.ownerMinX = ownerMinX;
+      this.ownerMaxX = ownerMaxX;
+      this.headMinY = ownerMinY + upwardDeltaY;
+      this.ownerMinY = ownerMinY;
+      this.floorMinY = ownerMaxY + upwardDeltaY;
+      this.ownerMaxY = ownerMaxY;
+      this.floorMaxY = ownerMaxY + downwardDeltaY;
+
+      this.allowedMinDeltaY = upwardDeltaY;
+      this.allowedMaxDeltaY = Number.MAX_VALUE;
+    }
+
+    initializeBeforePlatformCheck() {
+      this.allowedMaxDeltaY = Number.MAX_VALUE;
+    }
+
+    initializeBeforeHitboxCheck() {
+      this.foundOverHead = false;
+      this.foundUnderHead = false;
+    }
+
+    /**
+     * Revert the search variables to a given state.
+     *
+     * This is used to revert side effect of jumpthru check.
+     * @param previousAllowedMinDeltaY
+     * @param previousAllowedMaxDeltaY
+     */
+    revertTo(previousAllowedMinDeltaY: float, previousAllowedMaxDeltaY: float) {
+      // Other members are either constants or local to an hitbox search.
+      this.allowedMinDeltaY = previousAllowedMinDeltaY;
+      this.allowedMaxDeltaY = previousAllowedMaxDeltaY;
+    }
+
+    setFloorIsTooHigh() {
+      this.allowedMinDeltaY = Number.MAX_VALUE;
+      this.allowedMaxDeltaY = -Number.MAX_VALUE;
+    }
+
+    floorIsTooHigh(): boolean {
+      return this.allowedMinDeltaY > this.allowedMaxDeltaY;
+    }
+
+    foundPlatform(): boolean {
+      return this.ownerMaxY + this.allowedMaxDeltaY <= this.floorMaxY;
+    }
+
+    getFloorDeltaY(): float {
+      return this.allowedMaxDeltaY;
     }
   }
 

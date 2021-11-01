@@ -2365,6 +2365,31 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         );
       });
 
+      it('can walk on a platform and go through a jump through', function () {
+        // Jumpthru that are ignored had a side effects on the search context.
+        // It made jumpthru appear solid when a platform was tested after them.
+
+        // Add the jumptru 1st to make RBrush gives it 1st.
+        // There is no causality but it does in the current implementation.
+        const jumpThroughPlatform = addJumpThroughPlatformObject(runtimeScene);
+        jumpThroughPlatform.setPosition(30, -15);
+        jumpThroughPlatform.setCustomWidthAndHeight(60, 10);
+
+        // Put a platform.
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+
+        object.setPosition(10, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+
+        // Walk from the 1st platform to the 2nd one.
+        walkRight(20);
+        expect(object.getX()).to.be.above(jumpThroughPlatform.getX());
+        expect(object.getY()).to.be(platform.getY() - object.getHeight());
+      });
+
       it('can walk from a platform to another one that not aligned', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
@@ -2569,10 +2594,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         const lastSpeed = behavior.getCurrentSpeed();
         behavior.simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
-        //expect(behavior.isOnFloor()).to.be(true);
-        //expect(object.getX()).to.be.above(lastX);
+        expect(behavior.isOnFloor()).to.be(true);
+        expect(object.getX()).to.be.above(lastX);
         // Check that the object doesn't stop
-        //expect(behavior.getCurrentSpeed()).to.be.above(lastSpeed);
+        expect(behavior.getCurrentSpeed()).to.be.above(lastSpeed);
       }
     };
 

@@ -697,6 +697,8 @@ namespace gdjs {
         }
 
         context.initializeBeforePlatformCheck();
+        const previousAllowedMinDeltaY = context.allowedMinDeltaY;
+        const previousAllowedMaxDeltaY = context.allowedMaxDeltaY;
         this._findPlatformHighestRelativeYUnderObject(platform, context);
         let highestRelativeY = context.getFloorDeltaY();
         if (
@@ -708,6 +710,8 @@ namespace gdjs {
           highestRelativeY < 0
         ) {
           // Don't follow jumpthrus that are higher than the character bottom.
+          // Revert side effect on the search context.
+          context.revertTo(previousAllowedMinDeltaY, previousAllowedMaxDeltaY);
           continue;
         }
         if (context.foundPlatform()) {
@@ -1963,51 +1967,74 @@ namespace gdjs {
     static readonly instance: FollowConstraintContext = new FollowConstraintContext();
     /**
      * Character right side
+     *
+     * (constant to a search)
      */
     ownerMinX: float = 0;
     /**
      * Character left side
+     *
+     * (constant to a search)
      */
     ownerMaxX: float = 0;
     /**
      * The maximum top position the character top can go.
+     *
+     * (constant to a search)
      */
     headMinY: float = 0;
     /**
      * Character top
+     *
+     * (constant to a search)
      */
     ownerMinY: float = 0;
     /**
      * The maximum top position the character bottom can go.
+     *
+     * (constant to a search)
      */
     floorMinY: float = 0;
     /**
      * Character bottom
+     *
+     * (constant to a search)
      */
     ownerMaxY: float = 0;
     /**
      * The maximum bottom position the character bottom can go.
+     *
+     * (constant to a search)
      */
     floorMaxY: float = 0;
 
     /**
      * The minimum upward delta according to already checked platforms.
+     *
+     * (a result of the search)
      */
     allowedMinDeltaY: float = 0;
     /**
      * The maximum downward delta according to already checked platforms.
+     *
+     * (a result of the search)
      */
     allowedMaxDeltaY: float = 0;
+
     /**
      * True if any edge has been found over the character top.
      *
      * It allows to check for encompassing platforms.
+     *
+     * (local to one hitbox check)
      */
     foundOverHead: boolean = false;
     /**
      * True if any edge has been found under the character top.
      *
      * It allows to check for encompassing platforms.
+     *
+     * (local to one hitbox check)
      */
     foundUnderHead: boolean = false;
 
@@ -2038,6 +2065,7 @@ namespace gdjs {
       this.floorMaxY = ownerMaxY + downwardDeltaY;
 
       this.allowedMinDeltaY = upwardDeltaY;
+      this.allowedMaxDeltaY = Number.MAX_VALUE;
     }
 
     initializeBeforePlatformCheck() {
@@ -2047,6 +2075,19 @@ namespace gdjs {
     initializeBeforeHitboxCheck() {
       this.foundOverHead = false;
       this.foundUnderHead = false;
+    }
+
+    /**
+     * Revert the search variables to a given state.
+     *
+     * This is used to revert side effect of jumpthru check.
+     * @param previousAllowedMinDeltaY
+     * @param previousAllowedMaxDeltaY
+     */
+    revertTo(previousAllowedMinDeltaY: float, previousAllowedMaxDeltaY: float) {
+      // Other members are either constants or local to an hitbox search.
+      this.allowedMinDeltaY = previousAllowedMinDeltaY;
+      this.allowedMaxDeltaY = previousAllowedMaxDeltaY;
     }
 
     setFloorIsTooHigh() {

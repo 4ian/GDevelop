@@ -819,6 +819,11 @@ namespace gdjs {
             }
           }
           previousVertex = vertex;
+          if (context.floorIsTooHigh()) {
+            // The character can't follow the platforms.
+            // No need to continue the search.
+            return context;
+          }
         }
       }
       return context;

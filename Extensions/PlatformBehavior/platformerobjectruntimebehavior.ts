@@ -667,10 +667,6 @@ namespace gdjs {
       upwardDeltaY: float,
       downwardDeltaY: float
     ): PlatformSearchResult {
-      // TODO What if one obstacle is just upward and another one is followed up?
-      // Should it remember how much the character can go up without collision on top
-      // and return _floorIsTooHigh if the floor found is higher than that.
-      // To avoid going in a too small cavern and then pop out awkwardly or being stuck.
       const context = FollowConstraintContext.instance;
       context.initializeBeforeSearch(this, upwardDeltaY, downwardDeltaY);
 
@@ -713,19 +709,22 @@ namespace gdjs {
           context.revertTo(previousAllowedMinDeltaY, previousAllowedMaxDeltaY);
           continue;
         }
-        if (context.foundPlatform()) {
+        if (context.isCollidingAnyPlatform()) {
           isCollidingAnyPlatform = true;
         }
         if (context.floorIsTooHigh()) {
           // One platform is colliding the character
           // and is too high for the character to walk on.
-          // This will still be an obstacle event if there
-          // are other platforms that fit the requirement.
+          // This will still be an obstacle even if there
+          // are other platforms that fit the requirements.
           highestGround = null;
           break;
         }
 
-        if (context.foundPlatform() && highestRelativeY < totalHighestY) {
+        if (
+          context.isCollidingAnyPlatform() &&
+          highestRelativeY < totalHighestY
+        ) {
           totalHighestY = highestRelativeY;
           highestGround = platform;
         }
@@ -2018,6 +2017,9 @@ namespace gdjs {
       this.floorMaxY = ownerMaxY + downwardDeltaY;
 
       this.allowedMinDeltaY = upwardDeltaY;
+      // Number.MAX_VALUE and not downwardDeltaY
+      // because it would means that a platform was found.
+      // see isCollidingAnyPlatform()
       this.allowedMaxDeltaY = Number.MAX_VALUE;
     }
 
@@ -2045,10 +2047,11 @@ namespace gdjs {
     }
 
     floorIsTooHigh(): boolean {
+      // Return true when the 2 constraints are incompatible.
       return this.allowedMinDeltaY > this.allowedMaxDeltaY;
     }
 
-    foundPlatform(): boolean {
+    isCollidingAnyPlatform(): boolean {
       return this.ownerMaxY + this.allowedMaxDeltaY <= this.floorMaxY;
     }
 
@@ -2075,7 +2078,9 @@ namespace gdjs {
           this.setFloorIsTooHigh();
           return;
         }
-        // Add the vertex to the constraints.
+        // When there is a platform on the top,
+        // the character is constraint on how high
+        // he can follow a floor.
         this.allowedMinDeltaY = Math.max(
           this.allowedMinDeltaY,
           y - this.ownerMinY
@@ -2088,6 +2093,9 @@ namespace gdjs {
           return;
         }
         // Add the vertex to the constraints.
+        // When there is a platform on the bottom,
+        // the character is constraint on how low
+        // he can follow a floor.
         this.allowedMaxDeltaY = Math.min(
           this.allowedMaxDeltaY,
           y - this.ownerMaxY

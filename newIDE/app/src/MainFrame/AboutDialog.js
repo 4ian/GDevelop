@@ -35,9 +35,9 @@ const styles = {
   },
 };
 
-/* There must be missing tons of people.
-If you contributed to GDevelop but you're not in the list, please
-send a Pull Request on GitHub or open an issue ;)*/
+// There must be missing tons of people.
+// If you contributed to GDevelop but you're not in the list, please
+// send a Pull Request on GitHub or open an issue ;)
 const contributors = [
   // Core development team
   {

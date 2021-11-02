@@ -1,6 +1,6 @@
 /// <reference path="shifty.d.ts" />
-const logger = new gdjs.Logger('Tween behavior');
 namespace gdjs {
+  const logger = new gdjs.Logger('Tween behavior');
   export interface RuntimeScene {
     shiftyJsScene: shifty.Scene;
   }
@@ -131,7 +131,7 @@ namespace gdjs {
         totalDuration
       );
 
-      // Attach it to the scene as it will become active and acttive tweens should be on the scene.
+      // Attach it to the scene as it will become active and active tweens should be on the scene.
       if (!this._runtimeScene.shiftyJsScene)
         this._runtimeScene.shiftyJsScene = new shifty.Scene();
       this._runtimeScene.shiftyJsScene.add(tweenable);

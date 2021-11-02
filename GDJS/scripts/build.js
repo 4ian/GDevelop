@@ -1,4 +1,4 @@
-const esbuild = require('esbuild');
+const { build } = require('esbuild');
 const path = require('path');
 const shell = require('shelljs');
 const {
@@ -26,8 +26,6 @@ if (!args.out) {
 shell.mkdir('-p', bundledOutPath);
 
 (async () => {
-  const esbuildService = await esbuild.startService();
-
   // Generate the output file paths
   const {
     allGDJSInOutFilePaths,
@@ -51,21 +49,19 @@ shell.mkdir('-p', bundledOutPath);
           return;
         }
 
-        return esbuildService
-          .build({
-            sourcemap: true,
-            entryPoints: [inPath],
-            outfile: renameBuiltFile(outPath),
-          })
-          .catch(() => {
-            // Error is already logged by esbuild.
-            errored = true;
-          });
+        return build({
+          sourcemap: true,
+          entryPoints: [inPath],
+          minify: true,
+          outfile: renameBuiltFile(outPath),
+        }).catch(() => {
+          // Error is already logged by esbuild.
+          errored = true;
+        });
       }
     )
   );
 
-  esbuildService.stop();
   const buildDuration = Date.now() - startTime;
   if (!errored) shell.echo(`✅ GDJS built in ${buildDuration}ms`);
   if (errored) shell.exit(1);

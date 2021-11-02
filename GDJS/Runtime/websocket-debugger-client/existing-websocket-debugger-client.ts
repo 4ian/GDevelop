@@ -1,14 +1,5 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Debugger client');
-
-  const originalConsole = {
-    log: console.log,
-    info: console.info,
-    debug: console.debug,
-    warn: console.warn,
-    error: console.error,
-  };
-
   /**
    * An client side implementation of the Debugger
    */
@@ -88,10 +79,10 @@ namespace gdjs {
    *
    * @param runtimeGame - The `gdjs.RuntimeGame` to be debugged
    */
-  export class WindowMessageDebuggerClient implements IDebuggerClient {
+  export class WebsocketDebuggerClient implements IDebuggerClient {
     _runtimegame: gdjs.RuntimeGame;
     _hotReloader: gdjs.HotReloader;
-    _opener: Window | null = null;
+    _ws: WebSocket | null;
 
     /**
      * @param path - The path of the property to modify, starting from the RuntimeGame.
@@ -99,19 +90,47 @@ namespace gdjs {
     constructor(runtimeGame: RuntimeGame) {
       this._runtimegame = runtimeGame;
       this._hotReloader = new gdjs.HotReloader(runtimeGame);
-
-      this._opener = window.opener || null;
-
-      if (!this._opener) {
-        logger.log("window.opener not existing, Debugger won't work");
+      this._ws = null;
+      if (typeof WebSocket === 'undefined') {
+        logger.log("WebSocket is not defined, debugger won't work");
         return;
       }
-
       const that = this;
-      window.addEventListener('message', (event) => {
-        const data = event.data;
-        console.log('received', data);
-
+      let ws = null;
+      try {
+        // Find the WebSocket server to connect to using the address that was stored
+        // in the options by the editor. If not, try the default address, though it's unlikely
+        // to work - which is ok, the game can run without a debugger server.
+        const runtimeGameOptions = this._runtimegame.getAdditionalOptions();
+        const address =
+          (runtimeGameOptions && runtimeGameOptions.debuggerServerAddress) ||
+          '127.0.0.1';
+        const port =
+          (runtimeGameOptions && runtimeGameOptions.debuggerServerPort) ||
+          '3030';
+        this._ws = new WebSocket('ws://' + address + ':' + port + '/');
+      } catch (e) {
+        logger.log(
+          "WebSocket could not initialize, debugger/hot-reload won't work (might be because of preview inside web browser)."
+        );
+        return;
+      }
+      this._ws.onopen = function open() {
+        logger.info('Debugger connection open');
+      };
+      this._ws.onclose = function close() {
+        logger.info('Debugger connection closed');
+      };
+      this._ws.onerror = function errored(error) {
+        logger.warn('Debugger client error:', error);
+      };
+      this._ws.onmessage = function incoming(message) {
+        let data: any = null;
+        try {
+          data = JSON.parse(message.data);
+        } catch (e) {
+          logger.info('Debugger received a badly formatted message');
+        }
         if (data && data.command) {
           if (data.command === 'play') {
             runtimeGame.pause(false);
@@ -147,7 +166,7 @@ namespace gdjs {
         } else {
           logger.info('Debugger received a message with badly formatted data.');
         }
-      });
+      };
 
       const redirectJsLog = (
         type: 'info' | 'warning' | 'error',
@@ -156,12 +175,20 @@ namespace gdjs {
         this.log(
           'JavaScript',
           messages.reduce(
-            (accumulator, value) => accumulator + value,
+            (accumulator, value) => accumulator + value.toString(),
             ''
           ),
           type,
           false
         );
+      };
+
+      const originalConsole = {
+        log: console.log,
+        info: console.info,
+        debug: console.debug,
+        warn: console.warn,
+        error: console.error,
       };
 
       // Hook the console logging functions to log to the Debugger as well
@@ -207,42 +234,29 @@ namespace gdjs {
       });
     }
 
-    _sendMessage(message: string) {
-      if (!this._opener) return;
-
-      try {
-        this._opener.postMessage(
-          message,
-          '*'
-        );
-      } catch(error) {
-        originalConsole.warn("Error while sending a message to the debugger:", error);
-      }
-    }
-
     log(
       group: string,
       message: string,
       type: 'info' | 'warning' | 'error',
       internal: boolean
     ) {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn('No connection to debugger opened to send logs');
         return;
       }
-
-      this._sendMessage(
-        JSON.stringify({
-          command: 'console.log',
-          payload: {
-            message,
-            type,
-            group,
-            internal,
-            timestamp: performance.now(),
-          },
-        })
-      );
+      if (this._ws.readyState === 1)
+        this._ws.send(
+          JSON.stringify({
+            command: 'console.log',
+            payload: {
+              message,
+              type,
+              group,
+              internal,
+              timestamp: performance.now(),
+            },
+          })
+        );
     }
 
     set(path: string[], newValue: any): boolean {
@@ -303,7 +317,7 @@ namespace gdjs {
     }
 
     sendRuntimeGameDump(): void {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn(
           'No connection to debugger opened to send RuntimeGame dump'
         );
@@ -372,15 +386,15 @@ namespace gdjs {
           'Serialization took a long time: please check if there is a need to remove some objects from serialization'
         );
       }
-      this._sendMessage(stringifiedMessage);
+      this._ws.send(stringifiedMessage);
     }
 
     sendHotReloaderLogs(logs: HotReloaderLog[]): void {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn('No connection to debugger opened');
         return;
       }
-      this._sendMessage(
+      this._ws.send(
         this._circularSafeStringify({
           command: 'hotReloader.logs',
           payload: logs,
@@ -389,11 +403,11 @@ namespace gdjs {
     }
 
     sendProfilerStarted(): void {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn('No connection to debugger opened');
         return;
       }
-      this._sendMessage(
+      this._ws.send(
         this._circularSafeStringify({
           command: 'profiler.started',
           payload: null,
@@ -402,11 +416,11 @@ namespace gdjs {
     }
 
     sendProfilerStopped(): void {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn('No connection to debugger opened');
         return;
       }
-      this._sendMessage(
+      this._ws.send(
         this._circularSafeStringify({
           command: 'profiler.stopped',
           payload: null,
@@ -418,13 +432,13 @@ namespace gdjs {
       framesAverageMeasures: FrameMeasure,
       stats: ProfilerStats
     ): void {
-      if (!this._opener) {
+      if (!this._ws) {
         logger.warn(
           'No connection to debugger opened to send profiler measures'
         );
         return;
       }
-      this._sendMessage(
+      this._ws.send(
         this._circularSafeStringify({
           command: 'profiler.output',
           payload: {
@@ -507,5 +521,5 @@ namespace gdjs {
   }
 
   //Register the class to let the engine use it.
-  export const DebuggerClient = WindowMessageDebuggerClient;
+  export const DebuggerClient = WebsocketDebuggerClient;
 }

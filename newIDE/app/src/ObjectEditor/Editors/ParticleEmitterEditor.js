@@ -61,7 +61,7 @@ export default class ParticleEmitterEditor extends React.Component<
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Line}
-            primaryText={t`Rectangle`}
+            primaryText={t`Line`}
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}

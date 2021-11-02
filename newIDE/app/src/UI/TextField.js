@@ -8,7 +8,7 @@ import { MarkdownText } from './MarkdownText';
 type ValueProps =
   // Support "text" and "password" type:
   | {|
-      type?: 'text' | 'password',
+      type?: 'text' | 'password' | 'search',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},

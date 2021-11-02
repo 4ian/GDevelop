@@ -57,7 +57,7 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
-import LayoutChooserDialog from '../MainFrame/EditorContainers/LayoutChooserDialog';
+import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
@@ -117,7 +117,8 @@ import {
   GDevelopGameApi,
 } from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
-import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
+import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
+import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -2441,7 +2442,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       parameterRenderingService={ParameterRenderingService}
     />
   ))
-  .add('autocompletions (second selected)', () => (
+  .add('autocompletions (expression selected)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
@@ -2449,11 +2450,11 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
-      selectedCompletionIndex={1}
+      selectedCompletionIndex={6}
       parameterRenderingService={ParameterRenderingService}
     />
   ))
-  .add('autocompletion for an exact expression', () => (
+  .add('empty autocompletions (because exact expression)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
@@ -2797,8 +2798,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2815,8 +2817,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2854,7 +2857,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
@@ -2866,7 +2869,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
@@ -2877,7 +2880,9 @@ storiesOf('MeasuresTable', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 250 }}>
-      <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
+      <MeasuresTable
+        profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
+      />
     </div>
   ));
 
@@ -2994,10 +2999,29 @@ storiesOf('OpenConfirmDialog', module)
     />
   ));
 
-storiesOf('LayoutChooserDialog', module)
+storiesOf('ExternalPropertiesDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LayoutChooserDialog open project={testProject.project} />
+  .add('with layout selection', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+    />
+  ))
+  .add('with help texts', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+      helpTexts={[
+        'This is a help text, remember to read it.',
+        "And there's another one!",
+      ]}
+    />
   ));
 
 storiesOf('EventsTree', module)
@@ -3205,6 +3229,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('default (no results)', () => (
@@ -3216,6 +3241,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('3 results', () => (
@@ -3227,6 +3253,19 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
+    />
+  ))
+  .add('3 results with focus on the second', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={3}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
+      searchFocusOffset={1}
     />
   ));
 

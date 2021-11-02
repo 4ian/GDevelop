@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Storage');
   export namespace evtTools {
     /**
      * Functions to store and load basic values (strings or numbers), organized
@@ -30,10 +31,10 @@ namespace gdjs {
           }
         }
       } catch (error) {
-        console.warn('Unable to get access to the localStorage: ', error);
+        logger.error('Unable to get access to the localStorage: ' + error);
       }
       if (!localStorage) {
-        console.warn(
+        logger.error(
           "Storage actions won't work as no localStorage was found."
         );
       }
@@ -64,9 +65,8 @@ namespace gdjs {
             serializedString = localStorage.getItem('GDJS_' + name);
           }
         } catch (error) {
-          console.warn(
-            'Unable to load data from localStorage for "' + name + '":',
-            error
+          logger.error(
+            'Unable to load data from localStorage for "' + name + '": ' + error
           );
         }
         let jsObject = {};
@@ -75,9 +75,11 @@ namespace gdjs {
             jsObject = JSON.parse(serializedString);
           }
         } catch (error) {
-          console.warn(
-            'Unable to load data from "' + name + '" - data is not valid JSON:',
-            error
+          logger.error(
+            'Unable to load data from "' +
+              name +
+              '" - data is not valid JSON: ' +
+              error
           );
         }
         loadedObjects.put(name, jsObject);
@@ -107,9 +109,8 @@ namespace gdjs {
             localStorage.setItem('GDJS_' + name, serializedString);
           }
         } catch (error) {
-          console.warn(
-            'Unable to save data to localStorage for "' + name + '":',
-            error
+          logger.error(
+            'Unable to save data to localStorage for "' + name + '": ' + error
           );
         }
         loadedObjects.remove(name);

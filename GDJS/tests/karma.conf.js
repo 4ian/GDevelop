@@ -10,6 +10,13 @@ module.exports = function (config) {
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
+    browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
+    plugins: [
+      require('karma-chrome-launcher'),
+      require('@chiragrupani/karma-chromium-edge-launcher'),
+      require('karma-firefox-launcher'),
+      require('karma-mocha'),
+    ],
     client: {
       mocha: {
         reporter: 'html',
@@ -21,6 +28,7 @@ module.exports = function (config) {
 
       //GDJS game engine files: (Order is important)
       '../../newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js',
+      '../../newIDE/app/resources/GDJS/Runtime/logger.js',
       '../../newIDE/app/resources/GDJS/Runtime/gd.js',
       '../../newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
       '../../newIDE/app/resources/GDJS/Runtime/cocos-renderers/cocos-director-manager.js',
@@ -82,7 +90,8 @@ module.exports = function (config) {
       // Test extensions:
       './tests/Extensions/**.js',
 
-      //All tests files:
+      // Other test initialization files:
+      './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
 
       // Assets

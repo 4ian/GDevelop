@@ -58,35 +58,36 @@ export type AuthError = {
 };
 
 export default class Authentication {
-  firebaseUser: ?FirebaseUser = null;
-  user: ?Profile = null;
   auth: Auth;
-  _onUserLogoutCallback: ?() => void = null;
+  _onUserLogoutCallback: ?() => void | Promise<void> = null;
+  _onUserUpdateCallback: ?() => void | Promise<void> = null;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
     onAuthStateChanged(this.auth, user => {
       if (user) {
-        // User has been updated. No need to fetch more info,
-        // this is handled directly by the corresponding actions (edit, signup, login...)
-        this.firebaseUser = user;
+        // User has logged in or changed.
+        if (this._onUserUpdateCallback) this._onUserUpdateCallback();
       } else {
         // User has logged out.
-        this.firebaseUser = null;
         if (this._onUserLogoutCallback) this._onUserLogoutCallback();
       }
     });
   }
 
-  setOnUserLogoutCallback = (cb: () => void) => {
+  setOnUserLogoutCallback = (cb: () => void | Promise<void>) => {
     this._onUserLogoutCallback = cb;
+  };
+
+  setOnUserUpdateCallback = (cb: () => void | Promise<void>) => {
+    this._onUserUpdateCallback = cb;
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.firebaseUser = userCredentials.user;
+        // The user is now stored in `this.auth`.
         sendEmailVerification(userCredentials.user);
       })
       .catch(error => {
@@ -101,7 +102,8 @@ export default class Authentication {
   ): Promise<void> => {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
+        const { currentUser } = this.auth;
+        if (!currentUser) {
           console.error(
             'Cannot create the user as it is not logged in any more.'
           );
@@ -112,13 +114,13 @@ export default class Authentication {
         return axios.post(
           `${GDevelopUserApi.baseUrl}/user`,
           {
-            id: this.firebaseUser.uid,
+            id: currentUser.uid,
             email: form.email,
             username: form.username,
           },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
@@ -126,8 +128,8 @@ export default class Authentication {
           }
         );
       })
-      .then(response => {
-        this.user = response.data;
+      .then(() => {
+        // User successfully created
       })
       .catch(error => {
         console.error('Error while creating user:', error);
@@ -138,7 +140,7 @@ export default class Authentication {
   login = (form: LoginForm): Promise<void> => {
     return signInWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.firebaseUser = userCredentials.user;
+        // The user is now stored in `this.auth`.
       })
       .catch(error => {
         console.error('Error while login:', error);
@@ -150,58 +152,66 @@ export default class Authentication {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
-  getFirebaseUser = (cb: (any, ?FirebaseUser) => void) => {
-    if (!this.isAuthenticated()) return cb({ unauthenticated: true });
+  getFirebaseUser = async (): Promise<?FirebaseUser> => {
+    const { currentUser } = this.auth;
+    if (!currentUser) {
+      return null;
+    }
+
     // In order to fetch the latest firebaseUser properties (like emailVerified)
     // we have to call the reload method.
-    this.auth.currentUser.reload().then(() => cb(null, this.firebaseUser));
+    await currentUser.reload();
+    return this.auth.currentUser;
   };
 
-  sendFirebaseEmailVerification = (cb: () => void): Promise<void> => {
-    return this.auth.currentUser.reload().then(() => {
-      if (!this.firebaseUser || this.firebaseUser.emailVerified) return;
-      sendEmailVerification(this.auth.currentUser).then(
-        () => {
-          cb();
-        },
-        (error: Error) => {
-          showErrorBox({
-            message: 'An email has been sent recently, please try again later.',
-            rawError: error,
-            errorId: 'email-verification-send-error',
-          });
-        }
-      );
-    });
+  sendFirebaseEmailVerification = async (): Promise<void> => {
+    {
+      const { currentUser } = this.auth;
+      if (!currentUser)
+        throw new Error(
+          'Tried to send verification email while not authenticated.'
+        );
+
+      await currentUser.reload();
+    }
+    const { currentUser } = this.auth;
+    if (!currentUser || currentUser.emailVerified) return;
+
+    try {
+      sendEmailVerification(currentUser);
+    } catch (error) {
+      showErrorBox({
+        message:
+          'An email has been sent recently, check your inbox or please try again later.',
+        rawError: error,
+        errorId: 'email-verification-send-error',
+      });
+    }
   };
 
-  changeEmail = (
+  changeEmail = async (
     getAuthorizationHeader: () => Promise<string>,
     form: ChangeEmailForm
   ) => {
-    return updateEmail(this.firebaseUser, form.email)
-      .then(() => sendEmailVerification(this.firebaseUser))
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to change email while not authenticated.');
+
+    return updateEmail(currentUser, form.email)
+      .then(() => sendEmailVerification(currentUser))
       .then(() => {
         console.log('Email successfully changed in Firebase.');
         return getAuthorizationHeader();
       })
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error(
-            'Cannot finish editing the user email as it is not logged in any more.'
-          );
-          throw new Error(
-            'Cannot finish editing the user email as it is not logged in any more.'
-          );
-        }
         return axios.patch(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             email: form.email,
           },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
@@ -218,28 +228,21 @@ export default class Authentication {
       });
   };
 
-  getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {
+  getUserProfile = async (getAuthorizationHeader: () => Promise<string>) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to get user profile while not authenticated.');
+
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error(
-            'Cannot get the user profile as it is not logged in any more.'
-          );
-          throw new Error(
-            'Cannot get the user profile as it is not logged in any more.'
-          );
-        }
-        return axios.get(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
-          {
-            params: {
-              userId: this.firebaseUser.uid,
-            },
-            headers: {
-              Authorization: authorizationHeader,
-            },
-          }
-        );
+        return axios.get(`${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`, {
+          params: {
+            userId: currentUser.uid,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        });
       })
       .then(response => response.data)
       .catch(error => {
@@ -248,30 +251,26 @@ export default class Authentication {
       });
   };
 
-  editUserProfile = (
+  editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
     form: EditForm
   ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to edit user profile while not authenticated.');
+
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error(
-            'Cannot finish editing the user as it is not logged in any more.'
-          );
-          throw new Error(
-            'Cannot finish editing the user as it is not logged in any more.'
-          );
-        }
         const { username, description } = form;
         return axios.patch(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             username,
             description,
           },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
@@ -287,7 +286,7 @@ export default class Authentication {
   };
 
   getFirebaseUserSync = (): ?FirebaseUser => {
-    return this.firebaseUser;
+    return this.auth.currentUser || null;
   };
 
   logout = () => {
@@ -301,14 +300,14 @@ export default class Authentication {
       });
   };
 
-  getAuthorizationHeader = (): Promise<string> => {
-    if (!this.firebaseUser)
-      return Promise.reject(new Error('User is not authenticated'));
+  getAuthorizationHeader = async (): Promise<string> => {
+    const { currentUser } = this.auth;
+    if (!currentUser) throw new Error('User is not authenticated.');
 
-    return this.firebaseUser.getIdToken().then(token => `Bearer ${token}`);
+    return currentUser.getIdToken().then(token => `Bearer ${token}`);
   };
 
   isAuthenticated = (): boolean => {
-    return !!this.firebaseUser;
+    return !!this.auth.currentUser;
   };
 }

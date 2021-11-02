@@ -276,7 +276,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    isAlwaysOnTopInPreview: true,
+    isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
   },

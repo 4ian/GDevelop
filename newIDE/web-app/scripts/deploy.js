@@ -76,9 +76,7 @@ isGitClean()
     if (!args['skip-app-build']) {
       const output = shell.exec('npm run build:app');
       if (output.code !== 0) {
-        shell.echo(
-          '❌ Unable to build the app.'
-        );
+        shell.echo('❌ Unable to build the app.');
         shell.exit(output.code);
       }
     } else {
@@ -87,9 +85,7 @@ isGitClean()
     if (!args['skip-gdjs-runtime-deploy']) {
       const output = shell.exec('npm run deploy:gdjs-runtime');
       if (output.code !== 0) {
-        shell.echo(
-          '❌ Unable to build GDJS Runtime.'
-        );
+        shell.echo('❌ Unable to build GDJS Runtime.');
         shell.exit(output.code);
       }
     } else {
@@ -102,7 +98,7 @@ isGitClean()
 
     if (!args['skip-deploy']) {
       shell.echo('🚄 Uploading the built app to gh-pages...');
-      ghpages.publish('dist', {}, (err) => {
+      ghpages.publish('dist', { history: false }, (err) => {
         if (err) {
           shell.echo('❌ Finished with error:');
           shell.echo(err);

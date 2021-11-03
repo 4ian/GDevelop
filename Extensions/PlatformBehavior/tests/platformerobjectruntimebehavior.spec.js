@@ -1416,9 +1416,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(platform.getY() - object.getHeight());
     });
 
-    // This test doesn't pass because there is no collision test.
-    // As long as the platform is in the result of the spacial search
-    // for nearby platforms the object will follow it.
     it('must not follow a platform that is moved over its top', function () {
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
@@ -2681,7 +2678,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
 
     [26, 45].forEach((slopeAngle) => {
-      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going left`, function () {
+      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going right`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);
@@ -2709,7 +2706,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       });
 
       // This is a mirror of the previous test.
-      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going right`, function () {
+      it(`can go uphill from a 0° slope to a ${slopeAngle}° slope going left`, function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setCustomWidthAndHeight(50, 50);

@@ -775,10 +775,15 @@ namespace gdjs {
 
         for (const vertex of hitbox.vertices) {
           const deltaX = vertex[0] - previousVertex[0];
+          // When the character is side by side to a wall,
+          // no collision should be detected.
+          // But, the character can share a vertex X with a platform
+          // when one of them is encompassing the other.
+          // This is why the edge direction is checked in this case.
           if (
             // The vertex is into the interval excluding bounds
             (context.ownerMinX < vertex[0] && vertex[0] < context.ownerMaxX) ||
-            // or the on a bound but its edge is from the inside.
+            // or is on a bound but its edge is from the inside.
             (vertex[0] === context.ownerMinX &&
               vertex[0] < previousVertex[0]) ||
             (vertex[0] === context.ownerMaxX && vertex[0] > previousVertex[0])
@@ -1973,7 +1978,7 @@ namespace gdjs {
     allowedMaxDeltaY: float = 0;
 
     /**
-     * True if any edge has been found over the character top.
+     * True if any edge has been found over where the character top can go (downward).
      *
      * It allows to check for encompassing platforms.
      *
@@ -1981,13 +1986,13 @@ namespace gdjs {
      */
     foundOverHead: boolean = false;
     /**
-     * True if any edge has been found under the character top.
+     * True if any edge has been found under where the character bottom can go (upward).
      *
      * It allows to check for encompassing platforms.
      *
      * (local to one hitbox check)
      */
-    foundUnderHead: boolean = false;
+    foundUnderBottom: boolean = false;
 
     initializeBeforeSearch(
       behavior: PlatformerObjectRuntimeBehavior,
@@ -2025,7 +2030,7 @@ namespace gdjs {
 
     initializeBeforeHitboxCheck() {
       this.foundOverHead = false;
-      this.foundUnderHead = false;
+      this.foundUnderBottom = false;
     }
 
     /**
@@ -2074,7 +2079,9 @@ namespace gdjs {
         }
         // ...but over the object.
         this.foundOverHead = true;
-        if (this.foundUnderHead) {
+        if (this.foundUnderBottom) {
+          // The current hitbox is below and above at the same time.
+          // As hitboxes are convex, the platform overlaps the character.
           this.setFloorIsTooHigh();
           return;
         }
@@ -2087,8 +2094,10 @@ namespace gdjs {
         );
       } else {
         // The platform can be walked on.
-        this.foundUnderHead = true;
+        this.foundUnderBottom = true;
         if (this.foundOverHead) {
+          // The current hitbox is below and above at the same time.
+          // As hitboxes are convex, the platform overlaps the character.
           this.setFloorIsTooHigh();
           return;
         }

@@ -10,7 +10,10 @@ import LocalNetworkPreviewDialog from './LocalNetworkPreviewDialog';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../../PreviewLauncher.flow';
 import SubscriptionChecker from '../../../Profile/SubscriptionChecker';
-import { LocalPreviewDebuggerServer } from './LocalPreviewDebuggerServer';
+import {
+  getDebuggerServerAddress,
+  localPreviewDebuggerServer,
+} from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -197,9 +200,9 @@ export default class LocalPreviewLauncher extends React.Component<
               );
             }
 
-            const previewDebuggerServerAddress = this.getPreviewDebuggerServer().getServerAddress();
+            const previewDebuggerServerAddress = getDebuggerServerAddress();
             if (previewDebuggerServerAddress) {
-              previewExportOptions.setDebuggerServerAddress(
+              previewExportOptions.useWebsocketDebuggerClientWithServerAddress(
                 previewDebuggerServerAddress.address,
                 '' + previewDebuggerServerAddress.port
               );
@@ -254,7 +257,7 @@ export default class LocalPreviewLauncher extends React.Component<
   };
 
   getPreviewDebuggerServer() {
-    return LocalPreviewDebuggerServer;
+    return localPreviewDebuggerServer;
   }
 
   _checkSubscriptionForNetworkPreview = () => {

@@ -15,16 +15,18 @@ import { openPreviewWindow } from '.';
 type Props = {|
   project: gdProject,
   url: string,
+  onPreviewWindowOpened: any => void,
   onClose: () => void,
 |};
 
 export default class BrowserPreviewLinkDialog extends Component<Props> {
   _makeOnOpen = (i18n: I18nType) => () => {
-    const windowObjectReference = openPreviewWindow(
+    const { previewWindow, targetId } = openPreviewWindow(
       this.props.project,
-      this.props.url
+      this.props.url,
+      null // No existing target id: always open a new window.
     );
-    if (!windowObjectReference) {
+    if (!{ previewWindow, targetId }) {
       showErrorBox({
         message: i18n._(
           t`Unable to open the preview! Be sure that popup are allowed for this website.`
@@ -32,6 +34,8 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
         rawError: undefined,
         errorId: 'preview-popup-disallowed',
       });
+    } else {
+      this.props.onPreviewWindowOpened({ previewWindow, targetId });
     }
     this.props.onClose();
   };

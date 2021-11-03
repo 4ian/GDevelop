@@ -34,18 +34,28 @@ struct PreviewExportOptions {
   PreviewExportOptions(gd::Project &project_, const gd::String &exportPath_)
       : project(project_),
         exportPath(exportPath_),
+        useWindowMessageDebuggerClient(false),
         projectDataOnlyExport(false),
         fullLoadingScreen(false),
         nonRuntimeScriptsCacheBurst(0){};
 
   /**
    * \brief Set the address of the debugger server that the game should reach
-   * out to, using WebSockets.
+   * out to, using the "WebSockets" debugger client.
    */
-  PreviewExportOptions &SetDebuggerServerAddress(const gd::String &address,
-                                                 const gd::String &port) {
-    debuggerServerAddress = address;
-    debuggerServerPort = port;
+  PreviewExportOptions &UseWebsocketDebuggerClientWithServerAddress(
+      const gd::String &address, const gd::String &port) {
+    websocketDebuggerServerAddress = address;
+    websocketDebuggerServerPort = port;
+    return *this;
+  }
+
+  /**
+   * \brief Set that the game should connect to the debugger server using
+   * the "Window Message " debugger client.
+   */
+  PreviewExportOptions &UseWindowMessageDebuggerClient() {
+    useWindowMessageDebuggerClient = true;
     return *this;
   }
 
@@ -107,8 +117,9 @@ struct PreviewExportOptions {
 
   gd::Project &project;
   gd::String exportPath;
-  gd::String debuggerServerAddress;
-  gd::String debuggerServerPort;
+  gd::String websocketDebuggerServerAddress;
+  gd::String websocketDebuggerServerPort;
+  bool useWindowMessageDebuggerClient;
   gd::String layoutName;
   gd::String externalLayoutName;
   std::map<gd::String, int> includeFileHashes;
@@ -164,10 +175,11 @@ class ExporterHelper {
                               gd::String exportDir);
 
   /**
-   * \brief Add libraries files from Pixi.js to the list of includes.
+   * \brief Add libraries files to the list of includes.
    */
   void AddLibsInclude(bool pixiRenderers,
-                      bool websocketDebuggerClient,
+                      bool includeWebsocketDebuggerClient,
+                      bool includeWindowMessageDebuggerClient,
                       gd::String gdevelopLogoStyle,
                       std::vector<gd::String> &includesFiles);
 

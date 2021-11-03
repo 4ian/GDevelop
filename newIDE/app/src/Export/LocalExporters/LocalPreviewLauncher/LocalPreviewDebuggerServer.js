@@ -29,7 +29,7 @@ const removeServerListeners = () => {
  * A debugger server implemented using Electron (this one is just a bridge to it,
  * communicating through events with it).
  */
-export const LocalPreviewDebuggerServer: PreviewDebuggerServer = {
+export const localPreviewDebuggerServer: PreviewDebuggerServer = {
   startServer: () => {
     if (!ipcRenderer) return Promise.reject();
     if (debuggerServerState === 'started') return Promise.resolve();
@@ -128,7 +128,6 @@ export const LocalPreviewDebuggerServer: PreviewDebuggerServer = {
     });
   },
   getServerState: () => debuggerServerState,
-  getServerAddress: () => debuggerServerAddress,
   getExistingDebuggerIds: () => debuggerIds,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => {
     callbacksList.push(callbacks);
@@ -139,3 +138,6 @@ export const LocalPreviewDebuggerServer: PreviewDebuggerServer = {
     };
   },
 };
+
+export const getDebuggerServerAddress = (): ?ServerAddress =>
+  debuggerServerAddress;

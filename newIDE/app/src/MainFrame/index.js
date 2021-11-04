@@ -65,7 +65,8 @@ import {
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+  type ChooseResourceOptions,
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -119,6 +120,7 @@ import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -234,7 +236,13 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?Toolbar>(null);
-  const _resourceSourceDialogs = React.useRef({});
+  const [
+    chooseResourceOptions,
+    setChooseResourceOptions,
+  ] = React.useState<?ChooseResourceOptions>(null);
+  const [onResourceChosen, setOnResourceChosen] = React.useState<?(
+    Array<gdResource>
+  ) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -1899,14 +1907,15 @@ const MainFrame = (props: Props) => {
   };
 
   const onChooseResource: ChooseResourceFunction = (
-    sourceName: string,
-    multiSelection: boolean = true
+    options: ChooseResourceOptions
   ) => {
-    const { currentProject } = state;
-    const resourceSourceDialog = _resourceSourceDialogs.current[sourceName];
-    if (!resourceSourceDialog) return Promise.resolve([]);
-
-    return resourceSourceDialog.chooseResources(currentProject, multiSelection);
+    return new Promise(resolve => {
+      setChooseResourceOptions(options);
+      const onResourceChosenSetter: () => (
+        Promise<Array<gdResource>> | Array<gdResource>
+      ) => void = () => resolve;
+      setOnResourceChosen(onResourceChosenSetter);
+    });
   };
 
   const setUpdateStatus = (updateStatus: UpdateStatus) => {
@@ -2285,21 +2294,23 @@ const MainFrame = (props: Props) => {
             _previewLauncher.current = previewLauncher;
           }
         )}
-      {resourceSources.map(
-        (resourceSource, index): React.Node => {
-          const Component = resourceSource.component;
-          return (
-            <Component
-              key={resourceSource.name}
-              ref={dialog =>
-                (_resourceSourceDialogs.current[resourceSource.name] = dialog)
-              }
-              i18n={i18n}
-              getLastUsedPath={preferences.getLastUsedPath}
-              setLastUsedPath={preferences.setLastUsedPath}
-            />
-          );
-        }
+      {!!currentProject && chooseResourceOptions && onResourceChosen && (
+        <NewResourceDialog
+          project={currentProject}
+          i18n={i18n}
+          resourceSources={resourceSources}
+          onChooseResources={resources => {
+            setOnResourceChosen(null);
+            setChooseResourceOptions(null);
+            onResourceChosen(resources);
+          }}
+          onClose={() => {
+            setOnResourceChosen(null);
+            setChooseResourceOptions(null);
+            onResourceChosen([]);
+          }}
+          options={chooseResourceOptions}
+        />
       )}
       {profileDialogOpen && (
         <ProfileDialog

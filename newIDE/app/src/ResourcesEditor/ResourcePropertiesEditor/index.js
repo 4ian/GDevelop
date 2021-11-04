@@ -13,7 +13,7 @@ import { type Schema } from '../../PropertiesEditor';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 
 const styles = {
   propertiesContainer: {
@@ -80,7 +80,11 @@ export default class ResourcePropertiesEditor extends React.Component<
       source => source.kind === resource.getKind()
     );
     if (!sources.length) return;
-    onChooseResource(sources[0].name).then(resources => {
+    onChooseResource({
+      initialSourceName: sources[0].name, // TODO: give the choice
+      multiSelection: true,
+      resourceKind: resource.getKind(),
+    }).then(resources => {
       if (!resources.length) return; // No path was chosen by the user.
       resource.setFile(resources[0].getFile());
 

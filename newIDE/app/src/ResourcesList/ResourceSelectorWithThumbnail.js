@@ -6,7 +6,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
-} from './ResourceSource.flow';
+} from './ResourceSource';
 import ResourceThumbnail from './ResourceThumbnail';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';

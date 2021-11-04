@@ -18,7 +18,7 @@ import {
   getResourceFilePathStatus,
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
-import { type ResourceKind } from './ResourceSource.flow';
+import { type ResourceKind } from './ResourceSource';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 import ResourcesLoader from '../ResourcesLoader';
 import newNameGenerator from '../Utils/NewNameGenerator';

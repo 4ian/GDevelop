@@ -11,7 +11,7 @@ import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWith
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -99,7 +99,11 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     const sources = resourceSources.filter(source => source.kind === 'image');
     if (!sources.length) return;
 
-    onChooseResource(sources[0].name, false).then(resources => {
+    onChooseResource({
+      initialSourceName: sources[0].name, // TODO: give the choice
+      multiSelection: false,
+      resourceKind: 'image',
+    }).then(resources => {
       if (!resources.length || !path) {
         return;
       }

@@ -13,7 +13,7 @@ import HelpButton from '../../UI/HelpButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';

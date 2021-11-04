@@ -773,6 +773,7 @@ namespace gdjs {
         // The platform hitbox could be in several parts.
         // So, the object could walk on one part
         // and have another part over its head.
+        // This is why flags are reset between each hitbox.
         context.initializeBeforeHitboxCheck();
 
         let previousVertex = hitbox.vertices[hitbox.vertices.length - 2];
@@ -780,13 +781,14 @@ namespace gdjs {
         for (const nextVertex of hitbox.vertices) {
           // When the character is side by side to a wall,
           // no collision should be detected.
+          // Indeed, it only shares an edge so the intersection has no area.
           // But, the character can share a vertex X with a platform
           // when one of them is encompassing the other.
           // This is why the edge direction is checked in this case.
           if (
-            // The vertex is into the interval excluding bounds
+            // The vertex is strictly into the interval...
             (context.ownerMinX < vertex[0] && vertex[0] < context.ownerMaxX) ||
-            // or is on a bound but at least one of its edges is from the inside.
+            // ...or is on a bound but at least one of its edges is from the inside.
             // Note: this needs strict convex hitbox to work.
             (vertex[0] === context.ownerMinX &&
               (previousVertex[0] > vertex[0] || nextVertex[0] > vertex[0])) ||

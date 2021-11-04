@@ -66,7 +66,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js',
-      '../../newIDE/app/resources/GDJS/Runtime/websocket-debugger-client/hot-reloader.js',
+      '../../newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',

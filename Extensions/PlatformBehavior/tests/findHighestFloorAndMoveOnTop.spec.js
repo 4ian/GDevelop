@@ -268,9 +268,21 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           position: [200, -200],
         },
         {
+          description:
+            '(An edge crossing from the left to the bottom with the vertex right on the left border)',
+          mask: collisionMasks.bottomLeftTriangle,
+          position: [300, -100],
+        },
+        {
           description: '(An edge crossing from the right to the bottom)',
           mask: collisionMasks.bottomRightTriangle,
           position: [200, -200],
+        },
+        {
+          description:
+            '(An edge crossing from the right to the bottom with the vertex right on the right border)',
+          mask: collisionMasks.bottomRightTriangle,
+          position: [100, -100],
         },
         {
           description: '(A vertex inside and edges crossing at the left)',

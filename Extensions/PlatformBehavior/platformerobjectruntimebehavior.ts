@@ -764,7 +764,9 @@ namespace gdjs {
       }
 
       for (const hitbox of platformObject.getHitBoxes()) {
-        let previousVertex = hitbox.vertices[hitbox.vertices.length - 1];
+        if (hitbox.vertices.length < 3) {
+          continue;
+        }
 
         // Edges over the character head might not result to a collision,
         // but if there is also an edge under its head then there is a collision.
@@ -773,8 +775,9 @@ namespace gdjs {
         // and have another part over its head.
         context.initializeBeforeHitboxCheck();
 
-        for (const vertex of hitbox.vertices) {
-          const deltaX = vertex[0] - previousVertex[0];
+        let previousVertex = hitbox.vertices[hitbox.vertices.length - 2];
+        let vertex = hitbox.vertices[hitbox.vertices.length - 1];
+        for (const nextVertex of hitbox.vertices) {
           // When the character is side by side to a wall,
           // no collision should be detected.
           // But, the character can share a vertex X with a platform
@@ -783,14 +786,17 @@ namespace gdjs {
           if (
             // The vertex is into the interval excluding bounds
             (context.ownerMinX < vertex[0] && vertex[0] < context.ownerMaxX) ||
-            // or is on a bound but its edge is from the inside.
+            // or is on a bound but at least one of its edges is from the inside.
+            // Note: this needs strict convex hitbox to work.
             (vertex[0] === context.ownerMinX &&
-              vertex[0] < previousVertex[0]) ||
-            (vertex[0] === context.ownerMaxX && vertex[0] > previousVertex[0])
+              (previousVertex[0] > vertex[0] || nextVertex[0] > vertex[0])) ||
+            (vertex[0] === context.ownerMaxX &&
+              (previousVertex[0] < vertex[0] || nextVertex[0] < vertex[0]))
           ) {
             context.addPointConstraint(vertex[1]);
           }
 
+          const deltaX = vertex[0] - previousVertex[0];
           // Vertical edges doesn't matter
           if (deltaX !== 0) {
             // Check intersection on the left side of owner
@@ -822,12 +828,13 @@ namespace gdjs {
               context.addPointConstraint(intersectionY);
             }
           }
-          previousVertex = vertex;
           if (context.floorIsTooHigh()) {
             // The character can't follow the platforms.
             // No need to continue the search.
             return context;
           }
+          previousVertex = vertex;
+          vertex = nextVertex;
         }
       }
       return context;

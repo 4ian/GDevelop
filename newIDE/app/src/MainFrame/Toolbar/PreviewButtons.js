@@ -16,7 +16,7 @@ export type PreviewButtonsProps = {|
     overridenPreviewLayoutName: ?string,
     overridenPreviewExternalLayoutName: ?string,
   |}) => void,
-  showNetworkPreviewButton: boolean,
+  canDoNetworkPreview: boolean,
   isPreviewEnabled: boolean,
   hasPreviewsRunning: boolean,
   previewState: PreviewState,
@@ -27,7 +27,7 @@ export default function PreviewButtons({
   onNetworkPreview,
   onOpenDebugger,
   onHotReloadPreview,
-  showNetworkPreviewButton,
+  canDoNetworkPreview,
   isPreviewEnabled,
   hasPreviewsRunning,
   previewState,
@@ -117,30 +117,29 @@ export default function PreviewButtons({
           },
         ]}
       />
-      {showNetworkPreviewButton && (
-        <ElementWithMenu
-          element={
-            <ToolbarIcon
-              disabled={!isPreviewEnabled}
-              src="res/ribbon_default/bug32.png"
-              tooltip={t`Advanced preview options (debugger, network preview...)`}
-            />
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
-              click: () => onNetworkPreview(),
-            },
-            { type: 'separator' },
-            {
-              label: i18n._(
-                t`Start Preview with Debugger and Performance Profiler`
-              ),
-              click: () => onOpenDebugger(),
-            },
-          ]}
-        />
-      )}
+      <ElementWithMenu
+        element={
+          <ToolbarIcon
+            disabled={!isPreviewEnabled}
+            src="res/ribbon_default/bug32.png"
+            tooltip={t`Advanced preview options (debugger, network preview...)`}
+          />
+        }
+        buildMenuTemplate={(i18n: I18nType) => [
+          {
+            label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
+            click: () => onNetworkPreview(),
+            enabled: canDoNetworkPreview,
+          },
+          { type: 'separator' },
+          {
+            label: i18n._(
+              t`Start Preview with Debugger and Performance Profiler`
+            ),
+            click: () => onOpenDebugger(),
+          },
+        ]}
+      />
     </React.Fragment>
   );
 }

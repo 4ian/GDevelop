@@ -2103,7 +2103,7 @@ const MainFrame = (props: Props) => {
         onPreviewWithoutHotReload={launchNewPreview}
         onNetworkPreview={launchNetworkPreview}
         onHotReloadPreview={launchHotReloadPreview}
-        showNetworkPreviewButton={
+        canDoNetworkPreview={
           !!_previewLauncher.current &&
           _previewLauncher.current.canDoNetworkPreview()
         }

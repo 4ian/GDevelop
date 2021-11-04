@@ -82,7 +82,8 @@ bool Exporter::ExportWholePixiProject(
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
-        /*websocketDebuggerClient=*/false,
+        /*includeWebsocketDebuggerClient=*/false,
+        /*includeWindowMessageDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 
@@ -119,7 +120,7 @@ bool Exporter::ExportWholePixiProject(
     helper.ExportProjectData(
         fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
-    
+
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";

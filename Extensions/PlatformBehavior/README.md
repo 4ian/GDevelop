@@ -42,7 +42,7 @@ it will go back to its original position and loose its speed.
 
 There are also more obvious obstacles that cover the character in the middle and end the search directly.
 
-[![RequestedDeltaX](./diagrams/SlopeFollowingRequestedDeltaX.png)](./diagrams/SlopeFollowingRequestedDeltaX.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingResult.png)](./diagrams/SlopeFollowingResult.svgz)
 
 Obstacles can eventually encompass the character. So platforms edges don't have any collision with character.
 To detect such cases, 2 flags are used:

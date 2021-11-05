@@ -10,19 +10,19 @@ If the platform is too high, the platform is considered to be an obstacle and th
 
 When there is no obstacle detected by the horizontal search, the movement is done in 1 step and the vertical search is done at the new `x` position.
 
-[![RequestedDeltaX](./SlopeFollowingRequestedDeltaX.png)](./SlopeFollowingRequestedDeltaX.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingRequestedDeltaX.png)](./diagrams/SlopeFollowingRequestedDeltaX.svgz)
 
 Otherwise, when there is a junction, 2 vertical searches are done:
 
 - one before a potential obstacle (in pink)
 - one at the end of the movement
 
-[![RequestedDeltaX](./SlopeFollowingClimbFactor.png)](./SlopeFollowingClimbFactor.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingClimbFactor.png)](./diagrams/SlopeFollowingClimbFactor.svgz)
 
 This allows to calculate the right slope angle. Indeed, in one step, the angle could appear lower (the dotted line).
 Which means that the character could climb it during 1 frame and then stop.
 
-[![RequestedDeltaX](./SlopeFollowingClimbFactorMean.png)](./SlopeFollowingClimbFactorMean.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingClimbFactorMean.png)](./diagrams/SlopeFollowingClimbFactorMean.svgz)
 
 For further details on the implementation, please take a look at the comments in:
 - the function `gdjs.PlatformerObjectRuntimeBehavior._moveX`
@@ -42,7 +42,7 @@ it will go back to its original position and loose its speed.
 
 There are also more obvious obstacles that cover the character in the middle and end the search directly.
 
-[![RequestedDeltaX](./SlopeFollowingRequestedDeltaX.png)](./SlopeFollowingRequestedDeltaX.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingRequestedDeltaX.png)](./diagrams/SlopeFollowingRequestedDeltaX.svgz)
 
 Obstacles can eventually encompass the character. So platforms edges don't have any collision with character.
 To detect such cases, 2 flags are used:
@@ -50,7 +50,7 @@ To detect such cases, 2 flags are used:
 - `foundOverHead` when an edge is over `headMaxY`
 - `foundUnderHead` when an edge is under `floorMinY`
 
-[![RequestedDeltaX](./SlopeFollowingResult.png)](./SlopeFollowingResult.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingResult.png)](./diagrams/SlopeFollowingResult.svgz)
 
 For further details on the implementation, please take a look at the comments in:
 - the function `gdjs.PlatformerObjectRuntimeBehavior._findHighestFloorAndMoveOnTop`

@@ -175,6 +175,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               <ExternalEventsAutoComplete
                 project={this.props.project}
                 value={target}
+                sceneName={this.props.scope.layout.getName()}
                 onChange={text => {
                   linkEvent.setTarget(text);
                   this.props.onUpdate();

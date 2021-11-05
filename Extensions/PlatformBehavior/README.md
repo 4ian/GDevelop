@@ -50,7 +50,7 @@ To detect such cases, 2 flags are used:
 - `foundOverHead` when an edge is over `headMaxY`
 - `foundUnderHead` when an edge is under `floorMinY`
 
-[![RequestedDeltaX](./diagrams/SlopeFollowingResult.png)](./diagrams/SlopeFollowingResult.svgz)
+[![RequestedDeltaX](./diagrams/SlopeFollowingContext.png)](./diagrams/SlopeFollowingContext.svgz)
 
 For further details on the implementation, please take a look at the comments in:
 - the function `gdjs.PlatformerObjectRuntimeBehavior._findHighestFloorAndMoveOnTop`

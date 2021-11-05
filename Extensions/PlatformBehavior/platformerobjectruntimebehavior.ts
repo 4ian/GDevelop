@@ -287,6 +287,9 @@ namespace gdjs {
       return this._currentSpeed * timeDelta;
     }
 
+    /**
+     * Also see {@link ./README.md}
+     */
     private _moveX() {
       const object = this.owner;
       //Move the object on x axis.
@@ -657,6 +660,9 @@ namespace gdjs {
 
     /**
      * Find the highest floor reachable and move the owner on top of it.
+     *
+     * Also see {@link ./README.md}
+     *
      * @param candidates The platform to be tested for collision
      * @param upwardDeltaY The owner won't move upward more than this value.
      * @param downwardDeltaY The owner won't move downward more than this value.
@@ -1399,6 +1405,8 @@ namespace gdjs {
 
   /**
    * The object is on the floor standing or walking.
+   *
+   * Also see {@link ./README.md}
    */
   class OnFloor implements State {
     private _behavior: PlatformerObjectRuntimeBehavior;

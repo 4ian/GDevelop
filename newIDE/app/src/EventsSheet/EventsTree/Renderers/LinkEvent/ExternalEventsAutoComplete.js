@@ -8,7 +8,7 @@ import SemiControlledAutoComplete, {
   type DataSource,
 } from '../../../../UI/SemiControlledAutoComplete';
 
-const getList = (project: ?gdProject): DataSource => {
+const getList = (currentSceneName: string, project: ?gdProject): DataSource => {
   if (!project) {
     return [];
   }
@@ -19,10 +19,12 @@ const getList = (project: ?gdProject): DataSource => {
       value: externalEvents.getName(),
     })
   );
-  const layouts = enumerateLayouts(project).map(layout => ({
-    text: layout.getName(),
-    value: layout.getName(),
-  }));
+  const layouts = enumerateLayouts(project)
+    .filter(layout => layout.getName() !== currentSceneName)
+    .map(layout => ({
+      text: layout.getName(),
+      value: layout.getName(),
+    }));
   return [...externalEvents, { type: 'separator' }, ...layouts];
 };
 
@@ -53,6 +55,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
       onApply,
       isInline,
       project,
+      sceneName,
     } = this.props;
 
     return (
@@ -64,7 +67,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
         onChange={onChange}
         onRequestClose={onRequestClose}
         onApply={onApply}
-        dataSource={getList(project)}
+        dataSource={getList(sceneName, project)}
         openOnFocus={!isInline}
         ref={field => (this._field = field)}
       />

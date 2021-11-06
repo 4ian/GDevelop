@@ -1,4 +1,5 @@
 // @flow
+import { string } from 'prop-types';
 import * as React from 'react';
 import {
   enumerateLayouts,
@@ -35,6 +36,7 @@ type Props = {|
   isInline?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
+  sceneName: string,
 |};
 
 export default class ExternalEventsAutoComplete extends React.Component<

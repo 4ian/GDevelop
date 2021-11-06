@@ -178,7 +178,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 sceneName={
                   this.props.scope.layout
                     ? this.props.scope.layout.getName()
-                    : ''
+                    : undefined
                 }
                 onChange={text => {
                   linkEvent.setTarget(text);

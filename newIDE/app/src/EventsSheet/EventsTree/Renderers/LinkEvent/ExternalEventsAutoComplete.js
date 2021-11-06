@@ -9,8 +9,11 @@ import SemiControlledAutoComplete, {
   type DataSource,
 } from '../../../../UI/SemiControlledAutoComplete';
 
-const getList = (currentSceneName: string, project: ?gdProject): DataSource => {
-  if (!project) {
+const getList = (
+  currentSceneName: ?string,
+  project: ?gdProject
+): DataSource => {
+  if (!project || !currentSceneName) {
     return [];
   }
 
@@ -36,7 +39,7 @@ type Props = {|
   isInline?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
-  sceneName: string,
+  sceneName?: string,
 |};
 
 export default class ExternalEventsAutoComplete extends React.Component<

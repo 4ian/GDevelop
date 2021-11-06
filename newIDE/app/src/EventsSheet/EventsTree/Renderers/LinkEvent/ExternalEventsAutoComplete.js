@@ -1,4 +1,5 @@
 // @flow
+import { string } from 'prop-types';
 import * as React from 'react';
 import {
   enumerateLayouts,
@@ -8,8 +9,11 @@ import SemiControlledAutoComplete, {
   type DataSource,
 } from '../../../../UI/SemiControlledAutoComplete';
 
-const getList = (project: ?gdProject): DataSource => {
-  if (!project) {
+const getList = (
+  currentSceneName: ?string,
+  project: ?gdProject
+): DataSource => {
+  if (!project || !currentSceneName) {
     return [];
   }
 
@@ -19,10 +23,12 @@ const getList = (project: ?gdProject): DataSource => {
       value: externalEvents.getName(),
     })
   );
-  const layouts = enumerateLayouts(project).map(layout => ({
-    text: layout.getName(),
-    value: layout.getName(),
-  }));
+  const layouts = enumerateLayouts(project)
+    .filter(layout => layout.getName() !== currentSceneName)
+    .map(layout => ({
+      text: layout.getName(),
+      value: layout.getName(),
+    }));
   return [...externalEvents, { type: 'separator' }, ...layouts];
 };
 
@@ -33,6 +39,7 @@ type Props = {|
   isInline?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
+  sceneName?: string,
 |};
 
 export default class ExternalEventsAutoComplete extends React.Component<
@@ -53,6 +60,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
       onApply,
       isInline,
       project,
+      sceneName,
     } = this.props;
 
     return (
@@ -64,7 +72,7 @@ export default class ExternalEventsAutoComplete extends React.Component<
         onChange={onChange}
         onRequestClose={onRequestClose}
         onApply={onApply}
-        dataSource={getList(project)}
+        dataSource={getList(sceneName, project)}
         openOnFocus={!isInline}
         ref={field => (this._field = field)}
       />

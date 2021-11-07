@@ -195,7 +195,9 @@ export default class SpritesList extends Component<Props, void> {
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
     onChooseResource({
-      initialSourceName: sources[0].name, // TODO: give the choice
+      // Should be updated once new sources are introduced in the desktop app.
+      // Search for "sources[0]" in the codebase for other places like this.
+      initialSourceName: sources[0].name,
       multiSelection: true,
       resourceKind: 'image',
     }).then(resources => {

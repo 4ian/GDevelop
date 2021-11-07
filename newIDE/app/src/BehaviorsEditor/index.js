@@ -18,7 +18,7 @@ import RaisedButton from '../UI/RaisedButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { getBehaviorTutorialHints } from '../Hints';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';

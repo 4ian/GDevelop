@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
@@ -27,6 +28,7 @@ type Option =
   | {|
       text: string, // The text used for filtering. If empty, item is always shown.
       value: string, // The value to show on screen and to be selected
+      translatableValue?: MessageDescriptor,
       onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |};
@@ -95,7 +97,10 @@ const useStyles = makeStyles({
   },
 });
 
-const renderItem = (option: Option, state: Object): React.Node => {
+const makeRenderItem = (i18n: I18nType) => (
+  option: Option,
+  state: Object
+): React.Node => {
   if (option.type && option.type === 'separator') {
     return (
       <ListItem
@@ -106,14 +111,18 @@ const renderItem = (option: Option, state: Object): React.Node => {
       />
     );
   }
+
+  const value = option.translatableValue
+    ? i18n._(option.translatableValue)
+    : option.value;
   return (
     <ListItem dense={true} component={'div'} style={styles.listItem}>
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
       <ListItemText
         style={styles.listItemText}
         primary={
-          <div title={option.value} style={textEllispsisStyle}>
-            {option.value}
+          <div title={value} style={textEllispsisStyle}>
+            {value}
           </div>
         }
       />
@@ -272,7 +281,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             value={currentInputValue}
             onInputChange={handleInputChange}
             options={props.dataSource}
-            renderOption={renderItem}
+            renderOption={makeRenderItem(i18n)}
             getOptionDisabled={isOptionDisabled}
             getOptionLabel={(option: Option) =>
               getOptionLabel(option, currentInputValue)

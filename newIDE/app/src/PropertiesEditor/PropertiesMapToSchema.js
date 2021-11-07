@@ -1,7 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
-import { type ResourceKind } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceKind } from '../ResourcesList/ResourceSource';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.

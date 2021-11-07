@@ -12,7 +12,7 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
 } from './PreferencesContext';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';

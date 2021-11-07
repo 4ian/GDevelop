@@ -77,7 +77,7 @@ const localResourceSources: Array<ResourceSource> = [
           return newResource;
         });
       },
-      renderComponent: () => <div>TODO</div>,
+      renderComponent: () => null,
     })
   ),
 ];

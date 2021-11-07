@@ -16,7 +16,6 @@ export type ResourceKind =
   | 'json'
   | 'bitmapFont';
 
-// TODO: see if this array can be used in other places
 export const allResourceKindsAndMetadata = [
   {
     kind: 'audio',

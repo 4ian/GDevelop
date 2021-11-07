@@ -81,7 +81,9 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
     if (!sources.length) return;
     onChooseResource({
-      initialSourceName: sources[0].name, // TODO: give the choice
+      // Should be updated once new sources are introduced in the desktop app.
+      // Search for "sources[0]" in the codebase for other places like this.
+      initialSourceName: sources[0].name,
       multiSelection: true,
       resourceKind: resource.getKind(),
     }).then(resources => {

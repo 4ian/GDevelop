@@ -193,7 +193,6 @@ const browserResourceSources: Array<ResourceSource> = [
       />
     ),
   })),
-  // TODO: Add UrlChooser
 ];
 
 export default browserResourceSources;

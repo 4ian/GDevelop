@@ -154,8 +154,7 @@ namespace gdjs {
      * Get the sound playback rate.
      */
     getRate(): float {
-      if (this._id === null) return 0;
-      return this._howl.rate(this._id);
+      return this._rate;
     }
 
     /**
@@ -174,8 +173,7 @@ namespace gdjs {
      * Get if the sound is looping.
      */
     getLoop(): boolean {
-      if (this._id === null) return false;
-      return this._howl.loop(this._id);
+      return this._loop;
     }
 
     /**
@@ -193,8 +191,7 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      if (this._id === null) return 100;
-      return this._howl.volume(this._id);
+      return this._volume;
     }
 
     /**

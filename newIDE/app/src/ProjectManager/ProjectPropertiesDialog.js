@@ -439,7 +439,7 @@ function ProjectPropertiesDialog(props: Props) {
                   />
                   <SemiControlledTextField
                     floatingLabelText={
-                      <Trans>Maximum FPS (0 to disable)</Trans>
+                      <Trans>Maximum FPS (0 for unlimited)</Trans>
                     }
                     fullWidth
                     type="number"

@@ -48,6 +48,12 @@ export const allResourceKindsAndMetadata = [
     createNewResource: () => new gd.JsonResource(),
   },
   {
+    kind: 'tilemap',
+    displayName: t`Tilemap`,
+    fileExtensions: ['json', 'ldtk'],
+    createNewResource: () => new gd.JsonResource(),//Should it be TilemapResource? Do we still need it in gd?
+  },
+  {
     kind: 'bitmapFont',
     displayName: t`Bitmap Font`,
     fileExtensions: ['fnt', 'xml'],

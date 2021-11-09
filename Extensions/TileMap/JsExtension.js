@@ -644,7 +644,7 @@ module.exports = {
           .getProperties(this.project)
           .get('levelIndex')
           .getValue(),
-        0
+        10
       );
       const displayMode = this._associatedObject
         .getProperties(this.project)

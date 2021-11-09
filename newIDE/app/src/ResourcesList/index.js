@@ -10,17 +10,21 @@ import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import { mapVector } from '../Utils/MapFor';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import Window from '../Utils/Window';
 import {
-  createOrUpdateResource,
+  applyResourceDefaults,
   getLocalResourceFullPath,
   getResourceFilePathStatus,
-  RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
-import { type ResourceKind } from './ResourceSource.flow';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
+import {
+  type ResourceKind,
+  allResourceKindsAndMetadata,
+} from './ResourceSource';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 import ResourcesLoader from '../ResourcesLoader';
+import newNameGenerator from '../Utils/NewNameGenerator';
 
 const lazyRequireGlob = optionalLazyRequire('glob');
 const path = optionalRequire('path');
@@ -116,7 +120,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _scanForNewResources = (
-    extensions: string,
+    extensions: Array<string>,
     createResource: () => gdResource
   ) => {
     const glob = lazyRequireGlob();
@@ -126,21 +130,45 @@ export default class ResourcesList extends React.Component<Props, State> {
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
 
-    const getDirectories = (src, callback) => {
-      glob(src + '/**/*.{' + extensions + '}', callback);
+    const allExtensions = [
+      ...extensions,
+      ...extensions.map(extension => extension.toUpperCase()),
+    ];
+    const getAllFiles = (src, callback) => {
+      glob(src + '/**/*.{' + allExtensions.join(',') + '}', callback);
     };
-    getDirectories(projectPath, (err, res) => {
-      if (err) {
-        console.error('Error loading ', err);
-      } else {
-        res.forEach(pathFound => {
-          const fileName = path.relative(projectPath, pathFound);
-          if (!resourcesManager.hasResource(fileName)) {
-            createOrUpdateResource(project, createResource(), fileName);
-            console.info(`${fileName} added to project.`);
-          }
-        });
+    getAllFiles(projectPath, (error, allFiles) => {
+      if (error) {
+        console.error(`Error finding files inside ${projectPath}:`, error);
+        return;
       }
+
+      const filesToCheck = new gd.VectorString();
+      allFiles.forEach(filePath =>
+        filesToCheck.push_back(path.relative(projectPath, filePath))
+      );
+      const filePathsNotInResources = project
+        .getResourcesManager()
+        .findFilesNotInResources(filesToCheck);
+      filesToCheck.delete();
+
+      mapVector(filePathsNotInResources, (relativeFilePath: string) => {
+        const resourceName = newNameGenerator(relativeFilePath, name =>
+          resourcesManager.hasResource(name)
+        );
+
+        const resource = createResource();
+        resource.setFile(relativeFilePath);
+        resource.setName(resourceName);
+        applyResourceDefaults(project, resource);
+        resourcesManager.addResource(resource);
+        resource.delete();
+
+        console.info(
+          `"${relativeFilePath}" added to project as resource named "${resourceName}".`
+        );
+      });
+
       this.forceUpdate();
     });
   };
@@ -194,11 +222,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    const answer = Window.showConfirmDialog(
-      'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
-    );
-    if (!answer) return;
-
     this.props.onRenameResource(resource, newName, doRename => {
       if (!doRename) return;
       resource.setName(newName);
@@ -226,7 +249,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   _renderResourceMenuTemplate = (i18n: I18nType) => (
     resource: gdResource,
     _index: number
-  ) => {
+  ): Array<MenuItemTemplate> => {
     return [
       {
         label: i18n._(t`Rename`),
@@ -254,68 +277,26 @@ export default class ResourcesList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
-        label: i18n._(t`Scan for Images`),
-        click: () => {
-          this._scanForNewResources(
-            RESOURCE_EXTENSIONS.image,
-            () => new gd.ImageResource()
-          );
-        },
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Scan for Audio`),
-        click: () => {
-          this._scanForNewResources(
-            RESOURCE_EXTENSIONS.audio,
-            () => new gd.AudioResource()
-          );
-        },
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Scan for Fonts`),
-        click: () => {
-          this._scanForNewResources(
-            RESOURCE_EXTENSIONS.font,
-            () => new gd.FontResource()
-          );
-          this._scanForNewResources(
-            RESOURCE_EXTENSIONS.bitmapFont,
-            () => new gd.BitmapFontResource()
-          );
-        },
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Scan for Videos`),
-        click: () => {
-          this._scanForNewResources(
-            RESOURCE_EXTENSIONS.video,
-            () => new gd.VideoResource()
-          );
-        },
-        enabled: hasElectron,
+        label: i18n._(t`Scan in the project folder for...`),
+        submenu: allResourceKindsAndMetadata.map(
+          ({ displayName, fileExtensions, createNewResource }) => ({
+            label: i18n._(displayName),
+            click: () => {
+              this._scanForNewResources(fileExtensions, createNewResource);
+            },
+            enabled: hasElectron,
+          })
+        ),
       },
       { type: 'separator' },
       {
-        label: i18n._(t`Remove Unused Images`),
-        click: () => {
-          this.props.onRemoveUnusedResources('image');
-        },
-      },
-      {
-        label: i18n._(t`Remove Unused Audio`),
-        click: () => {
-          this.props.onRemoveUnusedResources('audio');
-        },
-      },
-      {
-        label: i18n._(t`Remove Unused Fonts`),
-        click: () => {
-          this.props.onRemoveUnusedResources('font');
-          this.props.onRemoveUnusedResources('bitmapFont');
-        },
+        label: i18n._(t`Remove unused...`),
+        submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
+          label: i18n._(displayName),
+          click: () => {
+            this.props.onRemoveUnusedResources(kind);
+          },
+        })),
       },
       {
         label: i18n._(t`Remove Resources with Invalid Path`),

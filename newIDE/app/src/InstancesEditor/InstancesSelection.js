@@ -77,4 +77,14 @@ export default class InstancesSelection {
       }
     }
   }
+
+  unselectInstancesOnLayer(layerName: string) {
+    for (let i = 0; i < this.selection.length; ) {
+      if (this.selection[i].getLayer() === layerName) {
+        this.selection.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+  }
 }

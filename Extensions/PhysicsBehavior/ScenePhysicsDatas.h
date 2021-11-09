@@ -8,8 +8,7 @@ This project is released under the MIT License.
 #ifndef SCENEPHYSICSDATAS_H
 #define SCENEPHYSICSDATAS_H
 
-#include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
-#include "RuntimeScenePhysicsDatas.h"
+#include "GDCore/Project/BehaviorsSharedData.h"
 
 /**
  * \brief Handle the data shared by Physics Behavior

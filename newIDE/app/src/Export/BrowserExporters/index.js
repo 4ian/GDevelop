@@ -8,7 +8,6 @@ import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';
 import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
 import { browserCordovaExportPipeline } from './BrowserCordovaExport';
 import { browserElectronExportPipeline } from './BrowserElectronExport';
-import { browserCocos2dExportPipeline } from './BrowserCocos2dExport';
 import { browserFacebookInstantGamesExportPipeline } from './BrowserFacebookInstantGamesExport';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
@@ -52,7 +51,7 @@ export const getBrowserExporters = (): Array<Exporter> => [
     description: (
       <Trans>
         Build the game locally as a HTML5 game. You can then publish it on
-        website like Kongregate, Game Jolt, itch.io, Poki...
+        website like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
       </Trans>
     ),
     key: 'browserhtml5export',
@@ -113,20 +112,6 @@ export const getBrowserExporters = (): Array<Exporter> => [
     key: 'browserelectronexport',
     exportPipeline: browserElectronExportPipeline,
     advanced: true,
-  },
-  {
-    name: <Trans>Cocos2d-JS</Trans>,
-    renderIcon: props => <PhoneIphone {...props} />,
-    helpPage: '/publishing/android_and_ios_with_cocos2d-js',
-    description: (
-      <Trans>
-        Export your game using Cocos2d-JS game engine. The game can be compiled
-        for Android or iOS if you install Cocos2d-JS developer tools.
-      </Trans>
-    ),
-    key: 'browsercocos2dexport',
-    exportPipeline: browserCocos2dExportPipeline,
-    experimental: true,
   },
 ];
 

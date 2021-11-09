@@ -9,9 +9,11 @@ export type TestProject = {|
   panelSpriteObject: any,
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
+  spriteObjectWithoutBehaviors: gdSpriteObject,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
+  group4WithLongsNames: gdObjectGroup,
   testLayoutInstance1: gdInitialInstance,
   testInstruction: gdInstruction,
   testExternalEvents1: gdExternalEvents,
@@ -29,6 +31,8 @@ export type TestProject = {|
   layerWithEffects: gdLayer,
   layerWithEffectWithoutEffectType: gdLayer,
   layerWithoutEffects: gdLayer,
+  spriteObjectWithEffects: gdSpriteObject,
+  spriteObjectWithoutEffects: gdSpriteObject,
 |};
 */
 
@@ -72,6 +76,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
+  );
+  const spriteObjectWithoutBehaviors = new gd.SpriteObject(
+    'MySpriteObjectWithoutBehaviors'
+  );
+  const spriteObjectWithLongName = new gd.SpriteObject(
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
 
   {
@@ -148,6 +158,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(panelSpriteObject, 0);
   testLayout.insertObject(spriteObject, 0);
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
+  testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
+  testLayout.insertObject(spriteObjectWithLongName, 14);
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -159,9 +171,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const group3 = new gd.ObjectGroup();
   group3.setName('GroupOfSpriteObjectsWithBehaviors');
   group3.addObject('MySpriteObjectWithBehaviors');
+  const group4WithLongsNames = new gd.ObjectGroup();
+  group4WithLongsNames.setName('MyGroupWithObjectsHavingLongName');
+  group4WithLongsNames.addObject('MySpriteObject');
+  group4WithLongsNames.addObject(
+    'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
+  );
+  group4WithLongsNames.addObject('MySpriteObjectWithoutBehaviors');
   testLayout.getObjectGroups().insert(group1, 0);
   testLayout.getObjectGroups().insert(group2, 1);
   testLayout.getObjectGroups().insert(group3, 2);
+  testLayout.getObjectGroups().insert(group4WithLongsNames, 3);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()
@@ -349,6 +369,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Layout with a long name
+  project.insertNewLayout(
+    'Layout with a very looooooooong naaaaame to test in the project manager',
+    2
+  );
+
   // Empty events list
   const emptyEventsList = new gd.EventsList();
 
@@ -503,6 +529,33 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   const layerWithoutEffects = new gd.Layer();
 
+  const spriteObjectWithoutEffects = new gd.SpriteObject(
+    'MySpriteObjectWithoutEffects'
+  );
+  const spriteObjectWithEffects = new gd.SpriteObject(
+    'MySpriteObjectWithEffects'
+  );
+  {
+    const effect1 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect1', 0);
+    const effect2 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect2', 1);
+    const effect3 = spriteObjectWithEffects
+      .getEffects()
+      .insertNewEffect('MyEffect3', 1);
+
+    effect1.setEffectType('FakeSepia');
+    effect1.setDoubleParameter('opacity', 0.6);
+    effect2.setEffectType('FakeNight');
+    effect2.setDoubleParameter('intensity', 0.1);
+    effect2.setDoubleParameter('opacity', 0.2);
+    effect3.setEffectType('FakeEffectWithVariousParameters');
+    effect3.setDoubleParameter('intensity', 0.1);
+    effect3.setStringParameter('image', 'my-image');
+  }
+
   return {
     project,
     shapePainterObject,
@@ -511,9 +564,11 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     panelSpriteObject,
     spriteObject,
     spriteObjectWithBehaviors,
+    spriteObjectWithoutBehaviors,
     testLayout,
     group1,
     group2,
+    group4WithLongsNames,
     testLayoutInstance1,
     testInstruction,
     testExternalEvents1,
@@ -531,5 +586,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWithEffects,
     layerWithEffectWithoutEffectType,
     layerWithoutEffects,
+    spriteObjectWithEffects,
+    spriteObjectWithoutEffects,
   };
 };

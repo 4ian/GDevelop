@@ -25,6 +25,7 @@ describe('gdjs.SpriteRuntimeObject (using a PIXI RuntimeGame with assets)', func
       updateIfNotVisible: false,
       variables: [],
       behaviors: [],
+      effects: [],
       animations: [
         {
           name: 'NewObject2',

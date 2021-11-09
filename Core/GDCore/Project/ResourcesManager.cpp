@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <map>
+#include <unordered_set>
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Project.h"
@@ -132,6 +133,22 @@ std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
   return allResources;
 }
 
+std::vector<gd::String> ResourcesManager::FindFilesNotInResources(
+    const std::vector<gd::String>& filesToCheck) const {
+  std::unordered_set<gd::String> resourceFiles;
+  for (const auto& resource: resources) {
+    resourceFiles.insert(resource->GetFile());
+  }
+
+  std::vector<gd::String> filesNotInResources;
+  for(const gd::String& file: filesToCheck) {
+    if (resourceFiles.find(file) == resourceFiles.end())
+      filesNotInResources.push_back(file);
+  }
+
+  return filesNotInResources;
+}
+
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
@@ -161,7 +178,8 @@ bool ImageResource::UpdateProperty(const gd::String& name,
   return true;
 }
 
-std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties() const {
+std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties()
+    const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Preload as sound")]
       .SetValue(preloadAsSound ? "true" : "false")

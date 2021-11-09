@@ -44,7 +44,7 @@ import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
@@ -106,7 +106,7 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
-  onEditObject: gdObject => void,
+  onEditObject: (object: gdObject, initialTab: ?string) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
@@ -383,12 +383,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         return;
       }
 
-      container.moveObject(
-        container.getObjectPosition(movedObjectWithContext.object.getName()),
-        container.getObjectPosition(
-          destinationObjectWithContext.object.getName()
-        )
+      const fromIndex = container.getObjectPosition(
+        movedObjectWithContext.object.getName()
       );
+      let toIndex = container.getObjectPosition(
+        destinationObjectWithContext.object.getName()
+      );
+      if (toIndex > fromIndex) toIndex -= 1;
+      container.moveObject(fromIndex, toIndex);
     });
     this._onObjectModified(true);
   };
@@ -466,6 +468,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         label: i18n._(t`Edit object variables`),
         click: () => this._editVariables(object),
       },
+      {
+        label: i18n._(t`Edit behaviors`),
+        click: () => this.props.onEditObject(object, 'behaviors'),
+      },
+      {
+        label: i18n._(t`Edit effects`),
+        click: () => this.props.onEditObject(object, 'effects'),
+      },
       { type: 'separator' },
       {
         label: i18n._(t`Tags`),
@@ -486,6 +496,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Set as a global object`),
+        enabled: !isObjectWithContextGlobal(objectWithContext),
         click: () => this._setAsGlobalObject(objectWithContext),
       },
       {

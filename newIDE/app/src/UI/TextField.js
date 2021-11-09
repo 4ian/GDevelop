@@ -8,7 +8,7 @@ import { MarkdownText } from './MarkdownText';
 type ValueProps =
   // Support "text" and "password" type:
   | {|
-      type?: 'text' | 'password',
+      type?: 'text' | 'password' | 'search',
       value: string,
       onChange?: (
         event: {| target: {| value: string |} |},
@@ -51,11 +51,15 @@ type Props = {|
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
 
-  // Error handling:
+  // Error handling/Validation:
   errorText?: React.Node,
+  required?: boolean,
+
+  // Accessibility:
+  disabled?: boolean,
+  readOnly?: boolean,
 
   // Labels:
-  disabled?: boolean,
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   name?: string,
@@ -81,9 +85,9 @@ type Props = {|
   margin?: 'none' | 'dense',
   fullWidth?: boolean,
   style?: {|
-    fontSize?: 14 | 18,
+    fontSize?: 14 | 18 | '1.3em',
     fontStyle?: 'normal' | 'italic',
-    width?: number | '100%',
+    width?: number | '30%' | '60%' | '100%',
     flex?: 1,
     top?: number,
     padding?: number,
@@ -92,6 +96,7 @@ type Props = {|
     // Allow to customize color (replace by color prop?) // TO VERIFY
     color?: string,
     WebkitTextFillColor?: string,
+    fontSize?: '1em',
 
     // Allow to display monospaced font
     fontFamily?: '"Lucida Console", Monaco, monospace',
@@ -206,6 +211,7 @@ export default class TextField extends React.Component<Props, {||}> {
             error={!!props.errorText}
             helperText={props.errorText || helperText}
             disabled={props.disabled}
+            required={props.required}
             InputLabelProps={{
               shrink: props.floatingLabelFixed ? true : undefined,
             }}
@@ -232,6 +238,7 @@ export default class TextField extends React.Component<Props, {||}> {
                 fontStyle: props.style ? props.style.fontStyle : undefined,
                 ...props.inputStyle,
               },
+              readOnly: props.readOnly,
               inputProps: {
                 onKeyPress: props.onKeyPress,
                 onKeyUp: props.onKeyUp,

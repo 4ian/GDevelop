@@ -80,8 +80,8 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
   return <div>Loading GDevelop.js, test extensions and test project...</div>;
 };
 
-const libGDDecorator: StoryDecorator = (story, context) => (
-  <GDevelopJsInitializer>{() => story(context)}</GDevelopJsInitializer>
+const libGDDecorator: StoryDecorator = (Story, context) => (
+  <GDevelopJsInitializer>{() => <Story />}</GDevelopJsInitializer>
 );
 
 export default libGDDecorator;

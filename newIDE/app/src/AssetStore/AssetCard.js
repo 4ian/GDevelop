@@ -1,6 +1,10 @@
 // @flow
 import * as React from 'react';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  isPixelArt,
+} from '../Utils/GDevelopServices/Asset';
+import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Text from '../UI/Text';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
@@ -18,6 +22,11 @@ const styles = {
     objectFit: 'contain',
     verticalAlign: 'middle',
     pointerEvents: 'none',
+  },
+  previewImagePixelated: {
+    width: '100%',
+    imageRendering: getPixelatedImageRendering(),
+    padding: 15,
   },
   icon: {
     color: '#fff',
@@ -60,9 +69,12 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
           <CorsAwareImage
             key={assetShortHeader.previewImageUrls[0]}
             style={{
-              ...styles.previewImage,
               maxWidth: 128 - 2 * paddingSize,
               maxHeight: 128 - 2 * paddingSize,
+              ...styles.previewImage,
+              ...(isPixelArt(assetShortHeader)
+                ? styles.previewImagePixelated
+                : undefined),
             }}
             src={assetShortHeader.previewImageUrls[0]}
             alt={assetShortHeader.name}

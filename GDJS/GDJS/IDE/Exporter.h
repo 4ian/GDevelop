@@ -50,15 +50,6 @@ class Exporter {
                               std::map<gd::String, bool>& exportOptions);
 
   /**
-   * \brief Export the specified project, using Cocos2d.
-   *
-   * Called by ShowProjectExportDialog if the user clicked on Ok.
-   */
-  bool ExportWholeCocos2dProject(gd::Project& project,
-                                 bool debugMode,
-                                 gd::String exportDir);
-
-  /**
    * \brief Return the error that occurred during the last export.
    */
   const gd::String& GetLastError() const { return lastError; };

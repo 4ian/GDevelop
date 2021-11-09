@@ -1,14 +1,26 @@
+// @flow
 import * as PIXI from 'pixi.js-legacy';
 import transformRect from '../Utils/TransformRect';
 import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
+type Props = {|
+  project: gdProject,
+  layout: gdLayout,
+  toCanvasCoordinates: (x: number, y: number) => [number, number],
+|};
+
 export default class WindowBorder {
-  constructor({ project, layout, toCanvasCoordinates }) {
+  project: gdProject;
+  layout: gdLayout;
+  toCanvasCoordinates: (x: number, y: number) => [number, number];
+  pixiRectangle = new PIXI.Graphics();
+  windowRectangle: { x: number, y: number, width: number, height: number };
+
+  constructor({ project, layout, toCanvasCoordinates }: Props) {
     this.project = project;
     this.layout = layout;
     this.toCanvasCoordinates = toCanvasCoordinates;
 
-    this.pixiRectangle = new PIXI.Graphics();
     this.pixiRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
     this.windowRectangle = {
       x: 0,

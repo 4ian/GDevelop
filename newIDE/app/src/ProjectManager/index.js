@@ -56,8 +56,9 @@ import { IconContainer } from '../UI/IconContainer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { textEllispsisStyle } from '../UI/TextEllipsis';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -78,11 +79,6 @@ const styles = {
   },
   noIndentNestedList: {
     padding: 0,
-  },
-  itemName: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
   },
   itemTextField: {
     top: noMarginTextFieldInListItemTopOffset,
@@ -182,7 +178,9 @@ class Item extends React.Component<ItemProps, {||}> {
         style={styles.itemTextField}
       />
     ) : (
-      <div style={styles.itemName}>{this.props.primaryText}</div>
+      <div style={textEllispsisStyle} title={this.props.primaryText}>
+        {this.props.primaryText}
+      </div>
     );
 
     return (
@@ -341,14 +339,14 @@ export default class ProjectManager extends React.Component<Props, State> {
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     if (
       nextState.projectPropertiesDialogOpen !==
-      this.state.projectPropertiesDialogOpen
-    )
-      return true;
-    if (
+        this.state.projectPropertiesDialogOpen ||
       nextState.projectVariablesEditorOpen !==
-      this.state.projectVariablesEditorOpen
+        this.state.projectVariablesEditorOpen ||
+      nextState.extensionsSearchDialogOpen !==
+        this.state.extensionsSearchDialogOpen
     )
       return true;
+
     // Rendering the component is (super) costly (~20ms) as it iterates over
     // every project layouts/external layouts/external events,
     // so the prop freezeUpdate allow to ask the component to stop
@@ -382,6 +380,10 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.setState({
       projectVariablesEditorOpen: true,
     });
+  };
+
+  _openSearchExtensionDialog = () => {
+    this.setState({ extensionsSearchDialogOpen: true });
   };
 
   _onEditName = (kind: ?string, name: string) => {
@@ -799,6 +801,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           onOpenPlatformSpecificAssetsDialog={
             this.props.onOpenPlatformSpecificAssets
           }
+          onOpenSearchExtensionDialog={this._openSearchExtensionDialog}
         />
         <List style={styles.list}>
           {this._renderMenu()}
@@ -1143,9 +1146,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   <SearchListItem
                     key={'extensions-search'}
                     primaryText={<Trans>Search for new extensions</Trans>}
-                    onClick={() =>
-                      this.setState({ extensionsSearchDialogOpen: true })
-                    }
+                    onClick={this._openSearchExtensionDialog}
                   />
                 )
             }

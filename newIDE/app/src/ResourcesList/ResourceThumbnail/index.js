@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
-import { type ResourceKind } from '../ResourceSource.flow';
+import { type ResourceKind } from '../ResourceSource';
 import ImageThumbnail from './ImageThumbnail';
 
 type Props = {|

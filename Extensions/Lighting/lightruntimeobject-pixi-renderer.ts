@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Light object');
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -134,7 +135,7 @@ namespace gdjs {
 
     updateMesh(): void {
       if (!PIXI.utils.isWebGLSupported()) {
-        console.warn(
+        logger.warn(
           'This device does not support webgl, which is required for Lighting Extension.'
         );
         return;
@@ -368,7 +369,9 @@ namespace gdjs {
      * @returns the vertices of mesh.
      */
     _computeLightVertices(): Array<any> {
-      const lightObstacles: Array<gdjs.LightObstacleRuntimeBehavior> = [];
+      const lightObstacles: gdjs.BehaviorRBushAABB<
+        LightObstacleRuntimeBehavior
+      >[] = [];
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,
@@ -393,7 +396,7 @@ namespace gdjs {
       const obstaclesCount = lightObstacles.length;
       const obstacleHitBoxes = new Array(obstaclesCount);
       for (let i = 0; i < obstaclesCount; i++) {
-        obstacleHitBoxes[i] = lightObstacles[i].owner.getHitBoxes();
+        obstacleHitBoxes[i] = lightObstacles[i].behavior.owner.getHitBoxes();
       }
       const obstaclePolygons: Array<any> = [];
       obstaclePolygons.push(this._lightBoundingPoly);
@@ -509,7 +512,7 @@ namespace gdjs {
 
     static _defaultIndexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
     static defaultVertexShader = `
-  precision mediump float;
+  precision highp float;
   attribute vec2 aVertexPosition;
 
   uniform mat3 translationMatrix;
@@ -521,7 +524,7 @@ namespace gdjs {
       gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
   }`;
     static defaultFragmentShader = `
-  precision mediump float;
+  precision highp float;
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;
@@ -535,7 +538,7 @@ namespace gdjs {
       gl_FragColor = vec4(color*intensity, 1.0);
   }`;
     static texturedFragmentShader = `
-  precision mediump float;
+  precision highp float;
   uniform vec2 center;
   uniform float radius;
   uniform vec3 color;

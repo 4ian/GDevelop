@@ -52,12 +52,12 @@ class GD_CORE_API ExtensionProperties {
   /**
    * \brief Serialize the Extension Properties.
    */
-  virtual void SerializeTo(SerializerElement& element) const;
+  void SerializeTo(SerializerElement& element) const;
 
   /**
    * \brief Unserialize the Extension Properties.
    */
-  virtual void UnserializeFrom(const SerializerElement& element);
+  void UnserializeFrom(const SerializerElement& element);
   ///@}
 
  private:

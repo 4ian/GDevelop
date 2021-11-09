@@ -6,7 +6,7 @@ declare class gdWholeProjectRefactorer {
   static renameBehaviorEventsFunction(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
   static moveEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, functionName: string, oldIndex: number, newIndex: number): void;
   static moveBehaviorEventsFunctionParameter(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, functionName: string, oldIndex: number, newIndex: number): void;
-  static renameBehaviorProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
+  static renameEventsBasedBehaviorProperty(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior, oldName: string, newName: string): void;
   static renameEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, oldName: string, newName: string): void;
   static objectOrGroupRenamedInLayout(project: gdProject, layout: gdLayout, oldName: string, newName: string, isObjectGroup: boolean): void;
   static objectOrGroupRemovedInLayout(project: gdProject, layout: gdLayout, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
@@ -16,6 +16,11 @@ declare class gdWholeProjectRefactorer {
   static globalObjectOrGroupRemoved(project: gdProject, objectName: string, isObjectGroup: boolean, removeEventsAndGroups: boolean): void;
   static getAllObjectTypesUsingEventsBasedBehavior(project: gdProject, eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): gdSetString;
   static ensureBehaviorEventsFunctionsProperParameters(eventsFunctionsExtension: gdEventsFunctionsExtension, eventsBasedBehavior: gdEventsBasedBehavior): void;
+  static addBehaviorAndRequiredBehaviors(project: gdProject, obj: gdObject, behaviorType: string, behaviorName: string): void;
+  static findDependentBehaviorNames(project: gdProject, obj: gdObject, behaviorName: string): gdVectorString;
+  static findInvalidRequiredBehaviorProperties(project: gdProject): gdVectorUnfilledRequiredBehaviorPropertyProblem;
+  static getBehaviorsWithType(obj: gdObject, type: string): gdVectorString;
+  static fixInvalidRequiredBehaviorProperties(project: gdProject): boolean;
   delete(): void;
   ptr: number;
 };

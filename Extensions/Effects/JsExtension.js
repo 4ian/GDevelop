@@ -897,7 +897,8 @@ module.exports = {
       .setFullName(_('Radial Blur'))
       .setDescription(_('Applies a Motion blur to an object.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-radial-blur.js')
-      .addIncludeFile('Extensions/Effects/radial-blur-pixi-filter.js');
+      .addIncludeFile('Extensions/Effects/radial-blur-pixi-filter.js')
+      .markAsNotWorkingForObjects(); // See https://github.com/pixijs/filters/issues/304
     const radialBlurProperties = radialBlurEffect.getProperties();
     radialBlurProperties
       .getOrCreate('radius')
@@ -1084,7 +1085,8 @@ module.exports = {
         )
       )
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-twist.js')
-      .addIncludeFile('Extensions/Effects/twist-pixi-filter.js');
+      .addIncludeFile('Extensions/Effects/twist-pixi-filter.js')
+      .markAsNotWorkingForObjects(); // See https://github.com/pixijs/filters/issues/304
     const twistProperties = twistEffect.getProperties();
     twistProperties
       .getOrCreate('radius')
@@ -1120,7 +1122,8 @@ module.exports = {
       .setFullName(_('Zoom blur'))
       .setDescription(_('Applies a Zoom blur.'))
       .addIncludeFile('Extensions/Effects/pixi-filters/filter-zoom-blur.js')
-      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js');
+      .addIncludeFile('Extensions/Effects/zoom-blur-pixi-filter.js')
+      .markAsNotWorkingForObjects(); // See https://github.com/pixijs/filters/issues/304
     const zoomBlurProperties = zoomBlurEffect.getProperties();
     zoomBlurProperties
       .getOrCreate('centerX')

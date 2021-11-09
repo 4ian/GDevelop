@@ -9,6 +9,8 @@
  * @namespace gdjs
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Engine runtime');
+
   /**
    * Contains functions used by events (this is a convention only, functions can actually
    * be anywhere).
@@ -42,7 +44,7 @@ namespace gdjs {
   export let gdevelopLogo: string = '';
 
   /**
-   * Convert a rgb color value to a hex string.
+   * Convert a RGB object to a Hex string.
    *
    * No "#" or "0x" are added.
    * @param r Red
@@ -58,7 +60,7 @@ namespace gdjs {
   };
 
   /**
-   * Convert a string hex color value to an array [r, g, b], where each component is in the range [0, 255].
+   * Convert a Hex string to an RGB color array [r, g, b], where each component is in the range [0, 255].
    *
    * @param {string} hex Color hexadecimal
    */
@@ -74,7 +76,27 @@ namespace gdjs {
   };
 
   /**
-   * Convert a rgb color value to a hex value.
+   * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color array ([r,g,b] with each component going from 0 to 255).
+   * @param value The color as a RGB string or Hex string
+   */
+  export const rgbOrHexToRGBColor = function (
+    value: string
+  ): [number, number, number] {
+    const splitValue = value.split(';');
+    // If a RGB string is provided, return the RGB object.
+    if (splitValue.length === 3) {
+      return [
+        parseInt(splitValue[0], 10),
+        parseInt(splitValue[1], 10),
+        parseInt(splitValue[2], 10),
+      ];
+    }
+    // Otherwise, convert the Hex to RGB.
+    return hexToRGBColor(value);
+  };
+
+  /**
+   * Convert a RGB object to a Hex number.
    * @param r Red
    * @param g Green
    * @param b Blue
@@ -88,7 +110,7 @@ namespace gdjs {
   };
 
   /**
-   * Convert a hex color value to an rgb object.
+   * Convert a Hex number to a RGB color array([r,g,b] with each component going from 0 to 255).
    * @param hex Hex color
    */
   export const hexNumberToRGB = (
@@ -314,7 +336,7 @@ namespace gdjs {
    * @private
    */
   export const registerGlobalCallbacks = function (): void {
-    console.warn(
+    logger.warn(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
   };
@@ -347,7 +369,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.objectsTypes.containsKey(name))
       return gdjs.objectsTypes.get(name);
 
-    console.warn('Object type "' + name + '" was not found.');
+    logger.warn('Object type "' + name + '" was not found.');
     return gdjs.objectsTypes.get(''); //Create a base empty runtime object.
   };
 
@@ -362,7 +384,7 @@ namespace gdjs {
     if (name !== undefined && gdjs.behaviorsTypes.containsKey(name))
       return gdjs.behaviorsTypes.get(name);
 
-    console.warn('Behavior type "' + name + '" was not found.');
+    logger.warn('Behavior type "' + name + '" was not found.');
     return gdjs.behaviorsTypes.get(''); //Create a base empty runtime behavior.
   };
 

@@ -53,12 +53,16 @@ There is a script file that automates cloning this repository, building the IDE 
 
 ### Development of UI components
 
-You can run a [storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:
+You can run a [Storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:
 
 ```bash
 cd newIDE/app
 npm run storybook # or yarn storybook
 ```
+
+> ℹ️ When creating a Pull Request/pushing a commit, a CI will build the Storybook for you and host it temporarily to allow to test components directly from your browser. Navigate to `http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/YOUR_BRANCH/latest/index.html` to see it.
+
+Find [here the Storybook of the latest version on master](http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/master/latest/index.html).
 
 ### Tests
 
@@ -110,22 +114,13 @@ Cloud storage providers are set up with development keys when you're running GDe
 
 ### Desktop version
 
-First, update the version number in `newIDE/electron-app/app/package.json`.
+First, update the version number in `newIDE/electron-app/app/package.json` and merge the change to master.
 
-```bash
-cd newIDE/electron-app
-yarn build # or npm run build
-```
+Then, wait for the CIs (CircleCI & AppVeyor) to build the artifacts needed for the release (MacOS+Linux and Windows respectively).
 
-This will build and package the Electron app for Windows, macOS or Linux (according to your OS). The output is stored inside `newIDE/electron-app/dist`.
+Once finished, you can download them (use `newIDE/app/scripts/download-all-build-artifacts.js` script) and upload them to the new Github release!
 
-To build artifacts for all platforms and publish to a draft GitHub release:
-
-```
-GH_TOKEN=xxx yarn build --mac --win --linux AppImage --publish always
-```
-
-> To build beta versions, you can create archives: `yarn build --mac zip --win zip --linux AppImage`.
+> Note: You can also build manually a desktop version locally by running `npm run build` in `newIDE/electron-app`.
 
 ### Webapp version
 
@@ -145,7 +140,7 @@ cd newIDE/app
 yarn extract-all-translations # or npm run extract-all-translations
 ```
 
-This will create `ide-messages.po` (in `newIDE/app/src/locales`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
+This will create `ide-messages.pot` (in `newIDE/app/src/locales/en`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
 
 To update translations, build and download the translations from Crowdin. Extract everything in `newIDE/app/src/locales`. And run:
 

@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -175,6 +175,7 @@ export type PreferencesValues = {|
   useUndefinedVariablesInAutocompletion: boolean,
   useGDJSDevelopmentWatcher: boolean,
   eventsSheetUseAssignmentOperators: boolean,
+  eventsSheetZoomLevel: number,
   showEffectParameterNames: boolean,
   projectLastUsedPaths: { [string]: { [ResourceKind]: string } },
   defaultEditorMosaicNodes: { [EditorMosaicName]: ?EditorMosaicNode },
@@ -209,6 +210,7 @@ export type Preferences = {|
   setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => void,
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => void,
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => void,
+  setEventsSheetZoomLevel: (zoomLevel: number) => void,
   setShowEffectParameterNames: (enabled: boolean) => void,
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => string,
   setLastUsedPath: (
@@ -264,6 +266,7 @@ export const initialPreferences = {
     useUndefinedVariablesInAutocompletion: false,
     useGDJSDevelopmentWatcher: true,
     eventsSheetUseAssignmentOperators: false,
+    eventsSheetZoomLevel: 14,
     showEffectParameterNames: false,
     projectLastUsedPaths: {},
     defaultEditorMosaicNodes: {},
@@ -273,7 +276,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    isAlwaysOnTopInPreview: true,
+    isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
   },
@@ -292,6 +295,7 @@ export const initialPreferences = {
   setUseUndefinedVariablesInAutocompletion: (enabled: boolean) => {},
   setUseGDJSDevelopmentWatcher: (enabled: boolean) => {},
   setEventsSheetUseAssignmentOperators: (enabled: boolean) => {},
+  setEventsSheetZoomLevel: (zoomLevel: number) => {},
   setShowEffectParameterNames: (enabled: boolean) => {},
   getLastUsedPath: (project: gdProject, kind: ResourceKind) => '',
   setLastUsedPath: (project: gdProject, kind: ResourceKind, path: string) => {},

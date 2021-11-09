@@ -164,6 +164,7 @@ declare interface ProjectPropertiesData {
   packageName: string;
   projectFile: string;
   scaleMode: 'linear' | 'nearest';
+  pixelsRounding: boolean;
   sizeOnStartupMode: string;
   useExternalSourceFiles: boolean;
   version: string;

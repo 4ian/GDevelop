@@ -136,6 +136,8 @@ declare class libGDevelop {
   EventsSearchResult: Class<gdEventsSearchResult>;
   VectorEventsSearchResult: Class<gdVectorEventsSearchResult>;
   EventsRefactorer: Class<gdEventsRefactorer>;
+  UnfilledRequiredBehaviorPropertyProblem: Class<gdUnfilledRequiredBehaviorPropertyProblem>;
+  VectorUnfilledRequiredBehaviorPropertyProblem: Class<gdVectorUnfilledRequiredBehaviorPropertyProblem>;
   WholeProjectRefactorer: Class<gdWholeProjectRefactorer>;
   UsedExtensionsFinder: Class<gdUsedExtensionsFinder>;
   ExtensionAndBehaviorMetadata: Class<gdExtensionAndBehaviorMetadata>;
@@ -177,7 +179,7 @@ declare class libGDevelop {
   ResourcesRenamer: Class<gdResourcesRenamer>;
   ProjectResourcesCopier: Class<gdProjectResourcesCopier>;
   ResourcesInUseHelper: Class<gdResourcesInUseHelper>;
-  LayoutEditorCanvasOptions: Class<gdLayoutEditorCanvasOptions>;
+  EditorSettings: Class<gdEditorSettings>;
   Point: Class<gdPoint>;
   VectorPoint: Class<gdVectorPoint>;
   Polygon2d: Class<gdPolygon2d>;

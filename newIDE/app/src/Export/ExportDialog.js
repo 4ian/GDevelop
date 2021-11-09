@@ -10,9 +10,9 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import BuildsDialog from './Builds/BuildsDialog';
 import { Line } from '../UI/Grid';
-import UserProfileContext, {
-  type UserProfile,
-} from '../Profile/UserProfileContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../Profile/AuthenticatedUserContext';
 import ExportLauncher from './ExportLauncher';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { OnlineStatus } from '../Utils/OnlineStatus';
@@ -55,6 +55,38 @@ type State = {|
   showExperimental: boolean,
   buildsDialogOpen: boolean,
 |};
+
+type ExperimentalExportButtonProps = {|
+  showExperimental: boolean,
+  onClick: (value: boolean) => void,
+  disabled: boolean,
+|};
+
+const ExperimentalExportButton = (props: ExperimentalExportButtonProps) => {
+  const { showExperimental, onClick, disabled } = props;
+  return (
+    <>
+      {!disabled && !showExperimental && (
+        <FlatButton
+          key="toggle-experimental"
+          icon={<Visibility />}
+          primary={false}
+          onClick={() => onClick(true)}
+          label={<Trans>Show experimental exports</Trans>}
+        />
+      )}
+      {!disabled && showExperimental && (
+        <FlatButton
+          key="toggle-experimental"
+          icon={<VisibilityOff />}
+          primary={false}
+          onClick={() => onClick(false)}
+          label={<Trans>Hide experimental exports</Trans>}
+        />
+      )}
+    </>
+  );
+};
 
 export default class ExportDialog extends React.Component<Props, State> {
   state = {
@@ -118,8 +150,8 @@ export default class ExportDialog extends React.Component<Props, State> {
     );
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
+      <AuthenticatedUserContext.Consumer>
+        {(authenticatedUser: AuthenticatedUser) => (
           <OnlineStatus>
             {onlineStatus => {
               const cantExportBecauseOffline =
@@ -211,23 +243,11 @@ export default class ExportDialog extends React.Component<Props, State> {
                             )}
                       </List>
                       <Line justifyContent="center" alignItems="center">
-                        {!showExperimental ? (
-                          <FlatButton
-                            key="toggle-experimental"
-                            icon={<Visibility />}
-                            primary={false}
-                            onClick={() => this._showExperimental(true)}
-                            label={<Trans>Show experimental exports</Trans>}
-                          />
-                        ) : (
-                          <FlatButton
-                            key="toggle-experimental"
-                            icon={<VisibilityOff />}
-                            primary={false}
-                            onClick={() => this._showExperimental(false)}
-                            label={<Trans>Hide experimental exports</Trans>}
-                          />
-                        )}
+                        <ExperimentalExportButton
+                          showExperimental={showExperimental}
+                          onClick={value => this._showExperimental(value)}
+                          disabled
+                        />
                       </Line>
                     </React.Fragment>
                   )}
@@ -237,21 +257,21 @@ export default class ExportDialog extends React.Component<Props, State> {
                         exportPipeline={exporter.exportPipeline}
                         project={project}
                         onChangeSubscription={onChangeSubscription}
-                        userProfile={userProfile}
+                        authenticatedUser={authenticatedUser}
                       />
                     </div>
                   )}
                   <BuildsDialog
                     open={this.state.buildsDialogOpen}
                     onClose={() => this._openBuildsDialog(false)}
-                    userProfile={userProfile}
+                    authenticatedUser={authenticatedUser}
                   />
                 </Dialog>
               );
             }}
           </OnlineStatus>
         )}
-      </UserProfileContext.Consumer>
+      </AuthenticatedUserContext.Consumer>
     );
   }
 }

@@ -20,6 +20,7 @@ import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
+import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -136,7 +137,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             <IconContainer
               alt={extensionShortHeader.fullName}
               src={extensionShortHeader.previewIconUrl}
-              size={48}
+              size={64}
             />
             <Column expand>
               <Text noMargin size="title">
@@ -145,6 +146,16 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               <Text noMargin size="body2">
                 <Trans>Version {' ' + extensionShortHeader.version}</Trans>
               </Text>
+              <Line>
+                {extensionShortHeader.authors &&
+                  extensionShortHeader.authors.map(author => (
+                    <UserPublicProfileChip
+                      user={author}
+                      key={author.id}
+                      isClickable
+                    />
+                  ))}
+              </Line>
             </Column>
           </Line>
           <Text noMargin>{extensionShortHeader.shortDescription}</Text>

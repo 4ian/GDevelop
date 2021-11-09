@@ -12,14 +12,14 @@ import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
 import ColorField from '../UI/ColorField';
 import { MarkdownText } from '../UI/MarkdownText';
-import { hexToRGBColor } from '../Utils/ColorTransformer';
+import { rgbOrHexToRGBString } from '../Utils/ColorTransformer';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
 import {
   type ResourceKind,
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   TextFieldWithButtonLayout,
@@ -199,7 +199,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       this.props.unsavedChanges.triggerUnsavedChanges();
     if (this.props.onInstancesModified)
       this.props.onInstancesModified(instances);
-    else this.forceUpdate();
+    this.forceUpdate();
   };
 
   _getFieldDescription = (instances: Instances, field: ValueField): ?string => {
@@ -294,10 +294,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           )}
           disableAlpha
           fullWidth
-          color={hexToRGBColor(getFieldValue(this.props.instances, field))}
-          onChangeComplete={color => {
+          color={getFieldValue(this.props.instances, field)}
+          onChange={color => {
             this.props.instances.forEach(i =>
-              setValue(i, color.hex || '#000000')
+              setValue(i, rgbOrHexToRGBString(color))
             );
             this._onInstancesModified(this.props.instances);
           }}
@@ -506,6 +506,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                     instances={this.props.instances}
                     mode="row"
                     unsavedChanges={unsavedChanges}
+                    onInstancesModified={this.props.onInstancesModified}
                   />
                 )}
               </UnsavedChangesContext.Consumer>
@@ -516,11 +517,17 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             <div key={field.name}>
               <Subheader>{field.name}</Subheader>
               <div style={styles.subPropertiesEditorContainer}>
-                <PropertiesEditor
-                  schema={field.children}
-                  instances={this.props.instances}
-                  mode="column"
-                />
+                <UnsavedChangesContext.Consumer key={field.name}>
+                  {unsavedChanges => (
+                    <PropertiesEditor
+                      schema={field.children}
+                      instances={this.props.instances}
+                      mode="column"
+                      unsavedChanges={unsavedChanges}
+                      onInstancesModified={this.props.onInstancesModified}
+                    />
+                  )}
+                </UnsavedChangesContext.Consumer>
               </div>
             </div>
           );

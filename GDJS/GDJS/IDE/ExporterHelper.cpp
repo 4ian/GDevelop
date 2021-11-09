@@ -101,8 +101,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
-                 /*cocosRenderers=*/false,
-                 /*websocketDebuggerClient=*/true,
+                 /*includeWebsocketDebuggerClient=*/
+                 !options.websocketDebuggerServerAddress.empty(),
+                 /*includeWindowMessageDebuggerClient=*/
+                 options.useWindowMessageDebuggerClient,
                  exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
@@ -137,11 +139,6 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   gd::ProjectStripper::StripProjectForExport(exportedProject);
   exportedProject.SetFirstLayout(options.layoutName);
 
-  // Strip the includes to only have Pixi.js files (*before* creating
-  // runtimeGameOptions, since otherwise Cocos files will be passed to the
-  // hot-reloader).
-  RemoveIncludes(false, true, includesFiles);
-
   previousTime = LogTimeSpent("Data stripping", previousTime);
 
   // Create the setup options passed to the gdjs.RuntimeGame
@@ -153,10 +150,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   }
   runtimeGameOptions.AddChild("projectDataOnlyExport")
       .SetBoolValue(options.projectDataOnlyExport);
-  runtimeGameOptions.AddChild("debuggerServerAddress")
-      .SetStringValue(options.debuggerServerAddress);
-  runtimeGameOptions.AddChild("debuggerServerPort")
-      .SetStringValue(options.debuggerServerPort);
+  runtimeGameOptions.AddChild("websocketDebuggerServerAddress")
+      .SetStringValue(options.websocketDebuggerServerAddress);
+  runtimeGameOptions.AddChild("websocketDebuggerServerPort")
+      .SetStringValue(options.websocketDebuggerServerPort);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -373,83 +370,6 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   return true;
 }
 
-bool ExporterHelper::ExportCocos2dFiles(
-    const gd::Project &project,
-    gd::String exportDir,
-    bool debugMode,
-    const std::vector<gd::String> &includesFiles) {
-  if (!fs.CopyFile(gdjsRoot + "/Runtime/Cocos2d/main.js",
-                   exportDir + "/main.js")) {
-    lastError = "Unable to write Cocos2d main.js file.";
-    return false;
-  }
-
-  if (!fs.CopyFile(gdjsRoot + "/Runtime/Cocos2d/cocos2d-js-v3.10.js",
-                   exportDir + "/cocos2d-js-v3.10.js")) {
-    lastError = "Unable to write Cocos2d cocos2d-js-v3.10.js file.";
-    return false;
-  }
-
-  {
-    gd::String str = fs.ReadFile(gdjsRoot + "/Runtime/Cocos2d/index.html");
-
-    // Generate custom declarations for font resources
-    gd::String customCss;
-    gd::String customHtml;
-
-    // Generate the file
-    std::vector<gd::String> noIncludesInThisFile;
-    if (!CompleteIndexFile(str,
-                           exportDir,
-                           noIncludesInThisFile,
-                           /*nonRuntimeScriptsCacheBurst=*/0,
-                           "")) {
-      lastError = "Unable to complete Cocos2d-JS index.html file.";
-      return false;
-    }
-
-    // Write the index.html file
-    if (!fs.WriteToFile(exportDir + "/index.html", str)) {
-      lastError = "Unable to write Cocos2d-JS index.html file.";
-      return false;
-    }
-  }
-
-  {
-    gd::String includeFilesStr = "";
-    bool first = true;
-    for (auto &include : includesFiles) {
-      gd::String scriptSrc = GetExportedIncludeFilename(include);
-
-      // Sanity check if the file exists - if not skip it to avoid
-      // including it in the list of scripts.
-      gd::String absoluteFilename = scriptSrc;
-      fs.MakeAbsolute(absoluteFilename, exportDir + "/src");
-      if (!fs.FileExists(absoluteFilename)) {
-        std::cout << "Warning: Unable to find " << absoluteFilename << "."
-                  << std::endl;
-        continue;
-      }
-
-      includeFilesStr +=
-          gd::String(first ? "" : ", ") + "\"src/" + scriptSrc + "\"\n";
-      first = false;
-    }
-
-    gd::String str =
-        fs.ReadFile(gdjsRoot + "/Runtime/Cocos2d/project.json")
-            .FindAndReplace("// GDJS_INCLUDE_FILES", includeFilesStr)
-            .FindAndReplace("/*GDJS_SHOW_FPS*/", debugMode ? "true" : "false");
-
-    if (!fs.WriteToFile(exportDir + "/project.json", str)) {
-      lastError = "Unable to write Cocos2d-JS project.json file.";
-      return false;
-    }
-  }
-
-  return true;
-}
-
 bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
                                                      gd::String exportDir) {
   {
@@ -604,13 +524,14 @@ bool ExporterHelper::CompleteIndexFile(
 }
 
 void ExporterHelper::AddLibsInclude(bool pixiRenderers,
-                                    bool cocosRenderers,
-                                    bool websocketDebuggerClient,
+                                    bool includeWebsocketDebuggerClient,
+                                    bool includeWindowMessageDebuggerClient,
                                     gd::String gdevelopLogoStyle,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
   InsertUnique(includesFiles, "libs/jshashtable.js");
+  InsertUnique(includesFiles, "logger.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "libs/rbush.js");
   InsertUnique(includesFiles, "inputmanager.js");
@@ -633,6 +554,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
+  InsertUnique(includesFiles, "events-tools/variabletools.js");
   InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
   InsertUnique(includesFiles, "events-tools/inputtools.js");
   InsertUnique(includesFiles, "events-tools/objecttools.js");
@@ -653,10 +575,16 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles, "splash/gd-logo-light.js");
   }
 
-  if (websocketDebuggerClient) {
-    InsertUnique(includesFiles, "websocket-debugger-client/hot-reloader.js");
+  if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
+    InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
+    InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+  }
+  if (includeWebsocketDebuggerClient) {
+    InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");
+  }
+  if (includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles,
-                 "websocket-debugger-client/websocket-debugger-client.js");
+                 "debugger-client/window-message-debugger-client.js");
   }
 
   if (pixiRenderers) {
@@ -671,30 +599,9 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
     InsertUnique(includesFiles,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
+    InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
-    InsertUnique(includesFiles,
-                 "fontfaceobserver-font-manager/fontfaceobserver.js");
-    InsertUnique(
-        includesFiles,
-        "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
-  }
-
-  if (cocosRenderers) {
-    InsertUnique(includesFiles, "cocos-renderers/cocos-director-manager.js");
-    InsertUnique(includesFiles, "cocos-renderers/cocos-image-manager.js");
-    InsertUnique(includesFiles, "cocos-renderers/cocos-bitmapfont-manager.js");
-    InsertUnique(includesFiles, "cocos-renderers/cocos-tools.js");
-    InsertUnique(includesFiles, "cocos-renderers/layer-cocos-renderer.js");
-    InsertUnique(includesFiles,
-                 "cocos-renderers/loadingscreen-cocos-renderer.js");
-    InsertUnique(includesFiles,
-                 "cocos-renderers/runtimegame-cocos-renderer.js");
-    InsertUnique(includesFiles,
-                 "cocos-renderers/runtimescene-cocos-renderer.js");
-    InsertUnique(includesFiles,
-                 "cocos-renderers/spriteruntimeobject-cocos-renderer.js");
-    InsertUnique(includesFiles, "cocos-sound-manager/cocos-sound-manager.js");
     InsertUnique(includesFiles,
                  "fontfaceobserver-font-manager/fontfaceobserver.js");
     InsertUnique(
@@ -704,23 +611,12 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
 }
 
 void ExporterHelper::RemoveIncludes(bool pixiRenderers,
-                                    bool cocosRenderers,
                                     std::vector<gd::String> &includesFiles) {
   if (pixiRenderers) {
     for (size_t i = 0; i < includesFiles.size();) {
       const gd::String &includeFile = includesFiles[i];
       if (includeFile.find("pixi-renderer") != gd::String::npos ||
           includeFile.find("pixi-filter") != gd::String::npos)
-        includesFiles.erase(includesFiles.begin() + i);
-      else
-        ++i;
-    }
-  }
-  if (cocosRenderers) {
-    for (size_t i = 0; i < includesFiles.size();) {
-      const gd::String &includeFile = includesFiles[i];
-      if (includeFile.find("cocos-renderer") != gd::String::npos ||
-          includeFile.find("cocos-shader") != gd::String::npos)
         includesFiles.erase(includesFiles.begin() + i);
       else
         ++i;

@@ -15,6 +15,10 @@ declare class gdBehaviorMetadata {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
+  addDuplicatedAction(newActionName: string, copiedActionName: string): gdInstructionMetadata;
+  addDuplicatedCondition(newConditionName: string, copiedConditionName: string): gdInstructionMetadata;
+  addDuplicatedExpression(newExpressionName: string, copiedExpressionName: string): gdExpressionMetadata;
+  addDuplicatedStrExpression(newExpressionName: string, copiedExpressionName: string): gdExpressionMetadata;
   setIncludeFile(includeFile: string): gdBehaviorMetadata;
   addIncludeFile(includeFile: string): gdBehaviorMetadata;
   setObjectType(objectType: string): gdBehaviorMetadata;

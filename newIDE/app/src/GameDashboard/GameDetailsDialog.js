@@ -21,7 +21,7 @@ import {
   type GameMetrics,
   getGameMetrics,
 } from '../Utils/GDevelopServices/Analytics';
-import UserProfileContext from '../Profile/UserProfileContext';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -69,7 +69,7 @@ export const GameDetailsDialog = ({
   onGameDeleted,
 }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
-    UserProfileContext
+    AuthenticatedUserContext
   );
   const [currentTab, setCurrentTab] = React.useState(initialTab);
   const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
@@ -89,14 +89,14 @@ export const GameDetailsDialog = ({
     async () => {
       if (!profile) return;
 
-      const { uid } = profile;
+      const { id } = profile;
 
       setIsGameMetricsLoading(true);
       setGameMetricsError(null);
       try {
         const gameRollingMetrics = await getGameMetrics(
           getAuthorizationHeader,
-          uid,
+          id,
           game.id,
           analyticsDate
         );
@@ -120,10 +120,10 @@ export const GameDetailsDialog = ({
   const updateGameFromProject = async () => {
     if (!project) return;
     if (!profile) return;
-    const { uid } = profile;
+    const { id } = profile;
 
     try {
-      const game = await updateGame(getAuthorizationHeader, uid, {
+      const game = await updateGame(getAuthorizationHeader, id, {
         authorName: project.getAuthor(),
         gameId: project.getProjectUuid(),
         gameName: project.getName(),
@@ -136,10 +136,10 @@ export const GameDetailsDialog = ({
 
   const unregisterGame = async () => {
     if (!profile) return;
-    const { uid } = profile;
+    const { id } = profile;
 
     try {
-      await deleteGame(getAuthorizationHeader, uid, game.id);
+      await deleteGame(getAuthorizationHeader, id, game.id);
       onGameDeleted();
     } catch (error) {
       console.error('Unable to delete the game:', error);

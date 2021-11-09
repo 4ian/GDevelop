@@ -16,6 +16,7 @@ describe('gdjs.SpriteRuntimeObject', function () {
       updateIfNotVisible: false,
       variables: [],
       behaviors: [],
+      effects: [],
       animations: [
         {
           name: 'NewObject2',

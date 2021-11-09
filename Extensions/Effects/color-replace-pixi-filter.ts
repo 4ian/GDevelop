@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('ColorReplace', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const colorReplaceFilter = new PIXI.filters.ColorReplaceFilter();
       return colorReplaceFilter;
     },
-    update: function (filter, layer) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const colorReplaceFilter = (filter as unknown) as PIXI.filters.ColorReplaceFilter;
       if (parameterName === 'epsilon') {

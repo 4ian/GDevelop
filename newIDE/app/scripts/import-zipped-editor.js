@@ -10,6 +10,7 @@ var unzipper = require('unzipper');
 var process = require('process');
 var path = require('path');
 const { hashElement } = require('folder-hash');
+const { downloadLocalFile } = require('./lib/DownloadLocalFile');
 
 const editor = process.argv[2];
 const gitRelease = process.argv[3];
@@ -60,73 +61,71 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
       ' (be patient)...'
   );
 
-  var file = fs.createWriteStream(zipFilePath);
-  https.get(
+  downloadLocalFile(
     gitUrl + '/releases/download/v' + gitRelease + '/' + editor + '-editor.zip',
-    function(response) {
-      if (response.statusCode !== 200) {
-        shell.echo(
-          `❌ Can't download ` +
-            editor +
-            `-editor.zip (${
-              response.statusMessage
-            }), please check your internet connection`
-        );
-        shell.exit(1);
-        return;
-      }
+    zipFilePath
+  ).then(
+    () => {
+      shell.echo(
+        '📂 Extracting ' +
+          editor +
+          '-editor.zip to public/external/' +
+          editor +
+          ' folder'
+      );
 
-      response.pipe(file).on('finish', function() {
+      try {
+        fs.createReadStream(zipFilePath)
+          .pipe(
+            unzipper.Extract({
+              path: path.join('../public/external/', editor),
+            })
+          )
+          .on('close', function() {
+            shell.echo(
+              '✅ Extracted ' +
+                editor +
+                '-editor.zip to public/external/' +
+                editor +
+                ' folder'
+            );
+            shell.rm(zipFilePath);
+            editorHasCorrectHash().then(
+              ({ isHashCorrect, actualFolderHash }) => {
+                if (!isHashCorrect) {
+                  shell.echo(
+                    "❌ Can't verify that " +
+                      editor +
+                      '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
+                  );
+                  shell.echo(
+                    `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
+                  );
+                }
+              }
+            );
+          });
+      } catch (e) {
         shell.echo(
-          '📂 Extracting ' +
+          '❌ Error while extracting ' +
             editor +
             '-editor.zip to public/external/' +
             editor +
-            ' folder'
+            ' folder:',
+          e.message
         );
-
-        try {
-          fs.createReadStream(zipFilePath)
-            .pipe(
-              unzipper.Extract({
-                path: path.join('../public/external/', editor),
-              })
-            )
-            .on('close', function() {
-              shell.echo(
-                '✅ Extracted ' +
-                  editor +
-                  '-editor.zip to public/external/' +
-                  editor +
-                  ' folder'
-              );
-              shell.rm(zipFilePath);
-              editorHasCorrectHash().then(
-                ({ isHashCorrect, actualFolderHash }) => {
-                  if (!isHashCorrect) {
-                    shell.echo(
-                      "❌ Can't verify that " +
-                        editor +
-                        '-editor hash is correct. Be careful about potential tampering of the third party editor! 💣'
-                    );
-                    shell.echo(
-                      `ℹ️ Expected folder hash was "${expectedFolderHash}" while actual folder hash that is computed is "${actualFolderHash}".`
-                    );
-                  }
-                }
-              );
-            });
-        } catch (e) {
-          shell.echo(
-            '❌ Error while extracting ' +
-              editor +
-              '-editor.zip to public/external/' +
-              editor +
-              ' folder:',
-            e.message
-          );
-        }
-      });
+      }
+    },
+    () => {
+      shell.echo(
+        `❌ Can't download ` +
+          editor +
+          `-editor.zip (${
+            response.statusMessage
+          }), please check your internet connection`
+      );
+      shell.exit(1);
+      return;
     }
   );
 });

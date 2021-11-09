@@ -2,6 +2,7 @@
 declare class gdResourcesManager {
   constructor(): void;
   getAllResourceNames(): gdVectorString;
+  findFilesNotInResources(filesToCheck: gdVectorString): gdVectorString;
   hasResource(name: string): boolean;
   getResource(name: string): gdResource;
   getResourceNameWithOrigin(originName: string, originIdentifier: string): string;

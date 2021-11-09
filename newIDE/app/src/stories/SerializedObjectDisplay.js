@@ -16,7 +16,7 @@ export default class SerializedObjectDisplay extends Component {
         <Paper elevation={2}>
           Object serialized to JSON:{' '}
           <RaisedButton label={<Trans>Update</Trans>} onClick={this.update} />
-          <pre>
+          <pre style={{ maxHeight: 400, overflow: 'scroll' }}>
             {JSON.stringify(
               serializeToJSObject(
                 this.props.object,

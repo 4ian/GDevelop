@@ -25,7 +25,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 
-#if defined(GD_IDE_ONLY)
   obj.AddCondition("PosX",
                    _("X position"),
                    _("Compare the X position of the object."),
@@ -84,9 +83,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
@@ -99,9 +98,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position24.png",
                 "res/actions/position.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
@@ -344,7 +343,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetObjectVariableAsBoolean",
                 _("Boolean value of an object variable"),
                 _("Change the boolean value of an object variable."),
-                _("Set the boolean value of the variable _PARAM1_ of object "
+                _("Set the boolean value of variable _PARAM1_ of "
                   "_PARAM0_ to _PARAM2_"),
                 _("Variables"),
                 "res/actions/var24.png",
@@ -360,7 +359,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Toggles the boolean value of an object variable.") + "\n" +
              _("If it was true, it will become false, and if it was false "
                "it will become true."),
-         _("Toggle the boolean value of the variable _PARAM1_ of object "
+         _("Toggle the boolean value of variable _PARAM1_ of "
            "_PARAM0_"),
          _("Variables"),
          "res/actions/var24.png",
@@ -795,8 +794,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition(
          "ObjectTimer",
-         _("Value of a timer"),
-         _("Test the elapsed time of a timer."),
+         _("Value of an object timer"),
+         _("Test the elapsed time of an object timer."),
          _("The timer _PARAM1_ of _PARAM0_ is greater than _PARAM2_ seconds"),
          _("Timers"),
          "res/conditions/timer24.png",
@@ -806,8 +805,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Time in seconds"));
 
   obj.AddCondition("ObjectTimerPaused",
-                   _("Timer paused"),
-                   _("Test if specified timer is paused."),
+                   _("Object timer paused"),
+                   _("Test if specified object timer is paused."),
                    _("The timer _PARAM1_ of _PARAM0_ is paused"),
                    _("Timers"),
                    "res/conditions/timerPaused24.png",
@@ -817,8 +816,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("ResetObjectTimer",
-                _("Start (or reset) a timer"),
-                _("Reset the specified timer, if the timer doesn't exist "
+                _("Start (or reset) an object timer"),
+                _("Reset the specified object timer, if the timer doesn't exist "
                   "it's created and started."),
                 _("Reset the timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
@@ -828,8 +827,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Timer's name"));
 
   obj.AddAction("PauseObjectTimer",
-                _("Pause a timer"),
-                _("Pause a timer."),
+                _("Pause an object timer"),
+                _("Pause an object timer."),
                 _("Pause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/pauseTimer24.png",
@@ -839,8 +838,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("UnPauseObjectTimer",
-                _("Unpause a timer"),
-                _("Unpause a timer."),
+                _("Unpause an object timer"),
+                _("Unpause an object timer."),
                 _("Unpause timer _PARAM1_ of _PARAM0_"),
                 _("Timers"),
                 "res/actions/unPauseTimer24.png",
@@ -850,8 +849,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   obj.AddAction("RemoveObjectTimer",
-                _("Delete a timer"),
-                _("Delete a timer from memory."),
+                _("Delete an object timer"),
+                _("Delete an object timer from memory."),
                 _("Delete timer _PARAM1_ of _PARAM0_ from memory"),
                 _("Timers"),
                 "res/actions/timer24.png",
@@ -1021,9 +1020,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"));
 
   obj.AddExpression("ObjectTimerElapsedTime",
-                    _("Timer value"),
-                    _("Value of a timer"),
-                    _("Timers"),
+                    _("Object timer value"),
+                    _("Value of an object timer"),
+                    _("Object timers"),
                     "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));
@@ -1071,6 +1070,74 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Target X position"))
       .AddParameter("expression", _("Target Y position"));
+
+  obj.AddAction("EnableEffect",
+                _("Enable an object effect"),
+                _("Enable an effect on the object"),
+                _("Enable effect _PARAM1_ on _PARAM0_: _PARAM2_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("yesorno", _("Enable?"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectDoubleParameter",
+                _("Effect parameter (number)"),
+                _("Change the value of a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("expression", _("New value"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectStringParameter",
+                _("Effect parameter (string)"),
+                _("Change the value (string) of a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("string", _("New value"))
+      .MarkAsSimple();
+
+  obj.AddAction("SetEffectBooleanParameter",
+                _("Effect parameter (enable or disable)"),
+                _("Enable or disable a parameter of an effect.") + "\n" +
+                  _("You can find the parameter names (and change the effect "
+                    "names) in the effects window."),
+                _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
+                _("Effects"),
+                "res/actions/effect24.png",
+                "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .AddParameter("objectEffectParameterName", _("Parameter name"))
+      .AddParameter("yesorno", _("Enable?"))
+      .MarkAsSimple();
+
+  obj.AddCondition("IsEffectEnabled",
+                  _("Effect is enabled"),
+                  _("Check if the effect on an object is enabled."),
+                  _("Effect _PARAM1_ of _PARAM0_ is enabled"),
+                  _("Effects"),
+                  "res/actions/effect24.png",
+                  "res/actions/effect.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("objectEffectName", _("Effect name"))
+      .MarkAsSimple();
 
   extension
       .AddAction("Create",
@@ -1373,7 +1440,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Objects"),
                        "res/actions/layer.png")
       .AddParameter("object", _("Object"));
-#endif
 }
 
 }  // namespace gd

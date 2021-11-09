@@ -6,7 +6,6 @@
 macro(gd_add_extension_includes)
 	include_directories(${sfml_include_dir})
 	include_directories(${GDCORE_include_dir})
-	include_directories(${GDCpp_include_dir})
 endmacro()
 
 #Add common defines for a target that will be a GD extension
@@ -76,69 +75,13 @@ function(gd_add_extension_target target_name source_files)
 	ENDIF()
 endfunction()
 
-#Add a GDC++ runtime extension target, that will produce the final library file for runtime.
-function(gdcpp_add_runtime_extension_target gdcpp_runtime_target_name source_files)
-	IF(NOT gdcpp_runtime_target_name MATCHES "_Runtime$")
-		MESSAGE(ERROR "You called gdcpp_add_runtime_extension_target with a target name not finishing with '_Runtime'")
-	ENDIF()
-	string(REGEX REPLACE "_Runtime" "" target_name ${gdcpp_runtime_target_name})
-
-	IF(NOT EMSCRIPTEN) #Also add a GDC++ extension target
-		add_library(${gdcpp_runtime_target_name} SHARED ${source_files})
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES COMPILE_DEFINITIONS "${${gdcpp_runtime_target_name}_extra_definitions}")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/CppPlatform/Extensions/Runtime")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES RUNTIME_OUTPUT_NAME "${target_name}")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES LIBRARY_OUTPUT_NAME "${target_name}")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES ARCHIVE_OUTPUT_NAME "${target_name}")
-		set_target_properties(${gdcpp_runtime_target_name} PROPERTIES PREFIX "")
-		IF(WIN32) #GD extensions have special suffix in their filenames.
-			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgdw")
-		ELSE()
-			set_target_properties(${gdcpp_runtime_target_name} PROPERTIES SUFFIX ".xgd")
-		ENDIF()
-	ENDIF()
-endfunction()
-
 #Link default libraries with a target that is a GD extension
 function(gd_extension_link_libraries target_name)
 	IF(EMSCRIPTEN)
 		#Nothing.
 	ELSE()
 		target_link_libraries(${target_name} GDCore)
-		target_link_libraries(${target_name} GDCpp)
 		target_link_libraries(${target_name} ${sfml_LIBRARIES})
 	ENDIF()
 endfunction()
 
-#Link default libraries with a target that is a GDC++ Runtime extension
-function(gdcpp_runtime_extension_link_libraries target_name)
-	IF(EMSCRIPTEN)
-		#Nothing.
-	ELSE()
-		target_link_libraries(${target_name} GDCpp_Runtime)
-		target_link_libraries(${target_name} ${sfml_LIBRARIES})
-		IF(WIN32)
-			target_link_libraries(${target_name} ws2_32 user32 opengl32 glu32)
-		ENDIF(WIN32)
-	ENDIF()
-endfunction()
-
-
-#Create a target for a test executable of a GDC++ Runtime extension
-function(gdcpp_add_tests_extension_target gdcpp_tests_target_name test_source_files)
-	IF(NOT gdcpp_tests_target_name MATCHES "_tests$")
-		MESSAGE(ERROR "You called gdcpp_add_tests_extension_target with a target name not finishing with '_tests'")
-	ENDIF()
-	string(REGEX REPLACE "_tests" "" target_name ${gdcpp_tests_target_name})
-
-	if(BUILD_TESTS)
-		add_executable(${gdcpp_tests_target_name} ${test_source_files})
-		target_link_libraries(${gdcpp_tests_target_name} GDCpp_Runtime)
-		target_link_libraries(${gdcpp_tests_target_name} ${target_name})
-		target_link_libraries(${gdcpp_tests_target_name} ${sfml_LIBRARIES})
-
-		set_target_properties(${gdcpp_tests_target_name} PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
-	endif()
-endfunction()

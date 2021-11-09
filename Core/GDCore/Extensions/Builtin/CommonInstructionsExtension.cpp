@@ -5,7 +5,6 @@
  */
 #include "AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -15,7 +14,6 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Event.h"
-#endif
 
 using namespace std;
 namespace gd {
@@ -33,7 +31,6 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition("Or",
                     _("Or"),
@@ -86,29 +83,29 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       std::make_shared<gd::StandardEvent>());
 
   extension.AddEvent("Link",
-                     _("Link"),
-                     _("Link to some external events"),
+                     _("Link external events"),
+                     _("Link to external events."),
                      "",
                      "res/lienaddicon.png",
                      std::make_shared<gd::LinkEvent>());
 
   extension.AddEvent("Comment",
                      _("Comment"),
-                     _("Event displaying a text in the events editor"),
+                     _("Event displaying a text in the events editor."),
                      "",
                      "res/comment.png",
                      std::make_shared<gd::CommentEvent>());
 
   extension.AddEvent("While",
                      _("While"),
-                     _("The event is repeated while the conditions are true"),
+                     _("Repeat the event while the conditions are true."),
                      "",
                      "res/while.png",
                      std::make_shared<gd::WhileEvent>());
 
   extension.AddEvent("Repeat",
                      _("Repeat"),
-                     _("Event repeated a number of times"),
+                     _("Repeat the event for a specified number of times."),
                      "",
                      "res/repeat.png",
                      std::make_shared<gd::RepeatEvent>());
@@ -129,12 +126,11 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       std::make_shared<gd::ForEachChildVariableEvent>());
 
   extension.AddEvent("Group",
-                     _("Group"),
-                     _("Group containing events"),
+                     _("Event group"),
+                     _("Group containing events."),
                      "",
                      "res/foreach.png",
                      std::make_shared<gd::GroupEvent>());
-#endif
 }
 
 }  // namespace gd

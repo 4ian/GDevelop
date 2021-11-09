@@ -12,7 +12,7 @@ import {
   type PreferencesValues,
   type EditorMosaicName,
 } from './PreferencesContext';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -56,6 +56,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
     ),
+    setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
     setLastUsedPath: this._setLastUsedPath.bind(this),
@@ -172,6 +173,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetUseAssignmentOperators,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetZoomLevel(eventsSheetZoomLevel: number) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetZoomLevel,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

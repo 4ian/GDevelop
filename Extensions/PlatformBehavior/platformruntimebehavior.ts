@@ -229,6 +229,17 @@ namespace gdjs {
     static NORMALPLAFTORM = 0;
     static JUMPTHRU = 1;
     static LADDER = 2;
+
+    static isOnPlatformTest(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as PlatformerObjectRuntimeBehavior;
+      return behavior1.isOnFloorObject(object2);
+    }
   }
   gdjs.registerBehavior(
     'PlatformBehavior::PlatformBehavior',

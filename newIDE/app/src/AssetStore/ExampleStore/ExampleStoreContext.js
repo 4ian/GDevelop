@@ -5,8 +5,8 @@ import {
   type ExampleShortHeader,
   type AllExamples,
   listAllExamples,
-} from '../../Utils/GDevelopServices/Asset';
-import { type Filters } from '../../Utils/GDevelopServices/Types.flow';
+} from '../../Utils/GDevelopServices/Example';
+import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
 
 const defaultSearchText = '';

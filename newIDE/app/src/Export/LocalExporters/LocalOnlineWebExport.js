@@ -8,7 +8,7 @@ import {
   getBuildFileUploadOptions,
 } from '../../Utils/GDevelopServices/Build';
 import { uploadLocalFile } from './LocalFileUploader';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
 import optionalRequire from '../../Utils/OptionalRequire.js';
@@ -131,12 +131,13 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   launchOnlineBuild: (
     exportState: ExportState,
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     uploadBucketKey: string
   ): Promise<Build> => {
-    const { getAuthorizationHeader, profile } = userProfile;
-    if (!profile) return Promise.reject(new Error('User is not authenticated'));
+    const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+    if (!firebaseUser)
+      return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(getAuthorizationHeader, profile.uid, uploadBucketKey);
+    return buildWeb(getAuthorizationHeader, firebaseUser.uid, uploadBucketKey);
   },
 };

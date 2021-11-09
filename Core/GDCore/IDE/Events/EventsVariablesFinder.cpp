@@ -151,7 +151,7 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
 
   for (std::size_t aId = 0; aId < instructions.size(); ++aId) {
     gd::String lastObjectParameter = "";
-    gd::InstructionMetadata instrInfos =
+    const gd::InstructionMetadata& instrInfos =
         instructionsAreConditions ? MetadataProvider::GetConditionMetadata(
                                         platform, instructions[aId].GetType())
                                   : MetadataProvider::GetActionMetadata(

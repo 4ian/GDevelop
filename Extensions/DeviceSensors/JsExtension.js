@@ -62,7 +62,7 @@ module.exports = {
         "JsPlatform/Extensions/orientation_alpha24.png",
         "JsPlatform/Extensions/orientation_alpha32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -82,7 +82,7 @@ module.exports = {
         "JsPlatform/Extensions/orientation_beta24.png",
         "JsPlatform/Extensions/orientation_beta32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -102,7 +102,7 @@ module.exports = {
         "JsPlatform/Extensions/orientation_gamma24.png",
         "JsPlatform/Extensions/orientation_gamma32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -228,7 +228,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_alpha24.png",
         "JsPlatform/Extensions/motion_rotation_alpha32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -248,7 +248,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_beta24.png",
         "JsPlatform/Extensions/motion_rotation_beta32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -268,7 +268,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_gamma24.png",
         "JsPlatform/Extensions/motion_rotation_gamma32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -288,7 +288,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_x24.png",
         "JsPlatform/Extensions/motion_acceleration_x32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -308,7 +308,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_y24.png",
         "JsPlatform/Extensions/motion_acceleration_y32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -328,7 +328,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_z24.png",
         "JsPlatform/Extensions/motion_acceleration_z32.png"
       )
-      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("relationalOperator", _("Sign of the test"), "number")
       .addParameter("expression", _("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(

@@ -3,6 +3,7 @@ GDevelop - Pathfinding Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Pathfinding behavior');
   /**
    * PathfindingRuntimeBehavior represents a behavior allowing objects to
    * follow a path computed to avoid obstacles.
@@ -542,7 +543,9 @@ namespace gdjs {
       //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       _openNodes: Node[] = [];
       //Used by getNodes to temporarily store obstacles near a position.
-      _closeObstacles: PathfindingObstacleRuntimeBehavior[] = [];
+      _closeObstacles: gdjs.BehaviorRBushAABB<
+        PathfindingObstacleRuntimeBehavior
+      >[] = [];
       //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
       _nodeCache: Node[] = [];
 
@@ -612,7 +615,7 @@ namespace gdjs {
 
       computePathTo(targetX: float, targetY: float) {
         if (this._obstacles === null) {
-          console.log(
+          logger.log(
             'You tried to compute a path without specifying the obstacles'
           );
           return;
@@ -783,7 +786,7 @@ namespace gdjs {
           this._closeObstacles
         );
         for (let k = 0; k < this._closeObstacles.length; ++k) {
-          const obj = this._closeObstacles[k].owner;
+          const obj = this._closeObstacles[k].behavior.owner;
           const topLeftCellX = Math.floor(
             (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
               this._cellWidth
@@ -813,13 +816,13 @@ namespace gdjs {
             yPos < bottomRightCellY
           ) {
             objectsOnCell = true;
-            if (this._closeObstacles[k].isImpassable()) {
+            if (this._closeObstacles[k].behavior.isImpassable()) {
               //The cell is impassable, stop here.
               newNode.cost = -1;
               break;
             } else {
               //Superimpose obstacles
-              newNode.cost += this._closeObstacles[k].getCost();
+              newNode.cost += this._closeObstacles[k].behavior.getCost();
             }
           }
         }

@@ -71,7 +71,7 @@ class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
    * Resources merging helper collects all resources filenames and update these
    * filenames.
    */
-  virtual void ExposeFile(gd::String& resource);
+  virtual void ExposeFile(gd::String& resource) override;
 
  protected:
   void SetNewFilename(gd::String oldFilename, gd::String newFilename);

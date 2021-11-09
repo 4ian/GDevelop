@@ -6,7 +6,9 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import Star from '@material-ui/icons/Star';
 import Favorite from '@material-ui/icons/Favorite';
-import UserProfileContext, { type UserProfile } from './UserProfileContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
 import {
   sendSubscriptionCheckDialogShown,
@@ -23,7 +25,7 @@ type Props = {|
 |};
 
 type DialogProps = {|
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
   ...$Exact<Props>,
 |};
 
@@ -43,9 +45,9 @@ export class SubscriptionCheckDialog extends React.Component<
   state = { open: false };
 
   checkHasSubscription() {
-    const { userProfile, mode, id } = this.props;
-    if (userProfile.subscription) {
-      const hasPlan = !!userProfile.subscription.planId;
+    const { authenticatedUser, mode, id } = this.props;
+    if (authenticatedUser.subscription) {
+      const hasPlan = !!authenticatedUser.subscription.planId;
       if (hasPlan) {
         this.setState({
           open: false,
@@ -104,7 +106,13 @@ export class SubscriptionCheckDialog extends React.Component<
         cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
-        title={mode === 'try' ? 'We need your support!' : this.props.title}
+        title={
+          mode === 'try' ? (
+            <Trans>We need your support!</Trans>
+          ) : (
+            this.props.title
+          )
+        }
       >
         <Column noMargin>
           <Line noMargin alignItems="center">
@@ -171,10 +179,10 @@ class SubscriptionChecker extends React.Component<Props, {}> {
 
   render() {
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
+      <AuthenticatedUserContext.Consumer>
+        {(authenticatedUser: AuthenticatedUser) => (
           <SubscriptionCheckDialog
-            userProfile={userProfile}
+            authenticatedUser={authenticatedUser}
             ref={dialog => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
             id={this.props.id}
@@ -182,7 +190,7 @@ class SubscriptionChecker extends React.Component<Props, {}> {
             mode={this.props.mode}
           />
         )}
-      </UserProfileContext.Consumer>
+      </AuthenticatedUserContext.Consumer>
     );
   }
 }

@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Tilemap object');
+
   /**
    * The PIXI.js renderer for the Tile map runtime object.
    *
@@ -89,7 +91,7 @@ namespace gdjs {
         .getJsonManager()
         .loadJson(this._object._tilemapJsonFile, (error, tileMapJsonData) => {
           if (error) {
-            console.error(
+            logger.error(
               'An error happened while loading a Tilemap JSON data:',
               error
             );
@@ -103,7 +105,7 @@ namespace gdjs {
                 this._object._tilesetJsonFile,
                 (error, tilesetJsonData) => {
                   if (error) {
-                    console.error(
+                    logger.error(
                       'An error happened while loading Tileset JSON data:',
                       error
                     );

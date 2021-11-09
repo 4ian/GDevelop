@@ -7,6 +7,10 @@ import Checkbox from '../../UI/Checkbox';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import ColorField from '../../UI/ColorField';
+import {
+  rgbColorToRGBString,
+  rgbStringAndAlphaToRGBColor,
+} from '../../Utils/ColorTransformer';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type EditorProps } from './EditorProps.flow';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
@@ -40,7 +44,7 @@ export default class ParticleEmitterEditor extends React.Component<
         ))}
         <SelectField
           fullWidth
-          floatingLabelText={<Trans>Particles kind</Trans>}
+          floatingLabelText={<Trans>Particle type</Trans>}
           value={particleEmitterObject.getRendererType()}
           onChange={(e, i, value: string) => {
             const rendererType = parseInt(value, 10) || 0;
@@ -53,7 +57,7 @@ export default class ParticleEmitterEditor extends React.Component<
         >
           <SelectOption
             value={gd.ParticleEmitterObject.Point}
-            primaryText={t`Point`}
+            primaryText={t`Circle`}
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Line}
@@ -61,7 +65,7 @@ export default class ParticleEmitterEditor extends React.Component<
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}
-            primaryText={t`Textured`}
+            primaryText={t`Image`}
           />
         </SelectField>
         {particleEmitterObject.getRendererType() ===
@@ -157,18 +161,20 @@ export default class ParticleEmitterEditor extends React.Component<
             floatingLabelText={<Trans>Particles start color</Trans>}
             disableAlpha
             fullWidth
-            color={{
+            color={rgbColorToRGBString({
               r: particleEmitterObject.getParticleRed1(),
               g: particleEmitterObject.getParticleGreen1(),
               b: particleEmitterObject.getParticleBlue1(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              particleEmitterObject.setParticleRed1(color.rgb.r);
-              particleEmitterObject.setParticleGreen1(color.rgb.g);
-              particleEmitterObject.setParticleBlue1(color.rgb.b);
+            })}
+            onChange={color => {
+              const rgbColor = rgbStringAndAlphaToRGBColor(color);
+              if (rgbColor) {
+                particleEmitterObject.setParticleRed1(rgbColor.r);
+                particleEmitterObject.setParticleGreen1(rgbColor.g);
+                particleEmitterObject.setParticleBlue1(rgbColor.b);
 
-              this.forceUpdate();
+                this.forceUpdate();
+              }
             }}
           />
           <SemiControlledTextField
@@ -188,18 +194,20 @@ export default class ParticleEmitterEditor extends React.Component<
             floatingLabelText={<Trans>Particles end color</Trans>}
             disableAlpha
             fullWidth
-            color={{
+            color={rgbColorToRGBString({
               r: particleEmitterObject.getParticleRed2(),
               g: particleEmitterObject.getParticleGreen2(),
               b: particleEmitterObject.getParticleBlue2(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              particleEmitterObject.setParticleRed2(color.rgb.r);
-              particleEmitterObject.setParticleGreen2(color.rgb.g);
-              particleEmitterObject.setParticleBlue2(color.rgb.b);
+            })}
+            onChange={color => {
+              const rgbColor = rgbStringAndAlphaToRGBColor(color);
+              if (rgbColor) {
+                particleEmitterObject.setParticleRed2(rgbColor.r);
+                particleEmitterObject.setParticleGreen2(rgbColor.g);
+                particleEmitterObject.setParticleBlue2(rgbColor.b);
 
-              this.forceUpdate();
+                this.forceUpdate();
+              }
             }}
           />
           <SemiControlledTextField
@@ -354,17 +362,6 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
         </ResponsiveLineStackLayout>
-        <SemiControlledTextField
-          commitOnBlur
-          floatingLabelText={<Trans>Friction on particles</Trans>}
-          fullWidth
-          type="number"
-          value={particleEmitterObject.getFriction()}
-          onChange={value => {
-            particleEmitterObject.setFriction(parseFloat(value));
-            this.forceUpdate();
-          }}
-        />
         <ResponsiveLineStackLayout noMargin>
           <SemiControlledTextField
             commitOnBlur

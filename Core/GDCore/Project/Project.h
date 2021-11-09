@@ -28,7 +28,6 @@ class Object;
 class VariablesContainer;
 class ArbitraryResourceWorker;
 class SourceFile;
-class ImageManager;
 class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
@@ -78,7 +77,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetVersion() const { return version; }
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Change the author of the project.
    */
@@ -88,6 +86,16 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Get project author name.
    */
   const gd::String& GetAuthor() const { return author; }
+
+  /**
+   * \brief Get the author ids of the project.
+   */
+  const std::vector<gd::String>& GetAuthorIds() const { return authorIds; };
+
+  /**
+   * \brief Get the author ids of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetAuthorIds() { return authorIds; };
 
   /**
    * \brief Change project package name.
@@ -179,7 +187,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Return a reference to loading screen setup for the project
    */
   const gd::LoadingScreen& GetLoadingScreen() const { return loadingScreen; }
-#endif
 
   /**
    * Change game's main window default width.
@@ -278,6 +285,16 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetScaleMode(const gd::String& scaleMode_) { scaleMode = scaleMode_; }
 
   /**
+   * Return true if pixels rounding option is enabled.
+   */
+  bool GetPixelsRounding() const { return pixelsRounding; }
+
+  /**
+   * Set pixels rounding option to true or false.
+   */
+  void SetPixelsRounding(bool enable) { pixelsRounding = enable; }
+
+  /**
    * \brief Return if the project should set 0 as Z-order for objects created
    * from events (which is deprecated) - instead of the highest Z order that was
    * found on each layer when the scene started.
@@ -313,7 +330,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   void ResetProjectUuid();
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Get the properties set by extensions.
    *
@@ -364,7 +380,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * current platform won't be changed.
    */
   void SetCurrentPlatform(const gd::String& platformName);
-#endif
 
   ///@}
 
@@ -390,7 +405,6 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& name,
                                            const gd::String& platformName = "");
 
-#if defined(GD_IDE_ONLY)
   /**
    * Create an event of the given type.
    *
@@ -406,7 +420,6 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::shared_ptr<gd::BaseEvent> CreateEvent(
       const gd::String& type, const gd::String& platformName = "");
   ///@}
-#endif
 
   /** \name Layouts management
    * Members functions related to layout management.
@@ -444,14 +457,12 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   std::size_t GetLayoutPosition(const gd::String& name) const;
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Swap the specified layouts.
    *
    * Do nothing if indexes are not correct.
    */
   void SwapLayouts(std::size_t first, std::size_t second);
-#endif
 
   /**
    * \brief Return the number of layouts.
@@ -490,26 +501,12 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   void UnserializeFrom(const SerializerElement& element);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the project.
    *
    * "Dirty" flag is set to false when serialization is done.
    */
   void SerializeTo(SerializerElement& element) const;
-
-  /**
-   * \brief Return true if the project is marked as being modified (The IDE or
-   * application using the project should ask to save the project if the project
-   * is closed).
-   */
-  bool IsDirty() { return dirty; }
-
-  /**
-   * \brief Mark the project as being modified (The IDE or application
-   * using the project should ask to save the project if the project is closed).
-   */
-  void SetDirty(bool enable = true) { dirty = enable; }
 
   /**
    * Get the major version of GDevelop used to save the project.
@@ -525,13 +522,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Get the minor version of GDevelop used to save the project.
    */
   unsigned int GetLastSaveGDBuildVersion() { return gdBuildVersion; };
-#endif
 
-/** \name External events management
- * Members functions related to external events management.
- */
-///@{
-#if defined(GD_IDE_ONLY)
+  /** \name External events management
+   * Members functions related to external events management.
+   */
+  ///@{
   /**
    * Return true if external events called "name" exists.
    */
@@ -599,7 +594,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Delete external events named "name".
    */
   void RemoveExternalEvents(const gd::String& name);
-#endif
   ///@}
 
   /** \name External layout management
@@ -640,14 +634,12 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   std::size_t GetExternalLayoutPosition(const gd::String& name) const;
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Swap the specified external layouts.
    *
    * Do nothing if indexes are not correct.
    */
   void SwapExternalLayouts(std::size_t first, std::size_t second);
-#endif
 
   /**
    * Return the number of external layout.
@@ -691,12 +683,11 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetFirstLayout() { return firstLayout; }
 
-///@}
+  ///@}
 
-/** \name Events functions extensions management
- */
-///@{
-#if defined(GD_IDE_ONLY)
+  /** \name Events functions extensions management
+   */
+  ///@{
   /**
    * \brief  Check if events functions extension called "name" exists.
    */
@@ -771,7 +762,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * \brief Remove all the events functions extensions.
    */
   void ClearEventsFunctionsExtensions();
-#endif
   ///@}
 
   /** \name Resources management
@@ -791,28 +781,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * the resources.
    */
   ResourcesManager& GetResourcesManager() { return resourcesManager; }
-
-  /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  const std::shared_ptr<gd::ImageManager>& GetImageManager() const {
-    return imageManager;
-  }
-
-  /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  std::shared_ptr<gd::ImageManager>& GetImageManager() { return imageManager; }
-
-  /**
-   * \brief Provide access to the ImageManager allowing to load SFML or OpenGL
-   * textures for the IDE ( or at runtime for the GD C++ Platform ).
-   */
-  void SetImageManager(std::shared_ptr<gd::ImageManager> imageManager_) {
-    imageManager = imageManager_;
-  }
 
   /**
    * \brief Called ( e.g. during compilation ) so as to inventory internal
@@ -856,13 +824,12 @@ class GD_CORE_API Project : public ObjectsContainer {
    * behavior, events function name, etc...).
    */
   static bool ValidateName(const gd::String& name);
-///@}
+  ///@}
 
-/** \name External source files
- * To manage external C++ or Javascript source files used by the game
- */
-///@{
-#if defined(GD_IDE_ONLY)
+  /** \name External source files
+   * To manage external C++ or Javascript source files used by the game
+   */
+  ///@{
   /**
    * \brief Return true if the game activated the use of external source files.
    */
@@ -907,14 +874,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::SourceFile& InsertNewSourceFile(const gd::String& name,
                                       const gd::String& language,
                                       std::size_t position = -1);
-#endif
-///@}
-
-// TODO: Put this in private part
-#if defined(GD_IDE_ONLY)
-  std::vector<gd::String> imagesChanged;  ///< Images that have been changed and
-                                          ///< which have to be reloaded
-#endif
+  ///@}
 
  private:
   /**
@@ -932,6 +892,8 @@ class GD_CORE_API Project : public ObjectsContainer {
                         ///< are below this number )
   bool verticalSync;    ///< If true, must activate vertical synchronization.
   gd::String scaleMode;
+  bool pixelsRounding;  ///< If true, the rendering should stop pixel
+                        ///< interpolation of rendered objects.
   bool adaptGameResolutionAtRuntime;  ///< Should the game resolution be adapted
                                       ///< to the window size at runtime
   gd::String
@@ -948,26 +910,22 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
-#if defined(GD_IDE_ONLY)
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
       eventsFunctionsExtensions;
-#endif
   gd::ResourcesManager
       resourcesManager;  ///< Contains all resources used by the project
-  std::shared_ptr<gd::ImageManager>
-      imageManager;  ///< Image manager is accessed thanks to a (smart) ptr as
-                     ///< it can be shared with GD C++ Platform projects.
   std::vector<gd::Platform*>
       platforms;  ///< Pointers to the platforms this project supports.
   gd::String firstLayout;
-#if defined(GD_IDE_ONLY)
   bool useExternalSourceFiles;  ///< True if game used external source files.
   std::vector<std::unique_ptr<gd::SourceFile> >
       externalSourceFiles;  ///< List of external source files used.
-  gd::String author;        ///< Game author name
-  gd::String packageName;   ///< Game package name
-  gd::String orientation;   ///< Lock game orientation (on mobile devices).
-                            ///< "default", "landscape" or "portrait".
+  gd::String author;        ///< Game author name, for publishing purpose.
+  std::vector<gd::String>
+      authorIds;           ///< Game author ids, from GDevelop users DB.
+  gd::String packageName;  ///< Game package name
+  gd::String orientation;  ///< Lock game orientation (on mobile devices).
+                           ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String
@@ -987,8 +945,6 @@ class GD_CORE_API Project : public ObjectsContainer {
                                         ///< time the project was saved.
   mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
-  mutable bool dirty;  ///< True to flag the project as being modified.
-#endif
 };
 
 }  // namespace gd

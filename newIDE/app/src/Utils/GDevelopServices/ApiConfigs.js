@@ -49,3 +49,9 @@ export const GDevelopGameApi = {
     ? 'https://we7eqjifc2.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/game',
 };
+
+export const GDevelopUserApi = {
+  baseUrl: isDev
+    ? 'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/user',
+};

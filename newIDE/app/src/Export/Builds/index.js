@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { type UserProfile } from '../../Profile/UserProfileContext';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import BuildsList from './BuildsList';
 import {
   getBuilds,
@@ -13,7 +13,7 @@ import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
   onBuildsUpdated: ?() => void,
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
 |};
 type State = {|
   builds: ?Array<Build>,
@@ -37,7 +37,7 @@ export default class Builds extends Component<Props, State> {
     if (!this.state.builds) return;
 
     this.buildsWatcher.start({
-      userProfile: this.props.userProfile,
+      authenticatedUser: this.props.authenticatedUser,
       builds: this.state.builds,
       onBuildUpdated: (newBuild: Build) => {
         if (!this.state.builds) return;
@@ -54,10 +54,13 @@ export default class Builds extends Component<Props, State> {
   };
 
   _refreshBuilds = () => {
-    const { getAuthorizationHeader, profile } = this.props.userProfile;
-    if (!profile) return;
+    const {
+      getAuthorizationHeader,
+      firebaseUser,
+    } = this.props.authenticatedUser;
+    if (!firebaseUser) return;
 
-    getBuilds(getAuthorizationHeader, profile.uid).then(
+    getBuilds(getAuthorizationHeader, firebaseUser.uid).then(
       builds => {
         this.setState(
           {
@@ -84,7 +87,7 @@ export default class Builds extends Component<Props, State> {
     return (
       <BuildsList
         builds={this.state.builds}
-        userProfile={this.props.userProfile}
+        authenticatedUser={this.props.authenticatedUser}
         onDownload={this._download}
       />
     );

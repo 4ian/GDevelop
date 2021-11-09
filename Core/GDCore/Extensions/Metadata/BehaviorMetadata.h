@@ -138,6 +138,46 @@ class GD_CORE_API BehaviorMetadata {
       const gd::String& group,
       const gd::String& icon);
 
+  /**
+   * \brief Create a new action which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated action that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedAction(
+      const gd::String& newActionName, const gd::String& copiedActionName);
+
+  /**
+   * \brief Create a new condition which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated condition that is just a "copy" of the new
+   * one.
+   */
+  gd::InstructionMetadata& AddDuplicatedCondition(
+      const gd::String& newConditionName,
+      const gd::String& copiedConditionName);
+
+  /**
+   * \brief Create a new expression which is the duplicate of the specified one.
+   *
+   * Useful for handling a deprecated expression that is just a "copy" of the
+   * new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+
+  /**
+   * \brief Create a new string expression which is the duplicate of the
+   * specified one.
+   *
+   * Useful for handling a deprecated string expression that is just a "copy" of
+   * the new one.
+   */
+  gd::ExpressionMetadata& AddDuplicatedStrExpression(
+      const gd::String& newExpressionName,
+      const gd::String& copiedExpressionName);
+
   BehaviorMetadata& SetFullName(const gd::String& fullname_);
   BehaviorMetadata& SetDefaultName(const gd::String& defaultName_);
   BehaviorMetadata& SetDescription(const gd::String& description_);
@@ -200,7 +240,7 @@ class GD_CORE_API BehaviorMetadata {
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
    */
-  gd::Behavior& Get() const { return *instance; }
+  gd::Behavior& Get() const;
 
   /**
    * \brief Return the associated gd::BehaviorsSharedData, handling behavior

@@ -9,8 +9,9 @@ This project is released under the MIT License.
  * Victor Levasseur ( Bold/Italic/Underlined styles )
  */
 
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCpp/Extensions/ExtensionBase.h"
+#include "GDCore/Tools/Localization.h"
 #include "TextObject.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
@@ -71,33 +72,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("police", _("Font"))
       .SetFunctionName("ChangeFont")
-      .SetIncludeFile("TextObject/TextObject.h");
-
-  obj.AddAction("Size",
-                _("Size"),
-                _("Change the size of the text."),
-                _("the size of the text"),
-                "",
-                "res/actions/characterSize24.png",
-                "res/actions/characterSize.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetCharacterSize")
-      .SetGetter("GetCharacterSize")
-      .SetIncludeFile("TextObject/TextObject.h");
-
-  obj.AddCondition("Size",
-                   _("Size"),
-                   _("Compare the size of the text"),
-                   _("the size of the text"),
-                   "",
-                   "res/conditions/characterSize24.png",
-                   "res/conditions/characterSize.png")
-
-      .AddParameter("object", _("Object"), "Text")
-      .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetCharacterSize")
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddCondition("ScaleX",
@@ -539,6 +513,21 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetAngle")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "FontSize",
+         _("Font size"),
+         _("the font size of a text object"),
+         _("the font size"),
+         "",
+         "res/conditions/characterSize24.png")
+      .AddParameter("object", _("Object"), "Text")
+      .UseStandardParameters("number");
+
+  // Support for deprecated "Size" actions/conditions:
+  obj.AddDuplicatedAction("Size", "Text::SetFontSize").SetHidden();
+  obj.AddDuplicatedCondition("Size", "Text::FontSize").SetHidden();
+
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
       .AddParameter("object", _("Object"), "Text")
@@ -546,35 +535,3 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 #endif
 }
-
-/**
- * \brief This class declares information about the C++ extension.
- */
-class Extension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  Extension() {
-    DeclareTextObjectExtension(*this);
-    AddRuntimeObject<TextObject, RuntimeTextObject>(
-        GetObjectMetadata("TextObject::Text"), "RuntimeTextObject");
-
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppTextObjectExtension() {
-  return new Extension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new Extension;
-}
-#endif

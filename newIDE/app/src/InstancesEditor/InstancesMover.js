@@ -1,10 +1,11 @@
 // @flow
 import { roundPosition } from '../Utils/GridHelpers';
 import Rectangle from '../Utils/Rectangle';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 export default class InstancesMover {
   instanceMeasurer: any;
-  options: Object;
+  instancesEditorSettings: InstancesEditorSettings;
   instancePositions: { [number]: { x: number, y: number } };
   totalDeltaX: number;
   totalDeltaY: number;
@@ -15,21 +16,21 @@ export default class InstancesMover {
 
   constructor({
     instanceMeasurer,
-    options,
+    instancesEditorSettings,
   }: {
     instanceMeasurer: any,
-    options: Object,
+    instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
-    this.options = options;
+    this.instancesEditorSettings = instancesEditorSettings;
     this.instancePositions = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
     this._temporaryPoint = [0, 0];
   }
 
-  setOptions(options: Object) {
-    this.options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
   _getMoveDeltaX(
@@ -52,10 +53,11 @@ export default class InstancesMover {
     return totalDeltaY;
   }
 
-  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): ?Rectangle {
     if (this._initialSelectionAABB) {
       return this._initialSelectionAABB;
     }
+    if (!instances.length) return null;
     let initialSelectionAABB = new Rectangle();
     this.instanceMeasurer.getInstanceAABB(instances[0], initialSelectionAABB);
     const initialInstanceAABB = new Rectangle();
@@ -84,6 +86,7 @@ export default class InstancesMover {
 
     // It will magnet the corner nearest to the grabbing position
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    if (!initialSelectionAABB) return;
     const magnetLeft = this._startX < initialSelectionAABB.centerX();
     const magnetTop = this._startY < initialSelectionAABB.centerY();
 
@@ -96,14 +99,18 @@ export default class InstancesMover {
     const magnetPosition = this._temporaryPoint;
     magnetPosition[0] = initialMagnetX + this.totalDeltaX;
     magnetPosition[1] = initialMagnetY + this.totalDeltaY;
-    if (this.options.snap && this.options.grid && !noGridSnap) {
+    if (
+      this.instancesEditorSettings.snap &&
+      this.instancesEditorSettings.grid &&
+      !noGridSnap
+    ) {
       roundPosition(
         magnetPosition,
-        this.options.gridWidth,
-        this.options.gridHeight,
-        this.options.gridOffsetX,
-        this.options.gridOffsetY,
-        this.options.gridType
+        this.instancesEditorSettings.gridWidth,
+        this.instancesEditorSettings.gridHeight,
+        this.instancesEditorSettings.gridOffsetX,
+        this.instancesEditorSettings.gridOffsetY,
+        this.instancesEditorSettings.gridType
       );
     } else {
       // Without a grid, the position is still rounded to the nearest pixel.

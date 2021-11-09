@@ -9,8 +9,8 @@ import { Column } from '../UI/Grid';
 import TextField from '../UI/TextField';
 import {
   type LoginForm,
-  type LoginError,
-} from '../Utils/GDevelopServices/Authentification';
+  type AuthError,
+} from '../Utils/GDevelopServices/Authentication';
 import RightLoader from '../UI/RightLoader';
 import LeftLoader from '../UI/LeftLoader';
 import Text from '../UI/Text';
@@ -21,10 +21,10 @@ import { ColumnStackLayout } from '../UI/Layout';
 type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
-  onLogin: (form: LoginForm) => void,
-  onForgotPassword: (form: LoginForm) => void,
+  onLogin: (form: LoginForm) => Promise<void>,
+  onForgotPassword: (form: LoginForm) => Promise<void>,
   loginInProgress: boolean,
-  error: ?LoginError,
+  error: ?AuthError,
   resetPasswordDialogOpen: boolean,
   onCloseResetPasswordDialog: () => void,
   forgotPasswordInProgress: boolean,

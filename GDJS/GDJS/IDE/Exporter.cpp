@@ -82,8 +82,8 @@ bool Exporter::ExportWholePixiProject(
     // Export engine libraries
     helper.AddLibsInclude(
         /*pixiRenderers=*/true,
-        /*cocosRenderers=*/false,
-        /*websocketDebuggerClient=*/false,
+        /*includeWebsocketDebuggerClient=*/false,
+        /*includeWindowMessageDebuggerClient=*/false,
         exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
         includesFiles);
 
@@ -121,8 +121,6 @@ bool Exporter::ExportWholePixiProject(
         fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
-    // Copy all dependencies and the index (or metadata) file.
-    helper.RemoveIncludes(false, true, includesFiles);
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
@@ -166,84 +164,6 @@ bool Exporter::ExportWholePixiProject(
       return false;
   } else {
     if (!exportProject(exportDir)) return false;
-  }
-
-  return true;
-}
-
-bool Exporter::ExportWholeCocos2dProject(gd::Project &project,
-                                         bool debugMode,
-                                         gd::String exportDir) {
-  ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
-
-  wxProgressDialog *progressDialogPtr = NULL;
-
-  // Prepare the export directory
-  fs.MkDir(exportDir);
-  std::vector<gd::String> includesFiles;
-
-  gd::Project exportedProject = project;
-
-  // Export the resources (before generating events as some resources filenames
-  // may be updated)
-  helper.ExportResources(fs, exportedProject, exportDir + "/res");
-
-  // Compatibility with GD <= 5.0-beta56
-  // Stay compatible with text objects declaring their font as just a filename
-  // without a font resource - by manually adding these resources.
-  helper.AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), exportDir + "/res", "res/");
-  // end of compatibility code
-
-  // Export engine libraries
-  helper.AddLibsInclude(
-      /*pixiRenderers=*/false,
-      /*cocosRenderers=*/true,
-      /*websocketDebuggerClient=*/false,
-      exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
-      includesFiles);
-
-  // Export files for object and behaviors
-  helper.ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
-
-  // Export effects (after engine libraries as they auto-register themselves to
-  // the engine)
-  helper.ExportEffectIncludes(exportedProject, includesFiles);
-
-  // Export events
-  if (!helper.ExportEventsCode(
-          exportedProject, codeOutputDir, includesFiles, false)) {
-    gd::LogError(_("Error during exporting! Unable to export events:\n") +
-                 lastError);
-    return false;
-  }
-
-  // Export source files
-  if (!helper.ExportExternalSourceFiles(
-          exportedProject, codeOutputDir, includesFiles)) {
-    gd::LogError(_("Error during exporting! Unable to export source files:\n") +
-                 lastError);
-    return false;
-  }
-
-  // Strip the project (*after* generating events as the events may use stripped
-  // things like objects groups...)...
-  gd::ProjectStripper::StripProjectForExport(exportedProject);
-
-  //...and export it
-  gd::SerializerElement noRuntimeGameOptions;
-  helper.ExportProjectData(
-      fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
-  includesFiles.push_back(codeOutputDir + "/data.js");
-
-  // Copy all dependencies and the index (or metadata) file.
-  helper.RemoveIncludes(true, false, includesFiles);
-  helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
-
-  if (!helper.ExportCocos2dFiles(
-          project, exportDir, debugMode, includesFiles)) {
-    gd::LogError(_("Error during export:\n") + lastError);
-    return false;
   }
 
   return true;

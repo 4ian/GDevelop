@@ -14,6 +14,7 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   setFullName(fullName: string): gdEventsFunctionsExtension;
   getFullName(): string;
   getTags(): gdVectorString;
+  getAuthorIds(): gdVectorString;
   setAuthor(author: string): gdEventsFunctionsExtension;
   getAuthor(): string;
   setPreviewIconUrl(previewIconUrl: string): gdEventsFunctionsExtension;

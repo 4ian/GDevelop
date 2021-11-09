@@ -39,6 +39,13 @@ export default class VariableField extends Component<Props, State> {
   }
 
   componentDidMount() {
+    this.updateAutocompletions();
+  }
+
+  /**
+   * Can be called to set up or force updating the variables list.
+   */
+  updateAutocompletions() {
     const definedVariableNames = enumerateVariables(
       this.props.variablesContainer
     )

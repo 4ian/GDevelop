@@ -21,14 +21,14 @@ const gd: libGDevelop = global.gd;
 
 const styles = {
   container: {
-    height: 40,
+    height: '2.5em',
     display: 'flex',
     alignItems: 'center',
     padding: 5,
     overflow: 'hidden',
   },
   title: {
-    fontSize: 18,
+    fontSize: '1.3em',
     width: '100%',
   },
 };

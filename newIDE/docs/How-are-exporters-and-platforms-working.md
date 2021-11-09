@@ -13,8 +13,6 @@ GDevelop is built on **platforms**. A platform is the term used in GDevelop code
 
 For now, there is a _single_ **platform** used in the GDevelop editor, which is called _GDJS_ (GDevelop JavaScript platform). The different exports that you can find in the editor are using the same _generator that export a whole game_ but with different parameters.
 
-There is another **platform** in the codebase called _GDCpp_ (GDevelop C++ platform). This was originally used in GDevelop 4 to generate "native" games, with events translated to C++. It is not being used in GDevelop 5 for now. The code is still around in case this can be used to create the basis for an alternate game engine.
-
 ## Can I get examples in the source code?
 
 - The _code generator for events_ for GDJS is in [GDJS/Events/CodeGeneration](https://github.com/4ian/GDevelop/tree/master/GDJS/GDJS/Events/CodeGeneration).
@@ -30,7 +28,7 @@ It depends on what you are targeting:
 
 - If your target is running in a **recent browser environment**, with JavaScript and WebGL, you might just want to define a [new export in the IDE](https://github.com/4ian/GDevelop/tree/master/newIDE/app/src/Export) and a few different files like an `index.html` or a set of files to export.
 - If your target is an **environment running JavaScript**, you might want to use GDJS and define _new renderers_ for the objects. This is what is done for the experimental export to Cocos2d-JS: objects have renderers that are written in JavaScript and rendering objects with the Cocos2d-JS API, instead of Pixi.js
-- If your target is **something not running JavaScript**, you might want to re-create a platform (like GDCpp and GDJS). While the **Core** library will help you, you'll still have to re-make a code generator, make a brand new game engine (or adapt the existing one), rewrite extension objects using the new game engine/renderer.
+- If your target is **something not running JavaScript**, you might want to re-create a platform (like GDJS). While the **Core** library will help you, you'll still have to re-make a code generator, make a brand new game engine (or adapt the existing one), rewrite extension objects using the new game engine/renderer.
 
 ## Am I forced to write these "platforms" to export to something new? I mean, there is C++ code to write 😬
 

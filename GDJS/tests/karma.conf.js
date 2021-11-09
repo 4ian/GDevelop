@@ -10,6 +10,13 @@ module.exports = function (config) {
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
+    browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
+    plugins: [
+      require('karma-chrome-launcher'),
+      require('@chiragrupani/karma-chromium-edge-launcher'),
+      require('karma-firefox-launcher'),
+      require('karma-mocha'),
+    ],
     client: {
       mocha: {
         reporter: 'html',
@@ -21,6 +28,7 @@ module.exports = function (config) {
 
       //GDJS game engine files: (Order is important)
       '../../newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js',
+      '../../newIDE/app/resources/GDJS/Runtime/logger.js',
       '../../newIDE/app/resources/GDJS/Runtime/gd.js',
       '../../newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
       '../../newIDE/app/resources/GDJS/Runtime/cocos-renderers/cocos-director-manager.js',
@@ -58,7 +66,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js',
-      '../../newIDE/app/resources/GDJS/Runtime/websocket-debugger-client/hot-reloader.js',
+      '../../newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',
@@ -76,11 +84,14 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/A_firebasejs/*.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
 
       // Test extensions:
       './tests/Extensions/**.js',
 
-      //All tests files:
+      // Other test initialization files:
+      './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
 
       // Assets

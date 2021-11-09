@@ -87,7 +87,6 @@ class GD_CORE_API ObjectsContainer {
    */
   std::size_t GetObjectsCount() const;
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Add a new empty object of type \a objectType called \a name at the
    * specified position in the list.<br>
@@ -99,7 +98,6 @@ class GD_CORE_API ObjectsContainer {
                               const gd::String& objectType,
                               const gd::String& name,
                               std::size_t position);
-#endif
 
   /**
    * \brief Add a new object to the list
@@ -176,7 +174,6 @@ class GD_CORE_API ObjectsContainer {
    */
   ///@{
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a reference to the project's objects groups.
    */
@@ -186,7 +183,6 @@ class GD_CORE_API ObjectsContainer {
    * \brief Return a const reference to the project's objects groups.
    */
   const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
-#endif
 
   ///@}
 

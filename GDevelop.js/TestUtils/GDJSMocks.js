@@ -245,7 +245,7 @@ function makeMinimalGDJSMock() {
   return {
     gdjs: {
       evtTools: {
-        common: { getVariableNumber: (variable) => variable.getAsNumber() },
+        variable: { getVariableNumber: (variable) => variable.getAsNumber() },
         object: { createObjectOnScene },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {

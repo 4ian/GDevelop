@@ -14,9 +14,8 @@
  *
  * \section other Other documentations
  *
- * GDevelop is architectured around a `Core` (this library), platforms (`GDJS`, `GDCpp`) and extensions (`Extensions` folder). The editor (`newIDE` folder) is using all of these libraries.
+ * GDevelop is architectured around a `Core` (this library), a game engine (`GDJS`) and extensions (`Extensions` folder). The editor (`newIDE` folder) is using all of these libraries.
  *
- *  - [Open GDevelop C++ Platform documentation](../GDCpp Documentation/index.html)
  *  - [Open GDevelop JS Platform documentation](../GDJS Documentation/index.html)
  *  - <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README.md">Getting started with the editor</a>
  *  - <a href="https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md">Getting started with the extensions</a>

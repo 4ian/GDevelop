@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Filters');
   import PIXI = GlobalPIXIModule.PIXI;
 
   export namespace PixiFiltersTools {
@@ -61,7 +62,7 @@ namespace gdjs {
       filterCreator: FilterCreator
     ) {
       if (_filterCreators.hasOwnProperty(filterName)) {
-        console.warn(
+        logger.warn(
           'Filter "' +
             filterName +
             '" was already registered in gdjs.PixiFiltersTools. Replacing it with the new one.'
@@ -78,9 +79,9 @@ namespace gdjs {
       const splitValue = value.split(';');
       if (splitValue.length === 3) {
         return gdjs.rgbToHexNumber(
-          parseInt(splitValue[0], 0),
-          parseInt(splitValue[1], 0),
-          parseInt(splitValue[2], 0)
+          parseInt(splitValue[0], 10),
+          parseInt(splitValue[1], 10),
+          parseInt(splitValue[2], 10)
         );
       }
       return parseInt(value.replace('#', '0x'), 16);
@@ -89,9 +90,9 @@ namespace gdjs {
     /** A wrapper allowing to create a PIXI filter and update it using a common interface */
     export type FilterCreator = {
       /** Function to call to create the filter */
-      makePIXIFilter: (layer: gdjs.Layer, effectData: EffectData) => any;
-      /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
+      makePIXIFilter: (target: EffectsTarget, effectData: EffectData) => any;
+      /** The function to be called to update the filter at every frame before the rendering. */
+      updatePreRender: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,
@@ -116,8 +117,8 @@ namespace gdjs {
     export type Filter = {
       /** The PIXI filter */
       pixiFilter: PIXI.Filter;
-      /** The function to be called to update the filter at every frame */
-      update: (filter: PIXI.Filter, layer: gdjs.Layer) => any;
+      /** The function to be called to update the filter at every frame before the rendering. */
+      updatePreRender: (filter: PIXI.Filter, target: gdjs.EffectsTarget) => any;
       /** The function to be called to update a parameter (with a number) */
       updateDoubleParameter: (
         filter: PIXI.Filter,

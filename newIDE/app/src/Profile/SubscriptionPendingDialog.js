@@ -1,53 +1,39 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import { type UserProfile } from './UserProfileContext';
+import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import BackgroundText from '../UI/BackgroundText';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Text from '../UI/Text';
+import { useInterval } from '../Utils/UseInterval';
 
 type Props = {|
   onClose: Function,
-  userProfile: UserProfile,
+  authenticatedUser: AuthenticatedUser,
 |};
-
-function useInterval(callback: () => void, delay: number | null) {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  });
-
-  useEffect(
-    () => {
-      function tick() {
-        if (savedCallback.current) savedCallback.current();
-      }
-
-      if (delay !== null) {
-        let id = setInterval(tick, delay);
-        return () => clearInterval(id);
-      }
-    },
-    [delay]
-  );
-}
 
 export default function SubscriptionPendingDialog({
   onClose,
-  userProfile,
+  authenticatedUser,
 }: Props) {
   const hasPlan =
-    !!userProfile &&
-    !!userProfile.subscription &&
-    !!userProfile.subscription.planId;
-  useInterval(() => userProfile.onRefreshUserProfile(), hasPlan ? null : 3900);
+    !!authenticatedUser &&
+    !!authenticatedUser.subscription &&
+    !!authenticatedUser.subscription.planId;
+  useInterval(
+    () => {
+      authenticatedUser.onRefreshUserProfile().catch(() => {
+        // Ignore any error, will be retried anyway.
+      });
+    },
+    hasPlan ? null : 3900
+  );
 
   return (
     <Dialog
@@ -68,13 +54,12 @@ export default function SubscriptionPendingDialog({
           />
         ),
       ]}
-      title={undefined}
       maxWidth="sm"
       cannotBeDismissed={true}
       open
       noMargin
     >
-      {!hasPlan && (
+      {!hasPlan ? (
         <Column>
           <Line>
             <Text>
@@ -106,8 +91,7 @@ export default function SubscriptionPendingDialog({
             </BackgroundText>
           </Line>
         </Column>
-      )}
-      {hasPlan && (
+      ) : (
         <Column>
           <Line>
             <Text>

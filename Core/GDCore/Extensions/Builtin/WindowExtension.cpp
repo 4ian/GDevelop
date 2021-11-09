@@ -22,7 +22,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/window");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddAction(
           "SetFullScreen",
@@ -215,7 +214,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
                         _("Screen"),
                         "res/window.png")
       .AddCodeOnlyParameter("currentScene", "");
-#endif
 }
 
 }  // namespace gd

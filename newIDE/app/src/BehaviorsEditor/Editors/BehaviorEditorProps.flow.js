@@ -2,7 +2,7 @@
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 /**
@@ -12,6 +12,7 @@ export type BehaviorEditorProps = {|
   behavior: gdBehavior,
   behaviorContent: gdBehaviorContent,
   project: gdProject,
+  object: gdObject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,

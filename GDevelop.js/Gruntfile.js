@@ -74,7 +74,6 @@ module.exports = function (grunt) {
           [
             ...cmakeGeneratorArgs,
             '../..',
-            '-DFULL_VERSION_NUMBER=FALSE',
             // Disable link time optimizations for slightly faster build time.
             isDev
               ? '-DDISABLE_EMSCRIPTEN_LINK_OPTIMIZATIONS=TRUE'

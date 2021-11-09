@@ -18,6 +18,12 @@ const jsExtensions = [
     objectsRenderingServiceModules: {},
   },
   {
+    name: 'AdvancedWindow',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdvancedWindow/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
     name: 'FacebookInstantGames',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
@@ -133,6 +139,12 @@ const jsExtensions = [
     name: 'BitmapText',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BitmapText/JsExtension.js'),
+    objectsRenderingServiceModules: {},
+  },
+  {
+    name: 'Screenshot',
+    // $FlowExpectedError - this path is ignored for Flow.
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Screenshot/JsExtension.js'),
     objectsRenderingServiceModules: {},
   },
 ];

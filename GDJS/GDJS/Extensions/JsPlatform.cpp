@@ -20,7 +20,6 @@
 #include "GDJS/Extensions/Builtin/CommonInstructionsExtension.h"
 #include "GDJS/Extensions/Builtin/ExternalLayoutsExtension.h"
 #include "GDJS/Extensions/Builtin/FileExtension.h"
-#include "GDJS/Extensions/Builtin/JoystickExtension.h"
 #include "GDJS/Extensions/Builtin/KeyboardExtension.h"
 #include "GDJS/Extensions/Builtin/MathematicalToolsExtension.h"
 #include "GDJS/Extensions/Builtin/MouseExtension.h"
@@ -79,8 +78,6 @@ void JsPlatform::ReloadBuiltinExtensions() {
   AddExtension(std::shared_ptr<gd::PlatformExtension>(new MouseExtension));
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(new KeyboardExtension));
-  std::cout.flush();
-  AddExtension(std::shared_ptr<gd::PlatformExtension>(new JoystickExtension));
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(new SceneExtension));
   std::cout.flush();

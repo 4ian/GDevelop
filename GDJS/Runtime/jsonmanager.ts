@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('JSON Manager');
   type JsonManagerOnProgressCallback = (
     loadedCount: integer,
     totalCount: integer
@@ -69,7 +70,7 @@ namespace gdjs {
 
       const onLoad: JsonManagerRequestCallback = function (error) {
         if (error) {
-          console.error('Error while preloading a json resource:' + error);
+          logger.error('Error while preloading a json resource:' + error);
         }
         loaded++;
         if (loaded === jsonResources.length) {

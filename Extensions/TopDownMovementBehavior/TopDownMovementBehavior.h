@@ -8,8 +8,8 @@ This project is released under the MIT License.
 #ifndef TOPDOWNMOVEMENTBEHAVIOR_H
 #define TOPDOWNMOVEMENTBEHAVIOR_H
 #include <vector>
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/Project/Object.h"
+#include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/Object.h"
 namespace gd {
 class SerializerElement;
 }  // namespace gd
@@ -17,7 +17,7 @@ class SerializerElement;
 /**
  * \brief Allow to move an object in 4 or 8 directions.
  */
-class GD_EXTENSION_API TopDownMovementBehavior : public Behavior {
+class GD_EXTENSION_API TopDownMovementBehavior : public gd::Behavior {
  public:
   TopDownMovementBehavior(){};
   virtual ~TopDownMovementBehavior(){};

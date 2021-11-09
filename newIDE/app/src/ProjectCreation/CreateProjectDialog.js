@@ -12,6 +12,11 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { GamesShowcase } from '../GamesShowcase';
 import Window from '../Utils/Window';
 import PublishIcon from '@material-ui/icons/Publish';
+import { findEmptyPath } from './LocalPathFinder';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const electron = optionalRequire('electron');
+const app = electron ? electron.remote.app : null;
 
 type State = {|
   currentTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase',
@@ -42,7 +47,9 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: this.props.initialTab,
-    outputPath: '',
+    outputPath: app
+      ? findEmptyPath(path.join(app.getPath('documents'), 'GDevelop projects'))
+      : '',
   };
 
   _onChangeTab = (
@@ -64,7 +71,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
-        title={<Trans>Create a new game</Trans>}
+        title={<Trans>Create a new project</Trans>}
         actions={[
           <FlatButton
             key="close"
@@ -97,7 +104,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               }}
               primary
               icon={<PublishIcon />}
-              label={<Trans>Submit your game as an example</Trans>}
+              label={<Trans>Submit your project as an example</Trans>}
             />
           ) : null,
         ]}

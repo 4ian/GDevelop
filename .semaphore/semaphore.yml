@@ -1,0 +1,107 @@
+version: v1.0
+name: Fast tests (not building GDevelop.js - can have false negatives)
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+auto_cancel:
+  running:
+    when: "true"
+blocks:
+  - name: Install
+    task:
+      jobs:
+        - name: Install node_modules and cache them
+          commands:
+            - checkout
+            - node -v && npm -v
+            - |-
+              if ! cache has_key newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json); then
+                cd newIDE/app
+                npm ci
+                cd ../..
+                cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
+              fi
+            - |-
+              if ! cache has_key GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json); then
+                cd GDJS
+                git checkout package-lock.json # Ensure no changes was made by newIDE post-install tasks.
+                npm ci
+                cd ..
+                cache store GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json) GDJS/node_modules
+              fi
+            - |-
+              if ! cache has_key GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json); then
+                cd GDJS/tests
+                npm ci
+                cd ../..
+                cache store GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json) GDJS/tests/node_modules
+              fi
+    dependencies: []
+  - name: Type checks
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE typing
+          commands:
+            - checkout
+            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cd newIDE/app
+            - npm run postinstall
+            - npm run flow
+            - npm run check-script-types
+            - cd ../..
+        - name: GDJS typing and documentation generation
+          commands:
+            - checkout
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
+            - cd GDJS
+            - npm run check-types
+            - npm run generate-doc
+  - name: Auto formatting
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE auto-formatting
+          commands:
+            - checkout
+            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cd newIDE/app
+            - npm run postinstall
+            - npm run check-format
+            - cd ../..
+        - name: GDJS auto-formatting
+          commands:
+            - checkout
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cd GDJS
+            - npm run check-format
+            - cd ..
+  - name: Tests
+    dependencies:
+      - Install
+    task:
+      jobs:
+        - name: newIDE tests
+          commands:
+            - checkout
+            - cache restore newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json)
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cd newIDE/app
+            - npm run postinstall
+            - npm run analyze-test-coverage
+            - cd ../..
+        - name: GDJS tests
+          commands:
+            - checkout
+            - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
+            - cd GDJS
+            - npm run build
+            - npm run test
+            - cd ../..

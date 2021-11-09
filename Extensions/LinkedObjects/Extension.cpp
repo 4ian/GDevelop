@@ -7,8 +7,8 @@ This project is released under the MIT License.
 
 #include <iostream>
 
-#include "GDCpp/Extensions/ExtensionBase.h"
-#include "ObjectsLinksManager.h"
+#include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Tools/Localization.h"
 
 void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
   extension
@@ -89,6 +89,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
@@ -106,66 +107,10 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
       .AddParameter("objectPtr", _("...if they are linked to this object"))
+      .AddCodeOnlyParameter("eventsFunctionContext", "")
 
       .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
       .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
 #endif
 }
-
-/**
- * \brief This class declares information about the extension.
- */
-class LinkedObjectsCppExtension : public ExtensionBase {
- public:
-  /**
-   * Constructor of an extension declares everything the extension contains:
-   * objects, actions, conditions and expressions.
-   */
-  LinkedObjectsCppExtension() {
-    DeclareLinkedObjectsExtension(*this);
-    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-  };
-
-  /**
-   * The extension must be aware of objects deletion
-   */
-  virtual bool ToBeNotifiedOnObjectDeletion() { return true; }
-
-  /**
-   * Be sure to remove all links when an object is deleted
-   */
-  virtual void ObjectDeletedFromScene(RuntimeScene& scene,
-                                      RuntimeObject* object) {
-    GDpriv::LinkedObjects::ObjectsLinksManager::managers[&scene]
-        .RemoveAllLinksOf(object);
-  }
-
-  /**
-   * Initialize manager of linked objects of scene
-   */
-  virtual void SceneLoaded(RuntimeScene& scene) {
-    GDpriv::LinkedObjects::ObjectsLinksManager::managers[&scene].ClearAll();
-  }
-
-  /**
-   * Destroy manager of linked objects of scene
-   */
-  virtual void SceneUnloaded(RuntimeScene& scene) {
-    GDpriv::LinkedObjects::ObjectsLinksManager::managers.erase(&scene);
-  }
-};
-
-#if defined(ANDROID)
-extern "C" ExtensionBase* CreateGDCppLinkedObjectsExtension() {
-  return new LinkedObjectsCppExtension;
-}
-#elif !defined(EMSCRIPTEN)
-/**
- * Used by GDevelop to create the extension class
- * -- Do not need to be modified. --
- */
-extern "C" ExtensionBase* GD_EXTENSION_API CreateGDExtension() {
-  return new LinkedObjectsCppExtension;
-}
-#endif

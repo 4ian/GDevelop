@@ -129,6 +129,7 @@ describe('gdjs.RuntimeScene integration tests', function () {
           type: 'Sprite',
           name: 'MyObject',
           behaviors: [],
+          effects: [],
           // @ts-expect-error ts-migrate(2322) FIXME: Type '{ type: string; name: string; behaviors: nev... Remove this comment to see the full error message
           animations: [],
           updateIfNotVisible: false,

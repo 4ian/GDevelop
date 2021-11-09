@@ -23,7 +23,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/variables");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition("VarScene",
                     _("Value of a scene variable"),
@@ -458,7 +457,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
                         _("Variables"),
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"));
-#endif
 }
 
 }  // namespace gd

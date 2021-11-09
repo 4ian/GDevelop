@@ -2,17 +2,10 @@
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import { toNewGdMapStringString } from '../Utils/MapStringString';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const gd: libGDevelop = global.gd;
-
-export const RESOURCE_EXTENSIONS = {
-  image: 'png,jpg,jpeg,PNG,JPG,JPEG',
-  audio: 'wav,mp3,ogg,WAV,MP3,OGG',
-  font: 'ttf,ttc,otf,TTF,TTC,OTF',
-  bitmapFont: 'fnt,xml,FNT,XML',
-  video: 'mp4,MP4',
-};
 
 export const createOrUpdateResource = (
   project: gdProject,
@@ -142,4 +135,20 @@ export const applyResourceDefaults = (
   if (newResource instanceof gd.ImageResource) {
     newResource.setSmooth(project.getScaleMode() !== 'nearest');
   }
+};
+
+/**
+ * Refactor an entire project to rename a resource
+ * @param project The project
+ * @param resourceNewNames The map from old resource name to new resource name.
+ */
+export const renameResourcesInProject = (
+  project: gdProject,
+  resourceNewNames: { [string]: string }
+) => {
+  const renamedResourcesMap = toNewGdMapStringString(resourceNewNames);
+  const resourcesRenamer = new gd.ResourcesRenamer(renamedResourcesMap);
+  renamedResourcesMap.delete();
+  project.exposeResources(resourcesRenamer);
+  resourcesRenamer.delete();
 };

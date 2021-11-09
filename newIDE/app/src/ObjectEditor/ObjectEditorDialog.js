@@ -15,13 +15,14 @@ import { type EditorProps } from './Editors/EditorProps.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
+import EffectsList from '../EffectsList';
 
 type Props = {|
   open: boolean,
@@ -41,6 +42,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
+  initialTab: ?string,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -55,7 +57,9 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
-  const [currentTab, setCurrentTab] = React.useState('properties');
+  const [currentTab, setCurrentTab] = React.useState(
+    props.initialTab || 'properties'
+  );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
@@ -119,6 +123,11 @@ const InnerDialog = (props: InnerDialogProps) => {
               value={'behaviors'}
               key={'behaviors'}
             />
+            <Tab
+              label={<Trans>Effects</Trans>}
+              value={'effects'}
+              key={'effects'}
+            />
           </Tabs>
         </div>
       }
@@ -179,6 +188,19 @@ const InnerDialog = (props: InnerDialogProps) => {
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
         />
       )}
+      {currentTab === 'effects' && (
+        <EffectsList
+          target="object"
+          project={props.project}
+          resourceSources={props.resourceSources}
+          onChooseResource={props.onChooseResource}
+          resourceExternalEditors={props.resourceExternalEditors}
+          effectsContainer={props.object.getEffects()}
+          onEffectsUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positionned*/
+          }
+        />
+      )}
     </Dialog>
   );
 };
@@ -233,7 +255,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
   }
 
   render() {
-    const { object } = this.props;
+    const { object, initialTab } = this.props;
     const { editorComponent, castToObjectType, helpPagePath } = this.state;
 
     if (!object || !castToObjectType) return null;
@@ -246,6 +268,7 @@ export default class ObjectEditorDialog extends Component<Props, State> {
         helpPagePath={helpPagePath}
         object={castToObjectType(object)}
         objectName={this.state.objectName}
+        initialTab={initialTab}
       />
     );
   }

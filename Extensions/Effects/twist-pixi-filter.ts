@@ -5,20 +5,20 @@ namespace gdjs {
   import PIXI_ = GlobalPIXIModule.PIXI;
 
   gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const twistFilter = new PIXI.filters.TwistFilter();
       twistFilter.offset = new PIXI_.Point(0, 0);
       return twistFilter;
     },
-    update: function (filter, layer) {
+    updatePreRender: function (filter, target) {
       const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter;
       twistFilter.offset.x = Math.round(
         // @ts-ignore - extra properties are stored on the filter.
-        twistFilter._offsetX * layer.getWidth()
+        twistFilter._offsetX * target.getWidth()
       );
       twistFilter.offset.y = Math.round(
         // @ts-ignore - extra properties are stored on the filter.
-        twistFilter._offsetY * layer.getHeight()
+        twistFilter._offsetY * target.getHeight()
       );
     },
     updateDoubleParameter: function (filter, parameterName, value) {

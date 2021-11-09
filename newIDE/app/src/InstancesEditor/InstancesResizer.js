@@ -1,6 +1,7 @@
 // @flow
 import Rectangle from '../Utils/Rectangle';
 import { roundPositionForResizing } from '../Utils/GridHelpers';
+import { type InstancesEditorSettings } from './InstancesEditorSettings';
 
 export type ResizeGrabbingLocation =
   | 'TopLeft'
@@ -49,7 +50,7 @@ const areAnyInstancesNotStraight = (instances: gdInitialInstance[]) => {
 
 export default class InstancesResizer {
   instanceMeasurer: any;
-  options: Object;
+  instancesEditorSettings: InstancesEditorSettings;
 
   // The initial state of instances before a resize:
   _initialSelectionAABB: ?Rectangle = null;
@@ -68,17 +69,17 @@ export default class InstancesResizer {
 
   constructor({
     instanceMeasurer,
-    options,
+    instancesEditorSettings,
   }: {
     instanceMeasurer: any,
-    options: Object,
+    instancesEditorSettings: InstancesEditorSettings,
   }) {
     this.instanceMeasurer = instanceMeasurer;
-    this.options = options;
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
-  setOptions(options: Object) {
-    this.options = options;
+  setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
+    this.instancesEditorSettings = instancesEditorSettings;
   }
 
   _getOrCreateInstanceAABB(instance: gdInitialInstance) {
@@ -114,11 +115,12 @@ export default class InstancesResizer {
     });
   }
 
-  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): ?Rectangle {
     let initialSelectionAABB = this._initialSelectionAABB;
     if (initialSelectionAABB) {
       return initialSelectionAABB;
     }
+    if (!instances.length) return null;
     initialSelectionAABB = new Rectangle();
     initialSelectionAABB.setRectangle(
       this._getOrCreateInstanceAABB(instances[0])
@@ -141,6 +143,7 @@ export default class InstancesResizer {
     this.totalDeltaY += deltaY;
 
     const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    if (!initialSelectionAABB) return;
 
     // Round the grabbed handle position on the grid.
     const grabbingRelativePosition =
@@ -154,14 +157,17 @@ export default class InstancesResizer {
     const grabbingPosition = this._temporaryGrabbingPosition;
     grabbingPosition[0] = initialGrabbingX + this.totalDeltaX;
     grabbingPosition[1] = initialGrabbingY + this.totalDeltaY;
-    if (this.options.snap && this.options.grid) {
+    if (
+      this.instancesEditorSettings.snap &&
+      this.instancesEditorSettings.grid
+    ) {
       roundPositionForResizing(
         grabbingPosition,
-        this.options.gridWidth,
-        this.options.gridHeight,
-        this.options.gridOffsetX,
-        this.options.gridOffsetY,
-        this.options.gridType
+        this.instancesEditorSettings.gridWidth,
+        this.instancesEditorSettings.gridHeight,
+        this.instancesEditorSettings.gridOffsetX,
+        this.instancesEditorSettings.gridOffsetY,
+        this.instancesEditorSettings.gridType
       );
     } else {
       // Without a grid, the position is still rounded to the nearest pixel.
@@ -196,11 +202,15 @@ export default class InstancesResizer {
     const flippedTotalDeltaY = isTop ? -roundedTotalDeltaY : roundedTotalDeltaY;
 
     let scaleX =
-      (initialSelectionAABB.width() + flippedTotalDeltaX) /
-      initialSelectionAABB.width();
+      initialSelectionAABB.width() !== 0
+        ? (initialSelectionAABB.width() + flippedTotalDeltaX) /
+          initialSelectionAABB.width()
+        : flippedTotalDeltaX;
     let scaleY =
-      (initialSelectionAABB.height() + flippedTotalDeltaY) /
-      initialSelectionAABB.height();
+      initialSelectionAABB.height() !== 0
+        ? (initialSelectionAABB.height() + flippedTotalDeltaY) /
+          initialSelectionAABB.height()
+        : flippedTotalDeltaY;
 
     const hasRotatedInstance = areAnyInstancesNotStraight(instances);
 
@@ -223,10 +233,21 @@ export default class InstancesResizer {
       }
     }
 
-    // No negative scale because instances can't be mirrored
-    // Make the minimal selection size to 1 to avoid absorption
-    scaleX = Math.max(1 / initialSelectionAABB.width(), scaleX);
-    scaleY = Math.max(1 / initialSelectionAABB.height(), scaleY);
+    // No negative scale because instances can't be mirrored.
+    // Make the minimal selection size to 1 to avoid absorption.
+    // If size is already 0, use a minimum scale to avoid negative scales.
+    scaleX = Math.max(
+      initialSelectionAABB.width() !== 0
+        ? 1 / initialSelectionAABB.width()
+        : 0.00001,
+      scaleX
+    );
+    scaleY = Math.max(
+      initialSelectionAABB.height() !== 0
+        ? 1 / initialSelectionAABB.height()
+        : 0.00001,
+      scaleY
+    );
 
     const fixedPointX =
       initialSelectionAABB.right -
@@ -247,6 +268,17 @@ export default class InstancesResizer {
         selectedInstance
       );
 
+      // Assume a size of 1 pixel to start the resizing
+      // if the instance had a size of 0.
+      const initialWidth =
+        initialUnrotatedInstanceAABB.width() !== 0
+          ? initialUnrotatedInstanceAABB.width()
+          : 1;
+      const initialHeight =
+        initialUnrotatedInstanceAABB.height() !== 0
+          ? initialUnrotatedInstanceAABB.height()
+          : 1;
+
       // The position and size of an instance describe the shape
       // before the rotation is applied.
       // The calculus is like a 90° or 270° rotation of the basis around the scaling.
@@ -259,12 +291,8 @@ export default class InstancesResizer {
         !hasRotatedInstance &&
         (angle === 90 || angle === 270)
       ) {
-        selectedInstance.setCustomWidth(
-          scaleY * initialUnrotatedInstanceAABB.width()
-        );
-        selectedInstance.setCustomHeight(
-          scaleX * initialUnrotatedInstanceAABB.height()
-        );
+        selectedInstance.setCustomWidth(scaleY * initialWidth);
+        selectedInstance.setCustomHeight(scaleX * initialHeight);
         selectedInstance.setHasCustomSize(true);
 
         // These 4 variables are the positions and vector after the scaling.
@@ -290,12 +318,8 @@ export default class InstancesResizer {
         selectedInstance.setX(centerX + centerToOriginX);
         selectedInstance.setY(centerY + centerToOriginY);
       } else {
-        selectedInstance.setCustomWidth(
-          scaleX * initialUnrotatedInstanceAABB.width()
-        );
-        selectedInstance.setCustomHeight(
-          scaleY * initialUnrotatedInstanceAABB.height()
-        );
+        selectedInstance.setCustomWidth(scaleX * initialWidth);
+        selectedInstance.setCustomHeight(scaleY * initialHeight);
         selectedInstance.setHasCustomSize(true);
 
         selectedInstance.setX(

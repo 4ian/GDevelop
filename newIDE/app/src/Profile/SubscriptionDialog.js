@@ -10,7 +10,9 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import UserProfileContext, { type UserProfile } from './UserProfileContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from './AuthenticatedUserContext';
 import { Column, Line } from '../UI/Grid';
 import {
   getSubscriptionPlans,
@@ -77,11 +79,15 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
 
   choosePlan = (
     i18n: I18nType,
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     plan: PlanDetails
   ) => {
-    const { getAuthorizationHeader, subscription, profile } = userProfile;
-    if (!profile || !subscription) return;
+    const {
+      getAuthorizationHeader,
+      subscription,
+      firebaseUser,
+    } = authenticatedUser;
+    if (!firebaseUser || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
     if (subscription.stripeSubscriptionId) {
@@ -95,10 +101,11 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       // We already have a stripe customer, change the subscription without
       // asking for the user card.
       this.setState({ isLoading: true });
-      changeUserSubscription(getAuthorizationHeader, profile.uid, {
+      changeUserSubscription(getAuthorizationHeader, firebaseUser.uid, {
         planId: plan.planId,
       }).then(
-        () => this.handleUpdatedSubscriptionSuccess(i18n, userProfile, plan),
+        () =>
+          this.handleUpdatedSubscriptionSuccess(i18n, authenticatedUser, plan),
         (err: Error) => this.handleUpdatedSubscriptionFailure(i18n, err)
       );
     } else {
@@ -108,8 +115,8 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       Window.openExternalURL(
         getRedirectToCheckoutUrl(
           plan.planId || '',
-          profile.uid,
-          profile.email || ''
+          firebaseUser.uid,
+          firebaseUser.email || ''
         )
       );
     }
@@ -117,10 +124,10 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
 
   handleUpdatedSubscriptionSuccess = (
     i18n: I18nType,
-    userProfile: UserProfile,
+    authenticatedUser: AuthenticatedUser,
     plan: PlanDetails
   ) => {
-    userProfile.onRefreshUserProfile();
+    authenticatedUser.onRefreshUserProfile();
     this.setState({ isLoading: false });
     if (plan.planId) {
       showMessageBox(
@@ -156,8 +163,10 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     );
   }
 
-  _isLoading = (userProfile: UserProfile) =>
-    !userProfile.subscription || !userProfile.profile || this.state.isLoading;
+  _isLoading = (authenticatedUser: AuthenticatedUser) =>
+    !authenticatedUser.subscription ||
+    !authenticatedUser.profile ||
+    this.state.isLoading;
 
   render() {
     const { open, onClose } = this.props;
@@ -166,8 +175,8 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     return (
       <I18n>
         {({ i18n }) => (
-          <UserProfileContext.Consumer>
-            {(userProfile: UserProfile) => (
+          <AuthenticatedUserContext.Consumer>
+            {(authenticatedUser: AuthenticatedUser) => (
               <ThemeConsumer>
                 {muiTheme => (
                   <Dialog
@@ -217,8 +226,8 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                             (descriptionBullet, index) => (
                               <Column key={index} expand>
                                 <Line noMargin alignItems="center">
-                                  {userProfile.subscription &&
-                                  userProfile.subscription.planId ===
+                                  {authenticatedUser.subscription &&
+                                  authenticatedUser.subscription.planId ===
                                     plan.planId ? (
                                     <CheckCircle
                                       style={{
@@ -246,37 +255,38 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                           </Text>
                         </CardContent>
                         <CardActions style={styles.actions}>
-                          {userProfile.subscription &&
-                          userProfile.subscription.planId === plan.planId ? (
+                          {authenticatedUser.subscription &&
+                          authenticatedUser.subscription.planId ===
+                            plan.planId ? (
                             <FlatButton
                               disabled
                               label={<Trans>This is your current plan</Trans>}
                               onClick={() =>
-                                this.choosePlan(i18n, userProfile, plan)
+                                this.choosePlan(i18n, authenticatedUser, plan)
                               }
                             />
                           ) : plan.planId ? (
                             <LeftLoader
-                              isLoading={this._isLoading(userProfile)}
+                              isLoading={this._isLoading(authenticatedUser)}
                             >
                               <RaisedButton
                                 primary
-                                disabled={this._isLoading(userProfile)}
+                                disabled={this._isLoading(authenticatedUser)}
                                 label={<Trans>Choose this plan</Trans>}
                                 onClick={() =>
-                                  this.choosePlan(i18n, userProfile, plan)
+                                  this.choosePlan(i18n, authenticatedUser, plan)
                                 }
                               />
                             </LeftLoader>
                           ) : (
                             <LeftLoader
-                              isLoading={this._isLoading(userProfile)}
+                              isLoading={this._isLoading(authenticatedUser)}
                             >
                               <FlatButton
-                                disabled={this._isLoading(userProfile)}
+                                disabled={this._isLoading(authenticatedUser)}
                                 label={<Trans>Cancel your subscription</Trans>}
                                 onClick={() =>
-                                  this.choosePlan(i18n, userProfile, plan)
+                                  this.choosePlan(i18n, authenticatedUser, plan)
                                 }
                               />
                             </LeftLoader>
@@ -296,7 +306,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                         </EmptyMessage>
                       </Line>
                     </Column>
-                    {!userProfile.authenticated && (
+                    {!authenticatedUser.authenticated && (
                       <PlaceholderMessage>
                         <Text>
                           <Trans>
@@ -308,7 +318,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                         <RaisedButton
                           label={<Trans>Create my account</Trans>}
                           primary
-                          onClick={userProfile.onLogin}
+                          onClick={authenticatedUser.onLogin}
                         />
                         <FlatButton
                           label={<Trans>Not now, thanks</Trans>}
@@ -318,13 +328,13 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                     )}
                     {subscriptionPendingDialogOpen && (
                       <SubscriptionPendingDialog
-                        userProfile={userProfile}
+                        authenticatedUser={authenticatedUser}
                         onClose={() => {
                           this.setState(
                             {
                               subscriptionPendingDialogOpen: false,
                             },
-                            () => userProfile.onRefreshUserProfile()
+                            () => authenticatedUser.onRefreshUserProfile()
                           );
                         }}
                       />
@@ -333,7 +343,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                 )}
               </ThemeConsumer>
             )}
-          </UserProfileContext.Consumer>
+          </AuthenticatedUserContext.Consumer>
         )}
       </I18n>
     );

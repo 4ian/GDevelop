@@ -131,7 +131,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(): void {
+    update(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.ensureUpToDate();
     }
 
@@ -224,7 +224,7 @@ namespace gdjs {
     /**
      * Get the font size of the characters of the object.
      */
-    getCharacterSize() {
+    getCharacterSize(): number {
       return this._characterSize;
     }
 

@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
 #include <algorithm>
 #include <iostream>
@@ -90,6 +89,19 @@ InstructionSentenceFormatter::GetAsFormattedText(
   return formattedStr;
 }
 
-}  // namespace gd
+gd::String InstructionSentenceFormatter::GetFullText(
+    const gd::Instruction &instr, const gd::InstructionMetadata &metadata)
+{
+  const std::vector<std::pair<gd::String, gd::TextFormatting> > formattedText =
+      GetAsFormattedText(instr, metadata);
 
-#endif
+  gd::String completeSentence = "";
+
+  for (std::size_t id = 0; id < formattedText.size(); ++id) {
+    completeSentence += formattedText.at(id).first;
+  }
+
+  return completeSentence;
+}
+
+}  // namespace gd

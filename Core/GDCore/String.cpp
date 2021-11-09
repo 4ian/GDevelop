@@ -6,6 +6,7 @@
 
 #include "GDCore/String.h"
 
+#include <algorithm>
 #include <string.h>
 
 #include <SFML/System/String.hpp>
@@ -283,11 +284,72 @@ String& String::insert( size_type pos, const String &str )
     return *this;
 }
 
+String& String::replace_if(iterator i1, iterator i2, std::function<bool(char32_t)> p,  const String &str)
+{
+    String::size_type offset = 1;
+    iterator it = i1.base();
+    while(it < i2.base())
+    {
+      if (p(*it)) { replace(std::distance(begin(), it), offset, str); }
+      else { it++; }
+    }
+    return *this;
+}
+
+String& String::RemoveConsecutiveOccurrences(iterator i1, iterator i2, const char c)
+{
+    std::vector<std::pair<size_type, size_type>> ranges_to_remove;
+    for(iterator current_index = i1.base(); current_index < i2.base(); current_index++)
+    {
+        if (*current_index == c){
+            iterator current_subindex = current_index;
+            std::advance(current_subindex, 1);
+            if (*current_subindex == c) {
+                while(current_subindex < end() && *current_subindex == c)
+                {
+                    current_subindex++;
+                }
+                replace(std::distance(begin(), current_index),
+                        std::distance(current_index, current_subindex),
+                        c);
+
+                std::advance(current_index, 1);
+            }
+        }
+    }
+    return *this;
+}
+
 String& String::replace( iterator i1, iterator i2, const String &str )
 {
     m_string.replace(i1.base(), i2.base(), str.m_string);
 
     return *this;
+}
+
+String& String::replace( iterator i1, iterator i2, size_type n, const char c )
+{
+    m_string.replace(i1.base(), i2.base(), n, c);
+
+    return *this;
+}
+
+String& String::replace( String::size_type pos, String::size_type len, const char c )
+{
+    if(pos > size())
+        throw std::out_of_range("[gd::String::replace] starting pos greater than size");
+
+    iterator i1 = begin();
+    std::advance( i1, pos );
+
+    iterator i2 = i1;
+    while(i2 != end() && len > 0) //Increment "len" times and stop if end() is reached
+    {
+        ++i2;
+        --len;
+    }
+
+    return replace( i1, i2, 1, c );
 }
 
 String& String::replace( String::size_type pos, String::size_type len, const String &str )

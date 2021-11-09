@@ -1,10 +1,10 @@
 namespace gdjs {
   gdjs.PixiFiltersTools.registerFilterCreator('KawaseBlur', {
-    makePIXIFilter: function (layer, effectData) {
+    makePIXIFilter: function (target, effectData) {
       const kawaseBlurFilter = new PIXI.filters.KawaseBlurFilter();
       return kawaseBlurFilter;
     },
-    update: function (filter, layer) {},
+    updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       const kawaseBlurFilter = (filter as unknown) as PIXI.filters.KawaseBlurFilter;
       if (parameterName === 'pixelizeX') {

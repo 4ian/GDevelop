@@ -10,16 +10,23 @@ import FlatButton from '../../../UI/FlatButton';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { Column, Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
+import { openPreviewWindow } from '.';
 
 type Props = {|
-  url: ?string,
+  project: gdProject,
+  url: string,
+  onPreviewWindowOpened: any => void,
   onClose: () => void,
 |};
 
 export default class BrowserPreviewLinkDialog extends Component<Props> {
   _makeOnOpen = (i18n: I18nType) => () => {
-    const windowObjectReference = window.open(this.props.url, '_blank');
-    if (!windowObjectReference) {
+    const { previewWindow, targetId } = openPreviewWindow(
+      this.props.project,
+      this.props.url,
+      null // No existing target id: always open a new window.
+    );
+    if (!{ previewWindow, targetId }) {
       showErrorBox({
         message: i18n._(
           t`Unable to open the preview! Be sure that popup are allowed for this website.`
@@ -27,6 +34,8 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
         rawError: undefined,
         errorId: 'preview-popup-disallowed',
       });
+    } else {
+      this.props.onPreviewWindowOpened({ previewWindow, targetId });
     }
     this.props.onClose();
   };

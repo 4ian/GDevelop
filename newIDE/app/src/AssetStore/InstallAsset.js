@@ -16,18 +16,8 @@ import {
 } from '../Utils/GDevelopServices/Extension';
 import { type EventsFunctionsExtensionsState } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { mapVector } from '../Utils/MapFor';
+import { toNewGdMapStringString } from '../Utils/MapStringString';
 const gd: libGDevelop = global.gd;
-
-const toNewGdMapStringString = (object: {
-  [string]: string,
-}): gdMapStringString => {
-  const map = new gd.MapStringString();
-  for (var key in object) {
-    map.set(key, object[key]);
-  }
-
-  return map;
-};
 
 const toPascalCase = (str: string) => {
   if (!str) return '';
@@ -207,6 +197,8 @@ export const addAssetToProject = async ({
         }
 
         const behavior = behaviorMetadata.get();
+        // TODO: When this feature is exposed to users, we might want to use
+        // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
         const behaviorContent = object.addNewBehavior(
           project,
           behaviorType,

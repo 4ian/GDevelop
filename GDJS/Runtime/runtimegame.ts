@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Game manager');
+
   /** Identify a script file, with its content hash (useful for hot-reloading). */
   export type RuntimeGameOptionsScriptFile = {
     /** The path for this script file. */
@@ -25,9 +27,9 @@ namespace gdjs {
     /** if true, export is a partial preview without events. */
     projectDataOnlyExport?: boolean;
     /** The address of the debugger server, to reach out using WebSocket. */
-    debuggerServerAddress?: string;
+    websocketDebuggerServerAddress?: string;
     /** The port of the debugger server, to reach out using WebSocket. */
-    debuggerServerPort?: string;
+    websocketDebuggerServerPort?: string;
   };
 
   /**
@@ -40,6 +42,7 @@ namespace gdjs {
     _soundManager: SoundManager;
     _fontManager: FontManager;
     _jsonManager: JsonManager;
+    _effectsManager: EffectsManager;
     _bitmapFontManager: BitmapFontManager;
     _maxFPS: integer;
     _minFPS: integer;
@@ -50,6 +53,7 @@ namespace gdjs {
     _resizeMode: 'adaptWidth' | 'adaptHeight' | string;
     _adaptGameResolutionAtRuntime: boolean;
     _scaleMode: 'linear' | 'nearest';
+    _pixelsRounding: boolean;
     _renderer: RuntimeGameRenderer;
 
     //Game loop management (see startGameLoop method)
@@ -67,9 +71,9 @@ namespace gdjs {
     _options: RuntimeGameOptions;
 
     /**
-     * Optional client to connect to a debugger
+     * Optional client to connect to a debugger server.
      */
-    _debuggerClient: gdjs.IDebuggerClient | null;
+    _debuggerClient: gdjs.AbstractDebuggerClient | null;
     _sessionMetricsInitialized: boolean = false;
     _disableMetrics: boolean = false;
     _isPreview: boolean;
@@ -94,6 +98,7 @@ namespace gdjs {
         this._data.resources.resources,
         this._imageManager
       );
+      this._effectsManager = new gdjs.EffectsManager();
       this._maxFPS = this._data ? this._data.properties.maxFPS : 60;
       this._minFPS = this._data ? this._data.properties.minFPS : 15;
       this._gameResolutionWidth = this._data.properties.windowWidth;
@@ -103,6 +108,7 @@ namespace gdjs {
       this._resizeMode = this._data.properties.sizeOnStartupMode;
       this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
+      this._pixelsRounding = this._data.properties.pixelsRounding;
       this._renderer = new gdjs.RuntimeGameRenderer(
         this,
         this._options.forceFullscreen || false
@@ -202,6 +208,15 @@ namespace gdjs {
     }
 
     /**
+     * Get the effects manager of the game, which allows to manage
+     * effects on runtime objects or runtime layers.
+     * @return The effects manager for the game
+     */
+    getEffectsManager(): gdjs.EffectsManager {
+      return this._effectsManager;
+    }
+
+    /**
      * Get the object containing the game data
      * @return The object associated to the game.
      */
@@ -225,7 +240,7 @@ namespace gdjs {
         }
       }
       if (scene === null) {
-        console.warn('The game has no scene called "' + sceneName + '"');
+        logger.error('The game has no scene called "' + sceneName + '"');
       }
       return scene;
     }
@@ -417,6 +432,13 @@ namespace gdjs {
     }
 
     /**
+     * Return if the game is rounding pixels when rendering.
+     */
+    getPixelsRounding(): boolean {
+      return this._pixelsRounding;
+    }
+
+    /**
      * Set or unset the game as paused.
      * When paused, the game won't step and will be freezed. Useful for debugging.
      * @param enable true to pause the game, false to unpause
@@ -521,73 +543,78 @@ namespace gdjs {
      * Start the game loop, to be called once assets are loaded.
      */
     startGameLoop() {
-      if (!this.hasScene()) {
-        console.log('The game has no scene.');
-        return;
+      try {
+        if (!this.hasScene()) {
+          logger.error('The game has no scene.');
+          return;
+        }
+        this._forceGameResolutionUpdate();
+
+        //Load the first scene
+        const firstSceneName = this._data.firstLayout;
+        this._sceneStack.push(
+          this.hasScene(firstSceneName)
+            ? firstSceneName
+            : // @ts-ignore - no risk of null object.
+              this.getSceneData().name,
+          this._injectExternalLayout
+        );
+
+        //Uncomment to profile the first x frames of the game.
+        // var x = 500;
+        // var startTime = Date.now();
+        // console.profile("Stepping for " + x + " frames")
+        // for(var i = 0; i < x; ++i) {
+        //     this._sceneStack.step(16);
+        // }
+        // console.profileEnd();
+        // var time = Date.now() - startTime;
+        // logger.log("Took", time, "ms");
+        // return;
+
+        //The standard game loop
+        const that = this;
+        let accumulatedElapsedTime = 0;
+        this._renderer.startGameLoop(function (lastCallElapsedTime) {
+          if (that._paused) {
+            return true;
+          }
+
+          // Skip the frame if we rendering frames too fast
+          accumulatedElapsedTime += lastCallElapsedTime;
+          if (
+            that._maxFPS > 0 &&
+            1000.0 / accumulatedElapsedTime > that._maxFPS + 7
+          ) {
+            // Only skip frame if the framerate is 7 frames above the maximum framerate.
+            // Most browser/engines will try to run at slightly more than 60 frames per second.
+            // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
+            // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
+            return true;
+          }
+          const elapsedTime = accumulatedElapsedTime;
+          accumulatedElapsedTime = 0;
+
+          //Manage resize events.
+          if (that._notifyScenesForGameResolutionResize) {
+            that._sceneStack.onGameResolutionResized();
+            that._notifyScenesForGameResolutionResize = false;
+          }
+
+          //Render and step the scene.
+          if (that._sceneStack.step(elapsedTime)) {
+            that.getInputManager().onFrameEnded();
+            return true;
+          }
+          return false;
+        });
+        setTimeout(() => {
+          this._setupSessionMetrics();
+        }, 10000);
+      } catch (e) {
+        logger.error('Internal crash: ' + e);
+        throw e;
       }
-      this._forceGameResolutionUpdate();
-
-      //Load the first scene
-      const firstSceneName = this._data.firstLayout;
-      this._sceneStack.push(
-        this.hasScene(firstSceneName)
-          ? firstSceneName
-          : // @ts-ignore - no risk of null object.
-            this.getSceneData().name,
-        this._injectExternalLayout
-      );
-
-      //Uncomment to profile the first x frames of the game.
-      // var x = 500;
-      // var startTime = Date.now();
-      // console.profile("Stepping for " + x + " frames")
-      // for(var i = 0; i < x; ++i) {
-      //     this._sceneStack.step(16);
-      // }
-      // console.profileEnd();
-      // var time = Date.now() - startTime;
-      // console.log("Took", time, "ms");
-      // return;
-
-      //The standard game loop
-      const that = this;
-      let accumulatedElapsedTime = 0;
-      this._renderer.startGameLoop(function (lastCallElapsedTime) {
-        if (that._paused) {
-          return true;
-        }
-
-        // Skip the frame if we rendering frames too fast
-        accumulatedElapsedTime += lastCallElapsedTime;
-        if (
-          that._maxFPS > 0 &&
-          1000.0 / accumulatedElapsedTime > that._maxFPS + 7
-        ) {
-          // Only skip frame if the framerate is 7 frames above the maximum framerate.
-          // Most browser/engines will try to run at slightly more than 60 frames per second.
-          // If game is set to have a maximum FPS to 60, then one out of two frames will be dropped.
-          // Hence, we use a 7 frames margin to ensure that we're not skipping frames too much.
-          return true;
-        }
-        const elapsedTime = accumulatedElapsedTime;
-        accumulatedElapsedTime = 0;
-
-        //Manage resize events.
-        if (that._notifyScenesForGameResolutionResize) {
-          that._sceneStack.onGameResolutionResized();
-          that._notifyScenesForGameResolutionResize = false;
-        }
-
-        //Render and step the scene.
-        if (that._sceneStack.step(elapsedTime)) {
-          that.getInputManager().onFrameEnded();
-          return true;
-        }
-        return false;
-      });
-      setTimeout(() => {
-        this._setupSessionMetrics();
-      }, 10000);
     }
 
     /**
@@ -654,6 +681,14 @@ namespace gdjs {
           },
         }),
       })
+        .then((response) => {
+          // Ensure the session is correctly created to avoid sending hits that will fail.
+          if (!response.ok) {
+            console.error('Error while creating the session', response);
+            throw new Error('Error while creating the session');
+          }
+          return response;
+        })
         .then((response) => response.text())
         .then((returnedSessionId) => {
           sessionId = returnedSessionId;

@@ -3,7 +3,7 @@
  * to generate types that can be consumed in the IDE codebase.
  *
  * Bindings.idl is also used by Emscripten
- * to generate the JS interface to the WebAssembly compiled C++ code of GDCore/GDJS/GDCpp.
+ * to generate the JS interface to the WebAssembly compiled C++ code of GDCore/GDJS.
  * The parsers and code generation have a few hacks (see postjs.js), so
  * we need to also do some hacks/manipulation on the input and some resulting files.
  */

@@ -1,7 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema } from '../PropertiesEditor';
-import { type ResourceKind } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceKind } from '../ResourcesList/ResourceSource';
 import flatten from 'lodash/flatten';
 
 export type EnumeratedEffectMetadata = {|
@@ -11,6 +11,7 @@ export type EnumeratedEffectMetadata = {|
   fullName: string,
   description: string,
   parametersSchema: Schema,
+  isMarkedAsNotWorkingForObjects: boolean,
 |};
 
 /**
@@ -115,6 +116,7 @@ export const enumerateEffectsMetadata = (
             effectMetadata,
             fullName: effectMetadata.getFullName(),
             description: effectMetadata.getDescription(),
+            isMarkedAsNotWorkingForObjects: effectMetadata.isMarkedAsNotWorkingForObjects(),
             parametersSchema,
           };
         });
@@ -129,6 +131,15 @@ export const enumerateEffectsMetadata = (
       );
     }
   );
+};
+
+export const enumerateEffectNames = (
+  effectsContainer: gdEffectsContainer
+): Array<string> => {
+  return mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
+    const effect: gdEffect = effectsContainer.getEffectAt(i);
+    return effect.getName();
+  });
 };
 
 export const setEffectDefaultParameters = (

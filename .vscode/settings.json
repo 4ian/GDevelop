@@ -108,7 +108,8 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "xlocbuf": "cpp",
-        "xlocmes": "cpp"
+        "xlocmes": "cpp",
+        "xmemory0": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

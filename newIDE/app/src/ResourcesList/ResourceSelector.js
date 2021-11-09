@@ -13,7 +13,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import ResourcesLoader from '../ResourcesLoader';
 import { applyResourceDefaults } from './ResourceUtils';
@@ -85,7 +85,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
         .filter(source => source.kind === this.props.resourceKind)
         .map(source => ({
           text: '',
-          value: source.displayName,
+          value: '',
+          translatableValue: source.displayName,
           renderIcon: () => <Add />,
           onClick: () => this._addFrom(source),
         })),
@@ -117,7 +118,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
     if (!source) return;
 
     const { project, onChooseResource } = this.props;
-    onChooseResource(source.name, false)
+    onChooseResource({
+      initialSourceName: source.name,
+      multiSelection: false,
+      resourceKind: this.props.resourceKind,
+    })
       .then(resources => {
         if (!resources.length) return;
         const resource = resources[0];
@@ -142,7 +147,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         resources.forEach(resource => resource.delete());
       })
       .catch(err => {
-        // TODO: Display an error message
+        // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);
       });
   };

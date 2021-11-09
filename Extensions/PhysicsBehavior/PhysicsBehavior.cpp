@@ -8,9 +8,8 @@ This project is released under the MIT License.
 #include "PhysicsBehavior.h"
 #include <string>
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/Runtime/Project/Project.h"
-#include "GDCpp/Runtime/Serialization/SerializerElement.h"
-#include "Triangulation/triangulate.h"
+#include "GDCore/Project/Project.h"
+#include "GDCore/Serialization/SerializerElement.h"
 #if defined(GD_IDE_ONLY)
 #include <map>
 #include "GDCore/Project/PropertyDescriptor.h"

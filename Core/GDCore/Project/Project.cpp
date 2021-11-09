@@ -26,7 +26,6 @@
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
-#include "GDCore/Project/ImageManager.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -50,41 +49,27 @@ using namespace std;
 namespace gd {
 
 Project::Project()
-    :
-#if defined(GD_IDE_ONLY)
-      name(_("Project")),
+    : name(_("Project")),
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
       folderProject(false),
-#endif
       windowWidth(800),
       windowHeight(600),
       maxFPS(60),
       minFPS(20),
       verticalSync(false),
       scaleMode("linear"),
+      pixelsRounding(false),
       adaptGameResolutionAtRuntime(true),
       sizeOnStartupMode("adaptWidth"),
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
-      imageManager(std::make_shared<ImageManager>())
-#if defined(GD_IDE_ONLY)
-      ,
       useExternalSourceFiles(false),
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
-      gdBuildVersion(gd::VersionWrapper::Build()),
-      dirty(false)
-#endif
-{
-  imageManager->SetResourcesManager(&resourcesManager);
-
-#if !defined(GD_IDE_ONLY)
-  platforms.push_back(&CppPlatform::Get());
-#endif
-}
+      gdBuildVersion(gd::VersionWrapper::Build()) {}
 
 Project::~Project() {}
 
@@ -109,7 +94,6 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   return nullptr;
 }
 
-#if defined(GD_IDE_ONLY)
 std::shared_ptr<gd::BaseEvent> Project::CreateEvent(
     const gd::String& type, const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
@@ -168,7 +152,6 @@ bool Project::RemovePlatform(const gd::String& platformName) {
 
   return false;
 }
-#endif
 
 bool Project::HasLayoutNamed(const gd::String& name) const {
   return (find_if(scenes.begin(),
@@ -195,13 +178,11 @@ std::size_t Project::GetLayoutPosition(const gd::String& name) const {
 }
 std::size_t Project::GetLayoutsCount() const { return scenes.size(); }
 
-#if defined(GD_IDE_ONLY)
 void Project::SwapLayouts(std::size_t first, std::size_t second) {
   if (first >= scenes.size() || second >= scenes.size()) return;
 
   std::iter_swap(scenes.begin() + first, scenes.begin() + second);
 }
-#endif
 
 gd::Layout& Project::InsertNewLayout(const gd::String& name,
                                      std::size_t position) {
@@ -210,9 +191,7 @@ gd::Layout& Project::InsertNewLayout(const gd::String& name,
       new Layout())));
 
   newlyInsertedLayout.SetName(name);
-#if defined(GD_IDE_ONLY)
   newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
-#endif
 
   return newlyInsertedLayout;
 }
@@ -223,9 +202,7 @@ gd::Layout& Project::InsertLayout(const gd::Layout& layout,
       position < scenes.size() ? scenes.begin() + position : scenes.end(),
       new Layout(layout))));
 
-#if defined(GD_IDE_ONLY)
   newlyInsertedLayout.UpdateBehaviorsSharedData(*this);
-#endif
 
   return newlyInsertedLayout;
 }
@@ -238,7 +215,6 @@ void Project::RemoveLayout(const gd::String& name) {
   scenes.erase(scene);
 }
 
-#if defined(GD_IDE_ONLY)
 bool Project::HasExternalEventsNamed(const gd::String& name) const {
   return (find_if(externalEvents.begin(),
                   externalEvents.end(),
@@ -318,7 +294,6 @@ void Project::SwapExternalLayouts(std::size_t first, std::size_t second) {
   std::iter_swap(externalLayouts.begin() + first,
                  externalLayouts.begin() + second);
 }
-#endif
 bool Project::HasExternalLayoutNamed(const gd::String& name) const {
   return (find_if(externalLayouts.begin(),
                   externalLayouts.end(),
@@ -384,7 +359,6 @@ void Project::RemoveExternalLayout(const gd::String& name) {
   externalLayouts.erase(externalLayout);
 }
 
-#if defined(GD_IDE_ONLY)
 void Project::SwapEventsFunctionsExtensions(std::size_t first,
                                             std::size_t second) {
   if (first >= eventsFunctionsExtensions.size() ||
@@ -483,11 +457,8 @@ void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
 void Project::ClearEventsFunctionsExtensions() {
   eventsFunctionsExtensions.clear();
 }
-#endif
 
 void Project::UnserializeFrom(const SerializerElement& element) {
-// Checking version
-#if defined(GD_IDE_ONLY)
   const SerializerElement& gdVersionElement =
       element.GetChild("gdVersion", 0, "GDVersion");
   gdMajorVersion =
@@ -520,7 +491,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
           "available.");
     }
   }
-#endif
 
   const SerializerElement& propElement =
       element.GetChild("properties", 0, "Info");
@@ -536,11 +506,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
   SetScaleMode(propElement.GetStringAttribute("scaleMode", "linear"));
+  SetPixelsRounding(propElement.GetBoolAttribute("pixelsRounding", false));
   SetAdaptGameResolutionAtRuntime(
       propElement.GetBoolAttribute("adaptGameResolutionAtRuntime", false));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
-#if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
@@ -557,6 +527,13 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   useExternalSourceFiles =
       propElement.GetBoolAttribute("useExternalSourceFiles");
+
+  authorIds.clear();
+  auto& authorIdsElement = propElement.GetChild("authorIds");
+  authorIdsElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
+    authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
+  }
 
   // Compatibility with GD <= 5.0.0-beta101
   if (VersionWrapper::IsOlderOrEqual(
@@ -589,9 +566,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
   // end of compatibility code
 
-#endif
-
-#if defined(GD_IDE_ONLY)
   currentPlatform = NULL;
   gd::String currentPlatformName =
       propElement.GetChild("currentPlatform").GetValue().GetString();
@@ -641,12 +615,9 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   if (currentPlatform == NULL && !platforms.empty())
     currentPlatform = platforms.back();
-#endif
 
-#if defined(GD_IDE_ONLY)
   GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "ObjectGroups"));
-#endif
   resourcesManager.UnserializeFrom(
       element.GetChild("resources", 0, "Resources"));
   UnserializeObjectsFrom(*this, element.GetChild("objects", 0, "Objects"));
@@ -664,7 +635,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     layout.UnserializeFrom(*this, layoutElement);
   }
 
-#if defined(GD_IDE_ONLY)
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
       element.GetChild("externalEvents", 0, "ExternalEvents");
@@ -696,7 +666,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     newEventsFunctionsExtension.UnserializeFrom(
         *this, eventsFunctionsExtensionElement);
   }
-#endif
 
   externalLayouts.clear();
   const SerializerElement& externalLayoutsElement =
@@ -711,7 +680,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     newExternalLayout.UnserializeFrom(externalLayoutElement);
   }
 
-#if defined(GD_IDE_ONLY)
   externalSourceFiles.clear();
   const SerializerElement& externalSourceFilesElement =
       element.GetChild("externalSourceFiles", 0, "ExternalSourceFiles");
@@ -724,10 +692,8 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::SourceFile& newSourceFile = InsertNewSourceFile("", "");
     newSourceFile.UnserializeFrom(sourceFileElement);
   }
-#endif
 }
 
-#if defined(GD_IDE_ONLY)
 void Project::SerializeTo(SerializerElement& element) const {
   SerializerElement& versionElement = element.AddChild("gdVersion");
   versionElement.SetAttribute("major", gd::VersionWrapper::Major());
@@ -748,6 +714,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
   propElement.SetAttribute("scaleMode", scaleMode);
+  propElement.SetAttribute("pixelsRounding", pixelsRounding);
   propElement.SetAttribute("adaptGameResolutionAtRuntime",
                            adaptGameResolutionAtRuntime);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
@@ -759,6 +726,12 @@ void Project::SerializeTo(SerializerElement& element) const {
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
   propElement.SetAttribute("useExternalSourceFiles", useExternalSourceFiles);
+
+  auto& authorIdsElement = propElement.AddChild("authorIds");
+  authorIdsElement.ConsiderAsArray();
+  for (const auto& authorId : authorIds) {
+    authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
 
   // Compatibility with GD <= 5.0.0-beta101
   if (useDeprecatedZeroAsDefaultZOrder) {
@@ -823,10 +796,6 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < externalSourceFiles.size(); ++i)
     externalSourceFiles[i]->SerializeTo(
         externalSourceFilesElement.AddChild("sourceFile"));
-
-#if defined(GD_IDE_ONLY)
-  dirty = false;
-#endif
 }
 
 bool Project::ValidateName(const gd::String& name) {
@@ -874,6 +843,10 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
     GetObject(j).ExposeResources(worker);
   }
+
+  // Add loading screen background image if present
+  if (loadingScreen.GetBackgroundImageResourceName() != "")
+    worker.ExposeImage(loadingScreen.GetBackgroundImageResourceName());
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {
@@ -924,7 +897,6 @@ gd::SourceFile& Project::InsertNewSourceFile(const gd::String& name,
 
   return newlyInsertedSourceFile;
 }
-#endif
 
 Project::Project(const Project& other) { Init(other); }
 
@@ -943,13 +915,14 @@ void Project::Init(const gd::Project& game) {
   minFPS = game.minFPS;
   verticalSync = game.verticalSync;
   scaleMode = game.scaleMode;
+  pixelsRounding = game.pixelsRounding;
   adaptGameResolutionAtRuntime = game.adaptGameResolutionAtRuntime;
   sizeOnStartupMode = game.sizeOnStartupMode;
   projectUuid = game.projectUuid;
   useDeprecatedZeroAsDefaultZOrder = game.useDeprecatedZeroAsDefaultZOrder;
 
-#if defined(GD_IDE_ONLY)
   author = game.author;
+  authorIds = game.authorIds;
   packageName = game.packageName;
   orientation = game.orientation;
   folderProject = game.folderProject;
@@ -965,36 +938,26 @@ void Project::Init(const gd::Project& game) {
   gdBuildVersion = game.gdBuildVersion;
 
   currentPlatform = game.currentPlatform;
-#endif
   platforms = game.platforms;
 
   resourcesManager = game.resourcesManager;
-  imageManager = std::make_shared<ImageManager>(*game.imageManager);
-  imageManager->SetResourcesManager(&resourcesManager);
 
   initialObjects = gd::Clone(game.initialObjects);
 
   scenes = gd::Clone(game.scenes);
 
-#if defined(GD_IDE_ONLY)
   externalEvents = gd::Clone(game.externalEvents);
-#endif
 
   externalLayouts = gd::Clone(game.externalLayouts);
-#if defined(GD_IDE_ONLY)
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
   useExternalSourceFiles = game.useExternalSourceFiles;
 
   externalSourceFiles = gd::Clone(game.externalSourceFiles);
-#endif
 
   variables = game.GetVariables();
 
-#if defined(GD_IDE_ONLY)
   projectFile = game.GetProjectFile();
-  imagesChanged = game.imagesChanged;
-#endif
 }
 
 }  // namespace gd

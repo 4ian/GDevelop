@@ -25,6 +25,7 @@ type Props = {|
   layout: gdLayout,
   instances: Array<gdInitialInstance>,
   onEditObjectByName: string => void,
+  onInstancesModified?: (Array<gdInitialInstance>) => void,
   editObjectVariables: (?gdObject) => void,
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
@@ -109,14 +110,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomWidth(newValue),
+            instance.setCustomWidth(Math.max(newValue, 0)),
         },
         {
           name: this.props.i18n._(t`Height`),
           valueType: 'number',
           getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
           setValue: (instance: gdInitialInstance, newValue: number) =>
-            instance.setCustomHeight(newValue),
+            instance.setCustomHeight(Math.max(newValue, 0)),
         },
       ],
     },
@@ -161,6 +162,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 unsavedChanges={this.props.unsavedChanges}
                 schema={this.schema.concat(instanceSchema)}
                 instances={instances}
+                onInstancesModified={this.props.onInstancesModified}
               />
               <Line alignItems="center" justifyContent="space-between">
                 <Text>

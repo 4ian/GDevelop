@@ -6,7 +6,7 @@ declare class gdExternalLayout {
   setAssociatedLayout(name: string): void;
   getAssociatedLayout(): string;
   getInitialInstances(): gdInitialInstancesContainer;
-  getAssociatedSettings(): gdLayoutEditorCanvasOptions;
+  getAssociatedEditorSettings(): gdEditorSettings;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

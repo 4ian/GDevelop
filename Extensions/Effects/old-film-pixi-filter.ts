@@ -7,9 +7,9 @@ namespace gdjs {
       oldFilmFilter._animationTimer = 0;
       return oldFilmFilter;
     },
-    update: function (filter, layer) {
+    updatePreRender: function (filter, target) {
       if (filter.animationFrequency !== 0) {
-        filter._animationTimer += layer.getElapsedTime() / 1000;
+        filter._animationTimer += target.getElapsedTime() / 1000;
         if (filter._animationTimer >= 1 / filter.animationFrequency) {
           filter.seed = Math.random();
           filter._animationTimer = 0;

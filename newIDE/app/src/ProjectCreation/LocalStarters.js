@@ -17,10 +17,7 @@ import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
-import { findEmptyPath } from './LocalPathFinder';
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 const gd: libGDevelop = global.gd;
 
@@ -80,16 +77,6 @@ export default class LocalStarters extends Component<Props, State> {
       fileIdentifier: filePath,
     });
     sendNewGameCreated('');
-  }
-
-  componentDidMount() {
-    if (this.props.outputPath === '')
-      if (path && app)
-        this.props.onChangeOutputPath(
-          findEmptyPath(
-            path.join(app.getPath('documents'), 'GDevelop projects')
-          )
-        );
   }
 
   render() {

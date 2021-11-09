@@ -1,5 +1,6 @@
 //A simple PIXI filter doing some color changes
 namespace gdjs {
+  const logger = new gdjs.Logger('Dummy effect');
   import PIXI = GlobalPIXIModule.PIXI;
 
   const DummyPixiFilter = function () {
@@ -46,7 +47,7 @@ namespace gdjs {
       // `effectData.stringParameters.someImage`
       // `effectData.stringParameters.someColor`
       // `effectData.booleanParameters.someBoolean`
-      console.info(
+      logger.info(
         'The PIXI texture found for the Dummy Effect (not actually used):',
         (layer
           .getRuntimeScene()
@@ -57,11 +58,12 @@ namespace gdjs {
       );
       return filter;
     },
-    // Function called at every frame rendered
-    update: function (filter, layer) {},
-    // If your filter depends on the time, you can get the elapsed time
-    // with `layer.getElapsedTime()`.
-    // You can update the uniforms or other state of the filter.
+    // Function called at every frame, after events and before the frame is rendered.
+    updatePreRender: function (filter, layer) {
+      // If your filter depends on the time, you can get the elapsed time
+      // with `layer.getElapsedTime()`.
+      // You can update the uniforms or other state of the filter.
+    },
     // Function that will be called to update a (number) parameter of the PIXI filter with a new value
     updateDoubleParameter: function (filter, parameterName, value) {
       if (parameterName === 'opacity') {

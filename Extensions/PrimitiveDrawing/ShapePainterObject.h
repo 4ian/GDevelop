@@ -5,45 +5,21 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#ifndef DRAWEROBJECT_H
-#define DRAWEROBJECT_H
-
-#include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#ifndef SHAPEPAINTEROBJECT_H
+#define SHAPEPAINTEROBJECT_H
 #include <vector>
-#include "GDCpp/Runtime/Project/Object.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-namespace sf {
-class Sprite;
-class Texture;
-}  // namespace sf
-class RuntimeScene;
+
+#include "GDCore/Project/Object.h"
 namespace gd {
 class Object;
 class InitialInstance;
-}  // namespace gd
-#if defined(GD_IDE_ONLY)
-namespace gd {
 class Project;
-}
-#endif
+}  // namespace gd
 
 /**
- * \brief Internal class to define a shape to be drawn
- */
-class GD_EXTENSION_API DrawingCommand {
- public:
-  DrawingCommand(const sf::RectangleShape& rectangleShape_)
-      : rectangleShape(rectangleShape_){};
-  DrawingCommand(const sf::CircleShape& circleShape_)
-      : circleShape(circleShape_){};
-
-  sf::RectangleShape rectangleShape;
-  sf::CircleShape circleShape;
-};
-
-/**
- * \brief Base object storing the setup of a drawer object.
+ * \brief Base object storing the setup of a shape painter object.
+ * \todo This is useless (now that GDCpp is removed). It should be merged
+ * with ShapePainterObject.
  */
 class GD_EXTENSION_API ShapePainterObjectBase {
  public:
@@ -85,7 +61,8 @@ class GD_EXTENSION_API ShapePainterObjectBase {
   inline bool IsClearedBetweenFrames() { return clearBetweenFrames; }
 
  protected:
-  virtual void DoUnserializeFrom(const gd::SerializerElement& element);
+  virtual void DoUnserializeFrom(gd::Project& project,
+                                 const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
 #endif
@@ -129,39 +106,4 @@ class GD_EXTENSION_API ShapePainterObject : public gd::Object,
 #endif
 };
 
-class GD_EXTENSION_API RuntimeShapePainterObject
-    : public RuntimeObject,
-      public ShapePainterObjectBase {
- public:
-  RuntimeShapePainterObject(RuntimeScene& scene,
-                            const ShapePainterObject& shapePainterObject);
-  virtual ~RuntimeShapePainterObject(){};
-  virtual std::unique_ptr<RuntimeObject> Clone() const {
-    return gd::make_unique<RuntimeShapePainterObject>(*this);
-  }
-
-  virtual bool Draw(sf::RenderTarget& renderTarget);
-
-  virtual float GetWidth() const { return 32; };
-  virtual float GetHeight() const { return 32; };
-
-  virtual bool SetAngle(float newAngle) { return false; };
-  virtual float GetAngle() const { return 0; };
-
-  void DrawRectangle(float x, float y, float x2, float y2);
-  void DrawLine(float x, float y, float x2, float y2, float thickness);
-  void DrawCircle(float x, float y, float radius);
-
-#if defined(GD_IDE_ONLY)
-  virtual void GetPropertyForDebugger(std::size_t propertyNb,
-                                      gd::String& name,
-                                      gd::String& value) const;
-  virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
-  virtual std::size_t GetNumberOfProperties() const;
-#endif
-
- private:
-  std::vector<DrawingCommand> shapesToDraw;
-};
-
-#endif  // DRAWEROBJECT_H
+#endif  // SHAPEPAINTEROBJECT_H

@@ -5,12 +5,35 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "GDevelop.js Jest tests (all)",
+      "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
+      "args": ["--runInBand"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/GDevelop.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "GDevelop.js Jest tests (current file)",
+      "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
+      "args": [
+        "${fileBasenameNoExtension}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/GDevelop.js"
+    },
+    {
       "type": "pwa-chrome",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
+      "name": "Debug with Chrome (web-app, local development server)",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "Start development server"
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }

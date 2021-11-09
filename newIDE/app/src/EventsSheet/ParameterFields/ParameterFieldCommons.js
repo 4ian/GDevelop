@@ -2,7 +2,7 @@
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
@@ -54,6 +54,10 @@ export type ParameterFieldProps = {|
 
   // The index of the parameter in the instruction or expression.
   parameterIndex?: number,
+|};
+
+export type ParameterFieldInterface = {|
+  focus: () => void,
 |};
 
 export const getParameterValueOrDefault = (

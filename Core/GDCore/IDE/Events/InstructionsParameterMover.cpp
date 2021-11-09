@@ -19,12 +19,15 @@ bool InstructionsParameterMover::DoVisitInstruction(
     gd::Instruction& instruction, bool isCondition) {
   if (instruction.GetType() == instructionType) {
     std::vector<gd::Expression> updatedParameters = instruction.GetParameters();
-    if (oldIndex < updatedParameters.size() ||
-        newIndex < updatedParameters.size()) {
-      gd::Expression movedParameter = updatedParameters[oldIndex];
+    if (oldIndex < updatedParameters.size()) {
+      gd::Expression movedParameter = updatedParameters.at(oldIndex);
       updatedParameters.erase(updatedParameters.begin() + oldIndex);
-      updatedParameters.insert(updatedParameters.begin() + newIndex,
-                               movedParameter);
+      if (newIndex < updatedParameters.size()) {
+        updatedParameters.insert(updatedParameters.begin() + newIndex,
+                                movedParameter);
+      } else {
+        updatedParameters.push_back(movedParameter);
+      }
       instruction.SetParameters(updatedParameters);
     }
   }

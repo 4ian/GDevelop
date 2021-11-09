@@ -1,4 +1,4 @@
-# Platformer Extension
+# Platformer Extension technical documentation
 
 ## Floor following
 
@@ -30,7 +30,7 @@ For further details on the implementation, please take a look at the comments in
 
 ### Vertical search
 
-The aim of the vertical search is to find the higher platform where the character can land.
+The aim of the vertical search is to find the highest platform where the character can land.
 There are 2 constraints:
 
 - `allowedMinDeltaY` how much the character can go upward
@@ -38,7 +38,7 @@ There are 2 constraints:
 
 During the search, these 2 constraints can tighten around the character.
 If they become incompatible, it means that the character can't go through the hole,
-it will go back to its original position and loose its speed.
+it will go back to its original position and lose its speed.
 
 There are also more obvious obstacles that cover the character in the middle and end the search directly.
 

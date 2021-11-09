@@ -469,9 +469,9 @@ namespace gdjs {
     createHowlerSound(
       soundName: string,
       isMusic: boolean,
-      volume,
-      loop,
-      rate
+      volume: float,
+      loop: boolean,
+      rate: float
     ): HowlerSound {
       const soundFile = this._getFileFromSoundName(soundName);
       const cacheContainer = isMusic ? this._loadedMusics : this._loadedSounds;

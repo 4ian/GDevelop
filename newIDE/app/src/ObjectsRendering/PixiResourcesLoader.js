@@ -4,7 +4,10 @@ import axios from 'axios';
 import * as PIXI from 'pixi.js-legacy';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
+import { getLocalResourceFullPath } from '../ResourcesList/ResourceUtils';
+import optionalRequire from '../Utils/OptionalRequire';
 const gd: libGDevelop = global.gd;
+const path = optionalRequire('path');
 
 const loadedBitmapFonts = {};
 const loadedFontFamilies = {};
@@ -96,8 +99,12 @@ export default class PixiResourcesLoader {
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.
    */
-  static getPIXITexture(project: gdProject, resourceName: string) {
-    if (loadedTextures[resourceName]) {
+  static getPIXITexture(
+    project: gdProject,
+    resourceName: string,
+    isNew: boolean = false
+  ) {
+    if (!isNew && loadedTextures[resourceName]) {
       // TODO: we never consider textures as not valid anymore. When we
       // update the IDE to unload textures, we should handle loading them again
       // here (and also be careful to return the same texture if it's not valid
@@ -122,6 +129,55 @@ export default class PixiResourcesLoader {
       loadedTextures[resourceName]
     );
     return loadedTextures[resourceName];
+  }
+
+  /**
+   * Return the PIXI texture relative to a file.
+   * If not loaded, it will load it.
+   * @returns The PIXI.Texture to be used. It can be loading, so you
+   * should listen to PIXI.Texture `update` event, and refresh your object
+   * if this event is triggered.
+   *
+   * If the texture image resource is missing, GDevelop will try to add it
+   */
+  static getPixiTextureRelativeToFile(
+    project: gdProject,
+    resourceName: string,
+    relativeToFile: string
+  ) {
+    if (!project.getResourcesManager().hasResource(resourceName)) {
+      const projectPath = path.dirname(project.getProjectFile());
+      const fullPathRelativeFile = path.dirname(
+        path.join(
+          projectPath,
+          project
+            .getResourcesManager()
+            .getResource(relativeToFile)
+            .getFile()
+        )
+      );
+      const fullPathNewResource = path.resolve(
+        fullPathRelativeFile,
+        resourceName
+      );
+      const resourceRelativePath = path.relative(
+        projectPath,
+        fullPathNewResource
+      );
+
+      const newResource = new gd.ImageResource();
+      newResource.setName(resourceName);
+      newResource.setFile(resourceRelativePath);
+      project.getResourcesManager().addResource(newResource);
+      console.log(
+        relativeToFile,
+        'file pulled a resource dependency:',
+        resourceName
+      );
+
+      return this.getPIXITexture(project, resourceName, true);
+    }
+    return this.getPIXITexture(project, resourceName);
   }
 
   /**
@@ -285,7 +341,7 @@ export default class PixiResourcesLoader {
       );
 
     const resource = project.getResourcesManager().getResource(resourceName);
-    if (resource.getKind() !== 'json')
+    if (resource.getKind() !== 'json' && resource.getKind() !== 'tilemap')
       return Promise.reject(
         new Error(`The resource called ${resourceName} is not a json file.`)
       );

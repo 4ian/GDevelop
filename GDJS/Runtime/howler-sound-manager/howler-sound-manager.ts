@@ -16,11 +16,23 @@ namespace gdjs {
   };
 
   /**
+   * Ensure the volume is between 0 and 1.
+   */
+  const clampVolume = (volume: float): float => {
+    if (volume > 1.0) {
+      return 1.0;
+    }
+    if (volume < 0) {
+      return 0;
+    }
+    return volume;
+  };
+
+  /**
    * A thin wrapper around a Howl object with:
    * * Handling of callbacks when the sound is not yet loaded.
    * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
-   *
-   * See https://github.com/goldfire/howler.js#methods for the full documentation.
+   * * Automatic clamping when calling `setVolume` so that the volume is always between 0 and 1.
    *
    * @memberof gdjs
    * @class HowlerSound
@@ -39,8 +51,9 @@ namespace gdjs {
 
     /**
      * The volume at which the sound is being played.
+     * This value is clamped between 0 and 1.
      */
-    private _volume: integer;
+    private _volume: float;
 
     /**
      * Whether the sound is being played in a loop or not.
@@ -49,6 +62,9 @@ namespace gdjs {
 
     /**
      * The rate (speed) the sound is being played at.
+     * This value is not clamped, though technically Howler.js will only
+     * accepts values between a specific range (so we clamp this when
+     * passing it to Howler.js, but keep the original value here).
      */
     private _rate: float;
 
@@ -64,7 +80,7 @@ namespace gdjs {
 
     constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
       this._howl = howl;
-      this._volume = volume;
+      this._volume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
     }
@@ -86,9 +102,12 @@ namespace gdjs {
           this._id === null ? '__default' : this._id
         );
         this._id = newID;
+
         // Set the howl properties as soon as the sound is played and we have its ID.
-        this._howl.volume(this._volume, newID);
+        this._howl.volume(this._volume, newID); // this._volume is already clamped between 0 and 1.
         this._howl.loop(this._loop, newID);
+        // this._rate is not clamped, but we need to clamp it when passing it to Howler.js as it
+        // only supports a specific range.
         this._howl.rate(gdjs.HowlerSoundManager.clampRate(this._rate), newID);
 
         // Manually handle the play event before we have an ID.
@@ -128,6 +147,9 @@ namespace gdjs {
 
     /**
      * Check if the sound is currently playing.
+     * Note that a loading sound is considered as playing (as it will be
+     * played as soon as it's loaded). To avoid loading at runtime, prefer
+     * to preload the sounds.
      */
     playing(): boolean {
       return (
@@ -151,7 +173,10 @@ namespace gdjs {
     }
 
     /**
-     * Get the sound playback rate.
+     * Get the sound playback rate. This 1 for the default speed.
+     * This value is not clamped (any value greater than 0 is valid),
+     * but the underlying audio system might not play the sound at the required
+     * rate if it's very low or very high.
      */
     getRate(): float {
       return this._rate;
@@ -159,6 +184,9 @@ namespace gdjs {
 
     /**
      * Set the playback rate.
+     * This value is not clamped (any value greater than 0 is valid),
+     * but the underlying audio system might not play the sound at the required
+     * rate if it's very low or very high.
      * @returns The current instance for chaining.
      */
     setRate(rate: float): this {
@@ -200,13 +228,14 @@ namespace gdjs {
 
     /**
      * Set the sound volume.
-     * @param volume A float from 0 to 1.
+     * @param volume A float from 0 to 1. The value is clamped if too high or too low.
      * @returns The current instance for chaining.
      */
     setVolume(volume: float): this {
-      this._volume = volume;
+      this._volume = clampVolume(volume);
+
       // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) this._howl.volume(volume, this._id);
+      if (this._id !== null) this._howl.volume(this._volume, this._id);
       return this;
     }
 

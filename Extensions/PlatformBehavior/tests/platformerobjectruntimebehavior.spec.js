@@ -477,6 +477,117 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
+  describe('Floating-point error mitigation', function () {
+    it('Specific coordinates with slopeMaxAngle=0 creating Y oscillations and drift on a moving floor', function () {
+      const runtimeScene = makeTestRuntimeScene();
+
+      // Create a Sprite object that has the origin at a specific position (see below)
+      // and that has a slope max angle of 0 (so it can't climb on a floor even if it's a bit higher
+      // than the bottom of the object).
+      const object = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 1300,
+            maxFallingSpeed: 1000,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 280,
+            jumpSpeed: 750,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 0,
+            jumpSustainTime: 0.2,
+          },
+        ],
+        effects: [],
+        animations: [
+          {
+            name: 'animation',
+            directions: [
+              {
+                sprites: [
+                  {
+                    originPoint: { x: 5, y: 19 },
+                    centerPoint: { x: 5, y: 46 },
+                    points: [
+                      { name: 'Center', x: 5, y: 46 },
+                      { name: 'Origin', x: 5, y: 19 },
+                    ],
+                    hasCustomCollisionMask: false,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      // Set the size of the object so that it results in a specific
+      // Y position for the bottom of the object AABB:
+      object.setUnscaledWidthAndHeight(10, 92);
+      object.setCustomWidthAndHeight(10, 66.0008);
+      // Origin Y is originally 19.
+      // After the scaling, it is now 19*66.0008/92=13.6306.
+
+      // Set the Y position so that the object falls at a Y position on the floor
+      // that would generate oscillations.
+      object.setPosition(0, 139.3118);
+      runtimeScene.addObject(object);
+
+      // Put a platform at a specific Y that can cause oscillations.
+      const platform = addJumpThroughPlatformObject(runtimeScene);
+      platform.setPosition(0, 193.000000000001);
+      // This means that the exact Y position the object should take is:
+      // platform Y - height + origin Y = 193.000000000001-66.0008+13.6306 = 140.6298
+
+      // Wait for the object to fall on the floor
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(false);
+
+      // Ensure it is on the floor
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      // The Y position won't be exact because of floating point errors.
+      // expect(object.getY()).to.be(140.6298)
+      expect(object.getY()).to.be.within(140.6297999, 140.6298001);
+
+      // Move the platform by 6 pixels to the right.
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+      platform.setX(platform.getX() + 1);
+      runtimeScene.renderAndStep(1000 / 60);
+      // console.log({x: object.getX(), y: object.getY()});
+
+      // Ensure the object followed the platform on the X axis.
+      // If the floating point errors caused oscillations between two Y positions,
+      // it won't work because the object will get repositioned back to its old X position
+      // whenever the floor is considered "too high" for the object to reach.
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getY()).to.be.within(140.6297999, 140.6298001);
+      expect(object.getX()).to.be(6);
+    });
+  });
+
   describe('(grab platforms)', function () {
     let runtimeScene;
     let object;

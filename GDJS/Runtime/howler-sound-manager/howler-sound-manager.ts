@@ -16,11 +16,23 @@ namespace gdjs {
   };
 
   /**
+   * Ensure the volume is between 0 and 1.
+   */
+  const clampVolume = (volume: float): float => {
+    if (volume > 1.0) {
+      return 1.0;
+    }
+    if (volume < 0) {
+      return 0;
+    }
+    return volume;
+  };
+
+  /**
    * A thin wrapper around a Howl object with:
    * * Handling of callbacks when the sound is not yet loaded.
    * * Automatic clamping when calling `setRate` to ensure a valid value is passed to Howler.js.
-   *
-   * See https://github.com/goldfire/howler.js#methods for the full documentation.
+   * * Automatic clamping when calling `setVolume` so that the volume is always between 0 and 1.
    *
    * @memberof gdjs
    * @class HowlerSound
@@ -38,9 +50,9 @@ namespace gdjs {
     private _howl: Howl;
 
     /**
-     * The volume at which the sound is being played.
+     * The volume at which the sound is being played (between 0 and 1).
      */
-    private _volume: integer;
+    private _volume: float;
 
     /**
      * Whether the sound is being played in a loop or not.
@@ -64,7 +76,7 @@ namespace gdjs {
 
     constructor(howl: Howl, volume: float, loop: boolean, rate: float) {
       this._howl = howl;
-      this._volume = volume;
+      this._volume = clampVolume(volume);
       this._loop = loop;
       this._rate = rate;
     }
@@ -204,9 +216,10 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     setVolume(volume: float): this {
-      this._volume = volume;
+      this._volume = clampVolume(volume);
+
       // If the sound has already started playing, then change the value directly.
-      if (this._id !== null) this._howl.volume(volume, this._id);
+      if (this._id !== null) this._howl.volume(this._volume, this._id);
       return this;
     }
 

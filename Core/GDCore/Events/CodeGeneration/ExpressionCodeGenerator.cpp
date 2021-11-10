@@ -109,8 +109,8 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   if (node.child) node.child->Visit(*this);
 }
 
-void ExpressionCodeGenerator::OnVisitImplicitVariableCastNode(
-    ImplicitVariableCastNode& node) {
+void ExpressionCodeGenerator::OnVisitVariableExpressionNode(
+    VariableExpressionNode& node) {
   output += "((";
   node.child->Visit(*this);
   output += ")";

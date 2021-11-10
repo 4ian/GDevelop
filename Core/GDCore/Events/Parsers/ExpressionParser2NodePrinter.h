@@ -78,7 +78,7 @@ class GD_CORE_API ExpressionParser2NodePrinter
     output += node.name;
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitImplicitVariableCastNode(ImplicitVariableCastNode& node) override {
+  void OnVisitVariableExpressionNode(VariableExpressionNode& node) override {
     output += "(";
     node.child->Visit(*this);
     output += ")<implicitely casted to " + node.type + ">";

@@ -97,8 +97,8 @@ class GD_CORE_API ExpressionNodeLocationFinder
       if (node.child) node.child->Visit(*this);
     }
   }
-  void OnVisitImplicitVariableCastNode(
-      ImplicitVariableCastNode& node) override {
+  void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) override {
     // This node is implicit, it is not present in the expression text, and
     // therefore has no positon to check.
     node.child->Visit(*this);

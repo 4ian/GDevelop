@@ -72,7 +72,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   void OnVisitVariableNode(VariableNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitImplicitVariableCastNode(ImplicitVariableCastNode& node) override {
+  void OnVisitVariableExpressionNode(VariableExpressionNode& node) override {
     node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
@@ -155,7 +155,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   void OnVisitVariableNode(VariableNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitImplicitVariableCastNode(ImplicitVariableCastNode& node) override {
+  void OnVisitVariableExpressionNode(VariableExpressionNode& node) override {
     node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {

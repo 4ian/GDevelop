@@ -284,7 +284,7 @@ class GD_CORE_API ExpressionParser2 {
   };
 
   std::unique_ptr<
-      IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode>
+      IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode>
   Identifier(const gd::String &type) {
     auto identifierAndLocation = ReadIdentifierName();
     gd::String name = identifierAndLocation.name;
@@ -313,22 +313,22 @@ class GD_CORE_API ExpressionParser2 {
     if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
       std::unique_ptr<
-          FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode>
+          FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
           function = FreeFunction(
               type, name, nameLocation, openingParenthesisLocation);
       if (function->type == "variable")
-        return gd::make_unique<ImplicitVariableCastNode>(type, std::move(function));
+        return gd::make_unique<VariableExpressionNode>(type, std::move(function));
       else
         return function;
     } else if (CheckIfChar(IsDot)) {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
       std::unique_ptr<
-          FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode>
+          FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
           function = ObjectFunctionOrBehaviorFunction(
               type, name, nameLocation, dotLocation);
       if (function->type == "variable")
-        return gd::make_unique<ImplicitVariableCastNode>(type, std::move(function));
+        return gd::make_unique<VariableExpressionNode>(type, std::move(function));
       else
         return function;
     } else {
@@ -456,7 +456,7 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<
-      FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode>
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
   ObjectFunctionOrBehaviorFunction(
       const gd::String &type,
       const gd::String &objectName,
@@ -538,7 +538,7 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<
-      FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode>
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
   BehaviorFunction(
       const gd::String &type,
       const gd::String &objectName,

@@ -92,7 +92,7 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
   node.factor->Visit(*this);
 };
 
-void UsedExtensionsFinder::OnVisitImplicitVariableCastNode(ImplicitVariableCastNode& node) {
+void UsedExtensionsFinder::OnVisitVariableExpressionNode(VariableExpressionNode& node) {
   node.child->Visit(*this);
 }
 

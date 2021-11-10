@@ -17,12 +17,12 @@ struct VariableNode;
 struct VariableAccessorNode;
 struct VariableBracketAccessorNode;
 struct
-    IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode;
+    IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode;
 struct IdentifierNode;
-struct FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode;
+struct FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode;
 struct ObjectFunctionNameNode;
 struct FunctionCallNode;
-struct ImplicitVariableCastNode;
+struct VariableExpressionNode;
 struct EmptyNode;
 }  // namespace gd
 
@@ -46,13 +46,13 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   friend struct VariableAccessorNode;
   friend struct VariableBracketAccessorNode;
   friend struct
-      IdentifierOrFunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode;
+      IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode;
   friend struct IdentifierNode;
   friend struct
-      FunctionCallOrObjectFunctionNameOrImplicitVariableCastOrEmptyNode;
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode;
   friend struct ObjectFunctionNameNode;
   friend struct FunctionCallNode;
-  friend struct ImplicitVariableCastNode;
+  friend struct VariableExpressionNode;
   friend struct EmptyNode;
 
  public:
@@ -65,8 +65,8 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   virtual void OnVisitNumberNode(NumberNode& node) = 0;
   virtual void OnVisitTextNode(TextNode& node) = 0;
   virtual void OnVisitVariableNode(VariableNode& node) = 0;
-  virtual void OnVisitImplicitVariableCastNode(
-      ImplicitVariableCastNode& node) = 0;
+  virtual void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) = 0;
   virtual void OnVisitVariableAccessorNode(VariableAccessorNode& node) = 0;
   virtual void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) = 0;

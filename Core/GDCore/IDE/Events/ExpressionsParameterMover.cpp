@@ -67,8 +67,8 @@ class GD_CORE_API ExpressionParameterMover
   void OnVisitVariableNode(VariableNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitImplicitVariableCastNode(
-      ImplicitVariableCastNode& node) override {
+  void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) override {
     node.child->Visit(*this);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {

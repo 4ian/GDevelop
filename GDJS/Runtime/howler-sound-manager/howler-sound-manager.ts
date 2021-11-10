@@ -26,7 +26,7 @@ namespace gdjs {
       return 0;
     }
     return volume;
-  }
+  };
 
   /**
    * A thin wrapper around a Howl object with:

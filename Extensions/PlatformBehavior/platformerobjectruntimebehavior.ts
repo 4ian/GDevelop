@@ -353,6 +353,7 @@ namespace gdjs {
           // Use the same method as for following the floor.
           // This is to be consistent on all floor collision.
           // The object will land right on floor.
+
           const { highestGround } = this._findHighestFloorAndMoveOnTop(
             this._potentialCollidingObjects,
             0,
@@ -1187,6 +1188,12 @@ namespace gdjs {
           (slopeMaxAngle * 3.1415926) / 180.0
         );
       }
+
+      // Avoid a `_slopeClimbingFactor` set to exactly 0.
+      // Otherwise, this can lead the floor finding functions to consider
+      // a floor to be "too high" to reach, even if the object is very slighlty
+      // inside it, which can happen because of rounding errors.
+      // See "Floating-point error mitigations" tests.
       if (this._slopeClimbingFactor < 1 / 1024) {
         this._slopeClimbingFactor = 1 / 1024;
       }
@@ -1517,6 +1524,13 @@ namespace gdjs {
       if (object.getX() === oldX + behavior._requestedDeltaX) {
         // The character didn't encounter any obstacles on the X axis.
         // It follows the floor.
+
+        // In theory, this max delta on the Y axis could be 0. In practice,
+        // `behavior._slopeClimbingFactor` has a lower bound of 1 / 1024.
+        // This avoids this max delta Y to be strictly 0, which would then risk
+        // considering a floor "too high", even if the object is inside it because
+        // of a very small rounding error.
+        // See "Floating-point error mitigations" tests.
         const deltaMaxY = Math.abs(
           behavior._requestedDeltaX * behavior._slopeClimbingFactor
         );

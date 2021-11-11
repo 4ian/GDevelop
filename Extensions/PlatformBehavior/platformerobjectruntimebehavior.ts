@@ -1187,6 +1187,9 @@ namespace gdjs {
           (slopeMaxAngle * 3.1415926) / 180.0
         );
       }
+      if (this._slopeClimbingFactor < 1 / 1024) {
+        this._slopeClimbingFactor = 1 / 1024;
+      }
     }
 
     /**

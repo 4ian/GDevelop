@@ -477,7 +477,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('Floating-point error mitigation', function () {
+  describe('Floating-point error mitigations', function () {
     it('Specific coordinates with slopeMaxAngle=0 creating Y oscillations and drift on a moving floor', function () {
       const runtimeScene = makeTestRuntimeScene();
 
@@ -560,22 +560,16 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Move the platform by 6 pixels to the right.
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
       platform.setX(platform.getX() + 1);
       runtimeScene.renderAndStep(1000 / 60);
-      // console.log({x: object.getX(), y: object.getY()});
 
       // Ensure the object followed the platform on the X axis.
       // If the floating point errors caused oscillations between two Y positions,

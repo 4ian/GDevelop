@@ -2462,6 +2462,9 @@ interface SpriteObject {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
+    boolean GetUpdateIfNotVisible();
 };
 SpriteObject implements gdObject;
 

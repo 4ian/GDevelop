@@ -116,6 +116,18 @@ class GD_CORE_API SpriteObject : public gd::Object {
    * animation of the object.
    */
   const std::vector<Animation>& GetAllAnimations() const { return animations; }
+
+  /**
+   * \brief Set if the object animation should be played even if the object is hidden
+   * or far from the camera.
+   */
+  void SetUpdateIfNotVisible(bool updateIfNotVisible_) { updateIfNotVisible = updateIfNotVisible_; }
+
+  /**
+   * \brief Check if the object animation should be played even if the object is hidden
+   * or far from the camera (false by default).
+   */
+  bool GetUpdateIfNotVisible() const { return updateIfNotVisible; }
   ///@}
 
  private:

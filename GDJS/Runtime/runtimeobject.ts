@@ -1724,7 +1724,10 @@ namespace gdjs {
       // Apply the longest projected vector if they all are in the same direction
       // Some projections could have rounding errors,
       // they are considered negligible under a 1 for 1,000,000 ratio.
-      if ((-scalarProductMin < scalarProductMax / 1048576) !== (scalarProductMax < -scalarProductMin / 1048576)) {
+      if (
+        -scalarProductMin < scalarProductMax / 1048576 !==
+        scalarProductMax < -scalarProductMin / 1048576
+      ) {
         if (scalarProductMin !== 0) {
           deltaX += scalarProductMin * vX;
           deltaY += scalarProductMin * vY;

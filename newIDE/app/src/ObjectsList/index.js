@@ -44,7 +44,7 @@ import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 

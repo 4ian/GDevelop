@@ -56,7 +56,7 @@ import { IconContainer } from '../UI/IconContainer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { textEllispsisStyle } from '../UI/TextEllipsis';
 

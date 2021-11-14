@@ -59,16 +59,22 @@ const addSearchParameterToUrl = (
   urlEncodedParameterName: string,
   urlEncodedValue: string
 ) => {
+  if (url.startsWith('data:') || url.startsWith('blob:')) {
+    // blob/data protocol does not support search parameters, which are useless anyway.
+    return url;
+  }
+
   const separator = url.indexOf('?') === -1 ? '?' : '&';
   return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
 };
 
 const isLocalFile = (urlOrFilename: string) => {
-  return (
-    urlOrFilename.indexOf('data:') !== 0 &&
-    urlOrFilename.indexOf('http://') !== 0 &&
-    urlOrFilename.indexOf('https://') !== 0 &&
-    urlOrFilename.indexOf('ftp://') !== 0
+  return !(
+    urlOrFilename.startsWith('http://') ||
+    urlOrFilename.startsWith('https://') ||
+    urlOrFilename.startsWith('ftp://') ||
+    urlOrFilename.startsWith('blob:') ||
+    urlOrFilename.startsWith('data:')
   );
 };
 

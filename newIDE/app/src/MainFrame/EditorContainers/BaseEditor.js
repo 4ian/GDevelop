@@ -5,7 +5,7 @@ import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';

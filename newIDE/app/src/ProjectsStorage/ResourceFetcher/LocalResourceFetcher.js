@@ -8,7 +8,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 
-const isExternalUrl = (filename: string) => {
+const isFetchableUrl = (filename: string) => {
   return (
     filename.startsWith('http://') ||
     filename.startsWith('https://') ||
@@ -23,7 +23,7 @@ const getResourcesToFetch = (project: gdProject): Array<string> => {
   return allResourceNames.filter(resourceName => {
     const resource = resourcesManager.getResource(resourceName);
 
-    return isExternalUrl(resource.getFile());
+    return isFetchableUrl(resource.getFile());
   });
 };
 

@@ -30,7 +30,7 @@ import { LoadingScreenEditor } from './LoadingScreenEditor';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   type HotReloadPreviewButtonProps,
@@ -439,7 +439,7 @@ function ProjectPropertiesDialog(props: Props) {
                   />
                   <SemiControlledTextField
                     floatingLabelText={
-                      <Trans>Maximum FPS (0 to disable)</Trans>
+                      <Trans>Maximum FPS (0 for unlimited)</Trans>
                     }
                     fullWidth
                     type="number"

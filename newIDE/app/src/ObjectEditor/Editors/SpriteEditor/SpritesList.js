@@ -20,7 +20,7 @@ import ResourcesLoader from '../../../ResourcesLoader';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../../ResourcesList/ResourceSource.flow';
+} from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { applyResourceDefaults } from '../../../ResourcesList/ResourceUtils';
 import FlatButton from '../../../UI/FlatButton';
@@ -194,7 +194,13 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    onChooseResource(sources[0].name).then(resources => {
+    onChooseResource({
+      // Should be updated once new sources are introduced in the desktop app.
+      // Search for "sources[0]" in the codebase for other places like this.
+      initialSourceName: sources[0].name,
+      multiSelection: true,
+      resourceKind: 'image',
+    }).then(resources => {
       resources.forEach(resource => {
         applyResourceDefaults(project, resource);
         project.getResourcesManager().addResource(resource);

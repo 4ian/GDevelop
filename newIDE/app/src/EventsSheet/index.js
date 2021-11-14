@@ -54,7 +54,7 @@ import SearchPanel, { type SearchPanelInterface } from './SearchPanel';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import EventsSearcher, {
   type ReplaceInEventsInputs,

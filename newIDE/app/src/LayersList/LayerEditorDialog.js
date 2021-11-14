@@ -17,7 +17,7 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,

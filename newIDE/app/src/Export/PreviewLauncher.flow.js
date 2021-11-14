@@ -65,7 +65,6 @@ export type ServerAddress = {
 export type PreviewDebuggerServer = {|
   startServer: () => Promise<void>,
   getServerState: () => 'started' | 'stopped',
-  getServerAddress: () => ?ServerAddress,
   getExistingDebuggerIds: () => Array<DebuggerId>,
   sendMessage: (id: DebuggerId, message: Object) => void,
   registerCallbacks: (callbacks: PreviewDebuggerServerCallbacks) => () => void,

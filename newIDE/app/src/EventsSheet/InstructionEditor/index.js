@@ -6,7 +6,7 @@ import InstructionParametersEditor from './InstructionParametersEditor.js';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 

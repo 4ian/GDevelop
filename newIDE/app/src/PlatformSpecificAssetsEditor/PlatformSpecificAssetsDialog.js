@@ -11,7 +11,7 @@ import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWith
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
@@ -99,7 +99,13 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     const sources = resourceSources.filter(source => source.kind === 'image');
     if (!sources.length) return;
 
-    onChooseResource(sources[0].name, false).then(resources => {
+    onChooseResource({
+      // Should be updated once new sources are introduced in the desktop app.
+      // Search for "sources[0]" in the codebase for other places like this.
+      initialSourceName: sources[0].name,
+      multiSelection: false,
+      resourceKind: 'image',
+    }).then(resources => {
       if (!resources.length || !path) {
         return;
       }

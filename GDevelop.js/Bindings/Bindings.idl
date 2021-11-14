@@ -2462,6 +2462,9 @@ interface SpriteObject {
     boolean HasNoAnimations();
     void SwapAnimations(unsigned long first, unsigned long second);
     void MoveAnimation(unsigned long oldIndex, unsigned long newIndex);
+
+    void SetUpdateIfNotVisible(boolean updateIfNotVisible);
+    boolean GetUpdateIfNotVisible();
 };
 SpriteObject implements gdObject;
 
@@ -2706,7 +2709,8 @@ interface EventsFunctionsExtensionCodeGenerator {
 [Prefix="gdjs::"]
 interface PreviewExportOptions {
     void PreviewExportOptions([Ref] Project project, [Const] DOMString outputPath);
-    [Ref] PreviewExportOptions SetDebuggerServerAddress([Const] DOMString address, [Const] DOMString port);
+    [Ref] PreviewExportOptions UseWebsocketDebuggerClientWithServerAddress([Const] DOMString address, [Const] DOMString port);
+    [Ref] PreviewExportOptions UseWindowMessageDebuggerClient();
     [Ref] PreviewExportOptions SetLayoutName([Const] DOMString layoutName);
     [Ref] PreviewExportOptions SetExternalLayoutName([Const] DOMString externalLayoutName);
     [Ref] PreviewExportOptions SetIncludeFileHash([Const] DOMString includeFile, long hash);

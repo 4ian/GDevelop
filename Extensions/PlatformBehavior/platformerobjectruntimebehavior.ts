@@ -770,7 +770,12 @@ namespace gdjs {
         return context;
       }
 
-      for (const hitbox of platformObject.getHitBoxes()) {
+      for (const hitbox of platformObject.getHitBoxesAround(
+        context.ownerMinX,
+        context.headMinY,
+        context.ownerMaxX,
+        context.floorMaxY
+      )) {
         if (hitbox.vertices.length < 3) {
           continue;
         }

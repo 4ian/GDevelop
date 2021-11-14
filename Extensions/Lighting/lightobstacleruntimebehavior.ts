@@ -87,12 +87,16 @@ namespace gdjs {
     _manager: any;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._manager = LightObstaclesManager.getManager(runtimeScene);
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       // Make sure the obstacle is or is not in the obstacles manager.
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);

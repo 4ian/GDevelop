@@ -1232,11 +1232,14 @@ namespace gdjs {
 
     //Hit boxes and collision :
     /**
-     * Get the hit boxes for the object.<br>
-     * The default implementation returns a basic bouding box based the size (getWidth and
+     * Get all the hit boxes for the object.
+     *
+     * For collision checks, {@link getHitBoxesAround} should be used instead.
+     *
+     * The default implementation returns a basic bounding box based the size (getWidth and
      * getHeight) and the center point of the object (getCenterX and getCenterY).
      *
-     * You should probably redefine updateHitBoxes instead of this function.
+     * You should probably redefine {@link updateHitBoxes} instead of this function.
      *
      * @return An array composed of polygon.
      */
@@ -1251,6 +1254,37 @@ namespace gdjs {
         this.hitBoxesDirty = false;
       }
       return this.hitBoxes;
+    }
+
+    /**
+     * Get the hit boxes for the object around a given area.
+     * The hit boxes don't need to actually overlapping the area,
+     * but the ones that do must be returned.
+     *
+     * The default implementation returns the same as {@link getHitBoxes}.
+     *
+     * This method can be override by grid based objects to optimize collision checks.
+     *
+     * When overriding this method, the following ones should be overridden too:
+     * * {@link getHitBoxes}
+     * * {@link getAABB}
+     * * {@link updateHitBoxes}
+     * * {@link updateAABB}
+     *
+     * @param left bound of the area
+     * @param top bound of the area
+     * @param right bound of the area
+     * @param bottom bound of the area
+     *
+     * @return The hitboxes polygons that are near the given area.
+     */
+    getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ): Iterable<gdjs.Polygon> {
+      return this.getHitBoxes();
     }
 
     /**
@@ -1606,14 +1640,23 @@ namespace gdjs {
       moveXArray.length = 0;
       moveYArray.length = 0;
 
+      // We can assume that the moving object is not grid based
+      // So there is no need for optimization
+      // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
+      const aabb = this.getAABB();
 
       // Check if their is a collision with each object
       for (const otherObject of objects) {
         if (otherObject.id === this.id) {
           continue;
         }
-        const otherHitBoxes = otherObject.getHitBoxes();
+        const otherHitBoxes = otherObject.getHitBoxesAround(
+          aabb.min[0],
+          aabb.min[1],
+          aabb.max[0],
+          aabb.max[1]
+        );
         for (const hitBox of hitBoxes) {
           for (const otherHitBox of otherHitBoxes) {
             const result = gdjs.Polygon.collisionTest(
@@ -1649,6 +1692,7 @@ namespace gdjs {
       moveYArray.length = 0;
 
       const hitBoxes = this.getHitBoxes();
+      const aabb = this.getAABB();
 
       for (const name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
@@ -1659,7 +1703,12 @@ namespace gdjs {
             if (otherObject.id === this.id) {
               continue;
             }
-            const otherHitBoxes = otherObject.getHitBoxes();
+            const otherHitBoxes = otherObject.getHitBoxesAround(
+              aabb.min[0],
+              aabb.min[1],
+              aabb.max[0],
+              aabb.max[1]
+            );
             for (const hitBox of hitBoxes) {
               for (const otherHitBox of otherHitBoxes) {
                 const result = gdjs.Polygon.collisionTest(
@@ -2046,16 +2095,26 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      const hitBoxes1 = obj1.getHitBoxes();
-      const hitBoxes2 = obj2.getHitBoxes();
-      for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
-        for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+      const aabb1 = obj1.getAABB();
+      const aabb2 = obj2.getAABB();
+      const hitBoxes1 = obj1.getHitBoxesAround(
+        aabb1.min[0],
+        aabb1.min[1],
+        aabb1.max[0],
+        aabb1.max[1]
+      );
+      const hitBoxes2 = obj2.getHitBoxesAround(
+        aabb2.min[0],
+        aabb2.min[1],
+        aabb2.max[0],
+        aabb2.max[1]
+      );
+
+      for (const hitBox1 of hitBoxes1) {
+        for (const hitBox2 of hitBoxes2) {
           if (
-            gdjs.Polygon.collisionTest(
-              hitBoxes1[k],
-              hitBoxes2[l],
-              ignoreTouchingEdges
-            ).collision
+            gdjs.Polygon.collisionTest(hitBox1, hitBox2, ignoreTouchingEdges)
+              .collision
           ) {
             return true;
           }
@@ -2113,9 +2172,9 @@ namespace gdjs {
 
       // Do a real check if necessary.
       let testSqDist = closest ? raySqBoundingRadius : 0;
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < hitBoxes.length; i++) {
-        const res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+      const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+      for (const hitBox of hitBoxes) {
+        const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
         if (res.collision) {
           if (closest && res.closeSqDist < testSqDist) {
             testSqDist = res.closeSqDist;
@@ -2203,9 +2262,9 @@ namespace gdjs {
      * @return true if the point is inside the object collision hitboxes.
      */
     isCollidingWithPoint(pointX: float, pointY: float): boolean {
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < this.hitBoxes.length; ++i) {
-        if (gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY)) {
+      const hitBoxes = this.getHitBoxesAround(pointX, pointY, pointX, pointY);
+      for (const hitBox of hitBoxes) {
+        if (gdjs.Polygon.isPointInside(hitBox, pointX, pointY)) {
           return true;
         }
       }

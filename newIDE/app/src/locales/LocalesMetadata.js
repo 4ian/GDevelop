@@ -11,7 +11,7 @@ module.exports = [
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اللغة العربية",
-    "translationRatio": 0.3258992805755395
+    "translationRatio": 0.3278776978417266
   },
   {
     "languageCode": "az_AZ",
@@ -53,7 +53,7 @@ module.exports = [
     "languageCode": "de_DE",
     "languageName": "German",
     "languageNativeName": "Deutsch",
-    "translationRatio": 0.7192446043165468
+    "translationRatio": 0.7205035971223022
   },
   {
     "languageCode": "el_GR",
@@ -77,7 +77,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9861510791366906
+    "translationRatio": 0.9884892086330935
   },
   {
     "languageCode": "fa_IR",
@@ -101,7 +101,7 @@ module.exports = [
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.983273381294964
+    "translationRatio": 0.9836330935251798
   },
   {
     "languageCode": "ha_HG",
@@ -131,19 +131,19 @@ module.exports = [
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0.4881294964028777
+    "translationRatio": 0.5161870503597122
   },
   {
     "languageCode": "it_IT",
     "languageName": "Italian",
     "languageNativeName": "Italiano",
-    "translationRatio": 0.9287769784172661
+    "translationRatio": 0.9386690647482014
   },
   {
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9902877697841727
+    "translationRatio": 0.9906474820143885
   },
   {
     "languageCode": "km_KH",
@@ -215,7 +215,7 @@ module.exports = [
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.9586330935251799
+    "translationRatio": 0.9589928057553957
   },
   {
     "languageCode": "pt_PT",
@@ -311,7 +311,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9931654676258993
+    "translationRatio": 0.9935251798561151
   },
   {
     "languageCode": "zh_TW",

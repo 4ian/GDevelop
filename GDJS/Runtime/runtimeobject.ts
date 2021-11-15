@@ -1691,6 +1691,9 @@ namespace gdjs {
       moveXArray.length = 0;
       moveYArray.length = 0;
 
+      // We can assume that the moving object is not grid based
+      // So there is no need for optimization
+      // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
       const aabb = this.getAABB();
 

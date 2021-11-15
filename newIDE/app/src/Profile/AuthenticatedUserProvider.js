@@ -6,6 +6,7 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
+import { getUserBadges } from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -225,6 +226,18 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user limits:', error);
+      }
+    );
+    getUserBadges(firebaseUser.uid).then(
+      badges =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            badges,
+          },
+        })),
+      error => {
+        console.error('Error while loading user badges:', error);
       }
     );
 

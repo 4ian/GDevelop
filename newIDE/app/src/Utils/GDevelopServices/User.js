@@ -17,6 +17,13 @@ export type UserPublicProfileByIds = {|
   [key: string]: UserPublicProfile,
 |};
 
+export type Badge = {|
+  seen: boolean,
+  unlockedAt: string,
+  userId: string,
+  achievementId: string,
+|};
+
 export const searchUserPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfileSearch>> => {
@@ -26,6 +33,12 @@ export const searchUserPublicProfilesByUsername = (
         username: searchString,
       },
     })
+    .then(response => response.data);
+};
+
+export const getUserBadges = (id: string): Promise<Array<Badge>> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
     .then(response => response.data);
 };
 

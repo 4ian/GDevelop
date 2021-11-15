@@ -1,7 +1,13 @@
-// @ts-check
+// @flow
 import React from 'react';
+
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
+import { type Badge } from '../../Utils/GDevelopServices/User';
+
+type Props = {|
+  badges: Array<Badge>,
+|};
 
 const styles = {
   achievementsContainer: {
@@ -10,22 +16,14 @@ const styles = {
   },
 };
 
-const AchievementList = props => {
-  const achievements = [
-    'First tweet',
-    'First Publication',
-    '1000 players',
-    '1000 players',
-    '1000 players',
-    '1000 players',
-    '1000 players',
-  ];
+const AchievementList = ({ badges }: Props) => {
+  console.log(badges);
   return (
     <Column>
       <div style={styles.achievementsContainer}>
-        {achievements.map(achievement => (
+        {badges.map(badge => (
           <Line>
-            <Text>{achievement}</Text>
+            <Text>{badge.achievementId}</Text>
           </Line>
         ))}
       </div>

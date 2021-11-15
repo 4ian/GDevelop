@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
+import { type Badge } from '../Utils/GDevelopServices/User';
 import {
   type Limits,
   type Usages,
@@ -12,6 +13,7 @@ export type AuthenticatedUser = {|
   authenticated: boolean,
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
+  badges: ?Array<Badge>,
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
@@ -30,6 +32,7 @@ export const initialAuthenticatedUser = {
   authenticated: false,
   firebaseUser: null,
   profile: null,
+  badges: null,
   subscription: null,
   usages: null,
   limits: null,

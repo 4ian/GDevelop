@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Tilemap object');
   /**
    * Displays a Tilemap object (mapeditor.org supported).
    * @memberof gdjs
@@ -15,7 +16,8 @@ namespace gdjs {
     _layerIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
-    _renderer: any;
+    _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
+    _collisionTileMap: gdjs.TileMap.CollisionTileMap;
 
     constructor(runtimeScene, objectData) {
       super(runtimeScene, objectData);
@@ -27,18 +29,12 @@ namespace gdjs {
       this._layerIndex = objectData.content.layerIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
-      if (this._renderer) {
-        gdjs.TileMapRuntimeObjectRenderer.call(
-          this._renderer,
-          this,
-          runtimeScene
-        );
-      } else {
-        this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
-          this,
-          runtimeScene
-        );
-      }
+      this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
+        this,
+        runtimeScene
+      );
+      this._collisionTileMap = new gdjs.TileMap.CollisionTileMap(0, 0, new Map());
+      this._updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
@@ -55,7 +51,7 @@ namespace gdjs {
       const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
       this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
       while (this._frameElapsedTime > 1 / this._animationFps) {
-        this._renderer.incrementAnimationFrameX();
+        this._renderer.incrementAnimationFrameX(runtimeScene);
         this._frameElapsedTime -= 1 / this._animationFps;
       }
     }
@@ -118,12 +114,52 @@ namespace gdjs {
       }
     }
 
+    private _updateTileMap(): void {
+      this._runtimeScene
+        .getGame()
+        .getJsonManager()
+        .loadJson(this._tilemapJsonFile, (error, tileMapJsonData) => {
+          if (error) {
+            logger.error(
+              'An error happened while loading a Tilemap JSON data:',
+              error
+            );
+            return;
+          }
+          const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
+          if (this._tilesetJsonFile) {
+            this._runtimeScene
+              .getGame()
+              .getJsonManager()
+              .loadJson(
+                this._tilesetJsonFile,
+                (error, tilesetJsonData) => {
+                  if (error) {
+                    logger.error(
+                      'An error happened while loading Tileset JSON data:',
+                      error
+                    );
+                    return;
+                  }
+                  const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
+                  tiledMap.tilesets = [tileSet];
+                  this._renderer.loadTileMapWithTileset(tiledMap);
+                  this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(tiledMap);
+                }
+              );
+          } else {
+            this._renderer.loadTileMapWithTileset(tiledMap);
+            this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(tiledMap);
+          }
+        });
+    }
+
     /**
      * Set the Tilemap json file to display.
      */
     setTilemapJsonFile(tilemapJsonFile): void {
       this._tilemapJsonFile = tilemapJsonFile;
-      this._renderer.updateTileMap();
+      this._updateTileMap();
     }
 
     getTilemapJsonFile() {
@@ -136,7 +172,7 @@ namespace gdjs {
 
     setTilesetJsonFile(tilesetJsonFile) {
       this._tilesetJsonFile = tilesetJsonFile;
-      this._renderer.updateTileMap();
+      this._updateTileMap();
     }
     getTilesetJsonFile() {
       return this._tilesetJsonFile;
@@ -156,7 +192,7 @@ namespace gdjs {
 
     setDisplayMode(displayMode): void {
       this._displayMode = displayMode;
-      this._renderer.updateTileMap();
+      this._updateTileMap();
     }
 
     getDisplayMode() {
@@ -165,7 +201,7 @@ namespace gdjs {
 
     setLayerIndex(layerIndex): void {
       this._layerIndex = layerIndex;
-      this._renderer.updateTileMap();
+      this._updateTileMap();
     }
 
     getLayerIndex() {

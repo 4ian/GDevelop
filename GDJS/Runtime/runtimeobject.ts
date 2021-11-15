@@ -1695,7 +1695,7 @@ namespace gdjs {
       // So there is no need for optimization
       // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
-      const aabb = this.getAABB();
+      let aabb: AABB | null = null;
 
       for (const name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
@@ -1706,12 +1706,21 @@ namespace gdjs {
             if (otherObject.id === this.id) {
               continue;
             }
-            const otherHitBoxes = otherObject.getHitBoxesAround(
-              aabb.min[0],
-              aabb.min[1],
-              aabb.max[0],
-              aabb.max[1]
-            );
+            let otherHitBoxesArray = otherObject.getHitBoxes();
+            let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
+            if (otherHitBoxesArray.length > 4) {
+              // The other object has a lot of hit boxes.
+              // Try to reduce the amount of hitboxes to check.
+              if (!aabb) {
+                aabb = this.getAABB();
+              }
+              otherHitBoxes = otherObject.getHitBoxesAround(
+                aabb.min[0],
+                aabb.min[1],
+                aabb.max[0],
+                aabb.max[1]
+              );
+            }
             for (const hitBox of hitBoxes) {
               for (const otherHitBox of otherHitBoxes) {
                 const result = gdjs.Polygon.collisionTest(

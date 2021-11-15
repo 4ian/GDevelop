@@ -1,11 +1,19 @@
-// @ts-check
+// @flow
 
+import { Trans } from '@lingui/macro';
 import React from 'react';
+
 import { Column } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
+import { type Badge } from '../../Utils/GDevelopServices/User';
+
 import AchievementList from './AchievementList';
 import { ReactComponent as Trophy } from './resources/trophy.svg';
+
+type Props = {|
+  badges: ?Array<Badge>,
+|};
 
 const styles = {
   summary: {
@@ -23,18 +31,26 @@ const styles = {
   },
 };
 
-const UserAchievements = props => {
+const UserAchievements = ({ badges }: Props) => {
   return (
     <Column>
       <ResponsiveLineStackLayout>
         <div style={styles.leftContainer}>
           <div style={styles.summary}>
             <Trophy height="100px" />
-            <Text size="title">0/3 achievements</Text>
+            <Text size="title">
+              <Trans>{badges ? badges.length : 0}/3 achievements</Trans>
+            </Text>
           </div>
         </div>
         <div style={styles.rightContainer}>
-          <AchievementList />
+          {badges && badges.length > 0 ? (
+            <AchievementList badges={badges} />
+          ) : (
+            <Text>
+              <Trans>No achievement unlocked</Trans>
+            </Text>
+          )}
         </div>
       </ResponsiveLineStackLayout>
     </Column>

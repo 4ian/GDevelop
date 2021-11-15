@@ -9,6 +9,7 @@ import Text from '../../UI/Text';
 import { type Badge } from '../../Utils/GDevelopServices/User';
 
 import AchievementList from './AchievementList';
+// $FlowFixMe[missing-export] TODO: check that this is the correct way to import SVG in the project. If yes, follow https://github.com/facebook/flow/issues/7121.
 import { ReactComponent as Trophy } from './resources/trophy.svg';
 
 type Props = {|

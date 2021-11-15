@@ -155,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Rotate"),
                 _("Rotate an object, clockwise if the speed is positive, "
                   "counterclockwise otherwise."),
-                _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
+                _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")

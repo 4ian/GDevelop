@@ -2095,19 +2095,17 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      const aabb1 = obj1.getAABB();
-      const aabb2 = obj2.getAABB();
       const hitBoxes1 = obj1.getHitBoxesAround(
-        aabb1.min[0],
-        aabb1.min[1],
-        aabb1.max[0],
-        aabb1.max[1]
+        o2centerX - obj2BoundingRadius,
+        o2centerY - obj2BoundingRadius,
+        o2centerX + obj2BoundingRadius,
+        o2centerY + obj2BoundingRadius
       );
       const hitBoxes2 = obj2.getHitBoxesAround(
-        aabb2.min[0],
-        aabb2.min[1],
-        aabb2.max[0],
-        aabb2.max[1]
+        o1centerX - obj1BoundingRadius,
+        o1centerY - obj1BoundingRadius,
+        o1centerX + obj1BoundingRadius,
+        o1centerY + obj1BoundingRadius
       );
 
       for (const hitBox1 of hitBoxes1) {

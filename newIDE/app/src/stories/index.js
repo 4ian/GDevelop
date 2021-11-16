@@ -694,6 +694,36 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       )}
     />
   ))
+  .add('default, with translatable elements and a separator', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Click me',
+                onClick: action('Click me clicked'),
+              },
+              {
+                type: 'separator',
+              },
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Or click me',
+                onClick: action('Click me clicked'),
+              },
+            ]}
+          />
+        </React.Fragment>
+      )}
+    />
+  ))
   .add('default, with onClick for some elements', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}

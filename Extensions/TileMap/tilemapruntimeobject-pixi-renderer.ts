@@ -56,7 +56,7 @@ namespace gdjs {
             .getGame()
             .getImageManager()
             .getPIXITexture(textureName),
-            tileMapJsonData,
+        tileMapJsonData,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
         this._object._tilesetJsonFile

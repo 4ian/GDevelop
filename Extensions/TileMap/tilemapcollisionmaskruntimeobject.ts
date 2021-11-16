@@ -1,63 +1,66 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
   /**
-   * Displays a Tilemap object (mapeditor.org supported).
-   * @memberof gdjs
-   * @class TileMapRuntimeObject
+   *
    * @extends gdjs.RuntimeObject
    */
-  export class TileMapRuntimeObject extends gdjs.RuntimeObject {
-    _frameElapsedTime: float = 0;
-    _opacity: float;
+  export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
     _tilemapJsonFile: string;
     _tilesetJsonFile: string;
     _tilemapAtlasImage: string;
-    _displayMode: string;
     _layerIndex: integer;
-    _animationSpeedScale: number;
-    _animationFps: number;
-    _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
+    _renderer: gdjs.TileMapCollisionMaskRender;
+    _collisionTileMap: gdjs.TileMap.CollisionTileMap;
+    _typeFilter: string;
+
+    _fillColor: integer;
+    _outlineColor: integer;
+    _fillOpacity: float;
+    _outlineOpacity: float;
+    _outlineSize: float;
 
     constructor(runtimeScene, objectData) {
       super(runtimeScene, objectData);
-      this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
-      this._displayMode = objectData.content.displayMode;
       this._layerIndex = objectData.content.layerIndex;
-      this._animationSpeedScale = objectData.content.animationSpeedScale;
-      this._animationFps = objectData.content.animationFps;
-      this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
-        this,
-        runtimeScene
+      this._typeFilter = objectData.content.typeFilter;
+      this._fillColor = this.rgbToNumber(gdjs.rgbOrHexToRGBColor(objectData.content.fillColor));
+      this._outlineColor = this.rgbToNumber(gdjs.rgbOrHexToRGBColor(objectData.content.outlineColor));
+      this._fillOpacity = objectData.content.fillOpacity;
+      this._outlineOpacity = objectData.content.outlineOpacity;
+      this._outlineSize = 1;//objectData.content.outlineSize;
+      this._collisionTileMap = new gdjs.TileMap.CollisionTileMap(
+        1,
+        1,
+        0,
+        0,
+        new Map()
       );
+      this._renderer = new gdjs.TileMapCollisionMaskRender(this, runtimeScene);
       this._updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
 
+   rgbToNumber = function (components: [integer, integer, integer]
+   ): integer {
+     return (components[0] << 16) + (components[1] << 8) + components[2];
+   };
+
     getRendererObject() {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene): void {
-      if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
-        return;
-      }
-      const elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
-      this._frameElapsedTime += elapsedTime * this._animationSpeedScale;
-      while (this._frameElapsedTime > 1 / this._animationFps) {
-        this._renderer.incrementAnimationFrameX(runtimeScene);
-        this._frameElapsedTime -= 1 / this._animationFps;
-      }
+    getVisibilityAABB() {
+      return null;
     }
 
+    update(runtimeScene): void {}
+
     updateFromObjectData(oldObjectData: any, newObjectData: any): boolean {
-      if (oldObjectData.content.opacity !== newObjectData.content.opacity) {
-        this.setOpacity(newObjectData.content.opacity);
-      }
       if (
         oldObjectData.content.tilemapJsonFile !==
         newObjectData.content.tilemapJsonFile
@@ -71,26 +74,9 @@ namespace gdjs {
         this.setTilesetJsonFile(newObjectData.content.tilesetJsonFile);
       }
       if (
-        oldObjectData.content.displayMode !== newObjectData.content.displayMode
-      ) {
-        this.setDisplayMode(newObjectData.content.displayMode);
-      }
-      if (
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
-      }
-      if (
-        oldObjectData.content.animationSpeedScale !==
-        newObjectData.content.animationSpeedScale
-      ) {
-        this.setAnimationSpeedScale(newObjectData.content.animationSpeedScale);
-      }
-      if (
-        oldObjectData.content.animationFps !==
-        newObjectData.content.animationFps
-      ) {
-        this.setAnimationFps(newObjectData.content.animationFps);
       }
       if (
         oldObjectData.content.tilemapAtlasImage !==
@@ -139,12 +125,89 @@ namespace gdjs {
                 }
                 const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
                 tiledMap.tilesets = [tileSet];
-                this._renderer.loadTileMapWithTileset(tiledMap);
+                this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+                  tiledMap
+                  );
+                this._renderer.redrawCollisionMask();
+                this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
+                  this._typeFilter
+                ));
+                this.hitBoxesDirty = true;
               });
           } else {
-            this._renderer.loadTileMapWithTileset(tiledMap);
+            this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+              tiledMap
+            );
+            this._renderer.redrawCollisionMask();
+            this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
+              this._typeFilter
+            ));
+            this.hitBoxesDirty = true;
           }
         });
+    }
+
+    updateHitBoxes(): void {
+      for (let i = 0; i < this._defaultHitBoxes.length; ++i) {
+        if (i >= this.hitBoxes.length) {
+          this.hitBoxes.push(new gdjs.Polygon());
+        }
+        for (
+          let j = 0;
+          j < this._defaultHitBoxes[i].vertices.length;
+          ++j
+        ) {
+          if (j >= this.hitBoxes[i].vertices.length) {
+            this.hitBoxes[i].vertices.push([0, 0]);
+          }
+          this._transformToGlobal(
+            this._defaultHitBoxes[i].vertices[j][0],
+            this._defaultHitBoxes[i].vertices[j][1],
+            this.hitBoxes[i].vertices[j]
+          );
+        }
+        this.hitBoxes[i].vertices.length = this._defaultHitBoxes[
+          i
+        ].vertices.length;
+      }
+      this.hitBoxes.length = this._defaultHitBoxes.length;
+    }
+
+    private _transformToGlobal(x: float, y: float, result: number[]) {
+      let cx = this.getCenterX();
+      let cy = this.getCenterY();
+
+      // //Flipping
+      // if (this._flippedX) {
+      //   x = x + (cx - x) * 2;
+      // }
+      // if (this._flippedY) {
+      //   y = y + (cy - y) * 2;
+      // }
+
+      //Scale
+      const absScaleX = 1;//Math.abs(this._scaleX);
+      const absScaleY = 1;//Math.abs(this._scaleY);
+      x *= absScaleX;
+      y *= absScaleY;
+      cx *= absScaleX;
+      cy *= absScaleY;
+
+      //Rotation
+      const oldX = x;
+      const angleInRadians = (this.angle / 180) * Math.PI;
+      const cosValue = Math.cos(
+        // Only compute cos and sin once (10% faster than doing it twice)
+        angleInRadians
+      );
+      const sinValue = Math.sin(angleInRadians);
+      const xToCenterXDelta = x - cx;
+      const yToCenterYDelta = y - cy;
+      x = cx + cosValue * xToCenterXDelta - sinValue * yToCenterYDelta;
+      y = cy + sinValue * xToCenterXDelta + cosValue * yToCenterYDelta;
+      result.length = 2;
+      result[0] = x + this.x;
+      result[1] = y + this.y;
     }
 
     /**
@@ -170,26 +233,8 @@ namespace gdjs {
     getTilesetJsonFile() {
       return this._tilesetJsonFile;
     }
-    setAnimationFps(animationFps) {
-      this._animationFps = animationFps;
-    }
-    getAnimationFps() {
-      return this._animationFps;
-    }
     isTilesetJsonFile(selectedTilesetJsonFile) {
       return this._tilesetJsonFile === selectedTilesetJsonFile;
-    }
-    isDisplayMode(selectedDisplayMode) {
-      return this._displayMode === selectedDisplayMode;
-    }
-
-    setDisplayMode(displayMode): void {
-      this._displayMode = displayMode;
-      this._updateTileMap();
-    }
-
-    getDisplayMode() {
-      return this._displayMode;
     }
 
     setLayerIndex(layerIndex): void {
@@ -199,14 +244,6 @@ namespace gdjs {
 
     getLayerIndex() {
       return this._layerIndex;
-    }
-
-    setAnimationSpeedScale(animationSpeedScale): void {
-      this._animationSpeedScale = animationSpeedScale;
-    }
-
-    getAnimationSpeedScale() {
-      return this._animationSpeedScale;
     }
 
     /**
@@ -255,23 +292,8 @@ namespace gdjs {
      */
     setAngle(angle: float): void {
       super.setAngle(angle);
-      this._renderer.updateAngle();
-    }
-
-    /**
-     * Set object opacity.
-     * @param opacity The new opacity of the object (0-255).
-     */
-    setOpacity(opacity: float): void {
-      this._opacity = opacity;
-      this._renderer.updateOpacity();
-    }
-
-    /**
-     * Get object opacity.
-     */
-    getOpacity() {
-      return this._opacity;
+      // TODO handle rotation
+      //this._renderer.updateAngle();
     }
 
     /**
@@ -288,5 +310,9 @@ namespace gdjs {
       return this._renderer.getHeight();
     }
   }
-  gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);
+  gdjs.registerObject(
+    'TileMap::CollisionMask',
+    gdjs.TileMapCollisionMaskRuntimeObject
+  );
+  TileMapCollisionMaskRuntimeObject.supportsReinitialization = false;
 }

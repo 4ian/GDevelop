@@ -146,8 +146,11 @@ const filterFunction = (
   });
 
   if (
-    !optionList.filter(option => option.type !== 'separator' && option.value)
-      .length
+    !optionList.filter(
+      option =>
+        option.type !== 'separator' &&
+        (option.value || option.translatableValue)
+    ).length
   )
     return [];
 

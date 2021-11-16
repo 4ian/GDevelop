@@ -24,6 +24,12 @@ export type Badge = {|
   achievementId: string,
 |};
 
+export type Achievement = {|
+  id: string,
+  category: string,
+  name: string,
+|};
+
 export const searchUserPublicProfilesByUsername = (
   searchString: string
 ): Promise<Array<UserPublicProfileSearch>> => {
@@ -33,6 +39,12 @@ export const searchUserPublicProfilesByUsername = (
         username: searchString,
       },
     })
+    .then(response => response.data);
+};
+
+export const getAchievements = (): Promise<Array<Achievement>> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/action/achievement`)
     .then(response => response.data);
 };
 

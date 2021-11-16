@@ -169,7 +169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "RotateTowardAngle",
          _("Rotate toward angle"),
          _("Rotate an object towards an angle with the specified speed."),
-         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
@@ -185,7 +185,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate toward position"),
          _("Rotate an object towards a position, with the specified speed."),
          _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed "
-           "_PARAM3_deg/second"),
+           "_PARAM3_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")

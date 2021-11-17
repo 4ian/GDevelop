@@ -1517,7 +1517,6 @@ const EventsSheet = (props, ref) => {
 
   const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
   const updateToolbar = () => {
-    console.log(component);
     if (component.current) component.current.updateToolbar();
   };
   return (

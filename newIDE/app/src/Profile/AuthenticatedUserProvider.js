@@ -6,6 +6,7 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
+import { getUserBadges } from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -118,6 +119,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
+        onBadgesChanged: this._onBadgesChanged,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
@@ -227,6 +229,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
+    this._onBadgesChanged();
 
     // Load and wait for the user profile to be fetched.
     // (and let the error propagate if any).
@@ -240,6 +243,23 @@ export default class AuthenticatedUserProvider extends React.Component<
         profile: userProfile,
       },
     }));
+  };
+
+  _onBadgesChanged = () => {
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+    getUserBadges(firebaseUser.uid).then(
+      badges =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            badges,
+          },
+        })),
+      error => {
+        console.error('Error while loading user badges:', error);
+      }
+    );
   };
 
   _doLogout = () => {

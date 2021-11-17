@@ -93,6 +93,7 @@ export const limitsReached: Limits = {
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -117,6 +118,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
 export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -141,6 +143,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
 export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -165,6 +168,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -189,6 +193,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
 export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,

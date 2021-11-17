@@ -11,6 +11,7 @@ import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
 import { Column } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
+import UserAchievements from './Achievement/UserAchievements';
 
 type Props = {|
   onEditProfile: () => void,
@@ -74,6 +75,7 @@ const AuthenticatedUserProfileDetails = ({
         }
         isAuthenticatedUserProfile
       />
+      <UserAchievements badges={authenticatedUser.badges} />
       <Column>
         <ResponsiveLineStackLayout justifyContent="flex-end">
           <RaisedButton

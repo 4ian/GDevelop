@@ -104,6 +104,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -132,6 +133,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -160,6 +162,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -188,6 +191,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -216,6 +220,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },

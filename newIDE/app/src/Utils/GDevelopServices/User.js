@@ -136,7 +136,6 @@ export const addPostBadgePreHookIfLocked = (
 
   return (...args) => {
     postBadgeIfLocked(authenticatedUser, achievementId);
-    console.log(args);
     callback.apply(null, args);
   };
 };

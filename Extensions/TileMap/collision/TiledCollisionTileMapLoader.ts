@@ -46,40 +46,49 @@ namespace gdjs {
         );
 
         for (const tiledLayer of tiledMap.layers) {
-        if (tiledLayer.type === 'tilelayer') {
-          let tileSlotIndex = 0;
-          let layerData: integer[] | null = null;
+          if (tiledLayer.type === 'tilelayer') {
+            let tileSlotIndex = 0;
+            let layerData: integer[] | null = null;
 
-          if (tiledLayer.encoding === 'base64') {
-            layerData = gdjs.TileMap.decodeBase64LayerData(tiledLayer);
-            if (!layerData) {
-              console.warn('Failed to uncompress layer.data');
+            if (tiledLayer.encoding === 'base64') {
+              layerData = gdjs.TileMap.decodeBase64LayerData(tiledLayer);
+              if (!layerData) {
+                console.warn('Failed to uncompress layer.data');
+              }
+            } else {
+              layerData = tiledLayer.data as integer[];
             }
-          } else {
-            layerData = tiledLayer.data as integer[];
-          }
-          if (layerData) {
-            const collisionTileLayer = collisionTileMap.addLayer(tiledLayer.id);
-            // TODO handle layer offset
+            if (layerData) {
+              const collisionTileLayer = collisionTileMap.addLayer(
+                tiledLayer.id
+              );
+              // TODO handle layer offset
 
-            for (let y = 0; y < tiledLayer.height; y++) {
-              for (let x = 0; x < tiledLayer.width; x++) {
-                // The "globalTileUid" is the tile UID with encoded
-                // bits about the flipping/rotation of the tile.
-                const globalTileUid = layerData[tileSlotIndex];
-                // Extract the tile UID and the texture.
-                const tileUid = gdjs.TileMap.extractTileUidFlippedStates(
-                  globalTileUid
+              for (let y = 0; y < tiledLayer.height; y++) {
+                for (let x = 0; x < tiledLayer.width; x++) {
+                  // The "globalTileUid" is the tile UID with encoded
+                  // bits about the flipping/rotation of the tile.
+                  const globalTileUid = layerData[tileSlotIndex];
+                  // Extract the tile UID and the texture.
+                  const tileUid = gdjs.TileMap.extractTileUidFlippedStates(
+                    globalTileUid
                   );
-                //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
-                collisionTileLayer.set(x, y, tileUid.id - 1, tileUid.flippedHorizontally, tileUid.flippedVertically, tileUid.flippedDiagonally);
+                  //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
+                  collisionTileLayer.set(
+                    x,
+                    y,
+                    tileUid.id - 1,
+                    tileUid.flippedHorizontally,
+                    tileUid.flippedVertically,
+                    tileUid.flippedDiagonally
+                  );
 
-                tileSlotIndex += 1;
+                  tileSlotIndex += 1;
+                }
               }
             }
           }
         }
-      }
 
         return collisionTileMap;
       }

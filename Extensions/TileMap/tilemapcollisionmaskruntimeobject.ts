@@ -26,11 +26,15 @@ namespace gdjs {
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._layerIndex = objectData.content.layerIndex;
       this._typeFilter = objectData.content.typeFilter;
-      this._fillColor = this.rgbToNumber(gdjs.rgbOrHexToRGBColor(objectData.content.fillColor));
-      this._outlineColor = this.rgbToNumber(gdjs.rgbOrHexToRGBColor(objectData.content.outlineColor));
+      this._fillColor = this.rgbToNumber(
+        gdjs.rgbOrHexToRGBColor(objectData.content.fillColor)
+      );
+      this._outlineColor = this.rgbToNumber(
+        gdjs.rgbOrHexToRGBColor(objectData.content.outlineColor)
+      );
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
-      this._outlineSize = 1;//objectData.content.outlineSize;
+      this._outlineSize = 1; //objectData.content.outlineSize;
       this._tileMapManager = TileMapManager.getManager(runtimeScene);
       this._collisionTileMap = new gdjs.TileMap.CollisionTileMap(
         1,
@@ -46,10 +50,9 @@ namespace gdjs {
       this.onCreated();
     }
 
-   rgbToNumber = function (components: [integer, integer, integer]
-   ): integer {
-     return (components[0] << 16) + (components[1] << 8) + components[2];
-   };
+    rgbToNumber = function (components: [integer, integer, integer]): integer {
+      return (components[0] << 16) + (components[1] << 8) + components[2];
+    };
 
     getRendererObject() {
       return this._renderer.getRendererObject();
@@ -100,14 +103,18 @@ namespace gdjs {
     }
 
     private _updateTileMap(): void {
-      this._tileMapManager.getOrLoadTileMap(this._tilemapJsonFile, this._tilesetJsonFile, (tileMap: gdjs.TileMap.CollisionTileMap) => {
-        this._collisionTileMap = tileMap;
-        this._renderer.redrawCollisionMask();
-        this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
-          this._typeFilter
-        ));
-        this.hitBoxesDirty = true;
-      });
+      this._tileMapManager.getOrLoadTileMap(
+        this._tilemapJsonFile,
+        this._tilesetJsonFile,
+        (tileMap: gdjs.TileMap.CollisionTileMap) => {
+          this._collisionTileMap = tileMap;
+          this._renderer.redrawCollisionMask();
+          this._defaultHitBoxes = Array.from(
+            this._collisionTileMap.getAllHitboxes(this._typeFilter)
+          );
+          this.hitBoxesDirty = true;
+        }
+      );
     }
 
     updateHitBoxes(): void {
@@ -115,11 +122,7 @@ namespace gdjs {
         if (i >= this.hitBoxes.length) {
           this.hitBoxes.push(new gdjs.Polygon());
         }
-        for (
-          let j = 0;
-          j < this._defaultHitBoxes[i].vertices.length;
-          ++j
-        ) {
+        for (let j = 0; j < this._defaultHitBoxes[i].vertices.length; ++j) {
           if (j >= this.hitBoxes[i].vertices.length) {
             this.hitBoxes[i].vertices.push([0, 0]);
           }
@@ -283,7 +286,10 @@ namespace gdjs {
     private _runtimeScene: gdjs.RuntimeScene;
 
     private _tileMaps: Map<string, gdjs.TileMap.CollisionTileMap>;
-    private _callbacks: Map<string, Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>>;
+    private _callbacks: Map<
+      string,
+      Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>
+    >;
 
     /**
      * @param object The object
@@ -291,7 +297,10 @@ namespace gdjs {
     constructor(runtimeScene: gdjs.RuntimeScene) {
       this._runtimeScene = runtimeScene;
       this._tileMaps = new Map<string, gdjs.TileMap.CollisionTileMap>();
-      this._callbacks = new Map<string, Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>>();
+      this._callbacks = new Map<
+        string,
+        Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>
+      >();
     }
 
     /**
@@ -313,22 +322,22 @@ namespace gdjs {
     getOrLoadTileMap(
       tilemapJsonFile: string,
       tilesetJsonFile: string,
-      callback: (tileMap: gdjs.TileMap.CollisionTileMap) => void): void {
-        const key = tilemapJsonFile + "|" + tilesetJsonFile;
-        const collisionTileMap = this._tileMaps.get(key);
-        if (collisionTileMap) {
-          callback(collisionTileMap);
-          console.log("already loaded");
-          return;
-        }
-        const callbacks = this._callbacks.get(key);
-        if (callbacks) {
-          callbacks.push(callback);
-          return;
-        }
-        else {
-          this._callbacks.set(key, [callback]);
-        }
+      callback: (tileMap: gdjs.TileMap.CollisionTileMap) => void
+    ): void {
+      const key = tilemapJsonFile + '|' + tilesetJsonFile;
+      const collisionTileMap = this._tileMaps.get(key);
+      if (collisionTileMap) {
+        callback(collisionTileMap);
+        console.log('already loaded');
+        return;
+      }
+      const callbacks = this._callbacks.get(key);
+      if (callbacks) {
+        callbacks.push(callback);
+        return;
+      } else {
+        this._callbacks.set(key, [callback]);
+      }
       this._runtimeScene
         .getGame()
         .getJsonManager()
@@ -359,11 +368,11 @@ namespace gdjs {
                 tiledMap.tilesets = [tileSet];
                 const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
                   tiledMap
-                  );
-                  const callbacks = this._callbacks.get(key)!;
-                  for (const callback of callbacks) {
-                    callback(collisionTileMap);
-                  }
+                );
+                const callbacks = this._callbacks.get(key)!;
+                for (const callback of callbacks) {
+                  callback(collisionTileMap);
+                }
               });
           } else {
             const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(

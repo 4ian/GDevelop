@@ -45,7 +45,12 @@ namespace gdjs {
         this._graphics.closePath();
         this._graphics.endFill();
       }
-      console.log("getLocalBounds: " + this._graphics.getLocalBounds().width + " " + this._graphics.getLocalBounds().height);
+      console.log(
+        'getLocalBounds: ' +
+          this._graphics.getLocalBounds().width +
+          ' ' +
+          this._graphics.getLocalBounds().height
+      );
     }
 
     getRendererObject() {

@@ -50,29 +50,18 @@ namespace gdjs {
         return this._layers.values();
       }
 
-      getHitboxes(tag: string,
+      getHitboxes(
+        tag: string,
         xMin: integer,
         yMin: integer,
         xMax: integer,
-        yMax: integer): Iterable<gdjs.Polygon> {
-        return new MapCollisionMaskIterable(
-          this,
-          tag,
-          xMin,
-          yMin,
-          xMax,
-          yMax
-        );
+        yMax: integer
+      ): Iterable<gdjs.Polygon> {
+        return new MapCollisionMaskIterable(this, tag, xMin, yMin, xMax, yMax);
       }
 
       getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
-        return this.getHitboxes(
-          tag,
-          0,
-          0,
-          this.dimX,
-          this.dimY
-        );
+        return this.getHitboxes(tag, 0, 0, this.dimX, this.dimY);
       }
     }
 
@@ -191,11 +180,13 @@ namespace gdjs {
         return this.tileMap.getHeight();
       }
 
-      getHitboxes(tag: string,
+      getHitboxes(
+        tag: string,
         xMin: integer,
         yMin: integer,
         xMax: integer,
-        yMax: integer): Iterable<gdjs.Polygon> {
+        yMax: integer
+      ): Iterable<gdjs.Polygon> {
         return new LayerCollisionMaskIterable(
           this._tiles,
           tag,
@@ -207,13 +198,7 @@ namespace gdjs {
       }
 
       getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
-        return this.getHitboxes(
-          tag,
-          0,
-          0,
-          this.dimX(),
-          this.dimY()
-        );
+        return this.getHitboxes(tag, 0, 0, this.dimX(), this.dimY());
       }
     }
 
@@ -325,8 +310,9 @@ namespace gdjs {
         ) {
           const polygon = new gdjs.Polygon();
           this.polygons[polygonIndex] = polygon;
-          polygon.vertices.length =
-            this.definition.polygons[polygonIndex].vertices.length;
+          polygon.vertices.length = this.definition.polygons[
+            polygonIndex
+          ].vertices.length;
           for (
             let vertexIndex = 0;
             vertexIndex < polygon.vertices.length;

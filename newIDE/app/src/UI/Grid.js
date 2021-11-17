@@ -14,6 +14,7 @@ export const Line = (props: {|
   justifyContent?: string,
   expand?: boolean,
   overflow?: string,
+  padding?: string | number,
 |}) => (
   <div
     style={{
@@ -24,6 +25,7 @@ export const Line = (props: {|
       justifyContent: props.justifyContent,
       flex: props.expand ? 1 : undefined,
       overflow: props.overflow,
+      padding: props.padding || 0,
     }}
   >
     {props.children}

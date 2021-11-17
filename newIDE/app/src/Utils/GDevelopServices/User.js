@@ -76,6 +76,13 @@ export const getUserPublicProfile = (
     .then(response => response.data);
 };
 
+const isAchievementAlreadyClaimed = (
+  badges: Badge[],
+  achievementId: string
+): boolean => {
+  return badges.map(badge => badge.achievementId).includes(achievementId);
+};
+
 const createOrEnsureBadgeForUser = (
   authenticatedUser: AuthenticatedUser,
   achievementId: string
@@ -87,7 +94,7 @@ const createOrEnsureBadgeForUser = (
     onBadgesChanged,
   } = authenticatedUser;
   if (!badges || !firebaseUser) return null;
-  if (badges.map(badge => badge.achievementId).includes(achievementId)) {
+  if (isAchievementAlreadyClaimed(badges, achievementId)) {
     return null;
   }
   console.log(`posting achievement ${achievementId}`);
@@ -130,7 +137,7 @@ export const addCreateBadgePreHookIfNotClaimed = (
 ): Function => {
   const { badges } = authenticatedUser;
   if (!badges) return callback;
-  if (badges.map(badge => badge.achievementId).includes(achievementId)) {
+  if (isAchievementAlreadyClaimed(badges, achievementId)) {
     return callback;
   }
 

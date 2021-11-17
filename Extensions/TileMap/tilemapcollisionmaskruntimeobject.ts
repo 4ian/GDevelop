@@ -1,5 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
+
   /**
    *
    * @extends gdjs.RuntimeObject
@@ -7,11 +8,11 @@ namespace gdjs {
   export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
     _tilemapJsonFile: string;
     _tilesetJsonFile: string;
-    _tilemapAtlasImage: string;
     _layerIndex: integer;
     _renderer: gdjs.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.CollisionTileMap;
     _typeFilter: string;
+    _tileMapManager: TileMapManager;
 
     _fillColor: integer;
     _outlineColor: integer;
@@ -23,7 +24,6 @@ namespace gdjs {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
-      this._tilemapAtlasImage = objectData.content.tilemapAtlasImage;
       this._layerIndex = objectData.content.layerIndex;
       this._typeFilter = objectData.content.typeFilter;
       this._fillColor = this.rgbToNumber(gdjs.rgbOrHexToRGBColor(objectData.content.fillColor));
@@ -31,6 +31,7 @@ namespace gdjs {
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = 1;//objectData.content.outlineSize;
+      this._tileMapManager = TileMapManager.getManager(runtimeScene);
       this._collisionTileMap = new gdjs.TileMap.CollisionTileMap(
         1,
         1,
@@ -99,52 +100,14 @@ namespace gdjs {
     }
 
     private _updateTileMap(): void {
-      this._runtimeScene
-        .getGame()
-        .getJsonManager()
-        .loadJson(this._tilemapJsonFile, (error, tileMapJsonData) => {
-          if (error) {
-            logger.error(
-              'An error happened while loading a Tilemap JSON data:',
-              error
-            );
-            return;
-          }
-          const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
-          if (this._tilesetJsonFile) {
-            this._runtimeScene
-              .getGame()
-              .getJsonManager()
-              .loadJson(this._tilesetJsonFile, (error, tilesetJsonData) => {
-                if (error) {
-                  logger.error(
-                    'An error happened while loading Tileset JSON data:',
-                    error
-                  );
-                  return;
-                }
-                const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
-                tiledMap.tilesets = [tileSet];
-                this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
-                  tiledMap
-                  );
-                this._renderer.redrawCollisionMask();
-                this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
-                  this._typeFilter
-                ));
-                this.hitBoxesDirty = true;
-              });
-          } else {
-            this._collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
-              tiledMap
-            );
-            this._renderer.redrawCollisionMask();
-            this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
-              this._typeFilter
-            ));
-            this.hitBoxesDirty = true;
-          }
-        });
+      this._tileMapManager.getOrLoadTileMap(this._tilemapJsonFile, this._tilesetJsonFile, (tileMap: gdjs.TileMap.CollisionTileMap) => {
+        this._collisionTileMap = tileMap;
+        this._renderer.redrawCollisionMask();
+        this._defaultHitBoxes = Array.from(this._collisionTileMap.getAllHitboxes(
+          this._typeFilter
+        ));
+        this.hitBoxesDirty = true;
+      });
     }
 
     updateHitBoxes(): void {
@@ -315,4 +278,104 @@ namespace gdjs {
     gdjs.TileMapCollisionMaskRuntimeObject
   );
   TileMapCollisionMaskRuntimeObject.supportsReinitialization = false;
+
+  class TileMapManager {
+    private _runtimeScene: gdjs.RuntimeScene;
+
+    private _tileMaps: Map<string, gdjs.TileMap.CollisionTileMap>;
+    private _callbacks: Map<string, Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>>;
+
+    /**
+     * @param object The object
+     */
+    constructor(runtimeScene: gdjs.RuntimeScene) {
+      this._runtimeScene = runtimeScene;
+      this._tileMaps = new Map<string, gdjs.TileMap.CollisionTileMap>();
+      this._callbacks = new Map<string, Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>>();
+    }
+
+    /**
+     * Get the platforms manager of a scene.
+     */
+    static getManager(runtimeScene: gdjs.RuntimeScene) {
+      // @ts-ignore
+      if (!runtimeScene.tileMapCollisionMaskManager) {
+        //Create the shared manager if necessary.
+        // @ts-ignore
+        runtimeScene.tileMapCollisionMaskManager = new TileMapManager(
+          runtimeScene
+        );
+      }
+      // @ts-ignore
+      return runtimeScene.tileMapCollisionMaskManager;
+    }
+
+    getOrLoadTileMap(
+      tilemapJsonFile: string,
+      tilesetJsonFile: string,
+      callback: (tileMap: gdjs.TileMap.CollisionTileMap) => void): void {
+        const key = tilemapJsonFile + "|" + tilesetJsonFile;
+        const collisionTileMap = this._tileMaps.get(key);
+        if (collisionTileMap) {
+          callback(collisionTileMap);
+          console.log("already loaded");
+          return;
+        }
+        const callbacks = this._callbacks.get(key);
+        if (callbacks) {
+          callbacks.push(callback);
+          return;
+        }
+        else {
+          this._callbacks.set(key, [callback]);
+        }
+      this._runtimeScene
+        .getGame()
+        .getJsonManager()
+        .loadJson(tilemapJsonFile, (error, tileMapJsonData) => {
+          if (error) {
+            logger.error(
+              'An error happened while loading a Tilemap JSON data:',
+              error
+            );
+            this._callbacks.delete(key);
+            return;
+          }
+          const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
+          if (tilesetJsonFile) {
+            this._runtimeScene
+              .getGame()
+              .getJsonManager()
+              .loadJson(tilesetJsonFile, (error, tilesetJsonData) => {
+                if (error) {
+                  logger.error(
+                    'An error happened while loading Tileset JSON data:',
+                    error
+                  );
+                  this._callbacks.delete(key);
+                  return;
+                }
+                const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
+                tiledMap.tilesets = [tileSet];
+                const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+                  tiledMap
+                  );
+                  const callbacks = this._callbacks.get(key)!;
+                  for (const callback of callbacks) {
+                    callback(collisionTileMap);
+                  }
+              });
+          } else {
+            const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+              tiledMap
+            );
+            this._tileMaps.set(key, collisionTileMap);
+            const callbacks = this._callbacks.get(key)!;
+            for (const callback of callbacks) {
+              callback(collisionTileMap);
+            }
+          }
+        });
+    }
+  }
 }

@@ -32,6 +32,9 @@ type Props = {|
 
     // Allow to change color
     opacity?: number,
+    // TODO: Maybe change color so that it is an array corresponding to a path
+    // in theme like ['message', 'valid'], to enforce use of theme
+    color?: string,
   |},
 |};
 

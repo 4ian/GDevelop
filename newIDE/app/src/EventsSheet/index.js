@@ -87,6 +87,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
+import { addPostBadgePreHookIfLocked } from '../Utils/GDevelopServices/User';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -207,6 +208,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
+  addNewEvent: (
+    type: string,
+    context: ?EventInsertionContext
+  ) => Array<gdBaseEvent>;
 
   state = {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
@@ -247,11 +252,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     fontSize: 14,
   };
 
+  constructor(props: ComponentProps) {
+    super(props)
+    this.addNewEvent = addPostBadgePreHookIfLocked(this.props.authenticatedUser, 'trivial_first-event', this._addNewEvent);
+  }
+
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
+  componentDidUpdate(prevProps: ComponentProps, prevState: State) {
+    console.log("didupdate")
+    this.addNewEvent = addPostBadgePreHookIfLocked(this.props.authenticatedUser, 'trivial_first-event', this._addNewEvent);
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
@@ -344,7 +356,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
-  addNewEvent = (
+  _addNewEvent = (
     type: string,
     context: ?EventInsertionContext
   ): Array<gdBaseEvent> => {

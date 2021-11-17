@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import EventsSheet, {type EventsSheetInterface} from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,

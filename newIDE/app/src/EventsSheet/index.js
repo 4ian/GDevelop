@@ -253,8 +253,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   constructor(props: ComponentProps) {
-    super(props)
-    this.addNewEvent = addPostBadgePreHookIfLocked(this.props.authenticatedUser, 'trivial_first-event', this._addNewEvent);
+    super(props);
+    this.addNewEvent = addPostBadgePreHookIfLocked(
+      this.props.authenticatedUser,
+      'trivial_first-event',
+      this._addNewEvent
+    );
   }
 
   componentDidMount() {
@@ -262,8 +266,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
-    console.log("didupdate")
-    this.addNewEvent = addPostBadgePreHookIfLocked(this.props.authenticatedUser, 'trivial_first-event', this._addNewEvent);
+    this.addNewEvent = addPostBadgePreHookIfLocked(
+      this.props.authenticatedUser,
+      'trivial_first-event',
+      this._addNewEvent
+    );
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();

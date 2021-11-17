@@ -261,7 +261,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user badges:', error);
       }
     );
-  }
+  };
 
   _doLogout = () => {
     if (this.props.authentication) this.props.authentication.logout();

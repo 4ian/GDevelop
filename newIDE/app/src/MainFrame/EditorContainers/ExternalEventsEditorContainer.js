@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import EventsSheet, {type EventsSheetInterface} from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {

@@ -84,7 +84,8 @@ const UserAchievements = ({ badges }: Props) => {
           {displayError ? (
             <Text>
               <Trans>
-                An error happened when loading achievements, please try again later.
+                An error happened when loading achievements, please try again
+                later.
               </Trans>
             </Text>
           ) : (

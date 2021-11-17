@@ -65,13 +65,12 @@ namespace gdjs {
                 // The "globalTileUid" is the tile UID with encoded
                 // bits about the flipping/rotation of the tile.
                 const globalTileUid = layerData[tileSlotIndex];
-
                 // Extract the tile UID and the texture.
                 const tileUid = gdjs.TileMap.extractTileUidFlippedStates(
                   globalTileUid
-                );
-                // TODO handle flipping
-                collisionTileMap.set(x, y, tileUid.id - 1);
+                  );
+                //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
+                collisionTileMap.set(x, y, tileUid.id - 1, tileUid.flippedHorizontally, tileUid.flippedVertically, tileUid.flippedDiagonally);
 
                 tileSlotIndex += 1;
               }

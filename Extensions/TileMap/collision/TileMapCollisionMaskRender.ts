@@ -36,15 +36,16 @@ namespace gdjs {
           this._object._fillOpacity / 255
         );
         this._graphics.moveTo(vertices[0][0], vertices[0][1]);
-        console.log("");
-        console.log("moveTo: " + vertices[0][0] + " " + vertices[0][1]);
+        //console.log("");
+        //console.log("moveTo: " + vertices[0][0] + " " + vertices[0][1]);
         for (let index = 1; index < vertices.length; index++) {
           this._graphics.lineTo(vertices[index][0], vertices[index][1]);
-          console.log("lineTo: " + vertices[index][0] + " " + vertices[index][1]);
+          //console.log("lineTo: " + vertices[index][0] + " " + vertices[index][1]);
         }
         this._graphics.closePath();
         this._graphics.endFill();
       }
+      console.log("getLocalBounds: " + this._graphics.getLocalBounds().width + " " + this._graphics.getLocalBounds().height);
     }
 
     getRendererObject() {
@@ -56,24 +57,36 @@ namespace gdjs {
       this._graphics.position.y = this._object.y;
     }
 
-    setWidth(width): void {
-      this._graphics.width = width / this._graphics.scale.x;
+    setWidth(width: float): void {
+      const tileMap = this._object._collisionTileMap;
+      this._graphics.scale.x = width / tileMap.getWidth();
       this._graphics.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
-      this._graphics.height = height / this._graphics.scale.y;
+    setHeight(height: float): void {
+      const tileMap = this._object._collisionTileMap;
+      this._graphics.scale.y = height / tileMap.getHeight();
       this._graphics.pivot.y = height / 2;
       this.updatePosition();
     }
 
     getWidth(): float {
-      return 240;//this._graphics.width;
+      const tileMap = this._object._collisionTileMap;
+      return tileMap.getWidth() * this._graphics.scale.x;
     }
 
     getHeight(): float {
-      return 240;//this._graphics.height;
+      const tileMap = this._object._collisionTileMap;
+      return tileMap.getHeight() * this._graphics.scale.y;
+    }
+
+    getScaleX(): float {
+      return this._graphics.scale.x;
+    }
+
+    getScaleY(): float {
+      return this._graphics.scale.y;
     }
   }
 }

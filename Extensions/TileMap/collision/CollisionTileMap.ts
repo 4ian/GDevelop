@@ -25,17 +25,17 @@ namespace gdjs {
         }
       }
 
-      set(x: integer, y: integer, definitionIndex: integer) {
+      set(x: integer, y: integer, definitionIndex: integer, flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean) {
         const definition = this._tileSet.get(definitionIndex);
         if (!definition) {
           // The tile has no collision mask.
           return;
         }
-        console.log(x + " " + y + " set: " + definitionIndex);
+        //console.log(x + " " + y + " set: " + definitionIndex);
         if (this._map[y][x]) {
           this._map[y][x].setDefinition(definition);
         } else {
-          this._map[y][x] = new CollisionTile(this, x, y, definition);
+          this._map[y][x] = new CollisionTile(this, x, y, definition, flippedHorizontally, flippedVertically, flippedDiagonally);
         }
       }
 
@@ -49,6 +49,14 @@ namespace gdjs {
 
       dimY() {
         return this._map.length;
+      }
+
+      getWidth() {
+        return this.tileWidth * this.dimX();
+      }
+
+      getHeight() {
+        return this.tileHeight * this.dimY();
       }
 
       getAllHitboxes(tag: string) {
@@ -93,8 +101,9 @@ namespace gdjs {
       }
 
       [Symbol.iterator]() {
-        let x = this.xMin;
-        let y = this.yMin;
+        // xMin and yMin next increment
+        let x = this.xMax;
+        let y = this.yMin - 1;
         let polygonItr: Iterator<gdjs.Polygon> = CollisionMaskIterable.emptyItr;
 
         return {
@@ -138,6 +147,9 @@ namespace gdjs {
       x: integer;
       y: integer;
       definition: CollisionTileDefinition;
+      flippedHorizontally: boolean;
+      flippedVertically: boolean;
+      flippedDiagonally: boolean;
       polygons: gdjs.Polygon[];
       polygonsAreUpToDate: boolean;
 
@@ -145,12 +157,16 @@ namespace gdjs {
         tileMap: CollisionTileMap,
         x: integer,
         y: integer,
-        definition: CollisionTileDefinition
+        definition: CollisionTileDefinition,
+        flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean
       ) {
         this.tileMap = tileMap;
         this.x = x;
         this.y = y;
         this.definition = definition;
+        this.flippedHorizontally = flippedHorizontally;
+        this.flippedVertically = flippedVertically;
+        this.flippedDiagonally = flippedDiagonally;
         this.polygons = [];
         this.polygons.length = this.definition.polygons.length;
         for (
@@ -200,8 +216,19 @@ namespace gdjs {
               const vertex = polygon.vertices[vertexIndex];
 
               //console.log(defVertex[0] + " + " + this.tileMap.tileWidth + " * " + this.x);
-              vertex[0] = defVertex[0] + this.tileMap.tileWidth * this.x;
-              vertex[1] = defVertex[1] + this.tileMap.tileHeight * this.y;
+              const width = this.tileMap.tileWidth;
+              const height = this.tileMap.tileHeight;
+              let x = defVertex[0];
+              let y = defVertex[1];
+              x = this.flippedHorizontally ? width - x : x;
+              y = this.flippedVertically ? height - y : y;
+              if (this.flippedDiagonally) {
+                const swap = x;
+                x = y;
+                y = swap;
+              }
+              vertex[0] = x + this.tileMap.tileWidth * this.x;
+              vertex[1] = y + this.tileMap.tileHeight * this.y;
             }
           }
           //console.log("polygonsAreUpToDate");

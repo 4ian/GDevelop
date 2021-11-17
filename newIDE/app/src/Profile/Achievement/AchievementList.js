@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { DateFormat } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { parseISO } from 'date-fns';
 
 import { Column, Line } from '../../UI/Grid';
@@ -74,26 +74,28 @@ const AchievementList = ({ badges, achievements }: Props) => {
 
   return (
     <Column>
-      <div style={styles.achievementsContainer}>
-        {formattedAchievements.map(achievement => (
-          <Line key={achievement.id}>
-            <div
-              style={
-                achievement.unlockedAt
-                  ? styles.unlockedAchievement
-                  : styles.lockedAchievement
-              }
-            >
-              <Text>{achievement.name}</Text>
-              {achievement.unlockedAt && (
-                <Text>
-                  <DateFormat>{achievement.unlockedAt}</DateFormat>
-                </Text>
-              )}
-            </div>
-          </Line>
-        ))}
-      </div>
+      <I18n>
+        {({ i18n }) => (
+          <div style={styles.achievementsContainer}>
+            {formattedAchievements.map(achievement => (
+              <Line key={achievement.id}>
+                <div
+                  style={
+                    achievement.unlockedAt
+                      ? styles.unlockedAchievement
+                      : styles.lockedAchievement
+                  }
+                >
+                  <Text>{achievement.name}</Text>
+                  {achievement.unlockedAt && (
+                    <Text>{i18n.date(parseISO(achievement.unlockedAt))}</Text>
+                  )}
+                </div>
+              </Line>
+            ))}
+          </div>
+        )}
+      </I18n>
     </Column>
   );
 };

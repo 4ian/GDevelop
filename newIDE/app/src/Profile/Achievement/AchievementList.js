@@ -1,6 +1,7 @@
 // @flow
 import React, { useEffect, useState } from 'react';
 import { DateFormat } from '@lingui/macro';
+import { parseISO } from 'date-fns';
 
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
@@ -45,18 +46,28 @@ const AchievementList = ({ badges, achievements }: Props) => {
         return acc;
       }, {});
 
-      setFormattedAchievements(
-        achievements.map(achievement => {
-          if (Object.keys(badgeByAchievementId).includes(achievement.id)) {
-            return {
-              ...achievement,
-              unlockedAt: badgeByAchievementId[achievement.id].unlockedAt,
-            };
-          } else {
-            return achievement;
-          }
-        })
-      );
+      const formattedAchievements = achievements.map(achievement => {
+        if (Object.keys(badgeByAchievementId).includes(achievement.id)) {
+          return {
+            ...achievement,
+            unlockedAt: badgeByAchievementId[achievement.id].unlockedAt,
+          };
+        } else {
+          return achievement;
+        }
+      });
+      formattedAchievements.sort((a, b) => {
+        if (a.unlockedAt && b.unlockedAt) {
+          return parseISO(b.unlockedAt) - parseISO(a.unlockedAt);
+        } else if (a.unlockedAt && !b.unlockedAt) {
+          return -1;
+        } else if (!a.unlockedAt && b.unlockedAt) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      setFormattedAchievements(formattedAchievements);
     },
     [badges, achievements]
   );

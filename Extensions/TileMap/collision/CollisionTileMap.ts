@@ -2,9 +2,11 @@ namespace gdjs {
   export namespace TileMap {
     export class CollisionTileMap {
       private _tileSet: Map<integer, CollisionTileDefinition>;
-      private _map: CollisionTile[][];
+      private _layers: Map<integer, CollisionTileMapLayer>;
       readonly tileWidth: integer;
       readonly tileHeight: integer;
+      readonly dimX: integer;
+      readonly dimY: integer;
 
       constructor(
         tileWidth: integer,
@@ -13,55 +15,199 @@ namespace gdjs {
         dimY: integer,
         tileSet: Map<integer, CollisionTileDefinition>
       ) {
-        console.log("tile dimension: " + tileWidth + " " + tileHeight);
+        console.log('tile dimension: ' + tileWidth + ' ' + tileHeight);
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
+        this.dimX = dimX;
+        this.dimY = dimY;
         this._tileSet = tileSet;
-        this._map = [];
-        this._map.length = dimY;
-        for (let index = 0; index < this._map.length; index++) {
-          this._map[index] = [];
-          this._map[index].length = dimX;
+        this._layers = new Map<integer, CollisionTileMapLayer>();
+      }
+
+      getWidth() {
+        return this.tileWidth * this.dimX;
+      }
+
+      getHeight() {
+        return this.tileHeight * this.dimY;
+      }
+
+      getTileDefinition(id: integer) {
+        return this._tileSet.get(id);
+      }
+
+      addLayer(id: integer) {
+        const layer = new CollisionTileMapLayer(this);
+        this._layers.set(id, layer);
+        return layer;
+      }
+
+      getLayer(id: integer) {
+        return this._layers[id];
+      }
+
+      getLayers(): Iterable<CollisionTileMapLayer> {
+        return this._layers.values();
+      }
+
+      getHitboxes(tag: string,
+        xMin: integer,
+        yMin: integer,
+        xMax: integer,
+        yMax: integer): Iterable<gdjs.Polygon> {
+        return new MapCollisionMaskIterable(
+          this,
+          tag,
+          xMin,
+          yMin,
+          xMax,
+          yMax
+        );
+      }
+
+      getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
+        return this.getHitboxes(
+          tag,
+          0,
+          0,
+          this.dimX,
+          this.dimY
+        );
+      }
+    }
+
+    class MapCollisionMaskIterable implements Iterable<gdjs.Polygon> {
+      map: CollisionTileMap;
+      tag: string;
+      xMin: integer;
+      yMin: integer;
+      xMax: integer;
+      yMax: integer;
+
+      static emptyItr: Iterator<gdjs.Polygon> = {
+        next: () => ({ value: undefined, done: true }),
+      };
+
+      constructor(
+        map: CollisionTileMap,
+        tag: string,
+        xMin: integer,
+        yMin: integer,
+        xMax: integer,
+        yMax: integer
+      ) {
+        //console.log("CollisionMaskIterable: " + xMax + " " + yMax);
+        this.map = map;
+        this.tag = tag;
+        this.xMin = xMin;
+        this.yMin = yMin;
+        this.xMax = xMax;
+        this.yMax = yMax;
+      }
+
+      [Symbol.iterator]() {
+        let mapItr = this.map.getLayers()[Symbol.iterator]();
+        let listItr: Iterator<gdjs.Polygon> = MapCollisionMaskIterable.emptyItr;
+
+        return {
+          next: () => {
+            let listNext = listItr.next();
+            while (listNext.done) {
+              const mapNext = mapItr.next();
+              if (mapNext.done) {
+                return listNext;
+              }
+              listItr = mapNext.value
+                .getAllHitboxes(this.tag)
+                [Symbol.iterator]();
+              listNext = listItr.next();
+            }
+            return listNext;
+          },
+        };
+      }
+    }
+
+    export class CollisionTileMapLayer {
+      readonly tileMap: CollisionTileMap;
+      private _tiles: CollisionTile[][];
+
+      constructor(tileMap: CollisionTileMap) {
+        this.tileMap = tileMap;
+        this._tiles = [];
+        this._tiles.length = this.tileMap.dimY;
+        for (let index = 0; index < this._tiles.length; index++) {
+          this._tiles[index] = [];
+          this._tiles[index].length = this.tileMap.dimX;
         }
       }
 
-      set(x: integer, y: integer, definitionIndex: integer, flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean) {
-        const definition = this._tileSet.get(definitionIndex);
+      set(
+        x: integer,
+        y: integer,
+        definitionIndex: integer,
+        flippedHorizontally: boolean,
+        flippedVertically: boolean,
+        flippedDiagonally: boolean
+      ) {
+        const definition = this.tileMap.getTileDefinition(definitionIndex);
         if (!definition) {
           // The tile has no collision mask.
           return;
         }
         //console.log(x + " " + y + " set: " + definitionIndex);
-        if (this._map[y][x]) {
-          this._map[y][x].setDefinition(definition);
+        if (this._tiles[y][x]) {
+          this._tiles[y][x].setDefinition(definition);
         } else {
-          this._map[y][x] = new CollisionTile(this, x, y, definition, flippedHorizontally, flippedVertically, flippedDiagonally);
+          this._tiles[y][x] = new CollisionTile(
+            this,
+            x,
+            y,
+            definition,
+            flippedHorizontally,
+            flippedVertically,
+            flippedDiagonally
+          );
         }
       }
 
       get(x: integer, y: integer): CollisionTile | undefined {
-        return this._map[y][x];
+        return this._tiles[y][x];
       }
 
       dimX() {
-        return this._map.length === 0 ? 0 : this._map[0].length;
+        return this._tiles.length === 0 ? 0 : this._tiles[0].length;
       }
 
       dimY() {
-        return this._map.length;
+        return this._tiles.length;
       }
 
       getWidth() {
-        return this.tileWidth * this.dimX();
+        return this.tileMap.getWidth();
       }
 
       getHeight() {
-        return this.tileHeight * this.dimY();
+        return this.tileMap.getHeight();
       }
 
-      getAllHitboxes(tag: string) {
-        return new CollisionMaskIterable(
-          this._map,
+      getHitboxes(tag: string,
+        xMin: integer,
+        yMin: integer,
+        xMax: integer,
+        yMax: integer): Iterable<gdjs.Polygon> {
+        return new LayerCollisionMaskIterable(
+          this._tiles,
+          tag,
+          xMin,
+          yMin,
+          xMax,
+          yMax
+        );
+      }
+
+      getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
+        return this.getHitboxes(
           tag,
           0,
           0,
@@ -71,7 +217,7 @@ namespace gdjs {
       }
     }
 
-    class CollisionMaskIterable implements Iterable<gdjs.Polygon> {
+    class LayerCollisionMaskIterable implements Iterable<gdjs.Polygon> {
       map: CollisionTile[][];
       tag: string;
       xMin: integer;
@@ -104,7 +250,8 @@ namespace gdjs {
         // xMin and yMin next increment
         let x = this.xMax;
         let y = this.yMin - 1;
-        let polygonItr: Iterator<gdjs.Polygon> = CollisionMaskIterable.emptyItr;
+        let polygonItr: Iterator<gdjs.Polygon> =
+          LayerCollisionMaskIterable.emptyItr;
 
         return {
           next: () => {
@@ -143,7 +290,7 @@ namespace gdjs {
     }
 
     class CollisionTile {
-      tileMap: CollisionTileMap;
+      layer: CollisionTileMapLayer;
       x: integer;
       y: integer;
       definition: CollisionTileDefinition;
@@ -154,13 +301,15 @@ namespace gdjs {
       polygonsAreUpToDate: boolean;
 
       constructor(
-        tileMap: CollisionTileMap,
+        tileMap: CollisionTileMapLayer,
         x: integer,
         y: integer,
         definition: CollisionTileDefinition,
-        flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean
+        flippedHorizontally: boolean,
+        flippedVertically: boolean,
+        flippedDiagonally: boolean
       ) {
-        this.tileMap = tileMap;
+        this.layer = tileMap;
         this.x = x;
         this.y = y;
         this.definition = definition;
@@ -176,9 +325,8 @@ namespace gdjs {
         ) {
           const polygon = new gdjs.Polygon();
           this.polygons[polygonIndex] = polygon;
-          polygon.vertices.length = this.definition.polygons[
-            polygonIndex
-          ].vertices.length;
+          polygon.vertices.length =
+            this.definition.polygons[polygonIndex].vertices.length;
           for (
             let vertexIndex = 0;
             vertexIndex < polygon.vertices.length;
@@ -216,8 +364,8 @@ namespace gdjs {
               const vertex = polygon.vertices[vertexIndex];
 
               //console.log(defVertex[0] + " + " + this.tileMap.tileWidth + " * " + this.x);
-              const width = this.tileMap.tileWidth;
-              const height = this.tileMap.tileHeight;
+              const width = this.layer.tileMap.tileWidth;
+              const height = this.layer.tileMap.tileHeight;
               let x = defVertex[0];
               let y = defVertex[1];
               x = this.flippedHorizontally ? width - x : x;
@@ -227,8 +375,8 @@ namespace gdjs {
                 x = y;
                 y = swap;
               }
-              vertex[0] = x + this.tileMap.tileWidth * this.x;
-              vertex[1] = y + this.tileMap.tileHeight * this.y;
+              vertex[0] = x + width * this.x;
+              vertex[1] = y + height * this.y;
             }
           }
           //console.log("polygonsAreUpToDate");

@@ -186,8 +186,8 @@ namespace gdjs {
       // }
 
       //Scale
-      const absScaleX = 1;//Math.abs(this._scaleX);
-      const absScaleY = 1;//Math.abs(this._scaleY);
+      const absScaleX = Math.abs(this._renderer.getScaleX());
+      const absScaleY = Math.abs(this._renderer.getScaleY());
       x *= absScaleX;
       y *= absScaleY;
       cx *= absScaleX;

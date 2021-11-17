@@ -2,8 +2,9 @@
 
 import { Trans } from '@lingui/macro';
 import React, { useState, useEffect, useCallback } from 'react';
+import AlertMessage from '../../UI/AlertMessage';
 
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import {
@@ -61,40 +62,36 @@ const UserAchievements = ({ badges }: Props) => {
   return (
     <Column>
       <ResponsiveLineStackLayout>
-        <div style={styles.leftContainer}>
-          <div style={styles.summary}>
-            <Trophy height="100px" />
-            {displayError ? (
-              <Text>
-                <Trans>Unexpected error</Trans>
-              </Text>
-            ) : (
-              badges &&
-              achievements && (
-                <Text size="title">
-                  <Trans>
-                    {badges.length}/{achievements.length} achievements
-                  </Trans>
-                </Text>
-              )
-            )}
-          </div>
-        </div>
-        <div style={styles.rightContainer}>
-          {displayError ? (
-            <Text>
+        {displayError ? (
+          <Line>
+            <AlertMessage kind="error">
+              <Trans>Unable to display your achievements for now.</Trans>{' '}
               <Trans>
-                An error happened when loading achievements, please try again
-                later.
+                Please check your internet connection or try again later.
               </Trans>
-            </Text>
-          ) : (
-            badges &&
-            achievements && (
-              <AchievementList badges={badges} achievements={achievements} />
-            )
-          )}
-        </div>
+            </AlertMessage>
+          </Line>
+        ) : (
+          <>
+            <div style={styles.leftContainer}>
+              <div style={styles.summary}>
+                <Trophy height="100px" />
+                {badges && achievements && (
+                  <Text size="title">
+                    <Trans>
+                      {badges.length}/{achievements.length} achievements
+                    </Trans>
+                  </Text>
+                )}
+              </div>
+            </div>
+            <div style={styles.rightContainer}>
+              {badges && achievements && (
+                <AchievementList badges={badges} achievements={achievements} />
+              )}
+            </div>
+          </>
+        )}
       </ResponsiveLineStackLayout>
     </Column>
   );

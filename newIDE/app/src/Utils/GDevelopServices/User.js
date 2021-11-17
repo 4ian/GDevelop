@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
@@ -73,3 +75,51 @@ export const getUserPublicProfile = (
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
     .then(response => response.data);
 };
+
+const postBadgeIfLocked = (
+  authenticatedUser: AuthenticatedUser,
+  achievementId: string
+): ?Promise<?Badge> => {
+  const {
+    badges,
+    firebaseUser,
+    getAuthorizationHeader,
+    onBadgesChanged,
+  } = authenticatedUser;
+  if (!badges || !firebaseUser) return null;
+  if (badges.map(badge => badge.achievementId).includes(achievementId)) {
+    return null;
+  }
+  console.log(`posting achievement ${achievementId}`);
+
+  const userId = firebaseUser.uid;
+  return getAuthorizationHeader().then(authorizationHeader =>
+    axios
+      .post(
+        `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
+        {
+          achievementId,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+      .then(response => {
+        onBadgesChanged();
+        return response.data;
+      })
+      .catch(err => {
+        if (err.response.status === 409) {
+          console.warn('Badge already exists');
+        } else {
+          throw err;
+        }
+      })
+  );
+};
+

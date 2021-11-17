@@ -87,7 +87,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
-import { addPostBadgePreHookIfLocked } from '../Utils/GDevelopServices/User';
+import { addCreateBadgePreHookIfNotClaimed } from '../Utils/GDevelopServices/User';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -254,7 +254,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   constructor(props: ComponentProps) {
     super(props);
-    this.addNewEvent = addPostBadgePreHookIfLocked(
+    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
       this.props.authenticatedUser,
       'trivial_first-event',
       this._addNewEvent
@@ -266,7 +266,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
-    this.addNewEvent = addPostBadgePreHookIfLocked(
+    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
       this.props.authenticatedUser,
       'trivial_first-event',
       this._addNewEvent

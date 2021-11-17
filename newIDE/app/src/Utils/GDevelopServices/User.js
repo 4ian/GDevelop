@@ -76,7 +76,7 @@ export const getUserPublicProfile = (
     .then(response => response.data);
 };
 
-const postBadgeIfLocked = (
+const createOrEnsureBadgeForUser = (
   authenticatedUser: AuthenticatedUser,
   achievementId: string
 ): ?Promise<?Badge> => {
@@ -123,7 +123,7 @@ const postBadgeIfLocked = (
   );
 };
 
-export const addPostBadgePreHookIfLocked = (
+export const addCreateBadgePreHookIfNotClaimed = (
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
   callback: Function
@@ -135,7 +135,7 @@ export const addPostBadgePreHookIfLocked = (
   }
 
   return (...args) => {
-    postBadgeIfLocked(authenticatedUser, achievementId);
     callback.apply(null, args);
+    createOrEnsureBadgeForUser(authenticatedUser, achievementId);
   };
 };

@@ -46,7 +46,7 @@ export const searchUserPublicProfilesByUsername = (
 
 export const getAchievements = (): Promise<Array<Achievement>> => {
   return axios
-    .get(`${GDevelopUserApi.baseUrl}/action/achievement`)
+    .get(`${GDevelopUserApi.baseUrl}/achievement`)
     .then(response => response.data);
 };
 

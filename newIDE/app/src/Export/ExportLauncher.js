@@ -25,6 +25,7 @@ import BuildsWatcher from './Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from './Builds/BuildStepsProgress';
+import { registerGame } from '../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
@@ -139,6 +140,24 @@ export default class ExportLauncher extends Component<Props, State> {
     };
 
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
+
+    try {
+      setStep('register')
+      if (authenticatedUser.profile) {
+        await registerGame(
+          authenticatedUser.getAuthorizationHeader,
+          authenticatedUser.profile.id,
+          {
+            gameId: project.getProjectUuid(),
+            authorName: project.getAuthor() || 'Unspecified author',
+            gameName: project.getName() || 'Untitled game',
+          }
+        );
+      }
+    } catch {
+      // Best effort call, we don't prevent building the game.
+      console.log('Error while registering the game.');
+    }
 
     try {
       const exportPipelineContext = {

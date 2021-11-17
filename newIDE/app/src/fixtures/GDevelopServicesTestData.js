@@ -37,6 +37,7 @@ export const indieUserProfile: Profile = {
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
+  getGameStatsEmail: false,
 };
 
 export const usagesForIndieUser: Usages = [

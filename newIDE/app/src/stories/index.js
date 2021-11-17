@@ -4188,6 +4188,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4202,6 +4203,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4216,6 +4218,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress

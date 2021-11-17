@@ -21,6 +21,7 @@ export type Profile = {|
   email: string,
   username: ?string,
   description: ?string,
+  getGameStatsEmail: boolean,
 |};
 
 export type LoginForm = {|
@@ -37,6 +38,7 @@ export type RegisterForm = {|
 export type EditForm = {|
   username: string,
   description: string,
+  getGameStatsEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -261,12 +263,13 @@ export default class Authentication {
 
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        const { username, description } = form;
+        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             username,
             description,
+            getGameStatsEmail,
           },
           {
             params: {

@@ -130,6 +130,10 @@ const createOrEnsureBadgeForUser = (
   );
 };
 
+/**
+ * Check if user has already claimed the achievement, to avoid executing
+ * any extra code if that's the case.
+ */
 export const addCreateBadgePreHookIfNotClaimed = (
   authenticatedUser: AuthenticatedUser,
   achievementId: string,

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { I18n } from '@lingui/react';
 import { parseISO } from 'date-fns';
+import Lock from '@material-ui/icons/Lock';
 
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
@@ -9,36 +10,30 @@ import {
   type Badge,
   type Achievement,
 } from '../../Utils/GDevelopServices/User';
+import ScrollView from '../../UI/ScrollView';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type Props = {|
   badges: Array<Badge>,
   achievements: Array<Achievement>,
 |};
 
-const achievementBaseline = {
-  width: '100%',
-  padding: '0 20px',
-};
-
-const styles = {
-  achievementsContainer: {
-    maxHeight: 250,
-    overflowY: 'scroll',
-  },
-  unlockedAchievement: {
-    ...achievementBaseline,
-    color: 'green',
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  lockedAchievement: {
-    ...achievementBaseline,
-    color: '#CCCCCC',
-  },
-};
-
 const AchievementList = ({ badges, achievements }: Props) => {
   const [formattedAchievements, setFormattedAchievements] = useState([]);
+  const theme = React.useContext(GDevelopThemeContext);
+
+  const styles = {
+    achievementsContainer: {
+      maxHeight: 250,
+    },
+    lockedAchievement: {
+      opacity: 0.4
+    },
+    unlockedAchievement: {
+      color: theme.message.valid,
+    }
+  };
+
   useEffect(
     () => {
       const badgeByAchievementId = badges.reduce((acc, badge) => {
@@ -47,15 +42,15 @@ const AchievementList = ({ badges, achievements }: Props) => {
       }, {});
 
       const formattedAchievements = achievements.map(achievement => {
-        if (Object.keys(badgeByAchievementId).includes(achievement.id)) {
+        if (!!badgeByAchievementId[achievement.id]) {
           return {
             ...achievement,
             unlockedAt: badgeByAchievementId[achievement.id].unlockedAt,
           };
-        } else {
-          return achievement;
         }
+        return achievement;
       });
+
       formattedAchievements.sort((a, b) => {
         if (a.unlockedAt && b.unlockedAt) {
           return parseISO(b.unlockedAt) - parseISO(a.unlockedAt);
@@ -76,24 +71,18 @@ const AchievementList = ({ badges, achievements }: Props) => {
     <Column>
       <I18n>
         {({ i18n }) => (
-          <div style={styles.achievementsContainer}>
+          <ScrollView style={styles.achievementsContainer}>
             {formattedAchievements.map(achievement => (
-              <Line key={achievement.id}>
-                <div
-                  style={
-                    achievement.unlockedAt
-                      ? styles.unlockedAchievement
-                      : styles.lockedAchievement
-                  }
-                >
-                  <Text>{achievement.name}</Text>
-                  {achievement.unlockedAt && (
+              <Line key={achievement.id} justifyContent="space-between" padding="0 20px">
+                <Text style={achievement.unlockedAt ? styles.unlockedAchievement : styles.lockedAchievement}>{achievement.name}</Text>
+                  {achievement.unlockedAt ? (
                     <Text>{i18n.date(parseISO(achievement.unlockedAt))}</Text>
+                  ) : (
+                    <Lock style={styles.lockedAchievement}/>
                   )}
-                </div>
               </Line>
             ))}
-          </div>
+          </ScrollView>
         )}
       </I18n>
     </Column>

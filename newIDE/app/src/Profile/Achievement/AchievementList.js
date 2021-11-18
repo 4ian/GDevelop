@@ -29,9 +29,7 @@ const AchievementList = ({ badges, achievements }: Props) => {
     lockedAchievement: {
       opacity: 0.4,
     },
-    unlockedAchievement: {
-      color: theme.message.valid,
-    },
+    unlockedAchievement: {},
   };
 
   useEffect(

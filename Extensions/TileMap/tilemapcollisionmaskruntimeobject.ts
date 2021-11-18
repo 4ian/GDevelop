@@ -10,8 +10,10 @@ namespace gdjs {
     _tilesetJsonFile: string;
     _layerIndex: integer;
     _renderer: gdjs.TileMapCollisionMaskRender;
-    _collisionTileMap: gdjs.TileMap.CollisionTileMap;
+    _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     _typeFilter: string;
+    // TODO Should it be one collision mask per layer?
+    // as layer are not necessarily on the same grid.
     _tileMapManager: TileMapManager;
 
     _fillColor: integer;
@@ -36,12 +38,15 @@ namespace gdjs {
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = 1; //objectData.content.outlineSize;
       this._tileMapManager = TileMapManager.getManager(runtimeScene);
-      this._collisionTileMap = new gdjs.TileMap.CollisionTileMap(
+      const collisionTileMap = new gdjs.TileMap.CollisionTileMap(
         1,
         1,
         0,
         0,
         new Map()
+      );
+      this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+        collisionTileMap
       );
       this._renderer = new gdjs.TileMapCollisionMaskRender(this, runtimeScene);
       this._updateTileMap();
@@ -107,7 +112,9 @@ namespace gdjs {
         this._tilemapJsonFile,
         this._tilesetJsonFile,
         (tileMap: gdjs.TileMap.CollisionTileMap) => {
-          this._collisionTileMap = tileMap;
+          this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
+            tileMap
+          );
           this._renderer.redrawCollisionMask();
           this._defaultHitBoxes = Array.from(
             this._collisionTileMap.getAllHitboxes(this._typeFilter)

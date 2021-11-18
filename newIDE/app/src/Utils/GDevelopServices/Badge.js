@@ -26,10 +26,10 @@ const isAchievementAlreadyClaimed = (
   return badges.map(badge => badge.achievementId).includes(achievementId);
 };
 
-const createOrEnsureBadgeForUser = (
+const createOrEnsureBadgeForUser = async (
   authenticatedUser: AuthenticatedUser,
   achievementId: string
-): ?Promise<?Badge> => {
+): Promise<?Badge> => {
   const {
     badges,
     firebaseUser,
@@ -43,34 +43,31 @@ const createOrEnsureBadgeForUser = (
   console.log(`posting achievement ${achievementId}`);
 
   const userId = firebaseUser.uid;
-  return getAuthorizationHeader().then(authorizationHeader =>
-    axios
-      .post(
-        `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
-        {
-          achievementId,
+  try {
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.post(
+      `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
+      {
+        achievementId,
+      },
+      {
+        params: {
+          userId,
         },
-        {
-          params: {
-            userId,
-          },
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
-      .then(response => {
-        onBadgesChanged();
-        return response.data;
-      })
-      .catch(err => {
-        if (err.response.status === 409) {
-          console.warn('Badge already exists');
-        } else {
-          throw err;
-        }
-      })
-  );
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    )
+    onBadgesChanged()
+    return response.data;
+  } catch (err) {
+    if (err.response && err.response.status === 409) {
+      console.warn('Badge already exists');
+    } else {
+      throw err;
+    }
+  }
 };
 
 /**

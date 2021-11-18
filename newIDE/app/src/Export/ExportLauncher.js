@@ -25,7 +25,11 @@ import BuildsWatcher from './Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from './Builds/BuildStepsProgress';
-import { registerGame, getGame } from '../Utils/GDevelopServices/Game';
+import {
+  registerGame,
+  getGame,
+  updateGame,
+} from '../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
@@ -145,20 +149,26 @@ export default class ExportLauncher extends Component<Props, State> {
       setStep('register');
       const profile = authenticatedUser.profile;
       const getAuthorizationHeader = authenticatedUser.getAuthorizationHeader;
+      const gameId = project.getProjectUuid();
+      const authorName = project.getAuthor() || 'Unspecified author';
+      const gameName = project.getName() || 'Untitled game';
       if (profile) {
+        const userId = profile.id;
         try {
-          await getGame(
-            getAuthorizationHeader,
-            profile.id,
-            project.getProjectUuid()
-          );
+          await getGame(getAuthorizationHeader, userId, gameId);
+          // Update the game details to ensure that it is up to date in GDevelop services.
+          await updateGame(getAuthorizationHeader, userId, {
+            gameId,
+            authorName,
+            gameName,
+          });
         } catch (err) {
           if (err.response.status === 404) {
-            // If the game is not registered, register it before launching the export
-            await registerGame(getAuthorizationHeader, profile.id, {
-              gameId: project.getProjectUuid(),
-              authorName: project.getAuthor() || 'Unspecified author',
-              gameName: project.getName() || 'Untitled game',
+            // If the game is not registered, register it before launching the export.
+            await registerGame(getAuthorizationHeader, userId, {
+              gameId,
+              authorName,
+              gameName,
             });
           }
         }
@@ -174,8 +184,8 @@ export default class ExportLauncher extends Component<Props, State> {
         updateStepProgress: this._updateStepProgress,
         exportState: this.state.exportState,
       };
+      setStep('export');
       this.setState({
-        exportStep: 'export',
         stepCurrentProgress: 0,
         stepMaxProgress: 0,
         errored: false,
@@ -211,20 +221,15 @@ export default class ExportLauncher extends Component<Props, State> {
           authenticatedUser,
           uploadBucketKey
         );
-        this.setState(
-          {
-            build,
-            exportStep: 'build',
-          },
-          () => {
-            this._startBuildWatch(authenticatedUser);
-          }
-        );
+        setStep('build');
+        this.setState({ build }, () => {
+          this._startBuildWatch(authenticatedUser);
+        });
       }
+      setStep('done');
       this.setState({
         compressionOutput,
         doneFooterOpen: true,
-        exportStep: 'done',
       });
     } catch (error) {
       console.error('An error happened during export:', error);

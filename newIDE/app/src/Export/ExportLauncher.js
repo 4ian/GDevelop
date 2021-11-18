@@ -25,7 +25,7 @@ import BuildsWatcher from './Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from './Builds/BuildStepsProgress';
-import { registerGame } from '../Utils/GDevelopServices/Game';
+import { registerGame, getGame } from '../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
@@ -142,17 +142,26 @@ export default class ExportLauncher extends Component<Props, State> {
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
 
     try {
-      setStep('register')
-      if (authenticatedUser.profile) {
-        await registerGame(
-          authenticatedUser.getAuthorizationHeader,
-          authenticatedUser.profile.id,
-          {
-            gameId: project.getProjectUuid(),
-            authorName: project.getAuthor() || 'Unspecified author',
-            gameName: project.getName() || 'Untitled game',
+      setStep('register');
+      const profile = authenticatedUser.profile;
+      const getAuthorizationHeader = authenticatedUser.getAuthorizationHeader;
+      if (profile) {
+        try {
+          await getGame(
+            getAuthorizationHeader,
+            profile.id,
+            project.getProjectUuid()
+          );
+        } catch (err) {
+          if (err.response.status === 404) {
+            // If the game is not registered, register it before launching the export
+            await registerGame(getAuthorizationHeader, profile.id, {
+              gameId: project.getProjectUuid(),
+              authorName: project.getAuthor() || 'Unspecified author',
+              gameName: project.getName() || 'Untitled game',
+            });
           }
-        );
+        }
       }
     } catch {
       // Best effort call, we don't prevent building the game.

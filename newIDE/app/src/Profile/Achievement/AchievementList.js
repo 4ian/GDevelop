@@ -15,9 +15,14 @@ import ScrollView from '../../UI/ScrollView';
 type Props = {|
   badges: Array<Badge>,
   achievements: Array<Achievement>,
+  displayUnclaimedAchievements: boolean,
 |};
 
-const AchievementList = ({ badges, achievements }: Props) => {
+const AchievementList = ({
+  badges,
+  achievements,
+  displayUnclaimedAchievements,
+}: Props) => {
   const [formattedAchievements, setFormattedAchievements] = useState([]);
 
   const styles = {
@@ -32,21 +37,32 @@ const AchievementList = ({ badges, achievements }: Props) => {
 
   useEffect(
     () => {
-      const badgeByAchievementId = badges.reduce((acc, badge) => {
-        acc[badge.achievementId] = badge;
-        return acc;
-      }, {});
+      let formattedAchievements = [];
+      if (displayUnclaimedAchievements) {
+        const badgeByAchievementId = badges.reduce((acc, badge) => {
+          acc[badge.achievementId] = badge;
+          return acc;
+        }, {});
 
-      const formattedAchievements = achievements.map(achievement => {
-        if (!!badgeByAchievementId[achievement.id]) {
+        formattedAchievements = achievements.map(achievement => {
+          if (!!badgeByAchievementId[achievement.id]) {
+            return {
+              ...achievement,
+              unlockedAt: badgeByAchievementId[achievement.id].unlockedAt,
+            };
+          }
+          return achievement;
+        });
+      } else {
+        formattedAchievements = badges.map(badge => {
           return {
-            ...achievement,
-            unlockedAt: badgeByAchievementId[achievement.id].unlockedAt,
+            ...achievements.find(
+              achievement => achievement.id === badge.achievementId
+            ),
+            unlockedAt: badge.unlockedAt,
           };
-        }
-        return achievement;
-      });
-
+        });
+      }
       formattedAchievements.sort((a, b) => {
         if (a.unlockedAt && b.unlockedAt) {
           return parseISO(b.unlockedAt) - parseISO(a.unlockedAt);
@@ -60,7 +76,7 @@ const AchievementList = ({ badges, achievements }: Props) => {
       });
       setFormattedAchievements(formattedAchievements);
     },
-    [badges, achievements]
+    [badges, achievements, displayUnclaimedAchievements]
   );
 
   return (

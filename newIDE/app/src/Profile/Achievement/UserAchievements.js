@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { useState, useEffect, useCallback } from 'react';
 import AlertMessage from '../../UI/AlertMessage';
 
-import { Column, Line } from '../../UI/Grid';
+import { Line } from '../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import Text from '../../UI/Text';
 import {
@@ -16,9 +16,11 @@ import {
 import AchievementList from './AchievementList';
 import Trophy from '../../UI/CustomSvgIcons/Trophy';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 
 type Props = {|
   badges: ?Array<Badge>,
+  displayUnclaimedAchievements: boolean,
 |};
 
 const styles = {
@@ -34,7 +36,7 @@ const styles = {
   },
 };
 
-const UserAchievements = ({ badges }: Props) => {
+const UserAchievements = ({ badges, displayUnclaimedAchievements }: Props) => {
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const windowWidth = useResponsiveWindowWidth();
@@ -58,45 +60,55 @@ const UserAchievements = ({ badges }: Props) => {
   );
 
   return (
-    <Column>
-      <ResponsiveLineStackLayout>
-        {displayError ? (
-          <Line>
-            <AlertMessage kind="error">
-              <Trans>Unable to display your achievements for now.</Trans>{' '}
-              <Trans>
-                Please check your internet connection or try again later.
-              </Trans>
-            </AlertMessage>
-          </Line>
-        ) : (
-          <>
-            <div style={styles.leftContainer}>
-              <div
-                style={{
-                  ...styles.summary,
-                  padding: windowWidth === 'small' ? '0 20' : '20',
-                }}
-              >
-                <Trophy color="primary" fontSize="large" />
-                {badges && achievements && (
-                  <Text size="title">
-                    <Trans>
-                      {badges.length}/{achievements.length} achievements
-                    </Trans>
-                  </Text>
+    <ResponsiveLineStackLayout>
+      {displayError ? (
+        <Line>
+          <AlertMessage kind="error">
+            <Trans>Unable to display your achievements for now.</Trans>{' '}
+            <Trans>
+              Please check your internet connection or try again later.
+            </Trans>
+          </AlertMessage>
+        </Line>
+      ) : !!badges && !!achievements ? (
+        <>
+          <div style={styles.leftContainer}>
+            <div
+              style={{
+                ...styles.summary,
+                padding: windowWidth === 'small' ? '0 20' : '20',
+              }}
+            >
+              <Trophy color="primary" fontSize="large" />
+              <Text size="title">
+                <Trans>
+                  {badges.length}/{achievements.length} achievements
+                </Trans>
+                {badges.length === 0 && (
+                  <>
+                    {' '}
+                    <Trans>(yet!)</Trans>
+                  </>
                 )}
-              </div>
+              </Text>
             </div>
+          </div>
+          {badges.length > 0 && (
             <div style={styles.rightContainer}>
               {badges && achievements && (
-                <AchievementList badges={badges} achievements={achievements} />
+                <AchievementList
+                  badges={badges}
+                  achievements={achievements}
+                  displayUnclaimedAchievements={displayUnclaimedAchievements}
+                />
               )}
             </div>
-          </>
-        )}
-      </ResponsiveLineStackLayout>
-    </Column>
+          )}
+        </>
+      ) : (
+        <PlaceholderLoader />
+      )}
+    </ResponsiveLineStackLayout>
   );
 };
 

@@ -58,8 +58,8 @@ const createOrEnsureBadgeForUser = async (
           Authorization: authorizationHeader,
         },
       }
-    )
-    onBadgesChanged()
+    );
+    onBadgesChanged();
     return response.data;
   } catch (err) {
     if (err.response && err.response.status === 409) {

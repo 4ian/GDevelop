@@ -11,7 +11,6 @@ import {
   type Achievement,
 } from '../../Utils/GDevelopServices/Badge';
 import ScrollView from '../../UI/ScrollView';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type Props = {|
   badges: Array<Badge>,
@@ -20,7 +19,6 @@ type Props = {|
 
 const AchievementList = ({ badges, achievements }: Props) => {
   const [formattedAchievements, setFormattedAchievements] = useState([]);
-  const theme = React.useContext(GDevelopThemeContext);
 
   const styles = {
     achievementsContainer: {

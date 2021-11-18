@@ -1522,21 +1522,16 @@ const EventsSheet = (props, ref) => {
   const updateToolbar = () => {
     if (component.current) component.current.updateToolbar();
   };
+
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const userPreferences = React.useContext(PreferencesContext);
   return (
-    <AuthenticatedUserContext.Consumer>
-      {(authenticatedUser: AuthenticatedUser) => (
-        <PreferencesContext.Consumer>
-          {userPreferences => (
-            <EventsSheetComponentWithoutHandle
-              ref={component}
-              authenticatedUser={authenticatedUser}
-              userPreferences={userPreferences}
-              {...props}
-            />
-          )}
-        </PreferencesContext.Consumer>
-      )}
-    </AuthenticatedUserContext.Consumer>
+    <EventsSheetComponentWithoutHandle
+      ref={component}
+      authenticatedUser={authenticatedUser}
+      userPreferences={userPreferences}
+      {...props}
+    />
   );
 };
 

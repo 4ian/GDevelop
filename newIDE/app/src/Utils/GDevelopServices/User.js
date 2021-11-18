@@ -48,3 +48,25 @@ export const getUserPublicProfile = (
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
     .then(response => response.data);
 };
+
+export const acceptGameStatsEmail = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+) => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader => {
+      return axios.patch(
+        `${GDevelopUserApi.baseUrl}/user/${userId}`,
+        { getGameStatsEmail: true },
+        {
+          params: { userId: userId },
+          headers: { Authorization: authorizationHeader },
+        }
+      );
+    })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error while editing user:', error);
+      throw error.response.data;
+    });
+};

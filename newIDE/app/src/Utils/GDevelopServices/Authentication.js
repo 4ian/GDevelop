@@ -21,6 +21,7 @@ export type Profile = {|
   email: string,
   username: ?string,
   description: ?string,
+  getGameStatsEmail: boolean,
 |};
 
 export type LoginForm = {|
@@ -37,6 +38,7 @@ export type RegisterForm = {|
 export type EditForm = {|
   username: string,
   description: string,
+  getGameStatsEmail: boolean,
 |};
 
 export type ChangeEmailForm = {|
@@ -261,12 +263,13 @@ export default class Authentication {
 
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        const { username, description } = form;
+        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
             username,
             description,
+            getGameStatsEmail,
           },
           {
             params: {
@@ -281,6 +284,33 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while editing user:', error);
+        throw error.response.data;
+      });
+  };
+
+  acceptGameStatsEmail = async (
+    getAuthorizationHeader: () => Promise<string>
+  ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to accept game stats email while not authenticated.'
+      );
+
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
+          { getGameStatsEmail: true },
+          {
+            params: { userId: currentUser.uid },
+            headers: { Authorization: authorizationHeader },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while accepting game stats email:', error);
         throw error.response.data;
       });
   };

@@ -27,11 +27,11 @@ const AchievementList = ({ badges, achievements }: Props) => {
       maxHeight: 250,
     },
     lockedAchievement: {
-      opacity: 0.4
+      opacity: 0.4,
     },
     unlockedAchievement: {
       color: theme.message.valid,
-    }
+    },
   };
 
   useEffect(
@@ -73,13 +73,25 @@ const AchievementList = ({ badges, achievements }: Props) => {
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>
             {formattedAchievements.map(achievement => (
-              <Line key={achievement.id} justifyContent="space-between" padding="0 20px">
-                <Text style={achievement.unlockedAt ? styles.unlockedAchievement : styles.lockedAchievement}>{achievement.name}</Text>
-                  {achievement.unlockedAt ? (
-                    <Text>{i18n.date(parseISO(achievement.unlockedAt))}</Text>
-                  ) : (
-                    <Lock style={styles.lockedAchievement}/>
-                  )}
+              <Line
+                key={achievement.id}
+                justifyContent="space-between"
+                padding="0 20px"
+              >
+                <Text
+                  style={
+                    achievement.unlockedAt
+                      ? styles.unlockedAchievement
+                      : styles.lockedAchievement
+                  }
+                >
+                  {achievement.name}
+                </Text>
+                {achievement.unlockedAt ? (
+                  <Text>{i18n.date(parseISO(achievement.unlockedAt))}</Text>
+                ) : (
+                  <Lock style={styles.lockedAchievement} />
+                )}
               </Line>
             ))}
           </ScrollView>

@@ -14,8 +14,8 @@ import {
 } from '../../Utils/GDevelopServices/Badge';
 
 import AchievementList from './AchievementList';
-// $FlowFixMe[missing-export] TODO: check that this is the correct way to import SVG in the project. If yes, follow https://github.com/facebook/flow/issues/7121.
-import { ReactComponent as Trophy } from './resources/trophy.svg';
+import Trophy from '../../UI/CustomSvgIcons/Trophy';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 type Props = {|
   badges: ?Array<Badge>,
@@ -23,13 +23,10 @@ type Props = {|
 
 const styles = {
   summary: {
-    padding: 20,
     textAlign: 'center',
   },
   leftContainer: {
     flex: 1,
-    backgroundColor: '#CCCCCC',
-    borderRadius: '20px',
     margin: '20px',
   },
   rightContainer: {
@@ -40,6 +37,7 @@ const styles = {
 const UserAchievements = ({ badges }: Props) => {
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
+  const windowWidth = useResponsiveWindowWidth();
 
   const fetchAchievements = useCallback(async () => {
     try {
@@ -74,8 +72,13 @@ const UserAchievements = ({ badges }: Props) => {
         ) : (
           <>
             <div style={styles.leftContainer}>
-              <div style={styles.summary}>
-                <Trophy height="100px" />
+              <div
+                style={{
+                  ...styles.summary,
+                  padding: windowWidth === 'small' ? '0 20' : '20',
+                }}
+              >
+                <Trophy color="primary" fontSize="large" />
                 {badges && achievements && (
                   <Text size="title">
                     <Trans>

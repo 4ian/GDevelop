@@ -4,14 +4,11 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import FlatButton from '../UI/FlatButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
-import { Column } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
-import UserAchievements from './Achievement/UserAchievements';
 
 type Props = {|
   onEditProfile: () => void,
@@ -74,21 +71,10 @@ const AuthenticatedUserProfileDetails = ({
             : null
         }
         isAuthenticatedUserProfile
+        onChangeEmail={onChangeEmail}
+        onEditProfile={onEditProfile}
+        badges={authenticatedUser.badges}
       />
-      <UserAchievements badges={authenticatedUser.badges} />
-      <Column>
-        <ResponsiveLineStackLayout justifyContent="flex-end">
-          <RaisedButton
-            label={<Trans>Change my email</Trans>}
-            onClick={onChangeEmail}
-          />
-          <RaisedButton
-            label={<Trans>Edit my profile</Trans>}
-            primary
-            onClick={onEditProfile}
-          />
-        </ResponsiveLineStackLayout>
-      </Column>
     </ColumnStackLayout>
   ) : (
     <PlaceholderLoader />

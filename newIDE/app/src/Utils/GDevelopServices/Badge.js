@@ -4,6 +4,8 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
+export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
+
 export type Badge = {|
   seen: boolean,
   unlockedAt: string,

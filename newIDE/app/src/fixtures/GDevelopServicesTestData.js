@@ -112,6 +112,9 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -135,6 +138,9 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -160,6 +166,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -184,6 +193,9 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -207,6 +219,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };

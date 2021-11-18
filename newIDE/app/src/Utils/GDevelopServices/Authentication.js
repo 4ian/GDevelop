@@ -288,6 +288,33 @@ export default class Authentication {
       });
   };
 
+  acceptGameStatsEmail = async (
+    getAuthorizationHeader: () => Promise<string>
+  ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to accept game stats email while not authenticated.'
+      );
+
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
+          { getGameStatsEmail: true },
+          {
+            params: { userId: currentUser.uid },
+            headers: { Authorization: authorizationHeader },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while accepting game stats email:', error);
+        throw error.response.data;
+      });
+  };
+
   getFirebaseUserSync = (): ?FirebaseUser => {
     return this.auth.currentUser || null;
   };

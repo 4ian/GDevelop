@@ -11,7 +11,7 @@ import {
   getAchievements,
   type Badge,
   type Achievement,
-} from '../../Utils/GDevelopServices/User';
+} from '../../Utils/GDevelopServices/Badge';
 
 import AchievementList from './AchievementList';
 // $FlowFixMe[missing-export] TODO: check that this is the correct way to import SVG in the project. If yes, follow https://github.com/facebook/flow/issues/7121.

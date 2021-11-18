@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
-import { type Badge } from '../Utils/GDevelopServices/User';
+import { type Badge } from '../Utils/GDevelopServices/Badge';
 import {
   type Limits,
   type Usages,

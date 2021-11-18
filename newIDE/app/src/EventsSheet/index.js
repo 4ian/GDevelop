@@ -87,7 +87,7 @@ import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
-import { addCreateBadgePreHookIfNotClaimed } from '../Utils/GDevelopServices/User';
+import { addCreateBadgePreHookIfNotClaimed } from '../Utils/GDevelopServices/Badge';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };

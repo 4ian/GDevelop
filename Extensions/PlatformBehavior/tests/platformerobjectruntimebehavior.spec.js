@@ -475,7 +475,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
       });
 
-      it.only('can track platform angle changes', function () {
+      it('can track platform angle changes', function () {
         // The initial pltaforms AABB are put in RBush.
         runtimeScene.renderAndStep(1000 / 60);
 

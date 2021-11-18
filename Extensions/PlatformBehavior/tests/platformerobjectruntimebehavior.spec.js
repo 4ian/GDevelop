@@ -474,6 +474,32 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
       });
+
+      it.only('can track platform angle changes', function () {
+        // The initial pltaforms AABB are put in RBush.
+        runtimeScene.renderAndStep(1000 / 60);
+
+        // Now change the angle to check that the AABB is updated in RBush.
+        platform.setAngle(90);
+
+        // Put the character above the rotated platform.
+        object.setPosition(
+          platform.getX() + platform.getWidth() / 2,
+          platform.getY() - platform.getWidth() / 2 - object.getHeight() - 10
+        );
+
+        for (let i = 0; i < 15; ++i) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // The character should land on it.
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          false
+        );
+        expect(object.getX()).to.be(30);
+        expect(object.getY()).to.be(-44);
+      });
     });
   });
 

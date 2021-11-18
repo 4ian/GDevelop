@@ -9,7 +9,7 @@ import Text from '../../UI/Text';
 import {
   type Badge,
   type Achievement,
-} from '../../Utils/GDevelopServices/User';
+} from '../../Utils/GDevelopServices/Badge';
 import ScrollView from '../../UI/ScrollView';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 

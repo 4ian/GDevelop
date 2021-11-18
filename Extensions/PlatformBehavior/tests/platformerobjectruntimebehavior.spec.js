@@ -485,7 +485,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         // Put the character above the rotated platform.
         object.setPosition(
           platform.getX() + platform.getWidth() / 2,
-          platform.getY() - platform.getWidth() / 2 - object.getHeight() - 10
+          platform.getY() +
+            (platform.getHeight() - platform.getWidth()) / 2 -
+            object.getHeight() -
+            10
         );
 
         for (let i = 0; i < 15; ++i) {

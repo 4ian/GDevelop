@@ -444,6 +444,49 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     });
   };
 
+  _buildInstructionContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteInstructions(),
+      enabled: hasClipboardConditions() || hasClipboardActions(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.history),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.history),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    {
+      label: i18n._(t`Invert Condition`),
+      click: () => this._invertSelectedConditions(),
+      visible: hasSelectedAtLeastOneCondition(this.state.selection),
+    },
+  ];
+
   openAddInstructionContextMenu = (
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
@@ -550,6 +593,103 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       () => this.updateToolbar()
     );
   };
+
+  _buildEventContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Edit`),
+      click: () => this.openEventTextDialog(),
+      visible:
+        filterEditableWithEventTextDialog(
+          getSelectedEvents(this.state.selection)
+        ).length > 0,
+    },
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteEvents(),
+      enabled: hasClipboardEvents(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    {
+      label: i18n._(t`Toggle disabled`),
+      click: () => this.toggleDisabled(),
+      enabled: this._selectionCanToggleDisabled(),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Add New Event Below`),
+      click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+    },
+    {
+      label: i18n._(t`Add Sub Event`),
+      click: () => this.addSubEvents(),
+      enabled: this._selectionCanHaveSubEvents(),
+    },
+    {
+      label: i18n._(t`Add Other`),
+      submenu: this.state.allEventsMetadata.map(metadata => {
+        return {
+          label: metadata.fullName,
+          click: () => this.addNewEvent(metadata.type),
+        };
+      }),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.history),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.history),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Extract Events to a Function`),
+      click: () => this.extractEventsToFunction(),
+    },
+    {
+      label: i18n._(t`Move Events into a Group`),
+      click: () => this.moveEventsIntoNewGroup(),
+    },
+    {
+      label: i18n._(t`Analyze Objects Used in this Event`),
+      click: this._openEventsContextAnalyzer,
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Zoom In`),
+      click: () => this.onZoomEvent('IN')(),
+      accelerator: 'CmdOrCtrl+=',
+      enabled:
+        this.props.userPreferences.values.eventsSheetZoomLevel < zoomLevel.max,
+    },
+    {
+      label: i18n._(t`Zoom Out`),
+      click: () => this.onZoomEvent('OUT')(),
+      accelerator: 'CmdOrCtrl+-',
+      enabled:
+        this.props.userPreferences.values.eventsSheetZoomLevel > zoomLevel.min,
+    },
+  ];
 
   openEventContextMenu = (x: number, y: number, eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
@@ -1274,150 +1414,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   ref={eventContextMenu =>
                     (this.eventContextMenu = eventContextMenu)
                   }
-                  buildMenuTemplate={(i18n: I18nType) => [
-                    {
-                      label: i18n._(t`Edit`),
-                      click: () => this.openEventTextDialog(),
-                      visible:
-                        filterEditableWithEventTextDialog(
-                          getSelectedEvents(this.state.selection)
-                        ).length > 0,
-                    },
-                    {
-                      label: i18n._(t`Copy`),
-                      click: () => this.copySelection(),
-                      accelerator: 'CmdOrCtrl+C',
-                    },
-                    {
-                      label: i18n._(t`Cut`),
-                      click: () => this.cutSelection(),
-                      accelerator: 'CmdOrCtrl+X',
-                    },
-                    {
-                      label: i18n._(t`Paste`),
-                      click: () => this.pasteEvents(),
-                      enabled: hasClipboardEvents(),
-                      accelerator: 'CmdOrCtrl+V',
-                    },
-                    {
-                      label: i18n._(t`Delete`),
-                      click: () => this.deleteSelection(),
-                      accelerator: 'Delete',
-                    },
-                    {
-                      label: i18n._(t`Toggle disabled`),
-                      click: () => this.toggleDisabled(),
-                      enabled: this._selectionCanToggleDisabled(),
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Add New Event Below`),
-                      click: () =>
-                        this.addNewEvent('BuiltinCommonInstructions::Standard'),
-                    },
-                    {
-                      label: i18n._(t`Add Sub Event`),
-                      click: () => this.addSubEvents(),
-                      enabled: this._selectionCanHaveSubEvents(),
-                    },
-                    {
-                      label: i18n._(t`Add Other`),
-                      submenu: this.state.allEventsMetadata.map(metadata => {
-                        return {
-                          label: metadata.fullName,
-                          click: () => this.addNewEvent(metadata.type),
-                        };
-                      }),
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Undo`),
-                      click: this.undo,
-                      enabled: canUndo(this.state.history),
-                      accelerator: 'CmdOrCtrl+Z',
-                    },
-                    {
-                      label: i18n._(t`Redo`),
-                      click: this.redo,
-                      enabled: canRedo(this.state.history),
-                      accelerator: 'CmdOrCtrl+Shift+Z',
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Extract Events to a Function`),
-                      click: () => this.extractEventsToFunction(),
-                    },
-                    {
-                      label: i18n._(t`Move Events into a Group`),
-                      click: () => this.moveEventsIntoNewGroup(),
-                    },
-                    {
-                      label: i18n._(t`Analyze Objects Used in this Event`),
-                      click: this._openEventsContextAnalyzer,
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Zoom In`),
-                      click: () => this.onZoomEvent('IN')(),
-                      accelerator: 'CmdOrCtrl+=',
-                      enabled:
-                        userPreferences.values.eventsSheetZoomLevel < zoomLevel.max,
-                    },
-                    {
-                      label: i18n._(t`Zoom Out`),
-                      click: () => this.onZoomEvent('OUT')(),
-                      accelerator: 'CmdOrCtrl+-',
-                      enabled:
-                        userPreferences.values.eventsSheetZoomLevel > zoomLevel.min,
-                    },
-                  ]}
+                  buildMenuTemplate={this._buildEventContextMenu}
                 />
                 <ContextMenu
                   ref={instructionContextMenu =>
                     (this.instructionContextMenu = instructionContextMenu)
                   }
-                  buildMenuTemplate={(i18n: I18nType) => [
-                    {
-                      label: i18n._(t`Copy`),
-                      click: () => this.copySelection(),
-                      accelerator: 'CmdOrCtrl+C',
-                    },
-                    {
-                      label: i18n._(t`Cut`),
-                      click: () => this.cutSelection(),
-                      accelerator: 'CmdOrCtrl+X',
-                    },
-                    {
-                      label: i18n._(t`Paste`),
-                      click: () => this.pasteInstructions(),
-                      enabled: hasClipboardConditions() || hasClipboardActions(),
-                      accelerator: 'CmdOrCtrl+V',
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Delete`),
-                      click: () => this.deleteSelection(),
-                      accelerator: 'Delete',
-                    },
-                    { type: 'separator' },
-                    {
-                      label: i18n._(t`Undo`),
-                      click: this.undo,
-                      enabled: canUndo(this.state.history),
-                      accelerator: 'CmdOrCtrl+Z',
-                    },
-                    {
-                      label: i18n._(t`Redo`),
-                      click: this.redo,
-                      enabled: canRedo(this.state.history),
-                      accelerator: 'CmdOrCtrl+Shift+Z',
-                    },
-                    {
-                      label: i18n._(t`Invert Condition`),
-                      click: () => this._invertSelectedConditions(),
-                      visible: hasSelectedAtLeastOneCondition(this.state.selection),
-                    },
-                  ]}                />
+                  buildMenuTemplate={this._buildInstructionContextMenu}
+                />
                 {this._renderInstructionEditorDialog(
                   // Force using the new instruction editor on touch screens.
                   userPreferences.values.useNewInstructionEditorDialog ||

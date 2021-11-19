@@ -94,6 +94,36 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
+  registerAndUpdateGame = async () => {
+    const profile = this.props.authenticatedUser.profile;
+    const getAuthorizationHeader = this.props.authenticatedUser
+      .getAuthorizationHeader;
+    const gameId = this.props.project.getProjectUuid();
+    const authorName = this.props.project.getAuthor() || 'Unspecified author';
+    const gameName = this.props.project.getName() || 'Untitled game';
+    if (profile) {
+      const userId = profile.id;
+      try {
+        await getGame(getAuthorizationHeader, userId, gameId);
+        // Update the game details to ensure that it is up to date in GDevelop services.
+        await updateGame(getAuthorizationHeader, userId, {
+          gameId,
+          authorName,
+          gameName,
+        });
+      } catch (err) {
+        if (err.response.status === 404) {
+          // If the game is not registered, register it before launching the export.
+          await registerGame(getAuthorizationHeader, userId, {
+            gameId,
+            authorName,
+            gameName,
+          });
+        }
+      }
+    }
+  };
+
   launchWholeExport = async () => {
     const t = str => str; //TODO;
     const { project, exportPipeline, authenticatedUser } = this.props;
@@ -121,7 +151,9 @@ export default class ExportLauncher extends Component<Props, State> {
         case 'build':
           return t('Error while lauching the build of the game.');
         default:
-          return t('Error while building the game.');
+          return t(
+            'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'
+          );
       }
     };
 
@@ -146,33 +178,8 @@ export default class ExportLauncher extends Component<Props, State> {
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
 
     try {
-      setStep('register');
-      const profile = authenticatedUser.profile;
-      const getAuthorizationHeader = authenticatedUser.getAuthorizationHeader;
-      const gameId = project.getProjectUuid();
-      const authorName = project.getAuthor() || 'Unspecified author';
-      const gameName = project.getName() || 'Untitled game';
-      if (profile) {
-        const userId = profile.id;
-        try {
-          await getGame(getAuthorizationHeader, userId, gameId);
-          // Update the game details to ensure that it is up to date in GDevelop services.
-          await updateGame(getAuthorizationHeader, userId, {
-            gameId,
-            authorName,
-            gameName,
-          });
-        } catch (err) {
-          if (err.response.status === 404) {
-            // If the game is not registered, register it before launching the export.
-            await registerGame(getAuthorizationHeader, userId, {
-              gameId,
-              authorName,
-              gameName,
-            });
-          }
-        }
-      }
+      // We do not await for this call, allowing to start building the game in parrallel.
+      this.registerAndUpdateGame();
     } catch {
       // Best effort call, we don't prevent building the game.
       console.log('Error while registering the game.');

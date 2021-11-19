@@ -25,7 +25,6 @@ const styles = {
 
 export type BuildStep =
   | ''
-  | 'register'
   | 'export'
   | 'resources-download'
   | 'compress'
@@ -61,9 +60,7 @@ export default ({
 }: Props) => (
   <Stepper
     activeStep={
-      exportStep === 'export' ||
-      exportStep === 'register' ||
-      exportStep === 'resources-download'
+      exportStep === 'export' || exportStep === 'resources-download'
         ? 0
         : exportStep === 'compress' || exportStep === 'upload'
         ? 1

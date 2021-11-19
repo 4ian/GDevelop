@@ -16,6 +16,7 @@ import {
   getGame,
   registerGame,
 } from '../Utils/GDevelopServices/Game';
+import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { GameDetailsDialog } from './GameDetailsDialog';
@@ -26,6 +27,9 @@ type Props = {|
   hideLoader?: boolean,
   onGameRegistered?: () => void,
 |};
+
+type DetailsTab = 'details' | 'analytics' | 'monetization';
+type UnavailableReason = 'unauthorized' | 'not-existing' | null;
 
 export const GameRegistration = ({
   project,
@@ -42,9 +46,10 @@ export const GameRegistration = ({
     onAcceptGameStatsEmail,
   } = React.useContext(AuthenticatedUserContext);
   const [error, setError] = React.useState<Error | null>(null);
-  const [unavailableReason, setUnavailableReason] = React.useState<
-    'unauthorized' | 'not-existing' | null
-  >(null);
+  const [
+    unavailableReason,
+    setUnavailableReason,
+  ] = React.useState<UnavailableReason>(null);
   const [game, setGame] = React.useState<Game | null>(null);
   const [registrationInProgress, setRegistrationInProgress] = React.useState(
     false
@@ -54,9 +59,9 @@ export const GameRegistration = ({
     setAcceptGameStatsEmailInProgress,
   ] = React.useState(false);
   const [detailsOpened, setDetailsOpened] = React.useState(false);
-  const [detailsInitialTab, setDetailsInitialTab] = React.useState<
-    'details' | 'analytics' | 'monetization'
-  >('details');
+  const [detailsInitialTab, setDetailsInitialTab] = React.useState<DetailsTab>(
+    'details'
+  );
 
   const loadGame = React.useCallback(
     async () => {
@@ -111,7 +116,7 @@ export const GameRegistration = ({
           errorId: 'register-game-error',
           // TODO: i18n
           message:
-            'Unable to register the game. ' +
+            'Unable to register the game.' +
             ' ' +
             'Verify your internet connection or try again later.',
         });
@@ -129,7 +134,7 @@ export const GameRegistration = ({
       try {
         await onAcceptGameStatsEmail();
       } catch (error) {
-        console.error('Unable to acccept game stats email.', error);
+        console.error('Unable to accept game stats email.', error);
         showErrorBox({
           rawError: error,
           errorId: 'game-stats-email-error',
@@ -151,7 +156,78 @@ export const GameRegistration = ({
     [loadGame]
   );
 
-  if (!project || hideIfRegistered) {
+  return (
+    <GameRegistrationWidget
+      authenticated={authenticated}
+      profile={profile}
+      onLogin={onLogin}
+      onCreateAccount={onCreateAccount}
+      project={project}
+      game={game}
+      setGame={setGame}
+      loadGame={loadGame}
+      onRegisterGame={onRegisterGame}
+      registrationInProgress={registrationInProgress}
+      hideIfRegistered={hideIfRegistered}
+      unavailableReason={unavailableReason}
+      acceptGameStatsEmailInProgress={acceptGameStatsEmailInProgress}
+      onAcceptGameStatsEmail={_onAcceptGameStatsEmail}
+      detailsInitialTab={detailsInitialTab}
+      setDetailsInitialTab={setDetailsInitialTab}
+      detailsOpened={detailsOpened}
+      setDetailsOpened={setDetailsOpened}
+      error={error}
+      hideLoader={hideLoader}
+    />
+  );
+};
+
+type GameRegistrationWidgetProps = {|
+  authenticated: boolean,
+  profile?: ?Profile,
+  onLogin: () => void,
+  onCreateAccount: () => void,
+  project?: ?gdProject,
+  game: ?Game,
+  setGame: Game => void,
+  loadGame: () => Promise<void>,
+  onRegisterGame: () => Promise<void>,
+  registrationInProgress: boolean,
+  hideIfRegistered?: boolean,
+  unavailableReason: ?UnavailableReason,
+  acceptGameStatsEmailInProgress: boolean,
+  onAcceptGameStatsEmail: () => Promise<void>,
+  detailsInitialTab: DetailsTab,
+  setDetailsInitialTab: (string: DetailsTab) => void,
+  detailsOpened: boolean,
+  setDetailsOpened: boolean => void,
+  error: ?Error,
+  hideLoader?: boolean,
+|};
+
+export const GameRegistrationWidget = ({
+  authenticated,
+  profile,
+  onLogin,
+  onCreateAccount,
+  project,
+  game,
+  setGame,
+  loadGame,
+  onRegisterGame,
+  registrationInProgress,
+  hideIfRegistered,
+  unavailableReason,
+  acceptGameStatsEmailInProgress,
+  onAcceptGameStatsEmail,
+  detailsInitialTab,
+  setDetailsInitialTab,
+  detailsOpened,
+  setDetailsOpened,
+  error,
+  hideLoader,
+}: GameRegistrationWidgetProps) => {
+  if (!project) {
     return null;
   }
 
@@ -195,7 +271,21 @@ export const GameRegistration = ({
     );
   }
 
+  if (error) {
+    return (
+      <PlaceholderError
+        onRetry={() => {
+          loadGame();
+        }}
+      >
+        <Trans>Can't check if the game is registered online.</Trans>{' '}
+        <Trans>Verify your internet connection or try again later.</Trans>
+      </PlaceholderError>
+    );
+  }
+
   if (game) {
+    if (hideIfRegistered) return null;
     if (!profile.getGameStatsEmail) {
       return (
         <AlertMessage
@@ -205,7 +295,7 @@ export const GameRegistration = ({
               label={<Trans>Get weekly game stats</Trans>}
               disabled={acceptGameStatsEmailInProgress}
               primary
-              onClick={_onAcceptGameStatsEmail}
+              onClick={onAcceptGameStatsEmail}
             />
           )}
         >
@@ -265,17 +355,6 @@ export const GameRegistration = ({
           />
         )}
       </ColumnStackLayout>
-    );
-  } else if (error) {
-    return (
-      <PlaceholderError
-        onRetry={() => {
-          loadGame();
-        }}
-      >
-        <Trans>Can't check if the game is registered online.</Trans>{' '}
-        <Trans>Verify your internet connection or try again later.</Trans>
-      </PlaceholderError>
     );
   }
 

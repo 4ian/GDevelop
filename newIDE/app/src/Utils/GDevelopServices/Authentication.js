@@ -284,7 +284,7 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while editing user:', error);
-        throw error.response.data;
+        throw error;
       });
   };
 
@@ -311,7 +311,7 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while accepting game stats email:', error);
-        throw error.response.data;
+        throw error;
       });
   };
 

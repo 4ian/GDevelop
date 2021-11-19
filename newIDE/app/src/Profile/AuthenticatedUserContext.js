@@ -23,6 +23,7 @@ export type AuthenticatedUser = {|
   onRefreshUserProfile: () => Promise<void>,
   onRefreshFirebaseProfile: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
+  onAcceptGameStatsEmail: () => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
 
@@ -41,6 +42,7 @@ export const initialAuthenticatedUser = {
   onRefreshUserProfile: async () => {},
   onRefreshFirebaseProfile: async () => {},
   onSendEmailVerification: async () => {},
+  onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 

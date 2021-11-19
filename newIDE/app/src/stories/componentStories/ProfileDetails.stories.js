@@ -83,11 +83,12 @@ export const OtherProfileWithAchievementLoadingError = (args: ArgsTypes) => (
 OtherProfileWithAchievementLoadingError.decorators = [withMock];
 OtherProfileWithAchievementLoadingError.parameters = apiDataServerSideError;
 export const Loading = (args: ArgsTypes) => (
-  <ProfileDetails {...args} profile={null} />
+  <ProfileDetails {...args} badges={[]} profile={null} />
 );
 export const Errored = (args: ArgsTypes) => (
   <ProfileDetails
     {...args}
+    badges={[]}
     profile={null}
     error={new Error('Connectivity Problems')}
     onRetry={() => {

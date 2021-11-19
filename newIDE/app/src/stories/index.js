@@ -87,6 +87,7 @@ import {
   usagesForIndieUser,
   indieFirebaseUser,
   indieUserProfile,
+  indieUserProfileWithGameStatsEmail,
   fakeNoSubscriptionAuthenticatedUser,
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
@@ -241,6 +242,7 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
+import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -4188,6 +4190,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4202,6 +4205,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4216,6 +4220,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress
@@ -5484,6 +5489,273 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       </AuthenticatedUserContext.Provider>
     );
   });
+
+storiesOf('GameRegistration', module)
+  .addDecorator(muiDecorator)
+  .add('No project loaded', () => (
+    <GameRegistrationWidget
+      authenticated={false}
+      profile={null}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={null}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('loading', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('loading but hiding loader', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader
+    />
+  ))
+  .add('Not logged in', () => (
+    <GameRegistrationWidget
+      authenticated={false}
+      profile={null}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('Game not registered', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason="not-existing"
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('Not authorized to access the game analytics', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason="unauthorized"
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('With error loading the game', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={null}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={new Error('Error loading game')}
+      hideLoader={false}
+    />
+  ))
+  .add('Game loaded but hiding if registered', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={game1}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('Game loaded but email not accepted', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfile}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={game1}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('Game loaded and email accepted', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfileWithGameStatsEmail}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={game1}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened={false}
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ))
+  .add('Game loaded and details opened', () => (
+    <GameRegistrationWidget
+      authenticated
+      profile={indieUserProfileWithGameStatsEmail}
+      onLogin={action('onLogin')}
+      onCreateAccount={action('onCreateAccount')}
+      project={testProject.project}
+      game={game1}
+      setGame={action('setGame')}
+      loadGame={action('loadGame')}
+      onRegisterGame={action('onRegisterGame')}
+      registrationInProgress={false}
+      hideIfRegistered={false}
+      unavailableReason={null}
+      acceptGameStatsEmailInProgress={false}
+      onAcceptGameStatsEmail={action('onAcceptGameStatsEmail')}
+      detailsInitialTab={'details'}
+      setDetailsInitialTab={action('setDetailsInitialTab')}
+      detailsOpened
+      setDetailsOpened={action('setDetailsOpened')}
+      error={null}
+      hideLoader={false}
+    />
+  ));
 
 storiesOf('AssetStore/ExtensionStore', module)
   .addDecorator(muiDecorator)

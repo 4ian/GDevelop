@@ -37,6 +37,15 @@ export const indieUserProfile: Profile = {
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
+  getGameStatsEmail: false,
+};
+
+export const indieUserProfileWithGameStatsEmail: Profile = {
+  id: 'indie-user',
+  email: 'indie-user@example.com',
+  username: 'im-the-indie-user',
+  description: 'Just here to develop indie games',
+  getGameStatsEmail: true,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -111,6 +120,9 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -134,6 +146,9 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -159,6 +174,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -183,6 +201,9 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
@@ -206,6 +227,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };

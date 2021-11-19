@@ -1,6 +1,5 @@
 /// <reference path="shifty.d.ts" />
 namespace gdjs {
-  const logger = new gdjs.Logger('Tween behavior');
   export interface RuntimeScene {
     shiftyJsScene: shifty.Scene;
   }
@@ -146,9 +145,7 @@ namespace gdjs {
           if (destroyObjectWhenFinished)
             this.owner.deleteFromScene(this._runtimeScene);
         })
-        .catch((e) => {
-          logger.error('An error has occured while running the tween: ', e);
-        });
+        .catch((e) => {});
     }
 
     private _tweenExists(identifier: string): boolean {

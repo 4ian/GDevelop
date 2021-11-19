@@ -178,11 +178,11 @@ export default class ExportLauncher extends Component<Props, State> {
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
 
     try {
-      // We do not await for this call, allowing to start building the game in parrallel.
+      // We do not await for this call, allowing to start building the game in parallel.
       this.registerAndUpdateGame();
     } catch {
       // Best effort call, we don't prevent building the game.
-      console.log('Error while registering the game.');
+      console.warn('Error while registering the game - ignoring it.');
     }
 
     try {

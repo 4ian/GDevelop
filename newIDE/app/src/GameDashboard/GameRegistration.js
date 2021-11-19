@@ -182,7 +182,7 @@ export const GameRegistration = ({
   );
 };
 
-type GameRegistrationWidgetProps = {|
+export type GameRegistrationWidgetProps = {|
   authenticated: boolean,
   profile?: ?Profile,
   onLogin: () => void,

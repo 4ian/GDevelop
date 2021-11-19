@@ -13,7 +13,10 @@ import { I18n } from '@lingui/react';
 import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
-import { type Badge } from '../Utils/GDevelopServices/Badge';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  type Badge,
+} from '../Utils/GDevelopServices/Badge';
 
 type DisplayedProfile = {
   +email?: string,
@@ -100,10 +103,12 @@ const ProfileDetails = ({
               />
             </ResponsiveLineStackLayout>
           )}
-          <UserAchievements
-            badges={badges}
-            displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
-          />
+          {ACHIEVEMENT_FEATURE_FLAG && (
+            <UserAchievements
+              badges={badges}
+              displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
+            />
+          )}
         </Column>
       )}
     </I18n>

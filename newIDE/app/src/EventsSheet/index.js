@@ -90,6 +90,7 @@ import AuthenticatedUserContext, {
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EVENT,
+  ACHIEVEMENT_FEATURE_FLAG,
 } from '../Utils/GDevelopServices/Badge';
 const gd: libGDevelop = global.gd;
 
@@ -257,11 +258,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   constructor(props: ComponentProps) {
     super(props);
-    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
-      this.props.authenticatedUser,
-      TRIVIAL_FIRST_EVENT,
-      this._addNewEvent
-    );
+    if (ACHIEVEMENT_FEATURE_FLAG) {
+      this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+        this.props.authenticatedUser,
+        TRIVIAL_FIRST_EVENT,
+        this._addNewEvent
+      );
+    } else {
+      this.addNewEvent = this._addNewEvent;
+    }
   }
 
   componentDidMount() {
@@ -269,11 +274,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
-    this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
-      this.props.authenticatedUser,
-      TRIVIAL_FIRST_EVENT,
-      this._addNewEvent
-    );
+    if (ACHIEVEMENT_FEATURE_FLAG) {
+      this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+        this.props.authenticatedUser,
+        TRIVIAL_FIRST_EVENT,
+        this._addNewEvent
+      );
+    } else {
+      this.addNewEvent = this._addNewEvent;
+    }
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();

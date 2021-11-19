@@ -2,11 +2,13 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import ListIcon from './ListIcon';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 import { MarkdownText } from './MarkdownText';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ListItem from '@material-ui/core/ListItem';
@@ -17,6 +19,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
+import { textEllispsisStyle } from './TextEllipsis';
 
 type Option =
   | {|
@@ -25,6 +28,7 @@ type Option =
   | {|
       text: string, // The text used for filtering. If empty, item is always shown.
       value: string, // The value to show on screen and to be selected
+      translatableValue?: MessageDescriptor,
       onClick?: () => void, // If defined, will be called when the item is clicked. onChange/onChoose won't be called.
       renderIcon?: ?() => React.Element<typeof ListIcon | typeof SvgIcon>,
     |};
@@ -64,13 +68,12 @@ const styles = {
     width: '100%',
   },
   listItem: {
+    // Make the list items very dense:
     padding: 0,
     margin: 0,
-    display: 'inline-block',
-    whiteSpace: 'nowrap',
-    width: 'calc(100%)',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+  },
+  listItemText: {
+    margin: '1px 0',
   },
 };
 
@@ -94,7 +97,10 @@ const useStyles = makeStyles({
   },
 });
 
-const renderItem = (option: Option, state: Object): React.Node => {
+const makeRenderItem = (i18n: I18nType) => (
+  option: Option,
+  state: Object
+): React.Node => {
   if (option.type && option.type === 'separator') {
     return (
       <ListItem
@@ -105,10 +111,21 @@ const renderItem = (option: Option, state: Object): React.Node => {
       />
     );
   }
+
+  const value = option.translatableValue
+    ? i18n._(option.translatableValue)
+    : option.value;
   return (
-    <ListItem component={'div'} style={styles.listItem}>
+    <ListItem dense={true} component={'div'} style={styles.listItem}>
       {option.renderIcon && <ListItemIcon>{option.renderIcon()}</ListItemIcon>}
-      {option.value}
+      <ListItemText
+        style={styles.listItemText}
+        primary={
+          <div title={value} style={textEllispsisStyle}>
+            {value}
+          </div>
+        }
+      />
     </ListItem>
   );
 };
@@ -129,8 +146,11 @@ const filterFunction = (
   });
 
   if (
-    !optionList.filter(option => option.type !== 'separator' && option.value)
-      .length
+    !optionList.filter(
+      option =>
+        option.type !== 'separator' &&
+        (option.value || option.translatableValue)
+    ).length
   )
     return [];
 
@@ -264,7 +284,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             value={currentInputValue}
             onInputChange={handleInputChange}
             options={props.dataSource}
-            renderOption={renderItem}
+            renderOption={makeRenderItem(i18n)}
             getOptionDisabled={isOptionDisabled}
             getOptionLabel={(option: Option) =>
               getOptionLabel(option, currentInputValue)

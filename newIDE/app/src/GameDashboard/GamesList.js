@@ -17,9 +17,11 @@ type Props = {|
 export const GamesList = (props: Props) => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
-  const { authenticated, profile, getAuthorizationHeader } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const {
+    authenticated,
+    firebaseUser,
+    getAuthorizationHeader,
+  } = React.useContext(AuthenticatedUserContext);
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
   const [openedGameInitialTab, setOpenedGameInitialTab] = React.useState<
     'details' | 'analytics' | 'monetization'
@@ -27,18 +29,18 @@ export const GamesList = (props: Props) => {
 
   const loadGames = React.useCallback(
     async () => {
-      if (!authenticated || !profile) return;
+      if (!authenticated || !firebaseUser) return;
 
       try {
         setError(null);
-        const games = await getGames(getAuthorizationHeader, profile.id);
+        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
         setGames(games);
       } catch (error) {
         console.error('Error while loading user games.', error);
         setError(error);
       }
     },
-    [authenticated, profile, getAuthorizationHeader]
+    [authenticated, firebaseUser, getAuthorizationHeader]
   );
 
   React.useEffect(

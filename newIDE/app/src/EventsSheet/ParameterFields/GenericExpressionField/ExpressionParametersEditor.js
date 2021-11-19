@@ -30,19 +30,18 @@ type Props = {|
 |};
 type State = {||};
 
+export const hasNonCodeOnlyParameters = (
+  expressionMetadata: gdExpressionMetadata
+) =>
+  mapFor(0, expressionMetadata.getParametersCount(), i => {
+    const parameterMetadata = expressionMetadata.getParameter(i);
+    return !parameterMetadata.isCodeOnly();
+  }).filter(isVisible => isVisible).length !== 0;
+
 export default class ExpressionParametersEditor extends React.Component<
   Props,
   State
 > {
-  static getNonCodeOnlyParametersCount(
-    expressionMetadata: gdExpressionMetadata
-  ) {
-    return mapFor(0, expressionMetadata.getParametersCount(), i => {
-      const parameterMetadata = expressionMetadata.getParameter(i);
-      return !parameterMetadata.isCodeOnly();
-    }).filter(isVisible => isVisible).length;
-  }
-
   render() {
     const {
       expressionMetadata,
@@ -97,9 +96,7 @@ export default class ExpressionParametersEditor extends React.Component<
             />
           );
         })}
-        {ExpressionParametersEditor.getNonCodeOnlyParametersCount(
-          expressionMetadata
-        ) === 0 && (
+        {!hasNonCodeOnlyParameters(expressionMetadata) && (
           <EmptyMessage>
             <Trans>There is nothing to configure.</Trans>
           </EmptyMessage>

@@ -18,8 +18,12 @@ export type AuthenticatedUser = {|
   onLogout: () => void,
   onLogin: () => void,
   onEdit: () => void,
+  onChangeEmail: () => void,
   onCreateAccount: () => void,
-  onRefreshUserProfile: () => void,
+  onRefreshUserProfile: () => Promise<void>,
+  onRefreshFirebaseProfile: () => Promise<void>,
+  onSendEmailVerification: () => Promise<void>,
+  onAcceptGameStatsEmail: () => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
 
@@ -33,8 +37,12 @@ export const initialAuthenticatedUser = {
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {},
+  onRefreshUserProfile: async () => {},
+  onRefreshFirebaseProfile: async () => {},
+  onSendEmailVerification: async () => {},
+  onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 

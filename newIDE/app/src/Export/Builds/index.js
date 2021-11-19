@@ -54,10 +54,13 @@ export default class Builds extends Component<Props, State> {
   };
 
   _refreshBuilds = () => {
-    const { getAuthorizationHeader, profile } = this.props.authenticatedUser;
-    if (!profile) return;
+    const {
+      getAuthorizationHeader,
+      firebaseUser,
+    } = this.props.authenticatedUser;
+    if (!firebaseUser) return;
 
-    getBuilds(getAuthorizationHeader, profile.id).then(
+    getBuilds(getAuthorizationHeader, firebaseUser.uid).then(
       builds => {
         this.setState(
           {

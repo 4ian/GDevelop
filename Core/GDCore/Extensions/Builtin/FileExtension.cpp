@@ -22,7 +22,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/storage");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddCondition(
           "GroupExists",
@@ -194,7 +193,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
                  "res/actions/launchFile.png")
       .AddParameter("string", _("Command"))
       .MarkAsAdvanced();
-#endif
 }
 
 }  // namespace gd

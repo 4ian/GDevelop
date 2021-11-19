@@ -1,4 +1,5 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('Firebase (setup)');
   export namespace evtTools {
     /**
      * Firebase Event Tools
@@ -23,7 +24,7 @@ namespace gdjs {
               .getExtensionProperty('Firebase', 'FirebaseConfig')
           );
         } catch (e) {
-          console.error('The Firebase configuration is invalid! Error: ' + e);
+          logger.error('The Firebase configuration is invalid! Error: ' + e);
           return;
         }
         if (typeof firebaseConfig !== 'object') return;

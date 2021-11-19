@@ -17,8 +17,8 @@ const addSearchParameterToUrl = (
   urlEncodedParameterName: string,
   urlEncodedValue: string
 ) => {
-  if (url.startsWith('data:')) {
-    // data protocol does not support search parameters, which are useless anyway.
+  if (url.startsWith('data:') || url.startsWith('blob:')) {
+    // blob/data protocol does not support search parameters, which are useless anyway.
     return url;
   }
 

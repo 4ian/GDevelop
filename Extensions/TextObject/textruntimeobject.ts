@@ -224,7 +224,7 @@ namespace gdjs {
     /**
      * Get the font size of the characters of the object.
      */
-    getCharacterSize() {
+    getCharacterSize(): number {
       return this._characterSize;
     }
 

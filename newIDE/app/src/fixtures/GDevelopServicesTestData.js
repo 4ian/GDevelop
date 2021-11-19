@@ -22,6 +22,13 @@ export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
   providerId: 'fake-provider.com',
   email: 'indie-user@example.com',
+  emailVerified: false,
+};
+
+export const indieVerifiedFirebaseUser: FirebaseUser = {
+  uid: 'indie-user',
+  providerId: 'fake-provider.com',
+  email: 'indie-user@example.com',
   emailVerified: true,
 };
 
@@ -29,6 +36,8 @@ export const indieUserProfile: Profile = {
   id: 'indie-user',
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
+  description: 'Just here to develop indie games',
+  getGameStatsEmail: false,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -92,9 +101,19 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -109,9 +128,46 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
+  getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
+};
+
+export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
+  authenticated: true,
+  profile: indieUserProfile,
+  firebaseUser: indieVerifiedFirebaseUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  onLogout: () => {},
+  onLogin: () => {},
+  onEdit: () => {},
+  onChangeEmail: () => {},
+  onCreateAccount: () => {},
+  onRefreshUserProfile: async () => {
+    console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -126,9 +182,19 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -143,9 +209,19 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onLogout: () => {},
   onLogin: () => {},
   onEdit: () => {},
+  onChangeEmail: () => {},
   onCreateAccount: () => {},
-  onRefreshUserProfile: () => {
+  onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
+  },
+  onRefreshFirebaseProfile: async () => {
+    console.info('This should refresh the firebase profile');
+  },
+  onSendEmailVerification: async () => {
+    console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -729,4 +805,39 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
   tags: [],
   previewImageUrls: [],
   gdevelopVersion: '99.0.0',
+};
+
+export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
+  id: '2ff24efa0de9b1340d7e8c8aedb494af6b4db9a72c6a643303734755efb977df',
+  name: 'Geometry monster',
+  shortDescription:
+    'A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n',
+  license: 'MIT',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/examples/geometry-monster/thumbnail.png',
+  ],
+  authorIds: [],
+  tags: [
+    'geometry-monster',
+    '',
+    'Advanced control features',
+    'Audio',
+    'Standard Conversions',
+    'Builtin events',
+    'Keyboard features',
+    'Mathematical tools',
+    'Mouse and touch',
+    'Features for all objects',
+    'Scene management features',
+    'Time',
+    'Variable features',
+    'Particle system',
+    'Sprite',
+    'Text object',
+    'Stay On Screen',
+    'Sine (or ellipsis) Movement',
+    'Flash (blink)',
+    'Health (life points and damages for objects)',
+  ],
+  gdevelopVersion: '',
 };

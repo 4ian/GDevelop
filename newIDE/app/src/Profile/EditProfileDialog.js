@@ -1,11 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import Dialog from '../UI/Dialog';
-import TextField from '../UI/TextField';
 import {
   type EditForm,
   type AuthError,
@@ -13,11 +12,18 @@ import {
 } from '../Utils/GDevelopServices/Authentication';
 import LeftLoader from '../UI/LeftLoader';
 import { ColumnStackLayout } from '../UI/Layout';
+import {
+  isUsernameValid,
+  UsernameField,
+  usernameFormatError,
+} from './UsernameField';
+import TextField from '../UI/TextField';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   profile: Profile,
   onClose: () => void,
-  onEdit: (form: EditForm) => void,
+  onEdit: (form: EditForm) => Promise<void>,
   editInProgress: boolean,
   error: ?AuthError,
 |};
@@ -31,6 +37,7 @@ export const getUsernameErrorText = (error: ?AuthError) => {
 
   if (error.code === 'auth/username-used')
     return 'This username is already used, please pick another one.';
+  if (error.code === 'auth/malformed-username') return usernameFormatError;
   return undefined;
 };
 
@@ -38,6 +45,8 @@ export default class EditDialog extends Component<Props, State> {
   state = {
     form: {
       username: this.props.profile.username || '',
+      description: this.props.profile.description || '',
+      getGameStatsEmail: !!this.props.profile.getGameStatsEmail,
     },
   };
 
@@ -61,7 +70,9 @@ export default class EditDialog extends Component<Props, State> {
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
-          disabled={editInProgress}
+          disabled={
+            editInProgress || !isUsernameValid(this.state.form.username)
+          }
         />
       </LeftLoader>,
     ];
@@ -78,17 +89,43 @@ export default class EditDialog extends Component<Props, State> {
         open
       >
         <ColumnStackLayout noMargin>
-          <TextField
-            autoFocus
+          <UsernameField
             value={this.state.form.username}
-            floatingLabelText={<Trans>Username</Trans>}
-            errorText={getUsernameErrorText(error)}
-            fullWidth
             onChange={(e, value) => {
               this.setState({
                 form: {
                   ...this.state.form,
                   username: value,
+                },
+              });
+            }}
+            errorText={getUsernameErrorText(error)}
+          />
+          <TextField
+            value={this.state.form.description}
+            floatingLabelText={<Trans>Bio</Trans>}
+            fullWidth
+            multiline
+            rows={3}
+            rowsMax={5}
+            hintText={t`What are you using GDevelop for?`}
+            onChange={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  description: value,
+                },
+              });
+            }}
+          />
+          <Checkbox
+            label={<Trans>I want to receive weekly stats about my games</Trans>}
+            checked={this.state.form.getGameStatsEmail}
+            onCheck={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  getGameStatsEmail: value,
                 },
               });
             }}

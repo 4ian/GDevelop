@@ -44,7 +44,7 @@ export default class ParticleEmitterEditor extends React.Component<
         ))}
         <SelectField
           fullWidth
-          floatingLabelText={<Trans>Particles kind</Trans>}
+          floatingLabelText={<Trans>Particle type</Trans>}
           value={particleEmitterObject.getRendererType()}
           onChange={(e, i, value: string) => {
             const rendererType = parseInt(value, 10) || 0;
@@ -57,7 +57,7 @@ export default class ParticleEmitterEditor extends React.Component<
         >
           <SelectOption
             value={gd.ParticleEmitterObject.Point}
-            primaryText={t`Point`}
+            primaryText={t`Circle`}
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Line}
@@ -65,7 +65,7 @@ export default class ParticleEmitterEditor extends React.Component<
           />
           <SelectOption
             value={gd.ParticleEmitterObject.Quad}
-            primaryText={t`Textured`}
+            primaryText={t`Image`}
           />
         </SelectField>
         {particleEmitterObject.getRendererType() ===

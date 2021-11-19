@@ -67,13 +67,13 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   /**
-   * Given an object name (or empty if none) and a behavior name (or empty if none),
-   * return the index of the first parameter that is inside the parenthesis: 
-   * 0, 1 or 2.
-   * 
-   * For example, in an expression like `Object.MyBehavior::Method("hello")`, the
-   * parameter "hello" is the second parameter (the first being by convention Object,
-   * and the second MyBehavior, also by convention).
+   * Given an object name (or empty if none) and a behavior name (or empty if
+   * none), return the index of the first parameter that is inside the
+   * parenthesis: 0, 1 or 2.
+   *
+   * For example, in an expression like `Object.MyBehavior::Method("hello")`,
+   * the parameter "hello" is the second parameter (the first being by
+   * convention Object, and the second MyBehavior, also by convention).
    */
   static size_t WrittenParametersFirstIndex(const gd::String &objectName,
                                             const gd::String &behaviorName) {
@@ -403,9 +403,18 @@ class GD_CORE_API ExpressionParser2 {
     const gd::ExpressionMetadata &metadata =
         MetadataProvider::GetAnyExpressionMetadata(platform, functionFullName);
 
+    // In case we can't find a valid expression, ensure the node has the type
+    // that is requested by the parent, so we avoid putting "unknown" (which
+    // would be also correct, but less precise and would prevent completions to
+    // be shown to the user)
+    const gd::String returnType =
+        gd::MetadataProvider::IsBadExpressionMetadata(metadata) == true
+            ? type
+            : metadata.GetReturnType();
+
     auto parametersNode = Parameters(metadata.parameters);
     auto function =
-        gd::make_unique<FunctionCallNode>(metadata.GetReturnType(),
+        gd::make_unique<FunctionCallNode>(returnType,
                                           std::move(parametersNode.parameters),
                                           metadata,
                                           functionFullName);
@@ -458,9 +467,18 @@ class GD_CORE_API ExpressionParser2 {
           MetadataProvider::GetObjectAnyExpressionMetadata(
               platform, objectType, objectFunctionOrBehaviorName);
 
+      // In case we can't find a valid expression, ensure the node has the type
+      // that is requested by the parent, so we avoid putting "unknown" (which
+      // would be also correct, but less precise and would prevent completions
+      // to be shown to the user)
+      const gd::String returnType =
+          gd::MetadataProvider::IsBadExpressionMetadata(metadata) == true
+              ? type
+              : metadata.GetReturnType();
+
       auto parametersNode = Parameters(metadata.parameters, objectName);
       auto function = gd::make_unique<FunctionCallNode>(
-          metadata.GetReturnType(),
+          returnType,
           objectName,
           std::move(parametersNode.parameters),
           metadata,
@@ -520,10 +538,19 @@ class GD_CORE_API ExpressionParser2 {
           MetadataProvider::GetBehaviorAnyExpressionMetadata(
               platform, behaviorType, functionName);
 
+      // In case we can't find a valid expression, ensure the node has the type
+      // that is requested by the parent, so we avoid putting "unknown" (which
+      // would be also correct, but less precise and would prevent completions
+      // to be shown to the user)
+      const gd::String returnType =
+          gd::MetadataProvider::IsBadExpressionMetadata(metadata) == true
+              ? type
+              : metadata.GetReturnType();
+
       auto parametersNode =
           Parameters(metadata.parameters, objectName, behaviorName);
       auto function = gd::make_unique<FunctionCallNode>(
-          metadata.GetReturnType(),
+          returnType,
           objectName,
           behaviorName,
           std::move(parametersNode.parameters),

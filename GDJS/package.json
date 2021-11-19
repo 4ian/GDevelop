@@ -11,7 +11,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^14.11.1",
     "better-docs": "^2.3.2",
-    "esbuild": "^0.8.26",
+    "esbuild": "^0.13.12",
     "jsdoc": "^3.6.6",
     "jsdoc-autoprivate": "0.0.1",
     "jsdoc-fresh": "^1.0.5",

@@ -25,6 +25,11 @@ import BuildsWatcher from './Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
 } from './Builds/BuildStepsProgress';
+import {
+  registerGame,
+  getGame,
+  updateGame,
+} from '../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
@@ -89,22 +94,77 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
-  launchWholeExport = (authenticatedUser: AuthenticatedUser) => {
+  registerAndUpdateGame = async () => {
+    const profile = this.props.authenticatedUser.profile;
+    const getAuthorizationHeader = this.props.authenticatedUser
+      .getAuthorizationHeader;
+    const gameId = this.props.project.getProjectUuid();
+    const authorName = this.props.project.getAuthor() || 'Unspecified author';
+    const gameName = this.props.project.getName() || 'Untitled game';
+    if (profile) {
+      const userId = profile.id;
+      try {
+        await getGame(getAuthorizationHeader, userId, gameId);
+        // Update the game details to ensure that it is up to date in GDevelop services.
+        await updateGame(getAuthorizationHeader, userId, {
+          gameId,
+          authorName,
+          gameName,
+        });
+      } catch (err) {
+        if (err.response.status === 404) {
+          // If the game is not registered, register it before launching the export.
+          await registerGame(getAuthorizationHeader, userId, {
+            gameId,
+            authorName,
+            gameName,
+          });
+        }
+      }
+    }
+  };
+
+  launchWholeExport = async () => {
     const t = str => str; //TODO;
-    const { project, exportPipeline } = this.props;
+    const { project, exportPipeline, authenticatedUser } = this.props;
     sendExportLaunched(exportPipeline.name);
 
     if (!displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project)))
       return;
 
-    const handleError = (message: string) => (err: Error) => {
+    const getErrorMessage = () => {
+      switch (this.state.exportStep) {
+        case 'export':
+          return t('Error while preparing the exporter.');
+        case 'resources-download':
+          return t('Error while exporting the game.');
+        case 'compress':
+          return t(
+            'Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.'
+          );
+        case 'upload':
+          return t('Error while compressing the game.');
+        case 'waiting-for-build':
+          return t(
+            'Error while uploading the game. Check your internet connection or try again later.'
+          );
+        case 'build':
+          return t('Error while lauching the build of the game.');
+        default:
+          return t(
+            'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'
+          );
+      }
+    };
+
+    const handleError = (err: Error) => {
       if (!this.state.errored) {
         this.setState({
           errored: true,
         });
         showErrorBox({
           message:
-            message +
+            getErrorMessage() +
             (err.message ? `\n\nDetails of the error: ${err.message}` : ''),
           rawError: {
             exportStep: this.state.exportStep,
@@ -113,94 +173,75 @@ export default class ExportLauncher extends Component<Props, State> {
           errorId: 'export-error',
         });
       }
-
-      throw err;
     };
 
-    const exportPipelineContext = {
-      project,
-      updateStepProgress: this._updateStepProgress,
-      exportState: this.state.exportState,
-    };
+    const setStep = (step: BuildStep) => this.setState({ exportStep: step });
 
-    this.setState({
-      exportStep: 'export',
-      stepCurrentProgress: 0,
-      stepMaxProgress: 0,
-      errored: false,
-      build: null,
-    });
-    exportPipeline
-      .prepareExporter(exportPipelineContext)
-      .then(preparedExporter => {
-        return exportPipeline.launchExport(
-          exportPipelineContext,
-          preparedExporter
-        );
-      }, handleError(t('Error while preparing the exporter.')))
-      .then(exportOutput => {
-        this.setState({
-          exportStep: 'resources-download',
-        });
-        return exportPipeline.launchResourcesDownload(
-          exportPipelineContext,
-          exportOutput
-        );
-      }, handleError(t('Error while exporting the game.')))
-      .then(resourcesDownloadOutput => {
-        this.setState({
-          exportStep: 'compress',
-        });
-        return exportPipeline.launchCompression(
-          exportPipelineContext,
-          resourcesDownloadOutput
-        );
-      }, handleError(t('Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.')))
-      .then(compressionOutput => {
-        const { launchUpload, launchOnlineBuild } = exportPipeline;
-        if (!!launchUpload && !!launchOnlineBuild) {
-          this.setState({
-            exportStep: 'upload',
-          });
-          return launchUpload(exportPipelineContext, compressionOutput)
-            .then((uploadBucketKey: string) => {
-              this.setState({
-                exportStep: 'waiting-for-build',
-              });
-              return launchOnlineBuild(
-                this.state.exportState,
-                authenticatedUser,
-                uploadBucketKey
-              );
-            }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
-            .then(build => {
-              this.setState(
-                {
-                  build,
-                  exportStep: 'build',
-                },
-                () => {
-                  this._startBuildWatch(authenticatedUser);
-                }
-              );
+    try {
+      // We do not await for this call, allowing to start building the game in parallel.
+      this.registerAndUpdateGame();
+    } catch {
+      // Best effort call, we don't prevent building the game.
+      console.warn('Error while registering the game - ignoring it.');
+    }
 
-              return { compressionOutput };
-            }, handleError(t('Error while lauching the build of the game.')));
-        }
-
-        return { compressionOutput };
-      }, handleError(t('Error while compressing the game.')))
-      .then(({ compressionOutput }) => {
-        this.setState({
-          compressionOutput,
-          doneFooterOpen: true,
-          exportStep: 'done',
-        });
-      })
-      .catch(error => {
-        console.error('An error happened during export:', error);
-        /* Error handled previously */
+    try {
+      const exportPipelineContext = {
+        project,
+        updateStepProgress: this._updateStepProgress,
+        exportState: this.state.exportState,
+      };
+      setStep('export');
+      this.setState({
+        stepCurrentProgress: 0,
+        stepMaxProgress: 0,
+        errored: false,
+        build: null,
       });
+      const preparedExporter = await exportPipeline.prepareExporter(
+        exportPipelineContext
+      );
+      const exportOutput = await exportPipeline.launchExport(
+        exportPipelineContext,
+        preparedExporter
+      );
+      setStep('resources-download');
+      const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
+        exportPipelineContext,
+        exportOutput
+      );
+      setStep('compress');
+      const compressionOutput = await exportPipeline.launchCompression(
+        exportPipelineContext,
+        resourcesDownloadOutput
+      );
+      const { launchUpload, launchOnlineBuild } = exportPipeline;
+      if (!!launchUpload && !!launchOnlineBuild) {
+        setStep('upload');
+        const uploadBucketKey = await launchUpload(
+          exportPipelineContext,
+          compressionOutput
+        );
+        setStep('waiting-for-build');
+        const build = await launchOnlineBuild(
+          this.state.exportState,
+          authenticatedUser,
+          uploadBucketKey
+        );
+        setStep('build');
+        this.setState({ build }, () => {
+          this._startBuildWatch(authenticatedUser);
+        });
+      }
+      setStep('done');
+      this.setState({
+        compressionOutput,
+        doneFooterOpen: true,
+      });
+    } catch (error) {
+      console.error('An error happened during export:', error);
+      handleError(error);
+    }
   };
 
   _downloadBuild = (key: BuildArtifactKeyName) => {
@@ -281,7 +322,7 @@ export default class ExportLauncher extends Component<Props, State> {
             <RaisedButton
               label={exportPipeline.renderLaunchButtonLabel()}
               primary
-              onClick={() => this.launchWholeExport(authenticatedUser)}
+              onClick={this.launchWholeExport}
               disabled={!canLaunchBuild(authenticatedUser)}
             />
           </Line>

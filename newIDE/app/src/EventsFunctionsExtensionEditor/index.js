@@ -20,7 +20,7 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';

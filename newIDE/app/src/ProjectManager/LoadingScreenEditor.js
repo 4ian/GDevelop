@@ -17,7 +17,7 @@ import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWith
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';

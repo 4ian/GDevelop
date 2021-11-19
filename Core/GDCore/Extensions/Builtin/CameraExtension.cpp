@@ -24,7 +24,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/layers-and-cameras");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddExpressionAndConditionAndAction(
           "number",
@@ -420,7 +419,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           _("Layer time scale"),
           _("Compare the time scale applied to the objects of the layer."),
           _("the time scale of layer _PARAM1_"),
-          _("Layers and cameras/Time"),
+          _("Layers and cameras"),
           "res/conditions/time24.png",
           "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -434,8 +433,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "ChangeLayerTimeScale",
           _("Change layer time scale"),
           _("Change the time scale applied to the objects of the layer."),
-          _("Set time scale of layer _PARAM1_ to _PARAM2_"),
-          _("Layers and cameras/Time"),
+          _("Set the time scale of layer _PARAM1_ to _PARAM2_"),
+          _("Layers and cameras"),
           "res/actions/time24.png",
           "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -552,8 +551,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
 
   extension
       .AddExpression("LayerTimeScale",
-                     _("Time scale"),
-                     _("Time scale"),
+                     _("Layer time scale"),
+                     _("Returns the time scale of the specified layer."),
                      _("Layers and cameras"),
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -567,7 +566,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                      "res/actions/camera.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("layer", _("Layer"));
-#endif
 }
 
 }  // namespace gd

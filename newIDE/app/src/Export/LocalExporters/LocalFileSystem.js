@@ -141,7 +141,9 @@ export default {
     return (
       filename.startsWith('http://') ||
       filename.startsWith('https://') ||
-      filename.startsWith('ftp://')
+      filename.startsWith('ftp://') ||
+      filename.startsWith('blob:') ||
+      filename.startsWith('data:')
     );
   },
   /**

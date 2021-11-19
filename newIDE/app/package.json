@@ -10,6 +10,7 @@
     "@storybook/addon-essentials": "6.3.8",
     "@storybook/react": "6.3.8",
     "axios-mock-adapter": "^1.19.0",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "8.0.6",
     "flow-bin": "0.131.0",
     "flow-coverage-report": "^0.4.0",

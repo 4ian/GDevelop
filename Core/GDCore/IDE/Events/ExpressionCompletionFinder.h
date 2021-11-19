@@ -9,12 +9,12 @@
 #include <memory>
 #include <vector>
 
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 
 namespace gd {
 class Expression;
@@ -32,7 +32,7 @@ namespace gd {
  * The IDE is responsible for actually *searching* and showing the completions -
  * this is only describing what must be listed.
  */
-struct ExpressionCompletionDescription {
+struct GD_CORE_API ExpressionCompletionDescription {
  public:
   /**
    * The different kind of completions that can be described.
@@ -274,7 +274,7 @@ struct ExpressionCompletionDescription {
 /**
  * \brief Turn an ExpressionCompletionDescription to a string.
  */
-std::ostream& operator<<(std::ostream& os,
+GD_CORE_API std::ostream& operator<<(std::ostream& os,
                          ExpressionCompletionDescription const& value);
 
 /**
@@ -326,10 +326,7 @@ class GD_CORE_API ExpressionCompletionFinder
         node.type, "", searchedPosition + 1, searchedPosition + 1));
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
-    completions.push_back(ExpressionCompletionDescription::ForObject(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
-    completions.push_back(ExpressionCompletionDescription::ForExpression(
-        node.type, "", searchedPosition + 1, searchedPosition + 1));
+    // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     completions.push_back(ExpressionCompletionDescription::ForObject(
@@ -359,8 +356,9 @@ class GD_CORE_API ExpressionCompletionFinder
       }
       // Search the parameter metadata index skipping invisible ones.
       size_t visibleParameterIndex = 0;
-      size_t metadataParameterIndex = ExpressionParser2::WrittenParametersFirstIndex(
-          functionCall->objectName, functionCall->behaviorName);
+      size_t metadataParameterIndex =
+          ExpressionParser2::WrittenParametersFirstIndex(
+              functionCall->objectName, functionCall->behaviorName);
 
       const gd::ParameterMetadata* parameterMetadata = nullptr;
       while (metadataParameterIndex <

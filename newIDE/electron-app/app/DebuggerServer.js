@@ -20,7 +20,7 @@ const getServerAddress = wsServer => ({
 /**
  * This module creates a WebSocket server listening for a connection
  * and simply forwards the messages.
- * Debugger logic is made inside Debugger (in newIDE) or websocket-debugger-client
+ * Debugger logic is made inside Debugger (in newIDE) or gdjs.AbstractDebuggerClient
  * (in GDJS).
  */
 module.exports = {

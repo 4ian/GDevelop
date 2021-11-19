@@ -111,9 +111,13 @@ const enrichCommits = rawCommits => {
         const shouldHide =
           lowerCaseMessage.includes("don't mention in changelog") ||
           lowerCaseMessage.includes("don't mention in the changelog") ||
+          lowerCaseMessage.includes("do not mention in changelog") ||
+          lowerCaseMessage.includes("do not mention in the changelog") ||
           lowerCaseMessage.includes("don't show in changelog") ||
           lowerCaseMessage.includes("don't show in the changelog") ||
-          lowerCaseMessage === 'update translations' ||
+          lowerCaseMessage.includes("do not show in changelog") ||
+          lowerCaseMessage.includes("do not show in the changelog") ||
+          lowerCaseMessage.startsWith('update translations') ||
           lowerCaseMessage === 'prettier' ||
           lowerCaseMessage === 'update jsextension.js' ||
           lowerCaseMessage.includes('run code formatting') ||
@@ -188,7 +192,7 @@ const findAuthorNicknameInCommits = async commits => {
     try {
       await delayGithubCall();
       console.log(
-        `ℹ️ Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
+        `\nℹ️ Calling https://api.github.com/search/users?q=${authorEmail}+in:email`
       );
       const response = await axios.get(
         `https://api.github.com/search/users?q=${authorEmail}+in:email`
@@ -198,9 +202,9 @@ const findAuthorNicknameInCommits = async commits => {
         data && data.items && data.items[0] ? data.items[0].login : '';
       authorEmailsToNicknames[authorEmail] = login;
       if (login) {
-        shell.echo(`ℹ️ Found nickname for email: ${authorEmail}:` + login);
+        shell.echo(`✅ Found nickname for email: ${authorEmail}:` + login);
       } else {
-        shell.echo(`ℹ️ No nickname found for email: ${authorEmail}:` + login);
+        shell.echo(`⚠️ No nickname found for email: ${authorEmail}`);
       }
 
       return login;
@@ -233,7 +237,7 @@ const findAuthorNicknameInCommits = async commits => {
  */
 const formatCommitMessage = ({ commit, includeAuthor }) => {
   const author =
-    includeAuthor && commit.authorNickname !== '4ian'
+    includeAuthor && !(['4ian', 'AlexandreSi', 'ClementPasteau'].includes(commit.authorNickname))
       ? `(Thanks ${
           commit.authorNickname
             ? '@' + commit.authorNickname

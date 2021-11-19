@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import type { ResourceKind } from '../../ResourcesList/ResourceSource.flow';
+import type { ResourceKind } from '../../ResourcesList/ResourceSource';
 import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import { type ShortcutMap } from '../../KeyboardShortcuts/DefaultShortcuts';
@@ -276,7 +276,7 @@ export const initialPreferences = {
     userShortcutMap: {},
     newObjectDialogDefaultTab: electron ? 'new-object' : 'asset-store',
     isMenuBarHiddenInPreview: true,
-    isAlwaysOnTopInPreview: true,
+    isAlwaysOnTopInPreview: false,
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
   },

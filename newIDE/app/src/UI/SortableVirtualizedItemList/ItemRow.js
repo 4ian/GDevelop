@@ -6,13 +6,9 @@ import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
+import { textEllispsisStyle } from '../TextEllipsis';
 
 const styles = {
-  itemName: {
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-  },
   textField: {
     top: noMarginTextFieldInListItemTopOffset,
   },
@@ -83,8 +79,9 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
             />
           ) : (
             <div
+              title={itemName}
               style={{
-                ...styles.itemName,
+                ...textEllispsisStyle,
                 color: selected
                   ? muiTheme.listItem.selectedTextColor
                   : undefined,

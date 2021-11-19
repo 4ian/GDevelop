@@ -142,6 +142,17 @@ namespace gdjs {
     }
 
     /**
+     * Remove all effects from a PixiJS DisplayObject.
+     * @param rendererObject The renderer object.
+     */
+    clearEffects(rendererObject: PIXI.DisplayObject): boolean {
+      if (rendererObject) {
+        rendererObject.filters = [];
+      }
+      return true;
+    }
+
+    /**
      * Update the parameter of an effect (with a number).
      * @param rendererEffects The collection of PixiJS filters.
      * @param name The effect name

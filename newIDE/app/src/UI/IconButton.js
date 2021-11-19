@@ -5,6 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { I18n } from '@lingui/react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { adaptAcceleratorString } from '../UI/AcceleratorString';
+import { tooltipEnterDelay } from './Tooltip';
 
 type IconProps =
   | {|
@@ -27,6 +28,7 @@ type Props = {|
   onClick?: (ev: any) => void,
   onContextMenu?: () => void,
   disabled?: boolean,
+  edge?: 'start' | 'end' | false,
 
   style?: {|
     padding?: number,
@@ -67,7 +69,7 @@ export default class IconButton extends React.Component<Props, {||}> {
                 : '')
             }
             placement="bottom"
-            enterDelay={300}
+            enterDelay={tooltipEnterDelay}
           >
             {iconButton}
           </Tooltip>

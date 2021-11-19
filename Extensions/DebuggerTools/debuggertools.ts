@@ -14,6 +14,20 @@ namespace gdjs {
       };
 
       /**
+       * Logs a message to the console.
+       * @param message - The message to log.
+       * @param type - The type of log (info, warning or error).
+       * @param group - The group of messages it belongs to.
+       */
+      export const log = function (
+        message: string,
+        type: 'info' | 'warning' | 'error',
+        group: string
+      ) {
+        gdjs.Logger.getLoggerOutput().log(group, message, type, false);
+      };
+
+      /**
        * Enable or disable the debug draw.
        * @param runtimeScene - The current scene.
        * @param enableDebugDraw - true to enable the debug draw, false to disable it.

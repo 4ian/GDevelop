@@ -44,7 +44,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
     return gd::make_unique<SpriteObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY)
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
@@ -60,7 +59,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
                                      const gd::String& value,
                                      gd::Project& project,
                                      gd::Layout& scene) override;
-#endif
 
   /** \name Animations
    * Methods related to animations management
@@ -118,14 +116,24 @@ class GD_CORE_API SpriteObject : public gd::Object {
    * animation of the object.
    */
   const std::vector<Animation>& GetAllAnimations() const { return animations; }
+
+  /**
+   * \brief Set if the object animation should be played even if the object is hidden
+   * or far from the camera.
+   */
+  void SetUpdateIfNotVisible(bool updateIfNotVisible_) { updateIfNotVisible = updateIfNotVisible_; }
+
+  /**
+   * \brief Check if the object animation should be played even if the object is hidden
+   * or far from the camera (false by default).
+   */
+  bool GetUpdateIfNotVisible() const { return updateIfNotVisible; }
   ///@}
 
  private:
   void DoUnserializeFrom(gd::Project& project,
                          const gd::SerializerElement& element) override;
-#if defined(GD_IDE_ONLY)
   void DoSerializeTo(gd::SerializerElement& element) const override;
-#endif
 
   mutable std::vector<Animation> animations;
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play

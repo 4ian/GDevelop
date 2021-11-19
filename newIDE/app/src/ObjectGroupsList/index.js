@@ -336,14 +336,13 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
       globalObjectGroups
     ).map(group => ({ group, global: true }));
-    this.objectGroupsList = filterGroupsList(objectGroupsList, searchText);
-    this.globalObjectGroupsList = filterGroupsList(
-      globalObjectGroupsList,
-      searchText
-    );
+    this.objectGroupsList = filterGroupsList(objectGroupsList, { searchText });
+    this.globalObjectGroupsList = filterGroupsList(globalObjectGroupsList, {
+      searchText,
+    });
     const allGroupsList = filterGroupsList(
       [...objectGroupsList, ...globalObjectGroupsList],
-      searchText
+      { searchText }
     );
     const fullList = allGroupsList.concat({
       key: 'add-groups-row',

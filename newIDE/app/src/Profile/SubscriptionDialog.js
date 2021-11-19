@@ -82,8 +82,12 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     authenticatedUser: AuthenticatedUser,
     plan: PlanDetails
   ) => {
-    const { getAuthorizationHeader, subscription, profile } = authenticatedUser;
-    if (!profile || !subscription) return;
+    const {
+      getAuthorizationHeader,
+      subscription,
+      firebaseUser,
+    } = authenticatedUser;
+    if (!firebaseUser || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
     if (subscription.stripeSubscriptionId) {
@@ -97,7 +101,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       // We already have a stripe customer, change the subscription without
       // asking for the user card.
       this.setState({ isLoading: true });
-      changeUserSubscription(getAuthorizationHeader, profile.id, {
+      changeUserSubscription(getAuthorizationHeader, firebaseUser.uid, {
         planId: plan.planId,
       }).then(
         () =>
@@ -111,8 +115,8 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
       Window.openExternalURL(
         getRedirectToCheckoutUrl(
           plan.planId || '',
-          profile.id,
-          profile.email || ''
+          firebaseUser.uid,
+          firebaseUser.email || ''
         )
       );
     }

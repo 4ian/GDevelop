@@ -11,6 +11,7 @@ import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionS
 import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
+import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
@@ -70,6 +71,7 @@ const styles = {
     marginTop: 22, //Properly align with the text field
     paddingLeft: 12,
     paddingRight: 12,
+    boxSizing: 'border-box',
   },
   backgroundHighlightingInline: {
     marginTop: 0, //Properly align with the text field
@@ -222,12 +224,25 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
+  _shouldOpenParametersDialog = (
+    expressionInfo: EnumeratedExpressionMetadata
+  ): boolean => {
+    // If there is no parameter to fill for the selected expression, no need to open the dialog.
+    return hasNonCodeOnlyParameters(expressionInfo.metadata);
+  };
+
   _handleExpressionChosen = (expressionInfo: EnumeratedExpressionMetadata) => {
-    this.setState({
-      popoverOpen: false,
-      parametersDialogOpen: true,
-      selectedExpressionInfo: expressionInfo,
-    });
+    let newState = { popoverOpen: false };
+    if (this._shouldOpenParametersDialog(expressionInfo)) {
+      newState = {
+        ...newState,
+        parametersDialogOpen: true,
+        selectedExpressionInfo: expressionInfo,
+      };
+    } else {
+      this.insertExpression(expressionInfo, []);
+    }
+    this.setState(newState);
   };
 
   insertExpression = (
@@ -296,7 +311,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         addDot: expressionAutocompletion.addDot,
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        addClosingParenthesis: expressionAutocompletion.addClosingParenthesis,
+        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
       }
     );
 
@@ -333,6 +348,8 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
+    const expression = this.state.validatedValue;
+
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
@@ -341,7 +358,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer
     );
-    const expression = this.state.validatedValue;
+
     const expressionNode = parser
       .parseExpression(expressionType, expression)
       .get();
@@ -350,6 +367,23 @@ export default class ExpressionField extends React.Component<Props, State> {
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
+    const formattedErrorText = [extraErrorText, errorText]
+      .filter(Boolean)
+      .join(' - ');
+
+    // If the expression ends with a space, the user must be navigating or switching to another text
+    // so let's not return any autocompletions.
+    if (
+      expression.length > 0 &&
+      expression.charAt(expression.length - 1) === ' '
+    ) {
+      this.setState(state => ({
+        errorText: formattedErrorText,
+        errorHighlights,
+        autocompletions: getAutocompletionsInitialState(),
+      }));
+      return;
+    }
 
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
@@ -375,7 +409,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     parser.delete();
 
     this.setState(state => ({
-      errorText: [extraErrorText, errorText].filter(Boolean).join(' - '),
+      errorText: formattedErrorText,
       errorHighlights,
       autocompletions: setNewAutocompletions(
         state.autocompletions,

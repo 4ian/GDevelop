@@ -9,34 +9,41 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  sendEmailVerification,
+  updateEmail,
 } from 'firebase/auth';
 import { GDevelopFirebaseConfig, GDevelopUserApi } from './ApiConfigs';
 import axios from 'axios';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
-export type Profile = {
+export type Profile = {|
   id: string,
   email: string,
   username: ?string,
-};
+  description: ?string,
+  getGameStatsEmail: boolean,
+|};
 
-export type LoginForm = {
+export type LoginForm = {|
   email: string,
   password: string,
-};
+|};
 
-export type RegisterForm = {
+export type RegisterForm = {|
   email: string,
   password: string,
   username: string,
-};
+|};
 
-export type EditForm = {
+export type EditForm = {|
   username: string,
-};
+  description: string,
+  getGameStatsEmail: boolean,
+|};
 
-export type ForgotPasswordForm = {
+export type ChangeEmailForm = {|
   email: string,
-};
+|};
 
 export type AuthError = {
   code:
@@ -47,35 +54,43 @@ export type AuthError = {
     | 'auth/email-already-in-use'
     | 'auth/operation-not-allowed'
     | 'auth/weak-password'
-    | 'auth/username-used',
+    | 'auth/username-used'
+    | 'auth/malformed-username'
+    | 'auth/requires-recent-login',
 };
 
 export default class Authentication {
-  firebaseUser: ?FirebaseUser = null;
-  user: ?Profile = null;
   auth: Auth;
-  _onUserChangeCb: ?() => void = null;
+  _onUserLogoutCallback: ?() => void | Promise<void> = null;
+  _onUserUpdateCallback: ?() => void | Promise<void> = null;
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
     onAuthStateChanged(this.auth, user => {
       if (user) {
-        this.firebaseUser = user;
+        // User has logged in or changed.
+        if (this._onUserUpdateCallback) this._onUserUpdateCallback();
       } else {
-        this.firebaseUser = null;
+        // User has logged out.
+        if (this._onUserLogoutCallback) this._onUserLogoutCallback();
       }
     });
   }
 
-  onUserChange = (cb: () => void) => {
-    this._onUserChangeCb = cb;
+  setOnUserLogoutCallback = (cb: () => void | Promise<void>) => {
+    this._onUserLogoutCallback = cb;
+  };
+
+  setOnUserUpdateCallback = (cb: () => void | Promise<void>) => {
+    this._onUserUpdateCallback = cb;
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.firebaseUser = userCredentials.user;
+        // The user is now stored in `this.auth`.
+        sendEmailVerification(userCredentials.user);
       })
       .catch(error => {
         console.error('Error while creating firebase account:', error);
@@ -89,20 +104,25 @@ export default class Authentication {
   ): Promise<void> => {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
+        const { currentUser } = this.auth;
+        if (!currentUser) {
+          console.error(
+            'Cannot create the user as it is not logged in any more.'
+          );
+          throw new Error(
+            'Cannot create the user as it is not logged in any more.'
+          );
         }
         return axios.post(
           `${GDevelopUserApi.baseUrl}/user`,
           {
-            id: this.firebaseUser.uid,
+            id: currentUser.uid,
             email: form.email,
             username: form.username,
           },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
@@ -110,8 +130,8 @@ export default class Authentication {
           }
         );
       })
-      .then(response => {
-        this.user = response.data;
+      .then(() => {
+        // User successfully created
       })
       .catch(error => {
         console.error('Error while creating user:', error);
@@ -122,7 +142,7 @@ export default class Authentication {
   login = (form: LoginForm): Promise<void> => {
     return signInWithEmailAndPassword(this.auth, form.email, form.password)
       .then(userCredentials => {
-        this.firebaseUser = userCredentials.user;
+        // The user is now stored in `this.auth`.
       })
       .catch(error => {
         console.error('Error while login:', error);
@@ -130,34 +150,101 @@ export default class Authentication {
       });
   };
 
-  forgotPassword = (form: ForgotPasswordForm): Promise<void> => {
+  forgotPassword = (form: LoginForm): Promise<void> => {
     return sendPasswordResetEmail(this.auth, form.email);
   };
 
-  getFirebaseUser = (cb: (any, ?FirebaseUser) => void) => {
-    if (!this.isAuthenticated()) return cb({ unauthenticated: true });
+  getFirebaseUser = async (): Promise<?FirebaseUser> => {
+    const { currentUser } = this.auth;
+    if (!currentUser) {
+      return null;
+    }
 
-    cb(null, this.firebaseUser);
+    // In order to fetch the latest firebaseUser properties (like emailVerified)
+    // we have to call the reload method.
+    await currentUser.reload();
+    return this.auth.currentUser;
   };
 
-  getUserProfile = (getAuthorizationHeader: () => Promise<string>) => {
-    return getAuthorizationHeader()
+  sendFirebaseEmailVerification = async (): Promise<void> => {
+    {
+      const { currentUser } = this.auth;
+      if (!currentUser)
+        throw new Error(
+          'Tried to send verification email while not authenticated.'
+        );
+
+      await currentUser.reload();
+    }
+    const { currentUser } = this.auth;
+    if (!currentUser || currentUser.emailVerified) return;
+
+    try {
+      sendEmailVerification(currentUser);
+    } catch (error) {
+      showErrorBox({
+        message:
+          'An email has been sent recently, check your inbox or please try again later.',
+        rawError: error,
+        errorId: 'email-verification-send-error',
+      });
+    }
+  };
+
+  changeEmail = async (
+    getAuthorizationHeader: () => Promise<string>,
+    form: ChangeEmailForm
+  ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to change email while not authenticated.');
+
+    return updateEmail(currentUser, form.email)
+      .then(() => sendEmailVerification(currentUser))
+      .then(() => {
+        console.log('Email successfully changed in Firebase.');
+        return getAuthorizationHeader();
+      })
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
-        }
-        return axios.get(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
+          {
+            email: form.email,
+          },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
             },
           }
         );
+      })
+      .then(() => {
+        console.log('Email successfully changed in the GDevelop services.');
+      })
+      .catch(error => {
+        console.error('An error happened during email change.', error);
+        throw error;
+      });
+  };
+
+  getUserProfile = async (getAuthorizationHeader: () => Promise<string>) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to get user profile while not authenticated.');
+
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        return axios.get(`${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`, {
+          params: {
+            userId: currentUser.uid,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        });
       })
       .then(response => response.data)
       .catch(error => {
@@ -166,24 +253,27 @@ export default class Authentication {
       });
   };
 
-  editUserProfile = (
+  editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
     form: EditForm
   ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error('Tried to edit user profile while not authenticated.');
+
     return getAuthorizationHeader()
       .then(authorizationHeader => {
-        if (!this.firebaseUser) {
-          console.error('Cannot get user if not logged in');
-          throw new Error('Cannot get user if not logged in');
-        }
+        const { username, description, getGameStatsEmail } = form;
         return axios.patch(
-          `${GDevelopUserApi.baseUrl}/user/${this.firebaseUser.uid}`,
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
-            username: form.username,
+            username,
+            description,
+            getGameStatsEmail,
           },
           {
             params: {
-              userId: this.firebaseUser.uid,
+              userId: currentUser.uid,
             },
             headers: {
               Authorization: authorizationHeader,
@@ -194,32 +284,60 @@ export default class Authentication {
       .then(response => response.data)
       .catch(error => {
         console.error('Error while editing user:', error);
-        throw error.response.data;
+        throw error;
+      });
+  };
+
+  acceptGameStatsEmail = async (
+    getAuthorizationHeader: () => Promise<string>
+  ) => {
+    const { currentUser } = this.auth;
+    if (!currentUser)
+      throw new Error(
+        'Tried to accept game stats email while not authenticated.'
+      );
+
+    return getAuthorizationHeader()
+      .then(authorizationHeader => {
+        return axios.patch(
+          `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
+          { getGameStatsEmail: true },
+          {
+            params: { userId: currentUser.uid },
+            headers: { Authorization: authorizationHeader },
+          }
+        );
+      })
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error while accepting game stats email:', error);
+        throw error;
       });
   };
 
   getFirebaseUserSync = (): ?FirebaseUser => {
-    return this.firebaseUser;
+    return this.auth.currentUser || null;
   };
 
   logout = () => {
     signOut(this.auth)
       .then(() => {
-        console.log('Logout successful');
+        console.log('Logout successful.');
       })
       .catch(error => {
-        console.log('An error happened during logout', error);
+        console.error('An error happened during logout.', error);
+        throw error;
       });
   };
 
-  getAuthorizationHeader = (): Promise<string> => {
-    if (!this.firebaseUser)
-      return Promise.reject(new Error('User is not authenticated'));
+  getAuthorizationHeader = async (): Promise<string> => {
+    const { currentUser } = this.auth;
+    if (!currentUser) throw new Error('User is not authenticated.');
 
-    return this.firebaseUser.getIdToken().then(token => `Bearer ${token}`);
+    return currentUser.getIdToken().then(token => `Bearer ${token}`);
   };
 
   isAuthenticated = (): boolean => {
-    return !!this.firebaseUser;
+    return !!this.auth.currentUser;
   };
 }

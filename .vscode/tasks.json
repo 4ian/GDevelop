@@ -80,7 +80,7 @@
     },
     {
       "type": "typescript",
-      "tsconfig": "GDJS/tsconfig.json",
+      "tsconfig": "tsconfig.json",
       "option": "watch",
       "problemMatcher": ["$tsc-watch"],
       "group": "test",

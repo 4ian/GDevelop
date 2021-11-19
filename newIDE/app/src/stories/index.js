@@ -57,7 +57,7 @@ import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
 import EventsTree from '../EventsSheet/EventsTree';
-import LayoutChooserDialog from '../MainFrame/EditorContainers/LayoutChooserDialog';
+import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
@@ -75,7 +75,7 @@ import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrE
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import CreateProfile from '../Profile/CreateProfile';
-import ProfileDetails from '../Profile/ProfileDetails';
+import AuthenticatedUserProfileDetails from '../Profile/AuthenticatedUserProfileDetails';
 import LimitDisplayer from '../Profile/LimitDisplayer';
 import ResourcePreview from '../ResourcesList/ResourcePreview';
 import ResourcesList from '../ResourcesList';
@@ -91,6 +91,7 @@ import {
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
   fakeAuthenticatedButLoadingAuthenticatedUser,
+  fakeAuthenticatedAndEmailVerifiedUser,
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
@@ -107,18 +108,23 @@ import {
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
   exampleFromFutureVersion,
+  geometryMonsterExampleShortHeader,
+  fireBulletExtensionShortHeader,
+  flashExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
 import {
   GDevelopAnalyticsApi,
   GDevelopGameApi,
 } from '../Utils/GDevelopServices/ApiConfigs.js';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
-import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
+import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
+import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import EditProfileDialog from '../Profile/EditProfileDialog';
+import ChangeEmailDialog from '../Profile/ChangeEmailDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
@@ -155,6 +161,7 @@ import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearc
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
 import SearchBar from '../UI/SearchBar';
@@ -163,6 +170,7 @@ import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstru
 import { PopoverButton } from './PopoverButton';
 import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
+import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
@@ -233,6 +241,7 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
+import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -247,6 +256,11 @@ import {
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
 import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import {
+  ExtensionsAccordion,
+  ExamplesAccordion,
+} from '../Profile/ContributionsDetails';
+import ListIcon from '../UI/ListIcon';
 
 configureActions({
   depth: 2,
@@ -681,6 +695,36 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       )}
     />
   ))
+  .add('default, with translatable elements and a separator', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Click me',
+                onClick: action('Click me clicked'),
+              },
+              {
+                type: 'separator',
+              },
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Or click me',
+                onClick: action('Click me clicked'),
+              },
+            ]}
+          />
+        </React.Fragment>
+      )}
+    />
+  ))
   .add('default, with onClick for some elements', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
@@ -715,6 +759,59 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
       )}
     />
   ))
+  .add(
+    'default, with onClick, long texts and renderIcon for some elements',
+    () => (
+      <ValueStateHolder
+        initialValue={'Choice 6'}
+        render={(value, onChange) => (
+          <React.Fragment>
+            <SemiControlledAutoComplete
+              value={value}
+              onChange={onChange}
+              dataSource={[
+                {
+                  text: '',
+                  value: 'Click me 1',
+                  onClick: action('Click me 1 clicked'),
+                  renderIcon: () => <Brush />,
+                },
+                {
+                  text: '',
+                  value: 'Click me 2',
+                  onClick: action('Click me 2 clicked'),
+                  renderIcon: () => (
+                    <ListIcon iconSize={24} src={'res/icon128.png'} />
+                  ),
+                },
+                {
+                  text: '',
+                  value: 'Click me 3',
+                  onClick: action('Click me 3 clicked'),
+                },
+                {
+                  type: 'separator',
+                },
+              ].concat(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                  text:
+                    i % 2
+                      ? `Choice ${i}`
+                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
+                  value:
+                    i % 2
+                      ? `Choice ${i}`
+                      : `A Veeeeeerrrryyyyyy Looooong Choooooooooooiiiiiiiiice ${i}`,
+                  renderIcon: i % 3 ? () => <Brush /> : undefined,
+                }))
+              )}
+            />
+            <p>State value is {value}</p>
+          </React.Fragment>
+        )}
+      />
+    )
+  )
   .add('in a dialog, with onClick for some elements', () => (
     <ValueStateHolder
       initialValue={'Choice 6'}
@@ -787,6 +884,112 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
           />
           <p>State value is {value}</p>
         </React.Fragment>
+      )}
+    />
+  ));
+
+storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ValueStateHolder
+      initialValue={[
+        { text: 'Choice 6', value: 'choice-6' },
+        { text: 'Choice 1', value: 'choice-1' },
+      ]}
+      render={(value, onChange) => (
+        <ValueStateHolder
+          initialValue={null}
+          render={(inputValue, onInputChange) => (
+            <React.Fragment>
+              <SemiControlledMultiAutoComplete
+                value={value}
+                onChange={(event, value) => onChange(value)}
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                  text: `Choice ${i}`,
+                  value: `choice-${i}`,
+                }))}
+                onInputChange={(event, value) => onInputChange(value)}
+                inputValue={inputValue}
+                loading={false}
+                helperText="This is an autocomplete"
+                hintText="Start typing!"
+              />
+              <p>
+                values are{' '}
+                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+              </p>
+            </React.Fragment>
+          )}
+        />
+      )}
+    />
+  ))
+  .add('loading', () => (
+    <ValueStateHolder
+      initialValue={[
+        { text: 'Choice 6', value: 'choice-6' },
+        { text: 'Choice 1', value: 'choice-1' },
+      ]}
+      render={(value, onChange) => (
+        <ValueStateHolder
+          initialValue={null}
+          render={(inputValue, onInputChange) => (
+            <React.Fragment>
+              <SemiControlledMultiAutoComplete
+                value={value}
+                onChange={(event, value) => onChange(value)}
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                  text: `Choice ${i}`,
+                  value: `choice-${i}`,
+                }))}
+                onInputChange={(event, value) => onInputChange(value)}
+                inputValue={inputValue}
+                loading
+                helperText="This is an autocomplete"
+                hintText="Start typing!"
+              />
+              <p>
+                values are{' '}
+                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+              </p>
+            </React.Fragment>
+          )}
+        />
+      )}
+    />
+  ))
+  .add('errored', () => (
+    <ValueStateHolder
+      initialValue={[
+        { text: 'Choice 6', value: 'choice-6' },
+        { text: 'Choice 1', value: 'choice-1' },
+      ]}
+      render={(value, onChange) => (
+        <ValueStateHolder
+          initialValue={null}
+          render={(inputValue, onInputChange) => (
+            <React.Fragment>
+              <SemiControlledMultiAutoComplete
+                value={value}
+                onChange={(event, value) => onChange(value)}
+                dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+                  text: `Choice ${i}`,
+                  value: `choice-${i}`,
+                }))}
+                onInputChange={(event, value) => onInputChange(value)}
+                inputValue={inputValue}
+                loading={false}
+                helperText="This is an autocomplete"
+                hintText="Start typing!"
+                error="There's been an error."
+              />
+              <p>
+                values are{' '}
+                {value.map(v => `(${v.text} - ${v.value})`).join(', ')}
+              </p>
+            </React.Fragment>
+          )}
+        />
       )}
     />
   ));
@@ -2270,7 +2473,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       parameterRenderingService={ParameterRenderingService}
     />
   ))
-  .add('autocompletions (second selected)', () => (
+  .add('autocompletions (expression selected)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExpressionAutocompletions()}
@@ -2278,11 +2481,11 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       // $FlowExpectedError
       anchorEl={getFakePopperJsAnchorElement()}
       onChoose={action('chosen')}
-      selectedCompletionIndex={1}
+      selectedCompletionIndex={6}
       parameterRenderingService={ParameterRenderingService}
     />
   ))
-  .add('autocompletion for an exact expression', () => (
+  .add('empty autocompletions (because exact expression)', () => (
     <ExpressionAutocompletionsDisplayer
       project={testProject.project}
       expressionAutocompletions={makeFakeExactExpressionAutocompletion()}
@@ -2626,8 +2829,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2644,8 +2848,9 @@ storiesOf('DebuggerContent', module)
           onCall={() => false}
           onStartProfiler={action('start profiler')}
           onStopProfiler={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
+          logsManager={consoleTestData}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2683,7 +2888,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={false}
         />
       </FixedHeightFlexContainer>
@@ -2695,7 +2900,7 @@ storiesOf('Profiler', module)
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
-          profilerOutput={profilerOutput}
+          profilerOutput={profilerOutputsTestData}
           profilingInProgress={true}
         />
       </FixedHeightFlexContainer>
@@ -2706,7 +2911,9 @@ storiesOf('MeasuresTable', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 250 }}>
-      <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
+      <MeasuresTable
+        profilerMeasures={profilerOutputsTestData.framesAverageMeasures}
+      />
     </div>
   ));
 
@@ -2823,10 +3030,29 @@ storiesOf('OpenConfirmDialog', module)
     />
   ));
 
-storiesOf('LayoutChooserDialog', module)
+storiesOf('ExternalPropertiesDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <LayoutChooserDialog open project={testProject.project} />
+  .add('with layout selection', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+    />
+  ))
+  .add('with help texts', () => (
+    <ExternalPropertiesDialog
+      title="Configure the properties"
+      open
+      onChoose={action('on choose')}
+      onClose={action('on close')}
+      project={testProject.project}
+      helpTexts={[
+        'This is a help text, remember to read it.',
+        "And there's another one!",
+      ]}
+    />
   ));
 
 storiesOf('EventsTree', module)
@@ -3034,6 +3260,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('default (no results)', () => (
@@ -3045,6 +3272,7 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
     />
   ))
   .add('3 results', () => (
@@ -3056,6 +3284,19 @@ storiesOf('SearchPanel', module)
       onGoToNextSearchResult={action('next')}
       onGoToPreviousSearchResult={action('previous')}
       onCloseSearchPanel={() => {}}
+      searchFocusOffset={null}
+    />
+  ))
+  .add('3 results with focus on the second', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={3}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+      onCloseSearchPanel={() => {}}
+      searchFocusOffset={1}
     />
   ));
 
@@ -3614,6 +3855,14 @@ storiesOf('ObjectGroupEditor', module)
       objectsContainer={testProject.testLayout}
       group={testProject.group2}
     />
+  ))
+  .add('with long object names', () => (
+    <ObjectGroupEditor
+      project={testProject.project}
+      globalObjectsContainer={testProject.project}
+      objectsContainer={testProject.testLayout}
+      group={testProject.group4WithLongsNames}
+    />
   ));
 
 storiesOf('ObjectGroupsList', module)
@@ -3757,11 +4006,23 @@ storiesOf('LimitDisplayer', module)
     />
   ));
 
-storiesOf('ProfileDetails', module)
+storiesOf('AuthenticatedUserProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('profile', () => <ProfileDetails profile={indieUserProfile} />)
-  .add('loading', () => <ProfileDetails profile={null} />);
+  .add('profile', () => (
+    <AuthenticatedUserProfileDetails
+      authenticatedUser={fakeIndieAuthenticatedUser}
+      onEditProfile={action('edit profile')}
+      onChangeEmail={action('change email')}
+    />
+  ))
+  .add('loading', () => (
+    <AuthenticatedUserProfileDetails
+      authenticatedUser={fakeAuthenticatedButLoadingAuthenticatedUser}
+      onEditProfile={action('edit profile')}
+      onChangeEmail={action('change email')}
+    />
+  ));
 
 storiesOf('SubscriptionDetails', module)
   .addDecorator(paperDecorator)
@@ -3827,6 +4088,22 @@ storiesOf('SubscriptionPendingDialog', module)
   .add('authenticated user with subscription', () => (
     <SubscriptionPendingDialog
       authenticatedUser={fakeIndieAuthenticatedUser}
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('EmailVerificationPendingDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('non verified user - loading', () => (
+    <EmailVerificationPendingDialog
+      authenticatedUser={fakeIndieAuthenticatedUser}
+      onClose={action('on close')}
+    />
+  ))
+  .add('verified user', () => (
+    <EmailVerificationPendingDialog
+      authenticatedUser={fakeAuthenticatedAndEmailVerifiedUser}
       onClose={action('on close')}
     />
   ));
@@ -3907,10 +4184,85 @@ storiesOf('Profile/EditProfileDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <EditProfileDialog
-      profile={{ id: 'id', email: 'email', username: 'username' }}
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
+      }}
       onClose={action('on close')}
       editInProgress={false}
       onEdit={action('on edit')}
+      error={null}
+    />
+  ))
+  .add('errored', () => (
+    <EditProfileDialog
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
+      }}
+      onClose={action('on close')}
+      editInProgress={false}
+      onEdit={action('on edit')}
+      error={{ code: 'auth/username-used' }}
+    />
+  ))
+  .add('loading', () => (
+    <EditProfileDialog
+      profile={{
+        id: 'id',
+        email: 'email',
+        username: 'username',
+        description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
+      }}
+      onClose={action('on close')}
+      editInProgress
+      onEdit={action('on edit')}
+      error={null}
+    />
+  ));
+
+storiesOf('Profile/ChangeEmailDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress={false}
+      onChangeEmail={action('on change email')}
+      error={null}
+    />
+  ))
+  .add('errored', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress={false}
+      onChangeEmail={action('on change email')}
+      error={{ code: 'auth/requires-recent-login' }}
+    />
+  ))
+  .add('loading', () => (
+    <ChangeEmailDialog
+      firebaseUser={{
+        uid: 'id',
+        email: 'email',
+      }}
+      onClose={action('on close')}
+      changeEmailInProgress
+      onChangeEmail={action('on change email')}
       error={null}
     />
   ));
@@ -3962,6 +4314,33 @@ storiesOf('UserPublicProfileChip', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
+  ));
+
+storiesOf('ContributionsDetails', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <>
+      <ExtensionsAccordion
+        extensions={[fireBulletExtensionShortHeader, flashExtensionShortHeader]}
+        extensionError={null}
+      />
+      <ExamplesAccordion
+        examples={[geometryMonsterExampleShortHeader]}
+        exampleError={null}
+      />
+    </>
+  ))
+  .add('no contributions', () => (
+    <>
+      <ExtensionsAccordion extensions={[]} extensionError={null} />
+      <ExamplesAccordion examples={[]} exampleError={null} />
+    </>
+  ))
+  .add('with errors', () => (
+    <>
+      <ExtensionsAccordion extensions={[]} extensionError={new Error()} />
+      <ExamplesAccordion examples={[]} exampleError={new Error()} />
+    </>
   ));
 
 storiesOf('LocalNetworkPreviewDialog', module)

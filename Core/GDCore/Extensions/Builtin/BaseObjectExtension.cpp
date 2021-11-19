@@ -25,7 +25,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
 
-#if defined(GD_IDE_ONLY)
   obj.AddCondition("PosX",
                    _("X position"),
                    _("Compare the X position of the object."),
@@ -84,9 +83,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position.png")
 
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
@@ -99,9 +98,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/position24.png",
                 "res/actions/position.png")
       .AddParameter("object", _("Object"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("X position"))
-      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("operator", _("Modification's sign"), "number")
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
@@ -156,7 +155,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Rotate"),
                 _("Rotate an object, clockwise if the speed is positive, "
                   "counterclockwise otherwise."),
-                _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
+                _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")
@@ -170,7 +169,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "RotateTowardAngle",
          _("Rotate toward angle"),
          _("Rotate an object towards an angle with the specified speed."),
-         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
@@ -186,7 +185,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate toward position"),
          _("Rotate an object towards a position, with the specified speed."),
          _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed "
-           "_PARAM3_deg/second"),
+           "_PARAM3_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
@@ -1441,7 +1440,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        _("Objects"),
                        "res/actions/layer.png")
       .AddParameter("object", _("Object"));
-#endif
 }
 
 }  // namespace gd

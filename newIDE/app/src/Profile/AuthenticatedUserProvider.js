@@ -246,21 +246,20 @@ export default class AuthenticatedUserProvider extends React.Component<
     }));
   };
 
-  _fetchUserBadges = () => {
+  _fetchUserBadges = async () => {
     const { firebaseUser } = this.state.authenticatedUser;
     if (!firebaseUser) return;
-    getUserBadges(firebaseUser.uid).then(
-      badges =>
-        this.setState(({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            badges,
-          },
-        })),
-      error => {
-        console.error('Error while loading user badges:', error);
-      }
-    );
+    try {
+      const badges = await getUserBadges(firebaseUser.uid);
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          badges,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user badges:', error);
+    }
   };
 
   _doLogout = () => {

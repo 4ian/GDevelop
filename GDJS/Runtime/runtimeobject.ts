@@ -28,6 +28,109 @@ namespace gdjs {
   };
 
   /**
+   * Arrays and data structure that are (re)used by
+   * {@link RuntimeObject.separateFromObjects} to avoid any allocation.
+   */
+  const separateFromObjectsStatics: {
+    moveXArray: Array<float>;
+    moveYArray: Array<float>;
+  } = {
+    moveXArray: [],
+    moveYArray: [],
+  };
+
+  /**
+   * Move the object using the results from collisionTest call.
+   *
+   * See {@link RuntimeObject.separateFromObjects}
+   *
+   * @param moveXArray
+   * @param moveYArray
+   * @return true if the object was moved
+   */
+  const moveFollowingSeparatingVectors = (
+    object: RuntimeObject,
+    moveXArray: Array<float>,
+    moveYArray: Array<float>
+  ): boolean => {
+    if (moveXArray.length === 0) {
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return false;
+    }
+    if (moveXArray.length === 1) {
+      // Move according to the results returned by the collision algorithm.
+      object.setPosition(
+        object.getX() + moveXArray[0],
+        object.getY() + moveYArray[0]
+      );
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return true;
+    }
+
+    // Find the longest vector
+    let squaredDistanceMax = 0;
+    let distanceMaxIndex = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const squaredDistance = moveX * moveX + moveY * moveY;
+      if (squaredDistance > squaredDistanceMax) {
+        squaredDistanceMax = squaredDistance;
+        distanceMaxIndex = index;
+      }
+    }
+
+    const distanceMax = Math.sqrt(squaredDistanceMax);
+    // unit vector of the longest vector
+    const uX = moveXArray[distanceMaxIndex] / distanceMax;
+    const uY = moveYArray[distanceMaxIndex] / distanceMax;
+
+    // normal vector of the longest vector
+    const vX = -uY;
+    const vY = uX;
+
+    // Project other vectors on the normal
+    let scalarProductMin = 0;
+    let scalarProductMax = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const scalarProduct = moveX * vX + moveY * vY;
+      scalarProductMin = Math.min(scalarProductMin, scalarProduct);
+      scalarProductMax = Math.max(scalarProductMax, scalarProduct);
+    }
+
+    // Apply the longest vector
+    let deltaX = moveXArray[distanceMaxIndex];
+    let deltaY = moveYArray[distanceMaxIndex];
+
+    // Apply the longest projected vector if they all are in the same direction
+    // Some projections could have rounding errors,
+    // they are considered negligible under a 1 for 1,000,000 ratio.
+    const scalarProductMinIsNegligible =
+      -scalarProductMin < scalarProductMax / 1048576;
+    const scalarProductMaxIsNegligible =
+      scalarProductMax < -scalarProductMin / 1048576;
+    if (scalarProductMinIsNegligible !== scalarProductMaxIsNegligible) {
+      if (scalarProductMaxIsNegligible) {
+        deltaX += scalarProductMin * vX;
+        deltaY += scalarProductMin * vY;
+      } else {
+        deltaX += scalarProductMax * vX;
+        deltaY += scalarProductMax * vY;
+      }
+    }
+    object.setPosition(object.getX() + deltaX, object.getY() + deltaY);
+    moveXArray.length = 0;
+    moveYArray.length = 0;
+    return true;
+  };
+
+  /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
@@ -1599,10 +1702,8 @@ namespace gdjs {
       objects: RuntimeObject[],
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moveXArray: Array<float> =
-        RuntimeObject.separateFromObjectsStatics.moveXArray;
-      let moveYArray: Array<float> =
-        RuntimeObject.separateFromObjectsStatics.moveYArray;
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
       moveXArray.length = 0;
       moveYArray.length = 0;
 
@@ -1628,7 +1729,7 @@ namespace gdjs {
           }
         }
       }
-      return this._doSeparateFromObjects(moveXArray, moveYArray);
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**
@@ -1641,10 +1742,8 @@ namespace gdjs {
       objectsLists: ObjectsLists,
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moveXArray: Array<float> =
-        RuntimeObject.separateFromObjectsStatics.moveXArray;
-      let moveYArray: Array<float> =
-        RuntimeObject.separateFromObjectsStatics.moveYArray;
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
       moveXArray.length = 0;
       moveYArray.length = 0;
 
@@ -1676,93 +1775,7 @@ namespace gdjs {
           }
         }
       }
-      return this._doSeparateFromObjects(moveXArray, moveYArray);
-    }
-
-    /**
-     * Separate the object from others objects, using the results from collisionTest call.
-     * @param moveXArray
-     * @param moveYArray
-     * @return true if the object was moved
-     */
-    private _doSeparateFromObjects(
-      moveXArray: Array<float>,
-      moveYArray: Array<float>
-    ): boolean {
-      if (moveXArray.length === 0) {
-        moveXArray.length = 0;
-        moveYArray.length = 0;
-        return false;
-      }
-      if (moveXArray.length === 1) {
-        // Move according to the results returned by the collision algorithm.
-        this.setPosition(
-          this.getX() + moveXArray[0],
-          this.getY() + moveYArray[0]
-        );
-        moveXArray.length = 0;
-        moveYArray.length = 0;
-        return true;
-      }
-
-      // Find the longest vector
-      let distanceSqMax = 0;
-      let distanceMaxIndex = 0;
-      for (let index = 0; index < moveXArray.length; index++) {
-        const moveX = moveXArray[index];
-        const moveY = moveYArray[index];
-
-        const distanceSq = moveX * moveX + moveY * moveY;
-        if (distanceSq > distanceSqMax) {
-          distanceSqMax = distanceSq;
-          distanceMaxIndex = index;
-        }
-      }
-
-      const distanceMax = Math.sqrt(distanceSqMax);
-      // unit vector of the longest vector
-      const uX = moveXArray[distanceMaxIndex] / distanceMax;
-      const uY = moveYArray[distanceMaxIndex] / distanceMax;
-
-      // normal vector of the longest vector
-      const vX = -uY;
-      const vY = uX;
-
-      // Project other vectors on the normal
-      let scalarProductMin = 0;
-      let scalarProductMax = 0;
-      for (let index = 0; index < moveXArray.length; index++) {
-        const moveX = moveXArray[index];
-        const moveY = moveYArray[index];
-
-        const scalarProduct = moveX * vX + moveY * vY;
-        scalarProductMin = Math.min(scalarProductMin, scalarProduct);
-        scalarProductMax = Math.max(scalarProductMax, scalarProduct);
-      }
-
-      // Apply the longest vector
-      let deltaX = moveXArray[distanceMaxIndex];
-      let deltaY = moveYArray[distanceMaxIndex];
-
-      // Apply the longest projected vector if they all are in the same direction
-      // Some projections could have rounding errors,
-      // they are considered negligible under a 1 for 1,000,000 ratio.
-      if (
-        -scalarProductMin < scalarProductMax / 1048576 !==
-        scalarProductMax < -scalarProductMin / 1048576
-      ) {
-        if (scalarProductMin !== 0) {
-          deltaX += scalarProductMin * vX;
-          deltaY += scalarProductMin * vY;
-        } else {
-          deltaX += scalarProductMax * vX;
-          deltaY += scalarProductMax * vY;
-        }
-      }
-      this.setPosition(this.getX() + deltaX, this.getY() + deltaY);
-      moveXArray.length = 0;
-      moveYArray.length = 0;
-      return true;
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**
@@ -2246,19 +2259,6 @@ namespace gdjs {
      * @static
      */
     static forcesGarbage: Array<gdjs.Force> = [];
-
-    /**
-     * Arrays and data structure that are (re)used by RuntimeObject.separateFromObjects to
-     * avoid any allocation.
-     * @static
-     */
-    private static separateFromObjectsStatics: {
-      moveXArray: Array<float>;
-      moveYArray: Array<float>;
-    } = {
-      moveXArray: [],
-      moveYArray: [],
-    };
 
     getVariableNumber = RuntimeObject.getVariableNumber;
     returnVariable = RuntimeObject.returnVariable;

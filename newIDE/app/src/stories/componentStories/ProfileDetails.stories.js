@@ -29,7 +29,6 @@ export default {
         'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
       },
     },
-    onEditProfile: { action: 'edit profile' },
   },
 };
 

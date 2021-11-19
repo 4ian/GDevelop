@@ -72,7 +72,8 @@ export default class LanguageDialog extends Component<Props, State> {
         {({ i18n }) => (
           <PreferencesContext.Consumer>
             {({ values, setLanguage }) => {
-              const isLoadingLanguage = i18n.language !== values.language;
+              const isLoadingLanguage =
+                i18n.language !== values.language.replace('_', '-');
 
               return (
                 <Dialog

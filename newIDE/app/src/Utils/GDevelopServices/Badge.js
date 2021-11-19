@@ -1,0 +1,98 @@
+// @flow
+import axios from 'axios';
+import { GDevelopUserApi } from './ApiConfigs';
+
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+
+export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
+
+export type Badge = {|
+  seen: boolean,
+  unlockedAt: string,
+  userId: string,
+  achievementId: string,
+|};
+
+export type Achievement = {|
+  id: string,
+  category: string,
+  name: string,
+|};
+
+const isAchievementAlreadyClaimed = (
+  badges: Badge[],
+  achievementId: string
+): boolean => {
+  return badges.map(badge => badge.achievementId).includes(achievementId);
+};
+
+const createOrEnsureBadgeForUser = async (
+  authenticatedUser: AuthenticatedUser,
+  achievementId: string
+): Promise<?Badge> => {
+  const {
+    badges,
+    firebaseUser,
+    getAuthorizationHeader,
+    onBadgesChanged,
+  } = authenticatedUser;
+  if (!badges || !firebaseUser) return null;
+  if (isAchievementAlreadyClaimed(badges, achievementId)) {
+    return null;
+  }
+  console.log(`posting achievement ${achievementId}`);
+
+  const userId = firebaseUser.uid;
+  try {
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.post(
+      `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
+      {
+        achievementId,
+      },
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+    onBadgesChanged();
+    return response.data;
+  } catch (err) {
+    if (err.response && err.response.status === 409) {
+      console.warn('Badge already exists');
+    } else {
+      throw err;
+    }
+  }
+};
+
+/**
+ * Check if user has already claimed the achievement, to avoid executing
+ * any extra code if that's the case.
+ */
+export const addCreateBadgePreHookIfNotClaimed = (
+  authenticatedUser: AuthenticatedUser,
+  achievementId: string,
+  callback: Function
+): Function => {
+  const { badges } = authenticatedUser;
+  if (!badges) return callback;
+  if (isAchievementAlreadyClaimed(badges, achievementId)) {
+    return callback;
+  }
+
+  return (...args) => {
+    callback.apply(null, args);
+    createOrEnsureBadgeForUser(authenticatedUser, achievementId);
+  };
+};
+
+export const getAchievements = (): Promise<Array<Achievement>> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/achievement`)
+    .then(response => response.data);
+};

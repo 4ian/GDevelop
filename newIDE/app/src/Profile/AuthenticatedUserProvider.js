@@ -127,6 +127,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           await this._reloadFirebaseProfile();
         },
         onSendEmailVerification: this._doSendEmailVerification,
+        onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
       },
@@ -353,6 +354,28 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     await authentication.sendFirebaseEmailVerification();
     this.openEmailVerificationPendingDialog(true);
+  };
+
+  _doAcceptGameStatsEmail = async () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      editInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.acceptGameStatsEmail(
+        authentication.getAuthorizationHeader
+      );
+      await this._fetchUserProfileWithoutThrowingErrors();
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      editInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
   };
 
   _doChangeEmail = async (form: ChangeEmailForm) => {

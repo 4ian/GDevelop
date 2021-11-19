@@ -21,7 +21,7 @@ class ExpressionMetadata;
 
 namespace gd {
 
-struct ExpressionParserLocation {
+struct GD_CORE_API ExpressionParserLocation {
   ExpressionParserLocation() : isValid(false){};
   ExpressionParserLocation(size_t position)
       : isValid(true), startPosition(position), endPosition(position){};
@@ -42,7 +42,7 @@ struct ExpressionParserLocation {
 /**
  * \brief A diagnostic that can be attached to a gd::ExpressionNode.
  */
-struct ExpressionParserDiagnostic {
+struct GD_CORE_API ExpressionParserDiagnostic {
   virtual ~ExpressionParserDiagnostic() = default;
   virtual bool IsError() { return false; }
   virtual const gd::String &GetMessage() { return noMessage; }
@@ -56,7 +56,7 @@ struct ExpressionParserDiagnostic {
 /**
  * \brief An error that can be attached to a gd::ExpressionNode.
  */
-struct ExpressionParserError : public ExpressionParserDiagnostic {
+struct GD_CORE_API ExpressionParserError : public ExpressionParserDiagnostic {
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,
                         size_t position_)
@@ -85,7 +85,7 @@ struct ExpressionParserError : public ExpressionParserDiagnostic {
  * \brief The base node, from which all nodes in the tree of
  * an expression inherits from.
  */
-struct ExpressionNode {
+struct GD_CORE_API ExpressionNode {
   ExpressionNode(const gd::String &type_) : type(type_){};
   virtual ~ExpressionNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker){};
@@ -104,7 +104,7 @@ struct ExpressionNode {
                     // gd::ParameterMetadata::IsExpression or "unknown".
 };
 
-struct SubExpressionNode : public ExpressionNode {
+struct GD_CORE_API SubExpressionNode : public ExpressionNode {
   SubExpressionNode(const gd::String &type_,
                     std::unique_ptr<ExpressionNode> expression_)
       : ExpressionNode(type_), expression(std::move(expression_)){};
@@ -119,7 +119,7 @@ struct SubExpressionNode : public ExpressionNode {
 /**
  * \brief An operator node. For example: "lhs + rhs".
  */
-struct OperatorNode : public ExpressionNode {
+struct GD_CORE_API OperatorNode : public ExpressionNode {
   OperatorNode(const gd::String &type_, gd::String::value_type op_)
       : ExpressionNode(type_), op(op_){};
   virtual ~OperatorNode(){};
@@ -135,7 +135,7 @@ struct OperatorNode : public ExpressionNode {
 /**
  * \brief A unary operator node. For example: "-2".
  */
-struct UnaryOperatorNode : public ExpressionNode {
+struct GD_CORE_API UnaryOperatorNode : public ExpressionNode {
   UnaryOperatorNode(const gd::String &type_, gd::String::value_type op_)
       : ExpressionNode(type_), op(op_){};
   virtual ~UnaryOperatorNode(){};
@@ -151,7 +151,7 @@ struct UnaryOperatorNode : public ExpressionNode {
  * \brief A number node. For example: "123".
  * Its `type` is always "number".
  */
-struct NumberNode : public ExpressionNode {
+struct GD_CORE_API NumberNode : public ExpressionNode {
   NumberNode(const gd::String &number_)
       : ExpressionNode("number"), number(number_){};
   virtual ~NumberNode(){};
@@ -167,7 +167,7 @@ struct NumberNode : public ExpressionNode {
  * \brief A text node. For example: "Hello World".
  * Its `type` is always "string".
  */
-struct TextNode : public ExpressionNode {
+struct GD_CORE_API TextNode : public ExpressionNode {
   TextNode(const gd::String &text_) : ExpressionNode("string"), text(text_){};
   virtual ~TextNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
@@ -177,7 +177,7 @@ struct TextNode : public ExpressionNode {
   gd::String text;
 };
 
-struct VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
+struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
   VariableAccessorOrVariableBracketAccessorNode() : ExpressionNode(""){};
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode> child;
@@ -191,7 +191,7 @@ struct VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
  * \see gd::VariableAccessorNode
  * \see gd::VariableBracketAccessorNode
  */
-struct VariableNode : public ExpressionNode {
+struct GD_CORE_API VariableNode : public ExpressionNode {
   VariableNode(const gd::String &type_,
                const gd::String &name_,
                const gd::String &objectName_)
@@ -214,7 +214,7 @@ struct VariableNode : public ExpressionNode {
  * \brief A bracket accessor of a variable. Example: MyChild
  * in MyVariable.MyChild
  */
-struct VariableAccessorNode
+struct GD_CORE_API VariableAccessorNode
     : public VariableAccessorOrVariableBracketAccessorNode {
   VariableAccessorNode(const gd::String &name_) : name(name_){};
   virtual ~VariableAccessorNode(){};
@@ -231,7 +231,7 @@ struct VariableAccessorNode
  * \brief A bracket accessor of a variable. Example: ["MyChild"]
  * (in MyVariable["MyChild"]).
  */
-struct VariableBracketAccessorNode
+struct GD_CORE_API VariableBracketAccessorNode
     : public VariableAccessorOrVariableBracketAccessorNode {
   VariableBracketAccessorNode(std::unique_ptr<ExpressionNode> expression_)
       : expression(std::move(expression_)){};
@@ -243,7 +243,7 @@ struct VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
-struct IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
+struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
     : public ExpressionNode {
   IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(
       const gd::String &type)
@@ -253,7 +253,7 @@ struct IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
 /**
  * \brief An identifier node, usually representing an object or a function name.
  */
-struct IdentifierNode
+struct GD_CORE_API IdentifierNode
     : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
   IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
       : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type_),
@@ -266,7 +266,7 @@ struct IdentifierNode
   gd::String identifierName;
 };
 
-struct FunctionCallOrObjectFunctionNameOrEmptyNode
+struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
     : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
   FunctionCallOrObjectFunctionNameOrEmptyNode(const gd::String &type)
       : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type){};
@@ -279,7 +279,7 @@ struct FunctionCallOrObjectFunctionNameOrEmptyNode
  * For example: "MyObject.Function" or "MyObject.Physics" or
  * "MyObject.Physics::LinearVelocity".
  */
-struct ObjectFunctionNameNode
+struct GD_CORE_API ObjectFunctionNameNode
     : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   ObjectFunctionNameNode(const gd::String &type_,
                          const gd::String &objectName_,
@@ -332,7 +332,7 @@ struct ObjectFunctionNameNode
  * For example: "MyExtension::MyFunction(1, 2)", "MyObject.Function()" or
  * "MyObject.Physics::LinearVelocity()".
  */
-struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   /** \brief Construct a free function call node. */
   FunctionCallNode(const gd::String &type_,
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
@@ -400,7 +400,7 @@ struct FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
  * \brief An empty node, used when parsing failed/a syntax error was
  * encountered and any other node could not make sense.
  */
-struct EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct GD_CORE_API EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   EmptyNode(const gd::String &type_, const gd::String &text_ = "")
       : FunctionCallOrObjectFunctionNameOrEmptyNode(type_), text(text_){};
   virtual ~EmptyNode(){};

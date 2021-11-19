@@ -38,8 +38,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddCondition("TimeScale",
                     _("Time scale"),
-                    _("Test the time scale."),
-                    _("the time scale"),
+                    _("Compare the time scale of the scene."),
+                    _("the time scale of the scene"),
                     _("Timers and time"),
                     "res/conditions/time24.png",
                     "res/conditions/time.png")
@@ -111,8 +111,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddAction("ChangeTimeScale",
                  _("Change time scale"),
-                 _("Change the time scale of the game."),
-                 _("Set time scale to _PARAM1_"),
+                 _("Change the time scale of the scene."),
+                 _("Set the time scale of the scene to _PARAM1_"),
                  _("Timers and time"),
                  "res/actions/time24.png",
                  "res/actions/time.png")
@@ -175,18 +175,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddExpression("TimeScale",
                      _("Time scale"),
-                     _("Time scale"),
+                     _("Returns the time scale of the scene."),
                      _("Time"),
                      "res/actions/time.png")
-      .AddCodeOnlyParameter("currentScene", "");
-
-  extension
-      .AddExpression("TimeScale",
-                     _("Time scale"),
-                     _("Time scale"),
-                     _("Time"),
-                     "res/actions/time.png")
-      .SetHidden()
       .AddCodeOnlyParameter("currentScene", "");
 
   extension

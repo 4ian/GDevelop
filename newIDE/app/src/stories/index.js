@@ -241,6 +241,7 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
+import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -690,6 +691,36 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
             errorText={'There was an error somewhere'}
           />
           <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('default, with translatable elements and a separator', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Click me',
+                onClick: action('Click me clicked'),
+              },
+              {
+                type: 'separator',
+              },
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Or click me',
+                onClick: action('Click me clicked'),
+              },
+            ]}
+          />
         </React.Fragment>
       )}
     />
@@ -4158,6 +4189,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4172,6 +4204,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4186,6 +4219,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress

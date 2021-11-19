@@ -156,7 +156,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 tabIndex={0}
               >
                 {target || (
-                  <Trans>{`<Enter the name of external events>`}</Trans>
+                  <Trans>{`<Enter the name of external events/scene>`}</Trans>
                 )}
               </i>
             </span>
@@ -175,6 +175,16 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               <ExternalEventsAutoComplete
                 project={this.props.project}
                 value={target}
+                sceneName={
+                  this.props.scope.layout
+                    ? this.props.scope.layout.getName()
+                    : undefined
+                }
+                externalEventsName={
+                  this.props.scope.externalEvents
+                    ? this.props.scope.externalEvents.getName()
+                    : undefined
+                }
                 onChange={text => {
                   linkEvent.setTarget(text);
                   this.props.onUpdate();

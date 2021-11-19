@@ -6,6 +6,7 @@
 // will be visible).
 export type EventsScope = {|
   layout?: ?gdLayout,
+  externalEvents?: ?gdExternalEvents,
   eventsFunctionsExtension?: gdEventsFunctionsExtension,
   eventsBasedBehavior?: ?gdEventsBasedBehavior,
   eventsFunction?: gdEventsFunction,

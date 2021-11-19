@@ -709,6 +709,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 scope={{
                   layout: null,
+                  externalEvents: null,
                   eventsFunctionsExtension,
                   eventsBasedBehavior: selectedEventsBasedBehavior,
                   eventsFunction: selectedEventsFunction,

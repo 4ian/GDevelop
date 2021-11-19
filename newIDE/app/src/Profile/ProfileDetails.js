@@ -26,8 +26,8 @@ type Props = {|
   isAuthenticatedUserProfile?: boolean,
   error?: ?Error,
   onRetry?: () => void,
-  onChangeEmail: () => void,
-  onEditProfile: () => void,
+  onChangeEmail?: () => void,
+  onEditProfile?: () => void,
   badges: ?Array<Badge>,
 |};
 
@@ -102,7 +102,7 @@ const ProfileDetails = ({
           )}
           <UserAchievements
             badges={badges}
-            displayUnclaimedAchievements={isAuthenticatedUserProfile}
+            displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
           />
         </Column>
       )}

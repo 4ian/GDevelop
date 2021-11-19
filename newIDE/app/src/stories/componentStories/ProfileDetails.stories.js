@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import withMock from 'storybook-addon-mock';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
@@ -36,12 +37,50 @@ type ArgsTypes = {|
   profile: Profile,
 |};
 
+const badges = [
+  {
+    achievementId: 'trivial_first-event',
+    seen: false,
+    unlockedAt: '2020-10-05T11:28:24.864Z',
+    userId: 'userId',
+  },
+  {
+    achievementId: 'game_success_1M-players',
+    seen: false,
+    unlockedAt: '2021-11-15T11:28:24.864Z',
+    userId: 'userId',
+  },
+];
+
+const apiDataServerSideError = {
+  mockData: [
+    {
+      url:
+        'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev/achievement',
+      method: 'GET',
+      status: 500,
+      response: { data: 'status' },
+    },
+  ],
+};
+
 export const MyProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} isAuthenticatedUserProfile />
+  <ProfileDetails {...args} isAuthenticatedUserProfile badges={badges} />
 );
+export const MyProfileWithAchievementLoadingError = (args: ArgsTypes) => (
+  <ProfileDetails {...args} isAuthenticatedUserProfile badges={badges} />
+);
+MyProfileWithAchievementLoadingError.decorators = [withMock];
+MyProfileWithAchievementLoadingError.parameters = apiDataServerSideError;
+
 export const OtherUserProfile = (args: ArgsTypes) => (
-  <ProfileDetails {...args} />
+  <ProfileDetails {...args} badges={badges} />
 );
+export const OtherProfileWithAchievementLoadingError = (args: ArgsTypes) => (
+  <ProfileDetails {...args} badges={badges} />
+);
+OtherProfileWithAchievementLoadingError.decorators = [withMock];
+OtherProfileWithAchievementLoadingError.parameters = apiDataServerSideError;
 export const Loading = (args: ArgsTypes) => (
   <ProfileDetails {...args} profile={null} />
 );
@@ -56,5 +95,8 @@ export const Errored = (args: ArgsTypes) => (
   />
 );
 Loading.argTypes = {
+  profile: { control: { disable: true } },
+};
+Errored.argTypes = {
   profile: { control: { disable: true } },
 };

@@ -156,7 +156,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 tabIndex={0}
               >
                 {target || (
-                  <Trans>{`<Enter the name of external events/scene>`}</Trans>
+                  <Trans>{`<Enter the name of external events>`}</Trans>
                 )}
               </i>
             </span>

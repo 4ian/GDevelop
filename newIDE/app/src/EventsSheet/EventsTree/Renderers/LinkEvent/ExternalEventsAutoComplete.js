@@ -27,7 +27,7 @@ const getList = (
     }));
 
   const layouts = enumerateLayouts(project)
-    .filter(layout => layout.getName() !== currentSceneName || externalEvents)
+    .filter(layout => layout.getName() !== currentSceneName)
     .map(layout => ({
       text: layout.getName(),
       value: layout.getName(),

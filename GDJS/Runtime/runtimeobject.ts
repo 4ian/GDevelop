@@ -1257,13 +1257,17 @@ namespace gdjs {
     }
 
     /**
-     * Get the hit boxes for the object around a given area.
-     * The hit boxes don't need to actually overlapping the area,
+     * Return at least all the hit boxes that overlap a given area.
+     *
+     * The hit boxes don't need to actually overlap the area,
+     * (i.e: it's correct to return more hit boxes than those in the specified area)
      * but the ones that do must be returned.
      *
      * The default implementation returns the same as {@link getHitBoxes}.
      *
-     * This method can be override by grid based objects to optimize collision checks.
+     * This method can be overridden by grid based objects (or other objects
+     * that can quickly compute which hitboxes are touching a given area)
+     * to optimize collision checks.
      *
      * When overriding this method, the following ones should be overridden too:
      * * {@link getHitBoxes}
@@ -1271,12 +1275,12 @@ namespace gdjs {
      * * {@link updateHitBoxes}
      * * {@link updateAABB}
      *
-     * @param left bound of the area
-     * @param top bound of the area
-     * @param right bound of the area
-     * @param bottom bound of the area
+     * @param left bound of the area in scene coordinates
+     * @param top bound of the area in scene coordinates
+     * @param right bound of the area in scene coordinates
+     * @param bottom bound of the area in scene coordinates
      *
-     * @return The hitboxes polygons that are near the given area.
+     * @return at least all the hit boxes that overlap a given area.
      */
     getHitBoxesAround(
       left: float,
@@ -1640,13 +1644,13 @@ namespace gdjs {
       moveXArray.length = 0;
       moveYArray.length = 0;
 
-      // We can assume that the moving object is not grid based
-      // So there is no need for optimization
+      // We can assume that the moving object is not grid based,
+      // so there is no need for optimization:
       // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
       let aabb: AABB | null = null;
 
-      // Check if their is a collision with each object
+      // Check if there is a collision with each object
       for (const otherObject of objects) {
         if (otherObject.id === this.id) {
           continue;

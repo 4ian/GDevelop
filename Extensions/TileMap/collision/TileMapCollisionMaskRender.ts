@@ -24,9 +24,7 @@ namespace gdjs {
         this._object._outlineColor,
         this._object._outlineOpacity / 255
       );
-      for (const polygon of this._object._collisionTileMap.getAllHitboxes(
-        this._object._typeFilter
-      )) {
+      for (const polygon of this._object.getHitBoxes()) {
         //console.log("polygon: " + polygon);
         const vertices = polygon.vertices;
         if (vertices.length === 0) continue;
@@ -45,12 +43,12 @@ namespace gdjs {
         this._graphics.closePath();
         this._graphics.endFill();
       }
-      console.log(
-        'getLocalBounds: ' +
-          this._graphics.getLocalBounds().width +
-          ' ' +
-          this._graphics.getLocalBounds().height
-      );
+      // console.log(
+      //   'getLocalBounds: ' +
+      //     this._graphics.getLocalBounds().width +
+      //     ' ' +
+      //     this._graphics.getLocalBounds().height
+      // );
     }
 
     getRendererObject() {
@@ -58,8 +56,8 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._graphics.position.x = this._object.x;
-      this._graphics.position.y = this._object.y;
+      // this._graphics.position.x = this._object.x;
+      // this._graphics.position.y = this._object.y;
     }
 
     setWidth(width: float): void {

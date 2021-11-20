@@ -22,6 +22,8 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
+    _affineTransformationIsUpToDate: boolean = false;
+
     constructor(runtimeScene, objectData) {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
@@ -115,72 +117,118 @@ namespace gdjs {
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap
           );
-          this._renderer.redrawCollisionMask();
-          this._defaultHitBoxes = Array.from(
-            this._collisionTileMap.getAllHitboxes(this._typeFilter)
-          );
-          this.hitBoxesDirty = true;
+          this.updateHitBoxes();
         }
       );
     }
 
     updateHitBoxes(): void {
-      for (let i = 0; i < this._defaultHitBoxes.length; ++i) {
-        if (i >= this.hitBoxes.length) {
-          this.hitBoxes.push(new gdjs.Polygon());
-        }
-        for (let j = 0; j < this._defaultHitBoxes[i].vertices.length; ++j) {
-          if (j >= this.hitBoxes[i].vertices.length) {
-            this.hitBoxes[i].vertices.push([0, 0]);
-          }
-          this._transformToGlobal(
-            this._defaultHitBoxes[i].vertices[j][0],
-            this._defaultHitBoxes[i].vertices[j][1],
-            this.hitBoxes[i].vertices[j]
-          );
-        }
-        this.hitBoxes[i].vertices.length = this._defaultHitBoxes[
-          i
-        ].vertices.length;
-      }
-      this.hitBoxes.length = this._defaultHitBoxes.length;
+      //console.log("updateHitBoxes");
+      this.updateAffineTransformation(
+        this._collisionTileMap.affineTransformation
+      );
+      this._collisionTileMap.invalidate();
+      this.hitBoxes = Array.from(
+        this._collisionTileMap.getAllHitboxes(this._typeFilter)
+      );
+      //this._defaultHitBoxes = this.hitBoxes;
+      this.hitBoxesDirty = false;
+      this._renderer.redrawCollisionMask();
+      this.updateAABB();
     }
 
-    private _transformToGlobal(x: float, y: float, result: number[]) {
-      let cx = this.getCenterX();
-      let cy = this.getCenterY();
-
-      // //Flipping
-      // if (this._flippedX) {
-      //   x = x + (cx - x) * 2;
-      // }
-      // if (this._flippedY) {
-      //   y = y + (cy - y) * 2;
-      // }
-
-      //Scale
+    updateAffineTransformation(
+      affineTransformation: gdjs.AffineTransformation
+    ) {
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
-      x *= absScaleX;
-      y *= absScaleY;
-      cx *= absScaleX;
-      cy *= absScaleY;
 
-      //Rotation
-      const oldX = x;
-      const angleInRadians = (this.angle / 180) * Math.PI;
-      const cosValue = Math.cos(
-        // Only compute cos and sin once (10% faster than doing it twice)
-        angleInRadians
+      affineTransformation.setToIdentity();
+
+      // Translation
+      affineTransformation.translate(this.x, this.y);
+
+      // Rotation
+      const angleInRadians = (this.angle * Math.PI) / 180;
+      affineTransformation.rotateAround(
+        angleInRadians,
+        this.getCenterX() * absScaleX,
+        this.getCenterY() * absScaleY
       );
-      const sinValue = Math.sin(angleInRadians);
-      const xToCenterXDelta = x - cx;
-      const yToCenterYDelta = y - cy;
-      x = cx + cosValue * xToCenterXDelta - sinValue * yToCenterYDelta;
-      y = cy + sinValue * xToCenterXDelta + cosValue * yToCenterYDelta;
-      result.length = 2;
-      result[0] = x + this.x;
-      result[1] = y + this.y;
+
+      // Scale
+      affineTransformation.scale(absScaleX, absScaleY);
+    }
+
+    updateAABB(): void {
+      if (this.getAngle() === 0) {
+        // Fast/simple computation of AABB for non rotated object
+        // (works even for object with non default center/origin
+        // because we're using getDrawableX/Y)
+        this.aabb.min[0] = this.x;
+        this.aabb.min[1] = this.y;
+        this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
+        this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+      } else {
+        const affineTransformation = this._collisionTileMap
+          .affineTransformation;
+
+        const left = 0;
+        const right = this._collisionTileMap.getWidth();
+        const top = 0;
+        const bottom = this._collisionTileMap.getHeight();
+
+        const workingPoint = this.aabb.min;
+
+        workingPoint[0] = left;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topLeftX = workingPoint[0];
+        const topLeftY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = top;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const topRightX = workingPoint[0];
+        const topRightY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomRightX = workingPoint[0];
+        const bottomRightY = workingPoint[1];
+
+        workingPoint[0] = left;
+        workingPoint[1] = bottom;
+        affineTransformation.transform(workingPoint, workingPoint);
+        const bottomLeftX = workingPoint[0];
+        const bottomLeftY = workingPoint[1];
+
+        this.aabb.min[0] = Math.min(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.max[0] = Math.max(
+          topLeftX,
+          topRightX,
+          bottomRightX,
+          bottomLeftX
+        );
+        this.aabb.min[1] = Math.min(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+        this.aabb.max[1] = Math.max(
+          topLeftY,
+          topRightY,
+          bottomRightY,
+          bottomLeftY
+        );
+      }
     }
 
     /**
@@ -227,6 +275,7 @@ namespace gdjs {
       if (this._renderer.getWidth() === width) return;
 
       this._renderer.setWidth(width);
+      this._affineTransformationIsUpToDate = false;
       this.hitBoxesDirty = true;
     }
 
@@ -238,6 +287,7 @@ namespace gdjs {
       if (this._renderer.getHeight() === height) return;
 
       this._renderer.setHeight(height);
+      this._affineTransformationIsUpToDate = false;
       this.hitBoxesDirty = true;
     }
 
@@ -248,6 +298,7 @@ namespace gdjs {
     setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
+      this._affineTransformationIsUpToDate = false;
     }
 
     /**
@@ -257,6 +308,7 @@ namespace gdjs {
     setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
+      this._affineTransformationIsUpToDate = false;
     }
 
     /**
@@ -267,6 +319,8 @@ namespace gdjs {
       super.setAngle(angle);
       // TODO handle rotation
       //this._renderer.updateAngle();
+      this._affineTransformationIsUpToDate = false;
+      this.updateHitBoxes();
     }
 
     /**

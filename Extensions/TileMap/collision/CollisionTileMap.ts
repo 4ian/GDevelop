@@ -245,6 +245,8 @@ namespace gdjs {
     export class TransformedCollisionTileMap {
       private _source: gdjs.TileMap.CollisionTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
+      affineTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      affineTransformationUpToDateCount: integer = 1;
 
       constructor(source: gdjs.TileMap.CollisionTileMap) {
         this._source = source;
@@ -255,6 +257,12 @@ namespace gdjs {
             new TransformedCollisionTileMapLayer(this, sourceLayer)
           );
         }
+      }
+
+      invalidate() {
+        this.affineTransformationUpToDateCount =
+          (this.affineTransformationUpToDateCount + 1) %
+          Number.MAX_SAFE_INTEGER;
       }
 
       getWidth() {
@@ -504,7 +512,7 @@ namespace gdjs {
       y: integer;
       source: CollisionTile;
       polygons: gdjs.Polygon[];
-      polygonsAreUpToDate: boolean;
+      private affineTransformationUpToDateCount: integer = 0;
 
       constructor(
         tileMap: TransformedCollisionTileMapLayer,
@@ -536,7 +544,6 @@ namespace gdjs {
             polygon.vertices[vertexIndex] = [0, 0];
           }
         }
-        this.polygonsAreUpToDate = false;
       }
 
       getTag() {
@@ -545,32 +552,34 @@ namespace gdjs {
 
       getPolygons() {
         //console.log("getPolygons");
-        if (!this.polygonsAreUpToDate) {
-          for (
-            let polygonIndex = 0;
-            polygonIndex < this.polygons.length;
-            polygonIndex++
-          ) {
-            const defPolygon = this.source.getPolygons()[polygonIndex];
-            const polygon = this.polygons[polygonIndex];
-
-            for (
-              let vertexIndex = 0;
-              vertexIndex < polygon.vertices.length;
-              vertexIndex++
-            ) {
-              const defVertex = defPolygon.vertices[vertexIndex];
-              const vertex = polygon.vertices[vertexIndex];
-              let x = defVertex[0];
-              let y = defVertex[1];
-              // TODO transform the polygon
-              vertex[0] = x;
-              vertex[1] = y;
-            }
-          }
-          //console.log("polygonsAreUpToDate");
-          this.polygonsAreUpToDate = true;
+        if (
+          this.affineTransformationUpToDateCount ===
+          this.layer.tileMap.affineTransformationUpToDateCount
+        ) {
+          return this.polygons;
         }
+        const affineTransformation = this.layer.tileMap.affineTransformation;
+        for (
+          let polygonIndex = 0;
+          polygonIndex < this.polygons.length;
+          polygonIndex++
+        ) {
+          const defPolygon = this.source.getPolygons()[polygonIndex];
+          const polygon = this.polygons[polygonIndex];
+
+          for (
+            let vertexIndex = 0;
+            vertexIndex < polygon.vertices.length;
+            vertexIndex++
+          ) {
+            const defVertex = defPolygon.vertices[vertexIndex];
+            const vertex = polygon.vertices[vertexIndex];
+
+            affineTransformation.transform(defVertex, vertex);
+          }
+        }
+        //console.log("polygonsAreUpToDate");
+        this.affineTransformationUpToDateCount = this.layer.tileMap.affineTransformationUpToDateCount;
         return this.polygons;
       }
     }

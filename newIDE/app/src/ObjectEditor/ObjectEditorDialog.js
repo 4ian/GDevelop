@@ -197,6 +197,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         />
       )}
       {currentTab === 'variables' && (
+        <Column expand>
         <VariablesList
         variablesContainer={props.object.getVariables()}
         emptyExplanationMessage={
@@ -223,6 +224,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         )}
         
         />
+        </Column>
       )}
       {currentTab === 'effects' && (
         <EffectsList

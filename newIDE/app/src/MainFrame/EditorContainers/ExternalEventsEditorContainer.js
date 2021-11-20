@@ -133,6 +133,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             project={project}
             scope={{
               layout,
+              externalEvents,
             }}
             globalObjectsContainer={project}
             objectsContainer={layout}

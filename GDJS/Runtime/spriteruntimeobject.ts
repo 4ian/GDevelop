@@ -315,7 +315,7 @@ namespace gdjs {
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
     hitBoxesDirty: any;
     _animationFrameDirty: any;
-    _affineTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+    _affineTransformation: gdjs.AffineTransformation | null = null;
     _affineTransformationDirty: boolean = true;
 
     constructor(runtimeScene, spriteObjectData) {
@@ -854,13 +854,36 @@ namespace gdjs {
      */
     private _transformToGlobal(x: float, y: float, result: number[]) {
       result.length = 2;
-      result[0] = x;
-      result[1] = y;
-      // @ts-ignore It's a FloatPoint at this point.
-      this.getAffineTransformation().transform(result, result);
+      const onlyNeedTranslation =
+        this.angle === 0 &&
+        this._scaleX === 0 &&
+        this._scaleY === 0 &&
+        !this._flippedX &&
+        !this._flippedY;
+      if (onlyNeedTranslation) {
+        // It's faster than applying a whole affine transformation.
+        // And it avoid to instantiate this._affineTransformation
+        // if it's never needed.
+        const animationFrame = this._animationFrame as SpriteAnimationFrame;
+        result[0] = x + this.x - animationFrame.origin.x;
+        result[1] = y + this.y - animationFrame.origin.y;
+      } else {
+        result[0] = x;
+        result[1] = y;
+        // @ts-ignore It's a FloatPoint at this point.
+        this.getAffineTransformation().transform(result, result);
+      }
     }
 
+    /**
+     * Return the affine transformation that represents
+     * flipping, scale, rotation and translation of the object.
+     * @returns the affine transformation.
+     */
     getAffineTransformation(): gdjs.AffineTransformation {
+      if (!this._affineTransformation) {
+        this._affineTransformation = new gdjs.AffineTransformation();
+      }
       if (!this._affineTransformationDirty) {
         return this._affineTransformation;
       }
@@ -886,7 +909,6 @@ namespace gdjs {
       );
 
       // Scale
-      //this._affineTransformation.translate(originX * absScaleX, originY * absScaleY);
       this._affineTransformation.scale(absScaleX, absScaleY);
       this._affineTransformation.translate(-originX, -originY);
 

@@ -3057,7 +3057,7 @@ storiesOf('ExternalPropertiesDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default, medium screen (no scope)', () => (
+  .add('default, medium screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3096,7 +3096,7 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('default, small screen (no scope)', () => (
+  .add('default, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3135,7 +3135,46 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('empty, small screen (no scope)', () => (
+  .add('default, medium screen (scope: not in a layout)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.testLayout.getEvents()}
+            project={testProject.project}
+            scope={{}}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'medium'}
+            eventsSheetHeight={500}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>

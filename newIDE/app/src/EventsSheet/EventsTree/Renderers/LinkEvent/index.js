@@ -142,23 +142,29 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 [disabledText]: this.props.disabled,
               })}
             >
-              <Trans>Include events from</Trans>{' '}
-              <i
-                className={classNames({
-                  [selectableArea]: true,
-                })}
-                onClick={this.edit}
-                onKeyPress={event => {
-                  if (shouldActivate(event)) {
-                    this.edit(event);
-                  }
-                }}
-                tabIndex={0}
-              >
-                {target || (
-                  <Trans>{`<Enter the name of external events>`}</Trans>
-                )}
-              </i>
+              {this.props.scope.layout ? (
+                <>
+                  <Trans>Include events from</Trans>{' '}
+                  <i
+                    className={classNames({
+                      [selectableArea]: true,
+                    })}
+                    onClick={this.edit}
+                    onKeyPress={event => {
+                      if (shouldActivate(event)) {
+                        this.edit(event);
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    {target || (
+                      <Trans>{`<Enter the name of external events>`}</Trans>
+                    )}
+                  </i>{' '}
+                </>
+              ) : (
+                <Trans>Links can't be used outside of a scene.</Trans>
+              )}
             </span>
             <IconButton
               onClick={() => this.openTarget(i18n)}

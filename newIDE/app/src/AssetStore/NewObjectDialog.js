@@ -34,7 +34,6 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 
@@ -198,6 +197,7 @@ export default function NewObjectDialog({
       open
       flexBody
       noMargin
+      fullHeight
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -269,17 +269,6 @@ export default function NewObjectDialog({
                   label={<Trans>Hide experimental objects</Trans>}
                 />
               )}
-            </Line>
-            <Line justifyContent="center" alignItems="center">
-              <RaisedButton
-                label={
-                  <Trans>Browse ready made objects in the Asset Store</Trans>
-                }
-                primary
-                onClick={() => {
-                  setCurrentTab('asset-store');
-                }}
-              />
             </Line>
           </ScrollView>
         )}

@@ -297,11 +297,67 @@ namespace gdjs {
         return this._layers.values();
       }
 
-      pointIsInsideTile(x: number, y: number, tag: string): boolean {
+      pointIsInsideTile(x: float, y: float, tag: string): boolean {
         // TODO avoid array allocation
-        const point: FloatPoint = [x, y];
-        this.inverseTransformation.transform(point, point);
-        return this._source.pointIsInsideTile(point[0], point[1], tag);
+        const workingPoint: FloatPoint = [x, y];
+        this.inverseTransformation.transform(workingPoint, workingPoint);
+        return this._source.pointIsInsideTile(
+          workingPoint[0],
+          workingPoint[1],
+          tag
+        );
+      }
+
+      getHitBoxesAround(
+        tag: string,
+        left: float,
+        top: float,
+        right: float,
+        bottom: float
+      ): Iterable<gdjs.Polygon> {
+        const inverseTransformation = this.inverseTransformation;
+        // TODO avoid array allocation
+        const workingPoint: FloatPoint = [left, top];
+        inverseTransformation.transform(workingPoint, workingPoint);
+        const topLeftX = workingPoint[0];
+        const topLeftY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = top;
+        inverseTransformation.transform(workingPoint, workingPoint);
+        const topRightX = workingPoint[0];
+        const topRightY = workingPoint[1];
+
+        workingPoint[0] = right;
+        workingPoint[1] = bottom;
+        inverseTransformation.transform(workingPoint, workingPoint);
+        const bottomRightX = workingPoint[0];
+        const bottomRightY = workingPoint[1];
+
+        workingPoint[0] = left;
+        workingPoint[1] = bottom;
+        inverseTransformation.transform(workingPoint, workingPoint);
+        const bottomLeftX = workingPoint[0];
+        const bottomLeftY = workingPoint[1];
+
+        const xMin = Math.floor(
+          Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+            this._source.tileWidth
+        );
+        const xMax = Math.floor(
+          Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+            this._source.tileWidth
+        );
+        const yMin = Math.floor(
+          Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+            this._source.tileHeight
+        );
+        const yMax = Math.floor(
+          Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+            this._source.tileHeight
+        );
+
+        return this.getHitboxes(tag, xMin, yMin, xMax, yMax);
       }
 
       getHitboxes(

@@ -83,6 +83,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
   Physics2, you can't mix the behaviors).`,
     };
   }
+  if (type.startsWith('BoundingBox')) {
+    return {
+      kind: 'info',
+      message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
+    };
+  }
   if (type === 'BitmapText::Scale') {
     return {
       kind: 'info',

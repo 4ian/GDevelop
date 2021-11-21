@@ -278,6 +278,37 @@ namespace gdjs {
       destination[1] = y;
     }
 
+    invert() {
+      const a = this.a;
+      const b = this.b;
+      const d = this.c;
+      const e = this.d;
+      const c = this.e;
+      const f = this.f;
+
+      const n = a * e - b * d;
+
+      this.a = e / n;
+      this.b = -b / n;
+      this.c = -d / n;
+      this.d = a / n;
+      this.e = (d * f - e * c) / n;
+      this.f = -(a * f - b * c) / n;
+
+      return this;
+    }
+
+    copyFrom(other: AffineTransformation) {
+      this.a = other.a;
+      this.b = other.b;
+      this.c = other.c;
+      this.d = other.d;
+      this.e = other.e;
+      this.f = other.f;
+
+      return this;
+    }
+
     toString() {
       return `[[${this.a} ${this.b} ${this.c}] [${this.d} ${this.e} ${this.f}]]`;
     }

@@ -1373,6 +1373,54 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Shortcut for `getAABB().min[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBLeft(): float {
+      return this.getAABB().min[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().min[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBTop(): float {
+      return this.getAABB().min[1];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBRight(): float {
+      return this.getAABB().max[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBBottom(): float {
+      return this.getAABB().max[1];
+    }
+
+    /**
+     * Shortcut for getting the center on the X coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterX(): float {
+      return this.getAABB().min[0] / 2 + this.getAABB().max[0] / 2;
+    }
+
+    /**
+     * Shortcut for getting the center on the Y coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterY(): float {
+      return this.getAABB().min[1] / 2 + this.getAABB().max[1] / 2;
+    }
+
     //Behaviors:
     /**
      * Call each behavior stepPreEvents method.

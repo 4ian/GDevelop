@@ -22,9 +22,7 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
-    _affineTransformationIsUpToDate: boolean = false;
-
-    constructor(runtimeScene, objectData) {
+    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
@@ -89,13 +87,6 @@ namespace gdjs {
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
       }
-      if (
-        oldObjectData.content.tilemapAtlasImage !==
-        newObjectData.content.tilemapAtlasImage
-      ) {
-        // TODO: support changing the atlas texture
-        return false;
-      }
       return true;
     }
 
@@ -117,6 +108,11 @@ namespace gdjs {
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap
           );
+          // The tile map polygons always keep the same references.
+          // TODO Update them if an action modify the tile map.
+          this.hitBoxes = Array.from(
+            this._collisionTileMap.getAllHitboxes(this._typeFilter)
+          );
           this.updateHitBoxes();
         }
       );
@@ -128,10 +124,9 @@ namespace gdjs {
         this._collisionTileMap.affineTransformation
       );
       this._collisionTileMap.invalidate();
-      this.hitBoxes = Array.from(
-        this._collisionTileMap.getAllHitboxes(this._typeFilter)
-      );
-      //this._defaultHitBoxes = this.hitBoxes;
+      for (const hitboxes of this._collisionTileMap.getAllHitboxes(this._typeFilter)) {
+        // just make them refresh
+      }
       this.hitBoxesDirty = false;
       this._renderer.redrawCollisionMask();
       this.updateAABB();
@@ -160,11 +155,39 @@ namespace gdjs {
       affineTransformation.scale(absScaleX, absScaleY);
     }
 
+    getHitBoxes(): gdjs.Polygon[] {
+      if (this.hitBoxesDirty) {
+        this.updateHitBoxes();
+        this.updateAABB();
+        this.hitBoxesDirty = false;
+      }
+      return this.hitBoxes;
+    }
+
+    getHitBoxesAround(left: float, top: float, right: float, bottom: float) {
+      // TODO
+    }
+
+    //TODO don't call updateHitBoxes
+    insideObject(x: float, y: float): boolean {
+      if (this.hitBoxesDirty) {
+        this.updateHitBoxes();
+        this.updateAABB();
+        this.hitBoxesDirty = false;
+      }
+      return (
+        this.aabb.min[0] <= x &&
+        this.aabb.max[0] >= x &&
+        this.aabb.min[1] <= y &&
+        this.aabb.max[1] >= y
+      );
+    }
+
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
     updateAABB(): void {
       if (this.getAngle() === 0) {
-        // Fast/simple computation of AABB for non rotated object
-        // (works even for object with non default center/origin
-        // because we're using getDrawableX/Y)
+        // Fast computation of AABB for non rotated object
         this.aabb.min[0] = this.x;
         this.aabb.min[1] = this.y;
         this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
@@ -234,7 +257,7 @@ namespace gdjs {
     /**
      * Set the Tilemap json file to display.
      */
-    setTilemapJsonFile(tilemapJsonFile): void {
+    setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
       this._updateTileMap();
     }
@@ -243,22 +266,24 @@ namespace gdjs {
       return this._tilemapJsonFile;
     }
 
-    isTilemapJsonFile(selectedTilemapJsonFile): boolean {
+    isTilemapJsonFile(selectedTilemapJsonFile: string): boolean {
       return this._tilemapJsonFile === selectedTilemapJsonFile;
     }
 
-    setTilesetJsonFile(tilesetJsonFile) {
+    setTilesetJsonFile(tilesetJsonFile: string) {
       this._tilesetJsonFile = tilesetJsonFile;
       this._updateTileMap();
     }
+
     getTilesetJsonFile() {
       return this._tilesetJsonFile;
     }
-    isTilesetJsonFile(selectedTilesetJsonFile) {
+
+    isTilesetJsonFile(selectedTilesetJsonFile: string) {
       return this._tilesetJsonFile === selectedTilesetJsonFile;
     }
 
-    setLayerIndex(layerIndex): void {
+    setLayerIndex(layerIndex: integer): void {
       this._layerIndex = layerIndex;
       this._updateTileMap();
     }
@@ -266,6 +291,8 @@ namespace gdjs {
     getLayerIndex() {
       return this._layerIndex;
     }
+
+    // TODO allow size changes from events?
 
     /**
      * Set the width of the object.
@@ -275,7 +302,6 @@ namespace gdjs {
       if (this._renderer.getWidth() === width) return;
 
       this._renderer.setWidth(width);
-      this._affineTransformationIsUpToDate = false;
       this.hitBoxesDirty = true;
     }
 
@@ -287,40 +313,7 @@ namespace gdjs {
       if (this._renderer.getHeight() === height) return;
 
       this._renderer.setHeight(height);
-      this._affineTransformationIsUpToDate = false;
       this.hitBoxesDirty = true;
-    }
-
-    /**
-     * Set object position on X axis.
-     * @param x The new position X of the object.
-     */
-    setX(x: float): void {
-      super.setX(x);
-      this._renderer.updatePosition();
-      this._affineTransformationIsUpToDate = false;
-    }
-
-    /**
-     * Set object position on Y axis.
-     * @param y The new position Y of the object.
-     */
-    setY(y: float): void {
-      super.setY(y);
-      this._renderer.updatePosition();
-      this._affineTransformationIsUpToDate = false;
-    }
-
-    /**
-     * Set the angle of the object.
-     * @param angle The new angle of the object.
-     */
-    setAngle(angle: float): void {
-      super.setAngle(angle);
-      // TODO handle rotation
-      //this._renderer.updateAngle();
-      this._affineTransformationIsUpToDate = false;
-      this.updateHitBoxes();
     }
 
     /**

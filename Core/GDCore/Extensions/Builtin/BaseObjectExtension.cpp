@@ -106,7 +106,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpressionAndConditionAndAction("number", "CenterX",
           _("Center X position"),
-          _("the X position of the center"),
+          _("the X position of the center of rotation"),
           _("the X position of the center"),
           _("Position/Center"),
           "res/actions/position24.png")
@@ -115,9 +115,63 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpressionAndConditionAndAction("number", "CenterY",
           _("Center Y position"),
-          _("the Y position of the center"),
+          _("the Y position of the center of rotation"),
           _("the Y position of the center"),
           _("Position/Center"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxLeft",
+          _("Bounding box left position"),
+          _("the bounding box (the area encapsulating the object) left position"),
+          _("the bounding box left position"),
+          _("Position/Bounding Box"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxTop",
+          _("Bounding box top position"),
+          _("the bounding box (the area encapsulating the object) top position"),
+          _("the bounding box top position"),
+          _("Position/Bounding Box"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxRight",
+          _("Bounding box right position"),
+          _("the bounding box (the area encapsulating the object) right position"),
+          _("the bounding box right position"),
+          _("Position/Bounding Box"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxBottom",
+          _("Bounding box bottom position"),
+          _("the bounding box (the area encapsulating the object) bottom position"),
+          _("the bounding box bottom position"),
+          _("Position/Bounding Box"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxCenterX",
+          _("Bounding box center X position"),
+          _("the bounding box (the area encapsulating the object) center X position"),
+          _("the bounding box center X position"),
+          _("Position/Bounding Box"),
+          "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxCenterY",
+          _("Bounding box center Y position"),
+          _("the bounding box (the area encapsulating the object) center Y position"),
+          _("the bounding box center Y position"),
+          _("Position/Bounding Box"),
           "res/actions/position24.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");

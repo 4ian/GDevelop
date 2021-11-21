@@ -55,23 +55,16 @@ namespace gdjs {
       return this._graphics;
     }
 
-    updatePosition(): void {
-      // this._graphics.position.x = this._object.x;
-      // this._graphics.position.y = this._object.y;
-    }
-
     setWidth(width: float): void {
       const tileMap = this._object._collisionTileMap;
       this._graphics.scale.x = width / tileMap.getWidth();
       this._graphics.pivot.x = width / 2;
-      this.updatePosition();
     }
 
     setHeight(height: float): void {
       const tileMap = this._object._collisionTileMap;
       this._graphics.scale.y = height / tileMap.getHeight();
       this._graphics.pivot.y = height / 2;
-      this.updatePosition();
     }
 
     getWidth(): float {

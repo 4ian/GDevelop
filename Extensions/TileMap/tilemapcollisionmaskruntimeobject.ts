@@ -22,6 +22,8 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
+    _transformationIsUpToDate: boolean = false;
+
     constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
@@ -120,11 +122,10 @@ namespace gdjs {
 
     updateHitBoxes(): void {
       //console.log("updateHitBoxes");
-      this.updateAffineTransformation(
-        this._collisionTileMap.affineTransformation
-      );
-      this._collisionTileMap.invalidate();
-      for (const hitboxes of this._collisionTileMap.getAllHitboxes(this._typeFilter)) {
+      this.updateTransformation();
+      for (const hitboxes of this._collisionTileMap.getAllHitboxes(
+        this._typeFilter
+      )) {
         // just make them refresh
       }
       this.hitBoxesDirty = false;
@@ -132,27 +133,39 @@ namespace gdjs {
       this.updateAABB();
     }
 
-    updateAffineTransformation(
-      affineTransformation: gdjs.AffineTransformation
-    ) {
+    updateTransformation() {
+      if (this._transformationIsUpToDate) {
+        return;
+      }
+      const transformation = this._collisionTileMap.transformation;
+
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
 
-      affineTransformation.setToIdentity();
+      transformation.setToIdentity();
 
       // Translation
-      affineTransformation.translate(this.x, this.y);
+      transformation.translate(this.x, this.y);
 
       // Rotation
       const angleInRadians = (this.angle * Math.PI) / 180;
-      affineTransformation.rotateAround(
+      transformation.rotateAround(
         angleInRadians,
         this.getCenterX() * absScaleX,
         this.getCenterY() * absScaleY
       );
 
       // Scale
-      affineTransformation.scale(absScaleX, absScaleY);
+      transformation.scale(absScaleX, absScaleY);
+
+      const inverseTransformation = this._collisionTileMap
+        .inverseTransformation;
+      inverseTransformation.copyFrom(transformation);
+      inverseTransformation.invert();
+
+      this._collisionTileMap.invalidate();
+
+      this._transformationIsUpToDate = true;
     }
 
     getHitBoxes(): gdjs.Polygon[] {
@@ -168,19 +181,12 @@ namespace gdjs {
       // TODO
     }
 
-    //TODO don't call updateHitBoxes
+    // This implementation doesn't use updateHitBoxes.
+    // It's important for good performances.
     insideObject(x: float, y: float): boolean {
-      if (this.hitBoxesDirty) {
-        this.updateHitBoxes();
-        this.updateAABB();
-        this.hitBoxesDirty = false;
-      }
-      return (
-        this.aabb.min[0] <= x &&
-        this.aabb.max[0] >= x &&
-        this.aabb.min[1] <= y &&
-        this.aabb.max[1] >= y
-      );
+      this.updateTransformation();
+      // This is more precise than the default implementation.
+      return this._collisionTileMap.pointIsInsideTile(x, y, this._typeFilter);
     }
 
     // This implementation doesn't use updateHitBoxes.
@@ -193,8 +199,7 @@ namespace gdjs {
         this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
         this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
       } else {
-        const affineTransformation = this._collisionTileMap
-          .affineTransformation;
+        const affineTransformation = this._collisionTileMap.transformation;
 
         const left = 0;
         const right = this._collisionTileMap.getWidth();
@@ -292,6 +297,21 @@ namespace gdjs {
       return this._layerIndex;
     }
 
+    setX(x: float): void {
+      super.setX(x);
+      this._transformationIsUpToDate = false;
+    }
+
+    setY(y: float): void {
+      super.setY(y);
+      this._transformationIsUpToDate = false;
+    }
+
+    setAngle(angle: float): void {
+      super.setAngle(angle);
+      this._transformationIsUpToDate = false;
+    }
+
     // TODO allow size changes from events?
 
     /**
@@ -303,6 +323,7 @@ namespace gdjs {
 
       this._renderer.setWidth(width);
       this.hitBoxesDirty = true;
+      this._transformationIsUpToDate = false;
     }
 
     /**
@@ -314,6 +335,7 @@ namespace gdjs {
 
       this._renderer.setHeight(height);
       this.hitBoxesDirty = true;
+      this._transformationIsUpToDate = false;
     }
 
     /**

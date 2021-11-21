@@ -49,6 +49,21 @@ namespace gdjs {
       getLayers(): Iterable<CollisionTileMapLayer> {
         return this._layers.values();
       }
+
+      pointIsInsideTile(x: float, y: float, tag: string): boolean {
+        const indexX = Math.floor(x / this.tileWidth);
+        const indexY = Math.floor(y / this.tileHeight);
+        for (const layer of this._layers.values()) {
+          const tile = layer.get(indexX, indexY);
+          if (!tile) {
+            return false;
+          }
+          if (tile.getTag() === tag) {
+            return true;
+          }
+        }
+        return false;
+      }
     }
 
     export class CollisionTileMapLayer {
@@ -102,7 +117,8 @@ namespace gdjs {
       }
 
       get(x: integer, y: integer): CollisionTile | undefined {
-        return this._tiles[y][x];
+        const row = this._tiles[y];
+        return row ? row[x] : undefined;
       }
 
       dimX() {
@@ -245,8 +261,9 @@ namespace gdjs {
     export class TransformedCollisionTileMap {
       private _source: gdjs.TileMap.CollisionTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
-      affineTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-      affineTransformationUpToDateCount: integer = 1;
+      transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      transformationUpToDateCount: integer = 1;
 
       constructor(source: gdjs.TileMap.CollisionTileMap) {
         this._source = source;
@@ -260,9 +277,8 @@ namespace gdjs {
       }
 
       invalidate() {
-        this.affineTransformationUpToDateCount =
-          (this.affineTransformationUpToDateCount + 1) %
-          Number.MAX_SAFE_INTEGER;
+        this.transformationUpToDateCount =
+          (this.transformationUpToDateCount + 1) % Number.MAX_SAFE_INTEGER;
       }
 
       getWidth() {
@@ -279,6 +295,13 @@ namespace gdjs {
 
       getLayers(): Iterable<TransformedCollisionTileMapLayer> {
         return this._layers.values();
+      }
+
+      pointIsInsideTile(x: number, y: number, tag: string): boolean {
+        // TODO avoid array allocation
+        const point: FloatPoint = [x, y];
+        this.inverseTransformation.transform(point, point);
+        return this._source.pointIsInsideTile(point[0], point[1], tag);
       }
 
       getHitboxes(
@@ -554,11 +577,11 @@ namespace gdjs {
         //console.log("getPolygons");
         if (
           this.affineTransformationUpToDateCount ===
-          this.layer.tileMap.affineTransformationUpToDateCount
+          this.layer.tileMap.transformationUpToDateCount
         ) {
           return this.polygons;
         }
-        const affineTransformation = this.layer.tileMap.affineTransformation;
+        const affineTransformation = this.layer.tileMap.transformation;
         for (
           let polygonIndex = 0;
           polygonIndex < this.polygons.length;
@@ -579,7 +602,7 @@ namespace gdjs {
           }
         }
         //console.log("polygonsAreUpToDate");
-        this.affineTransformationUpToDateCount = this.layer.tileMap.affineTransformationUpToDateCount;
+        this.affineTransformationUpToDateCount = this.layer.tileMap.transformationUpToDateCount;
         return this.polygons;
       }
     }

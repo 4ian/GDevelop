@@ -23,13 +23,11 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
-import VariablesList from '../VariablesList/index'
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import VariablesList from '../VariablesList/index';
 
 type Props = {|
   open: boolean,
   object: ?gdObject,
-  variables: ?gdObject.variables,
 
   onApply: () => void,
   onCancel: () => void,
@@ -40,6 +38,7 @@ type Props = {|
 
   // Passed down to object editors:
   project: gdProject,
+  onComputeAllVariableNames: () => Array<string>,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -198,32 +197,26 @@ const InnerDialog = (props: InnerDialogProps) => {
       )}
       {currentTab === 'variables' && (
         <Column expand noMargin>
-        <VariablesList
-        variablesContainer={props.object.getVariables()}
-        emptyExplanationMessage={
-          <Trans>
-            When you add variables to an object, any instance of the object put on the 
-            scene or created during the game will have these variables attached to it.
-          </Trans>
-        }
-        emptyExplanationSecondMessage={
-          <Trans>
-            For example, you can have a variable called 
-            Life representing the health of the object.
-          </Trans>
-        }
-        onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positioned*/
-        }
-        onComputeAllVariableNames={() =>
-          EventsRootVariablesFinder.findAllObjectVariables(
-            props.project.getCurrentPlatform(),
-            props.project,
-            props.layout,
-            props.object
-        )}
-        
-        />
+          <VariablesList
+            variablesContainer={props.object.getVariables()}
+            emptyExplanationMessage={
+              <Trans>
+                When you add variables to an object, any instance of the object
+                put on the scene or created during the game will have these
+                variables attached to it.
+              </Trans>
+            }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called Life representing
+                the health of the object.
+              </Trans>
+            }
+            onSizeUpdated={
+              forceUpdate /*Force update to ensure dialog is properly positioned*/
+            }
+            onComputeAllVariableNames={props.onComputeAllVariableNames}
+          />
         </Column>
       )}
       {currentTab === 'effects' && (

@@ -27,6 +27,7 @@ const VariablesEditorDialog = ({
   onCancel,
   onApply,
   open,
+  onEditObjectVariables,
   title,
   emptyExplanationMessage,
   emptyExplanationSecondMessage,
@@ -62,6 +63,14 @@ const VariablesEditorDialog = ({
       cannotBeDismissed={true}
       onRequestClose={onCancelChanges}
       secondaryActions={[
+        onEditObjectVariables ? (
+          <FlatButton
+            key="edit-object-variables"
+            label={<Trans>Edit Object Variables</Trans>}
+            primary={false}
+            onClick={onEditObjectVariables}
+          />
+        ) : null,
         hotReloadPreviewButtonProps ? (
           <HotReloadPreviewButton
             key="hot-reload-preview-button"

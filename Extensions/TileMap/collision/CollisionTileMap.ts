@@ -3,10 +3,10 @@ namespace gdjs {
     export class CollisionTileMap {
       private _tileSet: Map<integer, CollisionTileDefinition>;
       private _layers: Map<integer, CollisionTileMapLayer>;
-      readonly tileWidth: integer;
-      readonly tileHeight: integer;
-      readonly dimX: integer;
-      readonly dimY: integer;
+      private readonly tileWidth: integer;
+      private readonly tileHeight: integer;
+      private readonly dimX: integer;
+      private readonly dimY: integer;
 
       constructor(
         tileWidth: integer,
@@ -32,6 +32,22 @@ namespace gdjs {
         return this.tileHeight * this.dimY;
       }
 
+      getTileHeight() {
+        return this.tileWidth;
+      }
+
+      getTileWidth() {
+        return this.tileHeight;
+      }
+
+      getDimensionX() {
+        return this.dimX;
+      }
+
+      getDimensionY() {
+        return this.dimY;
+      }
+
       getTileDefinition(id: integer) {
         return this._tileSet.get(id);
       }
@@ -54,11 +70,12 @@ namespace gdjs {
         const indexX = Math.floor(x / this.tileWidth);
         const indexY = Math.floor(y / this.tileHeight);
         for (const layer of this._layers.values()) {
-          const tile = layer.get(indexX, indexY);
-          if (!tile) {
+          const tileId = layer.get(indexX, indexY);
+          if (!tileId) {
             return false;
           }
-          if (tile.getTag() === tag) {
+          const tileDefinition = this._tileSet.get(tileId);
+          if (tileDefinition!.getTag() === tag) {
             return true;
           }
         }
@@ -67,58 +84,99 @@ namespace gdjs {
     }
 
     export class CollisionTileMapLayer {
+      private static readonly flippedHorizontallyFlag = 0x80000000;
+      private static readonly flippedVerticallyFlag = 0x40000000;
+      private static readonly flippedDiagonallyFlag = 0x20000000;
+      private static readonly tileIdMask = ~(
+        CollisionTileMapLayer.flippedHorizontallyFlag |
+        CollisionTileMapLayer.flippedVerticallyFlag |
+        CollisionTileMapLayer.flippedDiagonallyFlag
+      );
+
       readonly tileMap: CollisionTileMap;
       readonly id: integer;
-      private _tiles: CollisionTile[][];
+      private _tiles: Array<Int32Array>;
 
       constructor(tileMap: CollisionTileMap, id: integer) {
         this.tileMap = tileMap;
         this.id = id;
         this._tiles = [];
-        this._tiles.length = this.tileMap.dimY;
+        this._tiles.length = this.tileMap.getDimensionY();
         for (let index = 0; index < this._tiles.length; index++) {
-          this._tiles[index] = [];
-          this._tiles[index].length = this.tileMap.dimX;
+          this._tiles[index] = new Int32Array(this.tileMap.getDimensionX());
         }
       }
 
-      set(
-        x: integer,
-        y: integer,
-        definitionIndex: integer,
-        flippedHorizontally: boolean,
-        flippedVertically: boolean,
-        flippedDiagonally: boolean
-      ) {
+      setTile(x: integer, y: integer, definitionIndex: integer) {
         const definition = this.tileMap.getTileDefinition(definitionIndex);
         if (!definition) {
           // The tile has no collision mask.
           return;
         }
         //console.log(x + " " + y + " set: " + definitionIndex);
-        if (this._tiles[y][x]) {
-          this._tiles[y][x].setDefinition(
-            definition,
-            flippedHorizontally,
-            flippedVertically,
-            flippedDiagonally
-          );
-        } else {
-          this._tiles[y][x] = new CollisionTile(
-            this,
-            x,
-            y,
-            definition,
-            flippedHorizontally,
-            flippedVertically,
-            flippedDiagonally
-          );
-        }
+        // +1 because 0 mean null
+        this._tiles[y][x] = definitionIndex + 1;
       }
 
-      get(x: integer, y: integer): CollisionTile | undefined {
+      setFlippedHorizontally(
+        x: integer,
+        y: integer,
+        flippedHorizontally: boolean
+      ) {
+        let tileId = this._tiles[y][x];
+        tileId &= ~CollisionTileMapLayer.flippedHorizontallyFlag;
+        if (flippedHorizontally) {
+          tileId |= CollisionTileMapLayer.flippedHorizontallyFlag;
+        }
+        this._tiles[y][x] = tileId;
+      }
+
+      setFlippedVertically(x: integer, y: integer, flippedVertically: boolean) {
+        let tileId = this._tiles[y][x];
+        tileId &= ~CollisionTileMapLayer.flippedVerticallyFlag;
+        if (flippedVertically) {
+          tileId |= CollisionTileMapLayer.flippedVerticallyFlag;
+        }
+        this._tiles[y][x] = tileId;
+      }
+
+      setFlippedDiagonally(x: integer, y: integer, flippedDiagonally: boolean) {
+        let tileId = this._tiles[y][x];
+        tileId &= ~CollisionTileMapLayer.flippedDiagonallyFlag;
+        if (flippedDiagonally) {
+          tileId |= CollisionTileMapLayer.flippedDiagonallyFlag;
+        }
+        this._tiles[y][x] = tileId;
+      }
+
+      isFlippedHorizontally(x: integer, y: integer): boolean {
+        return (
+          (this._tiles[y][x] &
+            CollisionTileMapLayer.flippedHorizontallyFlag) !==
+          0
+        );
+      }
+
+      isFlippedVertically(x: integer, y: integer): boolean {
+        return (
+          (this._tiles[y][x] & CollisionTileMapLayer.flippedVerticallyFlag) !==
+          0
+        );
+      }
+
+      isFlippedDiagonally(x: integer, y: integer): boolean {
+        return (
+          (this._tiles[y][x] & CollisionTileMapLayer.flippedDiagonallyFlag) !==
+          0
+        );
+      }
+
+      get(x: integer, y: integer): integer | undefined {
         const row = this._tiles[y];
-        return row ? row[x] : undefined;
+        // -1 because 0 mean null
+        return row
+          ? (row[x] - 1) & CollisionTileMapLayer.tileIdMask
+          : undefined;
       }
 
       dimX() {
@@ -139,23 +197,34 @@ namespace gdjs {
     }
 
     export class CollisionTileDefinition {
-      polygons: Polygon[];
-      tag: string;
+      private readonly polygons: Polygon[];
+      private readonly tag: string;
 
       constructor(polygons: gdjs.Polygon[], tag: string = '') {
         this.polygons = polygons;
         this.tag = tag;
       }
+
+      getTag() {
+        return this.tag;
+      }
+
+      getPolygons() {
+        return this.polygons;
+      }
     }
 
+    // TODO use a number instead of this class?
     class CollisionTile {
-      readonly layer: CollisionTileMapLayer;
-      readonly x: integer;
-      readonly y: integer;
       private definition: CollisionTileDefinition;
       private flippedHorizontally: boolean;
       private flippedVertically: boolean;
       private flippedDiagonally: boolean;
+
+      // TODO can be done without them
+      readonly layer: CollisionTileMapLayer;
+      readonly x: integer;
+      readonly y: integer;
       private polygons: gdjs.Polygon[];
       private polygonsAreUpToDate: boolean;
 
@@ -176,7 +245,7 @@ namespace gdjs {
         this.flippedVertically = flippedVertically;
         this.flippedDiagonally = flippedDiagonally;
         this.polygons = [];
-        this.polygons.length = this.definition.polygons.length;
+        this.polygons.length = this.definition.getPolygons().length;
         for (
           let polygonIndex = 0;
           polygonIndex < this.polygons.length;
@@ -184,7 +253,7 @@ namespace gdjs {
         ) {
           const polygon = new gdjs.Polygon();
           this.polygons[polygonIndex] = polygon;
-          polygon.vertices.length = this.definition.polygons[
+          polygon.vertices.length = this.definition.getPolygons()[
             polygonIndex
           ].vertices.length;
           for (
@@ -212,19 +281,19 @@ namespace gdjs {
       }
 
       getTag() {
-        return this.definition.tag;
+        return this.definition.getTag();
       }
 
       getPolygons() {
         //console.log("getPolygons");
         if (!this.polygonsAreUpToDate) {
-          // TODO transform the polygons
+          // TODO use an affine transformation ?
           for (
             let polygonIndex = 0;
             polygonIndex < this.polygons.length;
             polygonIndex++
           ) {
-            const defPolygon = this.definition.polygons[polygonIndex];
+            const defPolygon = this.definition.getPolygons()[polygonIndex];
             const polygon = this.polygons[polygonIndex];
 
             for (
@@ -236,8 +305,8 @@ namespace gdjs {
               const vertex = polygon.vertices[vertexIndex];
 
               //console.log(defVertex[0] + " + " + this.tileMap.tileWidth + " * " + this.x);
-              const width = this.layer.tileMap.tileWidth;
-              const height = this.layer.tileMap.tileHeight;
+              const width = this.layer.tileMap.getTileWidth();
+              const height = this.layer.tileMap.getTileHeight();
               let x = defVertex[0];
               let y = defVertex[1];
               x = this.flippedHorizontally ? width - x : x;
@@ -261,6 +330,7 @@ namespace gdjs {
     export class TransformedCollisionTileMap {
       private _source: gdjs.TileMap.CollisionTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
+      // TODO Tiled allow to offset the layers
       transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
       inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
       transformationUpToDateCount: integer = 1;
@@ -289,12 +359,24 @@ namespace gdjs {
         return this._source.getHeight();
       }
 
-      dimX() {
-        return this._source.dimX;
+      getTileHeight() {
+        return this._source.getTileHeight();
       }
 
-      dimY() {
-        return this._source.dimY;
+      getTileWidth() {
+        return this._source.getTileWidth();
+      }
+
+      getDimensionX() {
+        return this._source.getDimensionX();
+      }
+
+      getDimensionY() {
+        return this._source.getDimensionY();
+      }
+
+      getTileDefinition(id: integer) {
+        return this._source.getTileDefinition(id);
       }
 
       getLayer(id: integer): TransformedCollisionTileMapLayer | undefined {
@@ -354,28 +436,28 @@ namespace gdjs {
           0,
           Math.floor(
             Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) /
-              this._source.tileWidth
+              this._source.getTileWidth()
           )
         );
         const xMax = Math.min(
-          this.dimX() - 1,
+          this.getDimensionX() - 1,
           Math.floor(
             Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) /
-              this._source.tileWidth
+              this._source.getTileWidth()
           )
         );
         const yMin = Math.max(
           0,
           Math.floor(
             Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) /
-              this._source.tileHeight
+              this._source.getTileHeight()
           )
         );
         const yMax = Math.min(
-          this.dimY() - 1,
+          this.getDimensionY() - 1,
           Math.floor(
             Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) /
-              this._source.tileHeight
+              this._source.getTileHeight()
           )
         );
 
@@ -409,8 +491,8 @@ namespace gdjs {
           tag,
           0,
           0,
-          this._source.dimX - 1,
-          this._source.dimY - 1
+          this._source.getDimensionX() - 1,
+          this._source.getDimensionY() - 1
         );
       }
     }
@@ -475,8 +557,8 @@ namespace gdjs {
 
     export class TransformedCollisionTileMapLayer {
       readonly tileMap: TransformedCollisionTileMap;
-      private _source: gdjs.TileMap.CollisionTileMapLayer;
-      private _tiles: TransformedCollisionTile[][];
+      readonly _source: gdjs.TileMap.CollisionTileMapLayer;
+      private readonly _tiles: TransformedCollisionTile[][];
 
       constructor(
         tileMap: TransformedCollisionTileMap,
@@ -485,38 +567,21 @@ namespace gdjs {
         this.tileMap = tileMap;
         this._source = source;
         this._tiles = [];
-        this._tiles.length = this._source.dimY();
-        for (let y = 0; y < this._tiles.length; y++) {
+        const dimX = this._source.dimX();
+        const dimY = this._source.dimY();
+        this._tiles.length = dimY;
+        for (let y = 0; y < dimY; y++) {
           this._tiles[y] = [];
-          this._tiles[y].length = this._source.dimX();
-          for (let x = 0; x < this._source.dimX(); x++) {
-            const sourceTile = this._source.get(x, y);
-            if (sourceTile) {
-              this._tiles[y][x] = new TransformedCollisionTile(
-                this,
-                x,
-                y,
-                sourceTile
-              );
-            }
+          this._tiles[y].length = dimX;
+          for (let x = 0; x < dimX; x++) {
+            this._tiles[y][x] = new TransformedCollisionTile(this, x, y);
           }
         }
       }
 
       get(x: integer, y: integer): TransformedCollisionTile | undefined {
-        const sourceTile = this._source.get(x, y);
-        if (!sourceTile) {
-          return undefined;
-        }
-        if (!this._tiles[y][x]) {
-          this._tiles[y][x] = new TransformedCollisionTile(
-            this,
-            x,
-            y,
-            sourceTile
-          );
-        }
-        return this._tiles[y][x];
+        const row = this._tiles[y];
+        return row ? row[x] : undefined;
       }
 
       dimX() {
@@ -535,6 +600,18 @@ namespace gdjs {
         return this._source.getHeight();
       }
 
+      isFlippedDiagonally(x: integer, y: integer) {
+        return this._source.isFlippedDiagonally(x, y);
+      }
+
+      isFlippedVertically(x: integer, y: integer) {
+        return this._source.isFlippedVertically(x, y);
+      }
+
+      isFlippedHorizontally(x: integer, y: integer) {
+        return this._source.isFlippedHorizontally(x, y);
+      }
+
       getHitboxes(
         tag: string,
         xMin: integer,
@@ -544,7 +621,7 @@ namespace gdjs {
       ): Iterable<gdjs.Polygon> {
         //console.log("getHitboxes layer: " + this._source.id);
         return new LayerCollisionMaskIterable(
-          this._tiles,
+          this,
           tag,
           xMin,
           yMin,
@@ -559,7 +636,7 @@ namespace gdjs {
     }
 
     class LayerCollisionMaskIterable implements Iterable<gdjs.Polygon> {
-      map: TransformedCollisionTile[][];
+      layer: TransformedCollisionTileMapLayer;
       tag: string;
       xMin: integer;
       yMin: integer;
@@ -571,7 +648,7 @@ namespace gdjs {
       };
 
       constructor(
-        map: TransformedCollisionTile[][],
+        layer: TransformedCollisionTileMapLayer,
         tag: string,
         xMin: integer,
         yMin: integer,
@@ -579,7 +656,7 @@ namespace gdjs {
         yMax: integer
       ) {
         //console.log("CollisionMaskIterable: " + xMax + " " + yMax);
-        this.map = map;
+        this.layer = layer;
         this.tag = tag;
         this.xMin = xMin;
         this.yMin = yMin;
@@ -607,10 +684,11 @@ namespace gdjs {
                 // done
                 return listNext;
               }
-              const tile = this.map[y][x];
+              const tile = this.layer.get(x, y);
+              const definition = tile?.getDefinition();
               //console.log("Check: " + x + " " + y + " tile: " + (tile ? tile.getTag(): tile));
-              if (tile && tile.getTag() === this.tag) {
-                polygonItr = this.map[y][x].getPolygons()[Symbol.iterator]();
+              if (definition && definition.getTag() === this.tag) {
+                polygonItr = tile!.getPolygons()[Symbol.iterator]();
                 listNext = polygonItr.next();
               }
             }
@@ -624,47 +702,50 @@ namespace gdjs {
       layer: TransformedCollisionTileMapLayer;
       x: integer;
       y: integer;
-      source: CollisionTile;
       polygons: gdjs.Polygon[];
       private affineTransformationUpToDateCount: integer = 0;
 
       constructor(
         tileMap: TransformedCollisionTileMapLayer,
         x: integer,
-        y: integer,
-        source: CollisionTile
+        y: integer
       ) {
         this.layer = tileMap;
         this.x = x;
         this.y = y;
-        this.source = source;
+        const definition = this.getDefinition();
         this.polygons = [];
-        this.polygons.length = this.source.getPolygons().length;
-        for (
-          let polygonIndex = 0;
-          polygonIndex < this.polygons.length;
-          polygonIndex++
-        ) {
-          const polygon = new gdjs.Polygon();
-          this.polygons[polygonIndex] = polygon;
-          polygon.vertices.length = this.source.getPolygons()[
-            polygonIndex
-          ].vertices.length;
+        // TODO only for the write tag?
+        if (definition) {
+          this.polygons.length = definition.getPolygons().length;
           for (
-            let vertexIndex = 0;
-            vertexIndex < polygon.vertices.length;
-            vertexIndex++
+            let polygonIndex = 0;
+            polygonIndex < this.polygons.length;
+            polygonIndex++
           ) {
-            polygon.vertices[vertexIndex] = [0, 0];
+            const polygon = new gdjs.Polygon();
+            this.polygons[polygonIndex] = polygon;
+            polygon.vertices.length = definition.getPolygons()[
+              polygonIndex
+            ].vertices.length;
+            for (
+              let vertexIndex = 0;
+              vertexIndex < polygon.vertices.length;
+              vertexIndex++
+            ) {
+              polygon.vertices[vertexIndex] = [0, 0];
+            }
           }
         }
       }
 
-      getTag() {
-        return this.source.getTag();
+      getDefinition(): CollisionTileDefinition | undefined {
+        return this.layer.tileMap.getTileDefinition(
+          this.layer._source.get(this.x, this.y)!
+        );
       }
 
-      getPolygons() {
+      getPolygons(): Polygon[] {
         //console.log("getPolygons");
         if (
           this.affineTransformationUpToDateCount ===
@@ -672,13 +753,51 @@ namespace gdjs {
         ) {
           return this.polygons;
         }
-        const affineTransformation = this.layer.tileMap.transformation;
+
+        const definition = this.getDefinition();
+        if (!definition) {
+          // It should be []
+          return this.polygons;
+        }
+
+        const layerTransformation = this.layer.tileMap.transformation;
+        const width = this.layer.tileMap.getTileWidth();
+        const height = this.layer.tileMap.getTileHeight();
+        // TODO avoid allocations
+        const tileTransformation = new gdjs.AffineTransformation();
+        tileTransformation.translate(width * this.x, height * this.y);
+        if (this.layer.isFlippedHorizontally(this.x, this.y)) {
+          tileTransformation.flipX(width / 2);
+        }
+        if (this.layer.isFlippedVertically(this.x, this.y)) {
+          tileTransformation.flipY(height / 2);
+        }
+        if (this.layer.isFlippedDiagonally(this.x, this.y)) {
+          tileTransformation.flipDiagonally();
+        }
+        tileTransformation.preConcatenate(layerTransformation);
+
+        // const width = this.layer.tileMap.tileWidth;
+        // const height = this.layer.tileMap.tileHeight;
+        // let x = defVertex[0];
+        // let y = defVertex[1];
+        // x = this.flippedHorizontally ? width - x : x;
+        // y = this.flippedVertically ? height - y : y;
+        // if (this.flippedDiagonally) {
+        //   const swap = x;
+        //   x = y;
+        //   y = swap;
+        // }
+        // vertex[0] = x + width * this.x;
+        // vertex[1] = y + height * this.y;
+
+        // TODO update lengths
         for (
           let polygonIndex = 0;
           polygonIndex < this.polygons.length;
           polygonIndex++
         ) {
-          const defPolygon = this.source.getPolygons()[polygonIndex];
+          const defPolygon = definition.getPolygons()[polygonIndex];
           const polygon = this.polygons[polygonIndex];
 
           for (
@@ -689,7 +808,7 @@ namespace gdjs {
             const defVertex = defPolygon.vertices[vertexIndex];
             const vertex = polygon.vertices[vertexIndex];
 
-            affineTransformation.transform(defVertex, vertex);
+            tileTransformation.transform(defVertex, vertex);
           }
         }
         //console.log("polygonsAreUpToDate");

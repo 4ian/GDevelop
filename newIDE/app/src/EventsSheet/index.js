@@ -65,7 +65,9 @@ import {
   enumerateEventsMetadata,
   type EventMetadata,
 } from './EnumerateEventsMetadata';
-import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext, {
+  type Preferences,
+} from '../MainFrame/Preferences/PreferencesContext';
 import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 import { type EventsScope } from '../InstructionOrExpression/EventsScope.flow';
@@ -79,9 +81,17 @@ import {
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
 import InfoBar from '../UI/Messages/InfoBar';
-import { ScreenTypeMeasurer } from '../UI/Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import AuthenticatedUserContext, {
+  type AuthenticatedUser,
+} from '../Profile/AuthenticatedUserContext';
+import {
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_EVENT,
+  ACHIEVEMENT_FEATURE_FLAG,
+} from '../Utils/GDevelopServices/Badge';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -108,6 +118,12 @@ type Props = {|
     eventsFunction: gdEventsFunction
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
+|};
+
+type ComponentProps = {|
+  ...Props,
+  authenticatedUser: AuthenticatedUser,
+  userPreferences: Preferences,
 |};
 
 type State = {|
@@ -166,7 +182,10 @@ const styles = {
   },
 };
 
-export default class EventsSheet extends React.Component<Props, State> {
+export class EventsSheetComponentWithoutHandle extends React.Component<
+  ComponentProps,
+  State
+> {
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanelInterface;
@@ -191,10 +210,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     },
   });
 
-  static contextType = PreferencesContext;
-
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
+  addNewEvent: (
+    type: string,
+    context: ?EventInsertionContext
+  ) => Array<gdBaseEvent>;
 
   state = {
     history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
@@ -235,11 +256,33 @@ export default class EventsSheet extends React.Component<Props, State> {
     fontSize: 14,
   };
 
+  constructor(props: ComponentProps) {
+    super(props);
+    if (ACHIEVEMENT_FEATURE_FLAG) {
+      this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+        this.props.authenticatedUser,
+        TRIVIAL_FIRST_EVENT,
+        this._addNewEvent
+      );
+    } else {
+      this.addNewEvent = this._addNewEvent;
+    }
+  }
+
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
+  componentDidUpdate(prevProps: ComponentProps, prevState: State) {
+    if (ACHIEVEMENT_FEATURE_FLAG) {
+      this.addNewEvent = addCreateBadgePreHookIfNotClaimed(
+        this.props.authenticatedUser,
+        TRIVIAL_FIRST_EVENT,
+        this._addNewEvent
+      );
+    } else {
+      this.addNewEvent = this._addNewEvent;
+    }
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
@@ -332,7 +375,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (
+  _addNewEvent = (
     type: string,
     context: ?EventInsertionContext
   ): Array<gdBaseEvent> => {
@@ -409,6 +452,49 @@ export default class EventsSheet extends React.Component<Props, State> {
       textEditedEvent: null,
     });
   };
+
+  _buildInstructionContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteInstructions(),
+      enabled: hasClipboardConditions() || hasClipboardActions(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.history),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.history),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    {
+      label: i18n._(t`Invert Condition`),
+      click: () => this._invertSelectedConditions(),
+      visible: hasSelectedAtLeastOneCondition(this.state.selection),
+    },
+  ];
 
   openAddInstructionContextMenu = (
     button: HTMLButtonElement,
@@ -516,6 +602,103 @@ export default class EventsSheet extends React.Component<Props, State> {
       () => this.updateToolbar()
     );
   };
+
+  _buildEventContextMenu = (i18n: I18nType) => [
+    {
+      label: i18n._(t`Edit`),
+      click: () => this.openEventTextDialog(),
+      visible:
+        filterEditableWithEventTextDialog(
+          getSelectedEvents(this.state.selection)
+        ).length > 0,
+    },
+    {
+      label: i18n._(t`Copy`),
+      click: () => this.copySelection(),
+      accelerator: 'CmdOrCtrl+C',
+    },
+    {
+      label: i18n._(t`Cut`),
+      click: () => this.cutSelection(),
+      accelerator: 'CmdOrCtrl+X',
+    },
+    {
+      label: i18n._(t`Paste`),
+      click: () => this.pasteEvents(),
+      enabled: hasClipboardEvents(),
+      accelerator: 'CmdOrCtrl+V',
+    },
+    {
+      label: i18n._(t`Delete`),
+      click: () => this.deleteSelection(),
+      accelerator: 'Delete',
+    },
+    {
+      label: i18n._(t`Toggle disabled`),
+      click: () => this.toggleDisabled(),
+      enabled: this._selectionCanToggleDisabled(),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Add New Event Below`),
+      click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+    },
+    {
+      label: i18n._(t`Add Sub Event`),
+      click: () => this.addSubEvents(),
+      enabled: this._selectionCanHaveSubEvents(),
+    },
+    {
+      label: i18n._(t`Add Other`),
+      submenu: this.state.allEventsMetadata.map(metadata => {
+        return {
+          label: metadata.fullName,
+          click: () => this.addNewEvent(metadata.type),
+        };
+      }),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Undo`),
+      click: this.undo,
+      enabled: canUndo(this.state.history),
+      accelerator: 'CmdOrCtrl+Z',
+    },
+    {
+      label: i18n._(t`Redo`),
+      click: this.redo,
+      enabled: canRedo(this.state.history),
+      accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Extract Events to a Function`),
+      click: () => this.extractEventsToFunction(),
+    },
+    {
+      label: i18n._(t`Move Events into a Group`),
+      click: () => this.moveEventsIntoNewGroup(),
+    },
+    {
+      label: i18n._(t`Analyze Objects Used in this Event`),
+      click: this._openEventsContextAnalyzer,
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Zoom In`),
+      click: () => this.onZoomEvent('IN')(),
+      accelerator: 'CmdOrCtrl+=',
+      enabled:
+        this.props.userPreferences.values.eventsSheetZoomLevel < zoomLevel.max,
+    },
+    {
+      label: i18n._(t`Zoom Out`),
+      click: () => this.onZoomEvent('OUT')(),
+      accelerator: 'CmdOrCtrl+-',
+      enabled:
+        this.props.userPreferences.values.eventsSheetZoomLevel > zoomLevel.min,
+    },
+  ];
 
   openEventContextMenu = (x: number, y: number, eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
@@ -810,10 +993,10 @@ export default class EventsSheet extends React.Component<Props, State> {
         domEvent.preventDefault();
         domEvent.stopPropagation();
       }
-      this.context.setEventsSheetZoomLevel(
+      this.props.userPreferences.setEventsSheetZoomLevel(
         Math.min(
           Math.max(
-            this.context.values.eventsSheetZoomLevel + factor * 1,
+            this.props.userPreferences.values.eventsSheetZoomLevel + factor * 1,
             zoomLevel.min
           ),
           zoomLevel.max
@@ -1076,414 +1259,272 @@ export default class EventsSheet extends React.Component<Props, State> {
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
+      userPreferences,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+      onCreateEventsFunction,
     } = this.props;
     if (!project) return null;
 
+    const screenType = useScreenType();
+
     return (
-      <ScreenTypeMeasurer>
-        {screenType => (
-          <ResponsiveWindowMeasurer>
-            {windowWidth => (
-              <PreferencesContext.Consumer>
-                {({ values: preferences }) => (
-                  <EventsSearcher
-                    key={events.ptr}
-                    ref={eventSearcher => (this._eventSearcher = eventSearcher)}
-                    events={events}
+      <ResponsiveWindowMeasurer>
+        {windowWidth => (
+          <EventsSearcher
+            key={events.ptr}
+            ref={eventSearcher => (this._eventSearcher = eventSearcher)}
+            events={events}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            selection={this.state.selection}
+            project={project}
+          >
+            {({
+              eventsSearchResultEvents,
+              searchFocusOffset,
+              searchInEvents,
+              replaceInEvents,
+              goToPreviousSearchResult,
+              goToNextSearchResult,
+              clearSearchResults,
+            }) => (
+              <div
+                className="gd-events-sheet"
+                style={styles.container}
+                onKeyDown={this._keyboardShortcuts.onKeyDown}
+                onKeyUp={this._keyboardShortcuts.onKeyUp}
+                onDragOver={this._keyboardShortcuts.onDragOver}
+                ref={this._containerDiv}
+                tabIndex={0}
+              >
+                <EventsTree
+                  ref={eventsTree => (this._eventsTree = eventsTree)}
+                  key={events.ptr}
+                  onScroll={this._ensureFocused}
+                  events={events}
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  selection={this.state.selection}
+                  onInstructionClick={this.selectInstruction}
+                  onInstructionDoubleClick={this.openInstructionEditor}
+                  onInstructionContextMenu={this.openInstructionContextMenu}
+                  onAddInstructionContextMenu={
+                    this.openAddInstructionContextMenu
+                  }
+                  onAddNewInstruction={this.openInstructionEditor}
+                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
+                  onMoveToInstruction={this.moveSelectionToInstruction}
+                  onMoveToInstructionsList={
+                    this.moveSelectionToInstructionsList
+                  }
+                  onParameterClick={this.openParameterEditor}
+                  onEventClick={this.selectEvent}
+                  onEventContextMenu={this.openEventContextMenu}
+                  onAddNewEvent={(
+                    eventType: string,
+                    eventsList: gdEventsList
+                  ) => {
+                    this.addNewEvent(eventType, {
+                      eventsList,
+                      indexInList: eventsList.getEventsCount(),
+                    });
+                  }}
+                  onOpenExternalEvents={onOpenExternalEvents}
+                  onOpenLayout={onOpenLayout}
+                  searchResults={eventsSearchResultEvents}
+                  searchFocusOffset={searchFocusOffset}
+                  onEventMoved={this._onEventMoved}
+                  showObjectThumbnails={
+                    userPreferences.values.eventsSheetShowObjectThumbnails
+                  }
+                  screenType={screenType}
+                  windowWidth={windowWidth}
+                  eventsSheetHeight={
+                    this._containerDiv.current
+                      ? this._containerDiv.current.clientHeight
+                      : 0
+                  }
+                  fontSize={userPreferences.values.eventsSheetZoomLevel}
+                />
+                {this.state.showSearchPanel && (
+                  <SearchPanel
+                    ref={searchPanel => (this._searchPanel = searchPanel)}
+                    onSearchInEvents={inputs =>
+                      this._searchInEvents(searchInEvents, inputs)
+                    }
+                    onReplaceInEvents={inputs =>
+                      this._replaceInEvents(replaceInEvents, inputs)
+                    }
+                    resultsCount={
+                      eventsSearchResultEvents
+                        ? eventsSearchResultEvents.length
+                        : null
+                    }
+                    hasEventSelected={hasEventSelected(this.state.selection)}
+                    onGoToPreviousSearchResult={() =>
+                      this._ensureEventUnfolded(goToPreviousSearchResult)
+                    }
+                    onCloseSearchPanel={() => {
+                      clearSearchResults();
+                      this._closeSearchPanel();
+                    }}
+                    onGoToNextSearchResult={() =>
+                      this._ensureEventUnfolded(goToNextSearchResult)
+                    }
+                    searchFocusOffset={searchFocusOffset}
+                  />
+                )}
+                <InlineParameterEditor
+                  open={this.state.inlineEditing}
+                  anchorEl={this.state.inlineEditingAnchorEl}
+                  onRequestClose={() => {
+                    this.closeParameterEditor(
+                      /*shouldCancel=*/ userPreferences.values
+                        .eventsSheetCancelInlineParameter === 'cancel'
+                    );
+                  }}
+                  onApply={() => {
+                    this.closeParameterEditor(/*shouldCancel=*/ false);
+                  }}
+                  project={project}
+                  scope={scope}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  isCondition={this.state.editedParameter.isCondition}
+                  instruction={this.state.editedParameter.instruction}
+                  parameterIndex={this.state.editedParameter.parameterIndex}
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
+                    if (!instruction || !this.state.inlineEditing) {
+                      // Unlikely to ever happen, but maybe a component could
+                      // fire the "onChange" while the inline editor was just
+                      // dismissed.
+                      return;
+                    }
+                    instruction.setParameter(parameterIndex, value);
+                    this.setState({
+                      inlineEditingChangesMade: true,
+                    });
+                    if (this._searchPanel)
+                      this._searchPanel.markSearchResultsDirty();
+                  }}
+                  resourceSources={resourceSources}
+                  onChooseResource={onChooseResource}
+                  resourceExternalEditors={resourceExternalEditors}
+                />
+                <ContextMenu
+                  ref={eventContextMenu =>
+                    (this.eventContextMenu = eventContextMenu)
+                  }
+                  buildMenuTemplate={this._buildEventContextMenu}
+                />
+                <ContextMenu
+                  ref={instructionContextMenu =>
+                    (this.instructionContextMenu = instructionContextMenu)
+                  }
+                  buildMenuTemplate={this._buildInstructionContextMenu}
+                />
+                {this._renderInstructionEditorDialog(
+                  // Force using the new instruction editor on touch screens.
+                  userPreferences.values.useNewInstructionEditorDialog ||
+                    screenType === 'touch'
+                )}
+                {this.state.analyzedEventsContextResult && (
+                  <EventsContextAnalyzerDialog
+                    onClose={this._closeEventsContextAnalyzer}
+                    eventsContextResult={this.state.analyzedEventsContextResult}
+                  />
+                )}
+                {this.state.serializedEventsToExtract && (
+                  <EventsFunctionExtractorDialog
+                    project={project}
                     globalObjectsContainer={globalObjectsContainer}
                     objectsContainer={objectsContainer}
-                    selection={this.state.selection}
-                    project={project}
-                  >
-                    {({
-                      eventsSearchResultEvents,
-                      searchFocusOffset,
-                      searchInEvents,
-                      replaceInEvents,
-                      goToPreviousSearchResult,
-                      goToNextSearchResult,
-                      clearSearchResults,
-                    }) => (
-                      <div
-                        className="gd-events-sheet"
-                        style={styles.container}
-                        onKeyDown={this._keyboardShortcuts.onKeyDown}
-                        onKeyUp={this._keyboardShortcuts.onKeyUp}
-                        onDragOver={this._keyboardShortcuts.onDragOver}
-                        ref={this._containerDiv}
-                        tabIndex={0}
-                      >
-                        <EventsTree
-                          ref={eventsTree => (this._eventsTree = eventsTree)}
-                          key={events.ptr}
-                          onScroll={this._ensureFocused}
-                          events={events}
-                          project={project}
-                          scope={scope}
-                          globalObjectsContainer={globalObjectsContainer}
-                          objectsContainer={objectsContainer}
-                          selection={this.state.selection}
-                          onInstructionClick={this.selectInstruction}
-                          onInstructionDoubleClick={this.openInstructionEditor}
-                          onInstructionContextMenu={
-                            this.openInstructionContextMenu
-                          }
-                          onAddInstructionContextMenu={
-                            this.openAddInstructionContextMenu
-                          }
-                          onAddNewInstruction={this.openInstructionEditor}
-                          onPasteInstructions={
-                            this.pasteInstructionsInInstructionsList
-                          }
-                          onMoveToInstruction={this.moveSelectionToInstruction}
-                          onMoveToInstructionsList={
-                            this.moveSelectionToInstructionsList
-                          }
-                          onParameterClick={this.openParameterEditor}
-                          onEventClick={this.selectEvent}
-                          onEventContextMenu={this.openEventContextMenu}
-                          onAddNewEvent={(
-                            eventType: string,
-                            eventsList: gdEventsList
-                          ) => {
-                            this.addNewEvent(eventType, {
-                              eventsList,
-                              indexInList: eventsList.getEventsCount(),
-                            });
-                          }}
-                          onOpenExternalEvents={onOpenExternalEvents}
-                          onOpenLayout={onOpenLayout}
-                          searchResults={eventsSearchResultEvents}
-                          searchFocusOffset={searchFocusOffset}
-                          onEventMoved={this._onEventMoved}
-                          showObjectThumbnails={
-                            preferences.eventsSheetShowObjectThumbnails
-                          }
-                          screenType={screenType}
-                          windowWidth={windowWidth}
-                          eventsSheetHeight={
-                            this._containerDiv.current
-                              ? this._containerDiv.current.clientHeight
-                              : 0
-                          }
-                          fontSize={preferences.eventsSheetZoomLevel}
-                        />
-                        {this.state.showSearchPanel && (
-                          <SearchPanel
-                            ref={searchPanel =>
-                              (this._searchPanel = searchPanel)
-                            }
-                            onSearchInEvents={inputs =>
-                              this._searchInEvents(searchInEvents, inputs)
-                            }
-                            onReplaceInEvents={inputs =>
-                              this._replaceInEvents(replaceInEvents, inputs)
-                            }
-                            resultsCount={
-                              eventsSearchResultEvents
-                                ? eventsSearchResultEvents.length
-                                : null
-                            }
-                            hasEventSelected={hasEventSelected(
-                              this.state.selection
-                            )}
-                            onGoToPreviousSearchResult={() =>
-                              this._ensureEventUnfolded(
-                                goToPreviousSearchResult
-                              )
-                            }
-                            onCloseSearchPanel={() => {
-                              clearSearchResults();
-                              this._closeSearchPanel();
-                            }}
-                            onGoToNextSearchResult={() =>
-                              this._ensureEventUnfolded(goToNextSearchResult)
-                            }
-                            searchFocusOffset={searchFocusOffset}
-                          />
-                        )}
-                        <InlineParameterEditor
-                          open={this.state.inlineEditing}
-                          anchorEl={this.state.inlineEditingAnchorEl}
-                          onRequestClose={() => {
-                            this.closeParameterEditor(
-                              /*shouldCancel=*/ preferences.eventsSheetCancelInlineParameter ===
-                                'cancel'
-                            );
-                          }}
-                          onApply={() => {
-                            this.closeParameterEditor(/*shouldCancel=*/ false);
-                          }}
-                          project={project}
-                          scope={scope}
-                          globalObjectsContainer={globalObjectsContainer}
-                          objectsContainer={objectsContainer}
-                          isCondition={this.state.editedParameter.isCondition}
-                          instruction={this.state.editedParameter.instruction}
-                          parameterIndex={
-                            this.state.editedParameter.parameterIndex
-                          }
-                          onChange={value => {
-                            const {
-                              instruction,
-                              parameterIndex,
-                            } = this.state.editedParameter;
-                            if (!instruction || !this.state.inlineEditing) {
-                              // Unlikely to ever happen, but maybe a component could
-                              // fire the "onChange" while the inline editor was just
-                              // dismissed.
-                              return;
-                            }
-                            instruction.setParameter(parameterIndex, value);
-                            this.setState({
-                              inlineEditingChangesMade: true,
-                            });
-                            if (this._searchPanel)
-                              this._searchPanel.markSearchResultsDirty();
-                          }}
-                          resourceSources={this.props.resourceSources}
-                          onChooseResource={this.props.onChooseResource}
-                          resourceExternalEditors={
-                            this.props.resourceExternalEditors
-                          }
-                        />
-                        <ContextMenu
-                          ref={eventContextMenu =>
-                            (this.eventContextMenu = eventContextMenu)
-                          }
-                          buildMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Edit`),
-                              click: () => this.openEventTextDialog(),
-                              visible:
-                                filterEditableWithEventTextDialog(
-                                  getSelectedEvents(this.state.selection)
-                                ).length > 0,
-                            },
-                            {
-                              label: i18n._(t`Copy`),
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: i18n._(t`Cut`),
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: i18n._(t`Paste`),
-                              click: () => this.pasteEvents(),
-                              enabled: hasClipboardEvents(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            {
-                              label: i18n._(t`Delete`),
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            {
-                              label: i18n._(t`Toggle disabled`),
-                              click: () => this.toggleDisabled(),
-                              enabled: this._selectionCanToggleDisabled(),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Add New Event Below`),
-                              click: () =>
-                                this.addNewEvent(
-                                  'BuiltinCommonInstructions::Standard'
-                                ),
-                            },
-                            {
-                              label: i18n._(t`Add Sub Event`),
-                              click: () => this.addSubEvents(),
-                              enabled: this._selectionCanHaveSubEvents(),
-                            },
-                            {
-                              label: i18n._(t`Add Other`),
-                              submenu: this.state.allEventsMetadata.map(
-                                metadata => {
-                                  return {
-                                    label: metadata.fullName,
-                                    click: () =>
-                                      this.addNewEvent(metadata.type),
-                                  };
-                                }
-                              ),
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Undo`),
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: i18n._(t`Redo`),
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Extract Events to a Function`),
-                              click: () => this.extractEventsToFunction(),
-                            },
-                            {
-                              label: i18n._(t`Move Events into a Group`),
-                              click: () => this.moveEventsIntoNewGroup(),
-                            },
-                            {
-                              label: i18n._(
-                                t`Analyze Objects Used in this Event`
-                              ),
-                              click: this._openEventsContextAnalyzer,
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Zoom In`),
-                              click: () => this.onZoomEvent('IN')(),
-                              accelerator: 'CmdOrCtrl+=',
-                              enabled:
-                                preferences.eventsSheetZoomLevel <
-                                zoomLevel.max,
-                            },
-                            {
-                              label: i18n._(t`Zoom Out`),
-                              click: () => this.onZoomEvent('OUT')(),
-                              accelerator: 'CmdOrCtrl+-',
-                              enabled:
-                                preferences.eventsSheetZoomLevel >
-                                zoomLevel.min,
-                            },
-                          ]}
-                        />
-                        <ContextMenu
-                          ref={instructionContextMenu =>
-                            (this.instructionContextMenu = instructionContextMenu)
-                          }
-                          buildMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Copy`),
-                              click: () => this.copySelection(),
-                              accelerator: 'CmdOrCtrl+C',
-                            },
-                            {
-                              label: i18n._(t`Cut`),
-                              click: () => this.cutSelection(),
-                              accelerator: 'CmdOrCtrl+X',
-                            },
-                            {
-                              label: i18n._(t`Paste`),
-                              click: () => this.pasteInstructions(),
-                              enabled:
-                                hasClipboardConditions() ||
-                                hasClipboardActions(),
-                              accelerator: 'CmdOrCtrl+V',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Delete`),
-                              click: () => this.deleteSelection(),
-                              accelerator: 'Delete',
-                            },
-                            { type: 'separator' },
-                            {
-                              label: i18n._(t`Undo`),
-                              click: this.undo,
-                              enabled: canUndo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Z',
-                            },
-                            {
-                              label: i18n._(t`Redo`),
-                              click: this.redo,
-                              enabled: canRedo(this.state.history),
-                              accelerator: 'CmdOrCtrl+Shift+Z',
-                            },
-                            {
-                              label: i18n._(t`Invert Condition`),
-                              click: () => this._invertSelectedConditions(),
-                              visible: hasSelectedAtLeastOneCondition(
-                                this.state.selection
-                              ),
-                            },
-                          ]}
-                        />
-                        {this._renderInstructionEditorDialog(
-                          // Force using the new instruction editor on touch screens.
-                          preferences.useNewInstructionEditorDialog ||
-                            screenType === 'touch'
-                        )}
-                        {this.state.analyzedEventsContextResult && (
-                          <EventsContextAnalyzerDialog
-                            onClose={this._closeEventsContextAnalyzer}
-                            eventsContextResult={
-                              this.state.analyzedEventsContextResult
-                            }
-                          />
-                        )}
-                        {this.state.serializedEventsToExtract && (
-                          <EventsFunctionExtractorDialog
-                            project={project}
-                            globalObjectsContainer={globalObjectsContainer}
-                            objectsContainer={objectsContainer}
-                            onClose={() =>
-                              this.setState({
-                                serializedEventsToExtract: null,
-                              })
-                            }
-                            serializedEvents={
-                              this.state.serializedEventsToExtract
-                            }
-                            onCreate={(extensionName, eventsFunction) => {
-                              this.props.onCreateEventsFunction(
-                                extensionName,
-                                eventsFunction
-                              );
-                              this._replaceSelectionByEventsFunction(
-                                extensionName,
-                                eventsFunction
-                              );
-                              this.setState({
-                                serializedEventsToExtract: null,
-                              });
-                            }}
-                          />
-                        )}
-                        {this.state.textEditedEvent && (
-                          <EventTextDialog
-                            event={this.state.textEditedEvent}
-                            onApply={() => {
-                              this.closeEventTextDialog();
-                              this._saveChangesToHistory();
-                            }}
-                            onClose={this.closeEventTextDialog}
-                          />
-                        )}
-                        <InfoBar
-                          identifier="edit-instruction-explanation"
-                          message={
-                            <Trans>
-                              Double click on a condition or action to edit it.
-                            </Trans>
-                          }
-                          touchScreenMessage={
-                            <Trans>
-                              Double tap a condition or action to edit it. Long
-                              press to show more options.
-                            </Trans>
-                          }
-                          show={hasInstructionSelected(this.state.selection)}
-                        />
-                      </div>
-                    )}
-                  </EventsSearcher>
+                    onClose={() =>
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      })
+                    }
+                    serializedEvents={this.state.serializedEventsToExtract}
+                    onCreate={(extensionName, eventsFunction) => {
+                      onCreateEventsFunction(extensionName, eventsFunction);
+                      this._replaceSelectionByEventsFunction(
+                        extensionName,
+                        eventsFunction
+                      );
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      });
+                    }}
+                  />
                 )}
-              </PreferencesContext.Consumer>
+                {this.state.textEditedEvent && (
+                  <EventTextDialog
+                    event={this.state.textEditedEvent}
+                    onApply={() => {
+                      this.closeEventTextDialog();
+                      this._saveChangesToHistory();
+                    }}
+                    onClose={this.closeEventTextDialog}
+                  />
+                )}
+                <InfoBar
+                  identifier="edit-instruction-explanation"
+                  message={
+                    <Trans>
+                      Double click on a condition or action to edit it.
+                    </Trans>
+                  }
+                  touchScreenMessage={
+                    <Trans>
+                      Double tap a condition or action to edit it. Long press to
+                      show more options.
+                    </Trans>
+                  }
+                  show={hasInstructionSelected(this.state.selection)}
+                />
+              </div>
             )}
-          </ResponsiveWindowMeasurer>
+          </EventsSearcher>
         )}
-      </ScreenTypeMeasurer>
+      </ResponsiveWindowMeasurer>
     );
   }
 }
+
+export type EventsSheetInterface = {|
+  updateToolbar: () => void,
+|};
+
+// EventsSheet is a wrapper so that the component can use multiple
+// context in class methods while correctly exposing the interface.
+const EventsSheet = (props, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    updateToolbar,
+  }));
+
+  const component = React.useRef<?EventsSheetComponentWithoutHandle>(null);
+  const updateToolbar = () => {
+    if (component.current) component.current.updateToolbar();
+  };
+
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const userPreferences = React.useContext(PreferencesContext);
+  return (
+    <EventsSheetComponentWithoutHandle
+      ref={component}
+      authenticatedUser={authenticatedUser}
+      userPreferences={userPreferences}
+      {...props}
+    />
+  );
+};
+
+export default React.forwardRef<Props, EventsSheetInterface>(EventsSheet);

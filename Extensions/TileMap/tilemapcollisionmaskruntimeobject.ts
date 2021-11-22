@@ -206,6 +206,8 @@ namespace gdjs {
         this.aabb.min[1] = this.y;
         this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
         this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+
+        //console.log(this._typeFilter + " aabb: " + this.aabb.min + " " + this.aabb.max);
       } else {
         const affineTransformation = this._collisionTileMap.transformation;
 

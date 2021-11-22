@@ -101,7 +101,7 @@ const AchievementList = ({
                             : styles.lockedAchievement
                         }
                       >
-                        {i18n._(achievement.name)}
+                        {achievement.name}
                       </Text>
                       {displayUnclaimedAchievements && (
                         <Text
@@ -113,7 +113,7 @@ const AchievementList = ({
                           }
                           size="body2"
                         >
-                          {i18n._(achievement.description)}
+                          {achievement.description}
                         </Text>
                       )}
                     </Column>

@@ -101,7 +101,7 @@ const AchievementList = ({
                             : styles.lockedAchievement
                         }
                       >
-                        {achievement.name}
+                        {i18n._(achievement.name)}
                       </Text>
                       <Text
                         noMargin
@@ -112,7 +112,7 @@ const AchievementList = ({
                         }
                         size="body2"
                       >
-                        {achievement.description}
+                        {i18n._(achievement.description)}
                       </Text>
                     </Column>
                     {achievement.unlockedAt ? (

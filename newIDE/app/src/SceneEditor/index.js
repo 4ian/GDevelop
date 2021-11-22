@@ -1199,7 +1199,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 project.getCurrentPlatform(),
                 project,
                 layout,
-                this.state.editedObjectWithContext.object
+                this.state.editedObjectWithContext
               )
             }
             onCancel={() => {

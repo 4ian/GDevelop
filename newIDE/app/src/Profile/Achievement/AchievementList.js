@@ -92,15 +92,29 @@ const AchievementList = ({
                     justifyContent="space-between"
                     padding="0 20px"
                   >
-                    <Text
-                      style={
-                        achievement.unlockedAt
-                          ? styles.unlockedAchievement
-                          : styles.lockedAchievement
-                      }
-                    >
-                      {achievement.name}
-                    </Text>
+                    <Column>
+                      <Text
+                        noMargin
+                        style={
+                          achievement.unlockedAt
+                            ? styles.unlockedAchievement
+                            : styles.lockedAchievement
+                        }
+                      >
+                        {achievement.name}
+                      </Text>
+                      <Text
+                        noMargin
+                        style={
+                          achievement.unlockedAt
+                            ? styles.unlockedAchievement
+                            : styles.lockedAchievement
+                        }
+                        size="body2"
+                      >
+                        {achievement.description}
+                      </Text>
+                    </Column>
                     {achievement.unlockedAt ? (
                       <Text>{i18n.date(achievement.unlockedAt)}</Text>
                     ) : (

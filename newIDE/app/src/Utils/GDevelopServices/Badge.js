@@ -19,6 +19,7 @@ export type Achievement = {|
   id: string,
   category: string,
   name: string,
+  description: string,
 |};
 
 const isAchievementAlreadyClaimed = (

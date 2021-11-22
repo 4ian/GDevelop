@@ -1194,14 +1194,26 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
-            onComputeAllVariableNames={() =>
-              EventsRootVariablesFinder.findAllObjectVariables(
-                project.getCurrentPlatform(),
+            onComputeAllVariableNames={() => {
+              const variablesEditedInstance = this.state
+                .variablesEditedInstance;
+              if (!variablesEditedInstance) {
+                return [];
+              }
+              const variablesEditedObject = getObjectByName(
                 project,
                 layout,
-                this.state.editedObject
-              )
-            }
+                variablesEditedInstance.getObjectName()
+              );
+              return variablesEditedObject
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    variablesEditedObject
+                  )
+                : [];
+            }}
             onCancel={() => {
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(

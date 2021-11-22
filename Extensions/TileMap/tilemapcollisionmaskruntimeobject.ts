@@ -12,8 +12,6 @@ namespace gdjs {
     _renderer: gdjs.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     _typeFilter: string;
-    // TODO Should it be one collision mask per layer?
-    // as layer are not necessarily on the same grid.
     _tileMapManager: TileMapManager;
 
     _fillColor: integer;

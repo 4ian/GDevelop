@@ -74,12 +74,20 @@ namespace gdjs {
                     globalTileUid
                   );
                   //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
-                  collisionTileLayer.set(
+                  collisionTileLayer.setTile(x, y, tileUid.id - 1);
+                  collisionTileLayer.setFlippedHorizontally(
                     x,
                     y,
-                    tileUid.id - 1,
-                    tileUid.flippedHorizontally,
-                    tileUid.flippedVertically,
+                    tileUid.flippedHorizontally
+                  );
+                  collisionTileLayer.setFlippedVertically(
+                    x,
+                    y,
+                    tileUid.flippedVertically
+                  );
+                  collisionTileLayer.setFlippedDiagonally(
+                    x,
+                    y,
                     tileUid.flippedDiagonally
                   );
 

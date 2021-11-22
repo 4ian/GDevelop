@@ -242,6 +242,22 @@ namespace gdjs {
       this.translate(0, -anchorY);
     }
 
+    flipDiagonally() {
+      const a = this.a;
+      const b = this.b;
+      const c = this.c;
+      const d = this.d;
+      const e = this.e;
+      const f = this.f;
+
+      this.a = d;
+      this.b = e;
+      this.c = f;
+      this.d = a;
+      this.e = b;
+      this.f = c;
+    }
+
     concatenate(other: AffineTransformation) {
       //       a b c
       //       d e f
@@ -256,6 +272,29 @@ namespace gdjs {
       const d = this.d * other.a + this.e * other.d;
       const e = this.d * other.b + this.e * other.e;
       const f = this.d * other.c + this.e * other.f + this.f;
+
+      this.a = a;
+      this.b = b;
+      this.c = c;
+      this.d = d;
+      this.e = e;
+      this.f = f;
+    }
+
+    preConcatenate(other: AffineTransformation) {
+      //       a b c
+      //       d e f
+      //       0 0 1
+      // a b c
+      // d e f
+      // 0 0 1
+      const a = other.a * this.a + other.b * this.d;
+      const b = other.a * this.b + other.b * this.e;
+      const c = other.a * this.c + other.b * this.f + other.c;
+
+      const d = other.d * this.a + other.e * this.d;
+      const e = other.d * this.b + other.e * this.e;
+      const f = other.d * this.c + other.e * this.f + other.f;
 
       this.a = a;
       this.b = b;

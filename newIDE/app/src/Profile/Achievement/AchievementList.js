@@ -92,7 +92,7 @@ const AchievementList = ({
                     justifyContent="space-between"
                     padding="0 20px"
                   >
-                    <Column>
+                    <Column justifyContent="center">
                       <Text
                         noMargin
                         style={
@@ -103,17 +103,19 @@ const AchievementList = ({
                       >
                         {i18n._(achievement.name)}
                       </Text>
-                      <Text
-                        noMargin
-                        style={
-                          achievement.unlockedAt
-                            ? styles.unlockedAchievement
-                            : styles.lockedAchievement
-                        }
-                        size="body2"
-                      >
-                        {i18n._(achievement.description)}
-                      </Text>
+                      {displayUnclaimedAchievements && (
+                        <Text
+                          noMargin
+                          style={
+                            achievement.unlockedAt
+                              ? styles.unlockedAchievement
+                              : styles.lockedAchievement
+                          }
+                          size="body2"
+                        >
+                          {i18n._(achievement.description)}
+                        </Text>
+                      )}
                     </Column>
                     {achievement.unlockedAt ? (
                       <Text>{i18n.date(achievement.unlockedAt)}</Text>

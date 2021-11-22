@@ -281,19 +281,19 @@ namespace gdjs {
     invert() {
       const a = this.a;
       const b = this.b;
-      const d = this.c;
-      const e = this.d;
-      const c = this.e;
+      const c = this.c;
+      const d = this.d;
+      const e = this.e;
       const f = this.f;
 
-      const n = a * e - b * d;
+      const n = a * e - d * b;
 
       this.a = e / n;
+      this.d = -d / n;
       this.b = -b / n;
-      this.c = -d / n;
-      this.d = a / n;
-      this.e = (d * f - e * c) / n;
-      this.f = -(a * f - b * c) / n;
+      this.e = a / n;
+      this.c = (b * f - e * c) / n;
+      this.f = -(a * f - d * c) / n;
 
       return this;
     }

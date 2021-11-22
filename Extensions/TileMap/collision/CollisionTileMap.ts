@@ -289,8 +289,16 @@ namespace gdjs {
         return this._source.getHeight();
       }
 
-      getLayer(id: integer) {
-        return this._layers[id];
+      dimX() {
+        return this._source.dimX;
+      }
+
+      dimY() {
+        return this._source.dimY;
+      }
+
+      getLayer(id: integer): TransformedCollisionTileMapLayer | undefined {
+        return this._layers.get(id);
       }
 
       getLayers(): Iterable<TransformedCollisionTileMapLayer> {
@@ -307,6 +315,8 @@ namespace gdjs {
           tag
         );
       }
+
+      // test: number = 300;
 
       getHitBoxesAround(
         tag: string,
@@ -340,22 +350,46 @@ namespace gdjs {
         const bottomLeftX = workingPoint[0];
         const bottomLeftY = workingPoint[1];
 
-        const xMin = Math.floor(
-          Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) /
-            this._source.tileWidth
+        const xMin = Math.max(
+          0,
+          Math.floor(
+            Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+              this._source.tileWidth
+          )
         );
-        const xMax = Math.floor(
-          Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) /
-            this._source.tileWidth
+        const xMax = Math.min(
+          this.dimX() - 1,
+          Math.floor(
+            Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX) /
+              this._source.tileWidth
+          )
         );
-        const yMin = Math.floor(
-          Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) /
-            this._source.tileHeight
+        const yMin = Math.max(
+          0,
+          Math.floor(
+            Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+              this._source.tileHeight
+          )
         );
-        const yMax = Math.floor(
-          Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) /
-            this._source.tileHeight
+        const yMax = Math.min(
+          this.dimY() - 1,
+          Math.floor(
+            Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY) /
+              this._source.tileHeight
+          )
         );
+
+        // this.test++;
+        // if (this.test > 300) {
+        // // console.log("dim: " + this.dimX() + " " + this.dimY());
+        // // console.log("transformation: " + this.transformation);
+        // // console.log("inverse: " + this.inverseTransformation);
+        // // console.log("zone: " + left + " " + top + " " + right + " " + bottom);
+        // // console.log("getHitboxes: " + xMin + " " + yMin + " " + xMax + " " + yMax);
+        // const arr = Array.from(this.getHitboxes(tag, xMin, yMin, xMax, yMax));
+        // console.log(tag + " hitboxes length: " + arr.length);
+        // this.test = 0;
+        // }
 
         return this.getHitboxes(tag, xMin, yMin, xMax, yMax);
       }
@@ -375,8 +409,8 @@ namespace gdjs {
           tag,
           0,
           0,
-          this._source.dimX,
-          this._source.dimY
+          this._source.dimX - 1,
+          this._source.dimY - 1
         );
       }
     }
@@ -508,6 +542,7 @@ namespace gdjs {
         xMax: integer,
         yMax: integer
       ): Iterable<gdjs.Polygon> {
+        //console.log("getHitboxes layer: " + this._source.id);
         return new LayerCollisionMaskIterable(
           this._tiles,
           tag,
@@ -519,7 +554,7 @@ namespace gdjs {
       }
 
       getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
-        return this.getHitboxes(tag, 0, 0, this.dimX(), this.dimY());
+        return this.getHitboxes(tag, 0, 0, this.dimX() - 1, this.dimY() - 1);
       }
     }
 
@@ -564,16 +599,16 @@ namespace gdjs {
             let listNext = polygonItr.next();
             while (listNext.done) {
               x++;
-              if (x >= this.xMax) {
+              if (x > this.xMax) {
                 y++;
                 x = this.xMin;
               }
-              if (y >= this.yMax) {
+              if (y > this.yMax) {
                 // done
                 return listNext;
               }
               const tile = this.map[y][x];
-              //console.log(x + " " + y + " tile: " + tile);
+              //console.log("Check: " + x + " " + y + " tile: " + (tile ? tile.getTag(): tile));
               if (tile && tile.getTag() === this.tag) {
                 polygonItr = this.map[y][x].getPolygons()[Symbol.iterator]();
                 listNext = polygonItr.next();

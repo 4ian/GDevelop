@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { I18n } from '@lingui/react';
+import { I18n, Trans } from '@lingui/react';
 import { parseISO } from 'date-fns';
 import Lock from '@material-ui/icons/Lock';
 
@@ -101,7 +101,7 @@ const AchievementList = ({
                             : styles.lockedAchievement
                         }
                       >
-                        {achievement.name}
+                        <Trans>{achievement.name}</Trans>
                       </Text>
                       <Text
                         noMargin
@@ -112,7 +112,7 @@ const AchievementList = ({
                         }
                         size="body2"
                       >
-                        {achievement.description}
+                        <Trans>{achievement.description}</Trans>
                       </Text>
                     </Column>
                     {achievement.unlockedAt ? (

@@ -2108,10 +2108,13 @@ namespace gdjs {
         )
       );
 
-      const diffX =
-        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
-      const diffY =
-        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      const o1AbsoluteCenterX = obj1.getDrawableX() + o1centerX;
+      const o1AbsoluteCenterY = obj1.getDrawableY() + o1centerY;
+      const o2AbsoluteCenterX = obj2.getDrawableX() + o2centerX;
+      const o2AbsoluteCenterY = obj2.getDrawableY() + o2centerY;
+
+      const diffX = o1AbsoluteCenterX - o2AbsoluteCenterX;
+      const diffY = o1AbsoluteCenterY - o2AbsoluteCenterY;
       if (
         Math.sqrt(diffX * diffX + diffY * diffY) >
         obj1BoundingRadius + obj2BoundingRadius
@@ -2121,16 +2124,16 @@ namespace gdjs {
 
       // Do a real check if necessary.
       const hitBoxes1 = obj1.getHitBoxesAround(
-        o2centerX - obj2BoundingRadius,
-        o2centerY - obj2BoundingRadius,
-        o2centerX + obj2BoundingRadius,
-        o2centerY + obj2BoundingRadius
+        o2AbsoluteCenterX - obj2BoundingRadius,
+        o2AbsoluteCenterY - obj2BoundingRadius,
+        o2AbsoluteCenterX + obj2BoundingRadius,
+        o2AbsoluteCenterY + obj2BoundingRadius
       );
       const hitBoxes2 = obj2.getHitBoxesAround(
-        o1centerX - obj1BoundingRadius,
-        o1centerY - obj1BoundingRadius,
-        o1centerX + obj1BoundingRadius,
-        o1centerY + obj1BoundingRadius
+        o1AbsoluteCenterX - obj1BoundingRadius,
+        o1AbsoluteCenterY - obj1BoundingRadius,
+        o1AbsoluteCenterX + obj1BoundingRadius,
+        o1AbsoluteCenterY + obj1BoundingRadius
       );
 
       for (const hitBox1 of hitBoxes1) {

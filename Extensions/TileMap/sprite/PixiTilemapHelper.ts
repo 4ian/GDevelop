@@ -94,9 +94,9 @@ namespace gdjs {
         // Note that this cache can be augmented later with rotated/flipped
         // versions of the tile textures.
         const textureCache = new gdjs.TileMap.TileTextureCache();
-        for (let frame = 0; frame <= tilecount; frame++) {
-          const columnMultiplier = Math.floor((frame - 1) % columns);
-          const rowMultiplier = Math.floor((frame - 1) / columns);
+        for (let frame = 0; frame < tilecount; frame++) {
+          const columnMultiplier = Math.floor(frame % columns);
+          const rowMultiplier = Math.floor(frame / columns);
           const x = margin + columnMultiplier * (tilewidth + spacing);
           const y = margin + rowMultiplier * (tileheight + spacing);
 
@@ -118,7 +118,7 @@ namespace gdjs {
           height: atlasTexture.height,
           atlasTexture: atlasTexture,
           textureCache: textureCache,
-          tileMap: gdjs.TileMap.TiledCollisionTileMapLoader.load(tiledData),
+          tileMap: gdjs.TileMap.TiledTileMapLoader.load(tiledData),
         };
         return tileMapData;
       }
@@ -147,8 +147,8 @@ namespace gdjs {
           // and everything invisible should just not be parsed in the 1st place.
           //else if (displayMode === 'visible' && !layer.visible) return;
 
-          if (layer as EditableObjectLayer) {
-            const objectLayer = layer as EditableObjectLayer;
+          if (layer instanceof gdjs.TileMap.EditableObjectLayer) {
+            const objectLayer = layer as gdjs.TileMap.EditableObjectLayer;
             for (const object of objectLayer.objects) {
               const texture = genericTileMapData.textureCache.findTileTexture(
                 object.getTileId(),
@@ -164,8 +164,8 @@ namespace gdjs {
                 );
               }
             }
-          } else if (layer as EditableTileMapLayer) {
-            const tileLayer = layer as EditableTileMapLayer;
+          } else if (layer instanceof gdjs.TileMap.EditableTileMapLayer) {
+            const tileLayer = layer as gdjs.TileMap.EditableTileMapLayer;
 
             for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
               for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {

@@ -4,7 +4,7 @@ import { GDevelopUserApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
-export const ACHIEVEMENT_FEATURE_FLAG = false;
+export const ACHIEVEMENT_FEATURE_FLAG = true;
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';

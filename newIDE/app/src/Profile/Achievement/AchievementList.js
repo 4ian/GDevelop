@@ -68,7 +68,7 @@ const AchievementList = ({
   );
 
   return (
-    <Column>
+    <Column noMargin>
       <I18n>
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>

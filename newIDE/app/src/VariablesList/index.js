@@ -21,6 +21,10 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
+import HelpButton from '../UI/HelpButton';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
+import { Trans } from '@lingui/macro';
+import Text from '../UI/Text';
 
 const gd: libGDevelop = global.gd;
 
@@ -41,6 +45,7 @@ type Props = {|
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
+  helpPagePath: ?string,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -360,18 +365,18 @@ export default class VariablesList extends React.Component<Props, State> {
     return (
       !!this.props.emptyExplanationMessage && (
         <div>
-          <EmptyMessage
-            style={styles.emptyExplanation}
-            messageStyle={styles.emptyExplanationMessage}
+          <EmptyPlaceholder
+            renderButtons={() => (
+              <HelpButton helpPagePath={this.props.helpPagePath} />
+            )}
           >
-            {this.props.emptyExplanationMessage}
-          </EmptyMessage>
-          <EmptyMessage
-            style={styles.emptyExplanation}
-            messageStyle={styles.emptyExplanationMessage}
-          >
-            {this.props.emptyExplanationSecondMessage}
-          </EmptyMessage>
+            <Text>
+              <Trans>{this.props.emptyExplanationMessage}</Trans>
+            </Text>
+            <Text>
+              <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
+            </Text>
+          </EmptyPlaceholder>
         </div>
       )
     );

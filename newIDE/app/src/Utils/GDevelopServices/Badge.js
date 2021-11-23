@@ -99,8 +99,12 @@ export const addCreateBadgePreHookIfNotClaimed = (
   }
 
   return (...args) => {
-    callback.apply(null, args);
-    createOrEnsureBadgeForUser(authenticatedUser, achievementId);
+    try {
+      createOrEnsureBadgeForUser(authenticatedUser, achievementId);
+    } catch (err) {
+      console.error(`Couldn't create badge ${achievementId}; ${err}`);
+    }
+    return callback.apply(null, args);
   };
 };
 

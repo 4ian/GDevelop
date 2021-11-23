@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 
+import { type Badge } from './Badge';
+
 export type UserPublicProfile = {|
   id: string,
   username: ?string,
@@ -26,6 +28,12 @@ export const searchUserPublicProfilesByUsername = (
         username: searchString,
       },
     })
+    .then(response => response.data);
+};
+
+export const getUserBadges = (id: string): Promise<Array<Badge>> => {
+  return axios
+    .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
     .then(response => response.data);
 };
 

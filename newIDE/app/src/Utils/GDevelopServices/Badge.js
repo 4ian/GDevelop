@@ -87,17 +87,18 @@ const createOrEnsureBadgeForUser = async (
  * Check if user has already claimed the achievement, to avoid executing
  * any extra code if that's the case.
  */
-export const addCreateBadgePreHookIfNotClaimed = (
+export const addCreateBadgePreHookIfNotClaimed = <T: Function>(
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
-  callback: Function
-): Function => {
+  callback: T
+): T => {
   const { badges } = authenticatedUser;
   if (!badges) return callback;
   if (isAchievementAlreadyClaimed(badges, achievementId)) {
     return callback;
   }
 
+  // $FlowFixMe
   return (...args) => {
     try {
       createOrEnsureBadgeForUser(authenticatedUser, achievementId);

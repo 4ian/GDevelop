@@ -10,6 +10,7 @@ export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
 export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
 export const TRIVIAL_FIRST_PREVIEW = 'trivial_first-preview';
 export const TRIVIAL_FIRST_WEB_EXPORT = 'trivial_first-web-export';
+export const TRIVIAL_FIRST_EXTENSION = 'trivial_first-extension';
 
 export type Badge = {|
   seen: boolean,

@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   const logger = new gdjs.Logger('Tilemap object');
   /**
    * Displays a Tilemap object (mapeditor.org supported).
@@ -16,6 +18,7 @@ namespace gdjs {
     _layerIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
+    _tileMapManager: gdjs.TileMap.TileMapManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
     constructor(runtimeScene, objectData) {
@@ -28,6 +31,9 @@ namespace gdjs {
       this._layerIndex = objectData.content.layerIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
+      this._tileMapManager = gdjs.TileMap.TileMapManager.getManager(
+        runtimeScene
+      );
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
         this,
         runtimeScene
@@ -113,38 +119,29 @@ namespace gdjs {
     }
 
     private _updateTileMap(): void {
-      this._runtimeScene
-        .getGame()
-        .getJsonManager()
-        .loadJson(this._tilemapJsonFile, (error, tileMapJsonData) => {
-          if (error) {
-            logger.error(
-              'An error happened while loading a Tilemap JSON data:',
-              error
-            );
-            return;
-          }
-          const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
-          if (this._tilesetJsonFile) {
-            this._runtimeScene
-              .getGame()
-              .getJsonManager()
-              .loadJson(this._tilesetJsonFile, (error, tilesetJsonData) => {
-                if (error) {
-                  logger.error(
-                    'An error happened while loading Tileset JSON data:',
-                    error
-                  );
-                  return;
-                }
-                const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
-                tiledMap.tilesets = [tileSet];
-                this._renderer.loadTileMapWithTileset(tiledMap);
-              });
-          } else {
-            this._renderer.loadTileMapWithTileset(tiledMap);
-          }
-        });
+      this._tileMapManager.getOrLoadTileMap(
+        this._tilemapJsonFile,
+        this._tilesetJsonFile,
+        (tileMap: gdjs.TileMap.EditableTileMap) => {
+          this._tileMapManager.getOrLoadTextureCache(
+            (textureName) =>
+              (this._runtimeScene
+                .getGame()
+                .getImageManager()
+                .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
+                PIXI.Resource
+              >,
+            this._tilemapAtlasImage,
+            this._tilemapJsonFile,
+            this._tilesetJsonFile,
+            (textureCache: TileMap.TileTextureCache | null) => {
+              if (textureCache) {
+                this._renderer.updatePixiTileMap(tileMap, textureCache);
+              }
+            }
+          );
+        }
+      );
     }
 
     /**

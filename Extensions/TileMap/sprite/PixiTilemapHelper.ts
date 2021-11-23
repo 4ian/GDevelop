@@ -2,27 +2,7 @@ namespace gdjs {
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
 
-    /**
-     * Data to render a tile map. Loosely based on the merge of a Tiled
-     * map and tileset.
-     *
-     */
-    type GenericPixiTileMapData = {
-      width: number;
-      height: number;
-      atlasTexture: PIXI.BaseTexture;
-      textureCache: gdjs.TileMap.TileTextureCache;
-      tileMap: gdjs.TileMap.EditableTileMap;
-    };
-
     export class PixiTileMapHelper {
-      /**
-       * The Tilesets that are ready to be used
-       * with Pixi Tilemap, indexed by their id.
-       * @type {Object<string, GenericPixiTileMapData>}
-       */
-      static loadedGenericPixiTileMapData = {};
-
       /**
        * Parse a Tiled map JSON file,
        * exported from Tiled (https://www.mapeditor.org/)
@@ -33,11 +13,11 @@ namespace gdjs {
        * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
        * @returns
        */
-      static parseTiledData(
+      static parseAtlas(
         tiledData: gdjs.TileMap.TiledMap,
         atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
         getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
-      ): GenericPixiTileMapData | null {
+      ): gdjs.TileMap.TileTextureCache | null {
         if (!tiledData.tiledversion) {
           console.warn(
             "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
@@ -113,34 +93,29 @@ namespace gdjs {
           }
         }
 
-        const tileMapData: GenericPixiTileMapData = {
-          width: atlasTexture.width,
-          height: atlasTexture.height,
-          atlasTexture: atlasTexture,
-          textureCache: textureCache,
-          tileMap: gdjs.TileMap.TiledTileMapLoader.load(tiledData),
-        };
-        return tileMapData;
+        return textureCache;
       }
 
       /**
        * Re-renders the tilemap whenever its rendering settings have been changed
        *
        * @param pixiTileMap
-       * @param genericTileMapData
+       * @param tileMap
+       * @param textureCache
        * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
        * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
        */
       static updatePixiTileMap(
         pixiTileMap,
-        genericTileMapData: GenericPixiTileMapData,
+        tileMap: gdjs.TileMap.EditableTileMap,
+        textureCache: gdjs.TileMap.TileTextureCache,
         displayMode: 'index' | 'visible' | 'all',
         layerIndex: number
       ) {
-        if (!pixiTileMap || !genericTileMapData) return;
+        if (!pixiTileMap) return;
         pixiTileMap.clear();
 
-        for (const layer of genericTileMapData.tileMap.getLayers()) {
+        for (const layer of tileMap.getLayers()) {
           if (displayMode === 'index' && layerIndex !== layer.id) return;
           // TODO is this really useful?
           // I think it's just an editor field
@@ -150,7 +125,7 @@ namespace gdjs {
           if (layer instanceof gdjs.TileMap.EditableObjectLayer) {
             const objectLayer = layer as gdjs.TileMap.EditableObjectLayer;
             for (const object of objectLayer.objects) {
-              const texture = genericTileMapData.textureCache.findTileTexture(
+              const texture = textureCache.findTileTexture(
                 object.getTileId(),
                 object.isFlippedHorizontally(),
                 object.isFlippedVertically(),
@@ -174,7 +149,7 @@ namespace gdjs {
 
                 const tileId = tileLayer.get(x, y)!;
 
-                const tileTexture = genericTileMapData.textureCache.findTileTexture(
+                const tileTexture = textureCache.findTileTexture(
                   tileId,
                   tileLayer.isFlippedHorizontally(x, y),
                   tileLayer.isFlippedVertically(x, y),
@@ -207,59 +182,6 @@ namespace gdjs {
             }
           }
         }
-      }
-
-      /**
-       * Load the given data, exported from Tiled, into a generic tilemap data (`GenericPixiTileMapData`),
-       * which can then be used to update a PIXI.Tilemap (see `updatePixiTileMap`).
-       *
-       * Later on, this could potentially be refactored to support other data structures
-       * (LDtk, for example: https://github.com/deepnight/ldtk).
-       *
-       * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
-       * @param tiledData A JS object representing a map exported from Tiled.
-       * @param atlasImageResourceName The name of the resource to pass to `getTexture` to load the atlas.
-       * @param tilemapResourceName The name of the tilemap resource - used to index internally the loaded tilemap data.
-       * @param tilesetResourceName The name of the tileset resource - used to index internally the loaded tilemap data.
-       * @returns
-       */
-      static loadPixiTileMapData(
-        getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
-        tiledData: gdjs.TileMap.TiledMap,
-        atlasImageResourceName: string,
-        tilemapResourceName: string,
-        tilesetResourceName: string
-      ): GenericPixiTileMapData | null {
-        const requestedTileMapDataId =
-          tilemapResourceName +
-          '@' +
-          tilesetResourceName +
-          '@' +
-          atlasImageResourceName;
-
-        // If the tilemap data is already in the cache, use it directly.
-        if (
-          PixiTileMapHelper.loadedGenericPixiTileMapData[requestedTileMapDataId]
-        ) {
-          return PixiTileMapHelper.loadedGenericPixiTileMapData[
-            requestedTileMapDataId
-          ];
-        }
-
-        const atlasTexture = atlasImageResourceName
-          ? getTexture(atlasImageResourceName)
-          : null;
-        const genericPixiTileMapData = PixiTileMapHelper.parseTiledData(
-          tiledData,
-          atlasTexture,
-          getTexture
-        );
-
-        if (genericPixiTileMapData)
-          PixiTileMapHelper.loadedGenericPixiTileMapData[
-            requestedTileMapDataId
-          ] = genericPixiTileMapData;
-        return genericPixiTileMapData;
       }
     }
   }

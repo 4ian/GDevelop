@@ -50,28 +50,17 @@ namespace gdjs {
       this._pixiObject.tileAnim[0] += 1;
     }
 
-    loadTileMapWithTileset(tileMapJsonData: gdjs.TileMap.TiledMap) {
-      const pixiTileMapData = gdjs.TileMap.PixiTileMapHelper.loadPixiTileMapData(
-        (textureName) =>
-          (this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
-            PIXI.Resource
-          >,
-        tileMapJsonData,
-        this._object._tilemapAtlasImage,
-        this._object._tilemapJsonFile,
-        this._object._tilesetJsonFile
+    updatePixiTileMap(
+      tileMap: gdjs.TileMap.EditableTileMap,
+      textureCache: gdjs.TileMap.TileTextureCache
+    ) {
+      gdjs.TileMap.PixiTileMapHelper.updatePixiTileMap(
+        this._pixiObject,
+        tileMap,
+        textureCache,
+        this._object._displayMode,
+        this._object._layerIndex
       );
-      if (pixiTileMapData) {
-        gdjs.TileMap.PixiTileMapHelper.updatePixiTileMap(
-          this._pixiObject,
-          pixiTileMapData,
-          this._object._displayMode,
-          this._object._layerIndex
-        );
-      }
     }
 
     updatePosition(): void {

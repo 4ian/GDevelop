@@ -28,6 +28,11 @@ export type Achievement = {|
   description: string,
 |};
 
+export type AchievementWithUnlockedDate = {|
+  ...Achievement,
+  unlockedAt: ?Date,
+|};
+
 const isAchievementAlreadyClaimed = (
   badges: Badge[],
   achievementId: string
@@ -105,3 +110,15 @@ export const getAchievements = (): Promise<Array<Achievement>> => {
     .get(`${GDevelopUserApi.baseUrl}/achievement`)
     .then(response => response.data);
 };
+
+export const compareAchievements = (a: AchievementWithUnlockedDate, b: AchievementWithUnlockedDate) => {
+  if (b.unlockedAt && a.unlockedAt) {
+    return b.unlockedAt - a.unlockedAt;
+  } else if (a.unlockedAt && !b.unlockedAt) {
+    return -1;
+  } else if (!a.unlockedAt && b.unlockedAt) {
+    return 1;
+  } else {
+    return 0;
+  }
+}

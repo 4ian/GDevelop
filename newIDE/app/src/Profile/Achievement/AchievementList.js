@@ -7,8 +7,10 @@ import Lock from '@material-ui/icons/Lock';
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
 import {
+  compareAchievements,
   type Badge,
   type Achievement,
+  type AchievementWithUnlockedDate,
 } from '../../Utils/GDevelopServices/Badge';
 import ScrollView from '../../UI/ScrollView';
 
@@ -16,11 +18,6 @@ type Props = {|
   badges: Array<Badge>,
   achievements: Array<Achievement>,
   displayUnclaimedAchievements: boolean,
-|};
-
-type FormattedAchievement = {|
-  ...Achievement,
-  unlockedAt: ?Date,
 |};
 
 const styles = {
@@ -38,9 +35,10 @@ const AchievementList = ({
   achievements,
   displayUnclaimedAchievements,
 }: Props) => {
-  const [formattedAchievements, setFormattedAchievements] = useState<
-    Array<FormattedAchievement>
-  >([]);
+  const [
+    achievementsWithUnlockedDate,
+    setAchievementsWithUnlockedDate,
+  ] = useState<Array<AchievementWithUnlockedDate>>([]);
 
   useEffect(
     () => {
@@ -62,19 +60,9 @@ const AchievementList = ({
         return acc;
       }, []);
 
-      achievementsWithDate.sort((a, b) => {
-        if (b.unlockedAt && a.unlockedAt) {
-          return b.unlockedAt - a.unlockedAt;
-        } else if (a.unlockedAt && !b.unlockedAt) {
-          return -1;
-        } else if (!a.unlockedAt && b.unlockedAt) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+      achievementsWithDate.sort(compareAchievements);
 
-      setFormattedAchievements(achievementsWithDate);
+      setAchievementsWithUnlockedDate(achievementsWithDate);
     },
     [badges, achievements, displayUnclaimedAchievements]
   );
@@ -84,7 +72,7 @@ const AchievementList = ({
       <I18n>
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>
-            {formattedAchievements.map(
+            {achievementsWithUnlockedDate.map(
               achievement =>
                 achievement && (
                   <Line

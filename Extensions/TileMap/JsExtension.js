@@ -185,6 +185,7 @@ const defineTileMap = function (
     .addIncludeFile('Extensions/TileMap/common/TiledTileMapLoader.js')
     .addIncludeFile('Extensions/TileMap/common/TiledLoaderHelper.js')
     .addIncludeFile('Extensions/TileMap/common/TileMapModel.js')
+    .addIncludeFile('Extensions/TileMap/common/TileMapManager.js')
     .addIncludeFile('Extensions/TileMap/sprite/PixiTilemapHelper.js')
     .addIncludeFile('Extensions/TileMap/sprite/TileTextureCache.js');
 
@@ -589,6 +590,7 @@ const defineCollisionMask = function (
     .addIncludeFile('Extensions/TileMap/common/TiledTileMapLoader.js')
     .addIncludeFile('Extensions/TileMap/common/TiledLoaderHelper.js')
     .addIncludeFile('Extensions/TileMap/common/TileMapModel.js')
+    .addIncludeFile('Extensions/TileMap/common/TileMapManager.js')
     .addIncludeFile('Extensions/TileMap/collision/TransformedTileMap.js')
     .addIncludeFile(
       'Extensions/TileMap/collision/TileMapCollisionMaskRender.js'

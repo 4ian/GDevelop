@@ -167,9 +167,12 @@ export default class InstancesEditor extends Component<Props> {
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomOnCursorBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
-        this.viewPosition.scrollBy(-event.deltaY / 10, 0);
+        this.viewPosition.scrollBy(-event.deltaY / 5, 0);
       } else {
-        this.viewPosition.scrollBy(event.deltaX / 10, event.deltaY / 10);
+        const zoomFactor = this.getZoomFactor();
+        const newX = event.deltaX / (5 * zoomFactor);
+        const newY = event.deltaY / (5 * zoomFactor);
+        this.viewPosition.scrollBy(newX, newY);
       }
 
       if (this.props.onViewPositionChanged) {

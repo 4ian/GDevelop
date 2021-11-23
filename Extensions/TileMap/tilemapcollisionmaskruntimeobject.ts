@@ -69,8 +69,6 @@ namespace gdjs {
       return null;
     }
 
-    update(runtimeScene): void {}
-
     updateFromObjectData(oldObjectData: any, newObjectData: any): boolean {
       if (
         oldObjectData.content.tilemapJsonFile !==

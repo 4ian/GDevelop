@@ -7,6 +7,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 export const ACHIEVEMENT_FEATURE_FLAG = false;
 
 export const TRIVIAL_FIRST_EVENT = 'trivial_first-event';
+export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
 
 export type Badge = {|
   seen: boolean,

@@ -1,4 +1,6 @@
 namespace gdjs {
+  import PIXI = GlobalPIXIModule.PIXI;
+
   const logger = new gdjs.Logger('Tilemap object');
 
   /**
@@ -49,27 +51,25 @@ namespace gdjs {
     }
 
     loadTileMapWithTileset(tileMapJsonData: gdjs.TileMap.TiledMap) {
-      // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-      const pixiTileMapData = PixiTileMapHelper.loadPixiTileMapData(
+      const pixiTileMapData = gdjs.TileMap.PixiTileMapHelper.loadPixiTileMapData(
         (textureName) =>
-          this._runtimeScene
+          (this._runtimeScene
             .getGame()
             .getImageManager()
-            .getPIXITexture(textureName),
+            .getPIXITexture(textureName) as unknown) as PIXI.BaseTexture<
+            PIXI.Resource
+          >,
         tileMapJsonData,
         this._object._tilemapAtlasImage,
         this._object._tilemapJsonFile,
         this._object._tilesetJsonFile
       );
       if (pixiTileMapData) {
-        // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-        PixiTileMapHelper.updatePixiTileMap(
+        gdjs.TileMap.PixiTileMapHelper.updatePixiTileMap(
           this._pixiObject,
           pixiTileMapData,
           this._object._displayMode,
-          this._object._layerIndex,
-          // @ts-ignore - TODO: Add typings for pako.
-          pako
+          this._object._layerIndex
         );
       }
     }
@@ -94,13 +94,13 @@ namespace gdjs {
       this._pixiObject.alpha = this._object._opacity / 255;
     }
 
-    setWidth(width): void {
+    setWidth(width: float): void {
       this._pixiObject.width = width / this._pixiObject.scale.x;
       this._pixiObject.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
+    setHeight(height: float): void {
       this._pixiObject.height = height / this._pixiObject.scale.y;
       this._pixiObject.pivot.y = height / 2;
       this.updatePosition();

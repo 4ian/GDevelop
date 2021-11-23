@@ -1,8 +1,8 @@
 namespace gdjs {
   export namespace TileMap {
-    export class CollisionTileMap {
+    export class EditableTileMap {
       private _tileSet: Map<integer, CollisionTileDefinition>;
-      private _layers: Map<integer, CollisionTileMapLayer>;
+      private _layers: Array<EditableTileMapLayer | EditableObjectLayer>;
       private readonly tileWidth: integer;
       private readonly tileHeight: integer;
       private readonly dimX: integer;
@@ -21,7 +21,7 @@ namespace gdjs {
         this.dimX = dimX;
         this.dimY = dimY;
         this._tileSet = tileSet;
-        this._layers = new Map<integer, CollisionTileMapLayer>();
+        this._layers = [];
       }
 
       getWidth() {
@@ -48,29 +48,35 @@ namespace gdjs {
         return this.dimY;
       }
 
-      getTileDefinition(id: integer) {
+      getTileDefinition(id: integer): CollisionTileDefinition | undefined {
         return this._tileSet.get(id);
       }
 
-      addLayer(id: integer) {
-        const layer = new CollisionTileMapLayer(this, id);
-        this._layers.set(id, layer);
+      addTileLayer(id: integer): EditableTileMapLayer {
+        const layer = new EditableTileMapLayer(this, id);
+        this._layers.push(layer);
         return layer;
       }
 
-      getLayer(id: integer) {
-        return this._layers[id];
+      addObjectLayer(id: integer): EditableObjectLayer {
+        const layer = new EditableObjectLayer(this, id);
+        this._layers.push(layer);
+        return layer;
       }
 
-      getLayers(): Iterable<CollisionTileMapLayer> {
-        return this._layers.values();
+      getLayers(): Iterable<EditableTileMapLayer | EditableObjectLayer> {
+        return this._layers;
       }
 
       pointIsInsideTile(x: float, y: float, tag: string): boolean {
         const indexX = Math.floor(x / this.tileWidth);
         const indexY = Math.floor(y / this.tileHeight);
-        for (const layer of this._layers.values()) {
-          const tileId = layer.get(indexX, indexY);
+        for (const layer of this._layers) {
+          const tileLayer = layer as EditableTileMapLayer;
+          if (!tileLayer) {
+            continue;
+          }
+          const tileId = tileLayer.get(indexX, indexY);
           if (!tileId) {
             return false;
           }
@@ -83,21 +89,95 @@ namespace gdjs {
       }
     }
 
-    export class CollisionTileMapLayer {
-      private static readonly flippedHorizontallyFlag = 0x80000000;
-      private static readonly flippedVerticallyFlag = 0x40000000;
-      private static readonly flippedDiagonallyFlag = 0x20000000;
-      private static readonly tileIdMask = ~(
-        CollisionTileMapLayer.flippedHorizontallyFlag |
-        CollisionTileMapLayer.flippedVerticallyFlag |
-        CollisionTileMapLayer.flippedDiagonallyFlag
+    export class EditableObjectLayer {
+      readonly tileMap: EditableTileMap;
+      readonly id: integer;
+      readonly objects: TileObject[];
+
+      constructor(tileMap: EditableTileMap, id: integer) {
+        this.tileMap = tileMap;
+        this.id = id;
+        this.objects = [];
+      }
+
+      add(object: TileObject) {
+        this.objects.push(object);
+      }
+    }
+
+    export class TileObject {
+      private tileId: integer;
+      readonly x: float;
+      readonly y: float;
+
+      constructor(x: float, y: float, tileId: integer) {
+        this.tileId = tileId;
+        this.x = x;
+        this.y = y;
+      }
+
+      getTileId(): integer {
+        return this.tileId & EditableTileMapLayer.tileIdMask;
+      }
+
+      setFlippedHorizontally(flippedHorizontally: boolean) {
+        let tileId = this.tileId;
+        tileId &= ~EditableTileMapLayer.flippedHorizontallyFlag;
+        if (flippedHorizontally) {
+          tileId |= EditableTileMapLayer.flippedHorizontallyFlag;
+        }
+        this.tileId = tileId;
+      }
+
+      setFlippedVertically(flippedVertically: boolean) {
+        let tileId = this.tileId;
+        tileId &= ~EditableTileMapLayer.flippedVerticallyFlag;
+        if (flippedVertically) {
+          tileId |= EditableTileMapLayer.flippedVerticallyFlag;
+        }
+        this.tileId = tileId;
+      }
+
+      setFlippedDiagonally(flippedDiagonally: boolean) {
+        let tileId = this.tileId;
+        tileId &= ~EditableTileMapLayer.flippedDiagonallyFlag;
+        if (flippedDiagonally) {
+          tileId |= EditableTileMapLayer.flippedDiagonallyFlag;
+        }
+        this.tileId = tileId;
+      }
+
+      isFlippedHorizontally(): boolean {
+        return (
+          (this.tileId & EditableTileMapLayer.flippedHorizontallyFlag) !== 0
+        );
+      }
+
+      isFlippedVertically(): boolean {
+        return (this.tileId & EditableTileMapLayer.flippedVerticallyFlag) !== 0;
+      }
+
+      isFlippedDiagonally(): boolean {
+        return (this.tileId & EditableTileMapLayer.flippedDiagonallyFlag) !== 0;
+      }
+    }
+
+    export class EditableTileMapLayer {
+      // TODO factorize flags handling?
+      static readonly flippedHorizontallyFlag = 0x80000000;
+      static readonly flippedVerticallyFlag = 0x40000000;
+      static readonly flippedDiagonallyFlag = 0x20000000;
+      static readonly tileIdMask = ~(
+        EditableTileMapLayer.flippedHorizontallyFlag |
+        EditableTileMapLayer.flippedVerticallyFlag |
+        EditableTileMapLayer.flippedDiagonallyFlag
       );
 
-      readonly tileMap: CollisionTileMap;
+      readonly tileMap: EditableTileMap;
       readonly id: integer;
       private _tiles: Array<Int32Array>;
 
-      constructor(tileMap: CollisionTileMap, id: integer) {
+      constructor(tileMap: EditableTileMap, id: integer) {
         this.tileMap = tileMap;
         this.id = id;
         this._tiles = [];
@@ -124,59 +204,54 @@ namespace gdjs {
         flippedHorizontally: boolean
       ) {
         let tileId = this._tiles[y][x];
-        tileId &= ~CollisionTileMapLayer.flippedHorizontallyFlag;
+        tileId &= ~EditableTileMapLayer.flippedHorizontallyFlag;
         if (flippedHorizontally) {
-          tileId |= CollisionTileMapLayer.flippedHorizontallyFlag;
+          tileId |= EditableTileMapLayer.flippedHorizontallyFlag;
         }
         this._tiles[y][x] = tileId;
       }
 
       setFlippedVertically(x: integer, y: integer, flippedVertically: boolean) {
         let tileId = this._tiles[y][x];
-        tileId &= ~CollisionTileMapLayer.flippedVerticallyFlag;
+        tileId &= ~EditableTileMapLayer.flippedVerticallyFlag;
         if (flippedVertically) {
-          tileId |= CollisionTileMapLayer.flippedVerticallyFlag;
+          tileId |= EditableTileMapLayer.flippedVerticallyFlag;
         }
         this._tiles[y][x] = tileId;
       }
 
       setFlippedDiagonally(x: integer, y: integer, flippedDiagonally: boolean) {
         let tileId = this._tiles[y][x];
-        tileId &= ~CollisionTileMapLayer.flippedDiagonallyFlag;
+        tileId &= ~EditableTileMapLayer.flippedDiagonallyFlag;
         if (flippedDiagonally) {
-          tileId |= CollisionTileMapLayer.flippedDiagonallyFlag;
+          tileId |= EditableTileMapLayer.flippedDiagonallyFlag;
         }
         this._tiles[y][x] = tileId;
       }
 
       isFlippedHorizontally(x: integer, y: integer): boolean {
         return (
-          (this._tiles[y][x] &
-            CollisionTileMapLayer.flippedHorizontallyFlag) !==
+          (this._tiles[y][x] & EditableTileMapLayer.flippedHorizontallyFlag) !==
           0
         );
       }
 
       isFlippedVertically(x: integer, y: integer): boolean {
         return (
-          (this._tiles[y][x] & CollisionTileMapLayer.flippedVerticallyFlag) !==
-          0
+          (this._tiles[y][x] & EditableTileMapLayer.flippedVerticallyFlag) !== 0
         );
       }
 
       isFlippedDiagonally(x: integer, y: integer): boolean {
         return (
-          (this._tiles[y][x] & CollisionTileMapLayer.flippedDiagonallyFlag) !==
-          0
+          (this._tiles[y][x] & EditableTileMapLayer.flippedDiagonallyFlag) !== 0
         );
       }
 
       get(x: integer, y: integer): integer | undefined {
         const row = this._tiles[y];
         // -1 because 0 mean null
-        return row
-          ? (row[x] - 1) & CollisionTileMapLayer.tileIdMask
-          : undefined;
+        return row ? (row[x] - 1) & EditableTileMapLayer.tileIdMask : undefined;
       }
 
       dimX() {
@@ -215,20 +290,24 @@ namespace gdjs {
     }
 
     export class TransformedCollisionTileMap {
-      private _source: gdjs.TileMap.CollisionTileMap;
+      private _source: gdjs.TileMap.EditableTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
       // TODO Tiled allow to offset the layers
       transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
       inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
       transformationUpToDateCount: integer = 1;
 
-      constructor(source: gdjs.TileMap.CollisionTileMap) {
+      constructor(source: gdjs.TileMap.EditableTileMap) {
         this._source = source;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         for (const sourceLayer of source.getLayers()) {
+          const tileLayer = sourceLayer as EditableTileMapLayer;
+          if (!tileLayer) {
+            continue;
+          }
           this._layers.set(
-            sourceLayer.id,
-            new TransformedCollisionTileMapLayer(this, sourceLayer)
+            tileLayer.id,
+            new TransformedCollisionTileMapLayer(this, tileLayer)
           );
         }
       }
@@ -444,12 +523,12 @@ namespace gdjs {
 
     export class TransformedCollisionTileMapLayer {
       readonly tileMap: TransformedCollisionTileMap;
-      readonly _source: gdjs.TileMap.CollisionTileMapLayer;
+      readonly _source: gdjs.TileMap.EditableTileMapLayer;
       private readonly _tiles: TransformedCollisionTile[][];
 
       constructor(
         tileMap: TransformedCollisionTileMap,
-        source: gdjs.TileMap.CollisionTileMapLayer
+        source: gdjs.TileMap.EditableTileMapLayer
       ) {
         this.tileMap = tileMap;
         this._source = source;

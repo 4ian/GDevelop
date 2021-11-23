@@ -12,7 +12,7 @@ namespace gdjs {
 
       private _tileMapCallbacks: Map<
         string,
-        Array<(tileMap: gdjs.TileMap.EditableTileMap) => void>
+        Array<(tileMap: gdjs.TileMap.EditableTileMap | null) => void>
       >;
       private _textureCachesCallbacks: Map<
         string,
@@ -28,7 +28,7 @@ namespace gdjs {
         this._textureCaches = new Map<string, gdjs.TileMap.TileTextureCache>();
         this._tileMapCallbacks = new Map<
           string,
-          Array<(tileMap: gdjs.TileMap.EditableTileMap) => void>
+          Array<(tileMap: gdjs.TileMap.EditableTileMap | null) => void>
         >();
         this._textureCachesCallbacks = new Map<
           string,
@@ -55,7 +55,7 @@ namespace gdjs {
       getOrLoadTileMap(
         tilemapJsonFile: string,
         tilesetJsonFile: string,
-        callback: (tileMap: gdjs.TileMap.EditableTileMap) => void
+        callback: (tileMap: gdjs.TileMap.EditableTileMap | null) => void
       ): void {
         const key = tilemapJsonFile + '|' + tilesetJsonFile;
         const collisionTileMap = this._tileMaps.get(key);
@@ -71,53 +71,28 @@ namespace gdjs {
         } else {
           this._tileMapCallbacks.set(key, [callback]);
         }
-        this._runtimeScene
-          .getGame()
-          .getJsonManager()
-          .loadJson(tilemapJsonFile, (error, tileMapJsonData) => {
-            if (error) {
-              logger.error(
-                'An error happened while loading a Tilemap JSON data:',
-                error
-              );
+        this._loadTiledMap(
+          tilemapJsonFile,
+          tilesetJsonFile,
+          (tiledMap: gdjs.TileMap.TiledMap | null) => {
+            const callbacks = this._tileMapCallbacks.get(key)!;
+            if (!tiledMap) {
               this._tileMapCallbacks.delete(key);
+              for (const callback of callbacks) {
+                callback(null);
+              }
               return;
             }
-            const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
-            if (tilesetJsonFile) {
-              this._runtimeScene
-                .getGame()
-                .getJsonManager()
-                .loadJson(tilesetJsonFile, (error, tilesetJsonData) => {
-                  if (error) {
-                    logger.error(
-                      'An error happened while loading Tileset JSON data:',
-                      error
-                    );
-                    this._tileMapCallbacks.delete(key);
-                    return;
-                  }
-                  const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
-                  tiledMap.tilesets = [tileSet];
-                  const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
-                    tiledMap
-                  );
-                  const callbacks = this._tileMapCallbacks.get(key)!;
-                  for (const callback of callbacks) {
-                    callback(collisionTileMap);
-                  }
-                });
-            } else {
-              const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
-                tiledMap
-              );
-              this._tileMaps.set(key, collisionTileMap);
-              const callbacks = this._tileMapCallbacks.get(key)!;
-              for (const callback of callbacks) {
-                callback(collisionTileMap);
-              }
+
+            const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
+              tiledMap
+            );
+            this._tileMaps.set(key, collisionTileMap);
+            for (const callback of callbacks) {
+              callback(collisionTileMap);
             }
-          });
+          }
+        );
       }
 
       getOrLoadTextureCache(
@@ -146,6 +121,43 @@ namespace gdjs {
         } else {
           this._textureCachesCallbacks.set(key, [callback]);
         }
+        this._loadTiledMap(
+          tilemapJsonFile,
+          tilesetJsonFile,
+          (tiledMap: gdjs.TileMap.TiledMap | null) => {
+            const callbacks = this._textureCachesCallbacks.get(key)!;
+            if (!tiledMap) {
+              for (const callback of callbacks) {
+                callback(null);
+              }
+              this._textureCachesCallbacks.delete(key);
+              return;
+            }
+
+            const atlasTexture = atlasImageResourceName
+              ? getTexture(atlasImageResourceName)
+              : null;
+            const textureCache = gdjs.TileMap.PixiTileMapHelper.parseAtlas(
+              tiledMap,
+              atlasTexture,
+              getTexture
+            );
+
+            if (textureCache) {
+              this._textureCaches.set(key, textureCache);
+            }
+            for (const callback of callbacks) {
+              callback(textureCache);
+            }
+          }
+        );
+      }
+
+      private _loadTiledMap(
+        tilemapJsonFile: string,
+        tilesetJsonFile: string,
+        callback: (tiledMap: gdjs.TileMap.TiledMap | null) => void
+      ) {
         this._runtimeScene
           .getGame()
           .getJsonManager()
@@ -155,7 +167,7 @@ namespace gdjs {
                 'An error happened while loading a Tilemap JSON data:',
                 error
               );
-              this._textureCachesCallbacks.delete(key);
+              callback(null);
               return;
             }
             const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
@@ -169,46 +181,15 @@ namespace gdjs {
                       'An error happened while loading Tileset JSON data:',
                       error
                     );
-                    this._tileMapCallbacks.delete(key);
+                    callback(null);
                     return;
                   }
                   const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
                   tiledMap.tilesets = [tileSet];
-
-                  const atlasTexture = atlasImageResourceName
-                    ? getTexture(atlasImageResourceName)
-                    : null;
-                  const textureCache = PixiTileMapHelper.parseAtlas(
-                    tiledMap,
-                    atlasTexture,
-                    getTexture
-                  );
-
-                  if (textureCache) {
-                    this._textureCaches.set(key, textureCache);
-                  }
-                  const callbacks = this._textureCachesCallbacks.get(key)!;
-                  for (const callback of callbacks) {
-                    callback(textureCache);
-                  }
+                  callback(tiledMap);
                 });
             } else {
-              const atlasTexture = atlasImageResourceName
-                ? getTexture(atlasImageResourceName)
-                : null;
-              const textureCache = gdjs.TileMap.PixiTileMapHelper.parseAtlas(
-                tiledMap,
-                atlasTexture,
-                getTexture
-              );
-
-              if (textureCache) {
-                this._textureCaches.set(key, textureCache);
-              }
-              const callbacks = this._textureCachesCallbacks.get(key)!;
-              for (const callback of callbacks) {
-                callback(textureCache);
-              }
+              callback(tiledMap);
             }
           });
       }

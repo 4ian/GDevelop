@@ -106,7 +106,11 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
-        (tileMap: gdjs.TileMap.EditableTileMap) => {
+        (tileMap: gdjs.TileMap.EditableTileMap | null) => {
+          if (!tileMap) {
+            return;
+          }
+
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap
           );

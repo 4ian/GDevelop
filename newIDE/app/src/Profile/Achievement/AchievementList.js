@@ -23,6 +23,16 @@ type FormattedAchievement = {|
   unlockedAt: ?Date,
 |};
 
+const styles = {
+  achievementsContainer: {
+    maxHeight: 250,
+  },
+  lockedAchievement: {
+    opacity: 0.4,
+  },
+  unlockedAchievement: {},
+};
+
 const AchievementList = ({
   badges,
   achievements,
@@ -31,16 +41,6 @@ const AchievementList = ({
   const [formattedAchievements, setFormattedAchievements] = useState<
     Array<FormattedAchievement>
   >([]);
-
-  const styles = {
-    achievementsContainer: {
-      maxHeight: 250,
-    },
-    lockedAchievement: {
-      opacity: 0.4,
-    },
-    unlockedAchievement: {},
-  };
 
   useEffect(
     () => {

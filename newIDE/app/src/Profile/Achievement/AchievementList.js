@@ -75,11 +75,7 @@ const AchievementList = ({
             {achievementsWithUnlockedDate.map(
               achievement =>
                 achievement && (
-                  <Line
-                    key={achievement.id}
-                    justifyContent="space-between"
-                    padding="0 20px"
-                  >
+                  <Line key={achievement.id} justifyContent="space-between">
                     <Column justifyContent="center">
                       <Text
                         noMargin
@@ -105,11 +101,13 @@ const AchievementList = ({
                         </Text>
                       )}
                     </Column>
-                    {achievement.unlockedAt ? (
-                      <Text>{i18n.date(achievement.unlockedAt)}</Text>
-                    ) : (
-                      <Lock style={styles.lockedAchievement} />
-                    )}
+                    <Column>
+                      {achievement.unlockedAt ? (
+                        <Text>{i18n.date(achievement.unlockedAt)}</Text>
+                      ) : (
+                        <Lock style={styles.lockedAchievement} />
+                      )}
+                    </Column>
                   </Line>
                 )
             )}

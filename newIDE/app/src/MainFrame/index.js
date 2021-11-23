@@ -121,6 +121,12 @@ import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_PREVIEW,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -236,6 +242,8 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?Toolbar>(null);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
   const [
     chooseResourceOptions,
     setChooseResourceOptions,
@@ -1183,7 +1191,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const launchPreview = React.useCallback(
+  const _launchPreview = React.useCallback(
     ({
       networkPreview,
       hotReload,
@@ -1259,6 +1267,14 @@ const MainFrame = (props: Props) => {
       preferences.getIsAlwaysOnTopInPreview,
     ]
   );
+
+  const launchPreview = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_PREVIEW,
+        _launchPreview
+      )
+    : _launchPreview;
 
   const launchNewPreview = React.useCallback(
     () => launchPreview({ networkPreview: false }),

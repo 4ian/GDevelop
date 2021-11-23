@@ -212,6 +212,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 the health of the object.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/object-variables'}
             onSizeUpdated={
               forceUpdate /*Force update to ensure dialog is properly positioned*/
             }

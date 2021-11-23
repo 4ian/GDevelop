@@ -136,7 +136,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?string,
   variablesEditedInstance: ?gdInitialInstance,
-  variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -189,7 +188,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      variablesEditedObject: null,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -357,10 +355,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
-  };
-
-  editObjectVariables = (object: ?gdObject) => {
-    this.setState({ variablesEditedObject: object });
   };
 
   editLayoutVariables = (open: boolean = true) => {
@@ -1194,26 +1188,14 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
-            onComputeAllVariableNames={() => {
-              const variablesEditedInstance = this.state
-                .variablesEditedInstance;
-              if (!variablesEditedInstance) {
-                return [];
-              }
-              const variablesEditedObject = getObjectByName(
+            onComputeAllVariableNames={() =>
+              EventsRootVariablesFinder.findAllObjectVariables(
+                project.getCurrentPlatform(),
                 project,
                 layout,
-                variablesEditedInstance.getObjectName()
-              );
-              return variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
+                this.state.editedObjectWithContext.object
+              )
+            }
             onCancel={() => {
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
@@ -1331,6 +1313,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 variables of the object.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/instance-variables'}
             title={<Trans>Instance Variables</Trans>}
             onEditObjectVariables={() => {
               if (!this.instancesSelection.hasSelectedInstances()) {

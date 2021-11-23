@@ -21,6 +21,7 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
+  helpPagePath: ?string,
 |};
 
 const VariablesEditorDialog = ({
@@ -34,6 +35,7 @@ const VariablesEditorDialog = ({
   variablesContainer,
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
+  helpPagePath,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
@@ -95,6 +97,7 @@ const VariablesEditorDialog = ({
           forceUpdate /*Force update to ensure dialog is properly positioned*/
         }
         onComputeAllVariableNames={onComputeAllVariableNames}
+        helpPagePath={helpPagePath}
       />
     </Dialog>
   );

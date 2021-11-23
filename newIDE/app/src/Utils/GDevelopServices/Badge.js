@@ -110,7 +110,10 @@ export const getAchievements = (): Promise<Array<Achievement>> => {
     .then(response => response.data);
 };
 
-export const compareAchievements = (a: AchievementWithUnlockedDate, b: AchievementWithUnlockedDate) => {
+export const compareAchievements = (
+  a: AchievementWithUnlockedDate,
+  b: AchievementWithUnlockedDate
+) => {
   if (b.unlockedAt && a.unlockedAt) {
     return b.unlockedAt - a.unlockedAt;
   } else if (a.unlockedAt && !b.unlockedAt) {
@@ -120,4 +123,4 @@ export const compareAchievements = (a: AchievementWithUnlockedDate, b: Achieveme
   } else {
     return 0;
   }
-}
+};

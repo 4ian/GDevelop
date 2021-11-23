@@ -81,10 +81,10 @@ export default class ExportLauncher extends Component<Props, State> {
     this.buildsWatcher.stop();
   }
 
-  componentDidMount() {
+  constructor(props: Props) {
+    super(props);
     this._setupAchievementHook();
   }
-
   componentDidUpdate(prevProps: Props, prevState: State) {
     this._setupAchievementHook();
   }

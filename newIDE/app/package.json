@@ -23,6 +23,7 @@
     "recursive-copy": "^2.0.10",
     "recursive-readdir": "^2.2.2",
     "shelljs": "0.8.4",
+    "storybook-addon-mock": "^1.7.0",
     "style-dictionary": "^2.10.2",
     "typescript": "^4.1.3",
     "unzipper": "^0.9.11",

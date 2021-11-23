@@ -29,6 +29,12 @@ import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_BEHAVIOR,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,6 +52,7 @@ const BehaviorsEditor = (props: Props) => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { object, project } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
@@ -60,7 +67,7 @@ const BehaviorsEditor = (props: Props) => {
       .filter(behaviorType => behaviorType === type).length;
   };
 
-  const addBehavior = (type: string, defaultName: string) => {
+  const _addBehavior = (type: string, defaultName: string) => {
     setNewBehaviorDialogOpen(false);
 
     if (hasBehaviorWithType(type)) {
@@ -85,6 +92,14 @@ const BehaviorsEditor = (props: Props) => {
     if (props.onSizeUpdated) props.onSizeUpdated();
     props.onUpdateBehaviorsSharedData();
   };
+
+  const addBehavior = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_BEHAVIOR,
+        _addBehavior
+      )
+    : _addBehavior;
 
   const onChangeBehaviorName = (
     behaviorContent: gdBehaviorContent,

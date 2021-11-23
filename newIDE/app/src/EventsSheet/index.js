@@ -123,7 +123,7 @@ type Props = {|
 type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
-  userPreferences: Preferences,
+  preferences: Preferences,
 |};
 
 type State = {|
@@ -689,14 +689,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: () => this.onZoomEvent('IN')(),
       accelerator: 'CmdOrCtrl+=',
       enabled:
-        this.props.userPreferences.values.eventsSheetZoomLevel < zoomLevel.max,
+        this.props.preferences.values.eventsSheetZoomLevel < zoomLevel.max,
     },
     {
       label: i18n._(t`Zoom Out`),
       click: () => this.onZoomEvent('OUT')(),
       accelerator: 'CmdOrCtrl+-',
       enabled:
-        this.props.userPreferences.values.eventsSheetZoomLevel > zoomLevel.min,
+        this.props.preferences.values.eventsSheetZoomLevel > zoomLevel.min,
     },
   ];
 
@@ -993,10 +993,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         domEvent.preventDefault();
         domEvent.stopPropagation();
       }
-      this.props.userPreferences.setEventsSheetZoomLevel(
+      this.props.preferences.setEventsSheetZoomLevel(
         Math.min(
           Math.max(
-            this.props.userPreferences.values.eventsSheetZoomLevel + factor * 1,
+            this.props.preferences.values.eventsSheetZoomLevel + factor * 1,
             zoomLevel.min
           ),
           zoomLevel.max
@@ -1259,7 +1259,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onOpenLayout,
       globalObjectsContainer,
       objectsContainer,
-      userPreferences,
+      preferences,
       resourceSources,
       onChooseResource,
       resourceExternalEditors,
@@ -1339,7 +1339,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   searchFocusOffset={searchFocusOffset}
                   onEventMoved={this._onEventMoved}
                   showObjectThumbnails={
-                    userPreferences.values.eventsSheetShowObjectThumbnails
+                    preferences.values.eventsSheetShowObjectThumbnails
                   }
                   screenType={screenType}
                   windowWidth={windowWidth}
@@ -1348,7 +1348,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       ? this._containerDiv.current.clientHeight
                       : 0
                   }
-                  fontSize={userPreferences.values.eventsSheetZoomLevel}
+                  fontSize={preferences.values.eventsSheetZoomLevel}
                 />
                 {this.state.showSearchPanel && (
                   <SearchPanel
@@ -1383,7 +1383,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   anchorEl={this.state.inlineEditingAnchorEl}
                   onRequestClose={() => {
                     this.closeParameterEditor(
-                      /*shouldCancel=*/ userPreferences.values
+                      /*shouldCancel=*/ preferences.values
                         .eventsSheetCancelInlineParameter === 'cancel'
                     );
                   }}
@@ -1433,7 +1433,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 />
                 {this._renderInstructionEditorDialog(
                   // Force using the new instruction editor on touch screens.
-                  userPreferences.values.useNewInstructionEditorDialog ||
+                  preferences.values.useNewInstructionEditorDialog ||
                     screenType === 'touch'
                 )}
                 {this.state.analyzedEventsContextResult && (
@@ -1516,12 +1516,12 @@ const EventsSheet = (props, ref) => {
   };
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
-  const userPreferences = React.useContext(PreferencesContext);
+  const preferences = React.useContext(PreferencesContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
-      userPreferences={userPreferences}
+      preferences={preferences}
       {...props}
     />
   );

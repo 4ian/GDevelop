@@ -33,6 +33,11 @@ import {
 import { type ExportPipeline } from './ExportPipeline.flow';
 import { GameRegistration } from '../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_WEB_EXPORT,
+} from '../Utils/GDevelopServices/Badge';
 
 type State = {|
   exportStep: BuildStep,
@@ -70,10 +75,34 @@ export default class ExportLauncher extends Component<Props, State> {
     ),
   };
   buildsWatcher = new BuildsWatcher();
+  launchWholeExport: () => Promise<void>;
 
   componentWillUnmount() {
     this.buildsWatcher.stop();
   }
+
+  constructor(props: Props) {
+    super(props);
+    this._setupAchievementHook();
+  }
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    this._setupAchievementHook();
+  }
+
+  _setupAchievementHook = () => {
+    if (
+      ACHIEVEMENT_FEATURE_FLAG &&
+      this.props.exportPipeline.name.includes('web')
+    ) {
+      this.launchWholeExport = addCreateBadgePreHookIfNotClaimed(
+        this.props.authenticatedUser,
+        TRIVIAL_FIRST_WEB_EXPORT,
+        this._launchWholeExport
+      );
+    } else {
+      this.launchWholeExport = this._launchWholeExport;
+    }
+  };
 
   _updateStepProgress = (
     stepCurrentProgress: number,
@@ -124,7 +153,7 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  launchWholeExport = async () => {
+  _launchWholeExport = async () => {
     const t = str => str; //TODO;
     const { project, exportPipeline, authenticatedUser } = this.props;
     sendExportLaunched(exportPipeline.name);

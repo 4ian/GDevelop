@@ -87,7 +87,9 @@ const createOrEnsureBadgeForUser = async (
  * Check if user has already claimed the achievement, to avoid executing
  * any extra code if that's the case.
  */
-export const addCreateBadgePreHookIfNotClaimed = <T: Function>(
+export const addCreateBadgePreHookIfNotClaimed = <
+  T: (...args: Array<any>) => any
+>(
   authenticatedUser: AuthenticatedUser,
   achievementId: string,
   callback: T
@@ -98,7 +100,7 @@ export const addCreateBadgePreHookIfNotClaimed = <T: Function>(
     return callback;
   }
 
-  // $FlowFixMe
+  // $FlowFixMe - hard to (or can't?) express the exact function being passed.
   return (...args) => {
     try {
       createOrEnsureBadgeForUser(authenticatedUser, achievementId);

@@ -7,16 +7,11 @@ namespace gdjs {
     export class TileMapManager {
       private _runtimeScene: gdjs.RuntimeScene;
 
-      private _tileMaps: Map<string, gdjs.TileMap.EditableTileMap>;
-      private _textureCaches: Map<string, gdjs.TileMap.TileTextureCache>;
-
-      private _tileMapCallbacks: Map<
-        string,
-        Array<(tileMap: gdjs.TileMap.EditableTileMap | null) => void>
+      private _tileMapCache: gdjs.TileMap.ResourceCache<
+        gdjs.TileMap.EditableTileMap
       >;
-      private _textureCachesCallbacks: Map<
-        string,
-        Array<(textureCache: gdjs.TileMap.TileTextureCache | null) => void>
+      private _textureCacheCaches: gdjs.TileMap.ResourceCache<
+        gdjs.TileMap.TileTextureCache
       >;
 
       /**
@@ -24,15 +19,11 @@ namespace gdjs {
        */
       constructor(runtimeScene: gdjs.RuntimeScene) {
         this._runtimeScene = runtimeScene;
-        this._tileMaps = new Map<string, gdjs.TileMap.EditableTileMap>();
-        this._textureCaches = new Map<string, gdjs.TileMap.TileTextureCache>();
-        this._tileMapCallbacks = new Map<
-          string,
-          Array<(tileMap: gdjs.TileMap.EditableTileMap | null) => void>
+        this._tileMapCache = new gdjs.TileMap.ResourceCache<
+          gdjs.TileMap.EditableTileMap
         >();
-        this._textureCachesCallbacks = new Map<
-          string,
-          Array<(textureCache: gdjs.TileMap.TileTextureCache | null) => void>
+        this._textureCacheCaches = new gdjs.TileMap.ResourceCache<
+          gdjs.TileMap.TileTextureCache
         >();
       }
 
@@ -58,40 +49,27 @@ namespace gdjs {
         callback: (tileMap: gdjs.TileMap.EditableTileMap | null) => void
       ): void {
         const key = tilemapJsonFile + '|' + tilesetJsonFile;
-        const collisionTileMap = this._tileMaps.get(key);
-        if (collisionTileMap) {
-          callback(collisionTileMap);
-          console.log('already loaded');
-          return;
-        }
-        const callbacks = this._tileMapCallbacks.get(key);
-        if (callbacks) {
-          callbacks.push(callback);
-          return;
-        } else {
-          this._tileMapCallbacks.set(key, [callback]);
-        }
-        this._loadTiledMap(
-          tilemapJsonFile,
-          tilesetJsonFile,
-          (tiledMap: gdjs.TileMap.TiledMap | null) => {
-            const callbacks = this._tileMapCallbacks.get(key)!;
-            if (!tiledMap) {
-              this._tileMapCallbacks.delete(key);
-              for (const callback of callbacks) {
-                callback(null);
-              }
-              return;
-            }
 
-            const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
-              tiledMap
+        this._tileMapCache.getOrLoad(
+          key,
+          (callback) => {
+            this._loadTiledMap(
+              tilemapJsonFile,
+              tilesetJsonFile,
+              (tiledMap: gdjs.TileMap.TiledMap | null) => {
+                if (!tiledMap) {
+                  callback(null);
+                  return;
+                }
+
+                const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
+                  tiledMap
+                );
+                callback(collisionTileMap);
+              }
             );
-            this._tileMaps.set(key, collisionTileMap);
-            for (const callback of callbacks) {
-              callback(collisionTileMap);
-            }
-          }
+          },
+          callback
         );
       }
 
@@ -108,48 +86,32 @@ namespace gdjs {
           tilesetJsonFile +
           '|' +
           atlasImageResourceName;
-        const textureCache = this._textureCaches.get(key);
-        if (textureCache) {
-          callback(textureCache);
-          console.log('already loaded');
-          return;
-        }
-        const callbacks = this._textureCachesCallbacks.get(key);
-        if (callbacks) {
-          callbacks.push(callback);
-          return;
-        } else {
-          this._textureCachesCallbacks.set(key, [callback]);
-        }
-        this._loadTiledMap(
-          tilemapJsonFile,
-          tilesetJsonFile,
-          (tiledMap: gdjs.TileMap.TiledMap | null) => {
-            const callbacks = this._textureCachesCallbacks.get(key)!;
-            if (!tiledMap) {
-              for (const callback of callbacks) {
-                callback(null);
+
+        this._textureCacheCaches.getOrLoad(
+          key,
+          (callback) => {
+            this._loadTiledMap(
+              tilemapJsonFile,
+              tilesetJsonFile,
+              (tiledMap: gdjs.TileMap.TiledMap | null) => {
+                if (!tiledMap) {
+                  callback(null);
+                  return;
+                }
+
+                const atlasTexture = atlasImageResourceName
+                  ? getTexture(atlasImageResourceName)
+                  : null;
+                const textureCache = gdjs.TileMap.PixiTileMapHelper.parseAtlas(
+                  tiledMap,
+                  atlasTexture,
+                  getTexture
+                );
+                callback(textureCache);
               }
-              this._textureCachesCallbacks.delete(key);
-              return;
-            }
-
-            const atlasTexture = atlasImageResourceName
-              ? getTexture(atlasImageResourceName)
-              : null;
-            const textureCache = gdjs.TileMap.PixiTileMapHelper.parseAtlas(
-              tiledMap,
-              atlasTexture,
-              getTexture
             );
-
-            if (textureCache) {
-              this._textureCaches.set(key, textureCache);
-            }
-            for (const callback of callbacks) {
-              callback(textureCache);
-            }
-          }
+          },
+          callback
         );
       }
 

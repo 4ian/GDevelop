@@ -54,7 +54,6 @@ const createOrEnsureBadgeForUser = async (
   if (isAchievementAlreadyClaimed(badges, achievementId)) {
     return null;
   }
-  console.log(`posting achievement ${achievementId}`);
 
   const userId = firebaseUser.uid;
   try {

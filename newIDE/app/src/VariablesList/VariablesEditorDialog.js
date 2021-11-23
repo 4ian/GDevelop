@@ -81,6 +81,8 @@ const VariablesEditorDialog = ({
         ) : null,
       ]}
       title={title}
+      flexBody
+      fullHeight
     >
       <VariablesList
         commitVariableValueOnBlur={

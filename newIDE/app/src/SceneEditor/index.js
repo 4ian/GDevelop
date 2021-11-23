@@ -994,7 +994,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 instances={selectedInstances}
                 editInstanceVariables={this.editInstanceVariables}
-                editObjectVariables={this.editObjectVariables}
                 onEditObjectByName={this.editObjectByName}
                 onInstancesModified={instances =>
                   this.forceUpdateInstancesList()
@@ -1144,7 +1143,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           project={project}
           layout={layout}
           onEditObject={this.props.onEditObject || this.editObject}
-          onEditObjectVariables={this.editObjectVariables}
+          onEditObjectVariables={object => {
+            this.editObject(object, 'variables');
+          }}
           onOpenSceneProperties={this.openSceneProperties}
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
@@ -1188,14 +1189,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
-            onComputeAllVariableNames={() =>
-              EventsRootVariablesFinder.findAllObjectVariables(
+            onComputeAllVariableNames={() => {
+              const { editedObjectWithContext } = this.state;
+              if (!editedObjectWithContext) return [];
+
+              return EventsRootVariablesFinder.findAllObjectVariables(
                 project.getCurrentPlatform(),
                 project,
                 layout,
-                this.state.editedObjectWithContext.object
-              )
-            }
+                editedObjectWithContext.object
+              );
+            }}
             onCancel={() => {
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
@@ -1309,7 +1313,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editInstanceVariables(null)}
             emptyExplanationMessage={
               <Trans>
-                Instance variables will override the default values of the
+                Instance variables will overwrite the default values of the
                 variables of the object.
               </Trans>
             }

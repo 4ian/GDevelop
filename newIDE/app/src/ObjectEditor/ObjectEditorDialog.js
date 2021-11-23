@@ -196,29 +196,27 @@ const InnerDialog = (props: InnerDialogProps) => {
         />
       )}
       {currentTab === 'variables' && (
-        <Column expand noMargin>
-          <VariablesList
-            variablesContainer={props.object.getVariables()}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Life representing
-                the health of the object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/object-variables'}
-            onSizeUpdated={
-              forceUpdate /*Force update to ensure dialog is properly positioned*/
-            }
-            onComputeAllVariableNames={props.onComputeAllVariableNames}
-          />
-        </Column>
+        <VariablesList
+          variablesContainer={props.object.getVariables()}
+          emptyExplanationMessage={
+            <Trans>
+              When you add variables to an object, any instance of the object
+              put on the scene or created during the game will have these
+              variables attached to it.
+            </Trans>
+          }
+          emptyExplanationSecondMessage={
+            <Trans>
+              For example, you can have a variable called Life representing the
+              health of the object.
+            </Trans>
+          }
+          helpPagePath={'/all-features/variables/object-variables'}
+          onSizeUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
+          }
+          onComputeAllVariableNames={props.onComputeAllVariableNames}
+        />
       )}
       {currentTab === 'effects' && (
         <EffectsList

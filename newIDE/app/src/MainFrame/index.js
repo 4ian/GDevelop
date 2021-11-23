@@ -124,6 +124,7 @@ import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
 import {
   ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_DEBUG,
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -1427,7 +1428,7 @@ const MainFrame = (props: Props) => {
     [i18n, setState]
   );
 
-  const openDebugger = React.useCallback(
+  const _openDebugger = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -1441,6 +1442,14 @@ const MainFrame = (props: Props) => {
     },
     [i18n, setState]
   );
+
+  const openDebugger = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_DEBUG,
+        _openDebugger
+      )
+    : _openDebugger;
 
   const launchDebuggerAndPreview = React.useCallback(
     () => {

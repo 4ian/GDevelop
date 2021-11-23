@@ -11,6 +11,7 @@ export const TRIVIAL_FIRST_BEHAVIOR = 'trivial_first-behavior';
 export const TRIVIAL_FIRST_PREVIEW = 'trivial_first-preview';
 export const TRIVIAL_FIRST_WEB_EXPORT = 'trivial_first-web-export';
 export const TRIVIAL_FIRST_EXTENSION = 'trivial_first-extension';
+export const TRIVIAL_FIRST_DEBUG = 'trivial_first-debug';
 
 export type Badge = {|
   seen: boolean,

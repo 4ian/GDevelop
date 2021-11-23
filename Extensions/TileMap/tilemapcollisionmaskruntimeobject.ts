@@ -38,7 +38,7 @@ namespace gdjs {
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = 1; //objectData.content.outlineSize;
       this._tileMapManager = TileMapManager.getManager(runtimeScene);
-      const collisionTileMap = new gdjs.TileMap.CollisionTileMap(
+      const collisionTileMap = new gdjs.TileMap.EditableTileMap(
         1,
         1,
         0,
@@ -104,7 +104,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
-        (tileMap: gdjs.TileMap.CollisionTileMap) => {
+        (tileMap: gdjs.TileMap.EditableTileMap) => {
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap
           );
@@ -369,10 +369,10 @@ namespace gdjs {
   class TileMapManager {
     private _runtimeScene: gdjs.RuntimeScene;
 
-    private _tileMaps: Map<string, gdjs.TileMap.CollisionTileMap>;
+    private _tileMaps: Map<string, gdjs.TileMap.EditableTileMap>;
     private _callbacks: Map<
       string,
-      Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>
+      Array<(tileMap: gdjs.TileMap.EditableTileMap) => void>
     >;
 
     /**
@@ -380,10 +380,10 @@ namespace gdjs {
      */
     constructor(runtimeScene: gdjs.RuntimeScene) {
       this._runtimeScene = runtimeScene;
-      this._tileMaps = new Map<string, gdjs.TileMap.CollisionTileMap>();
+      this._tileMaps = new Map<string, gdjs.TileMap.EditableTileMap>();
       this._callbacks = new Map<
         string,
-        Array<(tileMap: gdjs.TileMap.CollisionTileMap) => void>
+        Array<(tileMap: gdjs.TileMap.EditableTileMap) => void>
       >();
     }
 
@@ -406,7 +406,7 @@ namespace gdjs {
     getOrLoadTileMap(
       tilemapJsonFile: string,
       tilesetJsonFile: string,
-      callback: (tileMap: gdjs.TileMap.CollisionTileMap) => void
+      callback: (tileMap: gdjs.TileMap.EditableTileMap) => void
     ): void {
       const key = tilemapJsonFile + '|' + tilesetJsonFile;
       const collisionTileMap = this._tileMaps.get(key);

@@ -3,7 +3,7 @@ namespace gdjs {
     export class TiledCollisionTileMapLoader {
       static load(
         tiledMap: gdjs.TileMap.TiledMap
-      ): gdjs.TileMap.CollisionTileMap {
+      ): gdjs.TileMap.EditableTileMap {
         const definitions = new Map<
           integer,
           gdjs.TileMap.CollisionTileDefinition
@@ -37,7 +37,7 @@ namespace gdjs {
             new gdjs.TileMap.CollisionTileDefinition(polygons, tile.type)
           );
         }
-        const collisionTileMap = new gdjs.TileMap.CollisionTileMap(
+        const collisionTileMap = new gdjs.TileMap.EditableTileMap(
           tiledMap.tilewidth,
           tiledMap.tileheight,
           tiledMap.width,
@@ -46,7 +46,30 @@ namespace gdjs {
         );
 
         for (const tiledLayer of tiledMap.layers) {
-          if (tiledLayer.type === 'tilelayer') {
+          if (!tiledLayer.visible) {
+            continue;
+          }
+
+          if (tiledLayer.type === 'objectgroup') {
+            const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
+            for (const tiledObject of tiledLayer.objects) {
+              if (!tiledObject.visible) {
+                continue;
+              }
+              const tileGid = gdjs.TileMap.extractTileUidFlippedStates(
+                tiledObject.gid
+              );
+              const object = new TileObject(
+                tiledObject.x,
+                tiledObject.y,
+                tileGid.id
+              );
+              objectLayer.add(object);
+              object.setFlippedHorizontally(tileGid.flippedHorizontally);
+              object.setFlippedVertically(tileGid.flippedVertically);
+              object.setFlippedDiagonally(tileGid.flippedDiagonally);
+            }
+          } else if (tiledLayer.type === 'tilelayer') {
             let tileSlotIndex = 0;
             let layerData: integer[] | null = null;
 
@@ -59,7 +82,7 @@ namespace gdjs {
               layerData = tiledLayer.data as integer[];
             }
             if (layerData) {
-              const collisionTileLayer = collisionTileMap.addLayer(
+              const collisionTileLayer = collisionTileMap.addTileLayer(
                 tiledLayer.id
               );
               // TODO handle layer offset

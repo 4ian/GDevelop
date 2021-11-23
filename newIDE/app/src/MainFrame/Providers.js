@@ -79,7 +79,7 @@ export default class Providers extends React.Component<Props, {||}> {
                   language: values.language,
                 });
                 return (
-                  <GDI18nProvider language={values.language}>
+                  <GDI18nProvider language={values.language.replace('_', '-')}>
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>

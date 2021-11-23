@@ -9,6 +9,7 @@ import paperDecorator from '../PaperDecorator';
 import ProfileDetails from '../../Profile/ProfileDetails';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';
 
 const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
   ...indieUserProfile,
@@ -55,8 +56,7 @@ const badges = [
 const apiDataServerSideError = {
   mockData: [
     {
-      url:
-        'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev/achievement',
+      url: `${GDevelopUserApi.baseUrl}/achievement`,
       method: 'GET',
       status: 500,
       response: { data: 'status' },

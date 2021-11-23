@@ -11,6 +11,12 @@ import HelpButton from '../../UI/HelpButton';
 import { importExtension, installExtension } from './InstallExtension';
 import InfoBar from '../../UI/Messages/InfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_EXTENSION,
+} from '../../Utils/GDevelopServices/Badge';
 
 type Props = {|
   project: gdProject,
@@ -33,6 +39,16 @@ export default function ExtensionsSearchDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const installDisplayedExtension = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_EXTENSION,
+        installExtension
+      )
+    : installExtension;
+
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
   return (
@@ -83,7 +99,7 @@ export default function ExtensionsSearchDialog({
             onInstall={async extensionShortHeader => {
               setIsInstalling(true);
               onInstallExtension(extensionShortHeader);
-              const wasExtensionInstalled = await installExtension(
+              const wasExtensionInstalled = await installDisplayedExtension(
                 i18n,
                 project,
                 eventsFunctionsExtensionsState,

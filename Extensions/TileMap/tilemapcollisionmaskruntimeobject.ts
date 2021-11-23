@@ -450,7 +450,7 @@ namespace gdjs {
                 }
                 const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
                 tiledMap.tilesets = [tileSet];
-                const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+                const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
                   tiledMap
                 );
                 const callbacks = this._callbacks.get(key)!;
@@ -459,7 +459,7 @@ namespace gdjs {
                 }
               });
           } else {
-            const collisionTileMap = gdjs.TileMap.TiledCollisionTileMapLoader.load(
+            const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
               tiledMap
             );
             this._tileMaps.set(key, collisionTileMap);

@@ -1,6 +1,6 @@
 namespace gdjs {
   export namespace TileMap {
-    export class TiledCollisionTileMapLoader {
+    export class TiledTileMapLoader {
       static load(
         tiledMap: gdjs.TileMap.TiledMap
       ): gdjs.TileMap.EditableTileMap {
@@ -37,6 +37,19 @@ namespace gdjs {
             new gdjs.TileMap.CollisionTileDefinition(polygons, tile.type)
           );
         }
+        for (
+          let tileId = 0;
+          tileId < tiledMap.tilesets[0].tilecount;
+          tileId++
+        ) {
+          if (!definitions.has(tileId)) {
+            definitions.set(
+              tileId,
+              new gdjs.TileMap.CollisionTileDefinition([], '')
+            );
+          }
+        }
+        //console.log(definitions.size + " tiles definition");
         const collisionTileMap = new gdjs.TileMap.EditableTileMap(
           tiledMap.tilewidth,
           tiledMap.tileheight,

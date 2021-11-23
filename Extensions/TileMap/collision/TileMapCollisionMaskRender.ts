@@ -43,6 +43,7 @@ namespace gdjs {
         this._graphics.closePath();
         this._graphics.endFill();
       }
+
       // console.log(
       //   'getLocalBounds: ' +
       //     this._graphics.getLocalBounds().width +

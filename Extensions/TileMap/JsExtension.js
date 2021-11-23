@@ -182,7 +182,11 @@ const defineTileMap = function (
       'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
     )
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
-    .addIncludeFile('Extensions/TileMap/pixi-tilemap-helper.js');
+    .addIncludeFile('Extensions/TileMap/common/TiledTileMapLoader.js')
+    .addIncludeFile('Extensions/TileMap/common/TiledLoaderHelper.js')
+    .addIncludeFile('Extensions/TileMap/common/TileMapModel.js')
+    .addIncludeFile('Extensions/TileMap/sprite/PixiTilemapHelper.js')
+    .addIncludeFile('Extensions/TileMap/sprite/TileTextureCache.js');
 
   object
     .addCondition(
@@ -582,9 +586,10 @@ const defineCollisionMask = function (
     )
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
-    .addIncludeFile('Extensions/TileMap/collision/CollisionTileMap.js')
-    .addIncludeFile('Extensions/TileMap/collision/TiledCollisionTileMapLoader.js')
-    .addIncludeFile('Extensions/TileMap/TiledLoaderHelper.js')
+    .addIncludeFile('Extensions/TileMap/common/TiledTileMapLoader.js')
+    .addIncludeFile('Extensions/TileMap/common/TiledLoaderHelper.js')
+    .addIncludeFile('Extensions/TileMap/common/TileMapModel.js')
+    .addIncludeFile('Extensions/TileMap/collision/TransformedTileMap.js')
     .addIncludeFile(
       'Extensions/TileMap/collision/TileMapCollisionMaskRender.js'
     );

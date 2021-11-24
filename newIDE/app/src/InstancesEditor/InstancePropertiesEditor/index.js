@@ -94,14 +94,14 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
         instance.setLayer(newValue),
     },
     {
-      name: this.props.i18n._(t`Custom size?`),
+      name: this.props.i18n._(t`Custom size`),
       valueType: 'boolean',
       getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
       setValue: (instance: gdInitialInstance, newValue: boolean) =>
         instance.setHasCustomSize(newValue),
     },
     {
-      name: this.props.i18n._(t`Custom size`),
+      name: 'custom-size-row',
       type: 'row',
       children: [
         {

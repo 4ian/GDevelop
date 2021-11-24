@@ -125,6 +125,8 @@ export default class InstancesMover {
     for (var i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
+      if (selectedInstance.isLocked()) continue;
+
       let initialPosition = this.instancePositions[selectedInstance.ptr];
       if (!initialPosition) {
         initialPosition = this.instancePositions[selectedInstance.ptr] = {

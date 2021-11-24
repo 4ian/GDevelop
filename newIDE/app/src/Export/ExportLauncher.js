@@ -119,7 +119,10 @@ export default class ExportLauncher extends Component<Props, State> {
     this.buildsWatcher.start({
       authenticatedUser,
       builds: [this.state.build],
-      onBuildUpdated: (build: Build) => this.setState({ build }),
+      onBuildUpdated: (build: Build) => {
+        this.setState({ build });
+        authenticatedUser.onRefreshUserProfile();
+      },
     });
   };
 

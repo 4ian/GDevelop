@@ -809,9 +809,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.map(instance =>
-      this.props.initialInstances.removeInstance(instance)
-    );
+    selectedInstances.forEach(instance => {
+      if (instance.isLocked()) return;
+      this.props.initialInstances.removeInstance(instance);
+    });
 
     this.instancesSelection.clearSelection();
     if (this.editor) this.editor.clearHighlightedInstance();

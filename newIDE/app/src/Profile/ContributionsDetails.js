@@ -117,6 +117,7 @@ export const ExtensionsAccordion = ({
         <Column>
           {extensions.map(extension => (
             <ContributionLine
+              key={extension.name}
               shortDescription={extension.shortDescription}
               fullName={extension.fullName}
               previewIconUrl={extension.previewIconUrl}

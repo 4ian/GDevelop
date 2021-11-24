@@ -782,20 +782,15 @@ module.exports = {
       __dirname,
       'pixi-tilemap/dist/pixi-tilemap.umd'
     );
-    const PixiTilemapHelper = objectsRenderingService.requireModule(
+    const TilemapHelper = objectsRenderingService.requireModule(
       __dirname,
-      'pixi-tilemap-helper'
+      'helper/TileMapHelper'
     );
     // required for decoding tiled zlib compressed layer data
     const pako = objectsRenderingService.requireModule(
       __dirname,
       'pako/dist/pako.min'
     );
-    // console.log("__dirname: " + __dirname);
-    // const TiledCollisionTileMapLoader = objectsRenderingService.requireModule(
-    //   __dirname,
-    //   'collision/TiledCollisionTileMapLoaderM'
-    // );
 
     /**
      * Renderer for instances of TileMap inside the IDE.
@@ -895,24 +890,35 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      const pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
+      console.log("project: " + this.project);
+
+      const tiledMap = tilesetJsonData
+      ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
+      : tileMapJsonData;
+      const manager = TilemapHelper.TileMapManager.getManager();
+      const tileMap = manager.getOrLoadTileMap(
+        pako,
+        tilemapJsonFile,
+        tilesetJsonFile,
+        tiledMap
+      )
+
+      const textureCache = manager.getOrLoadTextureCache(
         (textureName) =>
           this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
-        tilesetJsonData
-          ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
-          : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
-        tilesetJsonFile
+        tilesetJsonFile,
+        tiledMap
       );
 
-      if (pixiTileMapData) {
-        PixiTilemapHelper.updatePixiTileMap(
+      if (tileMap && textureCache) {
+        TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
           this._pixiObject,
-          pixiTileMapData,
+          tileMap,
+          textureCache,
           displayMode,
-          layerIndex,
-          pako
+          layerIndex
         );
       }
     };

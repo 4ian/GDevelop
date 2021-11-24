@@ -862,9 +862,9 @@ module.exports = {
      * This is used to reload the Tilemap
      */
     RenderedTileMapInstance.prototype._loadTileMapWithTileset = function (
-      tileMapJsonData,
-      tilesetJsonData
+      tiledMapJsonData
     ) {
+      console.log("TileMap._loadTileMapWithTileset");
       // Get the tileset resource to use
       const tilemapAtlasImage = this._associatedObject
         .getProperties(this.project)
@@ -890,17 +890,12 @@ module.exports = {
         .get('tilesetJsonFile')
         .getValue();
 
-      console.log("project: " + this.project);
-
-      const tiledMap = tilesetJsonData
-      ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
-      : tileMapJsonData;
-      const manager = TilemapHelper.TileMapManager.getManager();
+      const manager = TilemapHelper.TileMapManager.getManager(this._project);
       const tileMap = manager.getOrLoadTileMap(
         pako,
         tilemapJsonFile,
         tilesetJsonFile,
-        tiledMap
+        tiledMapJsonData
       )
 
       const textureCache = manager.getOrLoadTextureCache(
@@ -909,7 +904,7 @@ module.exports = {
         tilemapAtlasImage,
         tilemapJsonFile,
         tilesetJsonFile,
-        tiledMap
+        tiledMapJsonData
       );
 
       if (tileMap && textureCache) {
@@ -947,7 +942,10 @@ module.exports = {
             )
           : null;
 
-        this._loadTileMapWithTileset(tileMapJsonData, tilesetJsonData);
+        if (tilesetJsonData) {
+          tileMapJsonData.tilesets = [tilesetJsonData];
+        }
+        this._loadTileMapWithTileset(tileMapJsonData);
       } catch (err) {
         console.error('Unable to load a Tilemap JSON data: ', err);
       }
@@ -1003,199 +1001,251 @@ module.exports = {
       RenderedTileMapInstance
     );
 
-    // /**
-    //  * Renderer for instances of TileMap inside the IDE.
-    //  *
-    //  * @extends RenderedInstance
-    //  * @class RenderedTileMapInstance
-    //  * @constructor
-    //  */
-    //  function RenderedCollisionMaskInstance(
-    //   project,
-    //   layout,
-    //   instance,
-    //   associatedObject,
-    //   pixiContainer,
-    //   pixiResourcesLoader
-    // ) {
-    //   RenderedInstance.call(
-    //     this,
-    //     project,
-    //     layout,
-    //     instance,
-    //     associatedObject,
-    //     pixiContainer,
-    //     pixiResourcesLoader
-    //   );
+    /**
+     * Renderer for instances of TileMap inside the IDE.
+     *
+     * @extends RenderedInstance
+     * @class RenderedTileMapInstance
+     * @constructor
+     */
+     function RenderedCollisionMaskInstance(
+      project,
+      layout,
+      instance,
+      associatedObject,
+      pixiContainer,
+      pixiResourcesLoader
+    ) {
+      RenderedInstance.call(
+        this,
+        project,
+        layout,
+        instance,
+        associatedObject,
+        pixiContainer,
+        pixiResourcesLoader
+      );
 
-    //   this._pixiObject = new PIXI.Graphics();
+      this._pixiObject = new PIXI.Graphics();
 
-    //   // Implement `containsPoint` so that we can set `interactive` to true and
-    //   // the Tilemap will properly emit events when hovered/clicked.
-    //   // By default, this is not implemented in pixi-tilemap.
-    //   this._pixiObject.containsPoint = (position) => {
-    //     // Turns the world position to the local object coordinates
-    //     const localPosition = new PIXI.Point();
-    //     this._pixiObject.worldTransform.applyInverse(position, localPosition);
+      // Implement `containsPoint` so that we can set `interactive` to true and
+      // the Tilemap will properly emit events when hovered/clicked.
+      // By default, this is not implemented in pixi-tilemap.
+      this._pixiObject.containsPoint = (position) => {
+        // Turns the world position to the local object coordinates
+        const localPosition = new PIXI.Point();
+        this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
-    //     // Check if the point is inside the object bounds
-    //     const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-    //     const originalHeight =
-    //       this._pixiObject.height / this._pixiObject.scale.y;
+        // Check if the point is inside the object bounds
+        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
+        const originalHeight =
+          this._pixiObject.height / this._pixiObject.scale.y;
 
-    //     return (
-    //       localPosition.x >= 0 &&
-    //       localPosition.x < originalWidth &&
-    //       localPosition.y >= 0 &&
-    //       localPosition.y < originalHeight
-    //     );
-    //   };
-    //   this._pixiContainer.addChild(this._pixiObject);
-    //   this.update();
-    //   this.updateTileMap();
-    // }
-    // RenderedCollisionMaskInstance.prototype = Object.create(
-    //   RenderedInstance.prototype
-    // );
+        return (
+          localPosition.x >= 0 &&
+          localPosition.x < originalWidth &&
+          localPosition.y >= 0 &&
+          localPosition.y < originalHeight
+        );
+      };
+      this._pixiContainer.addChild(this._pixiObject);
+      this.update();
+      this.updateTileMap();
+      this.width = 20;
+      this.height = 20;
+    }
+    RenderedCollisionMaskInstance.prototype = Object.create(
+      RenderedInstance.prototype
+    );
 
-    // /**
-    //  * Return the path to the thumbnail of the specified object.
-    //  */
-    //  RenderedCollisionMaskInstance.getThumbnail = function (
-    //   project,
-    //   resourcesLoader,
-    //   object
-    // ) {
-    //   return 'JsPlatform/Extensions/tile_map32.png';
-    // };
+    /**
+     * Return the path to the thumbnail of the specified object.
+     */
+     RenderedCollisionMaskInstance.getThumbnail = function (
+      project,
+      resourcesLoader,
+      object
+    ) {
+      return 'JsPlatform/Extensions/tile_map32.png';
+    };
 
-    // /**
-    //  * This is used to reload the Tilemap
-    //  * @param {gdjs.TileMap.TiledMap} tileMapJsonData 
-    //  */
-    //  RenderedCollisionMaskInstance.prototype._loadTileMapWithTileset = function (
-    //   tileMapJsonData
-    // ) {
-    //   console.log("TiledCollisionTileMapLoader: " + TiledCollisionTileMapLoader);
-    //   const collisionTileMap = TiledCollisionTileMapLoader.TiledCollisionTileMapLoader.load(
-    //     tileMapJsonData
-    //     );
+    /**
+     * This is used to reload the Tilemap
+     * @param {gdjs.TileMap.TiledMap} tileMapJsonData 
+     */
+     RenderedCollisionMaskInstance.prototype._loadTileMapWithTileset = function (
+      tiledMapJsonData
+    ) {
+      // Get the tileset resource to use
+      const tilemapAtlasImage = this._associatedObject
+        .getProperties(this.project)
+        .get('tilemapAtlasImage')
+        .getValue();
+      const tilemapJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilemapJsonFile')
+        .getValue();
+      const layerIndex = parseInt(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('layerIndex')
+          .getValue(),
+        10
+      );
+      const displayMode = 'visible';
+      // this._associatedObject
+      //   .getProperties(this.project)
+      //   .get('displayMode')
+      //   .getValue();
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
+      const typeFilter = this._associatedObject
+        .getProperties(this.project)
+        .get('typeFilter')
+        .getValue();
+      const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('outlineColor')
+          .getValue()
+      );
+      const fillColor = objectsRenderingService.rgbOrHexToHexNumber(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('fillColor')
+          .getValue()
+      );
+      const outlineOpacity = this._associatedObject
+        .getProperties(this.project)
+        .get('outlineOpacity')
+        .getValue() / 255;
+      const fillOpacity = this._associatedObject
+        .getProperties(this.project)
+        .get('fillOpacity')
+        .getValue() / 255;
+      const outlineSize = 1;
 
-    //   this._graphics.clear();
-    //   for (const polygon of collisionTileMap.getAllHitboxes(
-    //     'Platform'
-    //   )) {
-    //     //console.log("polygon: " + polygon);
-    //     const vertices = polygon.vertices;
-    //     if (vertices.length === 0) continue;
+      console.log("CollisionMask._loadTileMapWithTileset: " + typeFilter);
 
-    //     this._graphics.beginFill(
-    //       this._object._fillColor,
-    //       this._object._fillOpacity / 255
-    //     );
-    //     this._graphics.moveTo(vertices[0][0], vertices[0][1]);
-    //     console.log("");
-    //     console.log("moveTo: " + vertices[0][0] + " " + vertices[0][1]);
-    //     for (let index = 1; index < vertices.length; index++) {
-    //       this._graphics.lineTo(vertices[index][0], vertices[index][1]);
-    //       console.log("lineTo: " + vertices[index][0] + " " + vertices[index][1]);
-    //     }
-    //     this._graphics.closePath();
-    //     this._graphics.endFill();
-    //   }
+      const manager = TilemapHelper.TileMapManager.getManager(this._project);
+      const tileMap = manager.getOrLoadTileMap(
+        pako,
+        tilemapJsonFile,
+        tilesetJsonFile,
+        tiledMapJsonData
+      );
 
-    //   this._graphics.beginFill(
-    //     this._object._fillColor,
-    //     this._object._fillOpacity / 255
-    //   );
-    //   this._graphics.moveTo(0, 0);
-    //   this._graphics.lineTo(0, 20);
-    //   this._graphics.lineTo(20, 0);
-    //   this._graphics.lineTo(20, 20);
-    //   this._graphics.closePath();
-    //   this._graphics.endFill();
-    // };
+      const textureCache = manager.getOrLoadTextureCache(
+        (textureName) =>
+          this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+        tilemapAtlasImage,
+        tilemapJsonFile,
+        tilesetJsonFile,
+        tiledMapJsonData
+      );
 
-    // RenderedCollisionMaskInstance.prototype.updateTileMap = async function () {
-    //   // Get the tileset resource to use
-    //   const tilemapJsonFile = this._associatedObject
-    //     .getProperties(this.project)
-    //     .get('tilemapJsonFile')
-    //     .getValue();
-    //   const tilesetJsonFile = this._associatedObject
-    //     .getProperties(this.project)
-    //     .get('tilesetJsonFile')
-    //     .getValue();
+      console.log("typeFilter: " + typeFilter);
 
-    //   try {
-    //     const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-    //       this._project,
-    //       tilemapJsonFile
-    //     );
+      if (tileMap && textureCache) {
+        this.width = tileMap.getWidth();
+        this.height = tileMap.getHeight();
+        TilemapHelper.PixiTileMapHelper.updatePixiCollisionMask(
+          this._pixiObject,
+          tileMap,
+          displayMode,
+          layerIndex,
+          typeFilter,
+          outlineSize,
+          outlineColor,
+          outlineOpacity,
+          fillColor,
+          fillOpacity
+        );
+      }
+    };
 
-    //     const tilesetJsonData = tilesetJsonFile
-    //       ? await this._pixiResourcesLoader.getResourceJsonData(
-    //           this._project,
-    //           tilesetJsonFile
-    //         )
-    //       : null;
-    //     if (tilesetJsonData) {
-    //       tileMapJsonData.tilesets = [tilesetJsonData];
-    //     }
-    //     this._loadTileMapWithTileset(tileMapJsonData);
-    //   } catch (err) {
-    //     console.error('Unable to load a Tilemap JSON data: ', err);
-    //   }
-    // };
-    // /**
-    //  * This is called to update the PIXI object on the scene editor
-    //  */
-    //  RenderedCollisionMaskInstance.prototype.update = function () {
-    //   if (this._instance.hasCustomSize()) {
-    //     this._pixiObject.width = this._instance.getCustomWidth();
-    //     this._pixiObject.height = this._instance.getCustomHeight();
-    //   } else {
-    //     this._pixiObject.scale.x = 1;
-    //     this._pixiObject.scale.y = 1;
-    //   }
+    RenderedCollisionMaskInstance.prototype.updateTileMap = async function () {
+      // Get the tileset resource to use
+      const tilemapJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilemapJsonFile')
+        .getValue();
+      const tilesetJsonFile = this._associatedObject
+        .getProperties(this.project)
+        .get('tilesetJsonFile')
+        .getValue();
 
-    //   // Place the center of rotation in the center of the object. Because pivot position in Pixi
-    //   // is in the **local coordinates of the object**, we need to find back the original width
-    //   // and height of the object before scaling (then divide by 2 to find the center)
-    //   const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-    //   const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
-    //   this._pixiObject.pivot.x = originalWidth / 2;
-    //   this._pixiObject.pivot.y = originalHeight / 2;
+      try {
+        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+          this._project,
+          tilemapJsonFile
+        );
 
-    //   // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
-    //   // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
-    //   // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-    //   this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
-    //   this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+        const tilesetJsonData = tilesetJsonFile
+          ? await this._pixiResourcesLoader.getResourceJsonData(
+              this._project,
+              tilesetJsonFile
+            )
+          : null;
+        if (tilesetJsonData) {
+          tileMapJsonData.tilesets = [tilesetJsonData];
+        }
+        this._loadTileMapWithTileset(tileMapJsonData);
+      } catch (err) {
+        console.error('Unable to load a Tilemap JSON data: ', err);
+      }
+    };
+    /**
+     * This is called to update the PIXI object on the scene editor
+     */
+     RenderedCollisionMaskInstance.prototype.update = function () {
+      if (this._instance.hasCustomSize()) {
+        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.y = this._instance.getCustomHeight() / this.height;
+      } else {
+        this._pixiObject.scale.x = 1;
+        this._pixiObject.scale.y = 1;
+      }
 
-    //   // Rotation works as intended because we put the pivot in the center
-    //   this._pixiObject.rotation = RenderedInstance.toRad(
-    //     this._instance.getAngle()
-    //   );
-    // };
+      // Place the center of rotation in the center of the object. Because pivot position in Pixi
+      // is in the **local coordinates of the object**, we need to find back the original width
+      // and height of the object before scaling (then divide by 2 to find the center)
+      const originalWidth = this.width / this._pixiObject.scale.x;
+      const originalHeight = this.height / this._pixiObject.scale.y;
+      this._pixiObject.pivot.x = originalWidth / 2;
+      this._pixiObject.pivot.y = originalHeight / 2;
 
-    // /**
-    //  * Return the width of the instance, when it's not resized.
-    //  */
-    //  RenderedCollisionMaskInstance.prototype.getDefaultWidth = function () {
-    //   return this._pixiObject.width / this._pixiObject.scale.x;
-    // };
+      // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
+      // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
+      // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
+      this._pixiObject.x = this._instance.getX() + this.width / 2;
+      this._pixiObject.y = this._instance.getY() + this.height / 2;
 
-    // /**
-    //  * Return the height of the instance, when it's not resized.
-    //  */
-    //  RenderedCollisionMaskInstance.prototype.getDefaultHeight = function () {
-    //   return this._pixiObject.height / this._pixiObject.scale.y;
-    // };
+      // Rotation works as intended because we put the pivot in the center
+      this._pixiObject.rotation = RenderedInstance.toRad(
+        this._instance.getAngle()
+      );
+    };
 
-    // objectsRenderingService.registerInstanceRenderer(
-    //   'TileMap::CollisionMask',
-    //   RenderedCollisionMaskInstance
-    // );
+    /**
+     * Return the width of the instance, when it's not resized.
+     */
+     RenderedCollisionMaskInstance.prototype.getDefaultWidth = function () {
+      return this.width;
+    };
+
+    /**
+     * Return the height of the instance, when it's not resized.
+     */
+     RenderedCollisionMaskInstance.prototype.getDefaultHeight = function () {
+      return this.height;
+    };
+
+    objectsRenderingService.registerInstanceRenderer(
+      'TileMap::CollisionMask',
+      RenderedCollisionMaskInstance
+    );
   },
 };

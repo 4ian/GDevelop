@@ -250,8 +250,11 @@ namespace gdjs {
 
       get(x: integer, y: integer): integer | undefined {
         const row = this._tiles[y];
-        // -1 because 0 mean null
-        return row ? (row[x] - 1) & EditableTileMapLayer.tileIdMask : undefined;
+        if (!row || row[x] === 0) {
+          return undefined;
+        }
+        // -1 because 0 is keep for null.
+        return (row[x] - 1) & EditableTileMapLayer.tileIdMask;
       }
 
       dimX() {

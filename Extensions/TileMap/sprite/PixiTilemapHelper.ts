@@ -183,6 +183,100 @@ namespace gdjs {
           }
         }
       }
+
+      /**
+       * Re-renders the collision mask
+       *
+       * @param pixiTileMap
+       * @param tileMap
+       * @param textureCache
+       * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
+       * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
+       */
+      static updatePixiCollisionMask(
+        pixiGraphics: PIXI.Graphics,
+        tileMap: EditableTileMap,
+        displayMode: 'index' | 'visible' | 'all',
+        layerIndex: integer,
+        typeFilter: string,
+        outlineSize: integer,
+        outlineColor: integer,
+        outlineOpacity: float,
+        fillColor: integer,
+        fillOpacity: float
+      ) {
+        if (!pixiGraphics) return;
+        pixiGraphics.clear();
+
+        for (const layer of tileMap.getLayers()) {
+          if (displayMode === 'index' && layerIndex !== layer.id) return;
+          // TODO is this really useful?
+          // I think it's just an editor field
+          // and everything invisible should just not be parsed in the 1st place.
+          //else if (displayMode === 'visible' && !layer.visible) return;
+          const tileWidth = tileMap.getTileWidth();
+          const tileHeight = tileMap.getTileHeight();
+
+          if (layer instanceof EditableTileMapLayer) {
+            const tileLayer = layer as EditableTileMapLayer;
+
+            for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
+              for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
+                const xPos = tileWidth * x;
+                const yPos = tileHeight * y;
+
+                const tileId = tileLayer.get(x, y)!;
+                const isFlippedHorizontally = tileLayer.isFlippedHorizontally(
+                  x,
+                  y
+                );
+                const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
+                const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
+                const tileDefinition = tileLayer.tileMap.getTileDefinition(
+                  tileId
+                );
+                if (!tileDefinition || tileDefinition.getTag() !== typeFilter) {
+                  continue;
+                }
+
+                pixiGraphics.lineStyle(
+                  outlineSize,
+                  outlineColor,
+                  outlineOpacity
+                );
+                for (const polygon of tileDefinition.getPolygons()) {
+                  const vertices = polygon.vertices;
+                  if (vertices.length === 0) continue;
+
+                  pixiGraphics.beginFill(fillColor, fillOpacity);
+                  for (let index = 0; index < vertices.length; index++) {
+                    let vertexX = vertices[index][0];
+                    let vertexY = vertices[index][1];
+                    if (isFlippedHorizontally) {
+                      vertexX = tileWidth - vertexX;
+                    }
+                    if (isFlippedVertically) {
+                      vertexY = tileHeight - vertexY;
+                    }
+                    if (isFlippedDiagonally) {
+                      const swap = vertexX;
+                      vertexX = vertexY;
+                      vertexY = swap;
+                    }
+                    if (index === 0) {
+                      pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);
+                    } else {
+                      pixiGraphics.lineTo(xPos + vertexX, yPos + vertexY);
+                    }
+                  }
+                  pixiGraphics.closePath();
+                  pixiGraphics.endFill();
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

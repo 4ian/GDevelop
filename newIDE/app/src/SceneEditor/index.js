@@ -136,7 +136,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?string,
   variablesEditedInstance: ?gdInitialInstance,
-  variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -189,7 +188,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      variablesEditedObject: null,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -357,10 +355,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
-  };
-
-  editObjectVariables = (object: ?gdObject) => {
-    this.setState({ variablesEditedObject: object });
   };
 
   editLayoutVariables = (open: boolean = true) => {
@@ -1000,7 +994,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 instances={selectedInstances}
                 editInstanceVariables={this.editInstanceVariables}
-                editObjectVariables={this.editObjectVariables}
                 onEditObjectByName={this.editObjectByName}
                 onInstancesModified={instances =>
                   this.forceUpdateInstancesList()
@@ -1150,7 +1143,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           project={project}
           layout={layout}
           onEditObject={this.props.onEditObject || this.editObject}
-          onEditObjectVariables={this.editObjectVariables}
+          onEditObjectVariables={object => {
+            this.editObject(object, 'variables');
+          }}
           onOpenSceneProperties={this.openSceneProperties}
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
@@ -1194,6 +1189,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
+            onComputeAllVariableNames={() => {
+              const { editedObjectWithContext } = this.state;
+              if (!editedObjectWithContext) return [];
+
+              return EventsRootVariablesFinder.findAllObjectVariables(
+                project.getCurrentPlatform(),
+                project,
+                layout,
+                editedObjectWithContext.object
+              );
+            }}
             onCancel={() => {
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
@@ -1307,10 +1313,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editInstanceVariables(null)}
             emptyExplanationMessage={
               <Trans>
-                Instance variables will override the default values of the
+                Instance variables will overwrite the default values of the
                 variables of the object.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/instance-variables'}
             title={<Trans>Instance Variables</Trans>}
             onEditObjectVariables={() => {
               if (!this.instancesSelection.hasSelectedInstances()) {
@@ -1325,7 +1332,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 associatedObjectName
               );
               if (object) {
-                this.editObjectVariables(object);
+                this.editObject(object, 'variables');
                 this.editInstanceVariables(null);
               }
             }}
@@ -1341,37 +1348,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout,
                 variablesEditedInstance.getObjectName()
               );
-              return variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
-          />
-        )}
-        {!!this.state.variablesEditedObject && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedObject &&
-              this.state.variablesEditedObject.getVariables()
-            }
-            onCancel={() => this.editObjectVariables(null)}
-            onApply={() => this.editObjectVariables(null)}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
-            }
-            title={<Trans>Object Variables</Trans>}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedObject = this.state.variablesEditedObject;
               return variablesEditedObject
                 ? EventsRootVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),

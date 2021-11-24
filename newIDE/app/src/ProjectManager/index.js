@@ -1183,6 +1183,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 representing the number of levels unlocked by the player.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/global-variables'}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
             onComputeAllVariableNames={() =>
               EventsRootVariablesFinder.findAllGlobalVariables(

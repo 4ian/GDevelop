@@ -72,6 +72,7 @@ export const ExamplesAccordion = ({
         <Column>
           {examples.map(example => (
             <ContributionLine
+              key={example.name}
               shortDescription={example.shortDescription}
               fullName={example.name}
               previewIconUrl={

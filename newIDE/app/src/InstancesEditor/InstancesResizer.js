@@ -261,6 +261,8 @@ export default class InstancesResizer {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
+      if (selectedInstance.isLocked()) continue;
+
       let initialUnrotatedInstanceAABB = this._getOrCreateUnrotatedInstanceAABB(
         selectedInstance
       );

@@ -94,6 +94,8 @@ export default class InstancesRotator {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
+      if (selectedInstance.isLocked()) continue;
+
       const initialAABB = this._getOrCreateInstanceAABB(selectedInstance);
       const initialAngle = this._getOrCreateInstanceAngle(selectedInstance);
       const initialInstanceOriginPosition = this._getOrCreateInstanceOriginPosition(

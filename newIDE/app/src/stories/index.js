@@ -3876,7 +3876,6 @@ storiesOf('InstancePropertiesEditor', module)
             layout={testProject.testLayout}
             instances={[testProject.testLayoutInstance1]}
             editInstanceVariables={action('edit instance variables')}
-            editObjectVariables={action('edit object variables')}
             onEditObjectByName={action('edit object')}
           />
         </SerializedObjectDisplay>

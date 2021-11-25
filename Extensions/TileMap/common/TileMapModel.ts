@@ -1,5 +1,7 @@
 namespace gdjs {
   export namespace TileMap {
+    export type PolygonVertices = FloatPoint[];
+
     export class EditableTileMap {
       private _tileSet: Map<integer, CollisionTileDefinition>;
       private _layers: Array<EditableTileMapLayer | EditableObjectLayer>;
@@ -275,10 +277,10 @@ namespace gdjs {
     }
 
     export class CollisionTileDefinition {
-      private readonly polygons: Polygon[];
+      private readonly polygons: PolygonVertices[];
       private readonly tag: string;
 
-      constructor(polygons: gdjs.Polygon[], tag: string = '') {
+      constructor(polygons: PolygonVertices[], tag: string = '') {
         this.polygons = polygons;
         this.tag = tag;
       }

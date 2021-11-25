@@ -404,7 +404,7 @@ namespace gdjs {
             this.polygons[polygonIndex] = polygon;
             polygon.vertices.length = definition.getPolygons()[
               polygonIndex
-            ].vertices.length;
+            ].length;
             for (
               let vertexIndex = 0;
               vertexIndex < polygon.vertices.length;
@@ -482,7 +482,7 @@ namespace gdjs {
             vertexIndex < polygon.vertices.length;
             vertexIndex++
           ) {
-            const defVertex = defPolygon.vertices[vertexIndex];
+            const defVertex = defPolygon[vertexIndex];
             const vertex = polygon.vertices[vertexIndex];
 
             tileTransformation.transform(defVertex, vertex);

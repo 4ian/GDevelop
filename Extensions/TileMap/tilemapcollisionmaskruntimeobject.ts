@@ -12,7 +12,7 @@ namespace gdjs {
     _renderer: gdjs.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     _typeFilter: string;
-    _tileMapManager: gdjs.TileMap.TileMapManager;
+    _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
 
     _fillColor: integer;
     _outlineColor: integer;
@@ -37,7 +37,7 @@ namespace gdjs {
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
       this._outlineSize = 1; //objectData.content.outlineSize;
-      this._tileMapManager = gdjs.TileMap.TileMapManager.getManager(
+      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
       const collisionTileMap = new gdjs.TileMap.EditableTileMap(
@@ -106,6 +106,7 @@ namespace gdjs {
         this._tilesetJsonFile,
         (tileMap: gdjs.TileMap.EditableTileMap | null) => {
           if (!tileMap) {
+            //TODO warn?
             return;
           }
 

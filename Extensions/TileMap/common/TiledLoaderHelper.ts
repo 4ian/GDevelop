@@ -5,7 +5,7 @@ namespace gdjs {
      * by Tiled.
      * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
      */
-    export const decodeBase64LayerData = (layer: TiledLayer) => {
+    export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
       const { data, compression } = layer;
       const dataBase64 = data as string;
       if (!dataBase64) {

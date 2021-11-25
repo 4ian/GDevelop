@@ -18,7 +18,7 @@ namespace gdjs {
     _layerIndex: integer;
     _animationSpeedScale: number;
     _animationFps: number;
-    _tileMapManager: gdjs.TileMap.TileMapManager;
+    _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
     constructor(runtimeScene, objectData) {
@@ -31,7 +31,7 @@ namespace gdjs {
       this._layerIndex = objectData.content.layerIndex;
       this._animationSpeedScale = objectData.content.animationSpeedScale;
       this._animationFps = objectData.content.animationFps;
-      this._tileMapManager = gdjs.TileMap.TileMapManager.getManager(
+      this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
       this._renderer = new gdjs.TileMapRuntimeObjectRenderer(
@@ -122,7 +122,11 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
-        (tileMap: gdjs.TileMap.EditableTileMap) => {
+        (tileMap: gdjs.TileMap.EditableTileMap | null) => {
+          if (!tileMap) {
+            //TODO warn?
+            return;
+          }
           this._tileMapManager.getOrLoadTextureCache(
             (textureName) =>
               (this._runtimeScene
@@ -135,9 +139,11 @@ namespace gdjs {
             this._tilemapJsonFile,
             this._tilesetJsonFile,
             (textureCache: TileMap.TileTextureCache | null) => {
-              if (textureCache) {
-                this._renderer.updatePixiTileMap(tileMap, textureCache);
+              if (!textureCache) {
+                //TODO warn?
+                return;
               }
+              this._renderer.updatePixiTileMap(tileMap, textureCache);
             }
           );
         }

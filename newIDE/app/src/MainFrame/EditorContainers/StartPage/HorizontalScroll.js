@@ -52,7 +52,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
   const scrollView = React.useRef(null);
   const itemsToDisplay =
     items ||
-    Array(5).fill({
+    Array(3).fill({
       placeholder: true,
       title: null,
     });
@@ -150,7 +150,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
         }}
         onClick={onClickArrow('left')}
       >
-        <ArrowBackIos />
+        {!!items && <ArrowBackIos />}
       </div>
       <div style={{ width: `calc(100% - ${arrowWidth})` }}>
         <Text size="title">{title}</Text>
@@ -167,23 +167,25 @@ const HorizontalScroll = ({ title, items }: Props) => {
               {renderItemTitle(item)}
             </GridListTile>
           ))}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'sticky',
-              right: '0',
-              top: '6px',
-              height: cellHeight - 12,
-              width: arrowWidth,
-              backgroundColor: 'rgba(100,100,100,0.8)',
-            }}
-            onClick={onClickArrow('right')}
-          >
-            <ArrowForwardIos htmlColor="white" />
-          </div>
+          {!!items && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'sticky',
+                right: '0',
+                top: '6px',
+                height: cellHeight - 12,
+                width: arrowWidth,
+                backgroundColor: 'rgba(100,100,100,0.8)',
+              }}
+              onClick={onClickArrow('right')}
+            >
+              <ArrowForwardIos htmlColor="white" />
+            </div>
+          )}
         </GridList>
       </div>
     </Line>

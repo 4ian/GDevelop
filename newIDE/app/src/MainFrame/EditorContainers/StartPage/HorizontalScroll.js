@@ -2,10 +2,12 @@
 import * as React from 'react';
 import GridList from '@material-ui/core/GridList';
 import { GridListTile, Paper } from '@material-ui/core';
+import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
 import Text from '../../../UI/Text';
 import './HorizontalScroll.css';
-import { Spacer } from '../../../UI/Grid';
+import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 
 export type YoutubeThumbnail = {|
@@ -47,18 +49,21 @@ const styles = {
 
 const HorizontalScroll = ({ title, items }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
+  const scrollView = React.useRef(null);
   const itemsToDisplay =
     items ||
     Array(5).fill({
       placeholder: true,
       title: null,
     });
+  const cellSpacing = 12;
   const imageHeight = 180;
   const titleHeight = 30;
   let cellHeight = imageHeight;
   if (itemsToDisplay.some(item => Object.keys(item).includes('title')))
     cellHeight += titleHeight;
   const cellWidth = (16 / 9) * imageHeight;
+  const arrowWidth = '30px';
 
   const renderThumbnail = (
     item:
@@ -82,13 +87,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
       return <img width={cellWidth} src={item.imageSource} />;
     }
     if (item.placeholder) {
-      return (
-        <Skeleton
-          variant="rectangular"
-          height={imageHeight}
-          width={cellWidth}
-        />
-      );
+      return <Skeleton variant="rect" height={imageHeight} width={cellWidth} />;
     }
   };
 
@@ -111,7 +110,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
           </div>
         ) : (
           <Skeleton
-            variant="rectangular"
+            variant="rect"
             height={titleHeight}
             width={(cellWidth / 3) * (1 + 2 * Math.random())}
           />
@@ -120,22 +119,74 @@ const HorizontalScroll = ({ title, items }: Props) => {
     );
   };
 
+  const computeScroll = (direction: 'left' | 'right'): number => {
+    const unit = 2 * (cellWidth + cellSpacing);
+    return (
+      Math.round(
+        (scrollView.current.scrollLeft +
+          unit * (direction === 'left' ? -1 : 1)) /
+          unit
+      ) * unit
+    );
+  };
+
+  const onClickArrow = (direction: 'left' | 'right') => (): void => {
+    scrollView.current.scrollTo({
+      left: computeScroll(direction),
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <>
-      <Text size="title">{title}</Text>
-      <GridList
-        cols={itemsToDisplay.length}
-        cellHeight={cellHeight}
-        spacing={12}
+    <Line noMargin expand>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: arrowWidth,
+          marginTop: '32px',
+        }}
+        onClick={onClickArrow('left')}
       >
-        {itemsToDisplay.map(item => (
-          <GridListTile>
-            {renderThumbnail(item)}
-            {renderItemTitle(item)}
-          </GridListTile>
-        ))}
-      </GridList>
-    </>
+        <ArrowBackIos />
+      </div>
+      <div style={{ width: `calc(100% - ${arrowWidth})` }}>
+        <Text size="title">{title}</Text>
+        <GridList
+          cols={itemsToDisplay.length}
+          cellHeight={cellHeight}
+          spacing={cellSpacing}
+          style={{ position: 'relative' }}
+          ref={scrollView}
+        >
+          {itemsToDisplay.map(item => (
+            <GridListTile>
+              {renderThumbnail(item)}
+              {renderItemTitle(item)}
+            </GridListTile>
+          ))}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'sticky',
+              right: '0',
+              top: '6px',
+              height: cellHeight - 12,
+              width: arrowWidth,
+              backgroundColor: 'rgba(100,100,100,0.8)',
+            }}
+            onClick={onClickArrow('right')}
+          >
+            <ArrowForwardIos htmlColor="white" />
+          </div>
+        </GridList>
+      </div>
+    </Line>
   );
 };
 

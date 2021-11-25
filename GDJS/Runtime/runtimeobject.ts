@@ -41,15 +41,18 @@ namespace gdjs {
 
   /**
    * Move the object using the results from collisionTest call.
+   * This moves the object according to the direction of the longest vector,
+   * and projects the others on the orthogonal vector.
    *
    * See {@link RuntimeObject.separateFromObjects}
    *
-   * @param moveXArray
-   * @param moveYArray
-   * @return true if the object was moved
+   * @param object The object to move.
+   * @param moveXArray The X coordinates of the vectors to move the object.
+   * @param moveYArray The Y coordinates of the vectors to move the object.
+   * @return true if the object was moved.
    */
   const moveFollowingSeparatingVectors = (
-    object: RuntimeObject,
+    object: gdjs.RuntimeObject,
     moveXArray: Array<float>,
     moveYArray: Array<float>
   ): boolean => {

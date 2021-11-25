@@ -2,6 +2,7 @@ namespace gdjs {
   export namespace TileMap {
     export class TiledTileMapLoader {
       static load(
+        pako: any,
         tiledMap: gdjs.TileMap.TiledMap
       ): gdjs.TileMap.EditableTileMap {
         const definitions = new Map<
@@ -87,7 +88,7 @@ namespace gdjs {
             let layerData: integer[] | null = null;
 
             if (tiledLayer.encoding === 'base64') {
-              layerData = gdjs.TileMap.decodeBase64LayerData(tiledLayer);
+              layerData = gdjs.TileMap.decodeBase64LayerData(pako, tiledLayer);
               if (!layerData) {
                 console.warn('Failed to uncompress layer.data');
               }

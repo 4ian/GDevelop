@@ -49,6 +49,10 @@ const styles = {
 
 const HorizontalScroll = ({ title, items }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
+  const [
+    shouldDisplayLeftArrow,
+    setShouldDisplayLeftArrow,
+  ] = React.useState<boolean>(false);
   const scrollView = React.useRef(null);
   const itemsToDisplay =
     items ||
@@ -131,8 +135,10 @@ const HorizontalScroll = ({ title, items }: Props) => {
   };
 
   const onClickArrow = (direction: 'left' | 'right') => (): void => {
+    const newScrollPosition = computeScroll(direction);
+    setShouldDisplayLeftArrow(newScrollPosition !== 0);
     scrollView.current.scrollTo({
-      left: computeScroll(direction),
+      left: newScrollPosition,
       behavior: 'smooth',
     });
   };
@@ -150,7 +156,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
         }}
         onClick={onClickArrow('left')}
       >
-        {!!items && <ArrowBackIos />}
+        {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
       <div style={{ width: `calc(100% - ${arrowWidth})` }}>
         <Text size="title">{title}</Text>

@@ -244,8 +244,7 @@ namespace gdjs {
                   outlineColor,
                   outlineOpacity
                 );
-                for (const polygon of tileDefinition.getPolygons()) {
-                  const vertices = polygon.vertices;
+                for (const vertices of tileDefinition.getPolygons()) {
                   if (vertices.length === 0) continue;
 
                   pixiGraphics.beginFill(fillColor, fillOpacity);

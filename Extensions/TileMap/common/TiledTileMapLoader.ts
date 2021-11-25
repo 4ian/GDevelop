@@ -10,19 +10,16 @@ namespace gdjs {
           gdjs.TileMap.CollisionTileDefinition
         >();
         for (const tile of tiledMap.tilesets[0].tiles!) {
-          const polygons: gdjs.Polygon[] = [];
+          const polygons: PolygonVertices[] = [];
           if (tile.objectgroup) {
             for (const object of tile.objectgroup.objects) {
-              const polygon = new gdjs.Polygon();
+              let polygon: PolygonVertices | null = null;
               if (object.polygon) {
-                polygon.vertices = object.polygon.map((point) => [
-                  point.x,
-                  point.y,
-                ]);
+                polygon = object.polygon.map((point) => [point.x, point.y]);
               }
               // TODO handle ellipse
               else {
-                polygon.vertices = [
+                polygon = [
                   [object.x, object.y],
                   [object.x, object.y + object.height],
                   [object.x + object.width, object.y + object.height],

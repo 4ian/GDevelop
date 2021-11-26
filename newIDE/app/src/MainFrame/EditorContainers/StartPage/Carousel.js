@@ -6,7 +6,7 @@ import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
 import Text from '../../../UI/Text';
-import './HorizontalScroll.css';
+import './Carousel.css';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -88,7 +88,7 @@ const styles = {
   },
 };
 
-const HorizontalScroll = ({
+const Carousel = ({
   title,
   items,
   displayTitleSkeleton = true,
@@ -339,4 +339,4 @@ const computeItemKey = (
   return 'key';
 };
 
-export default HorizontalScroll;
+export default Carousel;

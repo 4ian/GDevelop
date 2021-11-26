@@ -6,10 +6,10 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
-import HorizontalScroll, {
+import Carousel, {
   type YoutubeThumbnail,
   type ShowcaseThumbnail,
-} from '../../MainFrame/EditorContainers/StartPage/HorizontalScroll';
+} from '../../MainFrame/EditorContainers/StartPage/Carousel';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';
@@ -17,13 +17,13 @@ import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';
 const items = [];
 
 export default {
-  title: 'HorizontalScroll',
-  component: HorizontalScroll,
+  title: 'Carousel',
+  component: Carousel,
   decorators: [paperDecorator, muiDecorator],
 };
 
 
-export const LoadingWithoutTitleSkeleton = () => <HorizontalScroll title="Our Latest Tutorials" items={null} displayTitleSkeleton={false}/>;
+export const LoadingWithoutTitleSkeleton = () => <Carousel title="Our Latest Tutorials" items={null} displayTitleSkeleton={false}/>;
 export const Tutorials = () => {
   const items: YoutubeThumbnail[] = [
     {
@@ -42,10 +42,10 @@ export const Tutorials = () => {
       link: 'https://www.youtube.com/watch?v=Q7e3gAWkLZI',
     },
   ];
-  return <HorizontalScroll title="Our Latest Tutorials" items={items} />;
+  return <Carousel title="Our Latest Tutorials" items={items} />;
 };
 
-export const LoadingWithTitleSkeleton = () => <HorizontalScroll title="Showcase" items={null} />;
+export const LoadingWithTitleSkeleton = () => <Carousel title="Showcase" items={null} />;
 export const Showcases = () => {
   const items: ShowcaseThumbnail[] = [
     {
@@ -93,5 +93,5 @@ export const Showcases = () => {
       imageSource: 'https://resources.gdevelop-app.com/games-showcase/images/apx-legion/apx-legion-banner-min.jpg'
     },
   ];
-  return <HorizontalScroll title="Showcase" items={items} />;
+  return <Carousel title="Showcase" items={items} />;
 };

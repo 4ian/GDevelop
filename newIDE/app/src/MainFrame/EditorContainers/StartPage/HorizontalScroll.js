@@ -39,15 +39,48 @@ type Props = {|
   displayTitleSkeleton?: boolean,
 |};
 
+const cellSpacing = 12;
+const imageHeight = 180;
+const titleHeight = 30;
+const spacerSize = 4;
+const cellWidth = (16 / 9) * imageHeight;
+const widthUnit = cellWidth + cellSpacing;
+const arrowWidth = 30;
+
 const styles = {
+  container: { width: `calc(100% - ${arrowWidth}px)` },
   title: {
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     overflowWrap: 'break-word',
     whiteSpace: 'nowrap',
   },
+  gridList: { position: 'relative' },
   image: {
     objectFit: 'cover',
+    height: imageHeight,
+    minHeight: imageHeight,
+    width: cellWidth,
+  },
+  itemTitle: { width: cellWidth, height: titleHeight },
+  leftArrowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: arrowWidth,
+    marginTop: '32px',
+  },
+  rightArrowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'sticky',
+    right: '0',
+    top: '6px',
+    width: arrowWidth,
+    backgroundColor: 'rgba(100,100,100,0.8)',
   },
 };
 
@@ -69,19 +102,12 @@ const HorizontalScroll = ({
         skeleton: true,
       })
       .map((item, index) => ({ ...item, key: `key${index}` }));
-  const cellSpacing = 12;
-  const imageHeight = 180;
-  const titleHeight = 30;
-  const spacerSize = 4;
   let cellHeight = imageHeight;
   if (
     (!items && displayTitleSkeleton) ||
     itemsToDisplay.some(item => Object.keys(item).includes('title'))
   )
     cellHeight += titleHeight + spacerSize;
-  const cellWidth = (16 / 9) * imageHeight;
-  const widthUnit = cellWidth + cellSpacing;
-  const arrowWidth = 30;
 
   const renderThumbnail = React.useCallback(
     (
@@ -97,28 +123,13 @@ const HorizontalScroll = ({
           <a href={item.link} target="_blank">
             <img
               src={constructImageLinkFromYoutubeLink(item.link)}
-              style={{
-                ...styles.image,
-                height: imageHeight,
-                minHeight: imageHeight,
-                width: cellWidth,
-              }}
+              style={styles.image}
             />
           </a>
         );
       }
       if (item.imageSource) {
-        return (
-          <img
-            src={item.imageSource}
-            style={{
-              ...styles.image,
-              height: imageHeight,
-              minHeight: imageHeight,
-              width: cellWidth,
-            }}
-          />
-        );
+        return <img src={item.imageSource} style={styles.image} />;
       }
       if (item.skeleton) {
         return (
@@ -142,7 +153,7 @@ const HorizontalScroll = ({
         <>
           <Spacer />
           {item.title ? (
-            <div style={{ width: cellWidth, height: titleHeight }}>
+            <div style={styles.itemTitle}>
               <Text noMargin size="title" style={styles.title}>
                 {item.title}
               </Text>
@@ -244,26 +255,16 @@ const HorizontalScroll = ({
 
   return (
     <Line noMargin expand>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: arrowWidth,
-          marginTop: '32px',
-        }}
-        onClick={onClickArrow('left')}
-      >
+      <div style={styles.leftArrowContainer} onClick={onClickArrow('left')}>
         {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
-      <div style={{ width: `calc(100% - ${arrowWidth}px)` }}>
+      <div style={styles.container}>
         <Text size="title">{title}</Text>
         <GridList
           cols={itemsToDisplay.length}
           cellHeight={cellHeight}
           spacing={cellSpacing}
-          style={{ position: 'relative' }}
+          style={styles.gridList}
           ref={scrollView}
         >
           {itemsToDisplay.map(item => (
@@ -274,18 +275,7 @@ const HorizontalScroll = ({
           ))}
           {!!items && (
             <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                position: 'sticky',
-                right: '0',
-                top: '6px',
-                height: cellHeight - 12,
-                width: arrowWidth,
-                backgroundColor: 'rgba(100,100,100,0.8)',
-              }}
+              style={{ ...styles.rightArrowContainer, height: cellHeight - 12 }}
               onClick={onClickArrow('right')}
             >
               <ArrowForwardIos htmlColor="white" />

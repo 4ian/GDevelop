@@ -26,6 +26,7 @@ type GameTemplateThumbnail = {|
 
 type SkeletonThumbnail = {|
   skeleton: boolean,
+  key: string,
 |};
 
 type Props = {|
@@ -63,9 +64,11 @@ const HorizontalScroll = ({
   const scrollView = React.useRef(null);
   const itemsToDisplay =
     items ||
-    Array(3).fill({
-      skeleton: true,
-    });
+    Array(3)
+      .fill({
+        skeleton: true,
+      })
+      .map((item, index) => ({ ...item, key: `key${index}` }));
   const cellSpacing = 12;
   const imageHeight = 180;
   const titleHeight = 30;
@@ -158,7 +161,11 @@ const HorizontalScroll = ({
     const currentScroll = scrollView.current.scrollLeft;
     const currentFirstVisibleItemIndex = currentScroll / unit;
 
-    if (currentFirstVisibleItemIndex > items.length - visibleThumbnailsVisible - 1) return 0;
+    if (
+      currentFirstVisibleItemIndex >
+      items.length - visibleThumbnailsVisible - 1
+    )
+      return 0;
     return (
       Math.round(
         (scrollView.current.scrollLeft +
@@ -175,6 +182,19 @@ const HorizontalScroll = ({
       left: newScrollPosition,
       behavior: 'smooth',
     });
+  };
+
+  const computeItemKey = (
+    item:
+      | YoutubeThumbnail
+      | SkeletonThumbnail
+      | GameTemplateThumbnail
+      | ShowcaseThumbnail
+  ): string => {
+    if (item.link) return item.link;
+    if (item.imageSource) return item.imageSource;
+    if (item.key) return item.key;
+    return 'key'
   };
 
   return (
@@ -202,7 +222,7 @@ const HorizontalScroll = ({
           ref={scrollView}
         >
           {itemsToDisplay.map(item => (
-            <GridListTile>
+            <GridListTile key={computeItemKey(item)}>
               {renderThumbnail(item)}
               {renderItemTitle(item)}
             </GridListTile>

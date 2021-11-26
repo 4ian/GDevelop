@@ -24,8 +24,8 @@ type GameTemplateThumbnail = {|
   imageSource: string,
 |};
 
-type PlaceholderThumbnail = {|
-  placeholder: boolean,
+type SkeletonThumbnail = {|
+  skeleton: boolean,
 |};
 
 type Props = {|
@@ -74,9 +74,9 @@ const HorizontalScroll = ({ title, items }: Props) => {
       | YoutubeThumbnail
       | GameTemplateThumbnail
       | ShowcaseThumbnail
-      | PlaceholderThumbnail
+      | SkeletonThumbnail
   ): ?React.Node => {
-    if (!item.link && !item.imageSource && !item.placeholder) return null;
+    if (!item.link && !item.imageSource && !item.skeleton) return null;
     if (item.link) {
       return (
         <a href={item.link} target="_blank">
@@ -90,7 +90,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
     if (item.imageSource) {
       return <img width={cellWidth} src={item.imageSource} />;
     }
-    if (item.placeholder) {
+    if (item.skeleton) {
       return <Skeleton variant="rect" height={imageHeight} width={cellWidth} />;
     }
   };
@@ -100,9 +100,9 @@ const HorizontalScroll = ({ title, items }: Props) => {
       | YoutubeThumbnail
       | GameTemplateThumbnail
       | ShowcaseThumbnail
-      | PlaceholderThumbnail
+      | SkeletonThumbnail
   ): ?React.Node => {
-    if (!item.title && !item.placeholder) return null;
+    if (!item.title && !item.skeleton) return null;
     return (
       <>
         <Spacer />

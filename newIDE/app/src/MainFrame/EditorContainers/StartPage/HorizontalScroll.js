@@ -77,7 +77,7 @@ const HorizontalScroll = ({
   )
     cellHeight += (titleHeight + spacerSize);
   const cellWidth = (16 / 9) * imageHeight;
-  const arrowWidth = '30px';
+  const arrowWidth = 30;
 
   const renderThumbnail = (
     item:
@@ -183,7 +183,7 @@ const HorizontalScroll = ({
       >
         {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
-      <div style={{ width: `calc(100% - ${arrowWidth})` }}>
+      <div style={{ width: `calc(100% - ${arrowWidth}px)` }}>
         <Text size="title">{title}</Text>
         <GridList
           cols={itemsToDisplay.length}

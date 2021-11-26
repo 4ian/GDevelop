@@ -156,17 +156,17 @@ const HorizontalScroll = ({
     direction: 'left' | 'right',
     scrollViewElement: HTMLUListElement
   ): number => {
-    const visibleThumbnailsVisible = Math.floor(
+    const visibleThumbnailsCount = Math.floor(
       scrollViewElement.offsetWidth / widthUnit
     );
-    const scale = visibleThumbnailsVisible * widthUnit;
+    const scale = visibleThumbnailsCount * widthUnit;
 
     const currentScroll = scrollViewElement.scrollLeft;
     const currentFirstVisibleItemIndex = currentScroll / widthUnit;
 
     if (
       currentFirstVisibleItemIndex >
-      itemsToDisplay.length - visibleThumbnailsVisible - 1
+      itemsToDisplay.length - visibleThumbnailsCount - 1
     )
       return 0;
     return roundScroll(
@@ -179,11 +179,11 @@ const HorizontalScroll = ({
     value: number,
     scrollViewElement: HTMLUListElement
   ): number => {
-    const visibleThumbnailsVisible = Math.floor(
+    const visibleThumbnailsCount = Math.floor(
       scrollViewElement.offsetWidth / widthUnit
     );
 
-    const scale = visibleThumbnailsVisible * widthUnit;
+    const scale = visibleThumbnailsCount * widthUnit;
     return Math.round(value / scale) * scale;
   };
 

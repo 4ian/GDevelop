@@ -9,6 +9,7 @@ import Text from '../../../UI/Text';
 import './HorizontalScroll.css';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type YoutubeThumbnail = {|
   link: string,
@@ -39,17 +40,25 @@ type Props = {|
   displayTitleSkeleton?: boolean,
 |};
 
+const referenceSizesByWindowSize = {
+  imageHeight: {
+    'small': 130,
+    'medium': 150,
+    'large': 180,
+  },
+  arrowWidth: {
+    'small': 18,
+    'medium': 24,
+    'large': 30,
+  },
+}
+
 const cellSpacing = 12;
-const imageHeight = 180;
 const titleHeight = 30;
 const spacerSize = 4;
-const cellWidth = (16 / 9) * imageHeight;
-const widthUnit = cellWidth + cellSpacing;
-const arrowWidth = 30;
 
 const styles = {
-  container: { width: `calc(100% - ${arrowWidth}px)` },
-  title: {
+  itemTitle: {
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     overflowWrap: 'break-word',
@@ -58,17 +67,13 @@ const styles = {
   gridList: { position: 'relative' },
   image: {
     objectFit: 'cover',
-    height: imageHeight,
-    minHeight: imageHeight,
-    width: cellWidth,
   },
-  itemTitle: { width: cellWidth, height: titleHeight },
+  itemTitleContainer: { height: titleHeight },
   leftArrowContainer: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    width: arrowWidth,
     marginTop: '32px',
   },
   rightArrowContainer: {
@@ -79,7 +84,6 @@ const styles = {
     position: 'sticky',
     right: '0',
     top: '6px',
-    width: arrowWidth,
     backgroundColor: 'rgba(100,100,100,0.8)',
   },
 };
@@ -102,6 +106,13 @@ const HorizontalScroll = ({
         skeleton: true,
       })
       .map((item, index) => ({ ...item, key: `key${index}` }));
+
+  const windowSize = useResponsiveWindowWidth();
+  const imageHeight = referenceSizesByWindowSize.imageHeight[windowSize];
+  const arrowWidth = referenceSizesByWindowSize.arrowWidth[windowSize];
+  const cellWidth = (16 / 9) * imageHeight;
+  const widthUnit = cellWidth + cellSpacing;
+
   let cellHeight = imageHeight;
   if (
     (!items && displayTitleSkeleton) ||
@@ -123,13 +134,28 @@ const HorizontalScroll = ({
           <a href={item.link} target="_blank">
             <img
               src={constructImageLinkFromYoutubeLink(item.link)}
-              style={styles.image}
+              style={{
+                ...styles.image,
+                height: imageHeight,
+                minHeight: imageHeight,
+                width: cellWidth,
+              }}
             />
           </a>
         );
       }
       if (item.imageSource) {
-        return <img src={item.imageSource} style={styles.image} />;
+        return (
+          <img
+            src={item.imageSource}
+            style={{
+              ...styles.image,
+              height: imageHeight,
+              minHeight: imageHeight,
+              width: cellWidth,
+            }}
+          />
+        );
       }
       if (item.skeleton) {
         return (
@@ -153,8 +179,8 @@ const HorizontalScroll = ({
         <>
           <Spacer />
           {item.title ? (
-            <div style={styles.itemTitle}>
-              <Text noMargin size="title" style={styles.title}>
+            <div style={{ ...styles.itemTitleContainer, width: cellWidth }}>
+              <Text noMargin size="title" style={styles.itemTitle}>
                 {item.title}
               </Text>
             </div>
@@ -249,10 +275,13 @@ const HorizontalScroll = ({
 
   return (
     <Line noMargin expand>
-      <div style={styles.leftArrowContainer} onClick={onClickArrow('left')}>
+      <div
+        style={{ ...styles.leftArrowContainer, width: arrowWidth }}
+        onClick={onClickArrow('left')}
+      >
         {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
-      <div style={styles.container}>
+      <div style={{ width: `calc(100% - ${arrowWidth}px)` }}>
         <Text size="title">{title}</Text>
         <GridList
           cols={itemsToDisplay.length}
@@ -269,7 +298,11 @@ const HorizontalScroll = ({
           ))}
           {!!items && (
             <div
-              style={{ ...styles.rightArrowContainer, height: cellHeight - 12 }}
+              style={{
+                ...styles.rightArrowContainer,
+                height: cellHeight - 12,
+                width: arrowWidth,
+              }}
               onClick={onClickArrow('right')}
             >
               <ArrowForwardIos htmlColor="white" />

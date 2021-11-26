@@ -190,21 +190,15 @@ const HorizontalScroll = ({
       )
         return 0;
       return roundScroll(
-        scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1),
-        scrollViewElement
+        scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1)
       );
     },
     [widthUnit, itemsToDisplay]
   );
 
   const roundScroll = React.useCallback(
-    (value: number, scrollViewElement: HTMLUListElement): number => {
-      const visibleThumbnailsCount = Math.floor(
-        scrollViewElement.offsetWidth / widthUnit
-      );
-
-      const scale = visibleThumbnailsCount * widthUnit;
-      return Math.round(value / scale) * scale;
+    (value: number): number => {
+      return Math.round(value / widthUnit) * widthUnit;
     },
     [widthUnit]
   );
@@ -237,7 +231,7 @@ const HorizontalScroll = ({
       if (!scrollViewElement) return;
 
       scrollViewElement.scrollTo({
-        left: roundScroll(scrollViewElement.scrollLeft, scrollViewElement),
+        left: roundScroll(scrollViewElement.scrollLeft),
         behavior: 'smooth',
       });
     },

@@ -69,12 +69,13 @@ const HorizontalScroll = ({
   const cellSpacing = 12;
   const imageHeight = 180;
   const titleHeight = 30;
+  const spacerSize = 4;
   let cellHeight = imageHeight;
   if (
     (!items && displayTitleSkeleton) ||
     itemsToDisplay.some(item => Object.keys(item).includes('title'))
   )
-    cellHeight += titleHeight;
+    cellHeight += (titleHeight + spacerSize);
   const cellWidth = (16 / 9) * imageHeight;
   const arrowWidth = '30px';
 

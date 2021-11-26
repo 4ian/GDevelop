@@ -54,6 +54,10 @@ namespace gdjs {
         return this._tileSet.get(id);
       }
 
+      getTileDefinitions(): Iterable<CollisionTileDefinition> {
+        return this._tileSet.values();
+      }
+
       addTileLayer(id: integer): EditableTileMapLayer {
         const layer = new EditableTileMapLayer(this, id);
         this._layers.push(layer);

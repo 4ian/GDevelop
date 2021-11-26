@@ -1166,6 +1166,32 @@ module.exports = {
             fillColor,
             fillOpacity
           );
+
+          // const textureCache = manager.getOrLoadTextureCache(
+          //   this._loadTiledMapWithCallback.bind(this),
+          //   (textureName) =>
+          //     this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+          //   tilemapAtlasImage,
+          //   tilemapJsonFile,
+          //   tilesetJsonFile,
+          //   (textureCache) => {
+          //     if (!textureCache) {
+          //       // TODO warn
+          //       return;
+          //     }
+
+          //     let tileId = -1;
+          //     for (const definition of tileMap.getTileDefinitions()) {
+          //       if (definition.getTag() === typeFilter) {
+          //         tileId = definition.getTag();
+          //       }
+          //     }
+          //     if (tileId >= 0) {
+          //       const texture = textureCache.findTileTexture(tileId, false, false, false);
+          //       // TODO set the thumbnail from this texture
+          //     }
+          //   }
+          // );
         }
       );
     };

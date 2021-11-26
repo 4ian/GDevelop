@@ -154,6 +154,11 @@ const HorizontalScroll = ({
       scrollView.current.offsetWidth / unit
     );
     const scale = visibleThumbnailsVisible * unit;
+
+    const currentScroll = scrollView.current.scrollLeft;
+    const currentFirstVisibleItemIndex = currentScroll / unit;
+
+    if (currentFirstVisibleItemIndex > items.length - visibleThumbnailsVisible - 1) return 0;
     return (
       Math.round(
         (scrollView.current.scrollLeft +
@@ -234,7 +239,7 @@ const extractVideoIdFromYoutubeLink = (link: string): ?string => {
 };
 
 const constructImageLinkFromYoutubeLink = (link: string): string => {
-  const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its skeleton if id is not recognized.
+  const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its placeholder if id is not recognized.
 
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`; // Better quality hqdefault.jpg returns a 4/3 thumbnail that would need croping.
 };

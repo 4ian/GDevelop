@@ -83,19 +83,34 @@ const HorizontalScroll = ({
   const widthUnit = cellWidth + cellSpacing;
   const arrowWidth = 30;
 
-  const renderThumbnail = (
-    item:
-      | YoutubeThumbnail
-      | GameTemplateThumbnail
-      | ShowcaseThumbnail
-      | SkeletonThumbnail
-  ): ?React.Node => {
-    if (!item.link && !item.imageSource && !item.skeleton) return null;
-    if (item.link) {
-      return (
-        <a href={item.link} target="_blank">
+  const renderThumbnail = React.useCallback(
+    (
+      item:
+        | YoutubeThumbnail
+        | GameTemplateThumbnail
+        | ShowcaseThumbnail
+        | SkeletonThumbnail
+    ): ?React.Node => {
+      if (!item.link && !item.imageSource && !item.skeleton) return null;
+      if (item.link) {
+        return (
+          <a href={item.link} target="_blank">
+            <img
+              src={constructImageLinkFromYoutubeLink(item.link)}
+              style={{
+                ...styles.image,
+                height: imageHeight,
+                minHeight: imageHeight,
+                width: cellWidth,
+              }}
+            />
+          </a>
+        );
+      }
+      if (item.imageSource) {
+        return (
           <img
-            src={constructImageLinkFromYoutubeLink(item.link)}
+            src={item.imageSource}
             style={{
               ...styles.image,
               height: imageHeight,
@@ -103,130 +118,121 @@ const HorizontalScroll = ({
               width: cellWidth,
             }}
           />
-        </a>
-      );
-    }
-    if (item.imageSource) {
+        );
+      }
+      if (item.skeleton) {
+        return (
+          <Skeleton variant="rect" height={imageHeight} width={cellWidth} />
+        );
+      }
+    },
+    [cellWidth, imageHeight]
+  );
+
+  const renderItemTitle = React.useCallback(
+    (
+      item:
+        | YoutubeThumbnail
+        | GameTemplateThumbnail
+        | ShowcaseThumbnail
+        | SkeletonThumbnail
+    ): ?React.Node => {
+      if (!(item.title || (item.skeleton && displayTitleSkeleton))) return null;
       return (
-        <img
-          src={item.imageSource}
-          style={{
-            ...styles.image,
-            height: imageHeight,
-            minHeight: imageHeight,
-            width: cellWidth,
-          }}
-        />
+        <>
+          <Spacer />
+          {item.title ? (
+            <div style={{ width: cellWidth, height: titleHeight }}>
+              <Text noMargin size="title" style={styles.title}>
+                {item.title}
+              </Text>
+            </div>
+          ) : (
+            <Skeleton
+              variant="rect"
+              height={titleHeight}
+              width={(cellWidth / 3) * (1 + 2 * Math.random())}
+            />
+          )}
+        </>
       );
-    }
-    if (item.skeleton) {
-      return <Skeleton variant="rect" height={imageHeight} width={cellWidth} />;
-    }
-  };
+    },
+    [cellWidth, titleHeight]
+  );
 
-  const renderItemTitle = (
-    item:
-      | YoutubeThumbnail
-      | GameTemplateThumbnail
-      | ShowcaseThumbnail
-      | SkeletonThumbnail
-  ): ?React.Node => {
-    if (!(item.title || (item.skeleton && displayTitleSkeleton))) return null;
-    return (
-      <>
-        <Spacer />
-        {item.title ? (
-          <div style={{ width: cellWidth, height: titleHeight }}>
-            <Text noMargin size="title" style={styles.title}>
-              {item.title}
-            </Text>
-          </div>
-        ) : (
-          <Skeleton
-            variant="rect"
-            height={titleHeight}
-            width={(cellWidth / 3) * (1 + 2 * Math.random())}
-          />
-        )}
-      </>
-    );
-  };
+  const computeScroll = React.useCallback(
+    (
+      direction: 'left' | 'right',
+      scrollViewElement: HTMLUListElement
+    ): number => {
+      const visibleThumbnailsCount = Math.floor(
+        scrollViewElement.offsetWidth / widthUnit
+      );
+      const scale = visibleThumbnailsCount * widthUnit;
 
-  const computeScroll = (
-    direction: 'left' | 'right',
-    scrollViewElement: HTMLUListElement
-  ): number => {
-    const visibleThumbnailsCount = Math.floor(
-      scrollViewElement.offsetWidth / widthUnit
-    );
-    const scale = visibleThumbnailsCount * widthUnit;
+      const currentScroll = scrollViewElement.scrollLeft;
+      const currentFirstVisibleItemIndex = currentScroll / widthUnit;
 
-    const currentScroll = scrollViewElement.scrollLeft;
-    const currentFirstVisibleItemIndex = currentScroll / widthUnit;
+      if (
+        currentFirstVisibleItemIndex >
+        itemsToDisplay.length - visibleThumbnailsCount - 1
+      )
+        return 0;
+      return roundScroll(
+        scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1),
+        scrollViewElement
+      );
+    },
+    [widthUnit, itemsToDisplay]
+  );
 
-    if (
-      currentFirstVisibleItemIndex >
-      itemsToDisplay.length - visibleThumbnailsCount - 1
-    )
-      return 0;
-    return roundScroll(
-      scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1),
-      scrollViewElement
-    );
-  };
+  const roundScroll = React.useCallback(
+    (value: number, scrollViewElement: HTMLUListElement): number => {
+      const visibleThumbnailsCount = Math.floor(
+        scrollViewElement.offsetWidth / widthUnit
+      );
 
-  const roundScroll = (
-    value: number,
-    scrollViewElement: HTMLUListElement
-  ): number => {
-    const visibleThumbnailsCount = Math.floor(
-      scrollViewElement.offsetWidth / widthUnit
+      const scale = visibleThumbnailsCount * widthUnit;
+      return Math.round(value / scale) * scale;
+    },
+    [widthUnit]
+  );
+
+  const onClickArrow = (direction: 'left' | 'right') =>
+    React.useCallback(
+      (): void => {
+        const scrollViewElement = scrollView.current;
+        if (!scrollViewElement) return;
+        const newScrollPosition = computeScroll(direction, scrollViewElement);
+
+        scrollViewElement.scrollTo({
+          left: newScrollPosition,
+          behavior: 'smooth',
+        });
+      },
+      [computeScroll]
     );
 
-    const scale = visibleThumbnailsCount * widthUnit;
-    return Math.round(value / scale) * scale;
-  };
-
-  const onClickArrow = (direction: 'left' | 'right') => (): void => {
-    const scrollViewElement = scrollView.current;
-    if (!scrollViewElement) return;
-    const newScrollPosition = computeScroll(direction, scrollViewElement);
-
-    scrollViewElement.scrollTo({
-      left: newScrollPosition,
-      behavior: 'smooth',
-    });
-  };
-
-  const computeItemKey = (
-    item:
-      | YoutubeThumbnail
-      | SkeletonThumbnail
-      | GameTemplateThumbnail
-      | ShowcaseThumbnail
-  ): string => {
-    if (item.link) return item.link;
-    if (item.imageSource) return item.imageSource;
-    if (item.key) return item.key;
-    return 'key';
-  };
-
-  const handleScroll = () => {
+  const handleScroll = React.useCallback(() => {
     const scrollViewElement = scrollView.current;
     if (!scrollViewElement) return;
 
     if (!shouldDisplayLeftArrow)
       setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
-  };
-  const handleScrollEnd = () => {
-    const scrollViewElement = scrollView.current;
-    if (!scrollViewElement) return;
+  });
+  const handleScrollEnd = React.useCallback(
+    () => {
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
 
-    scrollViewElement.scrollTo({
-      left: roundScroll(scrollViewElement.scrollLeft, scrollViewElement),
-      behavior: 'smooth',
-    });
-  };
+      scrollViewElement.scrollTo({
+        left: roundScroll(scrollViewElement.scrollLeft, scrollViewElement),
+        behavior: 'smooth',
+      });
+    },
+    [roundScroll]
+  );
+
   React.useEffect(() => {
     const scrollViewElement = scrollView.current;
     if (!scrollViewElement) return;
@@ -301,6 +307,19 @@ const constructImageLinkFromYoutubeLink = (link: string): string => {
   const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its placeholder if id is not recognized.
 
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`; // Better quality hqdefault.jpg returns a 4/3 thumbnail that would need croping.
+};
+
+const computeItemKey = (
+  item:
+    | YoutubeThumbnail
+    | SkeletonThumbnail
+    | GameTemplateThumbnail
+    | ShowcaseThumbnail
+): string => {
+  if (item.link) return item.link;
+  if (item.imageSource) return item.imageSource;
+  if (item.key) return item.key;
+  return 'key';
 };
 
 export default HorizontalScroll;

@@ -61,7 +61,7 @@ const HorizontalScroll = ({
     shouldDisplayLeftArrow,
     setShouldDisplayLeftArrow,
   ] = React.useState<boolean>(false);
-  const scrollView = React.useRef(null);
+  const scrollView = React.useRef<?HTMLUListElement>(null);
   const itemsToDisplay =
     items ||
     Array(3)
@@ -151,24 +151,27 @@ const HorizontalScroll = ({
     );
   };
 
-  const computeScroll = (direction: 'left' | 'right'): number => {
+  const computeScroll = (
+    direction: 'left' | 'right',
+    scrollViewElement: HTMLUListElement
+  ): number => {
     const unit = cellWidth + cellSpacing;
     const visibleThumbnailsVisible = Math.floor(
-      scrollView.current.offsetWidth / unit
+      scrollViewElement.offsetWidth / unit
     );
     const scale = visibleThumbnailsVisible * unit;
 
-    const currentScroll = scrollView.current.scrollLeft;
+    const currentScroll = scrollViewElement.scrollLeft;
     const currentFirstVisibleItemIndex = currentScroll / unit;
 
     if (
       currentFirstVisibleItemIndex >
-      items.length - visibleThumbnailsVisible - 1
+      itemsToDisplay.length - visibleThumbnailsVisible - 1
     )
       return 0;
     return (
       Math.round(
-        (scrollView.current.scrollLeft +
+        (scrollViewElement.scrollLeft +
           scale * (direction === 'left' ? -1 : 1)) /
           scale
       ) * scale
@@ -176,8 +179,11 @@ const HorizontalScroll = ({
   };
 
   const onClickArrow = (direction: 'left' | 'right') => (): void => {
-    const newScrollPosition = computeScroll(direction);
-    scrollView.current.scrollTo({
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
+    const newScrollPosition = computeScroll(direction, scrollViewElement);
+
+    scrollViewElement.scrollTo({
       left: newScrollPosition,
       behavior: 'smooth',
     });
@@ -197,11 +203,17 @@ const HorizontalScroll = ({
   };
 
   const handleScroll = () => {
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
+
     if (!shouldDisplayLeftArrow)
-      setShouldDisplayLeftArrow(scrollView.current.scrollLeft !== 0);
+      setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
   };
   React.useEffect(() => {
-    scrollView.current.addEventListener('scroll', handleScroll);
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
+
+    scrollViewElement.addEventListener('scroll', handleScroll);
   });
 
   return (

@@ -14,7 +14,7 @@ export type YoutubeThumbnail = {|
   link: string,
 |};
 
-type ShowcaseThumbnail = {|
+export type ShowcaseThumbnail = {|
   title: string,
   imageSource: string,
 |};
@@ -44,6 +44,9 @@ const styles = {
     overflow: 'hidden',
     overflowWrap: 'break-word',
     whiteSpace: 'nowrap',
+  },
+  image: {
+    objectFit: 'cover',
   },
 };
 
@@ -87,14 +90,29 @@ const HorizontalScroll = ({
       return (
         <a href={item.link} target="_blank">
           <img
-            width={cellWidth}
             src={constructImageLinkFromYoutubeLink(item.link)}
+            style={{
+              ...styles.image,
+              height: imageHeight,
+              minHeight: imageHeight,
+              width: cellWidth,
+            }}
           />
         </a>
       );
     }
     if (item.imageSource) {
-      return <img width={cellWidth} src={item.imageSource} />;
+      return (
+        <img
+          src={item.imageSource}
+          style={{
+            ...styles.image,
+            height: imageHeight,
+            minHeight: imageHeight,
+            width: cellWidth,
+          }}
+        />
+      );
     }
     if (item.skeleton) {
       return <Skeleton variant="rect" height={imageHeight} width={cellWidth} />;

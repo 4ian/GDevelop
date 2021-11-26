@@ -35,7 +35,7 @@ type Props = {|
     | Array<ShowcaseThumbnail>
     | Array<GameTemplateThumbnail>
   ),
-  onClickItem?: () => void,
+  displayTitleSkeleton?: boolean,
 |};
 
 const styles = {
@@ -47,7 +47,11 @@ const styles = {
   },
 };
 
-const HorizontalScroll = ({ title, items }: Props) => {
+const HorizontalScroll = ({
+  title,
+  items,
+  displayTitleSkeleton = true,
+}: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const [
     shouldDisplayLeftArrow,
@@ -57,14 +61,16 @@ const HorizontalScroll = ({ title, items }: Props) => {
   const itemsToDisplay =
     items ||
     Array(3).fill({
-      placeholder: true,
-      title: null,
+      skeleton: true,
     });
   const cellSpacing = 12;
   const imageHeight = 180;
   const titleHeight = 30;
   let cellHeight = imageHeight;
-  if (itemsToDisplay.some(item => Object.keys(item).includes('title')))
+  if (
+    (!items && displayTitleSkeleton) ||
+    itemsToDisplay.some(item => Object.keys(item).includes('title'))
+  )
     cellHeight += titleHeight;
   const cellWidth = (16 / 9) * imageHeight;
   const arrowWidth = '30px';
@@ -102,7 +108,7 @@ const HorizontalScroll = ({ title, items }: Props) => {
       | ShowcaseThumbnail
       | SkeletonThumbnail
   ): ?React.Node => {
-    if (!item.title && !item.skeleton) return null;
+    if (!(item.title || (item.skeleton && displayTitleSkeleton))) return null;
     return (
       <>
         <Spacer />
@@ -205,7 +211,7 @@ const extractVideoIdFromYoutubeLink = (link: string): ?string => {
 };
 
 const constructImageLinkFromYoutubeLink = (link: string): string => {
-  const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its placeholder if id is not recognized.
+  const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its skeleton if id is not recognized.
 
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`; // Better quality hqdefault.jpg returns a 4/3 thumbnail that would need croping.
 };

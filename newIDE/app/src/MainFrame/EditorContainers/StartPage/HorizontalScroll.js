@@ -75,7 +75,7 @@ const HorizontalScroll = ({
     (!items && displayTitleSkeleton) ||
     itemsToDisplay.some(item => Object.keys(item).includes('title'))
   )
-    cellHeight += (titleHeight + spacerSize);
+    cellHeight += titleHeight + spacerSize;
   const cellWidth = (16 / 9) * imageHeight;
   const arrowWidth = 30;
 
@@ -149,13 +149,17 @@ const HorizontalScroll = ({
   };
 
   const computeScroll = (direction: 'left' | 'right'): number => {
-    const unit = 2 * (cellWidth + cellSpacing);
+    const unit = cellWidth + cellSpacing;
+    const visibleThumbnailsVisible = Math.floor(
+      scrollView.current.offsetWidth / unit
+    );
+    const scale = visibleThumbnailsVisible * unit;
     return (
       Math.round(
         (scrollView.current.scrollLeft +
-          unit * (direction === 'left' ? -1 : 1)) /
-          unit
-      ) * unit
+          scale * (direction === 'left' ? -1 : 1)) /
+          scale
+      ) * scale
     );
   };
 

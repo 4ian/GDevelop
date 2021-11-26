@@ -21,7 +21,8 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Loading = () => <HorizontalScroll title="Showcase" items={null} />;
+export const LoadingWithTitleSkeleton = () => <HorizontalScroll title="Showcase" items={null} />;
+export const LoadingWithoutTitleSkeleton = () => <HorizontalScroll title="Showcase" items={null} displayTitleSkeleton={false}/>;
 
 export const Tutorials = () => {
   const items: YoutubeThumbnail[] = [

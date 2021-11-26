@@ -42,16 +42,16 @@ type Props = {|
 
 const referenceSizesByWindowSize = {
   imageHeight: {
-    'small': 130,
-    'medium': 150,
-    'large': 180,
+    small: 130,
+    medium: 150,
+    large: 180,
   },
   arrowWidth: {
-    'small': 18,
-    'medium': 24,
-    'large': 30,
+    small: 18,
+    medium: 24,
+    large: 30,
   },
-}
+};
 
 const cellSpacing = 12;
 const titleHeight = 30;
@@ -88,11 +88,7 @@ const styles = {
   },
 };
 
-const Carousel = ({
-  title,
-  items,
-  displayTitleSkeleton = true,
-}: Props) => {
+const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const [
     shouldDisplayLeftArrow,

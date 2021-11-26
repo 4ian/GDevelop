@@ -80,6 +80,7 @@ const HorizontalScroll = ({
   )
     cellHeight += titleHeight + spacerSize;
   const cellWidth = (16 / 9) * imageHeight;
+  const widthUnit = cellWidth + cellSpacing;
   const arrowWidth = 30;
 
   const renderThumbnail = (
@@ -155,27 +156,35 @@ const HorizontalScroll = ({
     direction: 'left' | 'right',
     scrollViewElement: HTMLUListElement
   ): number => {
-    const unit = cellWidth + cellSpacing;
     const visibleThumbnailsVisible = Math.floor(
-      scrollViewElement.offsetWidth / unit
+      scrollViewElement.offsetWidth / widthUnit
     );
-    const scale = visibleThumbnailsVisible * unit;
+    const scale = visibleThumbnailsVisible * widthUnit;
 
     const currentScroll = scrollViewElement.scrollLeft;
-    const currentFirstVisibleItemIndex = currentScroll / unit;
+    const currentFirstVisibleItemIndex = currentScroll / widthUnit;
 
     if (
       currentFirstVisibleItemIndex >
       itemsToDisplay.length - visibleThumbnailsVisible - 1
     )
       return 0;
-    return (
-      Math.round(
-        (scrollViewElement.scrollLeft +
-          scale * (direction === 'left' ? -1 : 1)) /
-          scale
-      ) * scale
+    return roundScroll(
+      scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1),
+      scrollViewElement
     );
+  };
+
+  const roundScroll = (
+    value: number,
+    scrollViewElement: HTMLUListElement
+  ): number => {
+    const visibleThumbnailsVisible = Math.floor(
+      scrollViewElement.offsetWidth / widthUnit
+    );
+
+    const scale = visibleThumbnailsVisible * widthUnit;
+    return Math.round(value / scale) * scale;
   };
 
   const onClickArrow = (direction: 'left' | 'right') => (): void => {
@@ -209,12 +218,23 @@ const HorizontalScroll = ({
     if (!shouldDisplayLeftArrow)
       setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
   };
+  const handleScrollEnd = () => {
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
+
+    scrollViewElement.scrollTo({
+      left: roundScroll(scrollViewElement.scrollLeft, scrollViewElement),
+      behavior: 'smooth',
+    });
+  };
   React.useEffect(() => {
     const scrollViewElement = scrollView.current;
     if (!scrollViewElement) return;
 
     scrollViewElement.addEventListener('scroll', handleScroll);
-  });
+    scrollViewElement.addEventListener('touchend', handleScrollEnd);
+    scrollViewElement.addEventListener('touchleave', handleScrollEnd);
+  }, []);
 
   return (
     <Line noMargin expand>

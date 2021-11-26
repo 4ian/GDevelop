@@ -177,7 +177,6 @@ const HorizontalScroll = ({
 
   const onClickArrow = (direction: 'left' | 'right') => (): void => {
     const newScrollPosition = computeScroll(direction);
-    setShouldDisplayLeftArrow(newScrollPosition !== 0);
     scrollView.current.scrollTo({
       left: newScrollPosition,
       behavior: 'smooth',
@@ -194,8 +193,16 @@ const HorizontalScroll = ({
     if (item.link) return item.link;
     if (item.imageSource) return item.imageSource;
     if (item.key) return item.key;
-    return 'key'
+    return 'key';
   };
+
+  const handleScroll = () => {
+    if (!shouldDisplayLeftArrow)
+      setShouldDisplayLeftArrow(scrollView.current.scrollLeft !== 0);
+  };
+  React.useEffect(() => {
+    scrollView.current.addEventListener('scroll', handleScroll);
+  });
 
   return (
     <Line noMargin expand>

@@ -453,6 +453,10 @@ const defineCollisionMask = function (
       objectContent.typeFilter = newValue;
       return true;
     }
+    if (propertyName === 'debugMode') {
+      objectContent.debugMode = newValue === '1';
+      return true;
+    }
     if (propertyName === 'fillColor') {
       objectContent.fillColor = newValue;
       return true;
@@ -462,11 +466,15 @@ const defineCollisionMask = function (
       return true;
     }
     if (propertyName === 'fillOpacity') {
-      objectContent.fillOpacity = newValue;
+      objectContent.fillOpacity = parseFloat(newValue);
       return true;
     }
     if (propertyName === 'outlineOpacity') {
-      objectContent.outlineOpacity = newValue;
+      objectContent.outlineOpacity = parseFloat(newValue);
+      return true;
+    }
+    if (propertyName === 'outlineSize') {
+      objectContent.outlineSize = parseFloat(newValue);
       return true;
     }
 
@@ -514,12 +522,22 @@ const defineCollisionMask = function (
       new gd.PropertyDescriptor(objectContent.typeFilter)
         .setType('string')
         .setLabel(_('Type filter'))
+        .setDescription(
+          _(
+            'Only the tiles with the given type (set in Tiled) will have hitboxes created.'
+          )
+        )
     );
     objectProperties.set(
-      'fillColor',
-      new gd.PropertyDescriptor(objectContent.fillColor)
-        .setType('color')
-        .setLabel(_('Fill color'))
+      'debugMode',
+      new gd.PropertyDescriptor(objectContent.debugMode ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Debug mode'))
+        .setDescription(
+          _(
+            'When activated, it displays the hitboxes in the given color.'
+          )
+        )
     );
     objectProperties.set(
       'outlineColor',
@@ -528,16 +546,28 @@ const defineCollisionMask = function (
         .setLabel(_('Outline color'))
     );
     objectProperties.set(
-      'fillOpacity',
-      new gd.PropertyDescriptor(objectContent.fillOpacity)
+      'outlineOpacity',
+      new gd.PropertyDescriptor(objectContent.outlineOpacity === undefined ? '64' : objectContent.outlineOpacity.toString())
         .setType('number')
-        .setLabel(_('Fill opacity'))
+        .setLabel(_('Outline opacity (0-255)'))
     );
     objectProperties.set(
-      'outlineOpacity',
-      new gd.PropertyDescriptor(objectContent.outlineOpacity)
+      'outlineSize',
+      new gd.PropertyDescriptor(objectContent.outlineSize === undefined ? '1' : objectContent.outlineSize.toString())
         .setType('number')
-        .setLabel(_('Outline opacity'))
+        .setLabel(_('Outline size (in pixels)'))
+    );
+    objectProperties.set(
+      'fillColor',
+      new gd.PropertyDescriptor(objectContent.fillColor)
+        .setType('color')
+        .setLabel(_('Fill color'))
+    );
+    objectProperties.set(
+      'fillOpacity',
+      new gd.PropertyDescriptor(objectContent.fillOpacity === undefined ? '32' : objectContent.fillOpacity.toString())
+        .setType('number')
+        .setLabel(_('Fill opacity (0-255)'))
     );
 
     return objectProperties;
@@ -548,10 +578,12 @@ const defineCollisionMask = function (
       tilesetJsonFile: '',
       layerIndex: 0,
       typeFilter: '',
+      debugMode: false,
       fillColor: '255;255;255',
       outlineColor: '255;255;255',
       fillOpacity: 64,
       outlineOpacity: 128,
+      outlineSize: 1,
     })
   );
 
@@ -582,7 +614,7 @@ const defineCollisionMask = function (
       'CollisionMask',
       _('Tilemap collision mask'),
       _(
-        'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
+        'An invisible object that allows to handle collisions with parts of a tilemap.'
       ),
       'JsPlatform/Extensions/tile_map32.png',
       collisionMaskObject

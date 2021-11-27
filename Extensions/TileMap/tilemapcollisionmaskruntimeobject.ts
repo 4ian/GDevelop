@@ -14,6 +14,7 @@ namespace gdjs {
     _typeFilter: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
 
+    _debugMode: boolean;
     _fillColor: integer;
     _outlineColor: integer;
     _fillOpacity: float;
@@ -28,6 +29,7 @@ namespace gdjs {
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._layerIndex = objectData.content.layerIndex;
       this._typeFilter = objectData.content.typeFilter;
+      this._debugMode = objectData.content.debugMode;
       this._fillColor = this.rgbToNumber(
         gdjs.rgbOrHexToRGBColor(objectData.content.fillColor)
       );
@@ -36,7 +38,8 @@ namespace gdjs {
       );
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
-      this._outlineSize = 1; //objectData.content.outlineSize;
+      console.log('outlineSize: ' + objectData.content.outlineSize);
+      this._outlineSize = objectData.content.outlineSize;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
@@ -86,6 +89,35 @@ namespace gdjs {
         oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
       ) {
         this.setLayerIndex(newObjectData.content.layerIndex);
+      }
+      if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
+        this.setDebugMode(newObjectData.content.debugMode);
+      }
+      if (oldObjectData.content.fillColor !== newObjectData.content.fillColor) {
+        this.setFillColor(
+          this.rgbToNumber(
+            gdjs.rgbOrHexToRGBColor(newObjectData.content.fillColor)
+          )
+        );
+      }
+      if (
+        oldObjectData.content.outlineColor !==
+        newObjectData.content.outlineColor
+      ) {
+        this.setOutlineColor(
+          this.rgbToNumber(
+            gdjs.rgbOrHexToRGBColor(newObjectData.content.outlineColor)
+          )
+        );
+      }
+      if (oldObjectData.fillOpacity !== newObjectData.fillOpacity) {
+        this.setFillOpacity(newObjectData.fillOpacity);
+      }
+      if (oldObjectData.outlineOpacity !== newObjectData.outlineOpacity) {
+        this.setOutlineOpacity(newObjectData.outlineOpacity);
+      }
+      if (oldObjectData.outlineSize !== newObjectData.outlineSize) {
+        this.setOutlineSize(newObjectData.outlineSize);
       }
       return true;
     }
@@ -308,6 +340,77 @@ namespace gdjs {
 
     getLayerIndex() {
       return this._layerIndex;
+    }
+
+    /**
+     * @returns true if the hitboxes are shown.
+     */
+    getDebugMode(): boolean {
+      return this._debugMode;
+    }
+
+    /**
+     * @returns true if the hitboxes are shown.
+     */
+    setDebugMode(debugMode: boolean): void {
+      this._debugMode = debugMode;
+      this._renderer.redrawCollisionMask();
+    }
+
+    getFillColor(): integer {
+      return this._fillColor;
+    }
+
+    getOutlineColor(): integer {
+      return this._outlineColor;
+    }
+
+    setFillColor(fillColor: integer): void {
+      this._fillColor = fillColor;
+    }
+
+    setOutlineColor(outlineColor: integer): void {
+      this._outlineColor = outlineColor;
+    }
+
+    setOutlineSize(size: float): void {
+      this._outlineSize = size;
+    }
+
+    getOutlineSize() {
+      return this._outlineSize;
+    }
+
+    /**
+     *
+     * @param opacity from 0 to 255
+     */
+    setFillOpacity(opacity: float): void {
+      this._fillOpacity = opacity;
+    }
+
+    /**
+     *
+     * @returns an opacity value from 0 to 255.
+     */
+    getFillOpacity() {
+      return this._fillOpacity;
+    }
+
+    /**
+     *
+     * @param opacity from 0 to 255
+     */
+    setOutlineOpacity(opacity: float): void {
+      this._outlineOpacity = opacity;
+    }
+
+    /**
+     *
+     * @returns an opacity value from 0 to 255.
+     */
+    getOutlineOpacity() {
+      return this._outlineOpacity;
     }
 
     setX(x: float): void {

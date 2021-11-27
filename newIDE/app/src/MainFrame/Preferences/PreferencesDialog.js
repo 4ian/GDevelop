@@ -67,15 +67,17 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       onRequestClose={onClose}
       cannotBeDismissed={true}
       open
-      title={<Trans>GDevelop Preferences</Trans>}
+      noTitleMargin
       maxWidth="sm"
       noMargin
+      title={
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>Preferences</Trans>} value="preferences" />
+          <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
+          <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
+        </Tabs>
+      }
     >
-      <Tabs value={currentTab} onChange={setCurrentTab}>
-        <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-        <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
-        <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
-      </Tabs>
       {currentTab === 'preferences' && (
         <Column>
           <Text size="title">

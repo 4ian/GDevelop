@@ -71,16 +71,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       maxWidth="sm"
       noMargin
       title={
-        <div>
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-            <Tab
-              label={<Trans>Hints &amp; explanations</Trans>}
-              value="hints"
-            />
-            <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
-          </Tabs>
-        </div>
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>Preferences</Trans>} value="preferences" />
+          <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
+          <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
+        </Tabs>
       }
     >
       {currentTab === 'preferences' && (

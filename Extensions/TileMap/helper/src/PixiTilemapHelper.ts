@@ -116,11 +116,12 @@ namespace gdjs {
         pixiTileMap.clear();
 
         for (const layer of tileMap.getLayers()) {
-          if (displayMode === 'index' && layerIndex !== layer.id) return;
-          // TODO is this really useful?
-          // I think it's just an editor field
-          // and everything invisible should just not be parsed in the 1st place.
-          //else if (displayMode === 'visible' && !layer.visible) return;
+          if (
+            (displayMode === 'index' && layerIndex !== layer.id) ||
+            (displayMode === 'visible' && !layer.isVisible())
+          ) {
+            return;
+          }
 
           if (layer instanceof gdjs.TileMap.EditableObjectLayer) {
             const objectLayer = layer as gdjs.TileMap.EditableObjectLayer;
@@ -212,10 +213,8 @@ namespace gdjs {
 
         for (const layer of tileMap.getLayers()) {
           if (displayMode === 'index' && layerIndex !== layer.id) return;
-          // TODO is this really useful?
-          // I think it's just an editor field
-          // and everything invisible should just not be parsed in the 1st place.
-          //else if (displayMode === 'visible' && !layer.visible) return;
+          // invisible doesn't mean no collision.
+          // TODO add a "Enable" flag next to "Visible" or rename "Visible" to "Enable"?
           const tileWidth = tileMap.getTileWidth();
           const tileHeight = tileMap.getTileHeight();
 

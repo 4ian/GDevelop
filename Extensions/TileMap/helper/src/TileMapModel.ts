@@ -4,7 +4,7 @@ namespace gdjs {
 
     export class EditableTileMap {
       private _tileSet: Map<integer, TileDefinition>;
-      private _layers: Array<EditableTileMapLayer | EditableObjectLayer>;
+      private _layers: Array<AbstractEditableLayer>;
       private readonly tileWidth: integer;
       private readonly tileHeight: integer;
       private readonly dimX: integer;
@@ -70,7 +70,7 @@ namespace gdjs {
         return layer;
       }
 
-      getLayers(): Iterable<EditableTileMapLayer | EditableObjectLayer> {
+      getLayers(): Iterable<AbstractEditableLayer> {
         return this._layers;
       }
 
@@ -95,14 +95,30 @@ namespace gdjs {
       }
     }
 
-    export class EditableObjectLayer {
+    abstract class AbstractEditableLayer {
       readonly tileMap: EditableTileMap;
       readonly id: integer;
-      readonly objects: TileObject[];
+      private visible: boolean = true;
 
       constructor(tileMap: EditableTileMap, id: integer) {
         this.tileMap = tileMap;
         this.id = id;
+      }
+
+      setVisible(visible: boolean): void {
+        this.visible = visible;
+      }
+
+      isVisible(): boolean {
+        return this.visible;
+      }
+    }
+
+    export class EditableObjectLayer extends AbstractEditableLayer {
+      readonly objects: TileObject[];
+
+      constructor(tileMap: EditableTileMap, id: integer) {
+        super(tileMap, id);
         this.objects = [];
       }
 
@@ -168,7 +184,7 @@ namespace gdjs {
       }
     }
 
-    export class EditableTileMapLayer {
+    export class EditableTileMapLayer extends AbstractEditableLayer {
       // TODO factorize flags handling?
       static readonly flippedHorizontallyFlag = 0x80000000;
       static readonly flippedVerticallyFlag = 0x40000000;
@@ -179,13 +195,10 @@ namespace gdjs {
         EditableTileMapLayer.flippedDiagonallyFlag
       );
 
-      readonly tileMap: EditableTileMap;
-      readonly id: integer;
       private readonly _tiles: Array<Int32Array>;
 
       constructor(tileMap: EditableTileMap, id: integer) {
-        this.tileMap = tileMap;
-        this.id = id;
+        super(tileMap, id);
         this._tiles = [];
         this._tiles.length = this.tileMap.getDimensionY();
         for (let index = 0; index < this._tiles.length; index++) {

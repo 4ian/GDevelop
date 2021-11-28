@@ -55,14 +55,15 @@ namespace gdjs {
         );
 
         for (const tiledLayer of tiledMap.layers) {
-          if (!tiledLayer.visible) {
-            continue;
-          }
-
           if (tiledLayer.type === 'objectgroup') {
             const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
+            objectLayer.setVisible(tiledLayer.visible);
             for (const tiledObject of tiledLayer.objects) {
               if (!tiledObject.visible) {
+                // Objects layer are nice to put decorations but dynamic objects
+                // must be done with GDevelop objects.
+                // So, there is no point to load it as there won't be any action to
+                // make objects visible individually.
                 continue;
               }
               const tileGid = gdjs.TileMap.extractTileUidFlippedStates(
@@ -94,6 +95,7 @@ namespace gdjs {
               const collisionTileLayer = collisionTileMap.addTileLayer(
                 tiledLayer.id
               );
+              collisionTileLayer.setVisible(tiledLayer.visible);
               // TODO handle layer offset
 
               for (let y = 0; y < tiledLayer.height; y++) {

@@ -3,7 +3,7 @@ namespace gdjs {
     export type PolygonVertices = FloatPoint[];
 
     export class EditableTileMap {
-      private _tileSet: Map<integer, CollisionTileDefinition>;
+      private _tileSet: Map<integer, TileDefinition>;
       private _layers: Array<EditableTileMapLayer | EditableObjectLayer>;
       private readonly tileWidth: integer;
       private readonly tileHeight: integer;
@@ -15,7 +15,7 @@ namespace gdjs {
         tileHeight: integer,
         dimX: integer,
         dimY: integer,
-        tileSet: Map<integer, CollisionTileDefinition>
+        tileSet: Map<integer, TileDefinition>
       ) {
         console.log('tile dimension: ' + tileWidth + ' ' + tileHeight);
         this.tileWidth = tileWidth;
@@ -50,11 +50,11 @@ namespace gdjs {
         return this.dimY;
       }
 
-      getTileDefinition(id: integer): CollisionTileDefinition | undefined {
+      getTileDefinition(id: integer): TileDefinition | undefined {
         return this._tileSet.get(id);
       }
 
-      getTileDefinitions(): Iterable<CollisionTileDefinition> {
+      getTileDefinitions(): Iterable<TileDefinition> {
         return this._tileSet.values();
       }
 
@@ -280,13 +280,19 @@ namespace gdjs {
       }
     }
 
-    export class CollisionTileDefinition {
+    export class TileDefinition {
       private readonly polygons: PolygonVertices[];
       private readonly tag: string;
+      private readonly animationLength: integer;
 
-      constructor(polygons: PolygonVertices[], tag: string = '') {
+      constructor(
+        polygons: PolygonVertices[],
+        tag: string,
+        animationLength: integer
+      ) {
         this.polygons = polygons;
         this.tag = tag;
+        this.animationLength = animationLength;
       }
 
       getTag() {
@@ -295,6 +301,14 @@ namespace gdjs {
 
       getPolygons() {
         return this.polygons;
+      }
+
+      /* Animated tiles have a limitation:
+       * they are only able to use frames arranged horizontally one next
+       * to each other on the atlas.
+       */
+      getAnimationLength(): integer {
+        return this.animationLength;
       }
     }
   }

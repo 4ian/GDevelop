@@ -102,6 +102,7 @@ namespace gdjs {
               tilesetJsonFile,
               (tiledMap: gdjs.TileMap.TiledMap | null) => {
                 if (!tiledMap) {
+                  // loadTiledMap already log errors.
                   callback(null);
                   return;
                 }

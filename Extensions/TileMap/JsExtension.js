@@ -930,7 +930,7 @@ module.exports = {
         pako,
         (tileMap) => {
           if (!tileMap) {
-            // TODO warn
+            // _loadTiledMapWithCallback already log errors
             return;
           }
 
@@ -943,7 +943,7 @@ module.exports = {
             tilesetJsonFile,
             (textureCache) => {
               if (!textureCache) {
-                // TODO warn
+                // getOrLoadTextureCache already log warns and errors.
                 return;
               }
 
@@ -1180,7 +1180,7 @@ module.exports = {
         pako,
         (tileMap) => {
           if (!tileMap) {
-            // TODO warn
+            // _loadTiledMapWithCallback already log errors
             return;
           }
 

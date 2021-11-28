@@ -193,6 +193,7 @@
       tileSetAtlases[tileset.uid] = { texture, ...tileset };
     });
     const selectedLevel = tiledData.levels[levelIndex > -1 ? levelIndex : 0];
+    if (!selectedLevel) return;
 
     const layers = [];
     const textureCache = {};

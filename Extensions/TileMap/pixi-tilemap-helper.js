@@ -54,13 +54,20 @@
     height: number,
     tileWidth: number,
     tileHeight: number,
-    atlasTexture: PIXI.BaseTexture,
+    atlasTexture: PIXI.BaseTexture | null,
     textureCache: Object<number, PIXI.Texture | null>,
     layers: Array<TiledDataLayer>,
     tiles: Array<TiledDataTile>,
    }} GenericPixiTileMapData
    */
 
+  // ldtk: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips)
+  const LdtkToPixiRotations = {
+    1: 12,
+    2: 8,
+    3: 4,
+    0: 0,
+  };
   /**
    * The Tilesets that are ready to be used
    * with Pixi Tilemap, indexed by their id.
@@ -79,14 +86,6 @@
    * @returns {?GenericPixiTileMapData}
    */
   const parseTiledData = (tiledData, atlasTexture, getTexture) => {
-    if (!tiledData.tiledversion) {
-      console.warn(
-        "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
-      );
-
-      return null;
-    }
-
     // We only handle tileset embedded in the tilemap. Warn if it's not the case.
     if (!tiledData.tilesets.length || 'source' in tiledData.tilesets[0]) {
       console.warn(
@@ -170,6 +169,152 @@
   };
 
   /**
+   * Parse a Tiled map Ldtk file,
+   * exported from Ldtk (https://ldtk.io/json/)
+   * into a generic tile map data (`GenericPixiTileMapData`).
+   *
+   * @param {Object} tiledData A JS object representing a map exported from Tiled.
+   * @param {?PIXI.BaseTexture} atlasTexture
+   * @param {(textureName: string, relativeToPath: string) => PIXI.BaseTexture} getTexture A getter to load a texture. Used if atlasTexture is not specified.
+   * @returns {?GenericPixiTileMapData}
+   */
+  const parseLDtkData = (
+    tiledData,
+    atlasTexture,
+    getTexture,
+    levelIndex,
+    tilemapResourceName
+  ) => {
+    const tileSetAtlases = {};
+    tiledData.defs.tilesets.forEach((tileset) => {
+      const texture = tileset.relPath
+        ? getTexture(tileset.relPath, tilemapResourceName)
+        : null;
+      tileSetAtlases[tileset.uid] = { texture, ...tileset };
+    });
+    const selectedLevel = tiledData.levels[levelIndex > -1 ? levelIndex : 0];
+    if (!selectedLevel) return;
+
+    const layers = [];
+    const textureCache = {};
+    selectedLevel.layerInstances.reverse().forEach((ldtkLayer, layerIndex) => {
+      const layerAtlasTextureRelPath = ldtkLayer['__tilesetRelPath'];
+      const gridSize = ldtkLayer['__gridSize'];
+      const type = ldtkLayer['__type'];
+      const tilesetUid = ldtkLayer['__tilesetDefUid'];
+      const autoLayerTiles = ldtkLayer.autoLayerTiles;
+      const gridTiles = ldtkLayer.gridTiles;
+      const ldtkTiles = [...autoLayerTiles, ...gridTiles];
+      const entities = ldtkLayer.entityInstances || [];
+      const layer = {
+        type: type,
+        autoLayerTiles,
+        ldtkTiles,
+        gridTiles,
+        entityInstances: entities,
+        visible: ldtkLayer.visible,
+        opacity: ldtkLayer['__opacity'],
+      };
+      textureCache[layerIndex] = {};
+      const tileSet = tileSetAtlases[tilesetUid];
+
+      ldtkTiles.forEach((generatedTile) => {
+        if (generatedTile.t in textureCache[layerIndex]) return;
+
+        try {
+          const [x, y] = generatedTile.src;
+          const rect = new PIXI.Rectangle(x, y, gridSize, gridSize);
+
+          // @ts-ignore - atlasTexture is never null here.
+          const texture = new PIXI.Texture(tileSet.texture, rect);
+
+          textureCache[layerIndex][generatedTile.t] = texture;
+        } catch (error) {
+          console.error(
+            'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
+            error
+          );
+          textureCache[layerIndex] = null;
+        }
+      });
+
+      layers.push(layer);
+    });
+
+    const selectedLevelBg = selectedLevel.bgRelPath;
+    textureCache.levelBg = {};
+    if (selectedLevelBg) {
+      if (selectedLevelBg in textureCache.levelBg) return;
+      try {
+        const levelBgTexture = getTexture(selectedLevelBg, tilemapResourceName);
+        const rect = new PIXI.Rectangle(0, 0, selectedLevel.pxWid, selectedLevel.pxHei);
+        // // @ts-ignore - atlasTexture is never null here.
+        const texture = new PIXI.Texture(levelBgTexture, rect);
+        textureCache.levelBg[selectedLevelBg] = texture;
+      } catch (error) {
+        console.error(
+          'An error occurred while creating a PIXI.Texture to be used in a TileMap:',
+          error
+        );
+        textureCache.levelBg[selectedLevelBg] = null;
+      }
+    }
+    /** @type {GenericPixiTileMapData} */
+    const tileMapData = {
+      width: 0,
+      height: 0,
+      tileWidth: 0, //not needed offset
+      tileHeight: 0, // not needed
+      atlasTexture, // oops, every layer can have a different one,, cant use this
+      textureCache,
+      layers,
+      tiles: [],
+      selectedLevelBg,
+    };
+
+    return tileMapData;
+  };
+
+  /**
+   * Detects if the file was created in tiled or ldtk and creates a GenericPixiTileMapData with the appropriate method
+   * @param tiledData
+   * @param atlasTexture
+   * @param getTexture
+   * @returns {?GenericPixiTileMapData}
+   */
+  const parseTilemapData = (
+    tiledData,
+    atlasTexture,
+    getTexture,
+    levelIndex,
+    tilemapResourceName
+  ) => {
+    if (tiledData.tiledversion) {
+      console.info(
+        'Detected the json file was created in Tiled, parsing the data...'
+      );
+      return parseTiledData(tiledData, atlasTexture, getTexture);
+    }
+    if (tiledData['__header__'] && tiledData['__header__'].app === 'LDtk') {
+      console.info(
+        'Detected the json/ldtk file was created in LDtk, parsing the data...'
+      );
+      return parseLDtkData(
+        tiledData,
+        atlasTexture,
+        getTexture,
+        levelIndex,
+        tilemapResourceName
+      );
+    }
+
+    console.warn(
+      "The loaded Tiled map data does not contain a 'tiledversion' or '__header__' key. Are you sure this file has been exported from Tiled (mapeditor.org) or LDtk (ldtk.io)?"
+    );
+    return null;
+  };
+
+  /**
    * Decodes a layer data, which can sometimes be store as a compressed base64 string
    * by Tiled.
    * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
@@ -226,11 +371,14 @@
   };
 
   /**
-   * Extract information about the rotation of a tile from the tile id.
+   * Returns the tileUid and the pixi rotation of tiled tiles
+   * information about rotation in bits 32, 31 and 30
+   * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
+   *
    * @param {number} globalTileUid
-   * @returns {[number, boolean, boolean, boolean]}
+   * @returns {[number, number]}
    */
-  const extractTileUidFlippedStates = (globalTileUid) => {
+  const getTileUidWithRotation = (globalTileUid) => {
     const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     const FLIPPED_VERTICALLY_FLAG = 0x40000000;
     const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
@@ -246,51 +394,6 @@
         FLIPPED_DIAGONALLY_FLAG
       );
 
-    return [tileUid, !!flippedHorizontally, !!flippedVertically, !!flippedDiagonally];
-  };
-
-  /**
-   * Return the texture to use for the tile with the specified uid, which can contains
-   * information about rotation in bits 32, 31 and 30
-   * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
-   *
-   * @param {Object<number, PIXI.Texture | null>} textureCache
-   * @param {number} globalTileUid
-   * @returns {?PIXI.Texture}
-   */
-  const findTileTextureInCache = (textureCache, globalTileUid) => {
-    if (globalTileUid === 0) return null;
-
-    if (textureCache[globalTileUid]) {
-      return textureCache[globalTileUid];
-    }
-
-    // If the texture is not in the cache, it's potentially because its ID
-    // is a flipped/rotated version of another ID.
-    const flippedStates = extractTileUidFlippedStates(globalTileUid);
-    const tileUid = flippedStates[0];
-    const flippedHorizontally = flippedStates[1];
-    const flippedVertically = flippedStates[2];
-    const flippedDiagonally = flippedStates[3];
-
-    if (tileUid === 0) return null;
-
-    // If the tile still can't be found in the cache, it means the ID we got
-    // is invalid.
-    const unflippedTexture = textureCache[tileUid];
-    if (!unflippedTexture) return null;
-
-    // Clone the unflipped texture and save it in the cache
-    const frame = unflippedTexture.frame.clone();
-    const orig = unflippedTexture.orig.clone();
-    if (flippedDiagonally) {
-      const width = orig.width;
-      orig.width = orig.height;
-      orig.height = width;
-    }
-    const trim = orig.clone();
-
-    // Get the rotation "D8" number.
     // See https://pixijs.io/examples/#/textures/texture-rotate.js
     let rotate = 0;
     if (flippedDiagonally) {
@@ -312,15 +415,7 @@
         rotate = 4;
       }
     }
-
-    const flippedTexture = new PIXI.Texture(
-      unflippedTexture.baseTexture,
-      frame,
-      orig,
-      trim,
-      rotate
-    );
-    return (textureCache[globalTileUid] = flippedTexture);
+    return [tileUid, rotate];
   };
 
   /**
@@ -342,19 +437,46 @@
     if (!pixiTileMap || !genericTileMapData) return;
     pixiTileMap.clear();
 
+    if (genericTileMapData.selectedLevelBg) {
+      const bgTexture =
+        genericTileMapData.textureCache.levelBg[
+          genericTileMapData.selectedLevelBg
+        ];
+      pixiTileMap.tile(bgTexture, 0, 0);
+    }
     genericTileMapData.layers.forEach(function (layer, index) {
       if (displayMode === 'index' && layerIndex !== index) return;
       else if (displayMode === 'visible' && !layer.visible) return;
 
-      if (layer.type === 'objectgroup') {
+      // Ldtk Types
+      if (layer.ldtkTiles) {
+        // @ts-ignore
+        layer.ldtkTiles.forEach(function (tile) {
+          var texture = genericTileMapData.textureCache[index];
+          if (texture) {
+            const [x, y] = tile.px;
+            pixiTileMap.tile(
+              // @ts-ignore
+              texture[tile.t],
+              x,
+              y,
+              { alpha: layer.opacity, rotate: LdtkToPixiRotations[tile.f] }
+            );
+          }
+        });
+      }
+
+      // Tiled types
+      else if (layer.type === 'objectgroup') {
         layer.objects.forEach(function (object) {
           const { gid, x, y, visible } = object;
           if (displayMode === 'visible' && !visible) return;
           if (genericTileMapData.textureCache[gid]) {
-            pixiTileMap.addFrame(
+            pixiTileMap.tile(
               genericTileMapData.textureCache[gid],
               x,
-              y - genericTileMapData.tileHeight
+              y - genericTileMapData.tileHeight,
+              { alpha: layer.opacity }
             );
           }
         });
@@ -374,31 +496,27 @@
         for (let i = 0; i < layer.height; i++) {
           for (let j = 0; j < layer.width; j++) {
             const xPos = genericTileMapData.tileWidth * j;
-            const yPos = genericTileMapData.tileHeight * i;
+            const yPos = genericTileMapData.tileHeight * i; // these are stored in Ldtk, so no need to compute their positions
 
-            // The "globalTileUid" is the tile UID with encoded
-            // bits about the flipping/rotation of the tile.
             /** @type {number} */
             // @ts-ignore
             const globalTileUid = layerData[tileSlotIndex];
+            const [tileUid, rotate] = getTileUidWithRotation(globalTileUid);
+            const tileTexture =
+              tileUid !== 0 ? genericTileMapData.textureCache[tileUid] : null;
 
-            // Extract the tile UID and the texture.
-            const tileUid = extractTileUidFlippedStates(globalTileUid)[0];
-            const tileTexture = findTileTextureInCache(
-              genericTileMapData.textureCache,
-              globalTileUid
-            );
             if (tileTexture) {
               const tileData =
                 genericTileMapData.tiles &&
                 genericTileMapData.tiles.find(function (tile) {
-                  return tile.id === tileUid - 1;
+                  return tile.id === globalTileUid - 1;
                 });
 
-              const pixiTilemapFrame = pixiTileMap.addFrame(
+              const pixiTilemapFrame = pixiTileMap.tile(
                 tileTexture,
                 xPos,
-                yPos
+                yPos,
+                { alpha: layer.opacity, rotate }
               );
 
               // Animated tiles have a limitation:
@@ -438,16 +556,23 @@
     tiledData,
     atlasImageResourceName,
     tilemapResourceName,
-    tilesetResourceName
+    tilesetResourceName,
+    levelIndex
   ) => {
     const requestedTileMapDataId =
       tilemapResourceName +
       '@' +
       tilesetResourceName +
       '@' +
-      atlasImageResourceName;
+      atlasImageResourceName +
+      '@' +
+      levelIndex;
 
     // If the tilemap data is already in the cache, use it directly.
+    // For LDtk we do not need to generate a tileset
+
+    // TODO we will need to split the cache here - one for tilemaps and another for tilesets
+    // TODO this is because LDtk tilemaps can have different atlas per layer
     if (loadedGenericPixiTileMapData[requestedTileMapDataId]) {
       return loadedGenericPixiTileMapData[requestedTileMapDataId];
     }
@@ -455,16 +580,17 @@
     const atlasTexture = atlasImageResourceName
       ? getTexture(atlasImageResourceName)
       : null;
-    const genericPixiTileMapData = parseTiledData(
+    const genericPixiTileMapData = parseTilemapData(
       tiledData,
       atlasTexture,
-      getTexture
+      getTexture,
+      levelIndex,
+      tilemapResourceName
     );
 
     if (genericPixiTileMapData)
-      loadedGenericPixiTileMapData[
-        requestedTileMapDataId
-      ] = genericPixiTileMapData;
+      loadedGenericPixiTileMapData[requestedTileMapDataId] =
+        genericPixiTileMapData;
     return genericPixiTileMapData;
   };
 });

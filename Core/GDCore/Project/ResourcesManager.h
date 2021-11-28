@@ -403,6 +403,48 @@ class GD_CORE_API BitmapFontResource : public Resource {
 };
 
 /**
+ * \brief Describe a tilemap file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API TilemapResource : public Resource {
+ public:
+  TilemapResource() : Resource(), disablePreload(false) { SetKind("tilemap"); };
+  virtual ~TilemapResource(){};
+  virtual TilemapResource* Clone() const override {
+    return new TilemapResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+#if defined(GD_IDE_ONLY)
+  virtual bool UseFile() override { return true; }
+
+  std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
+  bool UpdateProperty(const gd::String& name, const gd::String& value) override;
+
+  void SerializeTo(SerializerElement& element) const override;
+#endif
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+  /**
+   * \brief Return true if the loading at game startup must be disabled
+   */
+  bool IsPreloadDisabled() const { return disablePreload; }
+
+  /**
+   * \brief Set if the tilemap preload at game startup must be disabled
+   */
+  void DisablePreload(bool disable = true) { disablePreload = disable; }
+
+ private:
+  bool disablePreload;  ///< If "true", don't load the Tilemap at game startup
+  gd::String file;
+};
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource

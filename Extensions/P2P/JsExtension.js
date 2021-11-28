@@ -156,6 +156,30 @@ module.exports = {
 
     extension
       .addAction(
+        'UseOwnICEServer',
+        _('Use a custom ICE server'),
+        _(
+          'Disables the default ICE (STUN or TURN) servers list and use one of your own. ' +
+            'Note that it is recommended to add at least 1 self-hosted STUN and TURN server ' +
+            'for games that are not over LAN but over the internet. ' +
+            'This action is cumulable, you can use it multiple times to add multiple servers. ' +
+            'This action needs to be called BEFORE connecting to the broker server.'
+        ),
+        _('Use ICE server _PARAM0_ (username: _PARAM1_, password: _PARAM2_)'),
+        _('P2P (experimental)'),
+        'JsPlatform/Extensions/p2picon.svg',
+        'JsPlatform/Extensions/p2picon.svg'
+      )
+      .addParameter('string', _('URL to the ICE server'), '', false)
+      .addParameter('string', _('(Optional) Username'), '', true)
+      .addParameter('string', _('(Optional) Password'), '', true)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/P2P/A_peer.js')
+      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
+      .setFunctionName('gdjs.evtTools.p2p.useCustomICECandidate');
+
+    extension
+      .addAction(
         'UseDefaultBroker',
         _('Connect to the default broker server'),
         _('Connects to the default broker server.'),

@@ -137,7 +137,7 @@ namespace gdjs {
         this._tilesetJsonFile,
         (tileMap: gdjs.TileMap.EditableTileMap | null) => {
           if (!tileMap) {
-            //TODO warn?
+            // getOrLoadTileMap already log errors.
             return;
           }
 

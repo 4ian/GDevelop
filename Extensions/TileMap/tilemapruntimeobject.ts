@@ -124,7 +124,7 @@ namespace gdjs {
         this._tilesetJsonFile,
         (tileMap: gdjs.TileMap.EditableTileMap | null) => {
           if (!tileMap) {
-            //TODO warn?
+            // getOrLoadTileMap already warn.
             return;
           }
           this._tileMapManager.getOrLoadTextureCache(
@@ -140,7 +140,7 @@ namespace gdjs {
             this._tilesetJsonFile,
             (textureCache: TileMap.TileTextureCache | null) => {
               if (!textureCache) {
-                //TODO warn?
+                // getOrLoadTextureCache already log warns and errors.
                 return;
               }
               this._renderer.updatePixiTileMap(tileMap, textureCache);

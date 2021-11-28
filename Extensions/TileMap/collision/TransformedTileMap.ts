@@ -416,7 +416,7 @@ namespace gdjs {
         }
       }
 
-      getDefinition(): CollisionTileDefinition | undefined {
+      getDefinition(): TileDefinition | undefined {
         return this.layer.tileMap.getTileDefinition(
           this.layer._source.get(this.x, this.y)!
         );

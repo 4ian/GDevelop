@@ -144,7 +144,8 @@ namespace gdjs {
 
             for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
               for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-                const xPos = tileLayer.tileMap.getTileWidth() * x;
+                const tileWidth = tileLayer.tileMap.getTileWidth();
+                const xPos = tileWidth * x;
                 const yPos = tileLayer.tileMap.getTileHeight() * y;
 
                 const tileId = tileLayer.get(x, y)!;
@@ -166,17 +167,18 @@ namespace gdjs {
                     tileId
                   );
 
-                  // TODO handle animations
-
-                  // // Animated tiles have a limitation:
-                  // // they are only able to use frames arranged horizontally one next
-                  // // to each other on the atlas.
-                  // if (tileDefinition && tileDefinition.animation) {
-                  //   pixiTilemapFrame.tileAnimX(
-                  //     genericTileMapData.tileWidth,
-                  //     tileDefinition.animation.length
-                  //   );
-                  // }
+                  // Animated tiles have a limitation:
+                  // they are only able to use frames arranged horizontally one next
+                  // to each other on the atlas.
+                  if (
+                    tileDefinition &&
+                    tileDefinition.getAnimationLength() > 0
+                  ) {
+                    pixiTilemapFrame.tileAnimX(
+                      tileWidth,
+                      tileDefinition.getAnimationLength()
+                    );
+                  }
                 }
               }
             }

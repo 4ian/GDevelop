@@ -38,7 +38,6 @@ namespace gdjs {
       );
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
-      console.log('outlineSize: ' + objectData.content.outlineSize);
       this._outlineSize = objectData.content.outlineSize;
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene

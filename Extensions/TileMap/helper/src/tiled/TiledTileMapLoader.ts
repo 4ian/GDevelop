@@ -5,10 +5,7 @@ namespace gdjs {
         pako: any,
         tiledMap: gdjs.TileMap.TiledMap
       ): gdjs.TileMap.EditableTileMap {
-        const definitions = new Map<
-          integer,
-          gdjs.TileMap.CollisionTileDefinition
-        >();
+        const definitions = new Map<integer, gdjs.TileMap.TileDefinition>();
         for (const tile of tiledMap.tilesets[0].tiles!) {
           const polygons: PolygonVertices[] = [];
           if (tile.objectgroup) {
@@ -32,7 +29,11 @@ namespace gdjs {
           //console.log("Definition: " + tile.id);
           definitions.set(
             tile.id,
-            new gdjs.TileMap.CollisionTileDefinition(polygons, tile.type)
+            new gdjs.TileMap.TileDefinition(
+              polygons,
+              tile.type ? tile.type : '',
+              tile.animation ? tile.animation.length : 0
+            )
           );
         }
         for (
@@ -41,10 +42,7 @@ namespace gdjs {
           tileId++
         ) {
           if (!definitions.has(tileId)) {
-            definitions.set(
-              tileId,
-              new gdjs.TileMap.CollisionTileDefinition([], '')
-            );
+            definitions.set(tileId, new gdjs.TileMap.TileDefinition([], '', 0));
           }
         }
         //console.log(definitions.size + " tiles definition");

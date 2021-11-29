@@ -8,6 +8,8 @@ namespace gdjs {
       inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
       transformationUpToDateCount: integer = 1;
 
+      private static readonly workingPoint: FloatPoint = [0, 0];
+
       constructor(source: gdjs.TileMap.EditableTileMap) {
         this._source = source;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
@@ -65,8 +67,10 @@ namespace gdjs {
       }
 
       pointIsInsideTile(x: float, y: float, tag: string): boolean {
-        // TODO avoid array allocation
-        const workingPoint: FloatPoint = [x, y];
+        const workingPoint: FloatPoint =
+          TransformedCollisionTileMap.workingPoint;
+        workingPoint[0] = x;
+        workingPoint[1] = y;
         this.inverseTransformation.transform(workingPoint, workingPoint);
         return this._source.pointIsInsideTile(
           workingPoint[0],
@@ -85,8 +89,11 @@ namespace gdjs {
         bottom: float
       ): Iterable<gdjs.Polygon> {
         const inverseTransformation = this.inverseTransformation;
-        // TODO avoid array allocation
-        const workingPoint: FloatPoint = [left, top];
+        const workingPoint: FloatPoint =
+          TransformedCollisionTileMap.workingPoint;
+
+        workingPoint[0] = left;
+        workingPoint[1] = top;
         inverseTransformation.transform(workingPoint, workingPoint);
         const topLeftX = workingPoint[0];
         const topLeftY = workingPoint[1];
@@ -381,6 +388,7 @@ namespace gdjs {
       y: integer;
       polygons: gdjs.Polygon[];
       private affineTransformationUpToDateCount: integer = 0;
+      private static readonly workingTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
 
       constructor(
         tileMap: TransformedCollisionTileMapLayer,
@@ -392,7 +400,7 @@ namespace gdjs {
         this.y = y;
         const definition = this.getDefinition();
         this.polygons = [];
-        // TODO only for the write tag?
+        // TODO only for the right tag?
         if (definition) {
           this.polygons.length = definition.getPolygons().length;
           for (
@@ -440,9 +448,10 @@ namespace gdjs {
         const layerTransformation = this.layer.tileMap.transformation;
         const width = this.layer.tileMap.getTileWidth();
         const height = this.layer.tileMap.getTileHeight();
-        // TODO avoid allocations
-        const tileTransformation = new gdjs.AffineTransformation();
-        tileTransformation.translate(width * this.x, height * this.y);
+
+        const tileTransformation =
+          TransformedCollisionTile.workingTransformation;
+        tileTransformation.setToTranslation(width * this.x, height * this.y);
         if (this.layer.isFlippedHorizontally(this.x, this.y)) {
           tileTransformation.flipX(width / 2);
         }
@@ -454,21 +463,7 @@ namespace gdjs {
         }
         tileTransformation.preConcatenate(layerTransformation);
 
-        // const width = this.layer.tileMap.tileWidth;
-        // const height = this.layer.tileMap.tileHeight;
-        // let x = defVertex[0];
-        // let y = defVertex[1];
-        // x = this.flippedHorizontally ? width - x : x;
-        // y = this.flippedVertically ? height - y : y;
-        // if (this.flippedDiagonally) {
-        //   const swap = x;
-        //   x = y;
-        //   y = swap;
-        // }
-        // vertex[0] = x + width * this.x;
-        // vertex[1] = y + height * this.y;
-
-        // TODO update lengths
+        // TODO To handle tile map modification, update lengths.
         for (
           let polygonIndex = 0;
           polygonIndex < this.polygons.length;

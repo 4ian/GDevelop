@@ -1197,7 +1197,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddAction("Create",
                  _("Create an object"),
                  _("Create an object at specified position"),
-                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_"),
+                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ (layer: _PARAM4_)"),
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")
@@ -1215,7 +1215,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Among the objects of the specified group, this action will "
                    "create the object with the specified name."),
                  _("Among objects _PARAM1_, create object named _PARAM2_ at "
-                   "position _PARAM3_;_PARAM4_"),
+                   "position _PARAM3_;_PARAM4_ (layer: _PARAM5_)"),
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")

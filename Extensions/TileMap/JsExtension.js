@@ -1208,7 +1208,6 @@ module.exports = {
           //   tilesetJsonFile,
           //   (textureCache) => {
           //     if (!textureCache) {
-          //       // TODO warn
           //       return;
           //     }
 

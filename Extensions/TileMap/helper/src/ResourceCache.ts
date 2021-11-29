@@ -6,7 +6,7 @@ namespace gdjs {
       private _callbacks: Map<string, Array<(value: T | null) => void>>;
 
       /**
-       * @param object The object
+       *
        */
       constructor() {
         this._cachedValues = new Map<string, T>();

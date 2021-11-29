@@ -13,6 +13,7 @@ namespace gdjs {
               let polygon: PolygonVertices | null = null;
               if (object.polygon) {
                 polygon = object.polygon.map((point) => [point.x, point.y]);
+                //TODO check that polygons are convex or split them.
               }
               // TODO handle ellipse
               else {

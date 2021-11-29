@@ -895,10 +895,8 @@ namespace gdjs {
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
 
-      this._affineTransformation.setToIdentity();
-
       // Translation
-      this._affineTransformation.translate(this.x, this.y);
+      this._affineTransformation.setToTranslation(this.x, this.y);
 
       // Rotation
       const angleInRadians = (this.angle * Math.PI) / 180;

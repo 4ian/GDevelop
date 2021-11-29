@@ -128,7 +128,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             <AlertMessage kind="error">
               <Trans>
                 Unfortunately, this extension requires a newer version of
-                GDevelop to work. Upgrade GDevelop to be able to use this
+                GDevelop to work. Update GDevelop to be able to use this
                 extension in your project.
               </Trans>
             </AlertMessage>

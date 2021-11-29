@@ -121,8 +121,7 @@ export function ExampleDialog({
           <AlertMessage kind="error">
             <Trans>
               Unfortunately, this example requires a newer version of GDevelop
-              to work. Upgrade GDevelop to be able to use this extension in your
-              project.
+              to work. Update GDevelop to be able to open this example.
             </Trans>
           </AlertMessage>
         )}

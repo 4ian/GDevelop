@@ -10,6 +10,7 @@ import './Carousel.css';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { Trans } from '@lingui/macro';
 
 export type YoutubeThumbnail = {|
   link: string,
@@ -274,7 +275,12 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
           width: `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
         }}
       >
-        <Text size="title">{title}</Text>
+        <Line noMargin justifyContent="space-between" alignItems="center">
+          <Text size="title">{title}</Text>
+          <Text>
+            <Trans>Browse all</Trans>
+          </Text>
+        </Line>
         <GridList
           cols={itemsToDisplay.length}
           cellHeight={cellHeight}

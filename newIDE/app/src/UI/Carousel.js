@@ -8,10 +8,12 @@ import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
 
+import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
+import FlatButton, { type Props as FlatButtonProps } from './FlatButton';
 
 type Thumbnail = {|
   id: string,
@@ -29,6 +31,8 @@ type SkeletonThumbnail = {|
 type Props<ThumbnailType> = {|
   title: React.Node,
   items: ?Array<ThumbnailType>,
+  onBrowseAllClick?: () => void,
+  browseAllLink?: string,
   displayItemTitles?: boolean,
   tabIndexOffset?: number,
 |};
@@ -98,6 +102,8 @@ const useStylesForGridListItem = makeStyles({
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
+  browseAllLink,
+  onBrowseAllClick,
   displayItemTitles = true,
   tabIndexOffset = 0,
 }: Props<ThumbnailType>) => {
@@ -195,6 +201,28 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [cellWidth, titleHeight]
   );
 
+  const renderBrowseAllButton = (): React.Node => {
+    const flatButtonProps: $Shape<FlatButtonProps> = { onClick: () => {} };
+    if (!onBrowseAllClick && browseAllLink) {
+      flatButtonProps.onClick = () => {
+        Window.openExternalURL(browseAllLink);
+      };
+      flatButtonProps.target = '_blank';
+    } else if (onBrowseAllClick) {
+      flatButtonProps.onClick = onBrowseAllClick;
+    } else {
+      flatButtonProps.onClick = () => {};
+    }
+
+    return (
+      <FlatButton
+        {...flatButtonProps}
+        label={<Trans>Browse all</Trans>}
+        tabIndex={tabIndexOffset + itemsToDisplay.length}
+      />
+    );
+  };
+
   const computeScroll = React.useCallback(
     (
       direction: 'left' | 'right',
@@ -287,10 +315,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
       >
         <Line noMargin justifyContent="space-between" alignItems="center">
           <Text size="bold-title">{title}</Text>
-          {/* TODO: Add a tab index to this text for accessibility purposes */}
-          <Text size="body2">
-            <Trans>Browse all</Trans>
-          </Text>
+          {renderBrowseAllButton()}
         </Line>
         <GridList
           classes={classesForGridList}

@@ -2,18 +2,28 @@ namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
 
   /**
-   *
+   * An object that handle hitboxes for a tile map.
    * @extends gdjs.RuntimeObject
    */
   export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
     _tilemapJsonFile: string;
     _tilesetJsonFile: string;
     _layerIndex: integer;
-    _renderer: gdjs.TileMapCollisionMaskRender;
+    _renderer: gdjs.TileMap.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
+    /**
+     * The tiles are filtered according to this tag.
+     *
+     * This allows have multiple objects with different usage
+     * for the same tile map.
+     * For instance, platforms, jumpthru, ladder, spike, water...
+     */
     _typeFilter: string;
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
 
+    /**
+     * When set to true, the hitboxes will be shown.
+     */
     _debugMode: boolean;
     _fillColor: integer;
     _outlineColor: integer;
@@ -21,6 +31,10 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
+    /**
+     * If the owner moves, the hitboxes vertices
+     * will have to be transformed again.
+     */
     _transformationIsUpToDate: boolean = false;
 
     constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
@@ -52,7 +66,10 @@ namespace gdjs {
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
         collisionTileMap
       );
-      this._renderer = new gdjs.TileMapCollisionMaskRender(this, runtimeScene);
+      this._renderer = new gdjs.TileMap.TileMapCollisionMaskRender(
+        this,
+        runtimeScene
+      );
       this._updateTileMap();
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.

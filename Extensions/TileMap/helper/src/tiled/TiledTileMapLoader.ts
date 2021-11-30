@@ -1,5 +1,8 @@
 namespace gdjs {
   export namespace TileMap {
+    /**
+     * It creates a {@link EditableTileMap} from a Tiled JSON.
+     */
     export class TiledTileMapLoader {
       static load(
         pako: any,

@@ -2,8 +2,14 @@ namespace gdjs {
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
 
-    const logger = new gdjs.Logger('Tilemap object');
-
+    /**
+     * An holder to share tile maps across the 2 extension objects.
+     *
+     * Every instance with the same files path in properties will
+     * share the same {@link EditableTileMap} and {@link TileTextureCache}.
+     *
+     * @see {@link TileMapRuntimeManager}
+     */
     export class TileMapManager {
       private _tileMapCache: gdjs.TileMap.ResourceCache<
         gdjs.TileMap.EditableTileMap
@@ -13,7 +19,7 @@ namespace gdjs {
       >;
 
       /**
-       * @param object The object
+       *
        */
       constructor() {
         this._tileMapCache = new gdjs.TileMap.ResourceCache<
@@ -25,7 +31,8 @@ namespace gdjs {
       }
 
       /**
-       * Get the platforms manager of a scene.
+       * @param instanceHolder Where to set the manager instance.
+       * @returns The shared manager.
        */
       static getManager(instanceHolder: Object) {
         // @ts-ignore
@@ -38,6 +45,13 @@ namespace gdjs {
         return instanceHolder.tileMapCollisionMaskManager;
       }
 
+      /**
+       * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+       * @param tilemapJsonFile
+       * @param tilesetJsonFile
+       * @param pako The zlib library.
+       * @param callback
+       */
       getOrLoadTileMap(
         loadTiledMap: (
           tilemapJsonFile: string,
@@ -75,6 +89,14 @@ namespace gdjs {
         );
       }
 
+      /**
+       * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+       * @param getTexture The method that loads the atlas image file in memory.
+       * @param atlasImageResourceName
+       * @param tilemapJsonFile
+       * @param tilesetJsonFile
+       * @param callback
+       */
       getOrLoadTextureCache(
         loadTiledMap: (
           tilemapJsonFile: string,

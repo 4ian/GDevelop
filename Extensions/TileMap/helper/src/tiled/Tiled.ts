@@ -1,5 +1,8 @@
 namespace gdjs {
   export namespace TileMap {
+    /**
+     * Tiled JSON format.
+     */
     export type TiledMap = {
       /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
       backgroundcolor?: string;

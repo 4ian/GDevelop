@@ -2,6 +2,12 @@ namespace gdjs {
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
 
+    /**
+     * A cache to access the tile images.
+     *
+     * It's created by {@link PixiTileMapHelper.parseAtlas}
+     * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
+     */
     export class TileTextureCache {
       private static readonly flippedHorizontallyFlag = 0x80000000;
       private static readonly flippedVerticallyFlag = 0x40000000;

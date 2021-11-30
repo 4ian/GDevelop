@@ -1,16 +1,17 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import { makeStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import { GridListTile, Paper } from '@material-ui/core';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
+
 import Text from '../../../UI/Text';
-import './Carousel.css';
 import { Column, Line, Spacer } from '../../../UI/Grid';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { Trans } from '@lingui/macro';
 
 type Thumbnail = {|
   id: string,
@@ -71,6 +72,29 @@ const styles = {
   },
 };
 
+const useStylesForGridList = makeStyles({
+  root: {
+    overflowX: 'scroll',
+    overflowY: 'hidden',
+    flexWrap: 'nowrap',
+    scrollbarWidth: 'none' /* For Firefox */,
+    '-ms-overflow-style': 'none' /* For Internet Explorer and Edge */,
+    '&::-webkit-scrollbar': {
+      height: 0 /* For Chrome, Safari, and Opera */,
+    },
+  },
+});
+
+const useStylesForGridListItem = makeStyles({
+  root: {
+    width: 'unset !important',
+  },
+  tile: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
+
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
@@ -82,6 +106,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
     shouldDisplayLeftArrow,
     setShouldDisplayLeftArrow,
   ] = React.useState<boolean>(false);
+  const classesForGridList = useStylesForGridList();
+  const classesForGridListItem = useStylesForGridListItem();
   const scrollView = React.useRef<?HTMLUListElement>(null);
   const itemsToDisplay =
     items ||
@@ -100,7 +126,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const cellWidth = (16 / 9) * imageHeight;
   const widthUnit = cellWidth + cellSpacing;
 
-  const cellHeight = imageHeight + (displayItemTitles ? (titleHeight + spacerSize) : 0);
+  const cellHeight =
+    imageHeight + (displayItemTitles ? titleHeight + spacerSize : 0);
 
   const renderImage = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): React.Node => (
@@ -264,6 +291,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
           </Text>
         </Line>
         <GridList
+          classes={classesForGridList}
           cols={itemsToDisplay.length}
           cellHeight={cellHeight}
           spacing={cellSpacing}
@@ -272,6 +300,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
         >
           {itemsToDisplay.map((item, index) => (
             <GridListTile
+              classes={classesForGridListItem}
               key={item.id}
               tabIndex={!items ? -1 : index + tabIndexOffset}
             >

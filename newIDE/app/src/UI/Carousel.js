@@ -109,16 +109,17 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
   const scrollView = React.useRef<?HTMLUListElement>(null);
-  const itemsToDisplay =
-    items ||
-    Array(3)
-      .fill({
-        skeleton: true,
-        title: '',
-        description: '',
-        thumbnail: '',
-      })
-      .map((item, index) => ({ ...item, id: `skeleton${index}` }));
+  const areItemsSet = items && items.length;
+  const itemsToDisplay = areItemsSet
+    ? items
+    : Array(3)
+        .fill({
+          skeleton: true,
+          title: '',
+          description: '',
+          thumbnail: '',
+        })
+        .map((item, index) => ({ ...item, id: `skeleton${index}` }));
 
   const windowSize = useResponsiveWindowWidth();
   const imageHeight = referenceSizesByWindowSize.imageHeight[windowSize];
@@ -184,7 +185,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <Skeleton
               variant="rect"
               height={titleHeight}
-              width={(cellWidth / 3) * (1 + 2 * Math.random())}
+              width={(cellWidth / 3) * (1 + 2 * Math.random())} // Make rectangles of different lengths so that the UI feels more "alive".
             />
           )}
         </>
@@ -276,7 +277,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
         style={{ ...styles.arrowContainer, width: arrowWidth }}
         onClick={onClickArrow('left')}
       >
-        {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
+        {areItemsSet && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
       <div
         style={{
@@ -302,7 +303,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <GridListTile
               classes={classesForGridListItem}
               key={item.id}
-              tabIndex={!items ? -1 : index + tabIndexOffset}
+              tabIndex={areItemsSet ? index + tabIndexOffset : -1}
             >
               {renderThumbnail(item)}
               {renderItemTitle(item)}
@@ -310,7 +311,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
           ))}
         </GridList>
       </div>
-      {!!items && (
+      {areItemsSet && (
         <div
           style={{
             ...styles.arrowContainer,

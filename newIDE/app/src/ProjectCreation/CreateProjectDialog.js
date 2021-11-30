@@ -6,7 +6,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import ScrollView from '../UI/ScrollView';
 import { Tabs, Tab } from '../UI/Tabs';
-import Tutorials from './Tutorials';
+import { TutorialsList } from '../Tutorial';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { GamesShowcase } from '../GamesShowcase';
@@ -140,11 +140,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               outputPath={this.state.outputPath}
             />
           )}
-          {this.state.currentTab === 'tutorials' && (
-            <ScrollView>
-              <Tutorials />
-            </ScrollView>
-          )}
+          {this.state.currentTab === 'tutorials' && <TutorialsList />}
           {this.state.currentTab === 'games-showcase' && <GamesShowcase />}
         </Column>
       </Dialog>

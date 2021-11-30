@@ -48,7 +48,13 @@ export const Tutorials = () => {
       link: 'https://www.youtube.com/watch?v=Q7e3gAWkLZI',
     },
   ];
-  return <Carousel title={<Trans>Our Latest Tutorials</Trans>} items={items} />;
+  return (
+    <Carousel
+      title={<Trans>Our Latest Tutorials</Trans>}
+      items={items}
+      tabIndexOffset={100}
+    />
+  );
 };
 
 export const LoadingWithTitleSkeleton = () => (
@@ -111,5 +117,11 @@ export const Showcases = () => {
         'https://resources.gdevelop-app.com/games-showcase/images/apx-legion/apx-legion-banner-min.jpg',
     },
   ];
-  return <Carousel title={<Trans>Showcase</Trans>} items={items} />;
+  return (
+    <Carousel
+      title={<Trans>Showcase</Trans>}
+      items={items}
+      tabIndexOffset={100}
+    />
+  );
 };

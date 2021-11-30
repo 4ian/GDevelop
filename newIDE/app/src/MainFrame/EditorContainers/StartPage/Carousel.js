@@ -39,6 +39,7 @@ type Props = {|
     | Array<GameTemplateThumbnail>
   ),
   displayTitleSkeleton?: boolean,
+  tabIndexOffset?: number,
 |};
 
 const referenceSizesByWindowSize = {
@@ -80,7 +81,12 @@ const styles = {
   },
 };
 
-const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
+const Carousel = ({
+  title,
+  items,
+  displayTitleSkeleton = true,
+  tabIndexOffset = 0,
+}: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
   const [
     shouldDisplayLeftArrow,
@@ -277,6 +283,7 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
       >
         <Line noMargin justifyContent="space-between" alignItems="center">
           <Text size="bold-title">{title}</Text>
+          {/* TODO: Add a tab index to this text for accessibility purposes */}
           <Text size="body2">
             <Trans>Browse all</Trans>
           </Text>
@@ -288,8 +295,11 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
           style={styles.gridList}
           ref={scrollView}
         >
-          {itemsToDisplay.map(item => (
-            <GridListTile key={computeItemKey(item)}>
+          {itemsToDisplay.map((item, index) => (
+            <GridListTile
+              key={computeItemKey(item)}
+              tabIndex={!items ? -1 : index + tabIndexOffset}
+            >
               {renderThumbnail(item)}
               {renderItemTitle(item)}
             </GridListTile>

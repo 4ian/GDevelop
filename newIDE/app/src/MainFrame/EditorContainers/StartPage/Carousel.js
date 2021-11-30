@@ -38,7 +38,7 @@ type Props = {|
     | Array<ShowcaseThumbnail>
     | Array<GameTemplateThumbnail>
   ),
-  displayTitleSkeleton?: boolean,
+  displayItemTitles?: boolean,
   tabIndexOffset?: number,
 |};
 
@@ -84,7 +84,7 @@ const styles = {
 const Carousel = ({
   title,
   items,
-  displayTitleSkeleton = true,
+  displayItemTitles = true,
   tabIndexOffset = 0,
 }: Props) => {
   const theme = React.useContext(GDevelopThemeContext);
@@ -108,11 +108,7 @@ const Carousel = ({
   const widthUnit = cellWidth + cellSpacing;
 
   let cellHeight = imageHeight;
-  if (
-    (!items && displayTitleSkeleton) ||
-    itemsToDisplay.some(item => Object.keys(item).includes('title'))
-  )
-    cellHeight += titleHeight + spacerSize;
+  if (displayItemTitles) cellHeight += titleHeight + spacerSize;
 
   const renderThumbnail = React.useCallback(
     (
@@ -170,7 +166,7 @@ const Carousel = ({
         | ShowcaseThumbnail
         | SkeletonThumbnail
     ): ?React.Node => {
-      if (!(item.title || (item.skeleton && displayTitleSkeleton))) return null;
+      if (!displayItemTitles) return null;
       return (
         <>
           <Spacer />

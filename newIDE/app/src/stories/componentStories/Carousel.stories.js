@@ -27,7 +27,7 @@ export const LoadingWithoutTitleSkeleton = () => (
   <Carousel
     title={<Trans>Our Latest Tutorials</Trans>}
     items={null}
-    displayTitleSkeleton={false}
+    displayItemTitles={false}
   />
 );
 export const Tutorials = () => {
@@ -53,6 +53,7 @@ export const Tutorials = () => {
       title={<Trans>Our Latest Tutorials</Trans>}
       items={items}
       tabIndexOffset={100}
+      displayItemTitles={false}
     />
   );
 };

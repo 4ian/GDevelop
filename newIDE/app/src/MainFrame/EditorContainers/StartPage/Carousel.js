@@ -207,8 +207,9 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
       const currentFirstVisibleItemIndex = currentScroll / widthUnit;
 
       if (
+        direction === 'right' &&
         currentFirstVisibleItemIndex >
-        itemsToDisplay.length - visibleThumbnailsCount - 1
+          itemsToDisplay.length - visibleThumbnailsCount - 1
       )
         return 0;
       return roundScroll(

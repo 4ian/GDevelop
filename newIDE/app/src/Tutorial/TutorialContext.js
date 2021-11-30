@@ -56,7 +56,7 @@ export const TutorialStateProvider = ({
 
   React.useEffect(
     () => {
-      // Don't attempt to load again extensions and filters if they
+      // Don't attempt to load again tutorials if they
       // were loaded already.
       if (tutorials || isLoading.current) return;
 

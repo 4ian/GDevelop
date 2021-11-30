@@ -72,7 +72,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       title={
         <Tabs value={currentTab} onChange={setCurrentTab}>
           <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-          <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
           <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
         </Tabs>
       }
@@ -281,6 +280,27 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             </SelectField>
           </Line>
           <Text size="title">
+            <Trans>Embedded help and tutorials</Trans>
+          </Text>
+          <Line>
+            <Column noMargin>
+              <Line>
+                <RaisedButton
+                  label={<Trans>Reset hidden embedded explanations</Trans>}
+                  onClick={() => showAllAlertMessages()}
+                  disabled={!Object.keys(values.hiddenAlertMessages).length}
+                />
+              </Line>
+              <Line>
+                <RaisedButton
+                  label={<Trans>Reset hidden embedded tutorials</Trans>}
+                  onClick={() => showAllTutorialHints()}
+                  disabled={!Object.keys(values.hiddenTutorialHints).length}
+                />
+              </Line>
+            </Column>
+          </Line>
+          <Text size="title">
             <Trans>Advanced</Trans>
           </Text>
           <Line>
@@ -342,34 +362,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               />
             </Line>
           )}
-        </Column>
-      )}
-      {currentTab === 'hints' && (
-        <Column>
-          <Line>
-            <Column noMargin>
-              <Text>
-                <Trans>Embedded explanations:</Trans>
-              </Text>
-              <Line>
-                <RaisedButton
-                  label={<Trans>Reset hidden embedded explanations</Trans>}
-                  onClick={() => showAllAlertMessages()}
-                  disabled={!Object.keys(values.hiddenAlertMessages).length}
-                />
-              </Line>
-              <Text>
-                <Trans>Embedded tutorials:</Trans>
-              </Text>
-              <Line>
-                <RaisedButton
-                  label={<Trans>Reset hidden embedded tutorials</Trans>}
-                  onClick={() => showAllTutorialHints()}
-                  disabled={!Object.keys(values.hiddenTutorialHints).length}
-                />
-              </Line>
-            </Column>
-          </Line>
         </Column>
       )}
       {currentTab === 'shortcuts' && (

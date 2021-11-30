@@ -52,8 +52,9 @@ export const DismissableTutorialMessageWidget = ({
   if (preferencesValues.hiddenTutorialHints[tutorialId]) return null;
 
   if (!tutorials) return null; // Loading or errored, do not display the tutorial.
-  /** @type {Tutorial} */
-  const tutorial = tutorials.find(tutorial => tutorial.id === tutorialId);
+  const tutorial: ?Tutorial = tutorials.find(
+    tutorial => tutorial.id === tutorialId
+  );
   if (!tutorial) {
     console.warn(`Tutorial ${tutorialId} not found`);
     return null;

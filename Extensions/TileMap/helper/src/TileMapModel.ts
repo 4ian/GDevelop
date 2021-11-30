@@ -97,11 +97,11 @@ namespace gdjs {
       }
 
       /**
-       * @param id The tile identifier
+       * @param tileId The tile identifier
        * @returns The tile definition form the tile set.
        */
-      getTileDefinition(id: integer): TileDefinition | undefined {
-        return this._tileSet.get(id);
+      getTileDefinition(tileId: integer): TileDefinition | undefined {
+        return this._tileSet.get(tileId);
       }
 
       /**

@@ -3,7 +3,7 @@ namespace gdjs {
     /**
      * A tile map transformed with an affine transformation.
      *
-     * @see {@link getHitBoxesAround} It gives a fast access to hitboxes for collision handling.
+     * @see {@link getHitboxesAround} It gives a fast access to hitboxes for collision handling.
      */
     export class TransformedCollisionTileMap {
       /**
@@ -118,18 +118,40 @@ namespace gdjs {
         return this._source.getDimensionY();
       }
 
-      getTileDefinition(id: integer) {
-        return this._source.getTileDefinition(id);
+      /**
+       * @param tileId The tile identifier
+       * @returns The tile definition form the tile set.
+       */
+      getTileDefinition(tileId: integer) {
+        return this._source.getTileDefinition(tileId);
       }
 
-      getLayer(id: integer): TransformedCollisionTileMapLayer | undefined {
-        return this._layers.get(id);
+      /**
+       * @param layerId
+       * @returns
+       */
+      getLayer(layerId: integer): TransformedCollisionTileMapLayer | undefined {
+        return this._layers.get(layerId);
       }
 
+      /**
+       * @returns All the layers of the tile map.
+       */
       getLayers(): Iterable<TransformedCollisionTileMapLayer> {
         return this._layers.values();
       }
 
+      /**
+       * Check if a point is inside a tile with a given tag.
+       *
+       * It doesn't use the tile hitboxes.
+       * It only check the point is inside the tile square.
+       *
+       * @param x The X coordinate of the point to check.
+       * @param y The Y coordinate of the point to check.
+       * @param tag The tile tag
+       * @returns true when the point is inside a tile with a given tag.
+       */
       pointIsInsideTile(x: float, y: float, tag: string): boolean {
         const workingPoint: FloatPoint =
           TransformedCollisionTileMap.workingPoint;
@@ -143,13 +165,32 @@ namespace gdjs {
         );
       }
 
-      getHitBoxesAround(
+      /**
+       * @param tag The tile tag.
+       * @param left The left border of the area in the scene.
+       * @param top The top border of the area in the scene.
+       * @param right The right border of the area in the scene.
+       * @param bottom The left border of the area in the scene.
+       * @returns At least all the hitboxes from the given area
+       * where tiles have the right tag.
+       *
+       * @see {@link gdjs.RuntimeObject.getHitboxesAround}
+       */
+      getHitboxesAround(
         tag: string,
         left: float,
         top: float,
         right: float,
         bottom: float
       ): Iterable<gdjs.Polygon> {
+        // Return the hitboxes from the tiles that overlap
+        // the AABB of the area in the tile map basis.
+        // Some of these tiles are not event in the given area
+        // but this is a good trade of between the number of
+        // useless returned hitboxes and the time to find them.
+
+        // Transform the vertices of the area
+        // from the scene basis to the tile map basis.
         const inverseTransformation = this._inverseTransformation;
         const workingPoint: FloatPoint =
           TransformedCollisionTileMap.workingPoint;
@@ -178,6 +219,7 @@ namespace gdjs {
         const bottomLeftX = workingPoint[0];
         const bottomLeftY = workingPoint[1];
 
+        // Calculate the AABB of the area in the tile map basis.
         const xMin = Math.max(
           0,
           Math.floor(
@@ -222,6 +264,15 @@ namespace gdjs {
         return this.getHitboxes(tag, xMin, yMin, xMax, yMax);
       }
 
+      /**
+       * @param tag The tile tag.
+       * @param xMin The fist column to include.
+       * @param yMin The fist row to include.
+       * @param xMax The last column to include.
+       * @param yMax The last row to include.
+       * @returns All the hitboxes from the tiles overlapping
+       * the given area where tiles have the right tag.
+       */
       getHitboxes(
         tag: string,
         xMin: integer,
@@ -232,6 +283,10 @@ namespace gdjs {
         return new MapCollisionMaskIterable(this, tag, xMin, yMin, xMax, yMax);
       }
 
+      /**
+       * @param tag The tile tag.
+       * @returns All the hitboxes from the tiles having the right tag.
+       */
       getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
         return this.getHitboxes(
           tag,
@@ -243,6 +298,9 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Iterable over the tile hitboxes of a given area and tag.
+     */
     class MapCollisionMaskIterable implements Iterable<gdjs.Polygon> {
       map: TransformedCollisionTileMap;
       tag: string;
@@ -251,10 +309,22 @@ namespace gdjs {
       xMax: integer;
       yMax: integer;
 
+      /**
+       * Avoid to allocate an empty iterator each time
+       * the iterable is initialized.
+       */
       static emptyItr: Iterator<gdjs.Polygon> = {
         next: () => ({ value: undefined, done: true }),
       };
 
+      /**
+       * @param map The tile map.
+       * @param tag The tile tag.
+       * @param xMin The fist column to include.
+       * @param yMin The fist row to include.
+       * @param xMax The last column to include.
+       * @param yMax The last row to include.
+       */
       constructor(
         map: TransformedCollisionTileMap,
         tag: string,
@@ -273,18 +343,19 @@ namespace gdjs {
       }
 
       [Symbol.iterator]() {
-        let mapItr = this.map.getLayers()[Symbol.iterator]();
+        // Flatten the iterable of each layers into one.
+        let layerItr = this.map.getLayers()[Symbol.iterator]();
         let listItr: Iterator<gdjs.Polygon> = MapCollisionMaskIterable.emptyItr;
 
         return {
           next: () => {
             let listNext = listItr.next();
             while (listNext.done) {
-              const mapNext = mapItr.next();
-              if (mapNext.done) {
+              const layerNext = layerItr.next();
+              if (layerNext.done) {
                 return listNext;
               }
-              listItr = mapNext.value
+              listItr = layerNext.value
                 .getHitboxes(
                   this.tag,
                   this.xMin,
@@ -301,11 +372,24 @@ namespace gdjs {
       }
     }
 
+    /**
+     * A tile map layer transformed with an affine transformation.
+     */
     export class TransformedCollisionTileMapLayer {
+      /**
+       * The time map that contains this layer.
+       */
       readonly tileMap: TransformedCollisionTileMap;
+      /**
+       * The model that describes the tile map.
+       */
       readonly _source: gdjs.TileMap.EditableTileMapLayer;
       private readonly _tiles: TransformedCollisionTile[][];
 
+      /**
+       * @param tileMap The time map that contains this layer.
+       * @param source The model that describes the tile map.
+       */
       constructor(
         tileMap: TransformedCollisionTileMap,
         source: gdjs.TileMap.EditableTileMapLayer
@@ -325,39 +409,79 @@ namespace gdjs {
         }
       }
 
+      /**
+       * @param x The layer column.
+       * @param y The layer row.
+       * @return The tile from the tile set.
+       */
       get(x: integer, y: integer): TransformedCollisionTile | undefined {
         const row = this._tiles[y];
         return row ? row[x] : undefined;
       }
 
-      dimX() {
+      /**
+       * The number of tile columns in the layer.
+       */
+      getDimensionX() {
         return this._tiles.length === 0 ? 0 : this._tiles[0].length;
       }
 
-      dimY() {
+      /**
+       * The number of tile rows in the layer.
+       */
+      getDimensionY() {
         return this._tiles.length;
       }
 
+      /**
+       * @returns The layer width in pixels.
+       */
       getWidth() {
         return this._source.getWidth();
       }
 
+      /**
+       * @returns The layer height in pixels.
+       */
       getHeight() {
         return this._source.getHeight();
       }
 
+      /**
+       * @param x The layer column.
+       * @param y The layer row.
+       * @return
+       */
       isFlippedDiagonally(x: integer, y: integer) {
         return this._source.isFlippedDiagonally(x, y);
       }
 
+      /**
+       * @param x The layer column.
+       * @param y The layer row.
+       * @return
+       */
       isFlippedVertically(x: integer, y: integer) {
         return this._source.isFlippedVertically(x, y);
       }
 
+      /**
+       * @param x The layer column.
+       * @param y The layer row.
+       * @return
+       */
       isFlippedHorizontally(x: integer, y: integer) {
         return this._source.isFlippedHorizontally(x, y);
       }
-
+      /**
+       * @param tag The tile tag.
+       * @param xMin The fist column to include.
+       * @param yMin The fist row to include.
+       * @param xMax The last column to include.
+       * @param yMax The last row to include.
+       * @returns All the hitboxes from the tiles overlapping
+       * the given area where tiles have the right tag.
+       */
       getHitboxes(
         tag: string,
         xMin: integer,
@@ -376,11 +500,24 @@ namespace gdjs {
         );
       }
 
+      /**
+       * @param tag The tile tag.
+       * @returns All the hitboxes from the tiles having the right tag.
+       */
       getAllHitboxes(tag: string): Iterable<gdjs.Polygon> {
-        return this.getHitboxes(tag, 0, 0, this.dimX() - 1, this.dimY() - 1);
+        return this.getHitboxes(
+          tag,
+          0,
+          0,
+          this.getDimensionX() - 1,
+          this.getDimensionY() - 1
+        );
       }
     }
 
+    /**
+     * Iterable over the tile hitboxes of a given area and tag.
+     */
     class LayerCollisionMaskIterable implements Iterable<gdjs.Polygon> {
       layer: TransformedCollisionTileMapLayer;
       tag: string;
@@ -389,10 +526,22 @@ namespace gdjs {
       xMax: integer;
       yMax: integer;
 
+      /**
+       * Avoid to allocate an empty iterator each time
+       * the iterable is initialized.
+       */
       static emptyItr: Iterator<gdjs.Polygon> = {
         next: () => ({ value: undefined, done: true }),
       };
 
+      /**
+       * @param map The tile map.
+       * @param tag The tile tag.
+       * @param xMin The fist column to include.
+       * @param yMin The fist row to include.
+       * @param xMax The last column to include.
+       * @param yMax The last row to include.
+       */
       constructor(
         layer: TransformedCollisionTileMapLayer,
         tag: string,
@@ -411,6 +560,8 @@ namespace gdjs {
       }
 
       [Symbol.iterator]() {
+        // Flatten the iterable of each tile into one.
+
         // xMin and yMin next increment
         let x = this.xMax;
         let y = this.yMin - 1;
@@ -434,7 +585,7 @@ namespace gdjs {
               const definition = tile?.getDefinition();
               //console.log("Check: " + x + " " + y + " tile: " + (tile ? tile.getTag(): tile));
               if (definition && definition.getTag() === this.tag) {
-                polygonItr = tile!.getPolygons()[Symbol.iterator]();
+                polygonItr = tile!.getHitboxes()[Symbol.iterator]();
                 listNext = polygonItr.next();
               }
             }
@@ -444,34 +595,56 @@ namespace gdjs {
       }
     }
 
+    /**
+     * A tile transformed with an affine transformation.
+     */
     class TransformedCollisionTile {
-      layer: TransformedCollisionTileMapLayer;
-      x: integer;
-      y: integer;
-      polygons: gdjs.Polygon[];
+      /**
+       * The layer that contains this tile.
+       */
+      readonly layer: TransformedCollisionTileMapLayer;
+      /**
+       * The column index in the layer.
+       */
+      readonly x: integer;
+      /**
+       * The row index in the layer.
+       */
+      readonly y: integer;
+      private readonly hitBoxes: gdjs.Polygon[];
       private affineTransformationUpToDateCount: integer = 0;
+
+      /**
+       * An reusable AffineTransformation to avoid allocations.
+       */
       private static readonly workingTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
 
+      /**
+       *
+       * @param layer The layer that contains this tile.
+       * @param x The column index in the layer.
+       * @param y The row index in the layer.
+       */
       constructor(
-        tileMap: TransformedCollisionTileMapLayer,
+        layer: TransformedCollisionTileMapLayer,
         x: integer,
         y: integer
       ) {
-        this.layer = tileMap;
+        this.layer = layer;
         this.x = x;
         this.y = y;
         const definition = this.getDefinition();
-        this.polygons = [];
+        this.hitBoxes = [];
         // TODO only for the right tag?
         if (definition) {
-          this.polygons.length = definition.getHiBoxes().length;
+          this.hitBoxes.length = definition.getHiBoxes().length;
           for (
             let polygonIndex = 0;
-            polygonIndex < this.polygons.length;
+            polygonIndex < this.hitBoxes.length;
             polygonIndex++
           ) {
             const polygon = new gdjs.Polygon();
-            this.polygons[polygonIndex] = polygon;
+            this.hitBoxes[polygonIndex] = polygon;
             polygon.vertices.length = definition.getHiBoxes()[
               polygonIndex
             ].length;
@@ -486,25 +659,40 @@ namespace gdjs {
         }
       }
 
-      getDefinition(): TileDefinition | undefined {
+      /**
+       * @returns The tile definition from the tile set.
+       */
+      getDefinition(): TileDefinition {
         return this.layer.tileMap.getTileDefinition(
           this.layer._source.get(this.x, this.y)!
+        )!;
+      }
+
+      private _isHitboxesUpToDate() {
+        return (
+          this.affineTransformationUpToDateCount ===
+          this.layer.tileMap._transformationUpToDateCount
         );
       }
 
-      getPolygons(): Polygon[] {
+      private _setHitboxesUpToDate() {
+        this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
+      }
+
+      /**
+       * @returns The hitboxes of this tile in the scene basis.
+       */
+      getHitboxes(): Polygon[] {
         //console.log("getPolygons");
-        if (
-          this.affineTransformationUpToDateCount ===
-          this.layer.tileMap._transformationUpToDateCount
-        ) {
-          return this.polygons;
+        if (this._isHitboxesUpToDate()) {
+          return this.hitBoxes;
         }
 
         const definition = this.getDefinition();
         if (!definition) {
-          // It should be []
-          return this.polygons;
+          // It should already be []
+          this.hitBoxes.length = 0;
+          return this.hitBoxes;
         }
 
         const layerTransformation = this.layer.tileMap.getTransformation();
@@ -528,11 +716,11 @@ namespace gdjs {
         // TODO To handle tile map modification, update lengths.
         for (
           let polygonIndex = 0;
-          polygonIndex < this.polygons.length;
+          polygonIndex < this.hitBoxes.length;
           polygonIndex++
         ) {
           const defPolygon = definition.getHiBoxes()[polygonIndex];
-          const polygon = this.polygons[polygonIndex];
+          const polygon = this.hitBoxes[polygonIndex];
 
           for (
             let vertexIndex = 0;
@@ -546,8 +734,8 @@ namespace gdjs {
           }
         }
         //console.log("polygonsAreUpToDate");
-        this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
-        return this.polygons;
+        this._setHitboxesUpToDate();
+        return this.hitBoxes;
       }
     }
   }

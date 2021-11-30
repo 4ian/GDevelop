@@ -8,10 +8,10 @@ import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
 
-import Text from '../../../UI/Text';
-import { Column, Line, Spacer } from '../../../UI/Grid';
-import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Text from './Text';
+import { Column, Line, Spacer } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
+import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 
 type Thumbnail = {|
   id: string,

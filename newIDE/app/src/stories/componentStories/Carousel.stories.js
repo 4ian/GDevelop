@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
-import Carousel from '../../MainFrame/EditorContainers/StartPage/Carousel';
+import Carousel from '../../UI/Carousel';
 import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { GDevelopUserApi } from '../../Utils/GDevelopServices/ApiConfigs';

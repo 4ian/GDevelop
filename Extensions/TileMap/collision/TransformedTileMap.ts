@@ -251,8 +251,8 @@ namespace gdjs {
         this.tileMap = tileMap;
         this._source = source;
         this._tiles = [];
-        const dimX = this._source.dimX();
-        const dimY = this._source.dimY();
+        const dimX = this._source.getDimensionX();
+        const dimY = this._source.getDimensionY();
         this._tiles.length = dimY;
         for (let y = 0; y < dimY; y++) {
           this._tiles[y] = [];

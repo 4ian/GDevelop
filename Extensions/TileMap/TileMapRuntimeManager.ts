@@ -4,19 +4,31 @@ namespace gdjs {
 
     const logger = new gdjs.Logger('Tilemap object');
 
+    /**
+     * An holder to share tile maps across the 2 extension objects.
+     *
+     * Every instance with the same files path in properties will
+     * share the same {@link EditableTileMap} and {@link TileTextureCache}.
+     *
+     * @see {@link TileMapRuntimeManager}
+     */
     export class TileMapRuntimeManager {
       private _runtimeScene: gdjs.RuntimeScene;
+      /**
+       * Delegate
+       */
       private _manager: gdjs.TileMap.TileMapManager;
       /**
        * @param object The object
        */
-      constructor(runtimeScene: gdjs.RuntimeScene) {
+      private constructor(runtimeScene: gdjs.RuntimeScene) {
         this._runtimeScene = runtimeScene;
         this._manager = new gdjs.TileMap.TileMapManager();
       }
 
       /**
-       * Get the platforms manager of a scene.
+       * @param instanceHolder Where to set the manager instance.
+       * @returns The shared manager.
        */
       static getManager(runtimeScene: gdjs.RuntimeScene) {
         // @ts-ignore
@@ -31,6 +43,11 @@ namespace gdjs {
         return runtimeScene.tileMapCollisionMaskManager;
       }
 
+      /**
+       * @param tilemapJsonFile
+       * @param tilesetJsonFile
+       * @param callback
+       */
       getOrLoadTileMap(
         tilemapJsonFile: string,
         tilesetJsonFile: string,
@@ -45,6 +62,13 @@ namespace gdjs {
         );
       }
 
+      /**
+       * @param getTexture The method that loads the atlas image file in memory.
+       * @param atlasImageResourceName
+       * @param tilemapJsonFile
+       * @param tilesetJsonFile
+       * @param callback
+       */
       getOrLoadTextureCache(
         getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
         atlasImageResourceName: string,

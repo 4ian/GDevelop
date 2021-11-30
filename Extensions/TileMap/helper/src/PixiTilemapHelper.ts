@@ -11,7 +11,7 @@ namespace gdjs {
        * @param tiledData A JS object representing a map exported from Tiled.
        * @param atlasTexture
        * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
-       * @returns
+       * @returns A textures cache.
        */
       static parseAtlas(
         tiledData: gdjs.TileMap.TiledMap,

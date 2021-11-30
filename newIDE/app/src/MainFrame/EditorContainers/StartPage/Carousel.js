@@ -148,6 +148,8 @@ const Carousel = ({
               minHeight: imageHeight,
               width: cellWidth,
             }}
+            alt={item.title}
+            title={item.title}
           />
         );
       }

@@ -168,7 +168,7 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
           <Spacer />
           {item.title ? (
             <div style={{ ...styles.itemTitleContainer, width: cellWidth }}>
-              <Text noMargin size="title" style={styles.itemTitle}>
+              <Text noMargin style={styles.itemTitle}>
                 {item.title}
               </Text>
             </div>
@@ -276,8 +276,8 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
         }}
       >
         <Line noMargin justifyContent="space-between" alignItems="center">
-          <Text size="title">{title}</Text>
-          <Text>
+          <Text size="bold-title">{title}</Text>
+          <Text size="body2">
             <Trans>Browse all</Trans>
           </Text>
         </Line>

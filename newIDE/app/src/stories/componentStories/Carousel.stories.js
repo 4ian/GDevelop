@@ -34,7 +34,7 @@ export const Tutorials = () => {
     description: string,
     thumbnailUrl: string,
     link: string,
-  |}
+  |};
   const items = [
     {
       id: 'tutorial1',
@@ -92,7 +92,7 @@ export const Showcases = () => {
     description: string,
     thumbnailUrl: string,
     link?: string,
-  |}
+  |};
   const items: ShowcaseThumbnail[] = [
     {
       id: 'lil-bub-s-hello-earth',

@@ -1,15 +1,40 @@
 namespace gdjs {
   export namespace TileMap {
+    /**
+     * A tile map transformed with an affine transformation.
+     *
+     * @see {@link getHitBoxesAround} It gives a fast access to hitboxes for collision handling.
+     */
     export class TransformedCollisionTileMap {
+      /**
+       * The model that describes the tile map.
+       */
       private _source: gdjs.TileMap.EditableTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
       // TODO Tiled allow to offset the layers
-      transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-      inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
-      transformationUpToDateCount: integer = 1;
-
+      /**
+       * The transformation from the time map coordinate (in pixels)
+       * to the scene coordinate (in pixels).
+       */
+      private _transformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      /**
+       * The transformation from the scene coordinate (in pixels)
+       * to the time map coordinate (in pixels).
+       */
+      private _inverseTransformation: gdjs.AffineTransformation = new gdjs.AffineTransformation();
+      /**
+       * This allows tiles to know if their hitboxes must be updated.
+       * @see {@link TransformedCollisionTile.affineTransformationUpToDateCount}
+       */
+      _transformationUpToDateCount: integer = 1;
+      /**
+       * An reusable Point to avoid allocations.
+       */
       private static readonly workingPoint: FloatPoint = [0, 0];
 
+      /**
+       * @param source The model that describes the tile map.
+       */
       constructor(source: gdjs.TileMap.EditableTileMap) {
         this._source = source;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
@@ -25,31 +50,70 @@ namespace gdjs {
         }
       }
 
-      invalidate() {
-        this.transformationUpToDateCount =
-          (this.transformationUpToDateCount + 1) % Number.MAX_SAFE_INTEGER;
+      /**
+       * @returns The transformation from the time map coordinate (in pixels)
+       * to the scene coordinate (in pixels).
+       */
+      getTransformation(): gdjs.AffineTransformation {
+        return this._transformation;
       }
 
+      /**
+       * @param transformation
+       */
+      setTransformation(transformation: gdjs.AffineTransformation) {
+        this._transformation = transformation;
+
+        const inverseTransformation = this._inverseTransformation;
+        inverseTransformation.copyFrom(transformation);
+        inverseTransformation.invert();
+
+        this._invalidate();
+      }
+
+      private _invalidate() {
+        this._transformationUpToDateCount =
+          (this._transformationUpToDateCount + 1) % Number.MAX_SAFE_INTEGER;
+      }
+
+      /**
+       * @returns The tile map width in pixels.
+       */
       getWidth() {
         return this._source.getWidth();
       }
 
+      /**
+       * @returns The tile map height in pixels.
+       */
       getHeight() {
         return this._source.getHeight();
       }
 
+      /**
+       * @returns The tile width in pixels.
+       */
       getTileHeight() {
         return this._source.getTileHeight();
       }
 
+      /**
+       * @returns The tile height in pixels.
+       */
       getTileWidth() {
         return this._source.getTileWidth();
       }
 
+      /**
+       * @returns The number of tile columns in the map.
+       */
       getDimensionX() {
         return this._source.getDimensionX();
       }
 
+      /**
+       * @returns The number of tile rows in the map.
+       */
       getDimensionY() {
         return this._source.getDimensionY();
       }
@@ -71,15 +135,13 @@ namespace gdjs {
           TransformedCollisionTileMap.workingPoint;
         workingPoint[0] = x;
         workingPoint[1] = y;
-        this.inverseTransformation.transform(workingPoint, workingPoint);
+        this._inverseTransformation.transform(workingPoint, workingPoint);
         return this._source.pointIsInsideTile(
           workingPoint[0],
           workingPoint[1],
           tag
         );
       }
-
-      // test: number = 300;
 
       getHitBoxesAround(
         tag: string,
@@ -88,7 +150,7 @@ namespace gdjs {
         right: float,
         bottom: float
       ): Iterable<gdjs.Polygon> {
-        const inverseTransformation = this.inverseTransformation;
+        const inverseTransformation = this._inverseTransformation;
         const workingPoint: FloatPoint =
           TransformedCollisionTileMap.workingPoint;
 
@@ -434,7 +496,7 @@ namespace gdjs {
         //console.log("getPolygons");
         if (
           this.affineTransformationUpToDateCount ===
-          this.layer.tileMap.transformationUpToDateCount
+          this.layer.tileMap._transformationUpToDateCount
         ) {
           return this.polygons;
         }
@@ -445,7 +507,7 @@ namespace gdjs {
           return this.polygons;
         }
 
-        const layerTransformation = this.layer.tileMap.transformation;
+        const layerTransformation = this.layer.tileMap.getTransformation();
         const width = this.layer.tileMap.getTileWidth();
         const height = this.layer.tileMap.getTileHeight();
 
@@ -484,7 +546,7 @@ namespace gdjs {
           }
         }
         //console.log("polygonsAreUpToDate");
-        this.affineTransformationUpToDateCount = this.layer.tileMap.transformationUpToDateCount;
+        this.affineTransformationUpToDateCount = this.layer.tileMap._transformationUpToDateCount;
         return this.polygons;
       }
     }

@@ -188,7 +188,7 @@ namespace gdjs {
       if (this._transformationIsUpToDate) {
         return;
       }
-      const transformation = this._collisionTileMap.transformation;
+      const transformation = this._collisionTileMap.getTransformation();
 
       const absScaleX = Math.abs(this._renderer.getScaleX());
       const absScaleY = Math.abs(this._renderer.getScaleY());
@@ -209,12 +209,7 @@ namespace gdjs {
       // Scale
       transformation.scale(absScaleX, absScaleY);
 
-      const inverseTransformation = this._collisionTileMap
-        .inverseTransformation;
-      inverseTransformation.copyFrom(transformation);
-      inverseTransformation.invert();
-
-      this._collisionTileMap.invalidate();
+      this._collisionTileMap.setTransformation(transformation);
 
       this._transformationIsUpToDate = true;
     }
@@ -260,7 +255,7 @@ namespace gdjs {
 
         //console.log(this._typeFilter + " aabb: " + this.aabb.min + " " + this.aabb.max);
       } else {
-        const affineTransformation = this._collisionTileMap.transformation;
+        const affineTransformation = this._collisionTileMap.getTransformation();
 
         const left = 0;
         const right = this._collisionTileMap.getWidth();

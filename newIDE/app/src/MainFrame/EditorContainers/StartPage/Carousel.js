@@ -12,32 +12,22 @@ import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { Trans } from '@lingui/macro';
 
-export type YoutubeThumbnail = {|
-  link: string,
-|};
-
-export type ShowcaseThumbnail = {|
+type Thumbnail = {|
+  id: string,
   title: string,
-  imageSource: string,
-|};
-
-type GameTemplateThumbnail = {|
-  title: string,
-  imageSource: string,
+  description: string,
+  thumbnailUrl: string,
+  link?: string,
 |};
 
 type SkeletonThumbnail = {|
+  ...Thumbnail,
   skeleton: boolean,
-  key: string,
 |};
 
-type Props = {|
+type Props<ThumbnailType> = {|
   title: React.Node,
-  items: ?(
-    | Array<YoutubeThumbnail>
-    | Array<ShowcaseThumbnail>
-    | Array<GameTemplateThumbnail>
-  ),
+  items: ?Array<ThumbnailType>,
   displayItemTitles?: boolean,
   tabIndexOffset?: number,
 |};
@@ -81,12 +71,12 @@ const styles = {
   },
 };
 
-const Carousel = ({
+const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
   displayItemTitles = true,
   tabIndexOffset = 0,
-}: Props) => {
+}: Props<ThumbnailType>) => {
   const theme = React.useContext(GDevelopThemeContext);
   const [
     shouldDisplayLeftArrow,
@@ -98,8 +88,11 @@ const Carousel = ({
     Array(3)
       .fill({
         skeleton: true,
+        title: '',
+        description: '',
+        thumbnail: '',
       })
-      .map((item, index) => ({ ...item, key: `key${index}` }));
+      .map((item, index) => ({ ...item, id: `skeleton${index}` }));
 
   const windowSize = useResponsiveWindowWidth();
   const imageHeight = referenceSizesByWindowSize.imageHeight[windowSize];
@@ -107,47 +100,37 @@ const Carousel = ({
   const cellWidth = (16 / 9) * imageHeight;
   const widthUnit = cellWidth + cellSpacing;
 
-  let cellHeight = imageHeight;
-  if (displayItemTitles) cellHeight += titleHeight + spacerSize;
+  const cellHeight = imageHeight + (displayItemTitles ? (titleHeight + spacerSize) : 0);
+
+  const renderImage = React.useCallback(
+    (item: ThumbnailType | SkeletonThumbnail): React.Node => (
+      <img
+        src={item.thumbnailUrl}
+        style={{
+          ...styles.image,
+          height: imageHeight,
+          minHeight: imageHeight,
+          width: cellWidth,
+        }}
+        alt={item.title}
+        title={item.title}
+      />
+    ),
+    [cellWidth, imageHeight]
+  );
 
   const renderThumbnail = React.useCallback(
-    (
-      item:
-        | YoutubeThumbnail
-        | GameTemplateThumbnail
-        | ShowcaseThumbnail
-        | SkeletonThumbnail
-    ): ?React.Node => {
-      if (!item.link && !item.imageSource && !item.skeleton) return null;
+    (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
+      if (!item.skeleton && !item.link && !item.thumbnailUrl) return null;
       if (item.link) {
         return (
           <a href={item.link} target="_blank">
-            <img
-              src={constructImageLinkFromYoutubeLink(item.link)}
-              style={{
-                ...styles.image,
-                height: imageHeight,
-                minHeight: imageHeight,
-                width: cellWidth,
-              }}
-            />
+            {renderImage(item)}
           </a>
         );
       }
-      if (item.imageSource) {
-        return (
-          <img
-            src={item.imageSource}
-            style={{
-              ...styles.image,
-              height: imageHeight,
-              minHeight: imageHeight,
-              width: cellWidth,
-            }}
-            alt={item.title}
-            title={item.title}
-          />
-        );
+      if (item.thumbnailUrl) {
+        return renderImage(item);
       }
       if (item.skeleton) {
         return (
@@ -155,17 +138,11 @@ const Carousel = ({
         );
       }
     },
-    [cellWidth, imageHeight]
+    [renderImage, cellWidth, imageHeight]
   );
 
   const renderItemTitle = React.useCallback(
-    (
-      item:
-        | YoutubeThumbnail
-        | GameTemplateThumbnail
-        | ShowcaseThumbnail
-        | SkeletonThumbnail
-    ): ?React.Node => {
+    (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
       if (!displayItemTitles) return null;
       return (
         <>
@@ -295,7 +272,7 @@ const Carousel = ({
         >
           {itemsToDisplay.map((item, index) => (
             <GridListTile
-              key={computeItemKey(item)}
+              key={item.id}
               tabIndex={!items ? -1 : index + tabIndexOffset}
             >
               {renderThumbnail(item)}
@@ -318,31 +295,6 @@ const Carousel = ({
       )}
     </Line>
   );
-};
-
-const extractVideoIdFromYoutubeLink = (link: string): ?string => {
-  const url = new URL(link);
-  const params = url.searchParams;
-  return params.get('v') || null;
-};
-
-const constructImageLinkFromYoutubeLink = (link: string): string => {
-  const videoId = extractVideoIdFromYoutubeLink(link) || 'null'; // youtube API returns its placeholder if id is not recognized.
-
-  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`; // Better quality hqdefault.jpg returns a 4/3 thumbnail that would need croping.
-};
-
-const computeItemKey = (
-  item:
-    | YoutubeThumbnail
-    | SkeletonThumbnail
-    | GameTemplateThumbnail
-    | ShowcaseThumbnail
-): string => {
-  if (item.link) return item.link;
-  if (item.imageSource) return item.imageSource;
-  if (item.key) return item.key;
-  return 'key';
 };
 
 export default Carousel;

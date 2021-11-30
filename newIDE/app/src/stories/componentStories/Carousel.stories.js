@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import withMock from 'storybook-addon-mock';
 import { action } from '@storybook/addon-actions';
 
@@ -24,7 +25,7 @@ export default {
 
 export const LoadingWithoutTitleSkeleton = () => (
   <Carousel
-    title="Our Latest Tutorials"
+    title={<Trans>Our Latest Tutorials</Trans>}
     items={null}
     displayTitleSkeleton={false}
   />
@@ -47,11 +48,11 @@ export const Tutorials = () => {
       link: 'https://www.youtube.com/watch?v=Q7e3gAWkLZI',
     },
   ];
-  return <Carousel title="Our Latest Tutorials" items={items} />;
+  return <Carousel title={<Trans>Our Latest Tutorials</Trans>} items={items} />;
 };
 
 export const LoadingWithTitleSkeleton = () => (
-  <Carousel title="Showcase" items={null} />
+  <Carousel title={<Trans>Showcase</Trans>} items={null} />
 );
 export const Showcases = () => {
   const items: ShowcaseThumbnail[] = [
@@ -110,5 +111,5 @@ export const Showcases = () => {
         'https://resources.gdevelop-app.com/games-showcase/images/apx-legion/apx-legion-banner-min.jpg',
     },
   ];
-  return <Carousel title="Showcase" items={items} />;
+  return <Carousel title={<Trans>Showcase</Trans>} items={items} />;
 };

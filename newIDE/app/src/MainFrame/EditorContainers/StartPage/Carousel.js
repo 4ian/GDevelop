@@ -31,7 +31,7 @@ type SkeletonThumbnail = {|
 |};
 
 type Props = {|
-  title: string,
+  title: React.Node,
   items: ?(
     | Array<YoutubeThumbnail>
     | Array<ShowcaseThumbnail>

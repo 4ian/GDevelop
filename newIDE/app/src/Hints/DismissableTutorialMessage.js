@@ -2,9 +2,7 @@
 import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import PreferencesContext, {
-  type PreferencesValues,
-} from '../MainFrame/Preferences/PreferencesContext';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import AlertMessage from '../UI/AlertMessage';
 import Window from '../Utils/Window';
 import RaisedButton from '../UI/RaisedButton';
@@ -26,30 +24,7 @@ const DismissableTutorialMessage = ({ tutorialId }: Props) => {
   const { values, showTutorialHint } = preferences;
   const { tutorials } = React.useContext(TutorialContext);
 
-  return (
-    <DismissableTutorialMessageWidget
-      tutorialId={tutorialId}
-      tutorials={tutorials}
-      preferencesValues={values}
-      showTutorialHint={showTutorialHint}
-    />
-  );
-};
-
-type DismissableTutorialMessageWidgetProps = {|
-  tutorialId: string,
-  tutorials: ?Array<Tutorial>,
-  preferencesValues: PreferencesValues,
-  showTutorialHint: (tutorialId: string, show: boolean) => void,
-|};
-
-export const DismissableTutorialMessageWidget = ({
-  tutorialId,
-  tutorials,
-  preferencesValues,
-  showTutorialHint,
-}: DismissableTutorialMessageWidgetProps) => {
-  if (preferencesValues.hiddenTutorialHints[tutorialId]) return null;
+  if (values.hiddenTutorialHints[tutorialId]) return null;
 
   if (!tutorials) return null; // Loading or errored, do not display the tutorial.
   const tutorial: ?Tutorial = tutorials.find(

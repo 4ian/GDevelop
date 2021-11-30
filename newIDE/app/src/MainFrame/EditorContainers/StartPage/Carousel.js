@@ -47,15 +47,16 @@ const referenceSizesByWindowSize = {
     large: 180,
   },
   arrowWidth: {
-    small: 18,
-    medium: 24,
-    large: 30,
+    small: 24,
+    medium: 30,
+    large: 36,
   },
 };
 
 const cellSpacing = 12;
 const titleHeight = 30;
 const spacerSize = 4;
+const rightArrowMargin = 6; // Necessary because MUI adds a -6 margin to GridList
 
 const styles = {
   itemTitle: {
@@ -69,22 +70,12 @@ const styles = {
     objectFit: 'cover',
   },
   itemTitleContainer: { height: titleHeight },
-  leftArrowContainer: {
+  arrowContainer: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '32px',
-  },
-  rightArrowContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'sticky',
-    right: '0',
-    top: '6px',
-    backgroundColor: 'rgba(100,100,100,0.8)',
+    marginTop: 32,
   },
 };
 
@@ -273,12 +264,16 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
   return (
     <Line noMargin expand>
       <div
-        style={{ ...styles.leftArrowContainer, width: arrowWidth }}
+        style={{ ...styles.arrowContainer, width: arrowWidth }}
         onClick={onClickArrow('left')}
       >
         {!!items && shouldDisplayLeftArrow && <ArrowBackIos />}
       </div>
-      <div style={{ width: `calc(100% - ${arrowWidth}px)` }}>
+      <div
+        style={{
+          width: `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
+        }}
+      >
         <Text size="title">{title}</Text>
         <GridList
           cols={itemsToDisplay.length}
@@ -293,20 +288,20 @@ const Carousel = ({ title, items, displayTitleSkeleton = true }: Props) => {
               {renderItemTitle(item)}
             </GridListTile>
           ))}
-          {!!items && (
-            <div
-              style={{
-                ...styles.rightArrowContainer,
-                height: cellHeight - 12,
-                width: arrowWidth,
-              }}
-              onClick={onClickArrow('right')}
-            >
-              <ArrowForwardIos htmlColor="white" />
-            </div>
-          )}
         </GridList>
       </div>
+      {!!items && (
+        <div
+          style={{
+            ...styles.arrowContainer,
+            width: arrowWidth,
+            marginLeft: rightArrowMargin,
+          }}
+          onClick={onClickArrow('right')}
+        >
+          <ArrowForwardIos />
+        </div>
+      )}
     </Line>
   );
 };

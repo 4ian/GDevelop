@@ -264,22 +264,19 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               )
             ) : null}
             {renderListItemSecondaryAction()}
-          
           </MUIListItem>
           <Collapse in={isItemOpen} timeout="auto" unmountOnExit>
-                <MUIList
-                  component="div"
-                  disablePadding
-                  style={{
-                    paddingLeft: 16,
-                    ...props.nestedListStyle,
-                  }}
-                  dense={useDenseLists}
-                >
-                
-                  {renderNestedItems()}
-                </MUIList>
-
+            <MUIList
+              component="div"
+              disablePadding
+              style={{
+                paddingLeft: 16,
+                ...props.nestedListStyle,
+              }}
+              dense={useDenseLists}
+            >
+              {renderNestedItems()}
+            </MUIList>
           </Collapse>
         </React.Fragment>
       );

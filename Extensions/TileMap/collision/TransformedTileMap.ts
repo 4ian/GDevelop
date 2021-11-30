@@ -402,7 +402,7 @@ namespace gdjs {
         this.polygons = [];
         // TODO only for the right tag?
         if (definition) {
-          this.polygons.length = definition.getPolygons().length;
+          this.polygons.length = definition.getHiBoxes().length;
           for (
             let polygonIndex = 0;
             polygonIndex < this.polygons.length;
@@ -410,7 +410,7 @@ namespace gdjs {
           ) {
             const polygon = new gdjs.Polygon();
             this.polygons[polygonIndex] = polygon;
-            polygon.vertices.length = definition.getPolygons()[
+            polygon.vertices.length = definition.getHiBoxes()[
               polygonIndex
             ].length;
             for (
@@ -469,7 +469,7 @@ namespace gdjs {
           polygonIndex < this.polygons.length;
           polygonIndex++
         ) {
-          const defPolygon = definition.getPolygons()[polygonIndex];
+          const defPolygon = definition.getHiBoxes()[polygonIndex];
           const polygon = this.polygons[polygonIndex];
 
           for (

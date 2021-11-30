@@ -245,7 +245,7 @@ namespace gdjs {
                   outlineColor,
                   outlineOpacity
                 );
-                for (const vertices of tileDefinition.getPolygons()) {
+                for (const vertices of tileDefinition.getHiBoxes()) {
                   if (vertices.length === 0) continue;
 
                   pixiGraphics.beginFill(fillColor, fillOpacity);

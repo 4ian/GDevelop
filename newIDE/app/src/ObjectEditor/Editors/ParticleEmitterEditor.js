@@ -16,7 +16,7 @@ import { type EditorProps } from './EditorProps.flow';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
-import { getObjectTutorialHints } from '../../Hints';
+import { getObjectTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 const gd = global.gd;
 
 export default class ParticleEmitterEditor extends React.Component<
@@ -32,14 +32,14 @@ export default class ParticleEmitterEditor extends React.Component<
       resourceExternalEditors,
     } = this.props;
     const particleEmitterObject = gd.asParticleEmitterObject(object);
-    const tutorialHints = getObjectTutorialHints(object.getType());
+    const tutorialIds = getObjectTutorialIds(object.getType());
 
     return (
       <ColumnStackLayout>
-        {tutorialHints.map(tutorialHint => (
+        {tutorialIds.map(tutorialId => (
           <DismissableTutorialMessage
-            key={tutorialHint.identifier}
-            tutorialHint={tutorialHint}
+            key={tutorialId}
+            tutorialId={tutorialId}
           />
         ))}
         <SelectField

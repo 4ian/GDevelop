@@ -16,9 +16,11 @@ namespace gdjs {
               let polygon: PolygonVertices | null = null;
               if (object.polygon) {
                 polygon = object.polygon.map((point) => [point.x, point.y]);
-                //TODO check that polygons are convex or split them.
+                //TODO check that polygons are convex or split them?
               }
-              // TODO handle ellipse
+              // TODO handle ellipses by creating a polygon?
+              // Make an object property for the number of vertices or always create 8 ones?
+              // Will the user need the same vertices number for every ellipse?
               else {
                 polygon = [
                   [object.x, object.y],

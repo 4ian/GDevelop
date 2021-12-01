@@ -14,17 +14,18 @@ import { Column, Line, Spacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 
-type Thumbnail = {|
+type Thumbnail = {
   id: string,
   title: string,
   thumbnailUrl: string,
-  link?: string,
-|};
+  +link?: string,
+  +onClick?: () => void,
+};
 
-type SkeletonThumbnail = {|
+type SkeletonThumbnail = {
   ...Thumbnail,
   skeleton: boolean,
-|};
+};
 
 type Props<ThumbnailType> = {|
   title: React.Node,
@@ -104,18 +105,6 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
-const useStylesForLink = makeStyles(theme =>
-  createStyles({
-    link: {
-      display: 'inline-block',
-      '&:focus': {
-        border: `${focusItemBorderWidth}px solid ${theme.palette.primary.main}`,
-      },
-      '&:focus-visible': { outline: 'unset' },
-    },
-  })
-);
-
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
@@ -129,7 +118,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
   ] = React.useState<boolean>(false);
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
-  const classesForLink = useStylesForLink();
   const scrollView = React.useRef<?HTMLUListElement>(null);
   const areItemsSet = items && items.length;
   const itemsToDisplay =
@@ -170,22 +158,14 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [cellWidth, imageHeight]
   );
 
+  const openLinkCallback = (link:string): () => void => (): void => {
+    Window.openExternalURL(link)
+  }
+
   const renderThumbnail = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
       if (!item.skeleton && !item.link && !item.thumbnailUrl) return null;
-      if (item.link) {
-        return (
-          <a
-            href={item.link}
-            target="_blank"
-            onFocus={onFocusItem}
-            className={classesForLink.link}
-          >
-            {renderImage(item)}
-          </a>
-        );
-      }
-      if (item.thumbnailUrl) {
+      if (item.thumbnailUrl || item.link) {
         return renderImage(item);
       }
       if (item.skeleton) {
@@ -291,7 +271,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   );
 
   const onFocusItem = event => {
-    event.target.scrollIntoViewIfNeeded();
+    event.target.scrollIntoView();
   };
 
   React.useEffect(() => {
@@ -326,9 +306,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
             onClick={
               onBrowseAllClick ||
               (browseAllLink
-                ? () => {
-                    Window.openExternalURL(browseAllLink);
-                  }
+                ? openLinkCallback(browseAllLink)
                 : () => {})
             }
             label={<Trans>Browse all</Trans>}
@@ -347,8 +325,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <GridListTile
               classes={classesForGridListItem}
               key={item.id}
-              tabIndex={item.link ? -1 : 0} // Do not add tab index when item renders a link, as it is reachable with tab by default
-              onFocus={item.link ? null : onFocusItem}
+              tabIndex={0} // Do not add tab index when item renders a link, as it is reachable with tab by default
+              onFocus={onFocusItem}
+              onClick={item.link ? openLinkCallback(item.link) : item.onClick ? item.onClick : null}
             >
               {renderThumbnail(item)}
               {renderItemTitle(item)}

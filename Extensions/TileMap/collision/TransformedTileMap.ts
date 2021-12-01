@@ -11,7 +11,7 @@ namespace gdjs {
        */
       private _source: gdjs.TileMap.EditableTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
-      // TODO Tiled allow to offset the layers
+      // TODO Tiled allows to offset the layers
       /**
        * The transformation from the time map coordinate (in pixels)
        * to the scene coordinate (in pixels).

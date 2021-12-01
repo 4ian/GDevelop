@@ -114,7 +114,7 @@ AdvancedExtension::AdvancedExtension() {
             "{"
             "const lists = eventsFunctionContext.getObjectsLists("+objectNameString+");"
             // Clear picked objects list...
-            "for (const list of Object.values(lists.items)) list.length = 0;"
+            "for (const listName in lists.items) lists.items[listName].length = 0;"
             // ...and pick one by one each objects that need to be picked.
             "for(const o of "+objectList+") lists.get(o.getName()).push(o);"
             "}";

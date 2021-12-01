@@ -5,7 +5,7 @@ import { Spacer } from './Grid';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
-export type Props = {|
+type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void,
   primary?: boolean,
@@ -22,7 +22,6 @@ export type Props = {|
     flexShrink?: 0,
   |},
   target?: '_blank',
-  tabIndex?: number,
 |};
 
 /**

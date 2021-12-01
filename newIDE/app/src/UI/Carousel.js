@@ -310,7 +310,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
                 : () => {})
             }
             label={<Trans>Browse all</Trans>}
-            tabIndex={0}
           />
         </Line>
         <GridList

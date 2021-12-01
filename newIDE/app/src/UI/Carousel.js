@@ -11,7 +11,6 @@ import { Skeleton } from '@material-ui/lab';
 import Window from '../Utils/Window';
 import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 

@@ -201,7 +201,7 @@ namespace gdjs {
       }
 
       /**
-       * @returns
+       * @returns true if the layer is visible.
        */
       isVisible(): boolean {
         return this.visible;
@@ -297,21 +297,21 @@ namespace gdjs {
       }
 
       /**
-       * @returns
+       * @returns true if the tile is flipped horizontally.
        */
       isFlippedHorizontally(): boolean {
         return FlippingHelper.isFlippedHorizontally(this.tileId);
       }
 
       /**
-       * @returns
+       * @returns true if the tile is flipped vertically.
        */
       isFlippedVertically(): boolean {
         return FlippingHelper.isFlippedVertically(this.tileId);
       }
 
       /**
-       * @returns
+       * @returns true if the tile is flipped diagonally.
        */
       isFlippedDiagonally(): boolean {
         return FlippingHelper.isFlippedDiagonally(this.tileId);
@@ -487,7 +487,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped horizontally.
        */
       isFlippedHorizontally(x: integer, y: integer): boolean {
         return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
@@ -496,7 +496,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped vertically.
        */
       isFlippedVertically(x: integer, y: integer): boolean {
         return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
@@ -505,7 +505,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped diagonally.
        */
       isFlippedDiagonally(x: integer, y: integer): boolean {
         return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
@@ -514,7 +514,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return The tile identifier from the tile set.
+       * @returns The tile identifier from the tile set.
        */
       get(x: integer, y: integer): integer | undefined {
         const row = this._tiles[y];

@@ -4,6 +4,9 @@ namespace gdjs {
      * Decodes a layer data, which can sometimes be store as a compressed base64 string
      * by Tiled.
      * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
+     * @param pako The zlib library.
+     * @param layer The layer data from a Tiled JSON.
+     * @returns The decoded layer data.
      */
     export const decodeBase64LayerData = (pako: any, layer: TiledLayer) => {
       const { data, compression } = layer;
@@ -64,8 +67,8 @@ namespace gdjs {
 
     /**
      * Extract information about the rotation of a tile from the tile id.
-     * @param {number} globalTileUid
-     * @returns {[number, boolean, boolean, boolean]}
+     * @param globalTileUid
+     * @returns The tile identifier and orientation.
      */
     export const extractTileUidFlippedStates = (
       globalTileUid: integer

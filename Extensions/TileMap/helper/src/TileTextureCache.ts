@@ -40,11 +40,11 @@ namespace gdjs {
        * information about rotation in bits 32, 31 and 30
        * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
        *
-       * @param globalTileUid
+       * @param tileId The tile identifier
        * @param flippedHorizontally
        * @param flippedVertically
        * @param flippedDiagonally
-       * @returns
+       * @returns The texture for the given tile identifier and orientation.
        */
       findTileTexture(
         tileId: integer,

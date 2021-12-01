@@ -13,6 +13,7 @@ import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
+import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 
 type Thumbnail = {
   id: string,
@@ -326,6 +327,12 @@ const Carousel = <ThumbnailType: Thumbnail>({
               key={item.id}
               tabIndex={0} // Do not add tab index when item renders a link, as it is reachable with tab by default
               onFocus={onFocusItem}
+              onKeyPress={event => {
+                if (shouldValidate(event)) {
+                  if (item.link) openLinkCallback(item.link)();
+                  if (item.onClick) item.onClick();
+                }
+              }}
               onClick={
                 item.link
                   ? openLinkCallback(item.link)

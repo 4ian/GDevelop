@@ -18,7 +18,6 @@ import FlatButton from './FlatButton';
 type Thumbnail = {|
   id: string,
   title: string,
-  description: string,
   thumbnailUrl: string,
   link?: string,
 |};
@@ -138,7 +137,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
           .fill({
             skeleton: true,
             title: '',
-            description: '',
             thumbnail: '',
           })
           .map((item, index) => ({ ...item, id: `skeleton${index}` }));

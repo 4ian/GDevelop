@@ -107,6 +107,19 @@ namespace gdjs {
       return true;
     }
 
+    onDestroy() {
+      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
+      if (!shiftyJsScene) return;
+
+      // Stop and delete all tweens of the behavior - otherwise they could:
+      // - continue to point to the behavior, and so to the object (memory leak),
+      // - affect the object in case it's recycled (wrong/hard to debug behavior).
+      for (const identifier in this._tweens) {
+        this._tweens[identifier].instance.stop();
+        shiftyJsScene.remove(this._tweens[identifier].instance);
+      }
+    }
+
     private _addTween(
       identifier: string,
       easingValue: string,

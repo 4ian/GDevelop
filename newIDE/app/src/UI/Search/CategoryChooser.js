@@ -67,7 +67,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
           ? toNodeId([...chosenCategory.parentNodes, chosenCategory.node])
           : ''
       }
-      defaultExpanded={allFilters.tagsTree.map(node => toNodeId([node]))}
+      defaultExpanded={[]}
       onNodeSelect={() => {}}
     >
       <TreeItem

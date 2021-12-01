@@ -51,7 +51,7 @@ export const getBrowserExporters = (): Array<Exporter> => [
     description: (
       <Trans>
         Build the game locally as a HTML5 game. You can then publish it on
-        website like Kongregate, Game Jolt, itch.io, Poki...
+        website like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
       </Trans>
     ),
     key: 'browserhtml5export',

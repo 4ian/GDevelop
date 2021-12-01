@@ -10,7 +10,6 @@ import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
 import Background from '../UI/Background';
 import SearchBar from '../UI/SearchBar';
 import NewObjectDialog from '../AssetStore/NewObjectDialog';
-import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
@@ -44,9 +43,8 @@ import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 
 const styles = {
   listContainer: {
@@ -78,7 +76,6 @@ const getPasteLabel = isGlobalObject => {
 type State = {|
   newObjectDialogOpen: boolean,
   renamedObjectWithContext: ?ObjectWithContext,
-  variablesEditedObject: ?gdObject,
   searchText: string,
   tagEditedObject: ?gdObject,
 |};
@@ -123,7 +120,6 @@ export default class ObjectsList extends React.Component<Props, State> {
   state = {
     newObjectDialogOpen: false,
     renamedObjectWithContext: null,
-    variablesEditedObject: null,
     searchText: '',
     tagEditedObject: null,
   };
@@ -140,7 +136,6 @@ export default class ObjectsList extends React.Component<Props, State> {
       this.state.newObjectDialogOpen !== nextState.newObjectDialogOpen ||
       this.state.renamedObjectWithContext !==
         nextState.renamedObjectWithContext ||
-      this.state.variablesEditedObject !== nextState.variablesEditedObject ||
       this.state.searchText !== nextState.searchText ||
       this.state.tagEditedObject !== nextState.tagEditedObject
     )
@@ -320,12 +315,6 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
   };
 
-  _editVariables = (object: ?gdObject) => {
-    this.setState({
-      variablesEditedObject: object,
-    });
-  };
-
   _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
     this.setState({
@@ -466,7 +455,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Edit object variables`),
-        click: () => this._editVariables(object),
+        click: () => this.props.onEditObject(object, 'variables'),
       },
       {
         label: i18n._(t`Edit behaviors`),
@@ -638,43 +627,6 @@ export default class ObjectsList extends React.Component<Props, State> {
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
-          />
-        )}
-        {this.state.variablesEditedObject && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedObject &&
-              this.state.variablesEditedObject.getVariables()
-            }
-            onCancel={() => this._editVariables(null)}
-            onApply={() => this._editVariables(null)}
-            title={<Trans>Object Variables</Trans>}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                For example, you can have a variable called Life representing
-                the health of the object.
-              </Trans>
-            }
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedObject = this.state.variablesEditedObject;
-              return layout && variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
           />
         )}
         {tagEditedObject && (

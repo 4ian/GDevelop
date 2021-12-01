@@ -78,7 +78,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Direction"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
-
+      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -242,7 +242,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Direction"),
          "res/conditions/direction24.png",
          "res/conditions/direction.png")
-
+      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters("number");
 
@@ -464,6 +464,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     _("Direction of the object"),
                     _("Direction"),
                     "res/actions/direction.png")
+      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
       .AddParameter("object", _("Object"), "Sprite");
 
   obj.AddExpression("Anim",

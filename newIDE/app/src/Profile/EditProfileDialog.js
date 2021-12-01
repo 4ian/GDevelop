@@ -18,11 +18,12 @@ import {
   usernameFormatError,
 } from './UsernameField';
 import TextField from '../UI/TextField';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   profile: Profile,
   onClose: () => void,
-  onEdit: (form: EditForm) => void,
+  onEdit: (form: EditForm) => Promise<void>,
   editInProgress: boolean,
   error: ?AuthError,
 |};
@@ -45,6 +46,7 @@ export default class EditDialog extends Component<Props, State> {
     form: {
       username: this.props.profile.username || '',
       description: this.props.profile.description || '',
+      getGameStatsEmail: !!this.props.profile.getGameStatsEmail,
     },
   };
 
@@ -112,6 +114,18 @@ export default class EditDialog extends Component<Props, State> {
                 form: {
                   ...this.state.form,
                   description: value,
+                },
+              });
+            }}
+          />
+          <Checkbox
+            label={<Trans>I want to receive weekly stats about my games</Trans>}
+            checked={this.state.form.getGameStatsEmail}
+            onCheck={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  getGameStatsEmail: value,
                 },
               });
             }}

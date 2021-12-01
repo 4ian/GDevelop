@@ -28,6 +28,112 @@ namespace gdjs {
   };
 
   /**
+   * Arrays and data structure that are (re)used by
+   * {@link RuntimeObject.separateFromObjects} to avoid any allocation.
+   */
+  const separateFromObjectsStatics: {
+    moveXArray: Array<float>;
+    moveYArray: Array<float>;
+  } = {
+    moveXArray: [],
+    moveYArray: [],
+  };
+
+  /**
+   * Move the object using the results from collisionTest call.
+   * This moves the object according to the direction of the longest vector,
+   * and projects the others on the orthogonal vector.
+   *
+   * See {@link RuntimeObject.separateFromObjects}
+   *
+   * @param object The object to move.
+   * @param moveXArray The X coordinates of the vectors to move the object.
+   * @param moveYArray The Y coordinates of the vectors to move the object.
+   * @return true if the object was moved.
+   */
+  const moveFollowingSeparatingVectors = (
+    object: gdjs.RuntimeObject,
+    moveXArray: Array<float>,
+    moveYArray: Array<float>
+  ): boolean => {
+    if (moveXArray.length === 0) {
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return false;
+    }
+    if (moveXArray.length === 1) {
+      // Move according to the results returned by the collision algorithm.
+      object.setPosition(
+        object.getX() + moveXArray[0],
+        object.getY() + moveYArray[0]
+      );
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+      return true;
+    }
+
+    // Find the longest vector
+    let squaredDistanceMax = 0;
+    let distanceMaxIndex = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const squaredDistance = moveX * moveX + moveY * moveY;
+      if (squaredDistance > squaredDistanceMax) {
+        squaredDistanceMax = squaredDistance;
+        distanceMaxIndex = index;
+      }
+    }
+
+    const distanceMax = Math.sqrt(squaredDistanceMax);
+    // unit vector of the longest vector
+    const uX = moveXArray[distanceMaxIndex] / distanceMax;
+    const uY = moveYArray[distanceMaxIndex] / distanceMax;
+
+    // normal vector of the longest vector
+    const vX = -uY;
+    const vY = uX;
+
+    // Project other vectors on the normal
+    let scalarProductMin = 0;
+    let scalarProductMax = 0;
+    for (let index = 0; index < moveXArray.length; index++) {
+      const moveX = moveXArray[index];
+      const moveY = moveYArray[index];
+
+      const scalarProduct = moveX * vX + moveY * vY;
+      scalarProductMin = Math.min(scalarProductMin, scalarProduct);
+      scalarProductMax = Math.max(scalarProductMax, scalarProduct);
+    }
+
+    // Apply the longest vector
+    let deltaX = moveXArray[distanceMaxIndex];
+    let deltaY = moveYArray[distanceMaxIndex];
+
+    // Apply the longest projected vector if they all are in the same direction
+    // Some projections could have rounding errors,
+    // they are considered negligible under a 1 for 1,000,000 ratio.
+    const scalarProductMinIsNegligible =
+      -scalarProductMin < scalarProductMax / 1048576;
+    const scalarProductMaxIsNegligible =
+      scalarProductMax < -scalarProductMin / 1048576;
+    if (scalarProductMinIsNegligible !== scalarProductMaxIsNegligible) {
+      if (scalarProductMaxIsNegligible) {
+        deltaX += scalarProductMin * vX;
+        deltaY += scalarProductMin * vY;
+      } else {
+        deltaX += scalarProductMax * vX;
+        deltaY += scalarProductMax * vY;
+      }
+    }
+    object.setPosition(object.getX() + deltaX, object.getY() + deltaY);
+    moveXArray.length = 0;
+    moveYArray.length = 0;
+    return true;
+  };
+
+  /**
    * RuntimeObject represents an object being used on a RuntimeScene.
    *
    * A `gdjs.RuntimeObject` should not be instantiated directly, always a child class
@@ -1373,6 +1479,54 @@ namespace gdjs {
       }
     }
 
+    /**
+     * Shortcut for `getAABB().min[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBLeft(): float {
+      return this.getAABB().min[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().min[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBTop(): float {
+      return this.getAABB().min[1];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[0]`.
+     * See {@link getAABB}.
+     */
+    getAABBRight(): float {
+      return this.getAABB().max[0];
+    }
+
+    /**
+     * Shortcut for `getAABB().max[1]`.
+     * See {@link getAABB}.
+     */
+    getAABBBottom(): float {
+      return this.getAABB().max[1];
+    }
+
+    /**
+     * Shortcut for getting the center on the X coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterX(): float {
+      return this.getAABB().min[0] / 2 + this.getAABB().max[0] / 2;
+    }
+
+    /**
+     * Shortcut for getting the center on the Y coordinates of the object AABB.
+     * See {@link getAABB}.
+     */
+    getAABBCenterY(): float {
+      return this.getAABB().min[1] / 2 + this.getAABB().max[1] / 2;
+    }
+
     //Behaviors:
     /**
      * Call each behavior stepPreEvents method.
@@ -1599,35 +1753,34 @@ namespace gdjs {
       objects: RuntimeObject[],
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moved = false;
-      let xMove = 0;
-      let yMove = 0;
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+
       const hitBoxes = this.getHitBoxes();
 
-      //Check if their is a collision with each object
-      for (let i = 0, len = objects.length; i < len; ++i) {
-        if (objects[i].id != this.id) {
-          const otherHitBoxes = objects[i].getHitBoxes();
-          for (let k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
-            for (let l = 0, lenl = otherHitBoxes.length; l < lenl; ++l) {
-              const result = gdjs.Polygon.collisionTest(
-                hitBoxes[k],
-                otherHitBoxes[l],
-                ignoreTouchingEdges
-              );
-              if (result.collision) {
-                xMove += result.move_axis[0];
-                yMove += result.move_axis[1];
-                moved = true;
-              }
+      // Check if their is a collision with each object
+      for (const otherObject of objects) {
+        if (otherObject.id === this.id) {
+          continue;
+        }
+        const otherHitBoxes = otherObject.getHitBoxes();
+        for (const hitBox of hitBoxes) {
+          for (const otherHitBox of otherHitBoxes) {
+            const result = gdjs.Polygon.collisionTest(
+              hitBox,
+              otherHitBox,
+              ignoreTouchingEdges
+            );
+            if (result.collision) {
+              moveXArray.push(result.move_axis[0]);
+              moveYArray.push(result.move_axis[1]);
             }
           }
         }
       }
-
-      //Move according to the results returned by the collision algorithm.
-      this.setPosition(this.getX() + xMove, this.getY() + yMove);
-      return moved;
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**
@@ -1640,40 +1793,40 @@ namespace gdjs {
       objectsLists: ObjectsLists,
       ignoreTouchingEdges: boolean
     ): boolean {
-      let moved = false;
-      let xMove = 0;
-      let yMove = 0;
+      let moveXArray: Array<float> = separateFromObjectsStatics.moveXArray;
+      let moveYArray: Array<float> = separateFromObjectsStatics.moveYArray;
+      moveXArray.length = 0;
+      moveYArray.length = 0;
+
       const hitBoxes = this.getHitBoxes();
+
       for (const name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
-          const objects = objectsLists.items[name];
+          const otherObjects = objectsLists.items[name];
 
-          //Check if their is a collision with each object
-          for (let i = 0, len = objects.length; i < len; ++i) {
-            if (objects[i].id != this.id) {
-              const otherHitBoxes = objects[i].getHitBoxes();
-              for (let k = 0, lenk = hitBoxes.length; k < lenk; ++k) {
-                for (let l = 0, lenl = otherHitBoxes.length; l < lenl; ++l) {
-                  const result = gdjs.Polygon.collisionTest(
-                    hitBoxes[k],
-                    otherHitBoxes[l],
-                    ignoreTouchingEdges
-                  );
-                  if (result.collision) {
-                    xMove += result.move_axis[0];
-                    yMove += result.move_axis[1];
-                    moved = true;
-                  }
+          // Check if their is a collision with each object
+          for (const otherObject of otherObjects) {
+            if (otherObject.id === this.id) {
+              continue;
+            }
+            const otherHitBoxes = otherObject.getHitBoxes();
+            for (const hitBox of hitBoxes) {
+              for (const otherHitBox of otherHitBoxes) {
+                const result = gdjs.Polygon.collisionTest(
+                  hitBox,
+                  otherHitBox,
+                  ignoreTouchingEdges
+                );
+                if (result.collision) {
+                  moveXArray.push(result.move_axis[0]);
+                  moveYArray.push(result.move_axis[1]);
                 }
               }
             }
           }
         }
       }
-
-      //Move according to the results returned by the collision algorithm.
-      this.setPosition(this.getX() + xMove, this.getY() + yMove);
-      return moved;
+      return moveFollowingSeparatingVectors(this, moveXArray, moveYArray);
     }
 
     /**

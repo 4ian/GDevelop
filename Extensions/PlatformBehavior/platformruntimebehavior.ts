@@ -105,6 +105,7 @@ namespace gdjs {
     _oldY: float = 0;
     _oldWidth: float = 0;
     _oldHeight: float = 0;
+    _oldAngle: float = 0;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
 
@@ -173,7 +174,8 @@ namespace gdjs {
         this._oldX !== this.owner.getX() ||
         this._oldY !== this.owner.getY() ||
         this._oldWidth !== this.owner.getWidth() ||
-        this._oldHeight !== this.owner.getHeight()
+        this._oldHeight !== this.owner.getHeight() ||
+        this._oldAngle !== this.owner.getAngle()
       ) {
         if (this._registeredInManager) {
           this._manager.removePlatform(this);
@@ -183,6 +185,7 @@ namespace gdjs {
         this._oldY = this.owner.getY();
         this._oldWidth = this.owner.getWidth();
         this._oldHeight = this.owner.getHeight();
+        this._oldAngle = this.owner.getAngle();
       }
     }
 

@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import EventsSheet from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
@@ -29,7 +29,7 @@ export class ExternalEventsEditorContainer extends React.Component<
   RenderEditorContainerProps,
   State
 > {
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
 
   state = {
     externalPropertiesDialogOpen: false,
@@ -133,6 +133,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             project={project}
             scope={{
               layout,
+              externalEvents,
             }}
             globalObjectsContainer={project}
             objectsContainer={layout}

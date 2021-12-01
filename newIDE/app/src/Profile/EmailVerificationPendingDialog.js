@@ -27,7 +27,11 @@ export default function EmailVerificationPendingDialog({
     !!authenticatedUser.firebaseUser &&
     !!authenticatedUser.firebaseUser.emailVerified;
   useInterval(
-    () => authenticatedUser.onRefreshFirebaseProfile(),
+    () => {
+      authenticatedUser.onRefreshFirebaseProfile().catch(() => {
+        // Ignore any error, will be retried anyway.
+      });
+    },
     isVerified ? null : 3900
   );
 

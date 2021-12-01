@@ -9,6 +9,8 @@ declare class gdSpriteObject extends gdObject {
   hasNoAnimations(): boolean;
   swapAnimations(first: number, second: number): void;
   moveAnimation(oldIndex: number, newIndex: number): void;
+  setUpdateIfNotVisible(updateIfNotVisible: boolean): void;
+  getUpdateIfNotVisible(): boolean;
   delete(): void;
   ptr: number;
 };

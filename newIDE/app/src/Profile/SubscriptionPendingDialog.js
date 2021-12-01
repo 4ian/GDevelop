@@ -27,7 +27,11 @@ export default function SubscriptionPendingDialog({
     !!authenticatedUser.subscription &&
     !!authenticatedUser.subscription.planId;
   useInterval(
-    () => authenticatedUser.onRefreshUserProfile(),
+    () => {
+      authenticatedUser.onRefreshUserProfile().catch(() => {
+        // Ignore any error, will be retried anyway.
+      });
+    },
     hasPlan ? null : 3900
   );
 

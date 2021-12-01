@@ -8,11 +8,11 @@ namespace gdjs {
    * called. This is used to avoid scrolling in a webpage when these keys are pressed
    * in the game.
    */
-  const defaultPreventedKeys = [
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
+  const defaultPreventedKeyCodes = [
+    37, // ArrowLeft
+    38, // ArrowUp
+    39, // ArrowRight
+    40, // ArrowDown
   ];
 
   /**
@@ -431,14 +431,14 @@ namespace gdjs {
 
       //Keyboard
       document.onkeydown = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
 

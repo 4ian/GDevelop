@@ -18,7 +18,7 @@ import { getEmailErrorText } from './CreateAccountDialog';
 type Props = {|
   firebaseUser: FirebaseUser,
   onClose: () => void,
-  onChangeEmail: (form: ChangeEmailForm) => void,
+  onChangeEmail: (form: ChangeEmailForm) => Promise<void>,
   changeEmailInProgress: boolean,
   error: ?AuthError,
 |};

@@ -22,9 +22,11 @@ type ConstructorArgs = {|
 
 const isURL = (filename: string) => {
   return (
-    filename.substr(0, 7) === 'http://' ||
-    filename.substr(0, 8) === 'https://' ||
-    filename.substr(0, 6) === 'ftp://'
+    filename.startsWith('http://') ||
+    filename.startsWith('https://') ||
+    filename.startsWith('ftp://') ||
+    filename.startsWith('blob:') ||
+    filename.startsWith('data:')
   );
 };
 

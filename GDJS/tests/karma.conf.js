@@ -10,6 +10,13 @@ module.exports = function (config) {
   config.set({
     frameworks: ['mocha'],
     browserNoActivityTimeout: 400000,
+    browsers: ['ChromeHeadless', 'EdgeHeadless', 'Chrome', 'Edge', 'Firefox'],
+    plugins: [
+      require('karma-chrome-launcher'),
+      require('@chiragrupani/karma-chromium-edge-launcher'),
+      require('karma-firefox-launcher'),
+      require('karma-mocha'),
+    ],
     client: {
       mocha: {
         reporter: 'html',
@@ -59,7 +66,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/storagetools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js',
-      '../../newIDE/app/resources/GDJS/Runtime/websocket-debugger-client/hot-reloader.js',
+      '../../newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js',
 
       //Extensions:
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',
@@ -83,7 +90,8 @@ module.exports = function (config) {
       // Test extensions:
       './tests/Extensions/**.js',
 
-      //All tests files:
+      // Other test initialization files:
+      './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
 
       // Assets

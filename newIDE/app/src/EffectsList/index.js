@@ -30,10 +30,16 @@ import {
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import ScrollView from '../UI/ScrollView';
 import { EmptyEffectsPlaceholder } from './EmptyEffectsPlaceholder';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_EFFECT,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: gdProject,
@@ -63,6 +69,7 @@ export default function EffectsList(props: Props) {
   const { effectsContainer, onEffectsUpdated } = props;
 
   const preferences = React.useContext(PreferencesContext);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const showEffectParameterNames = preferences.values.showEffectParameterNames;
   const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
 
@@ -73,7 +80,7 @@ export default function EffectsList(props: Props) {
 
   const forceUpdate = useForceUpdate();
 
-  const addEffect = () => {
+  const _addEffect = () => {
     const newName = newNameGenerator('Effect', name =>
       effectsContainer.hasEffectNamed(name)
     );
@@ -85,6 +92,14 @@ export default function EffectsList(props: Props) {
     forceUpdate();
     onEffectsUpdated();
   };
+
+  const addEffect = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_EFFECT,
+        _addEffect
+      )
+    : _addEffect;
 
   const removeEffect = (name: string) => {
     effectsContainer.removeEffect(name);

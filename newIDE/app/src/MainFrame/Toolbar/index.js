@@ -61,13 +61,6 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
               element={<ToolbarIcon src="res/ribbon_default/bug32.png" />}
               buildMenuTemplate={() => [
                 {
-                  label: 'Request update from external editor',
-                  disabled: !this.props.requestUpdate,
-                  click: () => {
-                    this.props.requestUpdate && this.props.requestUpdate();
-                  },
-                },
-                {
                   label: 'Simulate update downloaded',
                   disabled: !this.props.simulateUpdateDownloaded,
                   click: () => {
@@ -93,7 +86,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
             onNetworkPreview={this.props.onNetworkPreview}
             onHotReloadPreview={this.props.onHotReloadPreview}
             setPreviewOverride={this.props.setPreviewOverride}
-            showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+            canDoNetworkPreview={this.props.canDoNetworkPreview}
             isPreviewEnabled={this.props.isPreviewEnabled}
             previewState={this.props.previewState}
             hasPreviewsRunning={this.props.hasPreviewsRunning}

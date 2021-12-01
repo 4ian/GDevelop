@@ -13,8 +13,8 @@ export const ExplanationHeader = () => (
     <Trans>This will export your game to a folder.</Trans>
     <Trans>
       You can then upload it on a website/game hosting service and share it on
-      marketplaces and gaming portals like Kongregate, Game Jolt, itch.io,
-      Poki...
+      marketplaces and gaming portals like CrazyGames, Poki, Game Jolt, itch.io,
+      Newsground...
     </Trans>
   </Text>
 );
@@ -49,6 +49,14 @@ export const DoneFooter = ({
         )
       }
       label={<Trans>Publish your game on Game Jolt</Trans>}
+    />
+    <FlatButton
+      fullWidth
+      primary
+      onClick={() =>
+        Window.openExternalURL('https://gdevelop-app.com/crazy-games')
+      }
+      label={<Trans>Publish your game on CrazyGames.com</Trans>}
     />
     <FlatButton
       fullWidth

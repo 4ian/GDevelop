@@ -7,7 +7,7 @@ import FlatButton from '../../UI/FlatButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../ResourcesList/ResourceSource.flow';
+} from '../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import InstructionParametersEditor from './InstructionParametersEditor';
 import InstructionOrObjectSelector, {

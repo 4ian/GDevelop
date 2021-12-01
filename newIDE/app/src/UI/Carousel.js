@@ -13,7 +13,7 @@ import Text from './Text';
 import { Column, Line, Spacer } from './Grid';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
-import FlatButton, { type Props as FlatButtonProps } from './FlatButton';
+import FlatButton from './FlatButton';
 
 type Thumbnail = {|
   id: string,
@@ -159,7 +159,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
       if (!item.skeleton && !item.link && !item.thumbnailUrl) return null;
       if (item.link) {
         return (
-          <a href={item.link} target="_blank">
+          <a href={item.link} target="_blank" onFocus={onFocusItem}>
             {renderImage(item)}
           </a>
         );
@@ -200,28 +200,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
     },
     [cellWidth, titleHeight]
   );
-
-  const renderBrowseAllButton = (): React.Node => {
-    const flatButtonProps: $Shape<FlatButtonProps> = { onClick: () => {} };
-    if (!onBrowseAllClick && browseAllLink) {
-      flatButtonProps.onClick = () => {
-        Window.openExternalURL(browseAllLink);
-      };
-      flatButtonProps.target = '_blank';
-    } else if (onBrowseAllClick) {
-      flatButtonProps.onClick = onBrowseAllClick;
-    } else {
-      flatButtonProps.onClick = () => {};
-    }
-
-    return (
-      <FlatButton
-        {...flatButtonProps}
-        label={<Trans>Browse all</Trans>}
-        tabIndex={tabIndexOffset + itemsToDisplay.length}
-      />
-    );
-  };
 
   const computeScroll = React.useCallback(
     (
@@ -291,6 +269,10 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [roundScroll]
   );
 
+  const onFocusItem = (event) => {
+    event.target.scrollIntoViewIfNeeded()
+  }
+
   React.useEffect(() => {
     const scrollViewElement = scrollView.current;
     if (!scrollViewElement) return;
@@ -315,7 +297,18 @@ const Carousel = <ThumbnailType: Thumbnail>({
       >
         <Line noMargin justifyContent="space-between" alignItems="center">
           <Text size="bold-title">{title}</Text>
-          {renderBrowseAllButton()}
+          <FlatButton
+            onClick={
+              onBrowseAllClick ||
+              (browseAllLink
+                ? () => {
+                    Window.openExternalURL(browseAllLink);
+                  }
+                : () => {})
+            }
+            label={<Trans>Browse all</Trans>}
+            tabIndex={0}
+          />
         </Line>
         <GridList
           classes={classesForGridList}
@@ -330,6 +323,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
               classes={classesForGridListItem}
               key={item.id}
               tabIndex={areItemsSet ? index + tabIndexOffset : -1}
+              onFocus={item.link ? null : onFocusItem}
             >
               {renderThumbnail(item)}
               {renderItemTitle(item)}

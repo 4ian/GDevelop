@@ -7,7 +7,15 @@ namespace gdjs {
       static load(
         pako: any,
         tiledMap: gdjs.TileMap.TiledMap
-      ): gdjs.TileMap.EditableTileMap {
+      ): gdjs.TileMap.EditableTileMap | null {
+        if (!tiledMap.tiledversion) {
+          console.warn(
+            "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
+          );
+
+          return null;
+        }
+
         const definitions = new Map<integer, gdjs.TileMap.TileDefinition>();
         for (const tile of tiledMap.tilesets[0].tiles!) {
           const polygons: PolygonVertices[] = [];

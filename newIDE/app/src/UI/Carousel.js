@@ -141,7 +141,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
 
   const cellHeight =
     imageHeight +
-    (displayItemTitles ? titleHeight + spacerSize : 2 * focusItemBorderWidth); // Take focus border into account to make sure it is not cut
+    (displayItemTitles ? titleHeight + spacerSize : 2 * focusItemBorderWidth); // Take focus border into account to make sure it is not cut (box-sizing: content-box not working)
 
   const renderImage = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): React.Node => (
@@ -253,15 +253,17 @@ const Carousel = <ThumbnailType: Thumbnail>({
       [computeScroll]
     );
 
-  const handleScroll = React.useCallback(() => {
-    const scrollViewElement = scrollView.current;
-    if (!scrollViewElement) return;
+  const handleScroll = React.useCallback(
+    (): void => {
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
 
-    if (!shouldDisplayLeftArrow)
-      setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
-  });
+      if (!shouldDisplayLeftArrow)
+        setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
+    }
+  );
   const handleScrollEnd = React.useCallback(
-    () => {
+    (): void => {
       const scrollViewElement = scrollView.current;
       if (!scrollViewElement) return;
 
@@ -273,8 +275,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [roundScroll]
   );
 
-  const onFocusItem = event => {
-    event.target.scrollIntoView();
+  const onFocusItem = (event: SyntheticFocusEvent<HTMLLIElement>): void => {
+    event.currentTarget.scrollIntoView();
   };
 
   React.useEffect(() => {
@@ -325,9 +327,11 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <GridListTile
               classes={classesForGridListItem}
               key={item.id}
-              tabIndex={0} // Do not add tab index when item renders a link, as it is reachable with tab by default
+              tabIndex={0}
               onFocus={onFocusItem}
-              onKeyPress={event => {
+              onKeyPress={(
+                event: SyntheticKeyboardEvent<HTMLLIElement>
+              ): void => {
                 if (shouldValidate(event)) {
                   if (item.link) openLinkCallback(item.link)();
                   if (item.onClick) item.onClick();

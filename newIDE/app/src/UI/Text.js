@@ -6,7 +6,7 @@ type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: 'body' | 'body2' | 'title',
+  size?: 'body' | 'body2' | 'title' | 'bold-title',
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -48,7 +48,15 @@ export default ({
   displayInlineAsSpan,
 }: Props) => (
   <Typography
-    variant={size === 'title' ? 'h6' : size === 'body2' ? 'body2' : 'body1'}
+    variant={
+      size === 'bold-title'
+        ? 'h5'
+        : size === 'title'
+        ? 'h6'
+        : size === 'body2'
+        ? 'body2'
+        : 'body1'
+    }
     component={displayInlineAsSpan ? 'span' : undefined}
     style={{
       ...style,

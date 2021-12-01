@@ -95,6 +95,7 @@ const useStylesForGridListItem = makeStyles(theme =>
       width: 'unset !important',
       '&:focus': {
         border: `${focusItemBorderWidth}px solid ${theme.palette.primary.main}`,
+        outline: 'none',
       },
       '&:focus-visible': { outline: 'unset' },
     },

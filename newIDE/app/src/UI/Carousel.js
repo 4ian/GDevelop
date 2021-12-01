@@ -49,8 +49,9 @@ const referenceSizesByWindowSize = {
 };
 
 const cellSpacing = 12;
-const titleHeight = 30;
+const titleHeight = 24;
 const spacerSize = 4;
+const focusItemBorderWidth = 2;
 const rightArrowMargin = 6; // Necessary because MUI adds a -6 margin to GridList
 
 const styles = {
@@ -92,7 +93,9 @@ const useStylesForGridListItem = makeStyles(theme =>
   createStyles({
     root: {
       width: 'unset !important',
-      '&:focus': { border: `2px solid ${theme.palette.primary.main}` },
+      '&:focus': {
+        border: `${focusItemBorderWidth}px solid ${theme.palette.primary.main}`,
+      },
       '&:focus-visible': { outline: 'unset' },
     },
     tile: {
@@ -106,7 +109,9 @@ const useStylesForLink = makeStyles(theme =>
   createStyles({
     link: {
       display: 'inline-block',
-      '&:focus': { border: `2px solid ${theme.palette.primary.main}` },
+      '&:focus': {
+        border: `${focusItemBorderWidth}px solid ${theme.palette.primary.main}`,
+      },
       '&:focus-visible': { outline: 'unset' },
     },
   })
@@ -146,7 +151,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const widthUnit = cellWidth + cellSpacing;
 
   const cellHeight =
-    imageHeight + (displayItemTitles ? titleHeight + spacerSize : 8); // 8 allows focus border to be displayed
+    imageHeight +
+    (displayItemTitles ? titleHeight + spacerSize : 2 * focusItemBorderWidth); // Take focus border into account to make sure it is not cut
 
   const renderImage = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): React.Node => (
@@ -293,6 +299,10 @@ const Carousel = <ThumbnailType: Thumbnail>({
     const scrollViewElement = scrollView.current;
     if (!scrollViewElement) return;
 
+    // Add event listeners on component mount. There is no need to
+    // remove them with a cleanup function because scrollview element
+    // does not change and they will be destroyed when the element is
+    // removed from the DOM.
     scrollViewElement.addEventListener('scroll', handleScroll);
     scrollViewElement.addEventListener('touchend', handleScrollEnd);
     scrollViewElement.addEventListener('touchleave', handleScrollEnd);

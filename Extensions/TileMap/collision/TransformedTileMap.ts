@@ -128,7 +128,7 @@ namespace gdjs {
 
       /**
        * @param layerId
-       * @returns
+       * @returns The layer identifier.
        */
       getLayer(layerId: integer): TransformedCollisionTileMapLayer | undefined {
         return this._layers.get(layerId);
@@ -450,7 +450,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped diagonally.
        */
       isFlippedDiagonally(x: integer, y: integer) {
         return this._source.isFlippedDiagonally(x, y);
@@ -459,7 +459,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped vertically.
        */
       isFlippedVertically(x: integer, y: integer) {
         return this._source.isFlippedVertically(x, y);
@@ -468,7 +468,7 @@ namespace gdjs {
       /**
        * @param x The layer column.
        * @param y The layer row.
-       * @return
+       * @returns true if the tile is flipped horizontally.
        */
       isFlippedHorizontally(x: integer, y: integer) {
         return this._source.isFlippedHorizontally(x, y);

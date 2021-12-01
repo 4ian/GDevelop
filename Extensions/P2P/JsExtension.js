@@ -162,7 +162,7 @@ module.exports = {
           'Disables the default ICE (STUN or TURN) servers list and use one of your own. ' +
             'Note that it is recommended to add at least 1 self-hosted STUN and TURN server ' +
             'for games that are not over LAN but over the internet. ' +
-            'This action is cumulable, you can use it multiple times to add multiple servers. ' +
+            'This action can be used multiple times to add multiple servers. ' +
             'This action needs to be called BEFORE connecting to the broker server.'
         ),
         _('Use ICE server _PARAM0_ (username: _PARAM1_, password: _PARAM2_)'),

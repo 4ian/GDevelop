@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import { GridListTile, Paper } from '@material-ui/core';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
@@ -64,6 +64,7 @@ const styles = {
   },
   gridList: { position: 'relative' },
   image: {
+    display: 'block',
     objectFit: 'cover',
   },
   itemTitleContainer: { height: titleHeight },
@@ -89,15 +90,29 @@ const useStylesForGridList = makeStyles({
   },
 });
 
-const useStylesForGridListItem = makeStyles({
-  root: {
-    width: 'unset !important',
-  },
-  tile: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-});
+const useStylesForGridListItem = makeStyles(theme =>
+  createStyles({
+    root: {
+      width: 'unset !important',
+      '&:focus': { border: `2px solid ${theme.palette.primary.main}` },
+      '&:focus-visible': { outline: 'unset' },
+    },
+    tile: {
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  })
+);
+
+const useStylesForLink = makeStyles(theme =>
+  createStyles({
+    link: {
+      display: 'inline-block',
+      '&:focus': { border: `2px solid ${theme.palette.primary.main}` },
+      '&:focus-visible': { outline: 'unset' },
+    },
+  })
+);
 
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
@@ -107,13 +122,13 @@ const Carousel = <ThumbnailType: Thumbnail>({
   displayItemTitles = true,
   tabIndexOffset = 0,
 }: Props<ThumbnailType>) => {
-  const theme = React.useContext(GDevelopThemeContext);
   const [
     shouldDisplayLeftArrow,
     setShouldDisplayLeftArrow,
   ] = React.useState<boolean>(false);
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
+  const classesForLink = useStylesForLink();
   const scrollView = React.useRef<?HTMLUListElement>(null);
   const areItemsSet = items && items.length;
   const itemsToDisplay =
@@ -135,7 +150,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const widthUnit = cellWidth + cellSpacing;
 
   const cellHeight =
-    imageHeight + (displayItemTitles ? titleHeight + spacerSize : 0);
+    imageHeight + (displayItemTitles ? titleHeight + spacerSize : 8); // 8 allows focus border to be displayed
 
   const renderImage = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): React.Node => (
@@ -159,7 +174,12 @@ const Carousel = <ThumbnailType: Thumbnail>({
       if (!item.skeleton && !item.link && !item.thumbnailUrl) return null;
       if (item.link) {
         return (
-          <a href={item.link} target="_blank" onFocus={onFocusItem}>
+          <a
+            href={item.link}
+            target="_blank"
+            onFocus={onFocusItem}
+            className={classesForLink.link}
+          >
             {renderImage(item)}
           </a>
         );
@@ -269,9 +289,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [roundScroll]
   );
 
-  const onFocusItem = (event) => {
-    event.target.scrollIntoViewIfNeeded()
-  }
+  const onFocusItem = event => {
+    event.target.scrollIntoViewIfNeeded();
+  };
 
   React.useEffect(() => {
     const scrollViewElement = scrollView.current;
@@ -322,7 +342,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <GridListTile
               classes={classesForGridListItem}
               key={item.id}
-              tabIndex={areItemsSet ? index + tabIndexOffset : -1}
+              tabIndex={item.link ? -1 : 0} // Do not add tab index when item renders a link, as it is reachable with tab by default
               onFocus={item.link ? null : onFocusItem}
             >
               {renderThumbnail(item)}

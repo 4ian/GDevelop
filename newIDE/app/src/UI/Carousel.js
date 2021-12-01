@@ -158,9 +158,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [cellWidth, imageHeight]
   );
 
-  const openLinkCallback = (link:string): () => void => (): void => {
-    Window.openExternalURL(link)
-  }
+  const openLinkCallback = (link: string): (() => void) => (): void => {
+    Window.openExternalURL(link);
+  };
 
   const renderThumbnail = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
@@ -207,8 +207,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
       direction: 'left' | 'right',
       scrollViewElement: HTMLUListElement
     ): number => {
-      const visibleThumbnailsCount = Math.floor(
-        scrollViewElement.offsetWidth / widthUnit
+      const visibleThumbnailsCount = Math.max(
+        Math.floor(scrollViewElement.offsetWidth / widthUnit),
+        1
       );
       const scale = visibleThumbnailsCount * widthUnit;
 
@@ -305,9 +306,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
           <FlatButton
             onClick={
               onBrowseAllClick ||
-              (browseAllLink
-                ? openLinkCallback(browseAllLink)
-                : () => {})
+              (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
             }
             label={<Trans>Browse all</Trans>}
           />
@@ -326,7 +325,13 @@ const Carousel = <ThumbnailType: Thumbnail>({
               key={item.id}
               tabIndex={0} // Do not add tab index when item renders a link, as it is reachable with tab by default
               onFocus={onFocusItem}
-              onClick={item.link ? openLinkCallback(item.link) : item.onClick ? item.onClick : null}
+              onClick={
+                item.link
+                  ? openLinkCallback(item.link)
+                  : item.onClick
+                  ? item.onClick
+                  : null
+              }
             >
               {renderThumbnail(item)}
               {renderItemTitle(item)}

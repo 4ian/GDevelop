@@ -33,7 +33,6 @@ type Props<ThumbnailType> = {|
   onBrowseAllClick?: () => void,
   browseAllLink?: string,
   displayItemTitles?: boolean,
-  tabIndexOffset?: number,
 |};
 
 const referenceSizesByWindowSize = {
@@ -119,7 +118,6 @@ const Carousel = <ThumbnailType: Thumbnail>({
   browseAllLink,
   onBrowseAllClick,
   displayItemTitles = true,
-  tabIndexOffset = 0,
 }: Props<ThumbnailType>) => {
   const [
     shouldDisplayLeftArrow,

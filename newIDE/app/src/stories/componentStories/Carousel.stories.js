@@ -70,7 +70,6 @@ export const Tutorials = () => {
     <Carousel
       title={<Trans>Our Latest Tutorials</Trans>}
       items={items}
-      tabIndexOffset={100}
       displayItemTitles={false}
       browseAllLink="https://www.youtube.com/c/GDevelopApp/videos"
     />
@@ -158,7 +157,6 @@ export const Showcases = () => {
     <Carousel
       title={<Trans>Showcase</Trans>}
       items={items}
-      tabIndexOffset={100}
       onBrowseAllClick={() => console.info('Browse all button clicked')}
     />
   );

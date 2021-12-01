@@ -65,188 +65,203 @@ type Props = {|
   onOpenLanguageDialog: () => void,
 |};
 
-export class StartPage extends React.Component<Props, {||}> {
-  shouldComponentUpdate(nextProps: Props) {
-    // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user.
-    return nextProps.isActive;
-  }
+type StartPageEditorInterface = {|
+  getProject: () => void,
+  updateToolbar: () => void,
+  forceUpdateEditor: () => void,
+|};
 
-  getProject() {
-    return undefined;
-  }
+export const StartPage = React.memo<Props>(
+  React.forwardRef<Props, StartPageEditorInterface>(
+    (
+      {
+        project,
+        canOpen,
+        onOpen,
+        onCreate,
+        onOpenProjectManager,
+        onCloseProject,
+        onOpenTutorials,
+        onOpenGamesShowcase,
+        onOpenHelpFinder,
+        onOpenLanguageDialog,
+        setToolbar,
+      }: Props,
+      ref
+    ) => {
+      const getProject = () => {
+        return undefined;
+      };
 
-  updateToolbar() {
-    if (this.props.setToolbar) this.props.setToolbar(null);
-  }
+      const updateToolbar = () => {
+        if (setToolbar) setToolbar(null);
+      };
 
-  forceUpdateEditor() {
-    // No updates to be done
-  }
+      const forceUpdateEditor = () => {
+        // No updates to be done
+      };
 
-  render() {
-    const {
-      project,
-      canOpen,
-      onOpen,
-      onCreate,
-      onOpenProjectManager,
-      onCloseProject,
-      onOpenTutorials,
-      onOpenGamesShowcase,
-      onOpenHelpFinder,
-      onOpenLanguageDialog,
-    } = this.props;
+      React.useImperativeHandle(ref, () => ({
+        getProject,
+        updateToolbar,
+        forceUpdateEditor,
+      }));
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <ScrollBackground>
-            <div style={styles.innerContainer}>
-              <Line expand justifyContent="center">
-                <div style={styles.centerContainer}>
-                  <Paper
-                    elevation={2}
-                    style={{
-                      ...styles.logoPaper,
-                    }}
+      return (
+        <I18n>
+          {({ i18n }) => (
+            <ScrollBackground>
+              <div style={styles.innerContainer}>
+                <Line expand justifyContent="center">
+                  <div style={styles.centerContainer}>
+                    <Paper
+                      elevation={2}
+                      style={{
+                        ...styles.logoPaper,
+                      }}
+                    >
+                      <GDevelopLogo />
+                      <Text>
+                        <Trans>
+                          GDevelop is an easy-to-use game creator with no
+                          programming language to learn.
+                        </Trans>
+                      </Text>
+                    </Paper>
+                    <ColumnStackLayout noMargin>
+                      {
+                        <RaisedButton
+                          label={<Trans>Getting Started and Tutorials</Trans>}
+                          fullWidth
+                          onClick={onOpenTutorials}
+                        />
+                      }
+                      {!project && (
+                        <RaisedButton
+                          label={<Trans>Create a new project</Trans>}
+                          fullWidth
+                          onClick={onCreate}
+                          primary
+                        />
+                      )}
+                      {!project && canOpen && (
+                        <RaisedButton
+                          label={<Trans>Open a project</Trans>}
+                          fullWidth
+                          onClick={onOpen}
+                          primary
+                        />
+                      )}
+                      {!!project && (
+                        <RaisedButton
+                          label={<Trans>Open Project Manager</Trans>}
+                          fullWidth
+                          onClick={onOpenProjectManager}
+                          primary
+                        />
+                      )}
+                      {!!project && (
+                        <FlatButton
+                          label={<Trans>Close project</Trans>}
+                          fullWidth
+                          onClick={() => {
+                            onCloseProject();
+                          }}
+                        />
+                      )}
+                    </ColumnStackLayout>
+                  </div>
+                </Line>
+                <Line noMargin>
+                  <ResponsiveLineStackLayout
+                    alignItems="center"
+                    justifyContent="space-between"
+                    expand
                   >
-                    <GDevelopLogo />
-                    <Text>
-                      <Trans>
-                        GDevelop is an easy-to-use game creator with no
-                        programming language to learn.
-                      </Trans>
-                    </Text>
-                  </Paper>
-                  <ColumnStackLayout noMargin>
-                    {
-                      <RaisedButton
-                        label={<Trans>Getting Started and Tutorials</Trans>}
-                        fullWidth
-                        onClick={onOpenTutorials}
-                      />
-                    }
-                    {!project && (
-                      <RaisedButton
-                        label={<Trans>Create a new project</Trans>}
-                        fullWidth
-                        onClick={onCreate}
-                        primary
-                      />
-                    )}
-                    {!project && canOpen && (
-                      <RaisedButton
-                        label={<Trans>Open a project</Trans>}
-                        fullWidth
-                        onClick={onOpen}
-                        primary
-                      />
-                    )}
-                    {!!project && (
-                      <RaisedButton
-                        label={<Trans>Open Project Manager</Trans>}
-                        fullWidth
-                        onClick={onOpenProjectManager}
-                        primary
-                      />
-                    )}
-                    {!!project && (
+                    <Line noMargin justifyContent="center">
                       <FlatButton
-                        label={<Trans>Close project</Trans>}
-                        fullWidth
-                        onClick={() => {
-                          onCloseProject();
-                        }}
+                        icon={<SportsEsportsIcon />}
+                        label={<Trans>GDevelop Games</Trans>}
+                        onClick={onOpenGamesShowcase}
                       />
-                    )}
-                  </ColumnStackLayout>
-                </div>
-              </Line>
-              <Line noMargin>
-                <ResponsiveLineStackLayout
-                  alignItems="center"
-                  justifyContent="space-between"
-                  expand
-                >
-                  <Line noMargin justifyContent="center">
-                    <FlatButton
-                      icon={<SportsEsportsIcon />}
-                      label={<Trans>GDevelop Games</Trans>}
-                      onClick={onOpenGamesShowcase}
-                    />
-                    <FlatButton
-                      icon={<ForumIcon />}
-                      label={<Trans>Community Forums</Trans>}
-                      onClick={() =>
-                        Window.openExternalURL('https://forum.gdevelop-app.com')
-                      }
-                    />
-                    <FlatButton
-                      icon={<HelpIcon />}
-                      label={<Trans>Help and documentation</Trans>}
-                      onClick={onOpenHelpFinder}
-                    />
-                  </Line>
-                  <Line noMargin alignItems="center" justifyContent="center">
-                    <IconButton
-                      className="icon-youtube"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://www.youtube.com/c/GDevelopApp'
-                        )
-                      }
-                      tooltip={t`Tutorials on YouTube`}
-                    />
-                    <IconButton
-                      className="icon-discord"
-                      onClick={() =>
-                        Window.openExternalURL('https://discord.gg/gdevelop')
-                      }
-                      tooltip={t`GDevelop on Discord`}
-                    />
-                    <IconButton
-                      className="icon-reddit"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://www.reddit.com/r/gdevelop'
-                        )
-                      }
-                      tooltip={t`GDevelop on Reddit`}
-                    />
-                    <IconButton
-                      className="icon-twitter"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://twitter.com/GDevelopApp'
-                        )
-                      }
-                      tooltip={t`GDevelop on Twitter`}
-                    />
-                    <IconButton
-                      className="icon-facebook"
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://www.facebook.com/GDevelopApp'
-                        )
-                      }
-                      tooltip={t`GDevelop on Facebook`}
-                    />
-                    <FlatButton
-                      label={i18n.language}
-                      onClick={onOpenLanguageDialog}
-                      icon={<Language />}
-                    />
-                  </Line>
-                </ResponsiveLineStackLayout>
-              </Line>
-            </div>
-          </ScrollBackground>
-        )}
-      </I18n>
-    );
-  }
-}
+                      <FlatButton
+                        icon={<ForumIcon />}
+                        label={<Trans>Community Forums</Trans>}
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://forum.gdevelop-app.com'
+                          )
+                        }
+                      />
+                      <FlatButton
+                        icon={<HelpIcon />}
+                        label={<Trans>Help and documentation</Trans>}
+                        onClick={onOpenHelpFinder}
+                      />
+                    </Line>
+                    <Line noMargin alignItems="center" justifyContent="center">
+                      <IconButton
+                        className="icon-youtube"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://www.youtube.com/c/GDevelopApp'
+                          )
+                        }
+                        tooltip={t`Tutorials on YouTube`}
+                      />
+                      <IconButton
+                        className="icon-discord"
+                        onClick={() =>
+                          Window.openExternalURL('https://discord.gg/gdevelop')
+                        }
+                        tooltip={t`GDevelop on Discord`}
+                      />
+                      <IconButton
+                        className="icon-reddit"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://www.reddit.com/r/gdevelop'
+                          )
+                        }
+                        tooltip={t`GDevelop on Reddit`}
+                      />
+                      <IconButton
+                        className="icon-twitter"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://twitter.com/GDevelopApp'
+                          )
+                        }
+                        tooltip={t`GDevelop on Twitter`}
+                      />
+                      <IconButton
+                        className="icon-facebook"
+                        onClick={() =>
+                          Window.openExternalURL(
+                            'https://www.facebook.com/GDevelopApp'
+                          )
+                        }
+                        tooltip={t`GDevelop on Facebook`}
+                      />
+                      <FlatButton
+                        label={i18n.language}
+                        onClick={onOpenLanguageDialog}
+                        icon={<Language />}
+                      />
+                    </Line>
+                  </ResponsiveLineStackLayout>
+                </Line>
+              </div>
+            </ScrollBackground>
+          )}
+        </I18n>
+      );
+    }
+  ),
+  // Prevent any update to the editor if the editor is not active,
+  // and so not visible to the user.
+  (prevProps, nextProps) => nextProps.isActive
+);
 
 export const renderStartPageContainer = (
   props: RenderEditorContainerPropsWithRef

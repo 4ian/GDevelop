@@ -618,6 +618,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._storeSoundInArray(this._freeSounds, sound);
       sound.once('play', () => {
         if (this._paused) {
           sound.pause();
@@ -625,7 +626,6 @@ namespace gdjs {
         }
       });
       sound.play();
-      this._storeSoundInArray(this._freeSounds, sound);
     }
 
     playSoundOnChannel(
@@ -644,6 +644,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._sounds[channel] = sound;
       sound.once('play', () => {
         if (this._paused) {
           sound.pause();
@@ -651,7 +652,6 @@ namespace gdjs {
         }
       });
       sound.play();
-      this._sounds[channel] = sound;
     }
 
     getSoundOnChannel(channel: integer): HowlerSound {
@@ -666,6 +666,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._storeSoundInArray(this._freeMusics, music);
       music.once('play', () => {
         if (this._paused) {
           music.pause();
@@ -673,7 +674,6 @@ namespace gdjs {
         }
       });
       music.play();
-      this._storeSoundInArray(this._freeMusics, music);
     }
 
     playMusicOnChannel(
@@ -692,6 +692,7 @@ namespace gdjs {
         loop,
         pitch
       );
+      this._musics[channel] = music;
       music.once('play', () => {
         if (this._paused) {
           music.pause();
@@ -699,7 +700,6 @@ namespace gdjs {
         }
       });
       music.play();
-      this._musics[channel] = music;
     }
 
     getMusicOnChannel(channel: integer): HowlerSound {

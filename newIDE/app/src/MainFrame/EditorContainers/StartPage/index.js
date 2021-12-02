@@ -255,6 +255,14 @@ export const StartPage = React.memo<Props>(
                 </Line>
               </div>
             </ScrollBackground>
+            {showcasedGameDialogOpen && selectedShowcasedGame && (
+        <ShowcasedGameDialog
+          open
+          onClose={() => setShowcasedGameDialogOpen(false)}
+          showcasedGame={selectedShowcasedGame}
+        />
+      )}
+      </>
           )}
         </I18n>
       );

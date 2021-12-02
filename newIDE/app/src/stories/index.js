@@ -2795,6 +2795,7 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onOpenExamples={() => action('open examples')}
     />
   ))
   .add('project opened', () => (
@@ -2812,6 +2813,7 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onOpenExamples={() => action('open examples')}
     />
   ));
 

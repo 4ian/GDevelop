@@ -24,7 +24,9 @@ export class DebuggerEditorContainer extends React.Component<
   };
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // We render updates only if the component is active, or becoming active.
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
     return this.props.isActive || nextProps.isActive;
   }
 

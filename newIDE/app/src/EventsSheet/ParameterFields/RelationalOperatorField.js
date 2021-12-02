@@ -16,10 +16,11 @@ const operatorLabels = {
   '!=': t`≠ (not equal to)`,
 };
 
-const mapTypeToOperators = {
+const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
   string: ['=', '!='],
+  color: ['=', '!='],
 };
 
 export default class RelationalOperatorField extends Component<ParameterFieldProps> {
@@ -37,7 +38,8 @@ export default class RelationalOperatorField extends Component<ParameterFieldPro
     const comparedValueType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
-    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
+    const operators =
+      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
 
     return (
       <SelectField

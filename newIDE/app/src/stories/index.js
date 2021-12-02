@@ -52,6 +52,8 @@ import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpression
 import TrueFalseField from '../EventsSheet/ParameterFields/TrueFalseField';
 import YesNoField from '../EventsSheet/ParameterFields/YesNoField';
 import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplierField';
+import RelationalOperatorField from '../EventsSheet/ParameterFields/RelationalOperatorField';
+import OperatorField from '../EventsSheet/ParameterFields/OperatorField';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -2454,6 +2456,142 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={testProject.project}
           objectsContainer={testProject.testLayout}
+        />
+      )}
+    />
+  ))
+  .add('RelationalOperatorField (string)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <RelationalOperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.stringRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('RelationalOperatorField (number)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <RelationalOperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.numberRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('RelationalOperatorField (color)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <RelationalOperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.colorRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('RelationalOperatorField (unknown type)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <RelationalOperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.unknownRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('OperatorField (string)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <OperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.stringRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('OperatorField (number)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <OperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.numberRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('OperatorField (color)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <OperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.colorRelationalOperatorParameterMetadata
+          }
+        />
+      )}
+    />
+  ))
+  .add('OperatorField (unknown type)', () => (
+    <ValueStateHolder
+      initialValue=""
+      render={(value, onChange) => (
+        <OperatorField
+          scope={{}}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={testProject.project}
+          objectsContainer={testProject.testLayout}
+          parameterMetadata={
+            testProject.unknownRelationalOperatorParameterMetadata
+          }
         />
       )}
     />

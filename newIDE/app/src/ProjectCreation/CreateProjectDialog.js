@@ -18,8 +18,10 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
+export type CreateProjectDialogTabs = 'starters' | 'examples' | 'tutorials' | 'games-showcase'
+
 type State = {|
-  currentTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase',
+  currentTab: CreateProjectDialogTabs,
   outputPath: string,
 |};
 
@@ -35,7 +37,7 @@ export type CreateProjectDialogWithComponentsProps = {|
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata
   ) => Promise<void>,
-  initialTab: 'starters' | 'tutorials' | 'games-showcase',
+  initialTab: CreateProjectDialogTabs,
 |};
 
 type Props = {|
@@ -53,7 +55,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
   };
 
   _onChangeTab = (
-    newTab: 'starters' | 'examples' | 'tutorials' | 'games-showcase'
+    newTab: CreateProjectDialogTabs
   ) => {
     this.setState({
       currentTab: newTab,

@@ -85,7 +85,10 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type CreateProjectDialogWithComponentsProps,
+  type CreateProjectDialogTabs,
+} from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -314,9 +317,10 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
-    'starters' | 'tutorials' | 'games-showcase'
-  >('starters');
+  const [
+    createDialogInitialTab,
+    setCreateDialogInitialTab,
+  ] = React.useState<CreateProjectDialogTabs>('starters');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.

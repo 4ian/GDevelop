@@ -19,6 +19,7 @@ const mapTypeToOperators = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '+', '-', '*', '/'],
   string: ['=', '+'],
+  color: ['=', '+'],
 };
 
 export default class OperatorField extends Component<ParameterFieldProps> {
@@ -36,7 +37,8 @@ export default class OperatorField extends Component<ParameterFieldProps> {
     const comparedValueType = parameterMetadata
       ? parameterMetadata.getExtraInfo()
       : 'unknown';
-    const operators = mapTypeToOperators[comparedValueType || 'unknown'];
+    const operators =
+      mapTypeToOperators[comparedValueType] || mapTypeToOperators.unknown;
 
     return (
       <SelectField

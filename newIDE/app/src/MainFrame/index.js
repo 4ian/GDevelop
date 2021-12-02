@@ -1557,6 +1557,14 @@ const MainFrame = (props: Props) => {
     [setState]
   );
 
+  const onOpenExamples = React.useCallback(
+    (open: boolean = true) => {
+      setCreateDialogInitialTab('examples');
+      setState(state => ({ ...state, createDialogOpen: open }));
+    },
+    [setState]
+  );
+
   const onOpenGamesShowcase = React.useCallback(
     (open: boolean = true) => {
       setCreateDialogInitialTab('games-showcase');
@@ -2207,6 +2215,7 @@ const MainFrame = (props: Props) => {
                   onCloseProject: () => askToCloseProject(),
                   onOpenTutorials: () => onOpenTutorials(),
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
+                  onOpenExamples: () => onOpenExamples(),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () =>

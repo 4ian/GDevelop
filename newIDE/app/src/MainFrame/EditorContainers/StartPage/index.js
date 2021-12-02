@@ -60,6 +60,7 @@ type Props = {|
 
   // Other dialogs opening:
   onOpenTutorials: () => void,
+  onOpenExamples: () => void,
   onOpenGamesShowcase: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
@@ -82,6 +83,7 @@ export const StartPage = React.memo<Props>(
         onOpenProjectManager,
         onCloseProject,
         onOpenTutorials,
+        onOpenExamples,
         onOpenGamesShowcase,
         onOpenHelpFinder,
         onOpenLanguageDialog,
@@ -278,6 +280,7 @@ export const renderStartPageContainer = (
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
     onOpenTutorials={props.onOpenTutorials}
+    onOpenExamples={props.onOpenExamples}
     onOpenGamesShowcase={props.onOpenGamesShowcase}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}

@@ -59,6 +59,7 @@ export type RenderEditorContainerProps = {|
   // Other dialogs opening:
   onOpenTutorials: () => void,
   onOpenGamesShowcase: () => void,
+  onOpenExamples: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onChangeSubscription: () => void,

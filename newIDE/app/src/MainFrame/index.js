@@ -772,8 +772,8 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (editorToolbar: any) => {
-    if (!toolbar.current) return;
+  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
+    if (!toolbar.current || !isCurrentTab) return;
 
     toolbar.current.setEditorToolbar(editorToolbar);
   };
@@ -2176,7 +2176,8 @@ const MainFrame = (props: Props) => {
                   extraEditorProps: editorTab.extraEditorProps,
                   project: currentProject,
                   ref: editorRef => (editorTab.editorRef = editorRef),
-                  setToolbar: setEditorToolbar,
+                  setToolbar: editorToolbar =>
+                    setEditorToolbar(editorToolbar, isCurrentTab),
                   onChangeSubscription: () => openSubscriptionDialog(true),
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,

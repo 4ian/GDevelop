@@ -217,18 +217,23 @@ export const ShowcasedGameListItem = ({
                   />
                 ))}
               </ResponsiveLineStackLayout>
-              <ResponsiveLineStackLayout
-                justifyContent="flex-end"
-                noColumnMargin
-              >
-                {otherLinks.map((link, index) => (
-                  <LinkButton
-                    key={index}
-                    link={link}
-                    showcasedGame={showcasedGame}
-                  />
-                ))}
-              </ResponsiveLineStackLayout>
+              {otherLinks.length > 0 && (
+                <>
+                  {windowWidth === 'small' && (<Spacer />)}
+                  <ResponsiveLineStackLayout
+                    justifyContent="flex-end"
+                    noColumnMargin
+                  >
+                    {otherLinks.map((link, index) => (
+                      <LinkButton
+                        key={index}
+                        link={link}
+                        showcasedGame={showcasedGame}
+                      />
+                    ))}
+                  </ResponsiveLineStackLayout>
+                </>
+              )}
             </Column>
           </Line>
         </ResponsiveLineStackLayout>

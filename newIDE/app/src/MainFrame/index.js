@@ -772,9 +772,13 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (editorToolbar: any) => {
-    if (!toolbar.current) return;
+  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
+    if (!toolbar.current || !isCurrentTab) {
+      console.log('returning toolbar');
+      return;
+    }
 
+    console.log('setting toolbar');
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
@@ -2167,6 +2171,7 @@ const MainFrame = (props: Props) => {
       </ClosableTabs>
       {getEditors(state.editorTabs).map((editorTab, id) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+        console.log(state.editorTabs, id, editorTab, isCurrentTab);
         return (
           <TabContentContainer key={editorTab.key} active={isCurrentTab}>
             <CommandsContextScopedProvider active={isCurrentTab}>
@@ -2176,7 +2181,10 @@ const MainFrame = (props: Props) => {
                   extraEditorProps: editorTab.extraEditorProps,
                   project: currentProject,
                   ref: editorRef => (editorTab.editorRef = editorRef),
-                  setToolbar: setEditorToolbar,
+                  setToolbar: editorToolbar => {
+                    console.log(state.editorTabs, id, editorTab, isCurrentTab, editorToolbar);
+                    setEditorToolbar(editorToolbar, isCurrentTab);
+                  },
                   onChangeSubscription: () => openSubscriptionDialog(true),
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,

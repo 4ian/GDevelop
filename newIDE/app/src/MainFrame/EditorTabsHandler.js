@@ -74,6 +74,7 @@ export const openEditorTab = (
     closable?: boolean,
   |}
 ): EditorTabsState => {
+  console.log('OPENING TAB')
   const existingEditorId = findIndex(
     state.editors,
     editor => editor.key === key
@@ -95,6 +96,8 @@ export const openEditorTab = (
     closable: typeof closable === 'undefined' ? true : !!closable,
   };
 
+  console.log('CREATING TAB')
+
   return {
     ...state,
     editors: [...state.editors, editorTab],
@@ -106,6 +109,7 @@ export const changeCurrentTab = (
   state: EditorTabsState,
   newTabId: number
 ): EditorTabsState => {
+  console.log('changing TAB')
   return {
     ...state,
     currentTab: Math.max(0, Math.min(newTabId, state.editors.length - 1)),
@@ -118,6 +122,7 @@ export const closeTabsExceptIf = (
 ) => {
   const currentEditorTab = getCurrentTab(state);
   const remainingEditors = state.editors.filter(keepPredicate);
+  console.log('CLOSING TAB')
   return changeCurrentTab(
     {
       ...state,

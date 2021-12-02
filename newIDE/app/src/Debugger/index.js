@@ -41,7 +41,6 @@ const isUnavoidableLibraryWarning = ({ group, message }: Log): boolean =>
 type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
-  isActive: boolean,
   previewDebuggerServer: PreviewDebuggerServer,
 |};
 
@@ -100,9 +99,7 @@ export default class Debugger extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (this.props.isActive) {
-      this._registerServerCallbacks();
-    }
+    this._registerServerCallbacks();
   }
 
   componentWillUnmount() {

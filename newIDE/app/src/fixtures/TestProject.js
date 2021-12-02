@@ -33,6 +33,10 @@ export type TestProject = {|
   layerWithoutEffects: gdLayer,
   spriteObjectWithEffects: gdSpriteObject,
   spriteObjectWithoutEffects: gdSpriteObject,
+  stringRelationalOperatorParameterMetadata: gdParameterMetadata,
+  numberRelationalOperatorParameterMetadata: gdParameterMetadata,
+  colorRelationalOperatorParameterMetadata: gdParameterMetadata,
+  unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
 |};
 */
 
@@ -556,6 +560,37 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     effect3.setStringParameter('image', 'my-image');
   }
 
+  // Set up some fake parameter metadata.
+  const stringRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  stringRelationalOperatorParameterMetadata.setType('relationalOperator');
+  stringRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for strings)'
+  );
+  stringRelationalOperatorParameterMetadata.setExtraInfo('string');
+
+  const numberRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  numberRelationalOperatorParameterMetadata.setType('relationalOperator');
+  numberRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for number)'
+  );
+  numberRelationalOperatorParameterMetadata.setExtraInfo('number');
+
+  const colorRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  colorRelationalOperatorParameterMetadata.setType('relationalOperator');
+  colorRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for colors)'
+  );
+  colorRelationalOperatorParameterMetadata.setExtraInfo('color');
+
+  const unknownRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  unknownRelationalOperatorParameterMetadata.setType('relationalOperator');
+  unknownRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (unknown type)'
+  );
+  unknownRelationalOperatorParameterMetadata.setExtraInfo(
+    'whatever-this-is-not-recognised'
+  );
+
   return {
     project,
     shapePainterObject,
@@ -588,5 +623,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWithoutEffects,
     spriteObjectWithEffects,
     spriteObjectWithoutEffects,
+    stringRelationalOperatorParameterMetadata,
+    numberRelationalOperatorParameterMetadata,
+    colorRelationalOperatorParameterMetadata,
+    unknownRelationalOperatorParameterMetadata,
   };
 };

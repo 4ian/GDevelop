@@ -94,8 +94,14 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._text.position.x = this._object.x + this._text.width / 2;
-      this._text.position.y = this._object.y + this._text.height / 2;
+      const angle = gdjs.toRad(this._object.angle);
+      const width = this._text.width / 2;
+      const height = this._text.height / 2;
+      const xDelta = width * Math.cos(angle) - height * Math.sin(angle);
+      const yDelta = height * Math.cos(angle) + width * Math.sin(angle);
+
+      this._text.position.x = this._object.x + xDelta;
+      this._text.position.y = this._object.y + yDelta;
     }
 
     updateAngle(): void {

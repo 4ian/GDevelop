@@ -149,8 +149,14 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      this._pixiObject.position.x = this._object.x + this.getWidth() / 2;
-      this._pixiObject.position.y = this._object.y + this.getHeight() / 2;
+      const angle = gdjs.toRad(this._object.angle);
+      const height = this.getHeight() / 2;
+      const width = this.getWidth() / 2;
+      const xDelta = width * Math.cos(angle) - height * Math.sin(angle);
+      const yDelta = width * Math.sin(angle) + height * Math.cos(angle);
+
+      this._pixiObject.position.x = this._object.x + xDelta;
+      this._pixiObject.position.y = this._object.y + yDelta;
     }
 
     updateAngle(): void {
@@ -169,5 +175,6 @@ namespace gdjs {
       return this._pixiObject.textHeight * this.getScale();
     }
   }
-  export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectPixiRenderer;
+  export const BitmapTextRuntimeObjectRenderer =
+    BitmapTextRuntimeObjectPixiRenderer;
 }

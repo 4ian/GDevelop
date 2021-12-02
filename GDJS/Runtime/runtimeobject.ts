@@ -1102,7 +1102,12 @@ namespace gdjs {
      * @return the X position of the object center, relative to `getDrawableX()`.
      */
     getCenterX(): float {
-      return this.getWidth() / 2;
+      const halfWidth = this.getWidth() / 2;
+      const halfHeight = this.getHeight() / 2;
+      return (
+        Math.sqrt(halfWidth * halfWidth + halfHeight * halfHeight) *
+        Math.cos(gdjs.toRad(this.getAngle()))
+      );
     }
 
     /**
@@ -1112,7 +1117,12 @@ namespace gdjs {
      * @return the Y position of the object center, relative to `getDrawableY()`.
      */
     getCenterY(): float {
-      return this.getHeight() / 2;
+      const halfWidth = this.getWidth() / 2;
+      const halfHeight = this.getHeight() / 2;
+      return (
+        Math.sqrt(halfWidth * halfWidth + halfHeight * halfHeight) *
+        Math.sin(gdjs.toRad(this.getAngle()))
+      );
     }
 
     /**
@@ -1394,10 +1404,13 @@ namespace gdjs {
         this.hitBoxes[0].vertices[3][0] = 0 - centerX;
         this.hitBoxes[0].vertices[3][1] = height - centerY;
       }
-      this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
+      const angle = gdjs.toRad(this.getAngle());
+      this.hitBoxes[0].rotate(angle);
+      const xDelta = centerX * Math.cos(angle) - centerY * Math.sin(angle);
+      const yDelta = centerY * Math.cos(angle) + centerX * Math.sin(angle);
       this.hitBoxes[0].move(
-        this.getDrawableX() + centerX,
-        this.getDrawableY() + centerY
+        this.getDrawableX() + xDelta,
+        this.getDrawableY() + yDelta
       );
     }
 

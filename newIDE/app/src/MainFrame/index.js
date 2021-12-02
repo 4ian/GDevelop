@@ -1541,36 +1541,29 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openCreateDialog = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('starters');
+  const openCreateProjectDialog = React.useCallback(
+    (tab: CreateProjectDialogTabs) => (open: boolean = true) => {
+      setCreateDialogInitialTab(tab);
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
   );
 
-  const onOpenTutorials = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('tutorials');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const openCreateDialog = React.useMemo(
+    () => openCreateProjectDialog('starters'),
+    [openCreateProjectDialog]
   );
-
-  const onOpenExamples = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('examples');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const onOpenTutorials = React.useMemo(
+    () => openCreateProjectDialog('tutorials'),
+    [openCreateProjectDialog]
   );
-
-  const onOpenGamesShowcase = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('games-showcase');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const onOpenExamples = React.useMemo(
+    () => openCreateProjectDialog('examples'),
+    [openCreateProjectDialog]
+  );
+  const onOpenGamesShowcase = React.useMemo(
+    () => openCreateProjectDialog('games-showcase'),
+    [openCreateProjectDialog]
   );
 
   const openOpenFromStorageProviderDialog = React.useCallback(

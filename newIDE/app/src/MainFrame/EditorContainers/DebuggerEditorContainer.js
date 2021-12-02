@@ -24,9 +24,10 @@ export class DebuggerEditorContainer extends React.Component<
   };
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user.
-    return nextProps.isActive;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   getProject(): ?gdProject {
@@ -75,7 +76,6 @@ export class DebuggerEditorContainer extends React.Component<
         <Debugger
           project={project}
           setToolbar={this.props.setToolbar}
-          isActive={this.props.isActive}
           previewDebuggerServer={previewDebuggerServer}
           ref={editor => (this.editor = editor)}
         />

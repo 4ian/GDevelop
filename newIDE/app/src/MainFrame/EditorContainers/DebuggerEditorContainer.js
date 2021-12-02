@@ -75,7 +75,6 @@ export class DebuggerEditorContainer extends React.Component<
         <Debugger
           project={project}
           setToolbar={this.props.setToolbar}
-          isActive={this.props.isActive}
           previewDebuggerServer={previewDebuggerServer}
           ref={editor => (this.editor = editor)}
         />

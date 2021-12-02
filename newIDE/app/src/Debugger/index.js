@@ -79,8 +79,6 @@ export default class Debugger extends React.Component<Props, State> {
   _debuggerLogs: Map<number, LogsManager> = new Map();
 
   updateToolbar() {
-    if (!this.props.isActive) return;
-
     this.props.setToolbar(
       <Toolbar
         onPlay={() => this._play(this.state.selectedId)}
@@ -103,12 +101,6 @@ export default class Debugger extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.isActive) {
-      this._registerServerCallbacks();
-    }
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.isActive && !this.props.isActive) {
       this._registerServerCallbacks();
     }
   }

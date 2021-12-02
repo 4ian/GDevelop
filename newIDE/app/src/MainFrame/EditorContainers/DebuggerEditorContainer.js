@@ -66,6 +66,13 @@ export class DebuggerEditorContainer extends React.Component<
     }
   }
 
+  setDebuggerToolbar = node => {
+    if (!this.props.isActive) {
+      return;
+    }
+    this.props.setToolbar(node);
+  };
+
   render() {
     const { project, previewDebuggerServer } = this.props;
     if (!project || !previewDebuggerServer) return null;
@@ -74,7 +81,7 @@ export class DebuggerEditorContainer extends React.Component<
       <React.Fragment>
         <Debugger
           project={project}
-          setToolbar={this.props.setToolbar}
+          setToolbar={this.setDebuggerToolbar}
           isActive={this.props.isActive}
           previewDebuggerServer={previewDebuggerServer}
           ref={editor => (this.editor = editor)}

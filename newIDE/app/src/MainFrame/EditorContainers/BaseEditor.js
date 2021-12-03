@@ -63,6 +63,7 @@ export type RenderEditorContainerProps = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenProfile: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,

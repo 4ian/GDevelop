@@ -64,6 +64,7 @@ type Props = {|
   onOpenGamesShowcase: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
+  onOpenProfile: ()=> void,
 |};
 
 type StartPageEditorInterface = {|
@@ -87,6 +88,7 @@ export const StartPage = React.memo<Props>(
         onOpenGamesShowcase,
         onOpenHelpFinder,
         onOpenLanguageDialog,
+        onOpenProfile,
         setToolbar,
       }: Props,
       ref
@@ -292,5 +294,6 @@ export const renderStartPageContainer = (
     onOpenGamesShowcase={props.onOpenGamesShowcase}
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
+    onOpenProfile={props.onOpenProfile}
   />
 );

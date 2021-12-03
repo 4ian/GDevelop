@@ -2209,6 +2209,7 @@ const MainFrame = (props: Props) => {
                   onOpenTutorials: () => onOpenTutorials(),
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
                   onOpenExamples: () => onOpenExamples(),
+                  onOpenProfile: () => openProfileDialogWithTab('profile'),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () =>

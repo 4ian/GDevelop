@@ -17,7 +17,7 @@ import { ExampleIcon } from './ExampleIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
-import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 
 const electron = optionalRequire('electron');
 

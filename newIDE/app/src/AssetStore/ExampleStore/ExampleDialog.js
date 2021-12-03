@@ -24,7 +24,7 @@ import { ExampleIcon } from './ExampleIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 
 const electron = optionalRequire('electron');
 

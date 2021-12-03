@@ -24,7 +24,6 @@ type Props = {|
   onCancel: () => void,
   onChoose: (parameters: EventsFunctionCreationParameters) => void,
 |};
-type State = {||};
 
 const styles = {
   icon: { width: 40, height: 40 },

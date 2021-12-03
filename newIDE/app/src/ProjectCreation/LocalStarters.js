@@ -3,9 +3,7 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import Divider from '@material-ui/core/Divider';
 import RaisedButton from '../UI/RaisedButton';
-import LocalFolderPicker from '../UI/LocalFolderPicker';
 import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -17,6 +15,7 @@ import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 const gd: libGDevelop = global.gd;
@@ -43,6 +42,7 @@ const LocalStarters = ({
   onShowExamples,
   outputPath,
 }: Props): React.Node => {
+  const [selectedStarter, setSelectedStarter] = React.useState<?string>(null);
   const createFromExample = React.useCallback(
     (i18n: I18nType, exampleName: string) => {
       if (!fs || !outputPath) return;
@@ -87,22 +87,15 @@ const LocalStarters = ({
     [onCreate, outputPath]
   );
 
+  const selectStarterAndOpenPreCreationDialog = (starter: string) => () => {
+    setSelectedStarter(starter);
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
         <>
           <Column noMargin>
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={outputPath}
-                  onChange={onChangeOutputPath}
-                  type="create-game"
-                />
-              </Column>
-            </Line>
-            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -128,7 +121,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'platformer')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'platformer'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -146,7 +141,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'space-shooter')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'space-shooter'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -164,7 +161,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'geometry-monster')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'geometry-monster'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -181,7 +180,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'isometric-game')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'isometric-game'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -198,9 +199,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      createFromExample(i18n, 'downhill-bike-physics-demo')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'downhill-bike-physics-demo'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -218,7 +219,7 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'pairs')}
+                    onClick={selectStarterAndOpenPreCreationDialog('pairs')}
                   />
                   <ListItem
                     leftIcon={
@@ -253,9 +254,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      createFromExample(i18n, 'particle-effects-demo')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'particle-effects-demo'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -273,7 +274,9 @@ const LocalStarters = ({
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => createFromExample(i18n, 'game-feel-demo')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'game-feel-demo'
+                    )}
                   />
                 </List>
                 <Line alignItems="center" justifyContent="center">
@@ -285,6 +288,19 @@ const LocalStarters = ({
               </Column>
             </Line>
           </Column>
+          {selectedStarter && (
+            <LocalProjectPreCreationDialog
+              open
+              onClose={() => setSelectedStarter(null)}
+              onCreate={
+                selectedStarter
+                  ? () => createFromExample(i18n, selectedStarter)
+                  : () => {}
+              }
+              outputPath={outputPath}
+              onChangeOutputPath={onChangeOutputPath}
+            />
+          )}
         </>
       )}
     </I18n>

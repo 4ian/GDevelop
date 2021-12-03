@@ -1421,7 +1421,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Start Page`),
+          label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderStartPageContainer,
           key: 'start page',

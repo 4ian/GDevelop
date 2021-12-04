@@ -21,13 +21,13 @@ import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { ExtensionStoreContext } from './ExtensionStoreContext';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
   isInstalling: boolean,
   onClose: () => void,
   onInstall: () => void,
-  alreadyInstalled: boolean,
 |};
 type State = {|
   extensionHeader: ?ExtensionHeader,
@@ -50,6 +50,8 @@ const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
 };
 
 export default class ExtensionInstallDialog extends Component<Props, State> {
+  static contextType = ExtensionStoreContext;
+
   state = {
     extensionHeader: null,
     error: null,
@@ -83,8 +85,8 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
       extensionShortHeader,
       onClose,
       onInstall,
-      alreadyInstalled,
     } = this.props;
+    const { updateState, installedExtensions } = this.context;
     const { extensionHeader, error } = this.state;
 
     const isCompatible = isCompatibleWithExtension(
@@ -107,8 +109,12 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               label={
                 !isCompatible ? (
                   <Trans>Not compatible</Trans>
-                ) : alreadyInstalled ? (
-                  <Trans>Re-install/update</Trans>
+                ) : installedExtensions.has(extensionShortHeader.name) ? (
+                  updateState.has(extensionShortHeader.name) ? (
+                    <Trans>Update</Trans>
+                  ) : (
+                    <Trans>Re-install</Trans>
+                  )
                 ) : (
                   <Trans>Install in project</Trans>
                 )

@@ -115,11 +115,12 @@ export default class InstancesResizer {
     });
   }
 
-  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): Rectangle {
+  _getOrCreateSelectionAABB(instances: gdInitialInstance[]): ?Rectangle {
     let initialSelectionAABB = this._initialSelectionAABB;
     if (initialSelectionAABB) {
       return initialSelectionAABB;
     }
+    if (!instances.length) return null;
     initialSelectionAABB = new Rectangle();
     initialSelectionAABB.setRectangle(
       this._getOrCreateInstanceAABB(instances[0])
@@ -141,7 +142,14 @@ export default class InstancesResizer {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    const initialSelectionAABB = this._getOrCreateSelectionAABB(instances);
+    const nonLockedInstances = instances.filter(
+      instance => !instance.isLocked()
+    );
+
+    const initialSelectionAABB = this._getOrCreateSelectionAABB(
+      nonLockedInstances
+    );
+    if (!initialSelectionAABB) return;
 
     // Round the grabbed handle position on the grid.
     const grabbingRelativePosition =
@@ -210,7 +218,7 @@ export default class InstancesResizer {
           initialSelectionAABB.height()
         : flippedTotalDeltaY;
 
-    const hasRotatedInstance = areAnyInstancesNotStraight(instances);
+    const hasRotatedInstance = areAnyInstancesNotStraight(nonLockedInstances);
 
     // Applying a rotation then a scaling can result to
     // an affine transformation with a shear transformation - which we don't want.
@@ -256,8 +264,8 @@ export default class InstancesResizer {
       resizeGrabbingRelativePositions[grabbingLocation][1] *
         initialSelectionAABB.height();
 
-    for (let i = 0; i < instances.length; i++) {
-      const selectedInstance = instances[i];
+    for (let i = 0; i < nonLockedInstances.length; i++) {
+      const selectedInstance = nonLockedInstances[i];
 
       let initialUnrotatedInstanceAABB = this._getOrCreateUnrotatedInstanceAABB(
         selectedInstance

@@ -1,5 +1,5 @@
 // @flow
-import { type ResourceKind } from './ResourceSource.flow';
+import { type ResourceKind } from './ResourceSource';
 import ResourcesLoader from '../ResourcesLoader';
 
 /**

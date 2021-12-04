@@ -1,6 +1,8 @@
 // @ts-nocheck - Weird usage of `this` in this file. Should be refactored.
 
 namespace gdjs {
+  const logger = new gdjs.Logger('Dialogue tree');
+
   gdjs.dialogueTree = {};
   gdjs.dialogueTree.runner = new bondage.Runner();
 
@@ -21,7 +23,7 @@ namespace gdjs {
         gdjs.dialogueTree.startFrom(startDialogueNode);
       }
     } catch (e) {
-      console.error(e);
+      logger.error('Error while loading from scene variable: ', e);
     }
   };
 
@@ -42,10 +44,7 @@ namespace gdjs {
       .getJsonManager()
       .loadJson(jsonResourceName, function (error, content) {
         if (error) {
-          console.error(
-            'An error happened while loading JSON resource:',
-            error
-          );
+          logger.error('An error happened while loading JSON resource:', error);
         } else {
           if (!content) {
             return;
@@ -54,7 +53,7 @@ namespace gdjs {
           try {
             gdjs.dialogueTree.runner.load(gdjs.dialogueTree.yarnData);
           } catch (error) {
-            console.error(
+            logger.error(
               'An error happened while loading parsing the dialogue tree data:',
               error
             );
@@ -155,7 +154,7 @@ namespace gdjs {
       this.clipTextEnd >= this.dialogueText.length
     ) {
       if (gdjs.dialogueTree.getVariable('debug')) {
-        console.warn(
+        logger.warn(
           'Scroll completed:',
           this.clipTextEnd,
           '/',
@@ -244,7 +243,7 @@ namespace gdjs {
           gdjs.dialogueTree.pauseScrolling = false;
           commandCalls.splice(index, 1);
           if (gdjs.dialogueTree.getVariable('debug')) {
-            console.info('CMD:', call);
+            logger.info('CMD:', call);
           }
         }, parseInt(call.params[1], 10));
       }
@@ -252,7 +251,7 @@ namespace gdjs {
         gdjs.dialogueTree.commandParameters = call.params;
         commandCalls.splice(index, 1);
         if (gdjs.dialogueTree.getVariable('debug')) {
-          console.info('CMD:', call);
+          logger.info('CMD:', call);
         }
         return true;
       }
@@ -366,7 +365,7 @@ namespace gdjs {
         this.dialogueData = this.dialogue.next().value;
         gdjs.dialogueTree.goToNextDialogueLine();
       } catch (error) {
-        console.error(
+        logger.error(
           `An error happened when trying to access the dialogue branch!`,
           error
         );
@@ -562,7 +561,7 @@ namespace gdjs {
     this.selectedOption = -1;
     this.selectedOptionUpdated = false;
     if (gdjs.dialogueTree.getVariable('debug')) {
-      console.info('parsing:', this.dialogueData);
+      logger.info('Parsing:', this.dialogueData);
     }
     if (!this.dialogueData) {
       gdjs.dialogueTree.stopRunningDialogue();
@@ -797,7 +796,7 @@ namespace gdjs {
   gdjs.dialogueTree.loadState = function (inputVariable: gdjs.Variable) {
     const loadedState = inputVariable.toJSObject();
     if (!loadedState) {
-      console.error('Load state variable is empty:', inputVariable);
+      logger.error('Load state variable is empty:', inputVariable);
       return;
     }
     try {
@@ -808,7 +807,7 @@ namespace gdjs {
         gdjs.dialogueTree.runner.variables.set(key, value);
       });
     } catch (e) {
-      console.error('Failed to load state from variable:', inputVariable, e);
+      logger.error('Failed to load state from variable:', inputVariable, e);
     }
   };
 

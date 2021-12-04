@@ -44,7 +44,12 @@ export const findGDJS = (
 |}> => {
   // Get GDJS for this version. If you updated the version,
   // run `newIDE/web-app/scripts/deploy-GDJS-Runtime` script.
-  const gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
+  let gdjsRoot = `https://resources.gdevelop-app.com/GDJS-${getIDEVersion()}`;
+
+  // If you want to test your local changes to the game engine on the local web-app,
+  // run `npx serve -- --cors` (or another CORS enabled http server on port 5000)
+  // in `newIDE/app/resources/GDJS` and uncomment this line:
+  // gdjsRoot = `http://localhost:5000`;
 
   return Promise.all(
     filesToDownload[fileSet].map(relativeFilePath => {

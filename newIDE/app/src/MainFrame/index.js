@@ -65,7 +65,8 @@ import {
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+  type ChooseResourceOptions,
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
@@ -119,6 +120,14 @@ import { delay } from '../Utils/Delay';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
+import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_DEBUG,
+  TRIVIAL_FIRST_PREVIEW,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -235,7 +244,15 @@ const MainFrame = (props: Props) => {
     }: State)
   );
   const toolbar = React.useRef<?Toolbar>(null);
-  const _resourceSourceDialogs = React.useRef({});
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const [
+    chooseResourceOptions,
+    setChooseResourceOptions,
+  ] = React.useState<?ChooseResourceOptions>(null);
+  const [onResourceChosen, setOnResourceChosen] = React.useState<?(
+    Array<gdResource>
+  ) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
@@ -756,8 +773,8 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (editorToolbar: any) => {
-    if (!toolbar.current) return;
+  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
+    if (!toolbar.current || !isCurrentTab) return;
 
     toolbar.current.setEditorToolbar(editorToolbar);
   };
@@ -1176,7 +1193,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const launchPreview = React.useCallback(
+  const _launchPreview = React.useCallback(
     ({
       networkPreview,
       hotReload,
@@ -1252,6 +1269,14 @@ const MainFrame = (props: Props) => {
       preferences.getIsAlwaysOnTopInPreview,
     ]
   );
+
+  const launchPreview = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_PREVIEW,
+        _launchPreview
+      )
+    : _launchPreview;
 
   const launchNewPreview = React.useCallback(
     () => launchPreview({ networkPreview: false }),
@@ -1404,7 +1429,7 @@ const MainFrame = (props: Props) => {
     [i18n, setState]
   );
 
-  const openDebugger = React.useCallback(
+  const _openDebugger = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -1418,6 +1443,14 @@ const MainFrame = (props: Props) => {
     },
     [i18n, setState]
   );
+
+  const openDebugger = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_DEBUG,
+        _openDebugger
+      )
+    : _openDebugger;
 
   const launchDebuggerAndPreview = React.useCallback(
     () => {
@@ -1900,14 +1933,15 @@ const MainFrame = (props: Props) => {
   };
 
   const onChooseResource: ChooseResourceFunction = (
-    sourceName: string,
-    multiSelection: boolean = true
+    options: ChooseResourceOptions
   ) => {
-    const { currentProject } = state;
-    const resourceSourceDialog = _resourceSourceDialogs.current[sourceName];
-    if (!resourceSourceDialog) return Promise.resolve([]);
-
-    return resourceSourceDialog.chooseResources(currentProject, multiSelection);
+    return new Promise(resolve => {
+      setChooseResourceOptions(options);
+      const onResourceChosenSetter: () => (
+        Promise<Array<gdResource>> | Array<gdResource>
+      ) => void = () => resolve;
+      setOnResourceChosen(onResourceChosenSetter);
+    });
   };
 
   const setUpdateStatus = (updateStatus: UpdateStatus) => {
@@ -2082,7 +2116,7 @@ const MainFrame = (props: Props) => {
               freezeUpdate={!projectManagerOpen}
               unsavedChanges={unsavedChanges}
               hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-              resourceSources={props.resourceSources}
+              resourceSources={resourceSources}
               onChooseResource={onChooseResource}
               resourceExternalEditors={resourceExternalEditors}
             />
@@ -2107,7 +2141,7 @@ const MainFrame = (props: Props) => {
           onPreviewWithoutHotReload={launchNewPreview}
           onNetworkPreview={launchNetworkPreview}
           onHotReloadPreview={launchHotReloadPreview}
-          showNetworkPreviewButton={
+          canDoNetworkPreview={
             !!_previewLauncher.current &&
             _previewLauncher.current.canDoNetworkPreview()
           }
@@ -2146,7 +2180,8 @@ const MainFrame = (props: Props) => {
                     extraEditorProps: editorTab.extraEditorProps,
                     project: currentProject,
                     ref: editorRef => (editorTab.editorRef = editorRef),
-                    setToolbar: setEditorToolbar,
+                    setToolbar: editorToolbar =>
+                      setEditorToolbar(editorToolbar, isCurrentTab),
                     onChangeSubscription: () => openSubscriptionDialog(true),
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
@@ -2290,21 +2325,23 @@ const MainFrame = (props: Props) => {
               _previewLauncher.current = previewLauncher;
             }
           )}
-        {resourceSources.map(
-          (resourceSource, index): React.Node => {
-            const Component = resourceSource.component;
-            return (
-              <Component
-                key={resourceSource.name}
-                ref={dialog =>
-                  (_resourceSourceDialogs.current[resourceSource.name] = dialog)
-                }
-                i18n={i18n}
-                getLastUsedPath={preferences.getLastUsedPath}
-                setLastUsedPath={preferences.setLastUsedPath}
-              />
-            );
-          }
+        {!!currentProject && chooseResourceOptions && onResourceChosen && (
+          <NewResourceDialog
+            project={currentProject}
+            i18n={i18n}
+            resourceSources={resourceSources}
+            onChooseResources={resources => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen(resources);
+            }}
+            onClose={() => {
+              setOnResourceChosen(null);
+              setChooseResourceOptions(null);
+              onResourceChosen([]);
+            }}
+            options={chooseResourceOptions}
+          />
         )}
         {profileDialogOpen && (
           <ProfileDialog

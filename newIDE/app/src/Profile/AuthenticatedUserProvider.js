@@ -6,6 +6,7 @@ import {
   getUserSubscription,
   getUserLimits,
 } from '../Utils/GDevelopServices/Usage';
+import { getUserBadges } from '../Utils/GDevelopServices/User';
 import Authentication, {
   type LoginForm,
   type RegisterForm,
@@ -15,7 +16,6 @@ import Authentication, {
 } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
 import LoginDialog from './LoginDialog';
-import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { sendSignupDone } from '../Utils/Analytics/EventSender';
 import AuthenticatedUserContext, {
@@ -67,11 +67,51 @@ export default class AuthenticatedUserProvider extends React.Component<
     changeEmailDialogOpen: false,
     changeEmailInProgress: false,
   };
+  _automaticallyUpdateUserProfile = true;
 
   componentDidMount() {
     this._resetAuthenticatedUser();
-    this.props.authentication.setOnUserLogoutCallback(this._fetchUserProfile);
-    this._fetchUserProfile();
+
+    // Listen to when the user log out so that we reset the user profile.
+    this.props.authentication.setOnUserLogoutCallback(
+      this._fetchUserProfileWithoutThrowingErrors
+    );
+
+    // When the authenticated user changes, we need to react accordingly
+    // This can happen:
+    // - at the startup, because the authenticated Firebase user was not ready yet
+    //   when this component mounted. So we'll fetch the user profile.
+    // - at the login, signup, profile edit. These methods are taking care of
+    //   fetching the user profile by themselves, so they will disable the automatic
+    //   refresh.
+    // - at any other moment (Firebase user was updated), in which case it's probably
+    //   not a problem to fetch again the user profile.
+    this.props.authentication.setOnUserUpdateCallback(() => {
+      if (this._automaticallyUpdateUserProfile) {
+        console.info(
+          'Fetching user profile as the authenticated user changed...'
+        );
+        this._fetchUserProfileWithoutThrowingErrors();
+      } else {
+        console.info(
+          'The authenticated user changed, but not fetching the user profile again (deactivated).'
+        );
+      }
+    });
+
+    if (this.props.authentication.getFirebaseUserSync()) {
+      // The user is logged already: fetch its user profile (because the "user update"
+      // won't trigger, as registered too late).
+      console.info(
+        'Fetching user profile as authenticated user found at startup...'
+      );
+      this._automaticallyUpdateUserProfile = false;
+      this._fetchUserProfileWithoutThrowingErrors();
+      this._automaticallyUpdateUserProfile = true;
+    } else {
+      // Don't do anything. Either no user is logged (nothing to do)
+      // or is being logged (the "user udpate" callback will trigger later).
+    }
   }
 
   _resetAuthenticatedUser() {
@@ -79,25 +119,30 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
+        onBadgesChanged: this._fetchUserBadges,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
         onCreateAccount: () => this.openCreateAccountDialog(true),
         onRefreshUserProfile: this._fetchUserProfile,
-        onRefreshFirebaseProfile: this._reloadFirebaseProfile,
+        onRefreshFirebaseProfile: async () => {
+          await this._reloadFirebaseProfile();
+        },
         onSendEmailVerification: this._doSendEmailVerification,
+        onAcceptGameStatsEmail: this._doAcceptGameStatsEmail,
         getAuthorizationHeader: () =>
           this.props.authentication.getAuthorizationHeader(),
       },
     }));
   }
 
-  _reloadFirebaseProfile = (callback?: FirebaseUser => void) => {
+  _reloadFirebaseProfile = async (): Promise<?FirebaseUser> => {
     const { authentication } = this.props;
 
-    authentication.getFirebaseUser((err, firebaseUser: ?FirebaseUser) => {
-      if (err && err.unauthenticated) {
-        return this.setState(({ authenticatedUser }) => ({
+    try {
+      const firebaseUser = await authentication.getFirebaseUser();
+      if (!firebaseUser) {
+        this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             authenticated: false,
@@ -107,75 +152,114 @@ export default class AuthenticatedUserProvider extends React.Component<
             subscription: null,
           },
         }));
-      } else if (err || !firebaseUser) {
-        console.error('Unable to fetch user profile', err);
-        return;
+        return null;
       }
 
-      this.setState(
-        ({ authenticatedUser }) => ({
-          authenticatedUser: {
-            ...authenticatedUser,
-            authenticated: true,
-            firebaseUser,
-          },
-        }),
-        () => {
-          if (!firebaseUser || !callback) return;
-          callback(firebaseUser);
-        }
-      );
-    });
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          authenticated: true,
+          firebaseUser,
+        },
+      }));
+      return firebaseUser;
+    } catch (error) {
+      console.error('Unable to fetch the authenticated Firebase user:', error);
+      throw error;
+    }
   };
 
-  _fetchUserProfile = () => {
+  _fetchUserProfileWithoutThrowingErrors = async () => {
+    try {
+      await this._fetchUserProfile();
+    } catch (error) {
+      console.error(
+        'Error while fetching the user profile - but ignoring it.',
+        error
+      );
+    }
+  };
+
+  _fetchUserProfile = async () => {
     const { authentication } = this.props;
 
-    this._reloadFirebaseProfile((firebaseUser: FirebaseUser) => {
-      authentication
-        .getUserProfile(authentication.getAuthorizationHeader)
-        .then(user =>
-          this.setState(({ authenticatedUser }) => ({
-            authenticatedUser: {
-              ...authenticatedUser,
-              profile: user,
-            },
-          }))
-        );
-      getUserUsages(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      ).then(usages =>
+    // First ensure the Firebase authenticated user is up to date
+    // (and let the error propagate if any).
+    const firebaseUser = await this._reloadFirebaseProfile();
+    if (!firebaseUser) return;
+
+    // Fetching user profile related information, but independently from
+    // the user profile itself, to not block in case one of these calls
+    // fails.
+    getUserUsages(authentication.getAuthorizationHeader, firebaseUser.uid).then(
+      usages =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             usages,
           },
-        }))
-      );
-      getUserSubscription(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      ).then(subscription =>
+        })),
+      error => {
+        console.error('Error while loading user usages:', error);
+      }
+    );
+    getUserSubscription(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      subscription =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             subscription,
           },
-        }))
-      );
-      getUserLimits(
-        authentication.getAuthorizationHeader,
-        firebaseUser.uid
-      ).then(limits =>
+        })),
+      error => {
+        console.error('Error while loading user subscriptions:', error);
+      }
+    );
+    getUserLimits(authentication.getAuthorizationHeader, firebaseUser.uid).then(
+      limits =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             limits,
           },
-        }))
-      );
-    });
+        })),
+      error => {
+        console.error('Error while loading user limits:', error);
+      }
+    );
+    this._fetchUserBadges();
+
+    // Load and wait for the user profile to be fetched.
+    // (and let the error propagate if any).
+    const userProfile = await authentication.getUserProfile(
+      authentication.getAuthorizationHeader
+    );
+
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        profile: userProfile,
+      },
+    }));
+  };
+
+  _fetchUserBadges = async () => {
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+    try {
+      const badges = await getUserBadges(firebaseUser.uid);
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          badges,
+        },
+      }));
+    } catch (error) {
+      console.error('Error while loading user badges:', error);
+    }
   };
 
   _doLogout = () => {
@@ -183,119 +267,158 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._resetAuthenticatedUser();
   };
 
-  _doLogin = (form: LoginForm) => {
+  _doLogin = async (form: LoginForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
-    watchPromiseInState(this, 'loginInProgress', () =>
-      authentication.login(form).then(
-        () => {
-          this._fetchUserProfile();
-          this.openLoginDialog(false);
-        },
-        (authError: AuthError) => {
-          this.setState({
-            authError,
-          });
-        }
-      )
-    );
+    this.setState({
+      loginInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.login(form);
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openLoginDialog(false);
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      loginInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
   };
 
-  _doEdit = (form: EditForm) => {
+  _doEdit = async (form: EditForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
-    watchPromiseInState(this, 'editInProgress', () =>
-      authentication
-        .editUserProfile(authentication.getAuthorizationHeader, form)
-        .then(
-          () => {
-            this._fetchUserProfile();
-            this.openEditProfileDialog(false);
-          },
-          (authError: AuthError) => {
-            this.setState({
-              authError,
-            });
-          }
-        )
-    );
+    this.setState({
+      editInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.editUserProfile(
+        authentication.getAuthorizationHeader,
+        form
+      );
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openEditProfileDialog(false);
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      editInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
   };
 
-  _doCreateAccount = (form: RegisterForm) => {
+  _doCreateAccount = async (form: RegisterForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
-    watchPromiseInState(this, 'createAccountInProgress', () =>
-      authentication.createFirebaseAccount(form).then(
-        () => {
-          authentication
-            .createUser(authentication.getAuthorizationHeader, form)
-            .then(() => {
-              this._fetchUserProfile();
-              this.openLoginDialog(false);
-              sendSignupDone(form.email);
-            });
-        },
-        (authError: AuthError) => {
-          this.setState({
-            authError,
-          });
-        }
-      )
-    );
+    this.setState({
+      createAccountInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.createFirebaseAccount(form);
+
+      try {
+        await authentication.createUser(
+          authentication.getAuthorizationHeader,
+          form
+        );
+      } catch (error) {
+        // Ignore this error - this is a best effort call
+        // and the user profile will be created on demand later
+        // by the API when fetched.
+      }
+
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openLoginDialog(false);
+      sendSignupDone(form.email);
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      createAccountInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
   };
 
-  _doForgotPassword = (form: LoginForm) => {
+  _doForgotPassword = async (form: LoginForm) => {
     const { authentication } = this.props;
     if (!authentication) return;
 
-    watchPromiseInState(this, 'forgotPasswordInProgress', () =>
-      authentication.forgotPassword(form).then(
-        () => {
-          this.openResetPassword(true);
-        },
-        (authError: AuthError) => {
-          this.setState({
-            authError,
-          });
-          showWarningBox(
-            "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
-          );
-        }
-      )
-    );
-  };
-
-  _doSendEmailVerification = () => {
-    const { authentication } = this.props;
-    if (!authentication) return;
-
-    authentication.sendFirebaseEmailVerification(() => {
-      this.openEmailVerificationPendingDialog(true);
+    this.setState({
+      forgotPasswordInProgress: true,
+    });
+    try {
+      await authentication.forgotPassword(form);
+      this.openResetPassword(true);
+    } catch (authError) {
+      this.setState({ authError });
+      showWarningBox(
+        "Unable to send you an email to reset your password. Please double-check that the email address that you've entered is valid."
+      );
+    }
+    this.setState({
+      forgotPasswordInProgress: false,
     });
   };
 
-  _doChangeEmail = (form: ChangeEmailForm) => {
+  _doSendEmailVerification = async () => {
     const { authentication } = this.props;
     if (!authentication) return;
 
-    watchPromiseInState(this, 'changeEmailInProgress', () =>
-      authentication
-        .changeEmail(authentication.getAuthorizationHeader, form)
-        .then(
-          () => {
-            this._fetchUserProfile();
-            this.openChangeEmailDialog(false);
-          },
-          (authError: AuthError) => {
-            this.setState({
-              authError,
-            });
-          }
-        )
-    );
+    await authentication.sendFirebaseEmailVerification();
+    this.openEmailVerificationPendingDialog(true);
+  };
+
+  _doAcceptGameStatsEmail = async () => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      editInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.acceptGameStatsEmail(
+        authentication.getAuthorizationHeader
+      );
+      await this._fetchUserProfileWithoutThrowingErrors();
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      editInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
+  };
+
+  _doChangeEmail = async (form: ChangeEmailForm) => {
+    const { authentication } = this.props;
+    if (!authentication) return;
+
+    this.setState({
+      changeEmailInProgress: true,
+    });
+    this._automaticallyUpdateUserProfile = false;
+    try {
+      await authentication.changeEmail(
+        authentication.getAuthorizationHeader,
+        form
+      );
+      await this._fetchUserProfileWithoutThrowingErrors();
+      this.openChangeEmailDialog(false);
+    } catch (authError) {
+      this.setState({ authError });
+    }
+    this.setState({
+      changeEmailInProgress: false,
+    });
+    this._automaticallyUpdateUserProfile = true;
   };
 
   openEmailVerificationPendingDialog = (open: boolean = true) => {
@@ -394,7 +517,11 @@ export default class AuthenticatedUserProvider extends React.Component<
             authenticatedUser={this.state.authenticatedUser}
             onClose={() => {
               this.openEmailVerificationPendingDialog(false);
-              this.state.authenticatedUser.onRefreshFirebaseProfile();
+              this.state.authenticatedUser
+                .onRefreshFirebaseProfile()
+                .catch(() => {
+                  // Ignore any error, we can't do much.
+                });
             }}
           />
         )}

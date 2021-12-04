@@ -21,8 +21,8 @@ import { ColumnStackLayout } from '../UI/Layout';
 type Props = {|
   onClose: () => void,
   onGoToCreateAccount: () => void,
-  onLogin: (form: LoginForm) => void,
-  onForgotPassword: (form: LoginForm) => void,
+  onLogin: (form: LoginForm) => Promise<void>,
+  onForgotPassword: (form: LoginForm) => Promise<void>,
   loginInProgress: boolean,
   error: ?AuthError,
   resetPasswordDialogOpen: boolean,

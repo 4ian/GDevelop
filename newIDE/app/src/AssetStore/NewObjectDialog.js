@@ -25,22 +25,17 @@ import { AssetDetails } from './AssetDetails';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   sendAssetAddedToProject,
   sendAssetOpened,
   sendNewObjectCreated,
 } from '../Utils/Analytics/EventSender';
-import optionalRequire from '../Utils/OptionalRequire';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
-import Window from '../Utils/Window';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
-const electron = optionalRequire('electron');
 
 const ObjectListItem = ({
   objectMetadata,
@@ -114,7 +109,6 @@ export default function NewObjectDialog({
     project,
   ]);
   const experimentalObjectsInformation = getExperimentalObjects();
-  const screenType = useScreenType();
   const resourcesFetcher = useResourceFetcher();
 
   React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
@@ -189,18 +183,7 @@ export default function NewObjectDialog({
   return (
     <Dialog
       title={<Trans>Add a new object</Trans>}
-      secondaryActions={[
-        <HelpButton helpPagePath="/objects" key="help" />,
-        !electron && screenType !== 'touch' ? (
-          <FlatButton
-            key="download-gdevelop"
-            label={<Trans>Download GDevelop to import your images</Trans>}
-            onClick={() =>
-              Window.openExternalURL('https://gdevelop-app.com/download')
-            }
-          />
-        ) : null,
-      ]}
+      secondaryActions={[<HelpButton helpPagePath="/objects" key="help" />]}
       actions={[
         <FlatButton
           key="close"
@@ -214,6 +197,7 @@ export default function NewObjectDialog({
       open
       flexBody
       noMargin
+      fullHeight
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -285,17 +269,6 @@ export default function NewObjectDialog({
                   label={<Trans>Hide experimental objects</Trans>}
                 />
               )}
-            </Line>
-            <Line justifyContent="center" alignItems="center">
-              <RaisedButton
-                label={
-                  <Trans>Browse ready made objects in the Asset Store</Trans>
-                }
-                primary
-                onClick={() => {
-                  setCurrentTab('asset-store');
-                }}
-              />
             </Line>
           </ScrollView>
         )}

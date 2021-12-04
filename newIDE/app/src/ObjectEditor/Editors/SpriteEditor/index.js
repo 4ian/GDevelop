@@ -31,11 +31,13 @@ import { type EditorProps } from '../EditorProps.flow';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../../../ResourcesList/ResourceSource.flow';
+} from '../../../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { Column } from '../../../UI/Grid';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
+import Checkbox from '../../../UI/Checkbox';
+import useForceUpdate from '../../../Utils/UseForceUpdate';
 
 const gd: libGDevelop = global.gd;
 
@@ -369,138 +371,150 @@ class AnimationsListContainer extends React.Component<
   }
 }
 
-type State = {|
-  pointsEditorOpen: boolean,
-  collisionMasksEditorOpen: boolean,
-|};
+export default function SpriteEditor({
+  object,
+  project,
+  resourceSources,
+  onChooseResource,
+  resourceExternalEditors,
+  onSizeUpdated,
+  objectName,
+}: EditorProps) {
+  const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
+  const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
+  const [
+    collisionMasksEditorOpen,
+    setCollisionMasksEditorOpen,
+  ] = React.useState(false);
+  const forceUpdate = useForceUpdate();
+  const spriteObject = gd.asSpriteObject(object);
 
-export default class SpriteEditor extends React.Component<EditorProps, State> {
-  state = {
-    pointsEditorOpen: false,
-    collisionMasksEditorOpen: false,
-  };
-
-  resourcesLoader: typeof ResourcesLoader;
-
-  constructor(props: EditorProps) {
-    super(props);
-
-    this.resourcesLoader = ResourcesLoader;
-  }
-
-  openPointsEditor = (open: boolean = true) => {
-    this.setState({
-      pointsEditorOpen: open,
-    });
-  };
-
-  openCollisionMasksEditor = (open: boolean = true) => {
-    this.setState({
-      collisionMasksEditorOpen: open,
-    });
-  };
-
-  render() {
-    const {
-      object,
-      project,
-      resourceSources,
-      onChooseResource,
-      resourceExternalEditors,
-      onSizeUpdated,
-      objectName,
-    } = this.props;
-    const spriteObject = gd.asSpriteObject(object);
-
-    return (
-      <>
-        <AnimationsListContainer
-          spriteObject={spriteObject}
-          resourcesLoader={this.resourcesLoader}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
-          project={project}
-          objectName={objectName}
-          onSizeUpdated={onSizeUpdated}
-          extraBottomTools={
-            <ResponsiveLineStackLayout noMargin noColumnMargin>
-              <RaisedButton
-                label={<Trans>Edit collision masks</Trans>}
-                primary={false}
-                onClick={() => this.openCollisionMasksEditor(true)}
-                disabled={spriteObject.getAnimationsCount() === 0}
-              />
-              <RaisedButton
-                label={<Trans>Edit points</Trans>}
-                primary={false}
-                onClick={() => this.openPointsEditor(true)}
-                disabled={spriteObject.getAnimationsCount() === 0}
-              />
-            </ResponsiveLineStackLayout>
+  return (
+    <>
+      <AnimationsListContainer
+        spriteObject={spriteObject}
+        resourcesLoader={ResourcesLoader}
+        resourceSources={resourceSources}
+        onChooseResource={onChooseResource}
+        resourceExternalEditors={resourceExternalEditors}
+        project={project}
+        objectName={objectName}
+        onSizeUpdated={onSizeUpdated}
+        extraBottomTools={
+          <ResponsiveLineStackLayout noMargin noColumnMargin>
+            <RaisedButton
+              label={<Trans>Edit collision masks</Trans>}
+              primary={false}
+              onClick={() => setCollisionMasksEditorOpen(true)}
+              disabled={spriteObject.getAnimationsCount() === 0}
+            />
+            <RaisedButton
+              label={<Trans>Edit points</Trans>}
+              primary={false}
+              onClick={() => setPointsEditorOpen(true)}
+              disabled={spriteObject.getAnimationsCount() === 0}
+            />
+            <FlatButton
+              label={<Trans>Advanced options</Trans>}
+              primary={false}
+              onClick={() => setAdvancedOptionsOpen(true)}
+              disabled={spriteObject.getAnimationsCount() === 0}
+            />
+          </ResponsiveLineStackLayout>
+        }
+      />
+      {advancedOptionsOpen && (
+        <Dialog
+          actions={
+            <FlatButton
+              label={<Trans>Close</Trans>}
+              primary
+              onClick={() => setAdvancedOptionsOpen(false)}
+            />
           }
-        />
-        {this.state.pointsEditorOpen && (
-          <Dialog
-            actions={
-              <FlatButton
-                label={<Trans>Close</Trans>}
-                primary
-                onClick={() => this.openPointsEditor(false)}
-              />
-            }
-            secondaryActions={[
-              <HelpButton
-                helpPagePath="/objects/sprite/edit-points"
-                key="help"
-              />,
-            ]}
-            cannotBeDismissed={true}
-            noMargin
-            maxWidth="lg"
-            flexBody
-            fullHeight
-            onRequestClose={() => this.openPointsEditor(false)}
-            open={this.state.pointsEditorOpen}
-          >
-            <PointsEditor
-              object={spriteObject}
-              resourcesLoader={this.resourcesLoader}
-              project={project}
+          maxWidth="sm"
+          flexBody
+          onRequestClose={() => setAdvancedOptionsOpen(false)}
+          open
+        >
+          <Column noMargin>
+            <Checkbox
+              label={
+                <Trans>
+                  Don't play the animation when the object is far from the
+                  camera or hidden (recommended for performance)
+                </Trans>
+              }
+              checked={!spriteObject.getUpdateIfNotVisible()}
+              onCheck={(_, value) => {
+                spriteObject.setUpdateIfNotVisible(!value);
+
+                forceUpdate();
+              }}
             />
-          </Dialog>
-        )}
-        {this.state.collisionMasksEditorOpen && (
-          <Dialog
-            actions={
-              <FlatButton
-                label={<Trans>Close</Trans>}
-                primary
-                onClick={() => this.openCollisionMasksEditor(false)}
-              />
-            }
-            secondaryActions={[
-              <HelpButton
-                helpPagePath="/objects/sprite/collision-mask"
-                key="help"
-              />,
-            ]}
-            noMargin
-            maxWidth="lg"
-            flexBody
-            fullHeight
-            cannotBeDismissed={true}
-            onRequestClose={() => this.openCollisionMasksEditor(false)}
-            open={this.state.collisionMasksEditorOpen}
-          >
-            <CollisionMasksEditor
-              object={spriteObject}
-              resourcesLoader={this.resourcesLoader}
-              project={project}
+          </Column>
+        </Dialog>
+      )}
+      {pointsEditorOpen && (
+        <Dialog
+          actions={
+            <FlatButton
+              label={<Trans>Close</Trans>}
+              primary
+              onClick={() => setPointsEditorOpen(false)}
             />
-          </Dialog>
-        )}
-      </>
-    );
-  }
+          }
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/objects/sprite/edit-points"
+              key="help"
+            />,
+          ]}
+          cannotBeDismissed={true}
+          noMargin
+          maxWidth="lg"
+          flexBody
+          fullHeight
+          onRequestClose={() => setPointsEditorOpen(false)}
+          open={pointsEditorOpen}
+        >
+          <PointsEditor
+            object={spriteObject}
+            resourcesLoader={ResourcesLoader}
+            project={project}
+          />
+        </Dialog>
+      )}
+      {collisionMasksEditorOpen && (
+        <Dialog
+          actions={
+            <FlatButton
+              label={<Trans>Close</Trans>}
+              primary
+              onClick={() => setCollisionMasksEditorOpen(false)}
+            />
+          }
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/objects/sprite/collision-mask"
+              key="help"
+            />,
+          ]}
+          noMargin
+          maxWidth="lg"
+          flexBody
+          fullHeight
+          cannotBeDismissed={true}
+          onRequestClose={() => setCollisionMasksEditorOpen(false)}
+          open={collisionMasksEditorOpen}
+        >
+          <CollisionMasksEditor
+            object={spriteObject}
+            resourcesLoader={ResourcesLoader}
+            project={project}
+          />
+        </Dialog>
+      )}
+    </>
+  );
 }

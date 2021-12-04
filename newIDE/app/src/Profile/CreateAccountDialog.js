@@ -20,7 +20,7 @@ import { UsernameField, isUsernameValid } from './UsernameField';
 type Props = {|
   onClose: () => void,
   onGoToLogin: () => void,
-  onCreateAccount: (form: RegisterForm) => void,
+  onCreateAccount: (form: RegisterForm) => Promise<void>,
   createAccountInProgress: boolean,
   error: ?AuthError,
 |};

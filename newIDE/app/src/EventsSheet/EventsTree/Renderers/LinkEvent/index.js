@@ -142,23 +142,29 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
                 [disabledText]: this.props.disabled,
               })}
             >
-              <Trans>Include events from</Trans>{' '}
-              <i
-                className={classNames({
-                  [selectableArea]: true,
-                })}
-                onClick={this.edit}
-                onKeyPress={event => {
-                  if (shouldActivate(event)) {
-                    this.edit(event);
-                  }
-                }}
-                tabIndex={0}
-              >
-                {target || (
-                  <Trans>{`<Enter the name of external events>`}</Trans>
-                )}
-              </i>
+              {this.props.scope.layout ? (
+                <>
+                  <Trans>Include events from</Trans>{' '}
+                  <i
+                    className={classNames({
+                      [selectableArea]: true,
+                    })}
+                    onClick={this.edit}
+                    onKeyPress={event => {
+                      if (shouldActivate(event)) {
+                        this.edit(event);
+                      }
+                    }}
+                    tabIndex={0}
+                  >
+                    {target || (
+                      <Trans>{`<Enter the name of external events>`}</Trans>
+                    )}
+                  </i>{' '}
+                </>
+              ) : (
+                <Trans>Links can't be used outside of a scene.</Trans>
+              )}
             </span>
             <IconButton
               onClick={() => this.openTarget(i18n)}
@@ -175,6 +181,16 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
               <ExternalEventsAutoComplete
                 project={this.props.project}
                 value={target}
+                sceneName={
+                  this.props.scope.layout
+                    ? this.props.scope.layout.getName()
+                    : undefined
+                }
+                externalEventsName={
+                  this.props.scope.externalEvents
+                    ? this.props.scope.externalEvents.getName()
+                    : undefined
+                }
                 onChange={text => {
                   linkEvent.setTarget(text);
                   this.props.onUpdate();

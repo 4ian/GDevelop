@@ -1,4 +1,6 @@
 namespace gdjs {
+  const logger = new gdjs.Logger('PIXI game renderer');
+
   import PIXI = GlobalPIXIModule.PIXI;
 
   /**
@@ -6,11 +8,11 @@ namespace gdjs {
    * called. This is used to avoid scrolling in a webpage when these keys are pressed
    * in the game.
    */
-  const defaultPreventedKeys = [
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
+  const defaultPreventedKeyCodes = [
+    37, // ArrowLeft
+    38, // ArrowUp
+    39, // ArrowRight
+    40, // ArrowDown
   ];
 
   /**
@@ -146,7 +148,7 @@ namespace gdjs {
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
-        console.error('Unexpected error while setting up orientation: ', error);
+        logger.error('Unexpected error while setting up orientation: ', error);
       }
     }
 
@@ -262,7 +264,7 @@ namespace gdjs {
           browserWindow.setContentSize(width, height);
         }
       } else {
-        console.warn("Window size can't be changed on this platform.");
+        logger.warn("Window size can't be changed on this platform.");
       }
     }
 
@@ -429,14 +431,14 @@ namespace gdjs {
 
       //Keyboard
       document.onkeydown = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
-        if (defaultPreventedKeys.includes(e.keyCode)) {
+        if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
 

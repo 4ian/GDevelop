@@ -1,14 +1,16 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import EventsSheet from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import RaisedButton from '../../UI/RaisedButton';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
-import LayoutChooserDialog from './LayoutChooserDialog';
+import ExternalPropertiesDialog, {
+  type ExternalProperties,
+} from './ExternalPropertiesDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
 
@@ -20,17 +22,17 @@ const styles = {
 };
 
 type State = {|
-  layoutChooserOpen: boolean,
+  externalPropertiesDialogOpen: boolean,
 |};
 
 export class ExternalEventsEditorContainer extends React.Component<
   RenderEditorContainerProps,
   State
 > {
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
 
   state = {
-    layoutChooserOpen: false,
+    externalPropertiesDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
@@ -65,6 +67,16 @@ export class ExternalEventsEditorContainer extends React.Component<
     const { project } = this.props;
     if (!project) return null;
 
+    const layoutName = this.getAssociatedLayoutName();
+    if (!layoutName) return null;
+
+    return project.getLayout(layoutName);
+  }
+
+  getAssociatedLayoutName(): ?string {
+    const { project } = this.props;
+    if (!project) return null;
+
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return null;
 
@@ -72,25 +84,26 @@ export class ExternalEventsEditorContainer extends React.Component<
     if (!project.hasLayoutNamed(layoutName)) {
       return null;
     }
-    return project.getLayout(layoutName);
+
+    return layoutName;
   }
 
-  setAssociatedLayout = (layoutName: string) => {
+  saveExternalProperties = (externalProps: ExternalProperties) => {
     const externalEvents = this.getExternalEvents();
     if (!externalEvents) return;
 
-    externalEvents.setAssociatedLayout(layoutName);
+    externalEvents.setAssociatedLayout(externalProps.layoutName);
     this.setState(
       {
-        layoutChooserOpen: false,
+        externalPropertiesDialogOpen: false,
       },
       () => this.updateToolbar()
     );
   };
 
-  openLayoutChooser = () => {
+  openExternalPropertiesDialog = () => {
     this.setState({
-      layoutChooserOpen: true,
+      externalPropertiesDialogOpen: true,
     });
   };
 
@@ -120,11 +133,12 @@ export class ExternalEventsEditorContainer extends React.Component<
             project={project}
             scope={{
               layout,
+              externalEvents,
             }}
             globalObjectsContainer={project}
             objectsContainer={layout}
             events={externalEvents.getEvents()}
-            onOpenSettings={this.openLayoutChooser}
+            onOpenSettings={this.openExternalPropertiesDialog}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
           />
         )}
@@ -140,18 +154,24 @@ export class ExternalEventsEditorContainer extends React.Component<
               <RaisedButton
                 label={<Trans>Choose the scene</Trans>}
                 primary
-                onClick={this.openLayoutChooser}
+                onClick={this.openExternalPropertiesDialog}
               />
             </Line>
           </PlaceholderMessage>
         )}
-        <LayoutChooserDialog
-          title={<Trans>Choose the associated scene</Trans>}
-          helpText="You still need to add a Link event in the scene to import the external events"
-          open={this.state.layoutChooserOpen}
+        <ExternalPropertiesDialog
+          title={<Trans>Configure the external events</Trans>}
+          helpTexts={[
+            <Trans>
+              In order to use these external events, you still need to add a
+              "Link" event in the events sheet of the corresponding scene
+            </Trans>,
+          ]}
+          open={this.state.externalPropertiesDialogOpen}
           project={project}
-          onChoose={this.setAssociatedLayout}
-          onClose={() => this.setState({ layoutChooserOpen: false })}
+          onChoose={this.saveExternalProperties}
+          layoutName={this.getAssociatedLayoutName()}
+          onClose={() => this.setState({ externalPropertiesDialogOpen: false })}
         />
       </div>
     );

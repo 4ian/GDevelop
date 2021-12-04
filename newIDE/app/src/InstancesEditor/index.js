@@ -164,12 +164,16 @@ export default class InstancesEditor extends Component<Props> {
     });
 
     this.pixiRenderer.view.onwheel = (event: any) => {
+      const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom()) {
         this.zoomOnCursorBy(-event.deltaY / 5000);
       } else if (this.keyboardShortcuts.shouldScrollHorizontally()) {
-        this.viewPosition.scrollBy(-event.deltaY / 10, 0);
+        const deltaX = event.deltaY / (5 * zoomFactor);
+        this.viewPosition.scrollBy(-deltaX, 0);
       } else {
-        this.viewPosition.scrollBy(event.deltaX / 10, event.deltaY / 10);
+        const deltaX = event.deltaX / (5 * zoomFactor);
+        const deltaY = event.deltaY / (5 * zoomFactor);
+        this.viewPosition.scrollBy(deltaX, deltaY);
       }
 
       if (this.props.onViewPositionChanged) {

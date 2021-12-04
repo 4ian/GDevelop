@@ -15,7 +15,8 @@ const {
 } = require('./lib/WikiHelpLink');
 const { convertMarkdownToDokuWikiMarkdown } = require('./lib/DokuwikiHelpers');
 
-const extensionsUrl = 'https://api.gdevelop-app.com/asset/extension';
+const extensionShortHeadersUrl =
+  'https://api.gdevelop-app.com/asset/extension-short-header';
 const gdRootPath = path.join(__dirname, '..', '..', '..');
 const outputRootPath = path.join(gdRootPath, 'docs-wiki');
 const extensionsRootPath = path.join(outputRootPath, 'extensions');
@@ -38,19 +39,22 @@ const generateExtensionFooterText = fullName => {
   );
 };
 
-const getAllExtensions = async () => {
-  const response = await axios.get(extensionsUrl);
-  if (!response.data.databaseUrl) {
+/**
+ * Return the list of all extensions and their associated short headers
+ * (useful as containing author public profiles information).
+ */
+const getAllExtensionAndExtensionShortHeaders = async () => {
+  const response = await axios.get(extensionShortHeadersUrl);
+  const extensionShortHeaders = response.data;
+  if (!extensionShortHeaders.length) {
     throw new Error('Unexpected response from the extension endpoint.');
   }
-  const databaseResponse = await axios.get(response.data.databaseUrl);
-  const extensionsDatabase = databaseResponse.data;
 
   const extensions = await Promise.all(
-    extensionsDatabase.extensionShortHeaders.map(async extensionShortHeader => {
+    extensionShortHeaders.map(async extensionShortHeader => {
       const response = await axios.get(extensionShortHeader.url);
-      const extensionHeader = response.data;
-      if (!extensionHeader) {
+      const extension = response.data;
+      if (!extension) {
         throw new Error(
           `Unexpected response when fetching an extension (${
             extensionShortHeader.url
@@ -58,7 +62,7 @@ const getAllExtensions = async () => {
         );
       }
 
-      return extensionHeader;
+      return { extensionShortHeader, extension };
     })
   );
 
@@ -68,7 +72,7 @@ const getAllExtensions = async () => {
 (async () => {
   try {
     console.info(`ℹ️ Loading all community extensions...`);
-    const extensions = await getAllExtensions();
+    const extensionsAndExtensionShortHeaders = await getAllExtensionAndExtensionShortHeaders();
 
     let indexPageContent = `# Extensions
 
@@ -78,10 +82,16 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
 
 `;
 
-    for (const extension of extensions) {
+    for (const {
+      extension,
+      extensionShortHeader,
+    } of extensionsAndExtensionShortHeaders) {
       const folderName = getExtensionFolderName(extension.name);
       const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
       const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
+      const authorUsernames = (extensionShortHeader.authors || [])
+        .map(author => author.username || null)
+        .filter(Boolean);
 
       const referencePageContent =
         `# ${extension.fullName}` +
@@ -91,7 +101,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         `${extension.shortDescription}\n` +
         '\n' +
         `**Authors and contributors** to this community extension: ${
-          extension.author
+          authorUsernames.length ? authorUsernames.join(', ') : 'not specified'
         }.\n` +
         '\n' +
         '---\n' +

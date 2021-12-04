@@ -4,6 +4,8 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
+  const logger = new gdjs.Logger('Bitmap text');
+
   import PIXI = GlobalPIXIModule.PIXI;
 
   const defaultBitmapFontKey = 'GDJS-DEFAULT-BITMAP-FONT';
@@ -152,7 +154,7 @@ namespace gdjs {
       }
 
       if (!this._pixiBitmapFontsInUse[bitmapFontInstallKey]) {
-        console.error(
+        logger.warn(
           'BitmapFont with name ' +
             bitmapFontInstallKey +
             ' was tried to be released but was never marked as used.'
@@ -176,7 +178,8 @@ namespace gdjs {
           const oldestUnloadedPixiBitmapFontName = this._pixiBitmapFontsToUninstall.shift() as string;
 
           PIXI.BitmapFont.uninstall(oldestUnloadedPixiBitmapFontName);
-          console.log(
+          logger.log(
+            'Bitmap Text',
             'Uninstalled BitmapFont "' +
               oldestUnloadedPixiBitmapFontName +
               '" from memory.'
@@ -209,7 +212,7 @@ namespace gdjs {
       // First get the font data:
       const fontData = this._loadedFontsData[bitmapFontResourceName];
       if (!fontData) {
-        console.warn(
+        logger.warn(
           'Could not find Bitmap Font for resource named "' +
             bitmapFontResourceName +
             '". The default font will be used.'
@@ -231,7 +234,7 @@ namespace gdjs {
         this._markBitmapFontAsUsed(bitmapFontInstallKey);
         return bitmapFont;
       } catch (error) {
-        console.warn(
+        logger.error(
           'Could not load the Bitmap Font for resource named "' +
             bitmapFontResourceName +
             '". The default font will be used. Error is: ' +
@@ -264,7 +267,7 @@ namespace gdjs {
               this._loadedFontsData[bitmapFontResource.name] = fontData;
             })
             .catch((error) => {
-              console.error(
+              logger.error(
                 "Can't fetch the bitmap font file " +
                   bitmapFontResource.file +
                   ', error: ' +

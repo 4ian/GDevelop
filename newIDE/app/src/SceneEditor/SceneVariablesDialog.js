@@ -34,6 +34,7 @@ export default (props: Props) => {
           current score of the player.
         </Trans>
       }
+      helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}
       onComputeAllVariableNames={() =>
         EventsRootVariablesFinder.findAllLayoutVariables(

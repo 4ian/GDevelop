@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import EventsSheet from '../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
 import EditorMosaic from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
@@ -20,7 +20,7 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import {
   type ResourceSource,
   type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource.flow';
+} from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
 import ExtensionFunctionSelectorDialog from './ExtensionFunctionSelectorDialog';
@@ -107,7 +107,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     extensionFunctionSelectorDialogOpen: false,
     onAddEventsFunctionCb: null,
   };
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
   _editorMosaic: ?EditorMosaic;
   _editorNavigator: ?EditorNavigatorInterface;
   _globalObjectsContainer: ?gdObjectsContainer;
@@ -709,6 +709,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 scope={{
                   layout: null,
+                  externalEvents: null,
                   eventsFunctionsExtension,
                   eventsBasedBehavior: selectedEventsBasedBehavior,
                   eventsFunction: selectedEventsFunction,

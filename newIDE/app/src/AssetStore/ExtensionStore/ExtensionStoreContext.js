@@ -8,7 +8,7 @@ import {
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
-import { diff } from 'semver';
+import { diff } from 'semver/functions/diff';
 
 const defaultSearchText = '';
 
@@ -17,6 +17,7 @@ type UpdateMetadata = {|
   currentVersion: string,
   newestVersion: string,
 |};
+type UpdateState = Map<string, UpdateMetadata>;
 type ExtensionStoreState = {|
   filters: ?Filters,
   searchResults: ?Array<ExtensionShortHeader>,
@@ -25,7 +26,11 @@ type ExtensionStoreState = {|
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
-  updateState: Map<string, UpdateMetadata>,
+  updateState: UpdateState,
+  allExtensionsShortHeaders: ?{
+    [string]: ExtensionShortHeader,
+  },
+  installedExtensions: Set<string>,
 |};
 
 export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
@@ -43,11 +48,13 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
     setChosenCategory: () => {},
   },
   updateState: new Map(),
+  allExtensionsShortHeaders: null,
+  installedExtensions: new Set(),
 });
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
-  extensionsContainer: gdProject,
+  extensionsList?: Array<gdEventsFunctionsExtension>,
 |};
 
 const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
@@ -62,7 +69,7 @@ const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
 
 export const ExtensionStoreStateProvider = ({
   children,
-  project,
+  extensionsList,
 }: ExtensionStoreStateProviderProps) => {
   const [
     extensionShortHeadersByName,
@@ -142,51 +149,45 @@ export const ExtensionStoreStateProvider = ({
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
   );
 
-  const [updateState, setUpdateState] = React.useState<UpdateState>(
-    () => new Map()
-  );
+  const [updateState, setUpdateState] = React.useState<UpdateState>(new Map());
   React.useEffect(
     () => {
-      // Wait for the extensions and project to be loaded
-      if (!(extensionShortHeadersByName && project)) return;
+      // Wait for the extensions and extenionsList to be loaded
+      if (!(extensionShortHeadersByName && extensionsList)) return;
 
       // Rebuild an update state
       const newState = new Map<string, UpdateMetadata>();
-      for (const { name, version } of Object.values(
-        extensionShortHeadersByName
-      )) {
-        if (project.hasEventsFunctionsExtensionNamed(name)) {
-          const currentVersion = project
-            .getEventsFunctionsExtension(name)
-            .getVersion();
-          try {
-            const versionDiff = diff(version, currentVersion);
-            if (['patch', 'minor', 'major'].includes(versionDiff)) {
-              newState.set(name, {
-                type: versionDiff,
-                currentVersion,
-                newestVersion: version,
-              });
-            }
-          } catch {
-            // An error will be thrown here only if the version does not respect semver.
-            // Simply compare the strings for such extensions.
-            if (version !== currentVersion)
-              newState.set(name, {
-                // Use minor as it is the most neutral option
-                type: 'minor',
-                currentVersion,
-                newestVersion: version,
-              });
+      for (const extension of extensionsList) {
+        const name = extension.getName();
+        const header = extensionShortHeadersByName[name];
+        if (!header) continue;
+        const currentVersion = extension.getVersion();
+        const newestVersion = header.version;
+        try {
+          const versionDiff = diff(currentVersion, newestVersion);
+          if (['patch', 'minor', 'major'].includes(versionDiff)) {
+            newState.set(name, {
+              type: versionDiff,
+              currentVersion,
+              newestVersion,
+            });
           }
+        } catch {
+          // An error will be thrown here only if the version does not respect semver.
+          // Simply compare the strings for such extensions.
+          if (currentVersion !== newestVersion)
+            newState.set(name, {
+              // Use minor as it is the most neutral option
+              type: 'minor',
+              currentVersion,
+              newestVersion,
+            });
         }
       }
 
-      console.log(newState);
-
       setUpdateState(newState);
     },
-    [extensionShortHeadersByName, project]
+    [extensionShortHeadersByName, extensionsList]
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
@@ -196,6 +197,14 @@ export const ExtensionStoreStateProvider = ({
     searchText,
     chosenCategory,
     chosenFilters
+  );
+
+  const installedExtensions = React.useMemo(
+    () =>
+      extensionsList
+        ? new Set(extensionsList.map(e => e.getName()))
+        : new Set(),
+    [extensionsList]
   );
 
   const extensionStoreState = React.useMemo(
@@ -208,6 +217,8 @@ export const ExtensionStoreStateProvider = ({
       setSearchText,
       filtersState,
       updateState,
+      allExtensionsShortHeaders: extensionShortHeadersByName,
+      installedExtensions,
     }),
     [
       searchResults,
@@ -217,6 +228,8 @@ export const ExtensionStoreStateProvider = ({
       filtersState,
       fetchExtensionsAndFilters,
       updateState,
+      extensionShortHeadersByName,
+      installedExtensions,
     ]
   );
 

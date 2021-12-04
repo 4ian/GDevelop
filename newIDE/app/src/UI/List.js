@@ -19,7 +19,7 @@ import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { useLongTouch } from '../Utils/UseLongTouch';
-import { Collapse } from '@material-ui/core';
+import { Badge, Collapse } from '@material-ui/core';
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -81,6 +81,7 @@ type ListItemProps = {|
   initiallyOpen?: boolean,
   disabled?: boolean,
   rightIconColor?: string,
+  dot?: boolean,
   nestedListStyle?: {|
     padding: 0,
   |},
@@ -120,7 +121,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
     );
     const longTouchForContextMenuProps = useLongTouch(openContextMenu);
 
-    const renderListItemSecondaryAction = () => {
+    const renderListItemSecondaryAction = (dot?: boolean) => {
       if (props.displayReloadButton) {
         return (
           <MUIListItemSecondaryAction>
@@ -131,7 +132,9 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
                 aria-label="reload"
                 onClick={props.onReload}
               >
-                <Refresh />
+                <Badge invisible={!props.dot} color="primary" variant="dot">
+                  <Refresh />
+                </Badge>
               </IconButton>
             </Tooltip>
           </MUIListItemSecondaryAction>
@@ -144,7 +147,9 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               ref={elementWithMenu}
               element={
                 <IconButton size="small" edge="end" aria-label="menu">
-                  <MoreVert style={{ color: props.rightIconColor }} />
+                  <Badge invisible={!props.dot} color="primary" variant="dot">
+                    <MoreVert style={{ color: props.rightIconColor }} />
+                  </Badge>
                 </IconButton>
               }
               buildMenuTemplate={props.buildMenuTemplate}
@@ -169,7 +174,9 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               aria-label="open link"
               onClick={props.onOpenLink}
             >
-              <OpenInNew style={{ color: props.rightIconColor }} />
+              <Badge invisible={!props.dot} color="primary" variant="dot">
+                <OpenInNew style={{ color: props.rightIconColor }} />
+              </Badge>
             </IconButton>
           </MUIListItemSecondaryAction>
         );
@@ -183,7 +190,9 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               aria-label="remove"
               onClick={props.onRemove}
             >
-              <Remove style={{ color: props.rightIconColor }} />
+              <Badge invisible={!props.dot} color="primary" variant="dot">
+                <Remove style={{ color: props.rightIconColor }} />
+              </Badge>
             </IconButton>
           </MUIListItemSecondaryAction>
         );

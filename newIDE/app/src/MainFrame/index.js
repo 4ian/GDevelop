@@ -129,6 +129,7 @@ import {
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
+import { enumerateEventsFunctionsExtensions } from '../ProjectManager/EnumerateProjectItems';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2020,7 +2021,12 @@ const MainFrame = (props: Props) => {
   const showLoader = isLoadingProject || previewLoading;
 
   return (
-    <ExtensionStoreStateProvider project={state.currentProject}>
+    <ExtensionStoreStateProvider
+      extensionsList={
+        !!state.currentProject &&
+        enumerateEventsFunctionsExtensions(state.currentProject)
+      }
+    >
       <div className="main-frame">
         {!!renderMainMenu &&
           renderMainMenu({

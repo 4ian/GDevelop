@@ -31,6 +31,11 @@ import {
 } from '../Utils/Serializer';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
+import ExtensionInstallDialog from '../AssetStore/ExtensionStore/ExtensionInstallDialog';
+import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
+import EventsFunctionsExtensionsState, {
+  type EventsFunctionsExtensionsState as EventsFunctionsExtensionsStateType,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
@@ -59,6 +64,8 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { textEllispsisStyle } from '../UI/TextEllipsis';
+import Badge from '@material-ui/core/Badge';
+import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -147,6 +154,7 @@ type ItemProps = {|
   canMoveDown: boolean,
   onMoveDown: () => void,
   buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
+  dot?: boolean,
   style?: ?Object,
 |};
 
@@ -255,6 +263,7 @@ class Item extends React.Component<ItemProps, {||}> {
                   // field.
                   if (!this.props.editingName) this.props.onEdit();
                 }}
+                dot={this.props.dot}
               />
             )}
           </I18n>
@@ -305,6 +314,12 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
+type PropsWithContext = {|
+  ...Props,
+  eventsFunctionsContext: EventsFunctionsExtensionsStateType,
+  i18n: I18nType,
+|};
+
 type State = {|
   editedPropertiesLayout: ?gdLayout,
   editedVariablesLayout: ?gdLayout,
@@ -317,10 +332,14 @@ type State = {|
   extensionsSearchDialogOpen: boolean,
   layoutPropertiesDialogOpen: boolean,
   layoutVariablesDialogOpen: boolean,
+  installingExtension: boolean,
+  viewingExtension: ExtensionShortHeader | null,
 |};
 
-export default class ProjectManager extends React.Component<Props, State> {
+class _ProjectManager extends React.Component<PropsWithContext, State> {
   _searchBar: ?SearchBar;
+
+  static contextType = ExtensionStoreContext;
 
   state = {
     editedPropertiesLayout: null,
@@ -334,9 +353,11 @@ export default class ProjectManager extends React.Component<Props, State> {
     extensionsSearchDialogOpen: false,
     layoutPropertiesDialogOpen: false,
     layoutVariablesDialogOpen: false,
+    installingExtension: false,
+    viewingExtension: null,
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: PropsWithContext, nextState: State) {
     if (
       nextState.projectPropertiesDialogOpen !==
         this.state.projectPropertiesDialogOpen ||
@@ -354,7 +375,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     return !nextProps.freezeUpdate;
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: PropsWithContext) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
       if (useShouldAutofocusSearchbar() && this._searchBar)
@@ -711,6 +732,19 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
+  _installExtension(extensionHeader: ExtensionShortHeader) {
+    this.props.onInstallExtension(extensionHeader);
+    this.setState({ installingExtension: true });
+    installExtension(
+      this.props.i18n,
+      this.props.project,
+      this.props.eventsFunctionsContext,
+      extensionHeader
+    ).then(() => {
+      this.setState({ installingExtension: false });
+    });
+  }
+
   _renderMenu() {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
@@ -1046,11 +1080,18 @@ export default class ProjectManager extends React.Component<Props, State> {
             error={eventsFunctionsExtensionsError}
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
-              <ListIcon
-                iconSize={24}
-                isGDevelopIcon
-                src="res/ribbon_default/function32.png"
-              />
+              <Badge
+                badgeContent={this.context.updateState.size}
+                max={9}
+                overlap="circle"
+                color="primary"
+              >
+                <ListIcon
+                  iconSize={24}
+                  isGDevelopIcon
+                  src="res/ribbon_default/function32.png"
+                />
+              </Badge>
             }
             initiallyOpen={false}
             open={forceOpen}
@@ -1068,6 +1109,36 @@ export default class ProjectManager extends React.Component<Props, State> {
                   return (
                     <Item
                       key={i}
+                      dot={this.context.updateState.has(name)}
+                      buildExtraMenuTemplate={(i18n: I18nType) => {
+                        if (
+                          !this.context.allExtensionsShortHeaders ||
+                          !this.context.allExtensionsShortHeaders[name]
+                        )
+                          return [];
+                        const header = this.context.allExtensionsShortHeaders[
+                          name
+                        ];
+                        const menu: Array<MenuItemTemplate> = [
+                          { type: 'separator' },
+                          {
+                            label: i18n._(t`Open store page`),
+                            click: () => {
+                              this.setState({
+                                viewingExtension: header,
+                              });
+                            },
+                          },
+                        ];
+                        if (this.context.updateState.has(name))
+                          menu.push({
+                            label: i18n._(t`Update extension`),
+                            click: () => {
+                              this._installExtension(header);
+                            },
+                          });
+                        return menu;
+                      }}
                       leftIcon={
                         iconUrl ? (
                           <IconContainer
@@ -1251,7 +1322,41 @@ export default class ProjectManager extends React.Component<Props, State> {
             onInstallExtension={onInstallExtension}
           />
         )}
+        {this.state.viewingExtension && (
+          <ExtensionInstallDialog
+            extensionShortHeader={this.state.viewingExtension}
+            isInstalling={this.state.installingExtension}
+            onClose={() =>
+              this.setState({
+                viewingExtension: null,
+                installingExtension: false,
+              })
+            }
+            onInstall={() => {
+              if (this.state.viewingExtension)
+                this._installExtension(this.state.viewingExtension);
+            }}
+          />
+        )}
       </div>
     );
   }
+}
+
+export default function ProjectManager(props: Props) {
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsState.Consumer>
+          {eventsFunctionsContext => (
+            <_ProjectManager
+              eventsFunctionsContext={eventsFunctionsContext}
+              i18n={i18n}
+              {...props}
+            />
+          )}
+        </EventsFunctionsExtensionsState.Consumer>
+      )}
+    </I18n>
+  );
 }

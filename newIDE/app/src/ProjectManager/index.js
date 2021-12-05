@@ -33,7 +33,9 @@ import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import ExtensionInstallDialog from '../AssetStore/ExtensionStore/ExtensionInstallDialog';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
-import EventsFunctionsExtensionsState from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import EventsFunctionsExtensionsState, {
+  type EventsFunctionsExtensionsState as EventsFunctionsExtensionsStateType,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
@@ -312,8 +314,9 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
-type PropsWithContext = Props & {|
-  eventsFunctionsContext: EventsFunctionsExtensionsState,
+type PropsWithContext = {|
+  ...Props,
+  eventsFunctionsContext: EventsFunctionsExtensionsStateType,
   i18n: I18nType,
 |};
 
@@ -330,7 +333,7 @@ type State = {|
   layoutPropertiesDialogOpen: boolean,
   layoutVariablesDialogOpen: boolean,
   installingExtension: boolean,
-  viewingExtenion: ExtensionShortHeader | null,
+  viewingExtension: ExtensionShortHeader | null,
 |};
 
 class _ProjectManager extends React.Component<PropsWithContext, State> {
@@ -354,7 +357,7 @@ class _ProjectManager extends React.Component<PropsWithContext, State> {
     viewingExtension: null,
   };
 
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
+  shouldComponentUpdate(nextProps: PropsWithContext, nextState: State) {
     if (
       nextState.projectPropertiesDialogOpen !==
         this.state.projectPropertiesDialogOpen ||
@@ -372,7 +375,7 @@ class _ProjectManager extends React.Component<PropsWithContext, State> {
     return !nextProps.freezeUpdate;
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: PropsWithContext) {
     // Typical usage (don't forget to compare props):
     if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
       if (useShouldAutofocusSearchbar() && this._searchBar)
@@ -1116,7 +1119,7 @@ class _ProjectManager extends React.Component<PropsWithContext, State> {
                         const header = this.context.allExtensionsShortHeaders[
                           name
                         ];
-                        const menu: MenuItemTemplate = [
+                        const menu: Array<MenuItemTemplate> = [
                           { type: 'separator' },
                           {
                             label: i18n._(t`Open store page`),
@@ -1329,9 +1332,10 @@ class _ProjectManager extends React.Component<PropsWithContext, State> {
                 installingExtension: false,
               })
             }
-            onInstall={() =>
-              this._installExtension(this.state.viewingExtension)
-            }
+            onInstall={() => {
+              if (this.state.viewingExtension)
+                this._installExtension(this.state.viewingExtension);
+            }}
           />
         )}
       </div>

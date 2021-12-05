@@ -2023,8 +2023,9 @@ const MainFrame = (props: Props) => {
   return (
     <ExtensionStoreStateProvider
       extensionsList={
-        !!state.currentProject &&
-        enumerateEventsFunctionsExtensions(state.currentProject)
+        state.currentProject
+          ? enumerateEventsFunctionsExtensions(state.currentProject)
+          : null
       }
     >
       <div className="main-frame">

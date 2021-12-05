@@ -8,9 +8,16 @@ import {
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import { diff } from 'semver/functions/diff';
 
 const defaultSearchText = '';
 
+type UpdateMetadata = {|
+  type: 'patch' | 'minor' | 'major',
+  currentVersion: string,
+  newestVersion: string,
+|};
+type UpdateState = Map<string, UpdateMetadata>;
 type ExtensionStoreState = {|
   filters: ?Filters,
   searchResults: ?Array<ExtensionShortHeader>,
@@ -19,6 +26,11 @@ type ExtensionStoreState = {|
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
+  updateState: UpdateState,
+  allExtensionsShortHeaders: ?{
+    [string]: ExtensionShortHeader,
+  },
+  installedExtensions: Set<string>,
 |};
 
 export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
@@ -35,10 +47,14 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
     chosenCategory: null,
     setChosenCategory: () => {},
   },
+  updateState: new Map(),
+  allExtensionsShortHeaders: null,
+  installedExtensions: new Set(),
 });
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
+  extensionsList?: Array<gdEventsFunctionsExtension>,
 |};
 
 const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
@@ -53,6 +69,7 @@ const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
 
 export const ExtensionStoreStateProvider = ({
   children,
+  extensionsList,
 }: ExtensionStoreStateProviderProps) => {
   const [
     extensionShortHeadersByName,
@@ -132,6 +149,47 @@ export const ExtensionStoreStateProvider = ({
     [fetchExtensionsAndFilters, extensionShortHeadersByName, isLoading]
   );
 
+  const [updateState, setUpdateState] = React.useState<UpdateState>(new Map());
+  React.useEffect(
+    () => {
+      // Wait for the extensions and extenionsList to be loaded
+      if (!(extensionShortHeadersByName && extensionsList)) return;
+
+      // Rebuild an update state
+      const newState = new Map<string, UpdateMetadata>();
+      for (const extension of extensionsList) {
+        const name = extension.getName();
+        const header = extensionShortHeadersByName[name];
+        if (!header) continue;
+        const currentVersion = extension.getVersion();
+        const newestVersion = header.version;
+        try {
+          const versionDiff = diff(currentVersion, newestVersion);
+          if (['patch', 'minor', 'major'].includes(versionDiff)) {
+            newState.set(name, {
+              type: versionDiff,
+              currentVersion,
+              newestVersion,
+            });
+          }
+        } catch {
+          // An error will be thrown here only if the version does not respect semver.
+          // Simply compare the strings for such extensions.
+          if (currentVersion !== newestVersion)
+            newState.set(name, {
+              // Use minor as it is the most neutral option
+              type: 'minor',
+              currentVersion,
+              newestVersion,
+            });
+        }
+      }
+
+      setUpdateState(newState);
+    },
+    [extensionShortHeadersByName, extensionsList]
+  );
+
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<ExtensionShortHeader> = useSearchItem(
     extensionShortHeadersByName,
@@ -139,6 +197,14 @@ export const ExtensionStoreStateProvider = ({
     searchText,
     chosenCategory,
     chosenFilters
+  );
+
+  const installedExtensions = React.useMemo(
+    () =>
+      extensionsList
+        ? new Set(extensionsList.map(e => e.getName()))
+        : new Set(),
+    [extensionsList]
   );
 
   const extensionStoreState = React.useMemo(
@@ -150,6 +216,9 @@ export const ExtensionStoreStateProvider = ({
       searchText,
       setSearchText,
       filtersState,
+      updateState,
+      allExtensionsShortHeaders: extensionShortHeadersByName,
+      installedExtensions,
     }),
     [
       searchResults,
@@ -158,6 +227,9 @@ export const ExtensionStoreStateProvider = ({
       searchText,
       filtersState,
       fetchExtensionsAndFilters,
+      updateState,
+      extensionShortHeadersByName,
+      installedExtensions,
     ]
   );
 

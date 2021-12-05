@@ -124,9 +124,6 @@ export const ExtensionStore = ({
         <ExtensionInstallDialog
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
           onInstall={() => {
             onInstall(selectedExtensionShortHeader);
           }}

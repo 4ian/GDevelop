@@ -2025,7 +2025,7 @@ const MainFrame = (props: Props) => {
       extensionsList={
         state.currentProject
           ? enumerateEventsFunctionsExtensions(state.currentProject)
-          : null
+          : undefined
       }
     >
       <div className="main-frame">

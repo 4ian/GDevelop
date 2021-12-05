@@ -115,7 +115,7 @@ export default function BehaviorMethodSelectorDialog({
           secondaryText={
             <Trans>
               A condition that can be used on objects with the behavior. You can
-              define the action parameters: objects, texts, numbers, layers,
+              define the condition parameters: objects, texts, numbers, layers,
               etc...
             </Trans>
           }

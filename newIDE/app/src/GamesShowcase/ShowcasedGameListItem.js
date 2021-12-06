@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react';
-import {
-  type ShowcasedGame,
-} from '../Utils/GDevelopServices/Game';
+import { type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { Card } from '@material-ui/core';
 import Text from '../UI/Text';
 import { Column, Line, Spacer } from '../UI/Grid';

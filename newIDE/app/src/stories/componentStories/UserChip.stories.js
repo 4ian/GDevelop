@@ -7,9 +7,7 @@ import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import UserChip from '../../UI/User/UserChip';
-import {
-  indieUserProfile,
-} from '../../fixtures/GDevelopServicesTestData';
+import { indieUserProfile } from '../../fixtures/GDevelopServicesTestData';
 
 export default {
   title: 'UserChip',
@@ -25,8 +23,5 @@ export const SignedUser = () => (
 );
 
 export const UnsignedUser = () => (
-  <UserChip
-    profile={null}
-    onClick={() => action('click user chip')}
-  />
+  <UserChip profile={null} onClick={() => action('click user chip')} />
 );

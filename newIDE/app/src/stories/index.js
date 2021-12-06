@@ -2796,6 +2796,11 @@ storiesOf('StartPage', module)
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
       onOpenExamples={() => action('open examples')}
+      onCreateFromExampleShortHeader={() => action('create from example')}
+      onOpenFromExampleShortHeader={() =>
+        action('call callback after project creation')
+      }
+      onOpenProfile={() => action('open profile')}
     />
   ))
   .add('project opened', () => (
@@ -2814,6 +2819,11 @@ storiesOf('StartPage', module)
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
       onOpenExamples={() => action('open examples')}
+      onCreateFromExampleShortHeader={() => action('create from example')}
+      onOpenFromExampleShortHeader={() =>
+        action('call callback after project creation')
+      }
+      onOpenProfile={() => action('open profile')}
     />
   ));
 
@@ -2941,6 +2951,7 @@ storiesOf('CreateProjectDialog', module)
         onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="starters"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2954,6 +2965,7 @@ storiesOf('CreateProjectDialog', module)
         onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="games-showcase"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ));

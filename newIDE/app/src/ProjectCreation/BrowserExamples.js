@@ -2,10 +2,7 @@
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { ExampleStore } from '../AssetStore/ExampleStore';
-import {
-
-  type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Example';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
 

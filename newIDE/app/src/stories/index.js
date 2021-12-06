@@ -255,7 +255,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -2795,6 +2795,7 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onOpenExamples={() => action('open examples')}
     />
   ))
   .add('project opened', () => (
@@ -2812,6 +2813,7 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onOpenExamples={() => action('open examples')}
     />
   ));
 

@@ -2,10 +2,8 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import React, { Component } from 'react';
-import Divider from '@material-ui/core/Divider';
+import * as React from 'react';
 import RaisedButton from '../UI/RaisedButton';
-import LocalFolderPicker from '../UI/LocalFolderPicker';
 import Text from '../UI/Text';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -17,6 +15,7 @@ import ListIcon from '../UI/ListIcon';
 import { showGameFileCreationError } from './LocalExamples';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
+import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 const gd: libGDevelop = global.gd;
@@ -36,65 +35,67 @@ type Props = {|
   outputPath: string,
 |};
 
-type State = {||};
+const LocalStarters = ({
+  onOpen,
+  onCreate,
+  onChangeOutputPath,
+  onShowExamples,
+  outputPath,
+}: Props): React.Node => {
+  const [selectedStarter, setSelectedStarter] = React.useState<?string>(null);
+  const createFromExample = React.useCallback(
+    (i18n: I18nType, exampleName: string) => {
+      if (!fs || !outputPath) return;
 
-export default class LocalStarters extends Component<Props, State> {
-  createFromExample(i18n: I18nType, exampleName: string) {
-    const { outputPath } = this.props;
-    if (!fs || !outputPath) return;
+      findExamples(examplesPath => {
+        try {
+          fs.mkdirsSync(outputPath);
+          fs.copySync(path.join(examplesPath, exampleName), outputPath);
+        } catch (error) {
+          showGameFileCreationError(i18n, outputPath, error);
+          return;
+        }
 
-    findExamples(examplesPath => {
+        onOpen(LocalFileStorageProvider, {
+          fileIdentifier: path.join(outputPath, exampleName + '.json'),
+        });
+        sendNewGameCreated(exampleName);
+      });
+    },
+    [onOpen, outputPath]
+  );
+
+  const createEmptyGame = React.useCallback(
+    (i18n: I18nType) => {
+      if (!fs || !outputPath) return;
+
       try {
         fs.mkdirsSync(outputPath);
-        fs.copySync(path.join(examplesPath, exampleName), outputPath);
       } catch (error) {
         showGameFileCreationError(i18n, outputPath, error);
         return;
       }
 
-      this.props.onOpen(LocalFileStorageProvider, {
-        fileIdentifier: path.join(outputPath, exampleName + '.json'),
+      const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
+      const filePath = path.join(outputPath, 'game.json');
+      project.setProjectFile(filePath);
+      onCreate(project, LocalFileStorageProvider, {
+        fileIdentifier: filePath,
       });
-      sendNewGameCreated(exampleName);
-    });
-  }
+      sendNewGameCreated('');
+    },
+    [onCreate, outputPath]
+  );
 
-  createEmptyGame(i18n: I18nType) {
-    const { outputPath } = this.props;
-    if (!fs || !outputPath) return;
+  const selectStarterAndOpenPreCreationDialog = (starter: string) => () => {
+    setSelectedStarter(starter);
+  };
 
-    try {
-      fs.mkdirsSync(outputPath);
-    } catch (error) {
-      showGameFileCreationError(i18n, outputPath, error);
-      return;
-    }
-
-    const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
-    const filePath = path.join(outputPath, 'game.json');
-    project.setProjectFile(filePath);
-    this.props.onCreate(project, LocalFileStorageProvider, {
-      fileIdentifier: filePath,
-    });
-    sendNewGameCreated('');
-  }
-
-  render() {
-    return (
-      <I18n>
-        {({ i18n }) => (
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <>
           <Column noMargin>
-            <Line expand>
-              <Column expand>
-                <LocalFolderPicker
-                  fullWidth
-                  value={this.props.outputPath}
-                  onChange={this.props.onChangeOutputPath}
-                  type="create-game"
-                />
-              </Column>
-            </Line>
-            <Divider />
             <Line>
               <Column>
                 <Text>
@@ -120,7 +121,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => this.createFromExample(i18n, 'platformer')}
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'platformer'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -138,9 +141,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'space-shooter')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'space-shooter'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -158,9 +161,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'geometry-monster')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'geometry-monster'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -177,9 +180,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'isometric-game')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'isometric-game'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -196,9 +199,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'downhill-bike-physics-demo')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'downhill-bike-physics-demo'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -216,7 +219,7 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => this.createFromExample(i18n, 'pairs')}
+                    onClick={selectStarterAndOpenPreCreationDialog('pairs')}
                   />
                   <ListItem
                     leftIcon={
@@ -230,7 +233,7 @@ export default class LocalStarters extends Component<Props, State> {
                       <Trans>Start a new game from scratch.</Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() => this.createEmptyGame(i18n)}
+                    onClick={() => createEmptyGame(i18n)}
                   />
                   <Subheader>
                     <Trans>Advanced</Trans>
@@ -251,9 +254,9 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'particle-effects-demo')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'particle-effects-demo'
+                    )}
                   />
                   <ListItem
                     leftIcon={
@@ -271,22 +274,37 @@ export default class LocalStarters extends Component<Props, State> {
                       </Trans>
                     }
                     secondaryTextLines={2}
-                    onClick={() =>
-                      this.createFromExample(i18n, 'game-feel-demo')
-                    }
+                    onClick={selectStarterAndOpenPreCreationDialog(
+                      'game-feel-demo'
+                    )}
                   />
                 </List>
                 <Line alignItems="center" justifyContent="center">
                   <RaisedButton
                     label={<Trans>See examples</Trans>}
-                    onClick={() => this.props.onShowExamples()}
+                    onClick={() => onShowExamples()}
                   />
                 </Line>
               </Column>
             </Line>
           </Column>
-        )}
-      </I18n>
-    );
-  }
-}
+          {selectedStarter && (
+            <LocalProjectPreCreationDialog
+              open
+              onClose={() => setSelectedStarter(null)}
+              onCreate={
+                selectedStarter
+                  ? () => createFromExample(i18n, selectedStarter)
+                  : () => {}
+              }
+              outputPath={outputPath}
+              onChangeOutputPath={onChangeOutputPath}
+            />
+          )}
+        </>
+      )}
+    </I18n>
+  );
+};
+
+export default LocalStarters;

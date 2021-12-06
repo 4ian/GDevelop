@@ -118,7 +118,7 @@ const ShowcasedGameButton = ({
       </StackLayout>
       {otherLinks.length > 0 && (
         <>
-          {windowWidth === 'small' && <Spacer />}
+          {(windowWidth === 'small' || forceColumn) && <Spacer />}
           {/* $FlowFixMe */}
           <StackLayout {...stackLayoutProps}>
             {otherLinks.map((link, index) => (

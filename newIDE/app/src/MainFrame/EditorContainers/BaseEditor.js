@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
@@ -9,6 +10,7 @@ import {
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -72,6 +74,20 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+
+  // Project creation from an example
+  onCreateFromExampleShortHeader: (
+    isOpeningCallback: (boolean) => void,
+    onOpenCallback: any
+  ) => (
+    i18n: I18nType,
+    exampleShortHeader: ExampleShortHeader,
+    outputPath?: string
+  ) => Promise<void>,
+  onOpenFromExampleShortHeader: (
+    storageProvider: empty,
+    fileMetadata: empty
+  ) => Promise<void>,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

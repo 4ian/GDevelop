@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
@@ -25,6 +26,14 @@ import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleSto
 import UserChip from '../../../UI/User/UserChip';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
+import optionalRequire from '../../../Utils/OptionalRequire';
+import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
+import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProjectPreCreationDialog';
+
+const electron = optionalRequire('electron');
+const path = optionalRequire('path');
+const app = electron ? electron.remote.app : null;
 
 const styles = {
   container: {
@@ -66,6 +75,20 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
+
+  // Project creation from example
+  onCreateFromExampleShortHeader: (
+    isOpeningCallback: (boolean) => void,
+    onOpenCallback: any
+  ) => (
+    i18n: I18nType,
+    exampleShortHeader: ExampleShortHeader,
+    outputPath?: string
+  ) => Promise<void>,
+  onOpenFromExampleShortHeader: (
+    storageProvider: empty,
+    fileMetadata: empty
+  ) => Promise<void>,
 |};
 
 type StartPageEditorInterface = {|
@@ -82,6 +105,8 @@ export const StartPage = React.memo<Props>(
         canOpen,
         onOpen,
         onCreate,
+        onCreateFromExampleShortHeader,
+        onOpenFromExampleShortHeader,
         onOpenProjectManager,
         onCloseProject,
         onOpenTutorials,
@@ -131,10 +156,26 @@ export const StartPage = React.memo<Props>(
         [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters]
       );
 
+      const [outputPath, setOutputPath] = React.useState<string>(
+        app && path
+          ? findEmptyPath(
+              path.join(app.getPath('documents'), 'GDevelop projects')
+            )
+          : ''
+      );
+      const [
+        preCreationDialogOpen,
+        setPreCreationDialogOpen,
+      ] = React.useState<boolean>(false);
+      const [isOpening, setIsOpening] = React.useState<boolean>(false);
       const [
         selectedShowcasedGame,
         setSelectedShowcasedGame,
       ] = React.useState<?ShowcasedGame>(null);
+      const [
+        selectedExample,
+        setSelectedExample,
+      ] = React.useState<?ExampleShortHeader>(null);
 
       const prepareExamples = React.useCallback(
         (examples: Array<ExampleShortHeader>) =>
@@ -145,7 +186,7 @@ export const StartPage = React.memo<Props>(
               id: example.id,
               title: example.name,
               thumbnailUrl: example.previewImageUrls[0],
-              onClick: () => console.log(example.id),
+              onClick: () => setSelectedExample(example),
             })),
         []
       );
@@ -160,6 +201,12 @@ export const StartPage = React.memo<Props>(
           })),
         []
       );
+
+      const onOpenExample = (...args) => {
+        setPreCreationDialogOpen(false);
+        setSelectedExample(null);
+        onOpenFromExampleShortHeader(...args);
+      };
 
       return (
         <I18n>
@@ -335,6 +382,36 @@ export const StartPage = React.memo<Props>(
                   showcasedGame={selectedShowcasedGame}
                 />
               )}
+              {selectedExample && (
+                <ExampleDialog
+                  isOpening={isOpening}
+                  onClose={() => setSelectedExample(null)}
+                  exampleShortHeader={selectedExample}
+                  onOpen={() => {
+                    electron
+                      ? setPreCreationDialogOpen(true)
+                      : onCreateFromExampleShortHeader(
+                          setIsOpening,
+                          onOpenExample
+                        )(i18n, selectedExample);
+                  }}
+                />
+              )}
+              {selectedExample && preCreationDialogOpen && (
+                <LocalProjectPreCreationDialog
+                  open
+                  onClose={() => setPreCreationDialogOpen(false)}
+                  onCreate={() =>
+                    onCreateFromExampleShortHeader(setIsOpening, onOpenExample)(
+                      i18n,
+                      selectedExample,
+                      outputPath
+                    )
+                  }
+                  outputPath={outputPath}
+                  onChangeOutputPath={setOutputPath}
+                />
+              )}
             </>
           )}
         </I18n>
@@ -358,6 +435,8 @@ export const renderStartPageContainer = (
     canOpen={props.canOpen}
     onOpen={props.onOpen}
     onCreate={props.onCreate}
+    onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
+    onOpenFromExampleShortHeader={props.onOpenFromExampleShortHeader}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
     onOpenTutorials={props.onOpenTutorials}

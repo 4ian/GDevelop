@@ -130,6 +130,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const classesForGridListItem = useStylesForGridListItem();
   const classesForLeftArrow = useStylesForLeftArrow();
   const scrollView = React.useRef<?HTMLUListElement>(null);
+  const [hoveredElement, setHoveredElement] = React.useState<?HTMLElement>(
+    null
+  );
   const areItemsSet = items && items.length;
   const itemsToDisplay =
     items && items.length
@@ -287,7 +290,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
   );
 
   const onFocusItem = (event: SyntheticFocusEvent<HTMLLIElement>): void => {
-    event.currentTarget.scrollIntoView();
+    if (event.currentTarget !== hoveredElement)
+      event.currentTarget.scrollIntoView();
   };
 
   React.useEffect(
@@ -348,6 +352,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
               key={item.id}
               tabIndex={0}
               onFocus={onFocusItem}
+              onMouseEnter={event => setHoveredElement(event.currentTarget)}
+              onMouseLeave={() => setHoveredElement(null)}
               onKeyPress={(
                 event: SyntheticKeyboardEvent<HTMLLIElement>
               ): void => {

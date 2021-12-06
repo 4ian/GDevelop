@@ -548,6 +548,11 @@ namespace gdjs {
   void main() {
       vec2 topleft = vec2(center.x - radius, center.y - radius);
       vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+      // Do not set the color if we are outside the texture,
+      // this prevents the texture from being repeated.
+      if (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0) {
+        discard;
+      }
       gl_FragColor = vec4(color, 1.0) * texture2D(uSampler, texCoord);
   }`;
   }

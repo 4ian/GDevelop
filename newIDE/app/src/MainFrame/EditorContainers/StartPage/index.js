@@ -132,21 +132,9 @@ export const StartPage = React.memo<Props>(
       );
 
       const [
-        showcasedGameDialogOpen,
-        setShowcasedGameDialogOpen,
-      ] = React.useState<boolean>(false);
-      const [
         selectedShowcasedGame,
-        selectShowcasedGame,
+        setSelectedShowcasedGame,
       ] = React.useState<?ShowcasedGame>(null);
-
-      const onOpenShowcasedGameDialog = React.useCallback(
-        (showcasedGame: ShowcasedGame) => {
-          selectShowcasedGame(showcasedGame);
-          setShowcasedGameDialogOpen(true);
-        },
-        []
-      );
 
       const prepareExamples = React.useCallback(
         (examples: Array<ExampleShortHeader>) =>
@@ -168,9 +156,9 @@ export const StartPage = React.memo<Props>(
             id: game.title,
             title: game.title,
             thumbnailUrl: game.thumbnailUrl,
-            onClick: () => onOpenShowcasedGameDialog(game),
+            onClick: () => setSelectedShowcasedGame(game),
           })),
-        [onOpenShowcasedGameDialog]
+        []
       );
 
       return (
@@ -340,10 +328,10 @@ export const StartPage = React.memo<Props>(
                   </Line>
                 </div>
               </ScrollBackground>
-              {showcasedGameDialogOpen && selectedShowcasedGame && (
+              {selectedShowcasedGame && (
                 <ShowcasedGameDialog
                   open
-                  onClose={() => setShowcasedGameDialogOpen(false)}
+                  onClose={() => setSelectedShowcasedGame(null)}
                   showcasedGame={selectedShowcasedGame}
                 />
               )}

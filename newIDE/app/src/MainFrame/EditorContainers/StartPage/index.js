@@ -149,12 +149,15 @@ export const StartPage = React.memo<Props>(
         [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters]
       );
 
-      const [outputPath, setOutputPath] = React.useState<string>(
+      const computeDefaultProjectPath = (): string =>
         app && path
           ? findEmptyPath(
               path.join(app.getPath('documents'), 'GDevelop projects')
             )
-          : ''
+          : '';
+
+      const [outputPath, setOutputPath] = React.useState<string>(
+        computeDefaultProjectPath()
       );
       const [
         preCreationDialogOpen,
@@ -196,8 +199,10 @@ export const StartPage = React.memo<Props>(
       );
 
       const onOpenExample = (...args) => {
+        // Close the dialogs and compute new path after the project is created and before it is opened in the editor
         setPreCreationDialogOpen(false);
         setSelectedExample(null);
+        setOutputPath(computeDefaultProjectPath());
         onOpenFromExampleShortHeader(...args);
       };
 

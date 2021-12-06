@@ -16,11 +16,16 @@ const UserChip = ({ profile, onClick }: Props) => {
   return (
     <Chip
       variant="outlined"
-      avatar={profile ? (
-        <Avatar src={getGravatarUrl(profile.email || '', { size: 30 })} sx={{ width: 30, height: 30 }}/>
-      ) : (
-        <FaceIcon />
-      )}
+      avatar={
+        profile ? (
+          <Avatar
+            src={getGravatarUrl(profile.email || '', { size: 30 })}
+            sx={{ width: 30, height: 30 }}
+          />
+        ) : (
+          <FaceIcon />
+        )
+      }
       label={
         profile ? (
           profile.username || profile.email

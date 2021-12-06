@@ -13,7 +13,6 @@ import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExterna
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { type OnCreateFromExampleShortHeaderFunction } from '../../ProjectCreation/CreateProjectDialog';
 
-
 export type RenderEditorContainerProps = {|
   isActive: boolean,
   projectItemName: ?string,

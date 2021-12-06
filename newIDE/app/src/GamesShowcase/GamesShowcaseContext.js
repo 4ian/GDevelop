@@ -15,6 +15,7 @@ type GamesShowcaseState = {|
   filters: ?Filters,
   searchResults: ?Array<ShowcasedGame>,
   fetchShowcasedGamesAndFilters: () => void,
+  allShowcasedGames: ?Array<ShowcasedGame>,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -25,6 +26,7 @@ export const GamesShowcaseContext = React.createContext<GamesShowcaseState>({
   filters: null,
   searchResults: null,
   fetchShowcasedGamesAndFilters: () => {},
+  allShowcasedGames: null,
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -59,6 +61,10 @@ export const GamesShowcaseStateProvider = ({
   const [showcasedGamesByName, setShowcasedGamesByName] = React.useState<?{
     [string]: ShowcasedGame,
   }>(null);
+  const [
+    allShowcasedGames,
+    setAllShowcasedGames,
+  ] = React.useState<?Array<ShowcasedGame>>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -79,6 +85,7 @@ export const GamesShowcaseStateProvider = ({
         try {
           const allShowcasedGames: AllShowcasedGames = await listAllShowcasedGames();
           const { showcasedGames, filters } = allShowcasedGames;
+          setAllShowcasedGames(showcasedGames);
 
           const showcasedGamesByName = {};
           showcasedGames.forEach(showcasedGame => {
@@ -117,6 +124,7 @@ export const GamesShowcaseStateProvider = ({
     () => ({
       searchResults,
       fetchShowcasedGamesAndFilters,
+      allShowcasedGames,
       filters,
       error,
       searchText,
@@ -125,6 +133,7 @@ export const GamesShowcaseStateProvider = ({
     }),
     [
       searchResults,
+      allShowcasedGames,
       error,
       filters,
       searchText,

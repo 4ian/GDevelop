@@ -133,11 +133,11 @@ export const StartPage = React.memo<Props>(
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { tutorials } = React.useContext(TutorialContext);
       const {
-        searchResults: showcasedGames,
+        allShowcasedGames: showcasedGames,
         fetchShowcasedGamesAndFilters,
       } = React.useContext(GamesShowcaseContext);
       const {
-        searchResults: examples,
+        allExamples: examples,
         fetchExamplesAndFilters,
       } = React.useContext(ExampleStoreContext);
 

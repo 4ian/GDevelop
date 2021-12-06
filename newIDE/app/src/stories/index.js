@@ -255,7 +255,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -2795,6 +2795,11 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onCreateFromExampleShortHeader={() => action('create from example')}
+      onOpenFromExampleShortHeader={() =>
+        action('call callback after project creation')
+      }
+      onOpenProfile={() => action('open profile')}
     />
   ))
   .add('project opened', () => (
@@ -2812,6 +2817,11 @@ storiesOf('StartPage', module)
       onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
       onOpenHelpFinder={() => action('onOpenHelpFinder')()}
       onOpenLanguageDialog={() => action('open language dialog')()}
+      onCreateFromExampleShortHeader={() => action('create from example')}
+      onOpenFromExampleShortHeader={() =>
+        action('call callback after project creation')
+      }
+      onOpenProfile={() => action('open profile')}
     />
   ));
 
@@ -2939,6 +2949,7 @@ storiesOf('CreateProjectDialog', module)
         onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="starters"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2952,6 +2963,7 @@ storiesOf('CreateProjectDialog', module)
         onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="games-showcase"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ));

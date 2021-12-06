@@ -85,7 +85,11 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type CreateProjectDialogWithComponentsProps,
+  type CreateProjectDialogTabs,
+} from '../ProjectCreation/CreateProjectDialog';
+import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -217,6 +221,7 @@ export type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -314,9 +319,10 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
-    'starters' | 'tutorials' | 'games-showcase'
-  >('starters');
+  const [
+    createDialogInitialTab,
+    setCreateDialogInitialTab,
+  ] = React.useState<CreateProjectDialogTabs>('starters');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -333,6 +339,7 @@ const MainFrame = (props: Props) => {
   const {
     renderExportDialog,
     renderCreateDialog,
+    onCreateFromExampleShortHeader,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -1417,7 +1424,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Start Page`),
+          label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderStartPageContainer,
           key: 'start page',
@@ -1537,28 +1544,29 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openCreateDialog = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('starters');
+  const openCreateProjectDialog = React.useCallback(
+    (tab: CreateProjectDialogTabs) => (open: boolean = true) => {
+      setCreateDialogInitialTab(tab);
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
   );
 
-  const onOpenTutorials = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('tutorials');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const openCreateDialog = React.useMemo(
+    () => openCreateProjectDialog('starters'),
+    [openCreateProjectDialog]
   );
-
-  const onOpenGamesShowcase = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('games-showcase');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const onOpenTutorials = React.useMemo(
+    () => openCreateProjectDialog('tutorials'),
+    [openCreateProjectDialog]
+  );
+  const onOpenExamples = React.useMemo(
+    () => openCreateProjectDialog('examples'),
+    [openCreateProjectDialog]
+  );
+  const onOpenGamesShowcase = React.useMemo(
+    () => openCreateProjectDialog('games-showcase'),
+    [openCreateProjectDialog]
   );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
@@ -2200,10 +2208,29 @@ const MainFrame = (props: Props) => {
                   ).length,
                   onOpen: () => chooseProject(),
                   onCreate: () => openCreateDialog(),
+                  onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
+                  onOpenFromExampleShortHeader: async (
+                    storageProvider,
+                    fileMetadata
+                  ) => {
+                    await getStorageProviderOperations(storageProvider);
+                    const state = await openFromFileMetadata(fileMetadata);
+
+                    if (state) {
+                      if (state.currentProject)
+                        state.currentProject.resetProjectUuid();
+                      openSceneOrProjectManager({
+                        currentProject: state.currentProject,
+                        editorTabs: state.editorTabs,
+                      });
+                    }
+                  },
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
                   onOpenTutorials: () => onOpenTutorials(),
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
+                  onOpenExamples: () => onOpenExamples(),
+                  onOpenProfile: () => openProfileDialogWithTab('profile'),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () =>

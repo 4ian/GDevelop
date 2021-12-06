@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
@@ -9,6 +10,8 @@ import {
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type OnCreateFromExampleShortHeaderFunction } from '../../ProjectCreation/CreateProjectDialog';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -59,9 +62,11 @@ export type RenderEditorContainerProps = {|
   // Other dialogs opening:
   onOpenTutorials: () => void,
   onOpenGamesShowcase: () => void,
+  onOpenExamples: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenProfile: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -70,6 +75,13 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+
+  // Project creation from an example
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  onOpenFromExampleShortHeader: (
+    storageProvider: empty,
+    fileMetadata: empty
+  ) => Promise<void>,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

@@ -3,14 +3,14 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
-import { GridListTile, Paper } from '@material-ui/core';
+import { GridListTile } from '@material-ui/core';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import { Skeleton } from '@material-ui/lab';
 
 import Window from '../Utils/Window';
 import Text from './Text';
-import { Column, Line, Spacer } from './Grid';
+import { Line, Spacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
@@ -38,9 +38,9 @@ type Props<ThumbnailType> = {|
 
 const referenceSizesByWindowSize = {
   imageHeight: {
-    small: 130,
-    medium: 150,
-    large: 180,
+    small: 120,
+    medium: 130,
+    large: 140,
   },
   arrowWidth: {
     small: 24,
@@ -53,7 +53,11 @@ const cellSpacing = 12;
 const titleHeight = 24;
 const spacerSize = 4;
 const focusItemBorderWidth = 2;
-const rightArrowMargin = 6; // Necessary because MUI adds a -6 margin to GridList
+const rightArrowMargin = cellSpacing / 2; // Necessary because MUI adds a margin to GridList corresponding to cell spacing
+const skeletonNumber = 4;
+const randomNumbers = Array(skeletonNumber)
+  .fill(0)
+  .map(e => Math.random());
 
 const styles = {
   itemTitle: {
@@ -107,6 +111,10 @@ const useStylesForGridListItem = makeStyles(theme =>
   })
 );
 
+const useStylesForLeftArrow = makeStyles({
+  arrow: { '& > path': { transform: 'translate(5px, 0px)' } }, // Translate path inside SVG since MUI icon is not centered
+});
+
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
@@ -120,12 +128,16 @@ const Carousel = <ThumbnailType: Thumbnail>({
   ] = React.useState<boolean>(false);
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
+  const classesForLeftArrow = useStylesForLeftArrow();
   const scrollView = React.useRef<?HTMLUListElement>(null);
+  const [hoveredElement, setHoveredElement] = React.useState<?HTMLElement>(
+    null
+  );
   const areItemsSet = items && items.length;
   const itemsToDisplay =
     items && items.length
       ? items
-      : Array(3)
+      : Array(skeletonNumber)
           .fill({
             skeleton: true,
             title: '',
@@ -180,7 +192,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   );
 
   const renderItemTitle = React.useCallback(
-    (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
+    (item: ThumbnailType | SkeletonThumbnail, index: number): ?React.Node => {
       if (!displayItemTitles) return null;
       return (
         <>
@@ -195,13 +207,20 @@ const Carousel = <ThumbnailType: Thumbnail>({
             <Skeleton
               variant="rect"
               height={titleHeight}
-              width={(cellWidth / 3) * (1 + 2 * Math.random())} // Make rectangles of different lengths so that the UI feels more "alive".
+              width={(cellWidth / 3) * (1 + 2 * randomNumbers[index])} // Make rectangles of different lengths so that the UI feels more "alive".
             />
           )}
         </>
       );
     },
-    [cellWidth, titleHeight]
+    [cellWidth, displayItemTitles]
+  );
+
+  const roundScroll = React.useCallback(
+    (value: number): number => {
+      return Math.round(value / widthUnit) * widthUnit;
+    },
+    [widthUnit]
   );
 
   const computeScroll = React.useCallback(
@@ -216,7 +235,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
       const scale = visibleThumbnailsCount * widthUnit;
 
       const currentScroll = scrollViewElement.scrollLeft;
-      const currentFirstVisibleItemIndex = currentScroll / widthUnit;
+      const currentFirstVisibleItemIndex = Math.round(
+        currentScroll / widthUnit
+      );
 
       if (
         direction === 'right' &&
@@ -228,30 +249,22 @@ const Carousel = <ThumbnailType: Thumbnail>({
         scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1)
       );
     },
-    [widthUnit, itemsToDisplay]
+    [widthUnit, itemsToDisplay, roundScroll]
   );
 
-  const roundScroll = React.useCallback(
-    (value: number): number => {
-      return Math.round(value / widthUnit) * widthUnit;
+  const onClickArrow = React.useCallback(
+    (direction: 'left' | 'right') => (): void => {
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
+      const newScrollPosition = computeScroll(direction, scrollViewElement);
+
+      scrollViewElement.scrollTo({
+        left: newScrollPosition,
+        behavior: 'smooth',
+      });
     },
-    [widthUnit]
+    [computeScroll]
   );
-
-  const onClickArrow = (direction: 'left' | 'right') =>
-    React.useCallback(
-      (): void => {
-        const scrollViewElement = scrollView.current;
-        if (!scrollViewElement) return;
-        const newScrollPosition = computeScroll(direction, scrollViewElement);
-
-        scrollViewElement.scrollTo({
-          left: newScrollPosition,
-          behavior: 'smooth',
-        });
-      },
-      [computeScroll]
-    );
 
   const handleScroll = React.useCallback(
     (): void => {
@@ -260,7 +273,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
 
       if (!shouldDisplayLeftArrow)
         setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
-    }
+    },
+    [shouldDisplayLeftArrow]
   );
   const handleScrollEnd = React.useCallback(
     (): void => {
@@ -276,29 +290,38 @@ const Carousel = <ThumbnailType: Thumbnail>({
   );
 
   const onFocusItem = (event: SyntheticFocusEvent<HTMLLIElement>): void => {
-    event.currentTarget.scrollIntoView();
+    if (event.currentTarget !== hoveredElement)
+      event.currentTarget.scrollIntoView();
   };
 
-  React.useEffect(() => {
-    const scrollViewElement = scrollView.current;
-    if (!scrollViewElement) return;
+  React.useEffect(
+    () => {
+      const scrollViewElement = scrollView.current;
+      if (!scrollViewElement) return;
 
-    // Add event listeners on component mount. There is no need to
-    // remove them with a cleanup function because scrollview element
-    // does not change and they will be destroyed when the element is
-    // removed from the DOM.
-    scrollViewElement.addEventListener('scroll', handleScroll);
-    scrollViewElement.addEventListener('touchend', handleScrollEnd);
-    scrollViewElement.addEventListener('touchleave', handleScrollEnd);
-  }, []);
+      // Add event listeners on component mount. There is no need to
+      // remove them with a cleanup function because scrollview element
+      // does not change and they will be destroyed when the element is
+      // removed from the DOM.
+      scrollViewElement.addEventListener('scroll', handleScroll);
+      scrollViewElement.addEventListener('touchend', handleScrollEnd);
+      scrollViewElement.addEventListener('touchleave', handleScrollEnd);
+    },
+    [handleScroll, handleScrollEnd]
+  );
 
   return (
-    <Line noMargin expand>
+    <Line noMargin>
       <div
-        style={{ ...styles.arrowContainer, width: arrowWidth }}
+        style={{
+          ...styles.arrowContainer,
+          width: arrowWidth,
+        }}
         onClick={onClickArrow('left')}
       >
-        {areItemsSet && shouldDisplayLeftArrow && <ArrowBackIos />}
+        {areItemsSet && shouldDisplayLeftArrow && (
+          <ArrowBackIos className={classesForLeftArrow.arrow} />
+        )}
       </div>
       <div
         style={{
@@ -329,6 +352,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
               key={item.id}
               tabIndex={0}
               onFocus={onFocusItem}
+              onMouseEnter={event => setHoveredElement(event.currentTarget)}
+              onMouseLeave={() => setHoveredElement(null)}
               onKeyPress={(
                 event: SyntheticKeyboardEvent<HTMLLIElement>
               ): void => {
@@ -346,7 +371,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
               }
             >
               {renderThumbnail(item)}
-              {renderItemTitle(item)}
+              {renderItemTitle(item, index)}
             </GridListTile>
           ))}
         </GridList>

@@ -46,18 +46,20 @@ export type CreateProjectDialogWithComponentsProps = {|
   initialTab: CreateProjectDialogTabs,
 |};
 
+export type OnCreateFromExampleShortHeaderFunction = (
+  isOpeningCallback: (boolean) => void,
+  onOpenCallback: any
+) => (
+  i18n: I18nType,
+  exampleShortHeader: ExampleShortHeader,
+  outputPath?: string
+) => Promise<void>;
+
 type Props = {|
   ...CreateProjectDialogWithComponentsProps,
   startersComponent: any,
   examplesComponent: any,
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader,
-    outputPath?: string
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {

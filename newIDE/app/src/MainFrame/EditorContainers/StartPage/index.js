@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
@@ -30,6 +29,7 @@ import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
 import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProjectPreCreationDialog';
+import { type OnCreateFromExampleShortHeaderFunction } from '../../../ProjectCreation/CreateProjectDialog';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -77,14 +77,7 @@ type Props = {|
   onOpenProfile: () => void,
 
   // Project creation from example
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader,
-    outputPath?: string
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onOpenFromExampleShortHeader: (
     storageProvider: empty,
     fileMetadata: empty

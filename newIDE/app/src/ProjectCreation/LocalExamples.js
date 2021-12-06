@@ -10,6 +10,7 @@ import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
+import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
 
 type Props = {|
   onOpen: (
@@ -18,14 +19,7 @@ type Props = {|
   ) => void,
   onChangeOutputPath: (outputPath: string) => void,
   outputPath: string,
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader,
-    outputPath?: string
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
 export const showGameFileCreationError = (

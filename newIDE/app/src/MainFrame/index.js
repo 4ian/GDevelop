@@ -2,7 +2,6 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -90,6 +89,7 @@ import {
   type CreateProjectDialogWithComponentsProps,
   type CreateProjectDialogTabs,
 } from '../ProjectCreation/CreateProjectDialog';
+import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -131,7 +131,6 @@ import {
   TRIVIAL_FIRST_DEBUG,
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
@@ -222,14 +221,7 @@ export type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader,
-    outputPath?: string
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -2216,12 +2208,16 @@ const MainFrame = (props: Props) => {
                   onOpen: () => chooseProject(),
                   onCreate: () => openCreateDialog(),
                   onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
-                  onOpenFromExampleShortHeader: async (storageProvider, fileMetadata) => {
+                  onOpenFromExampleShortHeader: async (
+                    storageProvider,
+                    fileMetadata
+                  ) => {
                     await getStorageProviderOperations(storageProvider);
                     const state = await openFromFileMetadata(fileMetadata);
 
                     if (state) {
-                      if (state.currentProject) state.currentProject.resetProjectUuid();
+                      if (state.currentProject)
+                        state.currentProject.resetProjectUuid();
                       openSceneOrProjectManager({
                         currentProject: state.currentProject,
                         editorTabs: state.editorTabs,

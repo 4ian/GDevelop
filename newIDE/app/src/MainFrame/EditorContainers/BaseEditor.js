@@ -11,6 +11,8 @@ import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { type OnCreateFromExampleShortHeaderFunction } from '../../ProjectCreation/CreateProjectDialog';
+
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -76,14 +78,7 @@ export type RenderEditorContainerProps = {|
   ) => void,
 
   // Project creation from an example
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader,
-    outputPath?: string
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onOpenFromExampleShortHeader: (
     storageProvider: empty,
     fileMetadata: empty

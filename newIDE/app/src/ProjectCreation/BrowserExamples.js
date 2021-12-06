@@ -1,6 +1,5 @@
 // @flow
 import { I18n } from '@lingui/react';
-import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { ExampleStore } from '../AssetStore/ExampleStore';
 import {
@@ -8,19 +7,14 @@ import {
   type ExampleShortHeader,
 } from '../Utils/GDevelopServices/Example';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
 
 type Props = {|
   onOpen: (
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  onCreateFromExampleShortHeader: (
-    isOpeningCallback: (boolean) => void,
-    onOpenCallback: any
-  ) => (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader
-  ) => Promise<void>,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
 export default function BrowserExamples({

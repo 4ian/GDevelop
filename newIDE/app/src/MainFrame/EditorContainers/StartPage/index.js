@@ -176,7 +176,11 @@ export const StartPage = React.memo<Props>(
       const prepareExamples = React.useCallback(
         (examples: Array<ExampleShortHeader>) =>
           examples
-            .filter(example => example.previewImageUrls.length)
+            .filter(
+              example =>
+                example.previewImageUrls.length &&
+                example.tags.includes('Starter')
+            )
             .slice(0, 16)
             .map(example => ({
               id: example.id,

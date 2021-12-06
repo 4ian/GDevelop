@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
@@ -10,6 +11,7 @@ import { TutorialsList } from '../Tutorial';
 import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { GamesShowcase } from '../GamesShowcase';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import PublishIcon from '@material-ui/icons/Publish';
 import { findEmptyPath } from './LocalPathFinder';
@@ -18,7 +20,11 @@ const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
-export type CreateProjectDialogTabs = 'starters' | 'examples' | 'tutorials' | 'games-showcase'
+export type CreateProjectDialogTabs =
+  | 'starters'
+  | 'examples'
+  | 'tutorials'
+  | 'games-showcase';
 
 type State = {|
   currentTab: CreateProjectDialogTabs,
@@ -44,6 +50,14 @@ type Props = {|
   ...CreateProjectDialogWithComponentsProps,
   startersComponent: any,
   examplesComponent: any,
+  onCreateFromExampleShortHeader: (
+    isOpeningCallback: (boolean) => void,
+    onOpenCallback: any
+  ) => (
+    i18n: I18nType,
+    exampleShortHeader: ExampleShortHeader,
+    outputPath?: string
+  ) => Promise<void>,
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
@@ -54,9 +68,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
       : '',
   };
 
-  _onChangeTab = (
-    newTab: CreateProjectDialogTabs
-  ) => {
+  _onChangeTab = (newTab: CreateProjectDialogTabs) => {
     this.setState({
       currentTab: newTab,
     });
@@ -65,7 +77,13 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
   _showExamples = () => this._onChangeTab('examples');
 
   render() {
-    const { open, onClose, onOpen, onCreate } = this.props;
+    const {
+      open,
+      onClose,
+      onOpen,
+      onCreate,
+      onCreateFromExampleShortHeader,
+    } = this.props;
     if (!open) return null;
 
     const ExamplesComponent = this.props.examplesComponent;
@@ -140,6 +158,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               onOpen={onOpen}
               onChangeOutputPath={outputPath => this.setState({ outputPath })}
               outputPath={this.state.outputPath}
+              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
             />
           )}
           {this.state.currentTab === 'tutorials' && <TutorialsList />}

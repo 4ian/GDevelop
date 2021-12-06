@@ -3,21 +3,13 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { ExampleStore } from '../AssetStore/ExampleStore';
-import { getExample } from '../Utils/GDevelopServices/Example';
 import Divider from '@material-ui/core/Divider';
-import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
+import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { Column } from '../UI/Grid';
-import optionalRequire from '../Utils/OptionalRequire.js';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
-import { writeAndCheckFile } from '../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import axios from 'axios';
 import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
-const path = optionalRequire('path');
-var fs = optionalRequire('fs-extra');
 
 type Props = {|
   onOpen: (
@@ -26,6 +18,14 @@ type Props = {|
   ) => void,
   onChangeOutputPath: (outputPath: string) => void,
   outputPath: string,
+  onCreateFromExampleShortHeader: (
+    isOpeningCallback: (boolean) => void,
+    onOpenCallback: any
+  ) => (
+    i18n: I18nType,
+    exampleShortHeader: ExampleShortHeader,
+    outputPath?: string
+  ) => Promise<void>,
 |};
 
 export const showGameFileCreationError = (
@@ -46,56 +46,13 @@ export default function LocalExamples({
   outputPath,
   onChangeOutputPath,
   onOpen,
+  onCreateFromExampleShortHeader,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
-
-  const onOpenExample = async (
-    i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader
-  ): Promise<void> => {
-    if (!fs || !outputPath) return;
-    try {
-      setIsOpening(true);
-      const example = await getExample(exampleShortHeader);
-
-      // Prepare the folder for the example.
-      fs.mkdirsSync(outputPath);
-
-      // Download the project file and save it.
-      const response = await axios.get(example.projectFileUrl, {
-        responseType: 'text',
-        // Required to properly get the response as text, and not as JSON:
-        transformResponse: [data => data],
-      });
-      const projectFileContent = response.data;
-      const localFilePath = path.join(outputPath, 'game.json');
-
-      await writeAndCheckFile(projectFileContent, localFilePath);
-
-      // Open the project file. Note that resources that are URLs will be downloaded
-      // thanks to the LocalResourceFetcher.
-      onOpen(LocalFileStorageProvider, {
-        fileIdentifier: localFilePath,
-      });
-
-      sendNewGameCreated(example.projectFileUrl);
-    } catch (error) {
-      showErrorBox({
-        message:
-          i18n._(t`Unable to load the example or save it on disk.`) +
-          ' ' +
-          i18n._(t`Verify your internet connection or try again later.`),
-        rawError: error,
-        errorId: 'local-example-load-error',
-      });
-    } finally {
-      setIsOpening(false);
-    }
-  };
 
   return (
     <I18n>
@@ -114,7 +71,13 @@ export default function LocalExamples({
             <LocalProjectPreCreationDialog
               open
               onClose={() => setSelectedExampleShortShortHeader(null)}
-              onCreate={() => onOpenExample(i18n, selectedExampleShortHeader)}
+              onCreate={() =>
+                onCreateFromExampleShortHeader(setIsOpening, onOpen)(
+                  i18n,
+                  selectedExampleShortHeader,
+                  outputPath
+                )
+              }
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
             />

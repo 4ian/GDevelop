@@ -15,6 +15,7 @@ type ExampleStoreState = {|
   filters: ?Filters,
   searchResults: ?Array<ExampleShortHeader>,
   fetchExamplesAndFilters: () => void,
+  allExamples: ?Array<ExampleShortHeader>,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -25,6 +26,7 @@ export const ExampleStoreContext = React.createContext<ExampleStoreState>({
   filters: null,
   searchResults: null,
   fetchExamplesAndFilters: () => {},
+  allExamples: null,
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -62,6 +64,11 @@ export const ExampleStoreStateProvider = ({
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
+  const [
+    allExamples,
+    setAllExamples,
+  ] = React.useState<?Array<ExampleShortHeader>>(null);
+
   const isLoading = React.useRef<boolean>(false);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
@@ -80,6 +87,7 @@ export const ExampleStoreStateProvider = ({
         try {
           const allExamples: AllExamples = await listAllExamples();
           const { exampleShortHeaders, filters } = allExamples;
+          setAllExamples(exampleShortHeaders);
 
           const exampleShortHeadersById = {};
           exampleShortHeaders.forEach(exampleShortHeader => {
@@ -135,6 +143,7 @@ export const ExampleStoreStateProvider = ({
     () => ({
       searchResults,
       fetchExamplesAndFilters,
+      allExamples,
       filters,
       error,
       searchText,
@@ -143,6 +152,7 @@ export const ExampleStoreStateProvider = ({
     }),
     [
       searchResults,
+      allExamples,
       error,
       filters,
       searchText,

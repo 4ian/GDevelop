@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar from './Toolbar';
+import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -242,7 +242,7 @@ const MainFrame = (props: Props) => {
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
-  const toolbar = React.useRef<?Toolbar>(null);
+  const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const [

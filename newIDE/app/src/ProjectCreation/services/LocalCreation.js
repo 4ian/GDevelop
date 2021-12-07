@@ -11,16 +11,43 @@ import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { writeAndCheckFile } from '../../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import { showGameFileCreationError } from '../LocalExamples';
+const gd: libGDevelop = global.gd;
 
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
+
+export const onCreateBlank = (
+  onOpenCallback: (
+    project: gdProject,
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
+  ) => void
+) => async (i18n: I18nType, outputPath?: string) => {
+  if (!fs || !outputPath) return;
+
+  try {
+    fs.mkdirsSync(outputPath);
+  } catch (error) {
+    showGameFileCreationError(i18n, outputPath, error);
+    return;
+  }
+
+  const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
+  const filePath = path.join(outputPath, 'game.json');
+  project.setProjectFile(filePath);
+  onOpenCallback(project, LocalFileStorageProvider, {
+    fileIdentifier: filePath,
+  });
+  sendNewGameCreated('');
+};
 
 export const onCreateFromExampleShortHeader = (
   isOpeningCallback: boolean => void,
   onOpenCallback: (
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
-  ) => void,
+  ) => void
 ) => async (
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,

@@ -29,7 +29,10 @@ import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
 import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProjectPreCreationDialog';
-import { type OnCreateFromExampleShortHeaderFunction } from '../../../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnCreateBlankFunction,
+} from '../../../ProjectCreation/CreateProjectDialog';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -65,7 +68,7 @@ type Props = {|
   // Project opening
   canOpen: boolean,
   onOpen: () => void,
-  onCreate: () => void,
+  onOpenExamples: () => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 
@@ -82,6 +85,10 @@ type Props = {|
     storageProvider: empty,
     fileMetadata: empty
   ) => Promise<void>,
+
+  // Blank project creation
+  onCreateBlank: OnCreateBlankFunction,
+  onOpenBlank: (storageProvider: empty, fileMetadata: empty) => Promise<void>,
 |};
 
 type StartPageEditorInterface = {|
@@ -104,9 +111,11 @@ export const StartPage = React.memo<Props>(
         project,
         canOpen,
         onOpen,
-        onCreate,
         onCreateFromExampleShortHeader,
         onOpenFromExampleShortHeader,
+        onCreateBlank,
+        onOpenBlank,
+        onOpenExamples,
         onOpenProjectManager,
         onCloseProject,
         onOpenTutorials,
@@ -213,12 +222,15 @@ export const StartPage = React.memo<Props>(
         []
       );
 
-      const onOpenExample = (...args) => {
+      const onOpenProjectJustCreated = (isFromExample: boolean) => (
+        ...args
+      ) => {
         // Close the dialogs and compute new path after the project is created and before it is opened in the editor
         setPreCreationDialogOpen(false);
         setSelectedExample(null);
         setOutputPath(computeDefaultProjectPath());
-        onOpenFromExampleShortHeader(...args);
+        if (isFromExample) onOpenFromExampleShortHeader(...args);
+        else onOpenBlank(...args);
       };
 
       return (
@@ -243,9 +255,15 @@ export const StartPage = React.memo<Props>(
                           noColumnMargin
                         >
                           {!project && (
-                            <RaisedButton
-                              label={<Trans>Create a new project</Trans>}
-                              onClick={onCreate}
+                            <FlatButton
+                              label={<Trans>Create a blank project</Trans>}
+                              onClick={() => {
+                                electron
+                                  ? setPreCreationDialogOpen(true)
+                                  : onCreateBlank(
+                                      onOpenProjectJustCreated(false)
+                                    )(i18n, outputPath);
+                              }}
                               primary
                             />
                           )}
@@ -282,7 +300,7 @@ export const StartPage = React.memo<Props>(
                       title={<Trans>Start from a template</Trans>}
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
-                      onBrowseAllClick={onCreate}
+                      onBrowseAllClick={onOpenExamples}
                       error={
                         exampleLoadingError && (
                           <>
@@ -444,21 +462,25 @@ export const StartPage = React.memo<Props>(
                       ? setPreCreationDialogOpen(true)
                       : onCreateFromExampleShortHeader(
                           setIsOpening,
-                          onOpenExample
+                          onOpenProjectJustCreated(true)
                         )(i18n, selectedExample);
                   }}
                 />
               )}
-              {selectedExample && preCreationDialogOpen && (
+              {preCreationDialogOpen && (
                 <LocalProjectPreCreationDialog
                   open
                   onClose={() => setPreCreationDialogOpen(false)}
                   onCreate={() =>
-                    onCreateFromExampleShortHeader(setIsOpening, onOpenExample)(
-                      i18n,
-                      selectedExample,
-                      outputPath
-                    )
+                    selectedExample
+                      ? onCreateFromExampleShortHeader(
+                          setIsOpening,
+                          onOpenProjectJustCreated(true)
+                        )(i18n, selectedExample, outputPath)
+                      : onCreateBlank(onOpenProjectJustCreated(false))(
+                          i18n,
+                          outputPath
+                        )
                   }
                   outputPath={outputPath}
                   onChangeOutputPath={setOutputPath}
@@ -486,8 +508,10 @@ export const renderStartPageContainer = (
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
     onOpen={props.onOpen}
-    onCreate={props.onCreate}
+    onOpenExamples={props.onOpenExamples}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
+    onCreateBlank={props.onCreateBlank}
+    onOpenBlank={props.onOpenBlank}
     onOpenFromExampleShortHeader={props.onOpenFromExampleShortHeader}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}

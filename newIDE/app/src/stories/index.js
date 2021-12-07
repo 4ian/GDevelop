@@ -2896,11 +2896,9 @@ storiesOf('CreateProjectDialog', module)
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
-        initialTab="starters"
+        initialTab="examples"
         onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
@@ -2910,9 +2908,7 @@ storiesOf('CreateProjectDialog', module)
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="games-showcase"
         onCreateFromExampleShortHeader={() => action('create from example')}

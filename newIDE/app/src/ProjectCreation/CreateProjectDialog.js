@@ -5,7 +5,6 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import ScrollView from '../UI/ScrollView';
 import { Tabs, Tab } from '../UI/Tabs';
 import { TutorialsList } from '../Tutorial';
 import { Column } from '../UI/Grid';
@@ -21,7 +20,6 @@ const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
 export type CreateProjectDialogTabs =
-  | 'starters'
   | 'examples'
   | 'tutorials'
   | 'games-showcase';
@@ -38,13 +36,12 @@ export type CreateProjectDialogWithComponentsProps = {|
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
   ) => Promise<void>,
-  onCreate: (
-    gdProject,
-    storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata
-  ) => Promise<void>,
   initialTab: CreateProjectDialogTabs,
 |};
+
+export type OnCreateBlankFunction = (
+  onOpenCallback: any
+) => (i18n: I18nType, outputPath?: string) => Promise<void>;
 
 export type OnCreateFromExampleShortHeaderFunction = (
   isOpeningCallback: (boolean) => void,
@@ -57,7 +54,6 @@ export type OnCreateFromExampleShortHeaderFunction = (
 
 type Props = {|
   ...CreateProjectDialogWithComponentsProps,
-  startersComponent: any,
   examplesComponent: any,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
@@ -83,13 +79,11 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
       open,
       onClose,
       onOpen,
-      onCreate,
       onCreateFromExampleShortHeader,
     } = this.props;
     if (!open) return null;
 
     const ExamplesComponent = this.props.examplesComponent;
-    const StartersComponent = this.props.startersComponent;
 
     return (
       <Dialog
@@ -139,22 +133,10 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
       >
         <Column expand noMargin>
           <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-            <Tab label={<Trans>Starters</Trans>} value="starters" />
             <Tab label={<Trans>Examples</Trans>} value="examples" />
             <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
             <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
           </Tabs>
-          {this.state.currentTab === 'starters' && (
-            <ScrollView>
-              <StartersComponent
-                onOpen={onOpen}
-                onCreate={onCreate}
-                onChangeOutputPath={outputPath => this.setState({ outputPath })}
-                onShowExamples={this._showExamples}
-                outputPath={this.state.outputPath}
-              />
-            </ScrollView>
-          )}
           {this.state.currentTab === 'examples' && (
             <ExamplesComponent
               onOpen={onOpen}

@@ -14,7 +14,10 @@ import GDevelopJsInitializerDecorator, {
 import { ExampleStoreStateProvider } from '../../AssetStore/ExampleStore/ExampleStoreContext';
 import { GamesShowcaseStateProvider } from '../../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../../Tutorial/TutorialContext';
-import { GDevelopAssetApi, GDevelopGameApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import {
+  GDevelopAssetApi,
+  GDevelopGameApi,
+} from '../../Utils/GDevelopServices/ApiConfigs';
 
 const apiDataServerSideError = {
   mockData: [
@@ -50,18 +53,22 @@ const WrappedStartPage = ({ project }: {| project: ?gdProject |}) => (
           setToolbar={() => {}}
           canOpen={true}
           onOpen={() => action('onOpen')()}
-          onCreate={() => action('onCreate')()}
+          onOpenExamples={() => action('onOpenExamples')()}
           onOpenProjectManager={() => action('onOpenProjectManager')()}
           onCloseProject={() => action('onCloseProject')()}
           onOpenTutorials={() => action('onOpenTutorials')()}
           onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
           onOpenHelpFinder={() => action('onOpenHelpFinder')()}
           onOpenLanguageDialog={() => action('open language dialog')()}
-          onCreateFromExampleShortHeader={() => action('create from example')}
+          onCreateFromExampleShortHeader={() => action('create from example')()}
           onOpenFromExampleShortHeader={() =>
-            action('call callback after project creation')
+            action('call callback after project creation from example')()
           }
-          onOpenProfile={() => action('open profile')}
+          onOpenProfile={() => action('open profile')()}
+          onCreateBlank={() => action('create blank')()}
+          onOpenBlank={() =>
+            action('call callback after blank project creation')()
+          }
         />
       </GamesShowcaseStateProvider>
     </TutorialStateProvider>
@@ -81,6 +88,6 @@ export const ProjectOpened = () => (
 
 export const WithServerSideErrors = () => (
   <WrappedStartPage project={testProject.project} />
-)
-WithServerSideErrors.decorators = [withMock]
-WithServerSideErrors.parameters = apiDataServerSideError
+);
+WithServerSideErrors.decorators = [withMock];
+WithServerSideErrors.parameters = apiDataServerSideError;

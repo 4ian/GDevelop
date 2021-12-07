@@ -89,7 +89,10 @@ import {
   type CreateProjectDialogWithComponentsProps,
   type CreateProjectDialogTabs,
 } from '../ProjectCreation/CreateProjectDialog';
-import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnCreateBlankFunction,
+} from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -222,6 +225,7 @@ export type Props = {
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  onCreateBlank: OnCreateBlankFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -322,7 +326,7 @@ const MainFrame = (props: Props) => {
   const [
     createDialogInitialTab,
     setCreateDialogInitialTab,
-  ] = React.useState<CreateProjectDialogTabs>('starters');
+  ] = React.useState<CreateProjectDialogTabs>('examples');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -340,6 +344,7 @@ const MainFrame = (props: Props) => {
     renderExportDialog,
     renderCreateDialog,
     onCreateFromExampleShortHeader,
+    onCreateBlank,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -1551,11 +1556,9 @@ const MainFrame = (props: Props) => {
     },
     [setState]
   );
-
-  const openCreateDialog = React.useMemo(
-    () => openCreateProjectDialog('starters'),
-    [openCreateProjectDialog]
-  );
+  const closeCreateDialog = () => {
+    setState(state => ({ ...state, createDialogOpen: false }));
+  };
   const onOpenTutorials = React.useMemo(
     () => openCreateProjectDialog('tutorials'),
     [openCreateProjectDialog]
@@ -2000,7 +2003,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenStartPage: openStartPage,
-    onCreateProject: openCreateDialog,
+    onCreateProject: onOpenExamples,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2039,7 +2042,7 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: openCreateDialog,
+          onCreateProject: onOpenExamples,
           onOpenProjectManager: () => openProjectManager(true),
           onOpenStartPage: openStartPage,
           onOpenDebugger: openDebugger,
@@ -2206,7 +2209,6 @@ const MainFrame = (props: Props) => {
                     ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                   ).length,
                   onOpen: () => chooseProject(),
-                  onCreate: () => openCreateDialog(),
                   onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
                   onOpenFromExampleShortHeader: async (
                     storageProvider,
@@ -2223,6 +2225,22 @@ const MainFrame = (props: Props) => {
                         editorTabs: state.editorTabs,
                       });
                     }
+                  },
+                  onCreateBlank: onCreateBlank,
+                  onOpenBlank: async (
+                    project,
+                    storageProvider,
+                    fileMetadata
+                  ) => {
+                    await getStorageProviderOperations(storageProvider);
+                    const state = await loadFromProject(project, fileMetadata);
+
+                    if (state.currentProject)
+                      state.currentProject.resetProjectUuid();
+                    openSceneOrProjectManager({
+                      currentProject: state.currentProject,
+                      editorTabs: state.editorTabs,
+                    });
                   },
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
@@ -2291,7 +2309,7 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           initialTab: createDialogInitialTab,
-          onClose: () => openCreateDialog(false),
+          onClose: closeCreateDialog,
           onOpen: async (storageProvider, fileMetadata) => {
             await setState(state => ({ ...state, createDialogOpen: false }));
             await getStorageProviderOperations(storageProvider);
@@ -2304,17 +2322,6 @@ const MainFrame = (props: Props) => {
                 editorTabs: state.editorTabs,
               });
             }
-          },
-          onCreate: async (project, storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await loadFromProject(project, fileMetadata);
-
-            if (state.currentProject) state.currentProject.resetProjectUuid();
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
           },
         })}
       {!!introDialog &&
@@ -2417,7 +2424,7 @@ const MainFrame = (props: Props) => {
           }}
           onCreateNewProject={() => {
             openOpenFromStorageProviderDialog(false);
-            openCreateDialog(true);
+            closeCreateDialog();
           }}
         />
       )}

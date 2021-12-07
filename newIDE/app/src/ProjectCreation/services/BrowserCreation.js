@@ -8,6 +8,23 @@ import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+const gd: libGDevelop = global.gd;
+
+// Signatures of this function and its arguments contain useless arguments
+// because this function has to match the signature of LocalCreation.onCreateBlank
+// that needs these arguments.
+export const onCreateBlank = (
+  onOpenCallback: (
+    project: gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => void
+) => async (i18n: I18nType, outputPath?: string) => {
+  sendNewGameCreated('');
+
+  const project = gd.ProjectHelper.createNewGDJSProject();
+  onOpenCallback(project, null, null);
+};
 
 export const onCreateFromExampleShortHeader = (
   isOpeningCallback: boolean => void,
@@ -15,10 +32,7 @@ export const onCreateFromExampleShortHeader = (
     storageProvider: StorageProvider,
     fileMetadata: FileMetadata
   ) => void
-) => async (
-  i18n: I18nType,
-  exampleShortHeader: ExampleShortHeader,
-) => {
+) => async (i18n: I18nType, exampleShortHeader: ExampleShortHeader) => {
   try {
     isOpeningCallback(true);
     const example = await getExample(exampleShortHeader);

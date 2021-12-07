@@ -11,7 +11,10 @@ import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
-import { type OnCreateFromExampleShortHeaderFunction } from '../../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnCreateBlankFunction,
+} from '../../ProjectCreation/CreateProjectDialog';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -55,7 +58,6 @@ export type RenderEditorContainerProps = {|
   // Project opening
   canOpen: boolean,
   onOpen: () => void,
-  onCreate: () => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 
@@ -82,6 +84,10 @@ export type RenderEditorContainerProps = {|
     storageProvider: empty,
     fileMetadata: empty
   ) => Promise<void>,
+
+  // Blank project creation
+  onCreateBlank: OnCreateBlankFunction,
+  onOpenBlank: (storageProvider: empty, fileMetadata: empty) => Promise<void>,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

@@ -9,7 +9,6 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 
 // Import for browser only IDE
 import BrowserExamples from './ProjectCreation/BrowserExamples';
-import BrowserStarters from './ProjectCreation/BrowserStarters';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
@@ -27,7 +26,7 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
-import { onCreateFromExampleShortHeader } from './ProjectCreation/services/BrowserCreation';
+import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/BrowserCreation';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -78,13 +77,13 @@ export const create = (authentication: Authentication) => {
                 <CreateProjectDialog
                   {...props}
                   examplesComponent={BrowserExamples}
-                  startersComponent={BrowserStarters}
                   onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
                 />
               )}
               introDialog={<BrowserIntroDialog />}
               storageProviders={storageProviders}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+              onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}

@@ -90,6 +90,13 @@ type StartPageEditorInterface = {|
   forceUpdateEditor: () => void,
 |};
 
+const betweenCarouselSpacerCount = 6;
+
+const renderBetweenCarouselSpace = (offset: number = 0) =>
+  Array(betweenCarouselSpacerCount)
+    .fill(0)
+    .map((e, index) => <Spacer key={`spacer${index + offset}`} />);
+
 export const StartPage = React.memo<Props>(
   React.forwardRef<Props, StartPageEditorInterface>(
     (
@@ -273,14 +280,14 @@ export const StartPage = React.memo<Props>(
                       displayItemTitles
                       onBrowseAllClick={onCreate}
                     />
-                    <Spacer />
+                    {renderBetweenCarouselSpace()}
                     <Carousel
                       title={<Trans>Our latest tutorials</Trans>}
                       items={tutorials ? tutorials.slice(0, 16) : null}
                       displayItemTitles={false}
                       onBrowseAllClick={onOpenTutorials}
                     />
-                    <Spacer />
+                    {renderBetweenCarouselSpace(betweenCarouselSpacerCount)}
                     <Carousel
                       title={<Trans>Games Showcase</Trans>}
                       items={

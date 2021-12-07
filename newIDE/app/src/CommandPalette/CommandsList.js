@@ -112,7 +112,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     area: 'PROJECT',
     displayText: t`Apply changes to the running preview`,
   },
-  OPEN_START_PAGE: { area: 'IDE', displayText: t`Open start page` },
+  OPEN_START_PAGE: { area: 'IDE', displayText: t`Show Home` },
   CREATE_NEW_PROJECT: {
     area: 'GENERAL',
     displayText: t`Create a new project`,

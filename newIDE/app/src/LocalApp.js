@@ -9,7 +9,6 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 
 // Import for Electron powered IDE.
 import LocalExamples from './ProjectCreation/LocalExamples';
-import LocalStarters from './ProjectCreation/LocalStarters';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
@@ -26,6 +25,7 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
+import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/LocalCreation';
 
 const gd: libGDevelop = global.gd;
 
@@ -49,7 +49,8 @@ export const create = (authentication: Authentication) => {
           appArguments={appArguments}
           storageProviders={
             // Add Url provider
-            [LocalFileStorageProvider]}
+            [LocalFileStorageProvider]
+          }
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
@@ -71,12 +72,16 @@ export const create = (authentication: Authentication) => {
                 <CreateProjectDialog
                   {...props}
                   examplesComponent={LocalExamples}
-                  startersComponent={LocalStarters}
+                  onCreateFromExampleShortHeader={
+                    onCreateFromExampleShortHeader
+                  }
                 />
               )}
               renderGDJSDevelopmentWatcher={
                 isDev ? () => <LocalGDJSDevelopmentWatcher /> : null
               }
+              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+              onCreateBlank={onCreateBlank}
               storageProviders={storageProviders}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}

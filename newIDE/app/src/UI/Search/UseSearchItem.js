@@ -76,7 +76,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
 
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
-  const suffledSearchItems: ?Array<SearchItem> = React.useMemo(
+  const shuffledSearchItems: ?Array<SearchItem> = React.useMemo(
     () => {
       if (!searchItemsById) return null;
 
@@ -130,7 +130,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       let discardSearch = false;
       if (!searchText) {
         setSearchResults(
-          filterSearchItems(suffledSearchItems, chosenCategory, chosenFilters)
+          filterSearchItems(shuffledSearchItems, chosenCategory, chosenFilters)
         );
       } else {
         if (!searchItemsById || !searchApi) {
@@ -179,7 +179,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       };
     },
     [
-      suffledSearchItems,
+      shuffledSearchItems,
       searchItemsById,
       searchText,
       chosenCategory,

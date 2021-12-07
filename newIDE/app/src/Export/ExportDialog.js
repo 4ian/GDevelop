@@ -35,6 +35,57 @@ export type Exporter = {|
   exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};
 
+type ExportHomeProps = {|
+  exporters: Array<Exporter>,
+  setChosenExporterKey: (key: string) => void,
+  cantExportBecauseOffline: boolean,
+|};
+
+const ExportHome = ({
+  exporters,
+  setChosenExporterKey,
+  cantExportBecauseOffline,
+}: ExportHomeProps) => {
+  const renderExporterListItem = (
+    exporter: Exporter,
+    index: number,
+    forceDisable: boolean
+  ) => {
+    return (
+      <ListItem
+        key={exporter.key}
+        disabled={forceDisable || exporter.disabled}
+        style={
+          forceDisable || exporter.disabled ? styles.disabledItem : undefined
+        }
+        leftIcon={exporter.renderIcon({ style: styles.icon })}
+        primaryText={exporter.name}
+        secondaryText={exporter.description}
+        secondaryTextLines={2}
+        onClick={() => setChosenExporterKey(exporter.key)}
+      />
+    );
+  };
+  return (
+    <React.Fragment>
+      <List>
+        {exporters
+          .filter(exporter => !exporter.advanced && !exporter.experimental)
+          .map((exporter, index) =>
+            renderExporterListItem(exporter, index, cantExportBecauseOffline)
+          )}
+
+        <Subheader>Advanced</Subheader>
+        {exporters
+          .filter(exporter => exporter.advanced)
+          .map((exporter, index) =>
+            renderExporterListItem(exporter, index, cantExportBecauseOffline)
+          )}
+      </List>
+    </React.Fragment>
+  );
+};
+
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
   onClose: () => void,
@@ -60,27 +111,6 @@ const ExportDialog = ({
   );
 
   if (!project) return null;
-
-  const renderExporterListItem = (
-    exporter: Exporter,
-    index: number,
-    forceDisable: boolean
-  ) => {
-    return (
-      <ListItem
-        key={exporter.key}
-        disabled={forceDisable || exporter.disabled}
-        style={
-          forceDisable || exporter.disabled ? styles.disabledItem : undefined
-        }
-        leftIcon={exporter.renderIcon({ style: styles.icon })}
-        primaryText={exporter.name}
-        secondaryText={exporter.description}
-        secondaryTextLines={2}
-        onClick={() => setChosenExporterKey(exporter.key)}
-      />
-    );
-  };
 
   const exporter = exporters.find(
     exporter => exporter.key === chosenExporterKey
@@ -141,33 +171,11 @@ const ExportDialog = ({
                   </AlertMessage>
                 )}
                 {!exporter && (
-                  <React.Fragment>
-                    <List>
-                      {exporters
-                        .filter(
-                          exporter =>
-                            !exporter.advanced && !exporter.experimental
-                        )
-                        .map((exporter, index) =>
-                          renderExporterListItem(
-                            exporter,
-                            index,
-                            cantExportBecauseOffline
-                          )
-                        )}
-
-                      <Subheader>Advanced</Subheader>
-                      {exporters
-                        .filter(exporter => exporter.advanced)
-                        .map((exporter, index) =>
-                          renderExporterListItem(
-                            exporter,
-                            index,
-                            cantExportBecauseOffline
-                          )
-                        )}
-                    </List>
-                  </React.Fragment>
+                  <ExportHome
+                    cantExportBecauseOffline={cantExportBecauseOffline}
+                    exporters={exporters}
+                    setChosenExporterKey={setChosenExporterKey}
+                  />
                 )}
                 {exporter && exporter.exportPipeline && (
                   <div style={styles.content}>

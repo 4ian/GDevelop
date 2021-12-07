@@ -166,3 +166,11 @@ export const Showcases = () => {
     />
   );
 };
+
+export const WithError = () => (
+  <Carousel
+    title={<Trans>Showcase</Trans>}
+    items={null}
+    error={<Trans>Unexpected error</Trans>}
+  />
+);

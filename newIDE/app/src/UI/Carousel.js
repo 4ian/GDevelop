@@ -14,6 +14,7 @@ import { Line, Spacer } from './Grid';
 import { useResponsiveWindowWidth } from './Reponsive/ResponsiveWindowMeasurer';
 import FlatButton from './FlatButton';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
+import AlertMessage from './AlertMessage';
 
 type Thumbnail = {
   id: string,
@@ -34,6 +35,7 @@ type Props<ThumbnailType> = {|
   onBrowseAllClick?: () => void,
   browseAllLink?: string,
   displayItemTitles?: boolean,
+  error?: React.Node,
 |};
 
 const referenceSizesByWindowSize = {
@@ -71,6 +73,7 @@ const styles = {
     display: 'block',
     objectFit: 'cover',
   },
+  error: { display: 'flex', justifyContent: 'center', alignItems: 'center' },
   itemTitleContainer: { height: titleHeight },
   arrowContainer: {
     display: 'flex',
@@ -120,6 +123,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
   items,
   browseAllLink,
   onBrowseAllClick,
+  error,
   displayItemTitles = true,
 }: Props<ThumbnailType>) => {
   const [
@@ -338,43 +342,49 @@ const Carousel = <ThumbnailType: Thumbnail>({
             label={<Trans>Browse all</Trans>}
           />
         </Line>
-        <GridList
-          classes={classesForGridList}
-          cols={itemsToDisplay.length}
-          cellHeight={cellHeight}
-          spacing={cellSpacing}
-          style={styles.gridList}
-          ref={scrollView}
-        >
-          {itemsToDisplay.map((item, index) => (
-            <GridListTile
-              classes={classesForGridListItem}
-              key={item.id}
-              tabIndex={0}
-              onFocus={onFocusItem}
-              onMouseEnter={event => setHoveredElement(event.currentTarget)}
-              onMouseLeave={() => setHoveredElement(null)}
-              onKeyPress={(
-                event: SyntheticKeyboardEvent<HTMLLIElement>
-              ): void => {
-                if (shouldValidate(event)) {
-                  if (item.link) openLinkCallback(item.link)();
-                  if (item.onClick) item.onClick();
+        {error ? (
+          <div style={{ ...styles.error, height: cellHeight }}>
+            <AlertMessage kind="warning">{error}</AlertMessage>
+          </div>
+        ) : (
+          <GridList
+            classes={classesForGridList}
+            cols={itemsToDisplay.length}
+            cellHeight={cellHeight}
+            spacing={cellSpacing}
+            style={styles.gridList}
+            ref={scrollView}
+          >
+            {itemsToDisplay.map((item, index) => (
+              <GridListTile
+                classes={classesForGridListItem}
+                key={item.id}
+                tabIndex={0}
+                onFocus={onFocusItem}
+                onMouseEnter={event => setHoveredElement(event.currentTarget)}
+                onMouseLeave={() => setHoveredElement(null)}
+                onKeyPress={(
+                  event: SyntheticKeyboardEvent<HTMLLIElement>
+                ): void => {
+                  if (shouldValidate(event)) {
+                    if (item.link) openLinkCallback(item.link)();
+                    if (item.onClick) item.onClick();
+                  }
+                }}
+                onClick={
+                  item.link
+                    ? openLinkCallback(item.link)
+                    : item.onClick
+                    ? item.onClick
+                    : null
                 }
-              }}
-              onClick={
-                item.link
-                  ? openLinkCallback(item.link)
-                  : item.onClick
-                  ? item.onClick
-                  : null
-              }
-            >
-              {renderThumbnail(item)}
-              {renderItemTitle(item, index)}
-            </GridListTile>
-          ))}
-        </GridList>
+              >
+                {renderThumbnail(item)}
+                {renderItemTitle(item, index)}
+              </GridListTile>
+            ))}
+          </GridList>
+        )}
       </div>
       {areItemsSet && (
         <div

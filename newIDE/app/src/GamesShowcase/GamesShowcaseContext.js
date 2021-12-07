@@ -8,6 +8,7 @@ import {
   type ShowcasedGame,
 } from '../Utils/GDevelopServices/Game';
 import { useSearchItem } from '../UI/Search/UseSearchItem';
+import { shuffle } from 'lodash';
 
 const defaultSearchText = '';
 
@@ -85,7 +86,7 @@ export const GamesShowcaseStateProvider = ({
         try {
           const allShowcasedGames: AllShowcasedGames = await listAllShowcasedGames();
           const { showcasedGames, filters } = allShowcasedGames;
-          setAllShowcasedGames(showcasedGames);
+          setAllShowcasedGames(shuffle(showcasedGames));
 
           const showcasedGamesByName = {};
           showcasedGames.forEach(showcasedGame => {

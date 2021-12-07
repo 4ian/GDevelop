@@ -85,6 +85,20 @@ const LinkButton = ({
   );
 };
 
+const renderLayout = (
+  children: Array<React.Node>,
+  forceColumn: boolean
+): React.Node =>
+  forceColumn ? (
+    <ColumnStackLayout justifyContent="flex-end" noMargin>
+      {children}
+    </ColumnStackLayout>
+  ) : (
+    <ResponsiveLineStackLayout justifyContent="flex-end" noColumnMargin>
+      {children}
+    </ResponsiveLineStackLayout>
+  );
+
 const ShowcasedGameButton = ({
   showcasedGame,
   forceColumn = false,
@@ -93,42 +107,32 @@ const ShowcasedGameButton = ({
   forceColumn?: boolean,
 |}): React.Node => {
   const { links } = showcasedGame;
-  const StackLayout = forceColumn
-    ? ColumnStackLayout
-    : ResponsiveLineStackLayout;
 
   const windowWidth = useResponsiveWindowWidth();
-
-  let stackLayoutProps = { justifyContent: 'flex-end' };
-  if (forceColumn) {
-    stackLayoutProps = { ...stackLayoutProps, noMargin: true };
-  } else {
-    stackLayoutProps = { ...stackLayoutProps, noColumnMargin: true };
-  }
 
   const firstLinks = links.slice(0, 3);
   const otherLinks = links.slice(3);
   return (
     <>
-      {/* $FlowFixMe */}
-      <StackLayout {...stackLayoutProps}>
-        {firstLinks.map((link, index) => (
+      {renderLayout(
+        firstLinks.map((link, index) => (
           <LinkButton key={index} link={link} showcasedGame={showcasedGame} />
-        ))}
-      </StackLayout>
+        )),
+        forceColumn
+      )}
       {otherLinks.length > 0 && (
         <>
           {(windowWidth === 'small' || forceColumn) && <Spacer />}
-          {/* $FlowFixMe */}
-          <StackLayout {...stackLayoutProps}>
-            {otherLinks.map((link, index) => (
+          {renderLayout(
+            otherLinks.map((link, index) => (
               <LinkButton
                 key={index}
                 link={link}
                 showcasedGame={showcasedGame}
               />
-            ))}
-          </StackLayout>
+            )),
+            forceColumn
+          )}
         </>
       )}
     </>

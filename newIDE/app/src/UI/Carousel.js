@@ -137,9 +137,9 @@ const Carousel = <ThumbnailType: Thumbnail>({
   const [hoveredElement, setHoveredElement] = React.useState<?HTMLElement>(
     null
   );
-  const areItemsSet = items && items.length;
+  const areItemsSet = items && items.length > 0;
   const itemsToDisplay =
-    items && items.length
+    items && items.length > 0
       ? items
       : Array(skeletonNumber)
           .fill({

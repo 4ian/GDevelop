@@ -3,6 +3,8 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
+import { type RenderIconProps } from '../ExportDialog';
+import Cordova from '../../UI/CustomSvgIcons/Cordova';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -28,3 +30,16 @@ export const DoneFooter = ({
     <Line justifyContent="center">{renderGameButton()}</Line>
   </Column>
 );
+
+export const cordovaExporter = {
+  name: <Trans>iOS &amp; Android (manual)</Trans>,
+  renderIcon: (props: RenderIconProps) => <Cordova {...props} />,
+  helpPage: '/publishing/android_and_ios_with_cordova',
+  description: (
+    <Trans>
+      Build the game locally as a Cordova project, and export it manually to iOS
+      or Android with Cordova developers tools.
+    </Trans>
+  ),
+  advanced: true,
+};

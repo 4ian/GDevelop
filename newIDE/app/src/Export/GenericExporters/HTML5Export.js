@@ -7,6 +7,8 @@ import Window from '../../Utils/Window';
 import FlatButton from '../../UI/FlatButton';
 import { Column, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
+import Folder from '@material-ui/icons/Folder';
+import { type RenderIconProps } from '../ExportDialog';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -89,3 +91,16 @@ export const DoneFooter = ({
     />
   </Column>
 );
+
+export const html5Exporter = {
+  name: <Trans>Local folder</Trans>,
+  renderIcon: (props: RenderIconProps) => <Folder {...props} />,
+  helpPage: '/publishing/html5_game_in_a_local_folder',
+  description: (
+    <Trans>
+      Build the game locally as a HTML5 game. You can then publish it on website
+      like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
+    </Trans>
+  ),
+  advanced: true,
+};

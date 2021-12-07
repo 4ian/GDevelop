@@ -5,6 +5,8 @@ import Text from '../../UI/Text';
 import Checkbox from '../../UI/Checkbox';
 import { Column, Line } from '../../UI/Grid';
 import { type TargetName } from '../../Utils/GDevelopServices/Build';
+import LaptopMac from '@material-ui/icons/LaptopMac';
+import { type RenderIconProps } from '../ExportDialog';
 
 export type ExportState = {|
   targets: Array<TargetName>,
@@ -77,4 +79,16 @@ export const SetupExportHeader = ({
       </Column>
     </React.Fragment>
   );
+};
+
+export const onlineElectronExporter = {
+  name: <Trans>Windows/macOS/Linux</Trans>,
+  renderIcon: (props: RenderIconProps) => <LaptopMac {...props} />,
+  helpPage: '/publishing/windows-macos-linux',
+  description: (
+    <Trans>
+      Package your game as an app for Windows, macOS or Linux directly from
+      GDevelop.
+    </Trans>
+  ),
 };

@@ -21,11 +21,13 @@ const styles = {
   content: { padding: 8 },
 };
 
+export type RenderIconProps = {|
+  style: {| width: number, height: number |},
+|};
+
 export type Exporter = {|
   name: React.Node,
-  renderIcon: (props: {|
-    style: {| width: number, height: number |},
-  |}) => React.Node,
+  renderIcon: (props: RenderIconProps) => React.Node,
   helpPage: string,
   description: React.Node,
   disabled?: boolean,

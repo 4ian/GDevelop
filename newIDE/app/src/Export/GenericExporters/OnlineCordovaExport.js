@@ -10,6 +10,8 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import HelpButton from '../../UI/HelpButton';
+import PhoneIphone from '@material-ui/icons/PhoneIphone';
+import { type RenderIconProps } from '../ExportDialog';
 
 export type ExportState = {|
   targets: Array<TargetName>,
@@ -156,4 +158,16 @@ export const SetupExportHeader = ({
       )}
     </Column>
   );
+};
+
+export const onlineCordovaExporter = {
+  name: <Trans>Android (&amp; iOS coming soon)</Trans>,
+  renderIcon: (props: RenderIconProps) => <PhoneIphone {...props} />,
+  helpPage: '/publishing/android_and_ios',
+  description: (
+    <Trans>
+      Package your game for Android directly from GDevelop. iOS support is
+      coming soon!
+    </Trans>
+  ),
 };

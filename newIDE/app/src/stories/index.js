@@ -4360,12 +4360,6 @@ storiesOf('Profile/CreateAccountDialog', module)
     />
   ));
 
-storiesOf('UserPublicProfileChip', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
-  ));
-
 storiesOf('ContributionsDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => (

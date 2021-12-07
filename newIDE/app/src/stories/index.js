@@ -14,7 +14,6 @@ import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -2775,53 +2774,6 @@ storiesOf('LocalFilePicker', module)
           fullWidth
         />
       )}
-    />
-  ));
-
-storiesOf('StartPage', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <StartPage
-      project={null}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-      onCreateFromExampleShortHeader={() => action('create from example')}
-      onOpenFromExampleShortHeader={() =>
-        action('call callback after project creation')
-      }
-      onOpenProfile={() => action('open profile')}
-    />
-  ))
-  .add('project opened', () => (
-    <StartPage
-      project={testProject.project}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-      onCreateFromExampleShortHeader={() => action('create from example')}
-      onOpenFromExampleShortHeader={() =>
-        action('call callback after project creation')
-      }
-      onOpenProfile={() => action('open profile')}
     />
   ));
 

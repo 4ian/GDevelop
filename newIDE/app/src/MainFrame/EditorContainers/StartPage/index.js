@@ -138,14 +138,18 @@ export const StartPage = React.memo<Props>(
 
       const windowWidth = useResponsiveWindowWidth();
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
-      const { tutorials } = React.useContext(TutorialContext);
+      const { tutorials, error: tutorialLoadingError } = React.useContext(
+        TutorialContext
+      );
       const {
         allShowcasedGames: showcasedGames,
         fetchShowcasedGamesAndFilters,
+        error: showcaseLoadingError,
       } = React.useContext(GamesShowcaseContext);
       const {
         allExamples: examples,
         fetchExamplesAndFilters,
+        error: exampleLoadingError,
       } = React.useContext(ExampleStoreContext);
 
       React.useEffect(
@@ -279,6 +283,19 @@ export const StartPage = React.memo<Props>(
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
                       onBrowseAllClick={onCreate}
+                      error={
+                        exampleLoadingError && (
+                          <>
+                            <Trans>
+                              An error ocurred while loading examples.
+                            </Trans>{' '}
+                            <Trans>
+                              Please check your internet connection or try again
+                              later.
+                            </Trans>
+                          </>
+                        )
+                      }
                     />
                     {renderBetweenCarouselSpace()}
                     <Carousel
@@ -286,6 +303,19 @@ export const StartPage = React.memo<Props>(
                       items={tutorials ? tutorials.slice(0, 16) : null}
                       displayItemTitles={false}
                       onBrowseAllClick={onOpenTutorials}
+                      error={
+                        tutorialLoadingError && (
+                          <>
+                            <Trans>
+                              An error ocurred while loading tutorials.
+                            </Trans>{' '}
+                            <Trans>
+                              Please check your internet connection or try again
+                              later.
+                            </Trans>
+                          </>
+                        )
+                      }
                     />
                     {renderBetweenCarouselSpace(betweenCarouselSpacerCount)}
                     <Carousel
@@ -297,6 +327,19 @@ export const StartPage = React.memo<Props>(
                       }
                       displayItemTitles
                       onBrowseAllClick={onOpenGamesShowcase}
+                      error={
+                        showcaseLoadingError && (
+                          <>
+                            <Trans>
+                              An error ocurred while loading showcased games.
+                            </Trans>{' '}
+                            <Trans>
+                              Please check your internet connection or try again
+                              later.
+                            </Trans>
+                          </>
+                        )
+                      }
                     />
                   </div>
                   <Line noMargin>

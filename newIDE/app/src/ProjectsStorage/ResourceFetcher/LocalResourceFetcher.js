@@ -44,7 +44,7 @@ const fetchResources = async ({
   let fetchedResourcesCount = 0;
   const resourcesToFetch = getResourcesToFetch(project);
 
-  return PromisePool.withConcurrency(3)
+  return PromisePool.withConcurrency(10)
     .for(resourceNames)
     .process(async resourceName => {
       const resource = resourcesManager.getResource(resourceName);

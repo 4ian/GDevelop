@@ -193,7 +193,7 @@ const buildAndSendMenuTemplate = (
         enabled: !!project,
       },
       {
-        label: i18n._(t`Show Start Page`),
+        label: i18n._(t`Show Home`),
         onClickSendEvent: 'main-menu-open-start-page',
       },
       {

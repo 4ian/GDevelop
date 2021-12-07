@@ -2,6 +2,8 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
+import Chrome from '../../UI/CustomSvgIcons/Chrome';
+import { type RenderIconProps } from '../ExportDialog';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -12,3 +14,16 @@ export const ExplanationHeader = () => (
     </Trans>
   </Text>
 );
+
+export const onlineWebExporter = {
+  name: <Trans>Web (upload online)</Trans>,
+  renderIcon: (props: RenderIconProps) => <Chrome {...props} />,
+  helpPage: '/publishing/web',
+  description: (
+    <Trans>
+      Upload your game online directly from GDevelop and share the link to
+      players. Play to your game using your browser on computers and mobile
+      phones.
+    </Trans>
+  ),
+};

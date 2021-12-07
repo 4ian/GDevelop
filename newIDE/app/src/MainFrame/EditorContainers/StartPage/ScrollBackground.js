@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
+import { Paper } from '@material-ui/core';
 
 const styles = {
   scrollContainer: {
@@ -15,18 +15,13 @@ type Props = {|
 |};
 
 const ScrollBackground = ({ children }: Props) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <div
-        style={{
-          ...styles.scrollContainer,
-          backgroundColor: muiTheme.palette.canvasColor,
-        }}
-      >
-        {children}
-      </div>
-    )}
-  </ThemeConsumer>
+  <Paper
+    style={{
+      ...styles.scrollContainer,
+    }}
+  >
+    {children}
+  </Paper>
 );
 
 export default ScrollBackground;

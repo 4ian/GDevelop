@@ -31,7 +31,10 @@ const getLinkIconAndLabel = (url: string, type: string) => {
   switch (type) {
     // Supported links:
     case '':
-      return { icon: <PlayArrowIcon />, label: <Trans>Play or download</Trans> };
+      return {
+        icon: <PlayArrowIcon />,
+        label: <Trans>Play or download</Trans>,
+      };
     case 'learn-more':
       return { icon: null, label: <Trans>Learn more</Trans> };
     case 'download' || type === 'download-win-mac-linux':

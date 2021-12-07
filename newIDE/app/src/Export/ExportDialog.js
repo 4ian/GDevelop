@@ -6,10 +6,7 @@ import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import BuildsDialog from './Builds/BuildsDialog';
-import { Line } from '../UI/Grid';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
 } from '../Profile/AuthenticatedUserContext';
@@ -50,70 +47,21 @@ type Props = {|
   allExportersRequireOnline?: boolean,
 |};
 
-type State = {|
-  chosenExporterKey: string,
-  showExperimental: boolean,
-  buildsDialogOpen: boolean,
-|};
-
-type ExperimentalExportButtonProps = {|
-  showExperimental: boolean,
-  onClick: (value: boolean) => void,
-  disabled: boolean,
-|};
-
-const ExperimentalExportButton = (props: ExperimentalExportButtonProps) => {
-  const { showExperimental, onClick, disabled } = props;
-  return (
-    <>
-      {!disabled && !showExperimental && (
-        <FlatButton
-          key="toggle-experimental"
-          icon={<Visibility />}
-          primary={false}
-          onClick={() => onClick(true)}
-          label={<Trans>Show experimental exports</Trans>}
-        />
-      )}
-      {!disabled && showExperimental && (
-        <FlatButton
-          key="toggle-experimental"
-          icon={<VisibilityOff />}
-          primary={false}
-          onClick={() => onClick(false)}
-          label={<Trans>Hide experimental exports</Trans>}
-        />
-      )}
-    </>
+const ExportDialog = ({
+  project,
+  onClose,
+  allExportersRequireOnline,
+  onChangeSubscription,
+  exporters,
+}: Props) => {
+  const [chosenExporterKey, setChosenExporterKey] = React.useState<string>('');
+  const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
+    false
   );
-};
 
-export default class ExportDialog extends React.Component<Props, State> {
-  state = {
-    chosenExporterKey: '',
-    showExperimental: false,
-    buildsDialogOpen: false,
-  };
+  if (!project) return null;
 
-  chooseExporter = (key: string) => {
-    this.setState({
-      chosenExporterKey: key,
-    });
-  };
-
-  _showExperimental = (show: boolean = true) => {
-    this.setState({
-      showExperimental: show,
-    });
-  };
-
-  _openBuildsDialog = (open: boolean = true) => {
-    this.setState({
-      buildsDialogOpen: open,
-    });
-  };
-
-  _renderExporterListItem = (
+  const renderExporterListItem = (
     exporter: Exporter,
     index: number,
     forceDisable: boolean
@@ -129,149 +77,120 @@ export default class ExportDialog extends React.Component<Props, State> {
         primaryText={exporter.name}
         secondaryText={exporter.description}
         secondaryTextLines={2}
-        onClick={() => this.chooseExporter(exporter.key)}
+        onClick={() => setChosenExporterKey(exporter.key)}
       />
     );
   };
 
-  render() {
-    const {
-      project,
-      onClose,
-      allExportersRequireOnline,
-      onChangeSubscription,
-      exporters,
-    } = this.props;
-    const { showExperimental, chosenExporterKey } = this.state;
-    if (!project) return null;
+  const exporter = exporters.find(
+    exporter => exporter.key === chosenExporterKey
+  );
 
-    const exporter = exporters.find(
-      exporter => exporter.key === chosenExporterKey
-    );
-
-    return (
-      <AuthenticatedUserContext.Consumer>
-        {(authenticatedUser: AuthenticatedUser) => (
-          <OnlineStatus>
-            {onlineStatus => {
-              const cantExportBecauseOffline =
-                !!allExportersRequireOnline && !onlineStatus;
-              return (
-                <Dialog
-                  title={<Trans>Export project to a standalone game</Trans>}
-                  onRequestClose={onClose}
-                  cannotBeDismissed={false}
-                  actions={[
-                    chosenExporterKey && (
-                      <FlatButton
-                        label={<Trans>Back</Trans>}
-                        key="back"
-                        primary={false}
-                        onClick={() => this.chooseExporter('')}
-                      />
-                    ),
+  return (
+    <AuthenticatedUserContext.Consumer>
+      {(authenticatedUser: AuthenticatedUser) => (
+        <OnlineStatus>
+          {onlineStatus => {
+            const cantExportBecauseOffline =
+              !!allExportersRequireOnline && !onlineStatus;
+            return (
+              <Dialog
+                title={<Trans>Export project to a standalone game</Trans>}
+                onRequestClose={onClose}
+                cannotBeDismissed={false}
+                actions={[
+                  chosenExporterKey && (
                     <FlatButton
-                      label={<Trans>Close</Trans>}
-                      key="close"
+                      label={<Trans>Back</Trans>}
+                      key="back"
                       primary={false}
-                      onClick={onClose}
-                    />,
-                  ]}
-                  secondaryActions={[
-                    <HelpButton
-                      key="help"
-                      helpPagePath={
-                        (exporter && exporter.helpPage) || '/publishing'
-                      }
-                    />,
+                      onClick={() => setChosenExporterKey('')}
+                    />
+                  ),
+                  <FlatButton
+                    label={<Trans>Close</Trans>}
+                    key="close"
+                    primary={false}
+                    onClick={onClose}
+                  />,
+                ]}
+                secondaryActions={[
+                  <HelpButton
+                    key="help"
+                    helpPagePath={
+                      (exporter && exporter.helpPage) || '/publishing'
+                    }
+                  />,
+                  exporter && (
                     <FlatButton
                       key="builds"
                       label={<Trans>See all my builds</Trans>}
-                      onClick={() => this._openBuildsDialog(true)}
-                    />,
-                  ]}
-                  open
-                  noMargin
-                >
-                  {cantExportBecauseOffline && (
-                    <AlertMessage kind="error">
-                      <Trans>
-                        You must be online and have a proper internet connection
-                        to export your game.
-                      </Trans>
-                    </AlertMessage>
-                  )}
-                  {!exporter && (
-                    <React.Fragment>
-                      <List>
-                        {exporters
-                          .filter(
-                            exporter =>
-                              !exporter.advanced && !exporter.experimental
+                      onClick={() => setBuildsDialogOpen(true)}
+                    />
+                  ),
+                ]}
+                open
+                noMargin
+              >
+                {cantExportBecauseOffline && (
+                  <AlertMessage kind="error">
+                    <Trans>
+                      You must be online and have a proper internet connection
+                      to export your game.
+                    </Trans>
+                  </AlertMessage>
+                )}
+                {!exporter && (
+                  <React.Fragment>
+                    <List>
+                      {exporters
+                        .filter(
+                          exporter =>
+                            !exporter.advanced && !exporter.experimental
+                        )
+                        .map((exporter, index) =>
+                          renderExporterListItem(
+                            exporter,
+                            index,
+                            cantExportBecauseOffline
                           )
-                          .map((exporter, index) =>
-                            this._renderExporterListItem(
-                              exporter,
-                              index,
-                              cantExportBecauseOffline
-                            )
-                          )}
-
-                        <Subheader>Advanced</Subheader>
-                        {exporters
-                          .filter(exporter => exporter.advanced)
-                          .map((exporter, index) =>
-                            this._renderExporterListItem(
-                              exporter,
-                              index,
-                              cantExportBecauseOffline
-                            )
-                          )}
-
-                        {showExperimental && (
-                          <Subheader>Experimental</Subheader>
                         )}
-                        {showExperimental &&
-                          exporters
-                            .filter(exporter => exporter.experimental)
-                            .map((exporter, index) =>
-                              this._renderExporterListItem(
-                                exporter,
-                                index,
-                                cantExportBecauseOffline
-                              )
-                            )}
-                      </List>
-                      <Line justifyContent="center" alignItems="center">
-                        <ExperimentalExportButton
-                          showExperimental={showExperimental}
-                          onClick={value => this._showExperimental(value)}
-                          disabled
-                        />
-                      </Line>
-                    </React.Fragment>
-                  )}
-                  {exporter && exporter.exportPipeline && (
-                    <div style={styles.content}>
-                      <ExportLauncher
-                        exportPipeline={exporter.exportPipeline}
-                        project={project}
-                        onChangeSubscription={onChangeSubscription}
-                        authenticatedUser={authenticatedUser}
-                      />
-                    </div>
-                  )}
-                  <BuildsDialog
-                    open={this.state.buildsDialogOpen}
-                    onClose={() => this._openBuildsDialog(false)}
-                    authenticatedUser={authenticatedUser}
-                  />
-                </Dialog>
-              );
-            }}
-          </OnlineStatus>
-        )}
-      </AuthenticatedUserContext.Consumer>
-    );
-  }
-}
+
+                      <Subheader>Advanced</Subheader>
+                      {exporters
+                        .filter(exporter => exporter.advanced)
+                        .map((exporter, index) =>
+                          renderExporterListItem(
+                            exporter,
+                            index,
+                            cantExportBecauseOffline
+                          )
+                        )}
+                    </List>
+                  </React.Fragment>
+                )}
+                {exporter && exporter.exportPipeline && (
+                  <div style={styles.content}>
+                    <ExportLauncher
+                      exportPipeline={exporter.exportPipeline}
+                      project={project}
+                      onChangeSubscription={onChangeSubscription}
+                      authenticatedUser={authenticatedUser}
+                    />
+                  </div>
+                )}
+                <BuildsDialog
+                  open={buildsDialogOpen}
+                  onClose={() => setBuildsDialogOpen(false)}
+                  authenticatedUser={authenticatedUser}
+                />
+              </Dialog>
+            );
+          }}
+        </OnlineStatus>
+      )}
+    </AuthenticatedUserContext.Consumer>
+  );
+};
+
+export default ExportDialog;

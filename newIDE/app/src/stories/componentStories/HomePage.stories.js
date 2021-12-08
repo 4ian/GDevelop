@@ -6,7 +6,7 @@ import withMock from 'storybook-addon-mock';
 
 import muiDecorator from '../ThemeDecorator';
 
-import { StartPage } from '../../MainFrame/EditorContainers/StartPage';
+import { HomePage } from '../../MainFrame/EditorContainers/HomePage';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
@@ -42,11 +42,11 @@ const apiDataServerSideError = {
   ],
 };
 
-const WrappedStartPage = ({ project }: {| project: ?gdProject |}) => (
+const WrappedHomePage = ({ project }: {| project: ?gdProject |}) => (
   <ExampleStoreStateProvider>
     <TutorialStateProvider>
       <GamesShowcaseStateProvider>
-        <StartPage
+        <HomePage
           project={project}
           isActive={true}
           projectItemName={null}
@@ -73,18 +73,18 @@ const WrappedStartPage = ({ project }: {| project: ?gdProject |}) => (
 );
 
 export default {
-  title: 'StartPage',
-  component: WrappedStartPage,
+  title: 'HomePage',
+  component: WrappedHomePage,
   decorators: [muiDecorator, GDevelopJsInitializerDecorator],
 };
 
-export const NoProjectOpened = () => <WrappedStartPage project={null} />;
+export const NoProjectOpened = () => <WrappedHomePage project={null} />;
 export const ProjectOpened = () => (
-  <WrappedStartPage project={testProject.project} />
+  <WrappedHomePage project={testProject.project} />
 );
 
 export const WithServerSideErrors = () => (
-  <WrappedStartPage project={testProject.project} />
+  <WrappedHomePage project={testProject.project} />
 );
 WithServerSideErrors.decorators = [withMock];
 WithServerSideErrors.parameters = apiDataServerSideError;

@@ -39,13 +39,6 @@ export default function PreviewAndPublishButtons({
   exportProject,
   hasProject,
 }: PreviewAndPublishButtonsProps) {
-  const previewTooltip = hasPreviewsRunning
-    ? 'Apply changes to the running preview, right click for more'
-    : previewState.isPreviewOverriden
-    ? 'Preview is overridden, right click for more'
-    : previewState.previewExternalLayoutName
-    ? 'Launch a preview of the external layout inside the scene, right click for more'
-    : 'Launch a preview of the scene, right click for more';
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -80,7 +73,7 @@ export default function PreviewAndPublishButtons({
                 disabled={!isPreviewEnabled}
                 icon={
                   <img
-                    alt={t`Preview`}
+                    alt="Preview"
                     src={
                       hasPreviewsRunning
                         ? 'res/ribbon_default/hotReload64.png'
@@ -104,7 +97,24 @@ export default function PreviewAndPublishButtons({
                     <Trans>Preview</Trans>
                   )
                 }
-                exceptionalTooltipForToolbar={<Trans>{previewTooltip}</Trans>}
+                exceptionalTooltipForToolbar={
+                  hasPreviewsRunning ? (
+                    <Trans>
+                      Apply changes to the running preview, right click for more
+                    </Trans>
+                  ) : previewState.isPreviewOverriden ? (
+                    <Trans>Preview is overridden, right click for more</Trans>
+                  ) : previewState.previewExternalLayoutName ? (
+                    <Trans>
+                      Launch a preview of the external layout inside the scene,
+                      right click for more
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Launch a preview of the scene, right click for more
+                    </Trans>
+                  )
+                }
               />
             }
             openMenuWithSecondaryClick
@@ -169,8 +179,8 @@ export default function PreviewAndPublishButtons({
             disabled={!hasProject}
             icon={
               <img
-                alt={t`Publish`}
-                src={'res/ribbon_default/export32.png'}
+                alt="Publish"
+                src={'res/ribbon_default/networkicon32.png'}
                 width={32}
                 height={32}
                 style={{

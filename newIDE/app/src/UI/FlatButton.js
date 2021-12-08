@@ -38,6 +38,7 @@ export default class FlatButton extends React.Component<Props, {||}> {
       icon,
       keyboardFocused,
       exceptionalTooltipForToolbar,
+      disabled,
       ...otherProps
     } = this.props;
 
@@ -61,7 +62,7 @@ export default class FlatButton extends React.Component<Props, {||}> {
       </Button>
     );
 
-    return exceptionalTooltipForToolbar ? (
+    return exceptionalTooltipForToolbar && !disabled ? (
       <Tooltip
         title={exceptionalTooltipForToolbar}
         placement="bottom"

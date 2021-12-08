@@ -25,10 +25,10 @@ const fakeEditorToolbar = (
       justifyContent: 'flex-end',
     }}
   >
-    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test" />
-    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test" />
-    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test" />
-    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test" />
+    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test tooltip" />
+    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test tooltip" />
+    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test tooltip" />
+    <ToolbarIcon src="res/ribbon_default/bug32.png" tooltip="test tooltip" />
   </span>
 );
 
@@ -75,7 +75,7 @@ export const ProjectOpenOnScene = () => (
       overridenPreviewExternalLayoutName: null,
       overridenPreviewLayoutName: null,
       previewExternalLayoutName: null,
-      previewLayoutName: 'test',
+      previewLayoutName: 'testLayout',
     }}
   />
 );
@@ -89,7 +89,7 @@ export const ProjectOpenOnExternalLayout = () => (
       isPreviewOverriden: false,
       overridenPreviewExternalLayoutName: null,
       overridenPreviewLayoutName: null,
-      previewExternalLayoutName: 'test',
+      previewExternalLayoutName: 'testExternalLayout',
       previewLayoutName: null,
     }}
   />
@@ -103,9 +103,9 @@ export const PreviewOverridenOnScene = () => (
     previewState={{
       isPreviewOverriden: true,
       overridenPreviewExternalLayoutName: null,
-      overridenPreviewLayoutName: 'test',
+      overridenPreviewLayoutName: 'testLayout',
       previewExternalLayoutName: null,
-      previewLayoutName: 'test',
+      previewLayoutName: 'testLayout',
     }}
   />
 );
@@ -117,10 +117,10 @@ export const PreviewOverridenOnExternalLayout = () => (
     hasProject
     previewState={{
       isPreviewOverriden: true,
-      overridenPreviewExternalLayoutName: 'test',
-      overridenPreviewLayoutName: 'test',
-      previewExternalLayoutName: 'test',
-      previewLayoutName: 'test',
+      overridenPreviewExternalLayoutName: 'testExternalLayout',
+      overridenPreviewLayoutName: 'testLayout',
+      previewExternalLayoutName: 'testExternalLayout',
+      previewLayoutName: 'testLayout',
     }}
   />
 );

@@ -6,6 +6,7 @@ import {
   Table as RVTable,
   Column as RVColumn,
 } from 'react-virtualized';
+import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 const gd /*TODO: add flow in this file */ = global.gd;
@@ -17,7 +18,7 @@ type State = {|
 type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
-  onSelectInstances: (Array<gdInitialInstance>) => void,
+  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
 |};
 
 type RenderedRowInfo = {
@@ -48,6 +49,10 @@ export default class InstancesList extends Component<Props, State> {
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
   _searchBar = React.createRef<SearchBar>();
+  _keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => false,
+    shortcutCallbacks: {},
+  });
 
   componentDidMount() {
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
@@ -86,7 +91,11 @@ export default class InstancesList extends Component<Props, State> {
 
   _onRowClick = ({ index }: { index: number }) => {
     if (!this.renderedRows[index]) return;
-    this.props.onSelectInstances([this.renderedRows[index].instance]);
+
+    this.props.onSelectInstances(
+      [this.renderedRows[index].instance],
+      this._keyboardShortcuts.shouldMultiSelect()
+    );
   };
 
   _rowGetter = ({ index }: { index: number }) => {
@@ -107,7 +116,7 @@ export default class InstancesList extends Component<Props, State> {
 
   _selectFirstInstance = () => {
     if (this.renderedRows.length) {
-      this.props.onSelectInstances([this.renderedRows[0].instance]);
+      this.props.onSelectInstances([this.renderedRows[0].instance], false);
     }
   };
 
@@ -129,7 +138,11 @@ export default class InstancesList extends Component<Props, State> {
       <ThemeConsumer>
         {muiTheme => (
           <div style={styles.container}>
-            <div style={{ flex: 1 }}>
+            <div
+              style={{ flex: 1 }}
+              onKeyDown={this._keyboardShortcuts.onKeyDown}
+              onKeyUp={this._keyboardShortcuts.onKeyUp}
+            >
               <AutoSizer>
                 {({ height, width }) => (
                   <RVTable

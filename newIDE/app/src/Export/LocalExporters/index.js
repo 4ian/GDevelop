@@ -15,40 +15,41 @@ import { onlineCordovaExporter } from '../GenericExporters/OnlineCordovaExport';
 import { onlineElectronExporter } from '../GenericExporters/OnlineElectronExport';
 import { electronExporter } from '../GenericExporters/ElectronExport';
 
-export const getLocalExporters = (): Array<Exporter> => [
-  {
-    ...onlineCordovaExporter,
-    key: 'localonlinecordovaexport',
-    exportPipeline: localOnlineCordovaExportPipeline,
-  },
-  {
-    ...onlineWebExporter,
-    key: 'localonlinewebexport',
-    exportPipeline: localOnlineWebExportPipeline,
-  },
+export const localOnlineWebExporter: Exporter = {
+  ...onlineWebExporter,
+  exportPipeline: localOnlineWebExportPipeline,
+};
+
+export const localAssistedExporters: Array<Exporter> = [
   {
     ...html5Exporter,
-    key: 'localexport',
     exportPipeline: localHTML5ExportPipeline,
   },
   {
-    ...facebookInstantGamesExporter,
-    key: 'localfacebookinstantgames',
-    exportPipeline: localFacebookInstantGamesExportPipeline,
-  },
-  {
-    ...cordovaExporter,
-    key: 'localcordovaexport',
-    exportPipeline: localCordovaExportPipeline,
+    ...onlineCordovaExporter,
+    exportPipeline: localOnlineCordovaExportPipeline,
   },
   {
     ...onlineElectronExporter,
-    key: 'localonlineelectronexport',
     exportPipeline: localOnlineElectronExportPipeline,
+  },
+];
+
+export const localManualExporters: Array<Exporter> = [
+  {
+    ...html5Exporter,
+    exportPipeline: localHTML5ExportPipeline,
+  },
+  {
+    ...cordovaExporter,
+    exportPipeline: localCordovaExportPipeline,
   },
   {
     ...electronExporter,
-    key: 'localelectronexport',
     exportPipeline: localElectronExportPipeline,
+  },
+  {
+    ...facebookInstantGamesExporter,
+    exportPipeline: localFacebookInstantGamesExportPipeline,
   },
 ];

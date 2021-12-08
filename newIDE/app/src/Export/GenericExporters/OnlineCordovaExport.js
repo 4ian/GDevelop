@@ -10,8 +10,6 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import HelpButton from '../../UI/HelpButton';
-import PhoneIphone from '@material-ui/icons/PhoneIphone';
-import { type RenderIconProps } from '../ExportDialog';
 
 export type ExportState = {|
   targets: Array<TargetName>,
@@ -161,8 +159,9 @@ export const SetupExportHeader = ({
 };
 
 export const onlineCordovaExporter = {
+  key: 'onlinecordovaexport',
+  tabName: <Trans>Mobile</Trans>,
   name: <Trans>Android (&amp; iOS coming soon)</Trans>,
-  renderIcon: (props: RenderIconProps) => <PhoneIphone {...props} />,
   helpPage: '/publishing/android_and_ios',
   description: (
     <Trans>

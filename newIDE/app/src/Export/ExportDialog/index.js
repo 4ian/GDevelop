@@ -1,19 +1,19 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../UI/Dialog';
-import HelpButton from '../UI/HelpButton';
-import FlatButton from '../UI/FlatButton';
-import Subheader from '../UI/Subheader';
-import { List, ListItem } from '../UI/List';
-import BuildsDialog from './Builds/BuildsDialog';
+import Dialog from '../../UI/Dialog';
+import HelpButton from '../../UI/HelpButton';
+import FlatButton from '../../UI/FlatButton';
+import BuildsDialog from '../Builds/BuildsDialog';
 import AuthenticatedUserContext, {
   type AuthenticatedUser,
-} from '../Profile/AuthenticatedUserContext';
+} from '../../Profile/AuthenticatedUserContext';
 import ExportLauncher from './ExportLauncher';
-import { type ExportPipeline } from './ExportPipeline.flow';
-import { OnlineStatus } from '../Utils/OnlineStatus';
-import AlertMessage from '../UI/AlertMessage';
+import { type ExportPipeline } from '../ExportPipeline.flow';
+import { OnlineStatus } from '../../Utils/OnlineStatus';
+import AlertMessage from '../../UI/AlertMessage';
+import { Tab, Tabs } from '../../UI/Tabs';
+import ExportHome from './ExportHome';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -21,72 +21,27 @@ const styles = {
   content: { padding: 8 },
 };
 
-export type RenderIconProps = {|
-  style: {| width: number, height: number |},
-|};
+export type ExporterSection = 'assisted' | 'manual' | '';
+export type ExporterKey =
+  | 'onlinewebexport'
+  | 'onlineelectronexport'
+  | 'onlinecordovaexport'
+  | 'webexport'
+  | 'facebookinstantgamesexport'
+  | 'electronexport'
+  | 'cordovaexport';
 
 export type Exporter = {|
   name: React.Node,
-  renderIcon: (props: RenderIconProps) => React.Node,
+  tabName: React.Node,
   helpPage: string,
   description: React.Node,
   disabled?: boolean,
   advanced?: boolean,
   experimental?: boolean,
-  key: string,
+  key: ExporterKey,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
 |};
-
-type ExportHomeProps = {|
-  exporters: Array<Exporter>,
-  setChosenExporterKey: (key: string) => void,
-  cantExportBecauseOffline: boolean,
-|};
-
-const ExportHome = ({
-  exporters,
-  setChosenExporterKey,
-  cantExportBecauseOffline,
-}: ExportHomeProps) => {
-  const renderExporterListItem = (
-    exporter: Exporter,
-    index: number,
-    forceDisable: boolean
-  ) => {
-    return (
-      <ListItem
-        key={exporter.key}
-        disabled={forceDisable || exporter.disabled}
-        style={
-          forceDisable || exporter.disabled ? styles.disabledItem : undefined
-        }
-        leftIcon={exporter.renderIcon({ style: styles.icon })}
-        primaryText={exporter.name}
-        secondaryText={exporter.description}
-        secondaryTextLines={2}
-        onClick={() => setChosenExporterKey(exporter.key)}
-      />
-    );
-  };
-  return (
-    <React.Fragment>
-      <List>
-        {exporters
-          .filter(exporter => !exporter.advanced && !exporter.experimental)
-          .map((exporter, index) =>
-            renderExporterListItem(exporter, index, cantExportBecauseOffline)
-          )}
-
-        <Subheader>Advanced</Subheader>
-        {exporters
-          .filter(exporter => exporter.advanced)
-          .map((exporter, index) =>
-            renderExporterListItem(exporter, index, cantExportBecauseOffline)
-          )}
-      </List>
-    </React.Fragment>
-  );
-};
 
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
@@ -96,7 +51,9 @@ export type ExportDialogWithoutExportsProps = {|
 
 type Props = {|
   ...ExportDialogWithoutExportsProps,
-  exporters: Array<Exporter>,
+  assistedExporters: Array<Exporter>,
+  manualExporters: Array<Exporter>,
+  onlineWebExporter: Exporter,
   allExportersRequireOnline?: boolean,
 |};
 
@@ -105,18 +62,38 @@ const ExportDialog = ({
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
-  exporters,
+  assistedExporters,
+  manualExporters,
+  onlineWebExporter,
 }: Props) => {
-  const [chosenExporterKey, setChosenExporterKey] = React.useState<string>('');
+  const [
+    chosenExporterSection,
+    setChosenExporterSection,
+  ] = React.useState<ExporterSection>('');
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
+  const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
+    'onlinewebexport'
+  );
+
+  console.log(project);
 
   if (!project) return null;
+  const exporters = [
+    ...assistedExporters,
+    ...manualExporters,
+    onlineWebExporter,
+  ];
 
   const exporter = exporters.find(
     exporter => exporter.key === chosenExporterKey
   );
+
+  console.log(exporter);
+  if (!exporter || !exporter.exportPipeline) return null;
+
+  console.log(chosenExporterSection);
 
   return (
     <AuthenticatedUserContext.Consumer>
@@ -127,16 +104,25 @@ const ExportDialog = ({
               !!allExportersRequireOnline && !onlineStatus;
             return (
               <Dialog
-                title={<Trans>Export project to a standalone game</Trans>}
+                title={
+                  chosenExporterSection === 'assisted' ? (
+                    <Trans>Publish your game</Trans>
+                  ) : chosenExporterSection === 'manual' ? (
+                    <Trans>Build manually</Trans>
+                  ) : null
+                }
                 onRequestClose={onClose}
                 cannotBeDismissed={false}
                 actions={[
-                  chosenExporterKey && (
+                  chosenExporterSection && (
                     <FlatButton
                       label={<Trans>Back</Trans>}
                       key="back"
                       primary={false}
-                      onClick={() => setChosenExporterKey('')}
+                      onClick={() => {
+                        setChosenExporterSection('');
+                        setChosenExporterKey('onlinewebexport');
+                      }}
                     />
                   ),
                   <FlatButton
@@ -147,13 +133,8 @@ const ExportDialog = ({
                   />,
                 ]}
                 secondaryActions={[
-                  <HelpButton
-                    key="help"
-                    helpPagePath={
-                      (exporter && exporter.helpPage) || '/publishing'
-                    }
-                  />,
-                  exporter && (
+                  <HelpButton key="help" helpPagePath={exporter.helpPage} />,
+                  exporter.key !== 'onlinewebexport' && (
                     <FlatButton
                       key="builds"
                       label={<Trans>See all my builds</Trans>}
@@ -172,14 +153,46 @@ const ExportDialog = ({
                     </Trans>
                   </AlertMessage>
                 )}
-                {!exporter && (
+                {chosenExporterSection === '' && (
                   <ExportHome
                     cantExportBecauseOffline={cantExportBecauseOffline}
-                    exporters={exporters}
+                    onlineWebExporter={onlineWebExporter}
                     setChosenExporterKey={setChosenExporterKey}
+                    setChosenExporterSection={setChosenExporterSection}
+                    project={project}
+                    onChangeSubscription={onChangeSubscription}
+                    authenticatedUser={authenticatedUser}
                   />
                 )}
-                {exporter && exporter.exportPipeline && (
+                {chosenExporterSection === 'assisted' && (
+                  <Tabs
+                    value={chosenExporterKey}
+                    onChange={setChosenExporterKey}
+                  >
+                    {assistedExporters.map(exporter => (
+                      <Tab
+                        label={exporter.tabName}
+                        value={exporter.key}
+                        key={exporter.key}
+                      />
+                    ))}
+                  </Tabs>
+                )}
+                {chosenExporterSection === 'manual' && (
+                  <Tabs
+                    value={chosenExporterKey}
+                    onChange={setChosenExporterKey}
+                  >
+                    {manualExporters.map(exporter => (
+                      <Tab
+                        label={exporter.tabName}
+                        value={exporter.key}
+                        key={exporter.key}
+                      />
+                    ))}
+                  </Tabs>
+                )}
+                {chosenExporterSection !== '' && (
                   <div style={styles.content}>
                     <ExportLauncher
                       exportPipeline={exporter.exportPipeline}

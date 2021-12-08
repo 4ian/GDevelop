@@ -52,7 +52,7 @@ import { renderExternalEventsEditorContainer } from './EditorContainers/External
 import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
-import { renderStartPageContainer } from './EditorContainers/StartPage';
+import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -360,7 +360,7 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (!integratedEditor) openStartPage();
+      if (!integratedEditor) openHomePage();
       GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
       _loadExtensions()
         .then(() =>
@@ -1424,14 +1424,14 @@ const MainFrame = (props: Props) => {
     }));
   };
 
-  const openStartPage = React.useCallback(
+  const openHomePage = React.useCallback(
     () => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
           label: i18n._(t`Home`),
           projectItemName: null,
-          renderEditorContainer: renderStartPageContainer,
+          renderEditorContainer: renderHomePageContainer,
           key: 'start page',
           closable: false,
         }),
@@ -2030,7 +2030,7 @@ const MainFrame = (props: Props) => {
     onHotReloadPreview: launchHotReloadPreview,
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
-    onOpenStartPage: openStartPage,
+    onOpenHomePage: openHomePage,
     onCreateProject: onOpenExamples,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
@@ -2072,7 +2072,7 @@ const MainFrame = (props: Props) => {
           onExportProject: () => openExportDialog(true),
           onCreateProject: onOpenExamples,
           onOpenProjectManager: () => openProjectManager(true),
-          onOpenStartPage: openStartPage,
+          onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
           onOpenAbout: () => openAboutDialog(true),
           onOpenPreferences: () => openPreferencesDialog(true),

@@ -87,7 +87,7 @@ type Props = {|
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
-type StartPageEditorInterface = {|
+type HomePageEditorInterface = {|
   getProject: () => void,
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
@@ -100,8 +100,8 @@ const renderBetweenCarouselSpace = (offset: number = 0) =>
     .fill(0)
     .map((e, index) => <Spacer key={`spacer${index + offset}`} />);
 
-export const StartPage = React.memo<Props>(
-  React.forwardRef<Props, StartPageEditorInterface>(
+export const HomePage = React.memo<Props>(
+  React.forwardRef<Props, HomePageEditorInterface>(
     (
       {
         project,
@@ -504,10 +504,10 @@ export const StartPage = React.memo<Props>(
   (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
-export const renderStartPageContainer = (
+export const renderHomePageContainer = (
   props: RenderEditorContainerPropsWithRef
 ) => (
-  <StartPage
+  <HomePage
     ref={props.ref}
     project={props.project}
     isActive={props.isActive}

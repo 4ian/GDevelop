@@ -498,7 +498,7 @@ export const StartPage = React.memo<Props>(
   ),
   // Prevent any update to the editor if the editor is not active,
   // and so not visible to the user.
-  (prevProps, nextProps) => nextProps.isActive
+  (prevProps, nextProps) => prevProps.isActive || nextProps.isActive
 );
 
 export const renderStartPageContainer = (

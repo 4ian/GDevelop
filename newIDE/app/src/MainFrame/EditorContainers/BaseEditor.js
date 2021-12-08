@@ -16,7 +16,11 @@ import {
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../ProjectCreation/CreateProjectDialog';
-import { type StorageProvider, type FileMetadata } from '../../ProjectsStorage';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type FileMetadataAndStorageProviderName,
+} from '../../ProjectsStorage';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -60,6 +64,7 @@ export type RenderEditorContainerProps = {|
   // Project opening
   canOpen: boolean,
   onOpen: () => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 

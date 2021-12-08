@@ -35,6 +35,9 @@ import {
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
+import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import PreferencesContext from '../../Preferences/PreferencesContext';
+import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -70,6 +73,7 @@ type Props = {|
   // Project opening
   canOpen: boolean,
   onOpen: () => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenExamples: () => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
@@ -107,6 +111,7 @@ export const HomePage = React.memo<Props>(
         project,
         canOpen,
         onOpen,
+        onOpenRecentFile,
         onCreateFromExampleShortHeader,
         onCreateBlank,
         onOpenProjectAfterCreation,
@@ -142,6 +147,11 @@ export const HomePage = React.memo<Props>(
 
       const windowWidth = useResponsiveWindowWidth();
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
+      const { getRecentProjectFiles } = React.useContext(PreferencesContext);
+      const [
+        recentProjectFiles,
+        setRecentProjectFiles,
+      ] = React.useState<?Array<FileMetadataAndStorageProviderName>>(null);
       const {
         tutorials,
         fetchTutorials,
@@ -163,8 +173,14 @@ export const HomePage = React.memo<Props>(
           fetchShowcasedGamesAndFilters();
           fetchExamplesAndFilters();
           fetchTutorials();
+          setRecentProjectFiles(getRecentProjectFiles());
         },
-        [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
+        [
+          fetchExamplesAndFilters,
+          fetchShowcasedGamesAndFilters,
+          fetchTutorials,
+          getRecentProjectFiles,
+        ]
       );
 
       const computeDefaultProjectPath = (): string =>
@@ -190,6 +206,17 @@ export const HomePage = React.memo<Props>(
         selectedExample,
         setSelectedExample,
       ] = React.useState<?ExampleShortHeader>(null);
+
+      const buildRecentProjectFilesMenuTemplate = React.useCallback(
+        (recentProjectFiles: Array<FileMetadataAndStorageProviderName>) => (
+          i18n: I18nType
+        ) =>
+          recentProjectFiles.map(file => ({
+            label: file.fileMetadata.fileIdentifier,
+            click: () => onOpenRecentFile(file),
+          })),
+        [onOpenRecentFile]
+      );
 
       const prepareExamples = React.useCallback(
         (examples: Array<ExampleShortHeader>) =>
@@ -286,10 +313,17 @@ export const HomePage = React.memo<Props>(
                           {!project && canOpen && (
                             <>
                               <Spacer />
-                              <RaisedButton
+                              <RaisedButtonWithSplitMenu
                                 label={<Trans>Open a project</Trans>}
                                 onClick={onOpen}
                                 primary
+                                buildMenuTemplate={
+                                  recentProjectFiles
+                                    ? buildRecentProjectFilesMenuTemplate(
+                                        recentProjectFiles
+                                      )
+                                    : () => []
+                                }
                               />
                             </>
                           )}
@@ -515,6 +549,7 @@ export const renderHomePageContainer = (
     setToolbar={props.setToolbar}
     canOpen={props.canOpen}
     onOpen={props.onOpen}
+    onOpenRecentFile={props.onOpenRecentFile}
     onOpenExamples={props.onOpenExamples}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}

@@ -2237,6 +2237,7 @@ const MainFrame = (props: Props) => {
                     ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                   ).length,
                   onOpen: () => chooseProject(),
+                  onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                   onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
                   onCreateBlank: onCreateBlank,
                   onOpenProjectAfterCreation: onOpenProjectAfterCreation,

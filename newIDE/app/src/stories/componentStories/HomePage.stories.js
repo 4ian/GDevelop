@@ -53,6 +53,7 @@ const WrappedHomePage = ({ project }: {| project: ?gdProject |}) => (
           setToolbar={() => {}}
           canOpen={true}
           onOpen={() => action('onOpen')()}
+          onOpenRecentFile={() => action('onOpenRecentFile')()}
           onOpenExamples={() => action('onOpenExamples')()}
           onOpenProjectManager={() => action('onOpenProjectManager')()}
           onCloseProject={() => action('onCloseProject')()}

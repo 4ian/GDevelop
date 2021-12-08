@@ -142,9 +142,11 @@ export const StartPage = React.memo<Props>(
 
       const windowWidth = useResponsiveWindowWidth();
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
-      const { tutorials, error: tutorialLoadingError } = React.useContext(
-        TutorialContext
-      );
+      const {
+        tutorials,
+        fetchTutorials,
+        error: tutorialLoadingError,
+      } = React.useContext(TutorialContext);
       const {
         allShowcasedGames: showcasedGames,
         fetchShowcasedGamesAndFilters,
@@ -160,8 +162,9 @@ export const StartPage = React.memo<Props>(
         () => {
           fetchShowcasedGamesAndFilters();
           fetchExamplesAndFilters();
+          fetchTutorials();
         },
-        [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters]
+        [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
       );
 
       const computeDefaultProjectPath = (): string =>

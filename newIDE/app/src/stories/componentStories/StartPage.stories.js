@@ -61,14 +61,11 @@ const WrappedStartPage = ({ project }: {| project: ?gdProject |}) => (
           onOpenHelpFinder={() => action('onOpenHelpFinder')()}
           onOpenLanguageDialog={() => action('open language dialog')()}
           onCreateFromExampleShortHeader={() => action('create from example')()}
-          onOpenFromExampleShortHeader={() =>
-            action('call callback after project creation from example')()
+          onOpenProjectAfterCreation={() =>
+            action('call callback after project creation')()
           }
           onOpenProfile={() => action('open profile')()}
           onCreateBlank={() => action('create blank')()}
-          onOpenBlank={() =>
-            action('call callback after blank project creation')()
-          }
         />
       </GamesShowcaseStateProvider>
     </TutorialStateProvider>

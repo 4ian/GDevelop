@@ -29,13 +29,17 @@ type State = {|
   outputPath: string,
 |};
 
+export type OnOpenProjectAfterCreationFunction = ({|
+  project?: gdProject,
+  storageProvider: ?StorageProvider,
+  fileMetadata: ?FileMetadata,
+  shouldCloseDialog?: boolean,
+|}) => Promise<void>;
+
 export type CreateProjectDialogWithComponentsProps = {|
   open: boolean,
   onClose: () => void,
-  onOpen: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => Promise<void>,
+  onOpen: OnOpenProjectAfterCreationFunction,
   initialTab: CreateProjectDialogTabs,
 |};
 

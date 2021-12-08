@@ -4,14 +4,13 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
-import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../ProjectCreation/CreateProjectDialog';
 
 type Props = {|
-  onOpen: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => Promise<void>,
+  onOpen: OnOpenProjectAfterCreationFunction,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
@@ -33,7 +32,7 @@ export default function BrowserExamples({
     });
     if (projectMetadata) {
       const { storageProvider, fileMetadata } = projectMetadata;
-      onOpen(storageProvider, fileMetadata);
+      onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
     }
     setIsOpening(false);
   };

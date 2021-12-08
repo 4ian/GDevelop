@@ -1967,6 +1967,34 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const onOpenProjectAfterCreation = async ({
+    project,
+    storageProvider,
+    fileMetadata,
+    shouldCloseDialog,
+  }: {|
+    project?: gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata,
+    shouldCloseDialog?: boolean,
+  |}) => {
+    if (shouldCloseDialog)
+      await setState(state => ({ ...state, createDialogOpen: false }));
+
+    await getStorageProviderOperations(storageProvider);
+    let state;
+    if (project) state = await loadFromProject(project, fileMetadata);
+    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+
+    if (state) {
+      if (state.currentProject) state.currentProject.resetProjectUuid();
+      openSceneOrProjectManager({
+        currentProject: state.currentProject,
+        editorTabs: state.editorTabs,
+      });
+    }
+  };
+
   const simulateUpdateDownloaded = () =>
     setUpdateStatus({
       status: 'update-downloaded',
@@ -2210,38 +2238,8 @@ const MainFrame = (props: Props) => {
                   ).length,
                   onOpen: () => chooseProject(),
                   onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
-                  onOpenFromExampleShortHeader: async (
-                    storageProvider,
-                    fileMetadata
-                  ) => {
-                    await getStorageProviderOperations(storageProvider);
-                    const state = await openFromFileMetadata(fileMetadata);
-
-                    if (state) {
-                      if (state.currentProject)
-                        state.currentProject.resetProjectUuid();
-                      openSceneOrProjectManager({
-                        currentProject: state.currentProject,
-                        editorTabs: state.editorTabs,
-                      });
-                    }
-                  },
                   onCreateBlank: onCreateBlank,
-                  onOpenBlank: async (
-                    project,
-                    storageProvider,
-                    fileMetadata
-                  ) => {
-                    await getStorageProviderOperations(storageProvider);
-                    const state = await loadFromProject(project, fileMetadata);
-
-                    if (state.currentProject)
-                      state.currentProject.resetProjectUuid();
-                    openSceneOrProjectManager({
-                      currentProject: state.currentProject,
-                      editorTabs: state.editorTabs,
-                    });
-                  },
+                  onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
                   onOpenTutorials: () => onOpenTutorials(),
@@ -2310,19 +2308,7 @@ const MainFrame = (props: Props) => {
           open: state.createDialogOpen,
           initialTab: createDialogInitialTab,
           onClose: closeCreateDialog,
-          onOpen: async (storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await openFromFileMetadata(fileMetadata);
-
-            if (state) {
-              if (state.currentProject) state.currentProject.resetProjectUuid();
-              openSceneOrProjectManager({
-                currentProject: state.currentProject,
-                editorTabs: state.editorTabs,
-              });
-            }
-          },
+          onOpen: onOpenProjectAfterCreation,
         })}
       {!!introDialog &&
         introDialogOpen &&

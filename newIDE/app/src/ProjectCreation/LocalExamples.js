@@ -8,15 +8,14 @@ import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
-import { type OnCreateFromExampleShortHeaderFunction } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../ProjectCreation/CreateProjectDialog';
 
 type Props = {|
-  onOpen: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => void,
+  onOpen: OnOpenProjectAfterCreationFunction,
   onChangeOutputPath: (outputPath: string) => void,
   outputPath: string,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -58,9 +57,9 @@ export default function LocalExamples({
       outputPath,
       exampleShortHeader: selectedExampleShortHeader,
     });
-    if (projectMetadata) {
+    if (!!projectMetadata) {
       const { storageProvider, fileMetadata } = projectMetadata;
-      onOpen(storageProvider, fileMetadata);
+      onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
     }
     setIsOpening(false);
   };

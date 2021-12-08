@@ -33,11 +33,8 @@ import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProject
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
-import {
-  type StorageProvider,
-  type FileMetadata,
-} from '../../../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -84,20 +81,10 @@ type Props = {|
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
 
-  // Project creation from example
+  // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  onOpenFromExampleShortHeader: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => Promise<void>,
-
-  // Blank project creation
   onCreateBlank: OnCreateBlankFunction,
-  onOpenBlank: (
-    project: gdProject,
-    storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata
-  ) => Promise<void>,
+  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
 type StartPageEditorInterface = {|
@@ -121,9 +108,8 @@ export const StartPage = React.memo<Props>(
         canOpen,
         onOpen,
         onCreateFromExampleShortHeader,
-        onOpenFromExampleShortHeader,
         onCreateBlank,
-        onOpenBlank,
+        onOpenProjectAfterCreation,
         onOpenExamples,
         onOpenProjectManager,
         onCloseProject,
@@ -240,7 +226,7 @@ export const StartPage = React.memo<Props>(
         const { project, storageProvider, fileMetadata } = projectMetadata;
         setPreCreationDialogOpen(false);
         setOutputPath(computeDefaultProjectPath());
-        onOpenBlank(project, storageProvider, fileMetadata);
+        onOpenProjectAfterCreation({ project, storageProvider, fileMetadata });
       };
 
       const createProjectFromExample = async (i18n: I18nType) => {
@@ -257,7 +243,7 @@ export const StartPage = React.memo<Props>(
           setPreCreationDialogOpen(false);
           setSelectedExample(null);
           setOutputPath(computeDefaultProjectPath());
-          onOpenFromExampleShortHeader(storageProvider, fileMetadata);
+          onOpenProjectAfterCreation({ storageProvider, fileMetadata });
         }
         setIsOpening(false);
       };
@@ -529,8 +515,7 @@ export const renderStartPageContainer = (
     onOpenExamples={props.onOpenExamples}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}
-    onOpenBlank={props.onOpenBlank}
-    onOpenFromExampleShortHeader={props.onOpenFromExampleShortHeader}
+    onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}
     onOpenTutorials={props.onOpenTutorials}

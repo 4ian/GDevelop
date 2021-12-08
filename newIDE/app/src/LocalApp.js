@@ -13,7 +13,11 @@ import LocalStarters from './ProjectCreation/LocalStarters';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
-import { getLocalExporters } from './Export/LocalExporters';
+import {
+  localAssistedExporters,
+  localManualExporters,
+  localOnlineWebExporter,
+} from './Export/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
@@ -49,7 +53,8 @@ export const create = (authentication: Authentication) => {
           appArguments={appArguments}
           storageProviders={
             // Add Url provider
-            [LocalFileStorageProvider]}
+            [LocalFileStorageProvider]
+          }
           defaultStorageProvider={LocalFileStorageProvider}
         >
           {({
@@ -65,7 +70,12 @@ export const create = (authentication: Authentication) => {
                 <LocalPreviewLauncher {...props} ref={ref} />
               )}
               renderExportDialog={props => (
-                <ExportDialog {...props} exporters={getLocalExporters()} />
+                <ExportDialog
+                  {...props}
+                  assistedExporters={localAssistedExporters}
+                  manualExporters={localManualExporters}
+                  onlineWebExporter={localOnlineWebExporter}
+                />
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog

@@ -28,3 +28,17 @@ export const DoneFooter = ({
     <Line justifyContent="center">{renderGameButton()}</Line>
   </Column>
 );
+
+export const cordovaExporter = {
+  key: 'cordovaexport',
+  tabName: <Trans>Mobile</Trans>,
+  name: <Trans>iOS &amp; Android (manual)</Trans>,
+  helpPage: '/publishing/android_and_ios_with_cordova',
+  description: (
+    <Trans>
+      Build the game locally as a Cordova project, and export it manually to iOS
+      or Android with Cordova developers tools.
+    </Trans>
+  ),
+  advanced: true,
+};

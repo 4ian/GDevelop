@@ -54,21 +54,6 @@ export const TutorialStateProvider = ({
     [tutorials, isLoading]
   );
 
-  React.useEffect(
-    () => {
-      // Don't attempt to load again tutorials if they
-      // were loaded already.
-      if (tutorials || isLoading.current) return;
-
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching tutorials...');
-        fetchTutorials();
-      }, 5000);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchTutorials, tutorials, isLoading]
-  );
-
   const tutorialState = React.useMemo(
     () => ({
       tutorials,

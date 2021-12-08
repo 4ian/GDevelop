@@ -48,6 +48,23 @@ export default function LocalExamples({
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
 
+  const createProjectFromExample = async (i18n: I18nType) => {
+    if (!selectedExampleShortHeader) return;
+
+    setIsOpening(true);
+
+    const projectMetadata = await onCreateFromExampleShortHeader({
+      i18n,
+      outputPath,
+      exampleShortHeader: selectedExampleShortHeader,
+    });
+    if (projectMetadata) {
+      const { storageProvider, fileMetadata } = projectMetadata;
+      onOpen(storageProvider, fileMetadata);
+    }
+    setIsOpening(false);
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -65,13 +82,7 @@ export default function LocalExamples({
             <LocalProjectPreCreationDialog
               open
               onClose={() => setSelectedExampleShortShortHeader(null)}
-              onCreate={() =>
-                onCreateFromExampleShortHeader(setIsOpening, onOpen)(
-                  i18n,
-                  selectedExampleShortHeader,
-                  outputPath
-                )
-              }
+              onCreate={() => createProjectFromExample(i18n)}
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
             />

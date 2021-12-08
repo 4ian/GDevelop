@@ -17,13 +17,17 @@ const gd: libGDevelop = global.gd;
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 
-export const onCreateBlank = (
-  onOpenCallback: (
-    project: gdProject,
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => void
-) => async (i18n: I18nType, outputPath?: string) => {
+export const onCreateBlank = async ({
+  i18n,
+  outputPath,
+}: {|
+  i18n: I18nType,
+  outputPath?: string,
+|}): Promise<?{|
+  project: gdProject,
+  storageProvider: ?StorageProvider,
+  fileMetadata: ?FileMetadata,
+|}> => {
   if (!fs || !outputPath) return;
 
   try {
@@ -36,26 +40,28 @@ export const onCreateBlank = (
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
   const filePath = path.join(outputPath, 'game.json');
   project.setProjectFile(filePath);
-  onOpenCallback(project, LocalFileStorageProvider, {
-    fileIdentifier: filePath,
-  });
   sendNewGameCreated('');
+  return {
+    project,
+    storageProvider: LocalFileStorageProvider,
+    fileMetadata: { fileIdentifier: filePath },
+  };
 };
 
-export const onCreateFromExampleShortHeader = (
-  isOpeningCallback: boolean => void,
-  onOpenCallback: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => void
-) => async (
+export const onCreateFromExampleShortHeader = async ({
+  i18n,
+  exampleShortHeader,
+  outputPath,
+}: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
-  outputPath?: string
-) => {
+  outputPath?: string,
+|}): Promise<?{|
+  storageProvider: StorageProvider,
+  fileMetadata: FileMetadata,
+|}> => {
   if (!fs || !outputPath) return;
   try {
-    isOpeningCallback(true);
     const example = await getExample(exampleShortHeader);
 
     // Prepare the folder for the example.
@@ -72,13 +78,11 @@ export const onCreateFromExampleShortHeader = (
 
     await writeAndCheckFile(projectFileContent, localFilePath);
 
-    // Open the project file. Note that resources that are URLs will be downloaded
-    // thanks to the LocalResourceFetcher.
-    onOpenCallback(LocalFileStorageProvider, {
-      fileIdentifier: localFilePath,
-    });
-
     sendNewGameCreated(example.projectFileUrl);
+    return {
+      storageProvider: LocalFileStorageProvider,
+      fileMetadata: { fileIdentifier: localFilePath },
+    };
   } catch (error) {
     showErrorBox({
       message:
@@ -88,7 +92,6 @@ export const onCreateFromExampleShortHeader = (
       rawError: error,
       errorId: 'local-example-load-error',
     });
-  } finally {
-    isOpeningCallback(false);
+    return;
   }
 };

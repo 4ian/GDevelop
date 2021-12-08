@@ -39,18 +39,23 @@ export type CreateProjectDialogWithComponentsProps = {|
   initialTab: CreateProjectDialogTabs,
 |};
 
-export type OnCreateBlankFunction = (
-  onOpenCallback: any
-) => (i18n: I18nType, outputPath?: string) => Promise<void>;
+export type OnCreateBlankFunction = ({|
+  i18n: I18nType,
+  outputPath?: string,
+|}) => Promise<?{|
+  project: gdProject,
+  storageProvider: ?StorageProvider,
+  fileMetadata: ?FileMetadata,
+|}>;
 
-export type OnCreateFromExampleShortHeaderFunction = (
-  isOpeningCallback: (boolean) => void,
-  onOpenCallback: any
-) => (
+export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
-  outputPath?: string
-) => Promise<void>;
+  outputPath?: string,
+|}) => Promise<?{|
+  storageProvider: StorageProvider,
+  fileMetadata: FileMetadata,
+|}>;
 
 type Props = {|
   ...CreateProjectDialogWithComponentsProps,

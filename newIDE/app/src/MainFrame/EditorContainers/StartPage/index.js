@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
@@ -33,6 +34,10 @@ import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
+import {
+  type StorageProvider,
+  type FileMetadata,
+} from '../../../ProjectsStorage';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -82,13 +87,17 @@ type Props = {|
   // Project creation from example
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onOpenFromExampleShortHeader: (
-    storageProvider: empty,
-    fileMetadata: empty
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
   ) => Promise<void>,
 
   // Blank project creation
   onCreateBlank: OnCreateBlankFunction,
-  onOpenBlank: (storageProvider: empty, fileMetadata: empty) => Promise<void>,
+  onOpenBlank: (
+    project: gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => Promise<void>,
 |};
 
 type StartPageEditorInterface = {|
@@ -222,15 +231,35 @@ export const StartPage = React.memo<Props>(
         []
       );
 
-      const onOpenProjectJustCreated = (isFromExample: boolean) => (
-        ...args
-      ) => {
-        // Close the dialogs and compute new path after the project is created and before it is opened in the editor
+      const createBlankProject = async (i18n: I18nType) => {
+        const projectMetadata = await onCreateBlank({
+          i18n,
+          outputPath,
+        });
+        if (!projectMetadata) return;
+        const { project, storageProvider, fileMetadata } = projectMetadata;
         setPreCreationDialogOpen(false);
-        setSelectedExample(null);
         setOutputPath(computeDefaultProjectPath());
-        if (isFromExample) onOpenFromExampleShortHeader(...args);
-        else onOpenBlank(...args);
+        onOpenBlank(project, storageProvider, fileMetadata);
+      };
+
+      const createProjectFromExample = async (i18n: I18nType) => {
+        if (!selectedExample) return;
+        setIsOpening(true);
+
+        const projectMetadata = await onCreateFromExampleShortHeader({
+          i18n,
+          outputPath,
+          exampleShortHeader: selectedExample,
+        });
+        if (projectMetadata) {
+          const { storageProvider, fileMetadata } = projectMetadata;
+          setPreCreationDialogOpen(false);
+          setSelectedExample(null);
+          setOutputPath(computeDefaultProjectPath());
+          onOpenFromExampleShortHeader(storageProvider, fileMetadata);
+        }
+        setIsOpening(false);
       };
 
       return (
@@ -260,9 +289,7 @@ export const StartPage = React.memo<Props>(
                               onClick={() => {
                                 electron
                                   ? setPreCreationDialogOpen(true)
-                                  : onCreateBlank(
-                                      onOpenProjectJustCreated(false)
-                                    )(i18n, outputPath);
+                                  : createBlankProject(i18n);
                               }}
                               primary
                             />
@@ -460,10 +487,7 @@ export const StartPage = React.memo<Props>(
                   onOpen={() => {
                     electron
                       ? setPreCreationDialogOpen(true)
-                      : onCreateFromExampleShortHeader(
-                          setIsOpening,
-                          onOpenProjectJustCreated(true)
-                        )(i18n, selectedExample);
+                      : createProjectFromExample(i18n);
                   }}
                 />
               )}
@@ -473,14 +497,8 @@ export const StartPage = React.memo<Props>(
                   onClose={() => setPreCreationDialogOpen(false)}
                   onCreate={() =>
                     selectedExample
-                      ? onCreateFromExampleShortHeader(
-                          setIsOpening,
-                          onOpenProjectJustCreated(true)
-                        )(i18n, selectedExample, outputPath)
-                      : onCreateBlank(onOpenProjectJustCreated(false))(
-                          i18n,
-                          outputPath
-                        )
+                      ? createProjectFromExample(i18n)
+                      : createBlankProject(i18n)
                   }
                   outputPath={outputPath}
                   onChangeOutputPath={setOutputPath}

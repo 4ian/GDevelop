@@ -15,6 +15,7 @@ import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
 } from '../../ProjectCreation/CreateProjectDialog';
+import { type StorageProvider, type FileMetadata } from '../../ProjectsStorage';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -81,13 +82,17 @@ export type RenderEditorContainerProps = {|
   // Project creation from an example
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onOpenFromExampleShortHeader: (
-    storageProvider: empty,
-    fileMetadata: empty
+    storageProvider: StorageProvider,
+    fileMetadata: FileMetadata
   ) => Promise<void>,
 
   // Blank project creation
   onCreateBlank: OnCreateBlankFunction,
-  onOpenBlank: (storageProvider: empty, fileMetadata: empty) => Promise<void>,
+  onOpenBlank: (
+    project: gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata
+  ) => Promise<void>,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

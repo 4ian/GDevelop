@@ -13,33 +13,44 @@ const gd: libGDevelop = global.gd;
 // Signatures of this function and its arguments contain useless arguments
 // because this function has to match the signature of LocalCreation.onCreateBlank
 // that needs these arguments.
-export const onCreateBlank = (
-  onOpenCallback: (
-    project: gdProject,
-    storageProvider: ?StorageProvider,
-    fileMetadata: ?FileMetadata
-  ) => void
-) => async (i18n: I18nType, outputPath?: string) => {
+export const onCreateBlank = async ({
+  i18n,
+  outputPath,
+}: {|
+  i18n: I18nType,
+  outputPath?: string,
+|}): Promise<?{|
+  project: gdProject,
+  storageProvider: ?StorageProvider,
+  fileMetadata: ?FileMetadata,
+|}> => {
   sendNewGameCreated('');
 
   const project = gd.ProjectHelper.createNewGDJSProject();
-  onOpenCallback(project, null, null);
+  return { project, storageProvider: null, fileMetadata: null };
 };
 
-export const onCreateFromExampleShortHeader = (
-  isOpeningCallback: boolean => void,
-  onOpenCallback: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => void
-) => async (i18n: I18nType, exampleShortHeader: ExampleShortHeader) => {
+export const onCreateFromExampleShortHeader = async ({
+  i18n,
+  exampleShortHeader,
+  outputPath,
+}: {|
+  i18n: I18nType,
+  exampleShortHeader: ExampleShortHeader,
+  outputPath?: string,
+|}): Promise<?{|
+  storageProvider: StorageProvider,
+  fileMetadata: FileMetadata,
+|}> => {
   try {
-    isOpeningCallback(true);
     const example = await getExample(exampleShortHeader);
-    onOpenCallback(UrlStorageProvider, {
-      fileIdentifier: example.projectFileUrl,
-    });
     sendNewGameCreated(example.projectFileUrl);
+    return {
+      storageProvider: UrlStorageProvider,
+      fileMetadata: {
+        fileIdentifier: example.projectFileUrl,
+      },
+    };
   } catch (error) {
     showErrorBox({
       message:
@@ -49,7 +60,6 @@ export const onCreateFromExampleShortHeader = (
       rawError: error,
       errorId: 'browser-example-load-error',
     });
-  } finally {
-    isOpeningCallback(false);
+    return;
   }
 };

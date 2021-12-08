@@ -1,55 +1,50 @@
 // @flow
-import { t } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
-import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { ExampleStore } from '../AssetStore/ExampleStore';
-import UrlStorageProvider from '../ProjectsStorage/UrlStorageProvider';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import {
-  getExample,
-  type ExampleShortHeader,
-} from '../Utils/GDevelopServices/Example';
-import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../ProjectCreation/CreateProjectDialog';
 
 type Props = {|
-  onOpen: (
-    storageProvider: StorageProvider,
-    fileMetadata: FileMetadata
-  ) => Promise<void>,
+  onOpen: OnOpenProjectAfterCreationFunction,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
-export default function BrowserExamples(props: Props) {
+export default function BrowserExamples({
+  onOpen,
+  onCreateFromExampleShortHeader,
+}: Props) {
   const [isOpening, setIsOpening] = React.useState(false);
+
+  const createProjectFromExample = async (
+    i18n: I18nType,
+    exampleShortHeader: ExampleShortHeader
+  ) => {
+    setIsOpening(true);
+
+    const projectMetadata = await onCreateFromExampleShortHeader({
+      i18n,
+      exampleShortHeader: exampleShortHeader,
+    });
+    if (projectMetadata) {
+      const { storageProvider, fileMetadata } = projectMetadata;
+      onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+    }
+    setIsOpening(false);
+  };
 
   return (
     <I18n>
       {({ i18n }) => (
         <ExampleStore
           isOpening={isOpening}
-          onOpen={async (exampleShortHeader: ExampleShortHeader) => {
-            try {
-              setIsOpening(true);
-              const example = await getExample(exampleShortHeader);
-              props.onOpen(UrlStorageProvider, {
-                fileIdentifier: example.projectFileUrl,
-              });
-              sendNewGameCreated(example.projectFileUrl);
-            } catch (error) {
-              showErrorBox({
-                message:
-                  i18n._(t`Unable to fetch the example.`) +
-                  ' ' +
-                  i18n._(
-                    t`Verify your internet connection or try again later.`
-                  ),
-                rawError: error,
-                errorId: 'browser-example-load-error',
-              });
-            } finally {
-              setIsOpening(false);
-            }
-          }}
+          onOpen={(exampleShortHeader: ExampleShortHeader) =>
+            createProjectFromExample(i18n, exampleShortHeader)
+          }
         />
       )}
     </I18n>

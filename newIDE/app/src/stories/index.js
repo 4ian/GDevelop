@@ -14,7 +14,6 @@ import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -255,7 +254,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -2778,43 +2777,6 @@ storiesOf('LocalFilePicker', module)
     />
   ));
 
-storiesOf('StartPage', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <StartPage
-      project={null}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-    />
-  ))
-  .add('project opened', () => (
-    <StartPage
-      project={testProject.project}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-    />
-  ));
-
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
   .add('with data', () => (
@@ -2934,11 +2896,10 @@ storiesOf('CreateProjectDialog', module)
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
-        initialTab="starters"
+        initialTab="examples"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2947,11 +2908,10 @@ storiesOf('CreateProjectDialog', module)
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="games-showcase"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ));
@@ -4346,12 +4306,6 @@ storiesOf('Profile/CreateAccountDialog', module)
         code: 'auth/invalid-email',
       }}
     />
-  ));
-
-storiesOf('UserPublicProfileChip', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
   ));
 
 storiesOf('ContributionsDetails', module)

@@ -227,14 +227,19 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [widthUnit]
   );
 
+  const getVisibleThumbnailsCount = React.useCallback(
+    (element: HTMLElement): number =>
+      Math.max(Math.floor(element.offsetWidth / widthUnit), 1),
+    [widthUnit]
+  );
+
   const computeScroll = React.useCallback(
     (
       direction: 'left' | 'right',
       scrollViewElement: HTMLUListElement
     ): number => {
-      const visibleThumbnailsCount = Math.max(
-        Math.floor(scrollViewElement.offsetWidth / widthUnit),
-        1
+      const visibleThumbnailsCount = getVisibleThumbnailsCount(
+        scrollViewElement
       );
       const scale = visibleThumbnailsCount * widthUnit;
 
@@ -253,7 +258,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
         scrollViewElement.scrollLeft + scale * (direction === 'left' ? -1 : 1)
       );
     },
-    [widthUnit, itemsToDisplay, roundScroll]
+    [widthUnit, itemsToDisplay, roundScroll, getVisibleThumbnailsCount]
   );
 
   const onClickArrow = React.useCallback(
@@ -280,6 +285,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
     },
     [shouldDisplayLeftArrow]
   );
+
   const handleScrollEnd = React.useCallback(
     (): void => {
       const scrollViewElement = scrollView.current;
@@ -293,10 +299,39 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [roundScroll]
   );
 
-  const onFocusItem = (event: SyntheticFocusEvent<HTMLLIElement>): void => {
-    if (event.currentTarget !== hoveredElement)
-      event.currentTarget.scrollIntoView();
-  };
+  const onFocusItem = React.useCallback(
+    (event: SyntheticFocusEvent<HTMLLIElement>, index: number): void => {
+      // Clicked element receives focus before click event is triggered.
+      // If a scroll occurs before onmouseup event and the element is scrolled out
+      // of the cursor, the click of the user is logically but wrongly ignored.
+      if (event.currentTarget !== hoveredElement) {
+        const element = event.currentTarget;
+        const parent = element.offsetParent;
+        if (!parent || !(parent instanceof HTMLElement)) return;
+
+        const visibleThumbnailsCount = getVisibleThumbnailsCount(parent);
+
+        // Browsers handle differently a focus on an out-of-sight element.
+        // To ensure the behavior is the same across all browsers, we compute
+        // the scroll value to reach to make the tab navigation pleasant.
+        const elementBoundingRect = element.getBoundingClientRect();
+        const parentBoundingRect = parent.getBoundingClientRect();
+        const isHiddenLeft =
+          Math.round(elementBoundingRect.left - parentBoundingRect.left) < 0;
+        const isHiddenRight =
+          Math.round(elementBoundingRect.right - parentBoundingRect.right) >= 0;
+        if (isHiddenLeft)
+          parent.scroll({
+            left: element.offsetLeft,
+          });
+        else if (isHiddenRight)
+          parent.scroll({
+            left: widthUnit * (index - visibleThumbnailsCount + 1),
+          });
+      }
+    },
+    [getVisibleThumbnailsCount, hoveredElement, widthUnit]
+  );
 
   React.useEffect(
     () => {
@@ -360,7 +395,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
                 classes={classesForGridListItem}
                 key={item.id}
                 tabIndex={0}
-                onFocus={onFocusItem}
+                onFocus={event => onFocusItem(event, index)}
                 onMouseEnter={event => setHoveredElement(event.currentTarget)}
                 onMouseLeave={() => setHoveredElement(null)}
                 onKeyPress={(

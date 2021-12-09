@@ -11,7 +11,7 @@ type IconProps =
   | {|
       children: React.Node,
     |}
-  // Support a few specific icons from iconmoon-font.css
+  // Support a few specific icons from icomoon-font.css
   | {|
       className:
         | 'icon-youtube'

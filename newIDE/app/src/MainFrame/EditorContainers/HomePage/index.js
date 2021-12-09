@@ -203,11 +203,22 @@ export const HomePage = React.memo<Props>(
       ] = React.useState<?ExampleShortHeader>(null);
 
       const buildRecentProjectFilesMenuTemplate = React.useCallback(
-        (i18n: I18nType) =>
-          getRecentProjectFiles().map(file => ({
+        (i18n: I18nType) => {
+          const recentFiles = getRecentProjectFiles();
+          if (!recentFiles.length) {
+            return [
+              {
+                label: i18n._(t`No project opened recently`),
+                disabled: true,
+              },
+            ];
+          }
+
+          return recentFiles.map(file => ({
             label: file.fileMetadata.fileIdentifier,
             click: () => onOpenRecentFile(file),
-          })),
+          }));
+        },
         [getRecentProjectFiles, onOpenRecentFile]
       );
 

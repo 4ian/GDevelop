@@ -33,9 +33,12 @@ export type ExportPipeline<
       updater: (prevExportState: ExportState) => ExportState
     ) => void,
   |}) => React.Node,
+
   renderLaunchButtonLabel: () => React.Node,
 
   canLaunchBuild: (exportState: ExportState) => boolean,
+
+  customStepsProgress?: (build: ?Build, loading: boolean) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

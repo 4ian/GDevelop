@@ -7,8 +7,6 @@ import Window from '../../Utils/Window';
 import FlatButton from '../../UI/FlatButton';
 import { Column, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
-import Folder from '@material-ui/icons/Folder';
-import { type RenderIconProps } from '../ExportDialog';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -93,8 +91,9 @@ export const DoneFooter = ({
 );
 
 export const html5Exporter = {
-  name: <Trans>Local folder</Trans>,
-  renderIcon: (props: RenderIconProps) => <Folder {...props} />,
+  key: 'webexport',
+  tabName: <Trans>Web</Trans>,
+  name: <Trans>Web</Trans>,
   helpPage: '/publishing/html5_game_in_a_local_folder',
   description: (
     <Trans>

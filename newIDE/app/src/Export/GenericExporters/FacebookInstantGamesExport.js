@@ -6,8 +6,6 @@ import { Column, Line } from '../../UI/Grid';
 import FlatButton from '../../UI/FlatButton';
 import { getHelpLink } from '../../Utils/HelpLink';
 import Window from '../../Utils/Window';
-import Facebook from '../../UI/CustomSvgIcons/Facebook';
-import { type RenderIconProps } from '../ExportDialog';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -51,8 +49,9 @@ export const DoneFooter = ({
 };
 
 export const facebookInstantGamesExporter = {
+  key: 'facebookinstantgamesexport',
+  tabName: <Trans>Facebook</Trans>,
   name: <Trans>Facebook Instant Games</Trans>,
-  renderIcon: (props: RenderIconProps) => <Facebook {...props} />,
   helpPage: '/publishing/publishing-to-facebook-instant-games',
   description: (
     <Trans>

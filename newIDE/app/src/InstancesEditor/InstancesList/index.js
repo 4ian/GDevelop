@@ -6,8 +6,12 @@ import {
   Table as RVTable,
   Column as RVColumn,
 } from 'react-virtualized';
+import IconButton from '../../UI/IconButton';
+import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+import Lock from '@material-ui/icons/Lock';
+import LockOpen from '@material-ui/icons/LockOpen';
 const gd /*TODO: add flow in this file */ = global.gd;
 
 type State = {|
@@ -17,13 +21,13 @@ type State = {|
 type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
-  onSelectInstances: (Array<gdInitialInstance>) => void,
+  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
 |};
 
 type RenderedRowInfo = {
   instance: gdInitialInstance,
   name: string,
-  locked: string,
+  locked: boolean,
   x: string,
   y: string,
   angle: string,
@@ -48,6 +52,10 @@ export default class InstancesList extends Component<Props, State> {
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
   _searchBar = React.createRef<SearchBar>();
+  _keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => false,
+    shortcutCallbacks: {},
+  });
 
   componentDidMount() {
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
@@ -69,7 +77,7 @@ export default class InstancesList extends Component<Props, State> {
         this.renderedRows.push({
           instance,
           name,
-          locked: instance.isLocked() ? '🔒' : '',
+          locked: instance.isLocked(),
           x: instance.getX().toFixed(2),
           y: instance.getY().toFixed(2),
           angle: instance.getAngle().toFixed(2),
@@ -86,7 +94,11 @@ export default class InstancesList extends Component<Props, State> {
 
   _onRowClick = ({ index }: { index: number }) => {
     if (!this.renderedRows[index]) return;
-    this.props.onSelectInstances([this.renderedRows[index].instance]);
+
+    this.props.onSelectInstances(
+      [this.renderedRows[index].instance],
+      this._keyboardShortcuts.shouldMultiSelect()
+    );
   };
 
   _rowGetter = ({ index }: { index: number }) => {
@@ -107,8 +119,22 @@ export default class InstancesList extends Component<Props, State> {
 
   _selectFirstInstance = () => {
     if (this.renderedRows.length) {
-      this.props.onSelectInstances([this.renderedRows[0].instance]);
+      this.props.onSelectInstances([this.renderedRows[0].instance], false);
     }
+  };
+
+  _renderLockCell = ({ rowData }: { rowData: RenderedRowInfo }) => {
+    return (
+      <IconButton
+        size="small"
+        onClick={() => {
+          rowData.instance.setLocked(!rowData.locked);
+        }}
+      >
+        {rowData.locked && <Lock />}
+        {!rowData.locked && <LockOpen />}
+      </IconButton>
+    );
   };
 
   render() {
@@ -129,7 +155,11 @@ export default class InstancesList extends Component<Props, State> {
       <ThemeConsumer>
         {muiTheme => (
           <div style={styles.container}>
-            <div style={{ flex: 1 }}>
+            <div
+              style={{ flex: 1 }}
+              onKeyDown={this._keyboardShortcuts.onKeyDown}
+              onKeyUp={this._keyboardShortcuts.onKeyUp}
+            >
               <AutoSizer>
                 {({ height, width }) => (
                   <RVTable
@@ -157,6 +187,7 @@ export default class InstancesList extends Component<Props, State> {
                       dataKey="locked"
                       width={width * 0.05}
                       className={'tableColumn'}
+                      cellRenderer={this._renderLockCell}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}

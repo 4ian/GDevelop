@@ -223,7 +223,10 @@ export const HomePage = React.memo<Props>(
             .map(example => ({
               id: example.id,
               title: example.name,
-              thumbnailUrl: example.previewImageUrls[0],
+              thumbnailUrl:
+                example.previewImageUrls.find(url =>
+                  url.endsWith('preview.png')
+                ) || example.previewImageUrls[0],
               onClick: () => setSelectedExample(example),
             })),
         []

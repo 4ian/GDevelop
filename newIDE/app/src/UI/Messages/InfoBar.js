@@ -1,55 +1,39 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
-import Button from '@material-ui/core/Button';
-import PreferencesContext, {
-  type AlertMessageIdentifier,
-} from '../../MainFrame/Preferences/PreferencesContext';
-import { ScreenTypeMeasurer } from '../Reponsive/ScreenTypeMeasurer';
+import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
 
 type Props = {|
-  identifier: AlertMessageIdentifier,
   message: React.Node,
   touchScreenMessage?: React.Node,
   show: boolean,
+  hideInfoBar: () => void,
 |};
 
-export default class InfoBar extends React.PureComponent<Props> {
-  render() {
-    const { identifier } = this.props;
+const InfoBar = ({ show, touchScreenMessage, message, hideInfoBar }: Props) => {
+  const screenType = useScreenType();
 
-    return (
-      <ScreenTypeMeasurer>
-        {screenType => (
-          <PreferencesContext.Consumer>
-            {({ values, showAlertMessage }) => (
-              <Snackbar
-                open={
-                  this.props.show && !values.hiddenAlertMessages[identifier]
-                }
-                message={
-                  screenType === 'touch' && this.props.touchScreenMessage
-                    ? this.props.touchScreenMessage
-                    : this.props.message
-                }
-                action={
-                  <Button
-                    key="undo"
-                    color="primary"
-                    size="small"
-                    onClick={() => {
-                      showAlertMessage(identifier, false);
-                    }}
-                  >
-                    <Trans>Got it</Trans>
-                  </Button>
-                }
-              />
-            )}
-          </PreferencesContext.Consumer>
-        )}
-      </ScreenTypeMeasurer>
-    );
-  }
-}
+  React.useEffect(
+    () => {
+      if (show) {
+        setTimeout(() => {
+          hideInfoBar();
+        }, 3000);
+      }
+    },
+    [show, hideInfoBar]
+  );
+
+  return (
+    <Snackbar
+      open={show}
+      message={
+        screenType === 'touch' && touchScreenMessage
+          ? touchScreenMessage
+          : message
+      }
+    />
+  );
+};
+
+export default InfoBar;

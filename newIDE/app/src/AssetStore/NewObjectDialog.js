@@ -15,7 +15,7 @@ import {
 import HelpButton from '../UI/HelpButton';
 import { getExperimentalObjects } from '../Hints';
 import { Line, Column } from '../UI/Grid';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -291,7 +291,7 @@ export default function NewObjectDialog({
         />
       ) : null}
       {resourcesFetcher.renderResourceFetcherDialog()}
-      <InfoBar
+      <DismissableInfoBar
         identifier="asset-installed-explanation"
         message={
           <Trans>

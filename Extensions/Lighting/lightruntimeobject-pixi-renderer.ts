@@ -21,11 +21,10 @@ namespace gdjs {
     _debugMode: boolean = false;
     _debugLight: PIXI.Container | null = null;
     _debugGraphics: PIXI.Graphics | null = null;
+
     /**
-     * The vertices instances are actually shared
-     * with {@link gdjs.RuntimeObject.hitBoxes}.
-     * This is very hacky and hitBoxes should
-     * probably be used directly if needed.
+     * A polygon updated when vertices of the light are computed
+     * to be a polygon bounding the light and its obstacles.
      */
     _lightBoundingPoly: gdjs.Polygon;
 
@@ -59,15 +58,8 @@ namespace gdjs {
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
       this._isPreview = runtimeScene.getGame().isPreview();
+      this._lightBoundingPoly = gdjs.Polygon.createRectangle(0, 0);
 
-      // Shadow copy of the object hit box.
-      // Is this really intended?
-      this._lightBoundingPoly = new gdjs.Polygon();
-      for (let i = 0; i < 4; i++) {
-        this._lightBoundingPoly.vertices.push(
-          runtimeObject.getHitBoxes()[0].vertices[i]
-        );
-      }
       this.updateDebugMode();
 
       // Objects will be added in lighting layer, this is just to maintain consistency.
@@ -399,22 +391,18 @@ namespace gdjs {
       }
 
       // Synchronize light bounding polygon with the hitbox.
-      const lightHitboxPoly = this._object.getHitBoxes()[0];
+      // Note: we suppose the hitbox is always a single rectangle.
+      const objectHitBox = this._object.getHitBoxes()[0];
       for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 2; j++) {
-          // This is actually completely useless as
-          // this._lightBoundingPoly.vertices[i] === lightHitboxPoly.vertices[i]
-          this._lightBoundingPoly.vertices[i][j] =
-            lightHitboxPoly.vertices[i][j];
-        }
+        this._lightBoundingPoly.vertices[i][0] = objectHitBox.vertices[i][0];
+        this._lightBoundingPoly.vertices[i][1] = objectHitBox.vertices[i][1];
       }
-      const obstaclesCount = lightObstacles.length;
-      // This array could be avoided.
-      const obstacleHitBoxes = new Array<Iterable<gdjs.Polygon>>(
-        obstaclesCount
-      );
-      for (let i = 0; i < obstaclesCount; i++) {
-        obstacleHitBoxes[i] = lightObstacles[
+
+      // Create the list of polygons to compute the light vertices
+      const obstaclePolygons: Array<gdjs.Polygon> = [];
+      obstaclePolygons.push(this._lightBoundingPoly);
+      for (let i = 0; i < lightObstacles.length; i++) {
+        const obstacleHitBoxes = lightObstacles[
           i
         ].behavior.owner.getHitBoxesAround(
           searchAreaLeft,
@@ -422,14 +410,11 @@ namespace gdjs {
           searchAreaRight,
           searchAreaBottom
         );
-      }
-      const obstaclePolygons: Array<gdjs.Polygon> = [];
-      obstaclePolygons.push(this._lightBoundingPoly);
-      for (let i = 0; i < obstaclesCount; i++) {
-        for (const hitbox of obstacleHitBoxes[i]) {
+        for (const hitbox of obstacleHitBoxes) {
           obstaclePolygons.push(hitbox);
         }
       }
+
       let maxX = this._object.x + this._radius;
       let minX = this._object.x - this._radius;
       let maxY = this._object.y + this._radius;
@@ -454,10 +439,6 @@ namespace gdjs {
           }
         }
       }
-      // obstaclePolygons[0] === this._lightBoundingPoly
-      // this._lightBoundingPoly === this._object.hitBoxes
-      // This is actually modifying the object hit boxes.
-      // Is it intended?
       obstaclePolygons[0].vertices[0][0] = minX;
       obstaclePolygons[0].vertices[0][1] = minY;
       obstaclePolygons[0].vertices[1][0] = maxX;

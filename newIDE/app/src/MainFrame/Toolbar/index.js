@@ -26,7 +26,7 @@ export type ToolbarInterface = {|
 |};
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
-  function LayerEffectNameField(props: MainFrameToolbarProps, ref) {
+  function MainframeToolbar(props: MainFrameToolbarProps, ref) {
     const isDev = Window.isDev();
 
     const [editorToolbar, setEditorToolbar] = React.useState<?any>(null);

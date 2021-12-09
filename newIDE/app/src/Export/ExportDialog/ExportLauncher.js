@@ -2,42 +2,42 @@
 
 import React, { Component } from 'react';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
-import RaisedButton from '../UI/RaisedButton';
-import { sendExportLaunched } from '../Utils/Analytics/EventSender';
+import { t, Trans } from '@lingui/macro';
+import RaisedButton from '../../UI/RaisedButton';
+import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
 import {
   type Build,
   type BuildArtifactKeyName,
   getBuildArtifactUrl,
-} from '../Utils/GDevelopServices/Build';
-import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
-import { Column, Line } from '../UI/Grid';
-import { showErrorBox } from '../UI/Messages/MessageBox';
-import Window from '../Utils/Window';
-import CreateProfile from '../Profile/CreateProfile';
-import LimitDisplayer from '../Profile/LimitDisplayer';
+} from '../../Utils/GDevelopServices/Build';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { Column, Line, Spacer } from '../../UI/Grid';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import Window from '../../Utils/Window';
+import CreateProfile from '../../Profile/CreateProfile';
+import LimitDisplayer from '../../Profile/LimitDisplayer';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
-} from '../Utils/ProjectErrorsChecker';
-import { type Limit } from '../Utils/GDevelopServices/Usage';
-import BuildsWatcher from './Builds/BuildsWatcher';
+} from '../../Utils/ProjectErrorsChecker';
+import { type Limit } from '../../Utils/GDevelopServices/Usage';
+import BuildsWatcher from '../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
-} from './Builds/BuildStepsProgress';
+} from '../Builds/BuildStepsProgress';
 import {
   registerGame,
   getGame,
   updateGame,
-} from '../Utils/GDevelopServices/Game';
-import { type ExportPipeline } from './ExportPipeline.flow';
-import { GameRegistration } from '../GameDashboard/GameRegistration';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+} from '../../Utils/GDevelopServices/Game';
+import { type ExportPipeline } from '../ExportPipeline.flow';
+import { GameRegistration } from '../../GameDashboard/GameRegistration';
+import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
   ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
-} from '../Utils/GDevelopServices/Badge';
+} from '../../Utils/GDevelopServices/Badge';
 
 type State = {|
   exportStep: BuildStep,
@@ -312,7 +312,10 @@ export default class ExportLauncher extends Component<Props, State> {
         ? authenticatedUser.limits[exportPipeline.onlineBuildType]
         : null;
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      if (!errored && exportStep !== '' && exportStep !== 'done') return false;
+      const buildPending =
+        !errored && exportStep !== '' && exportStep !== 'done';
+      const buildFinished = !errored && exportStep === 'done';
+      if (buildPending || buildFinished) return false;
 
       const limit: ?Limit = getBuildLimit(authenticatedUser);
       if (limit && limit.limitReached) return false;
@@ -359,32 +362,46 @@ export default class ExportLauncher extends Component<Props, State> {
             />
           </Line>
         )}
-        {!!exportPipeline.onlineBuildType &&
-          authenticatedUser.authenticated && (
-            <LimitDisplayer
-              subscription={authenticatedUser.subscription}
-              limit={getBuildLimit(authenticatedUser)}
-              onChangeSubscription={this.props.onChangeSubscription}
-            />
-          )}
+        <Spacer />
         {!!exportPipeline.onlineBuildType &&
           !authenticatedUser.authenticated && (
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}
+              message={
+                <Trans>
+                  Create an account or login first to publish your game.
+                </Trans>
+              }
+              justifyContent="center"
             />
           )}
-        <Line expand>
-          <BuildStepsProgress
-            exportStep={exportStep}
-            hasBuildStep={!!exportPipeline.onlineBuildType}
-            build={build}
-            onDownload={this._downloadBuild}
-            stepMaxProgress={stepMaxProgress}
-            stepCurrentProgress={stepCurrentProgress}
-            errored={errored}
+        {authenticatedUser.authenticated &&
+          (exportPipeline.renderCustomStepsProgress ? (
+            exportPipeline.renderCustomStepsProgress(
+              build,
+              !!this.state.exportStep && this.state.exportStep !== 'done'
+            )
+          ) : (
+            <Line expand>
+              <BuildStepsProgress
+                exportStep={exportStep}
+                hasBuildStep={!!exportPipeline.onlineBuildType}
+                build={build}
+                onDownload={this._downloadBuild}
+                stepMaxProgress={stepMaxProgress}
+                stepCurrentProgress={stepCurrentProgress}
+                errored={errored}
+              />
+            </Line>
+          ))}
+        {!!exportPipeline.limitedBuilds && authenticatedUser.authenticated && (
+          <LimitDisplayer
+            subscription={authenticatedUser.subscription}
+            limit={getBuildLimit(authenticatedUser)}
+            onChangeSubscription={this.props.onChangeSubscription}
           />
-        </Line>
+        )}
         {doneFooterOpen &&
           exportPipeline.renderDoneFooter &&
           exportPipeline.renderDoneFooter({
@@ -393,7 +410,7 @@ export default class ExportLauncher extends Component<Props, State> {
             onClose: this._closeDoneFooter,
           })}
         {doneFooterOpen && (
-          <Line>
+          <Line justifyContent="center">
             <GameRegistration project={project} />
           </Line>
         )}

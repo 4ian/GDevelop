@@ -3,8 +3,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
-import LaptopMac from '@material-ui/icons/LaptopMac';
-import { type RenderIconProps } from '../ExportDialog';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -34,8 +32,9 @@ export const DoneFooter = ({
 );
 
 export const electronExporter = {
+  key: 'electronexport',
+  tabName: <Trans>Desktop</Trans>,
   name: <Trans>Windows/macOS/Linux (manual)</Trans>,
-  renderIcon: (props: RenderIconProps) => <LaptopMac {...props} />,
   helpPage: '/publishing/windows-macos-linux-with-electron',
   description: (
     <Trans>

@@ -12,11 +12,17 @@ type Props = {
   message?: React.Node,
   onLogin: () => void,
   onCreateAccount: () => void,
+  justifyContent?: 'center',
 };
 
-export default ({ message, onLogin, onCreateAccount }: Props) => (
+export default ({
+  message,
+  onLogin,
+  onCreateAccount,
+  justifyContent,
+}: Props) => (
   <Column noMargin>
-    <Line>
+    <Line justifyContent={justifyContent}>
       <Text>
         {message || (
           <Trans>

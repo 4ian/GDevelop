@@ -30,7 +30,7 @@ import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import EditorMosaic from '../UI/EditorMosaic';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
@@ -1240,7 +1240,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editGroup(null)}
           />
         )}
-        <InfoBar
+        <DismissableInfoBar
           identifier="instance-drag-n-drop-explanation"
           message={
             <Trans>
@@ -1256,7 +1256,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.selectedObjectNames.length}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="objects-panel-explanation"
           message={
             <Trans>
@@ -1265,7 +1265,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showObjectsListInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="instance-properties-panel-explanation"
           message={
             <Trans>
@@ -1275,7 +1275,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showPropertiesInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="layers-panel-explanation"
           message={
             <Trans>
@@ -1285,7 +1285,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showLayersInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="instances-panel-explanation"
           message={
             <Trans>
@@ -1409,7 +1409,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         <I18n>
           {({ i18n }) => (
             <React.Fragment>
-              <InfoBar
+              <DismissableInfoBar
                 show={this.state.showAdditionalWorkInfoBar}
                 identifier={this.state.additionalWorkInfoBar.identifier}
                 message={i18n._(this.state.additionalWorkInfoBar.message)}

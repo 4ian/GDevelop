@@ -80,7 +80,7 @@ import {
   hasClipboardConditions,
   pasteInstructionsFromClipboardInInstructionsList,
 } from './ClipboardKind';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { useScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
@@ -1475,7 +1475,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                     onClose={this.closeEventTextDialog}
                   />
                 )}
-                <InfoBar
+                <DismissableInfoBar
                   identifier="edit-instruction-explanation"
                   message={
                     <Trans>

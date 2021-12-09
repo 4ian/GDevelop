@@ -15,40 +15,41 @@ import { onlineCordovaExporter } from '../GenericExporters/OnlineCordovaExport';
 import { onlineElectronExporter } from '../GenericExporters/OnlineElectronExport';
 import { electronExporter } from '../GenericExporters/ElectronExport';
 
-export const getBrowserExporters = (): Array<Exporter> => [
+export const localOnlineWebExporter: Exporter = {
+  ...onlineWebExporter,
+  exportPipeline: browserOnlineWebExportPipeline,
+};
+
+export const localAssistedExporters: Array<Exporter> = [
+  {
+    ...html5Exporter,
+    exportPipeline: browserHTML5ExportPipeline,
+  },
   {
     ...onlineCordovaExporter,
-    key: 'browseronlinecordovaexport',
     exportPipeline: browserOnlineCordovaExportPipeline,
   },
   {
-    ...onlineWebExporter,
-    key: 'browsers3export',
-    exportPipeline: browserOnlineWebExportPipeline,
+    ...onlineElectronExporter,
+    exportPipeline: browserOnlineElectronExportPipeline,
   },
+];
+
+export const localManualExporters: Array<Exporter> = [
   {
     ...html5Exporter,
-    key: 'browserhtml5export',
     exportPipeline: browserHTML5ExportPipeline,
   },
   {
     ...facebookInstantGamesExporter,
-    key: 'browserfacebookinstantgames',
     exportPipeline: browserFacebookInstantGamesExportPipeline,
   },
   {
     ...cordovaExporter,
-    key: 'browsercordovaexport',
     exportPipeline: browserCordovaExportPipeline,
   },
   {
-    ...onlineElectronExporter,
-    key: 'browseronlineelectronexport',
-    exportPipeline: browserOnlineElectronExportPipeline,
-  },
-  {
     ...electronExporter,
-    key: 'browserelectronexport',
     exportPipeline: browserElectronExportPipeline,
   },
 ];

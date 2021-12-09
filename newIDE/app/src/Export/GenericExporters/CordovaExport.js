@@ -3,8 +3,6 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
-import { type RenderIconProps } from '../ExportDialog';
-import Cordova from '../../UI/CustomSvgIcons/Cordova';
 
 export const ExplanationHeader = () => (
   <Text>
@@ -32,8 +30,9 @@ export const DoneFooter = ({
 );
 
 export const cordovaExporter = {
+  key: 'cordovaexport',
+  tabName: <Trans>Mobile</Trans>,
   name: <Trans>iOS &amp; Android (manual)</Trans>,
-  renderIcon: (props: RenderIconProps) => <Cordova {...props} />,
   helpPage: '/publishing/android_and_ios_with_cordova',
   description: (
     <Trans>

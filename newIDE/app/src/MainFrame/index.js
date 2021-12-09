@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar from './Toolbar';
+import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -242,7 +242,7 @@ const MainFrame = (props: Props) => {
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
-  const toolbar = React.useRef<?Toolbar>(null);
+  const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const [
@@ -447,6 +447,15 @@ const MainFrame = (props: Props) => {
     },
     [setState]
   );
+
+  const _closeExportDialog = React.useCallback(
+    () => openExportDialog(false),
+    []
+  );
+  const _changeSubcsriptionInExportDialog = React.useCallback(() => {
+    openExportDialog(false);
+    openSubscriptionDialog(true);
+  }, []);
 
   const openInitialFileMetadata = async () => {
     if (!initialFileMetadataToOpen) return;
@@ -2018,6 +2027,8 @@ const MainFrame = (props: Props) => {
 
   const showLoader = isLoadingProject || previewLoading;
 
+  console.log(!!renderExportDialog && exportDialogOpen);
+
   return (
     <div className="main-frame">
       {!!renderMainMenu &&
@@ -2253,11 +2264,8 @@ const MainFrame = (props: Props) => {
       {!!renderExportDialog &&
         exportDialogOpen &&
         renderExportDialog({
-          onClose: () => openExportDialog(false),
-          onChangeSubscription: () => {
-            openExportDialog(false);
-            openSubscriptionDialog(true);
-          },
+          onClose: _closeExportDialog,
+          onChangeSubscription: _changeSubcsriptionInExportDialog,
           project: state.currentProject,
         })}
       {!!renderCreateDialog &&

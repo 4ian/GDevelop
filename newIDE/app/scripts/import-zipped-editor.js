@@ -116,12 +116,12 @@ editorHasCorrectHash().then(({ isHashCorrect }) => {
         );
       }
     },
-    () => {
+    (e) => {
       shell.echo(
         `❌ Can't download ` +
           editor +
           `-editor.zip (${
-            response.statusMessage
+            e
           }), please check your internet connection`
       );
       shell.exit(1);

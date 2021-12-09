@@ -14,7 +14,11 @@ import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
-import { getBrowserExporters } from './Export/BrowserExporters';
+import {
+  localAssistedExporters,
+  localManualExporters,
+  localOnlineWebExporter,
+} from './Export/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
@@ -68,8 +72,12 @@ export const create = (authentication: Authentication) => {
               )}
               renderExportDialog={props => (
                 <ExportDialog
-                  {...props}
-                  exporters={getBrowserExporters()}
+                  project={props.project}
+                  onChangeSubscription={props.onChangeSubscription}
+                  onClose={props.onClose}
+                  assistedExporters={localAssistedExporters}
+                  manualExporters={localManualExporters}
+                  onlineWebExporter={localOnlineWebExporter}
                   allExportersRequireOnline
                 />
               )}

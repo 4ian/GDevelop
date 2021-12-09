@@ -318,17 +318,14 @@ export const HomePage = React.memo<Props>(
                             />
                           )}
                           {!project && canOpen && (
-                            <>
-                              <Spacer />
-                              <RaisedButtonWithSplitMenu
-                                label={<Trans>Open a project</Trans>}
-                                onClick={onOpen}
-                                primary
-                                buildMenuTemplate={
-                                  buildRecentProjectFilesMenuTemplate
-                                }
-                              />
-                            </>
+                            <RaisedButtonWithSplitMenu
+                              label={<Trans>Open a project</Trans>}
+                              onClick={onOpen}
+                              primary
+                              buildMenuTemplate={
+                                buildRecentProjectFilesMenuTemplate
+                              }
+                            />
                           )}
                           {!!project && (
                             <>

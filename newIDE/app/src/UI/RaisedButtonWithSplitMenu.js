@@ -23,6 +23,10 @@ const shouldNeverBeCalled = () => {
   );
 };
 
+const styles = {
+  mainButton: { flex: 1 },
+};
+
 /**
  * A raised button based on Material-UI button, that has a menu displayed
  * when the the dropdown arrow is clicked.
@@ -43,7 +47,11 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
       disabled={disabled}
       size="small"
     >
-      <Button focusRipple={focusRipple} onClick={onClick}>
+      <Button
+        focusRipple={focusRipple}
+        onClick={onClick}
+        style={styles.mainButton}
+      >
         {icon}
         {icon && <Spacer />}
         {label}

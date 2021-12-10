@@ -76,9 +76,14 @@ const CollisionMasksEditor = (props: Props) => {
     spriteIndex
   );
 
-  const objectHasPlatformerBehavior = props.object.hasBehaviorNamed(
-    'PlatformerObject'
-  );
+  const objectHasPlatformerBehavior = props.object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => props.object.getBehavior(behaviorName))
+    .some(
+      behavior =>
+        behavior.getTypeName() === 'PlatformBehavior::PlatformerObjectBehavior'
+    );
 
   const updateCollisionMasks = React.useCallback(
     () => {

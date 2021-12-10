@@ -50,14 +50,7 @@ export const DoneFooter = ({
 
 export const facebookInstantGamesExporter = {
   key: 'facebookinstantgamesexport',
-  tabName: <Trans>Facebook</Trans>,
+  tabName: <Trans>Instant Games</Trans>,
   name: <Trans>Facebook Instant Games</Trans>,
   helpPage: '/publishing/publishing-to-facebook-instant-games',
-  description: (
-    <Trans>
-      Package your game as a Facebook Instant Games that can be played on
-      Facebook Gaming.
-    </Trans>
-  ),
-  advanced: true,
 };

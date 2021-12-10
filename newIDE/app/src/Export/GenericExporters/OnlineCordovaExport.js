@@ -163,10 +163,4 @@ export const onlineCordovaExporter = {
   tabName: <Trans>Mobile</Trans>,
   name: <Trans>Android (&amp; iOS coming soon)</Trans>,
   helpPage: '/publishing/android_and_ios',
-  description: (
-    <Trans>
-      Package your game for Android directly from GDevelop. iOS support is
-      coming soon!
-    </Trans>
-  ),
 };

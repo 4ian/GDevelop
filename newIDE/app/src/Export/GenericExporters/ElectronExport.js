@@ -36,11 +36,4 @@ export const electronExporter = {
   tabName: <Trans>Desktop</Trans>,
   name: <Trans>Windows/macOS/Linux (manual)</Trans>,
   helpPage: '/publishing/windows-macos-linux-with-electron',
-  description: (
-    <Trans>
-      Build the game locally and export it manually to Windows, macOS or Linux
-      with third-party developer tools.
-    </Trans>
-  ),
-  advanced: true,
 };

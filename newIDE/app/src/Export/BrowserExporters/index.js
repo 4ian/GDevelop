@@ -33,16 +33,16 @@ export const browserAutomatedExporters: Array<Exporter> = [
     ...onlineElectronExporter,
     exportPipeline: browserOnlineElectronExportPipeline,
   },
+  {
+    ...facebookInstantGamesExporter,
+    exportPipeline: browserFacebookInstantGamesExportPipeline,
+  },
 ];
 
 export const browserManualExporters: Array<Exporter> = [
   {
     ...html5Exporter,
     exportPipeline: browserHTML5ExportPipeline,
-  },
-  {
-    ...facebookInstantGamesExporter,
-    exportPipeline: browserFacebookInstantGamesExportPipeline,
   },
   {
     ...cordovaExporter,

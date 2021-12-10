@@ -19,7 +19,7 @@ export const ExplanationHeader = () => (
       <Text align="center">
         <Trans>
           Generate a unique link to share your game, for a few days, playable
-          from any computer browser or mobile phone.
+          from any computer or mobile phone's browser.
         </Trans>
       </Text>
     </Line>
@@ -78,11 +78,4 @@ export const onlineWebExporter = {
   tabName: 'Web',
   name: <Trans>Web (upload online)</Trans>,
   helpPage: '/publishing/web',
-  description: (
-    <Trans>
-      Upload your game online directly from GDevelop and share the link to
-      players. Play to your game using your browser on computers and mobile
-      phones.
-    </Trans>
-  ),
 };

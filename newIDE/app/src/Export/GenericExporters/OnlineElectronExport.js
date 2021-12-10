@@ -84,10 +84,4 @@ export const onlineElectronExporter = {
   tabName: <Trans>Desktop</Trans>,
   name: <Trans>Windows/macOS/Linux</Trans>,
   helpPage: '/publishing/windows-macos-linux',
-  description: (
-    <Trans>
-      Package your game as an app for Windows, macOS or Linux directly from
-      GDevelop.
-    </Trans>
-  ),
 };

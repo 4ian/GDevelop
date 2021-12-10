@@ -33,6 +33,10 @@ export const localAutomatedExporters: Array<Exporter> = [
     ...onlineElectronExporter,
     exportPipeline: localOnlineElectronExportPipeline,
   },
+  {
+    ...facebookInstantGamesExporter,
+    exportPipeline: localFacebookInstantGamesExportPipeline,
+  },
 ];
 
 export const localManualExporters: Array<Exporter> = [
@@ -47,9 +51,5 @@ export const localManualExporters: Array<Exporter> = [
   {
     ...electronExporter,
     exportPipeline: localElectronExportPipeline,
-  },
-  {
-    ...facebookInstantGamesExporter,
-    exportPipeline: localFacebookInstantGamesExportPipeline,
   },
 ];

@@ -1338,11 +1338,14 @@ namespace gdjs {
 
     //Hit boxes and collision :
     /**
-     * Get the hit boxes for the object.<br>
-     * The default implementation returns a basic bouding box based the size (getWidth and
+     * Get all the hit boxes for the object.
+     *
+     * For collision checks, {@link getHitBoxesAround} should be used instead.
+     *
+     * The default implementation returns a basic bounding box based the size (getWidth and
      * getHeight) and the center point of the object (getCenterX and getCenterY).
      *
-     * You should probably redefine updateHitBoxes instead of this function.
+     * You should probably redefine {@link updateHitBoxes} instead of this function.
      *
      * @return An array composed of polygon.
      */
@@ -1357,6 +1360,41 @@ namespace gdjs {
         this.hitBoxesDirty = false;
       }
       return this.hitBoxes;
+    }
+
+    /**
+     * Return at least all the hit boxes that overlap a given area.
+     *
+     * The hit boxes don't need to actually overlap the area,
+     * (i.e: it's correct to return more hit boxes than those in the specified area)
+     * but the ones that do must be returned.
+     *
+     * The default implementation returns the same as {@link getHitBoxes}.
+     *
+     * This method can be overridden by grid based objects (or other objects
+     * that can quickly compute which hitboxes are touching a given area)
+     * to optimize collision checks.
+     *
+     * When overriding this method, the following ones should be overridden too:
+     * * {@link getHitBoxes}
+     * * {@link getAABB}
+     * * {@link updateHitBoxes}
+     * * {@link updateAABB}
+     *
+     * @param left bound of the area in scene coordinates
+     * @param top bound of the area in scene coordinates
+     * @param right bound of the area in scene coordinates
+     * @param bottom bound of the area in scene coordinates
+     *
+     * @return at least all the hit boxes that overlap a given area.
+     */
+    getHitBoxesAround(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ): Iterable<gdjs.Polygon> {
+      return this.getHitBoxes();
     }
 
     /**
@@ -1758,14 +1796,32 @@ namespace gdjs {
       moveXArray.length = 0;
       moveYArray.length = 0;
 
+      // We can assume that the moving object is not grid based,
+      // so there is no need for optimization:
+      // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
+      let aabb: AABB | null = null;
 
-      // Check if their is a collision with each object
+      // Check if there is a collision with each object
       for (const otherObject of objects) {
         if (otherObject.id === this.id) {
           continue;
         }
-        const otherHitBoxes = otherObject.getHitBoxes();
+        let otherHitBoxesArray = otherObject.getHitBoxes();
+        let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
+        if (otherHitBoxesArray.length > 4) {
+          // The other object has a lot of hit boxes.
+          // Try to reduce the amount of hitboxes to check.
+          if (!aabb) {
+            aabb = this.getAABB();
+          }
+          otherHitBoxes = otherObject.getHitBoxesAround(
+            aabb.min[0],
+            aabb.min[1],
+            aabb.max[0],
+            aabb.max[1]
+          );
+        }
         for (const hitBox of hitBoxes) {
           for (const otherHitBox of otherHitBoxes) {
             const result = gdjs.Polygon.collisionTest(
@@ -1798,7 +1854,11 @@ namespace gdjs {
       moveXArray.length = 0;
       moveYArray.length = 0;
 
+      // We can assume that the moving object is not grid based
+      // So there is no need for optimization
+      // getHitBoxes can be called directly.
       const hitBoxes = this.getHitBoxes();
+      let aabb: AABB | null = null;
 
       for (const name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
@@ -1809,7 +1869,21 @@ namespace gdjs {
             if (otherObject.id === this.id) {
               continue;
             }
-            const otherHitBoxes = otherObject.getHitBoxes();
+            let otherHitBoxesArray = otherObject.getHitBoxes();
+            let otherHitBoxes: Iterable<gdjs.Polygon> = otherHitBoxesArray;
+            if (otherHitBoxesArray.length > 4) {
+              // The other object has a lot of hit boxes.
+              // Try to reduce the amount of hitboxes to check.
+              if (!aabb) {
+                aabb = this.getAABB();
+              }
+              otherHitBoxes = otherObject.getHitBoxesAround(
+                aabb.min[0],
+                aabb.min[1],
+                aabb.max[0],
+                aabb.max[1]
+              );
+            }
             for (const hitBox of hitBoxes) {
               for (const otherHitBox of otherHitBoxes) {
                 const result = gdjs.Polygon.collisionTest(
@@ -2098,10 +2172,13 @@ namespace gdjs {
         )
       );
 
-      const diffX =
-        obj1.getDrawableX() + o1centerX - (obj2.getDrawableX() + o2centerX);
-      const diffY =
-        obj1.getDrawableY() + o1centerY - (obj2.getDrawableY() + o2centerY);
+      const o1AbsoluteCenterX = obj1.getDrawableX() + o1centerX;
+      const o1AbsoluteCenterY = obj1.getDrawableY() + o1centerY;
+      const o2AbsoluteCenterX = obj2.getDrawableX() + o2centerX;
+      const o2AbsoluteCenterY = obj2.getDrawableY() + o2centerY;
+
+      const diffX = o1AbsoluteCenterX - o2AbsoluteCenterX;
+      const diffY = o1AbsoluteCenterY - o2AbsoluteCenterY;
       if (
         Math.sqrt(diffX * diffX + diffY * diffY) >
         obj1BoundingRadius + obj2BoundingRadius
@@ -2110,16 +2187,24 @@ namespace gdjs {
       }
 
       // Do a real check if necessary.
-      const hitBoxes1 = obj1.getHitBoxes();
-      const hitBoxes2 = obj2.getHitBoxes();
-      for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
-        for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+      const hitBoxes1 = obj1.getHitBoxesAround(
+        o2AbsoluteCenterX - obj2BoundingRadius,
+        o2AbsoluteCenterY - obj2BoundingRadius,
+        o2AbsoluteCenterX + obj2BoundingRadius,
+        o2AbsoluteCenterY + obj2BoundingRadius
+      );
+      const hitBoxes2 = obj2.getHitBoxesAround(
+        o1AbsoluteCenterX - obj1BoundingRadius,
+        o1AbsoluteCenterY - obj1BoundingRadius,
+        o1AbsoluteCenterX + obj1BoundingRadius,
+        o1AbsoluteCenterY + obj1BoundingRadius
+      );
+
+      for (const hitBox1 of hitBoxes1) {
+        for (const hitBox2 of hitBoxes2) {
           if (
-            gdjs.Polygon.collisionTest(
-              hitBoxes1[k],
-              hitBoxes2[l],
-              ignoreTouchingEdges
-            ).collision
+            gdjs.Polygon.collisionTest(hitBox1, hitBox2, ignoreTouchingEdges)
+              .collision
           ) {
             return true;
           }
@@ -2177,9 +2262,9 @@ namespace gdjs {
 
       // Do a real check if necessary.
       let testSqDist = closest ? raySqBoundingRadius : 0;
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < hitBoxes.length; i++) {
-        const res = gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+      const hitBoxes = this.getHitBoxesAround(x, y, endX, endY);
+      for (const hitBox of hitBoxes) {
+        const res = gdjs.Polygon.raycastTest(hitBox, x, y, endX, endY);
         if (res.collision) {
           if (closest && res.closeSqDist < testSqDist) {
             testSqDist = res.closeSqDist;
@@ -2267,9 +2352,9 @@ namespace gdjs {
      * @return true if the point is inside the object collision hitboxes.
      */
     isCollidingWithPoint(pointX: float, pointY: float): boolean {
-      const hitBoxes = this.getHitBoxes();
-      for (let i = 0; i < this.hitBoxes.length; ++i) {
-        if (gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY)) {
+      const hitBoxes = this.getHitBoxesAround(pointX, pointY, pointX, pointY);
+      for (const hitBox of hitBoxes) {
+        if (gdjs.Polygon.isPointInside(hitBox, pointX, pointY)) {
           return true;
         }
       }

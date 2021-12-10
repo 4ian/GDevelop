@@ -3968,7 +3968,7 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-storiesOf('CreateProfile', module)
+storiesOf('Profile/CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4307,7 +4307,7 @@ storiesOf('Profile/CreateAccountDialog', module)
     />
   ));
 
-storiesOf('ContributionsDetails', module)
+storiesOf('Profile/ContributionsDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <>

@@ -2923,7 +2923,6 @@ storiesOf('OpenFromStorageProviderDialog', module)
       storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
       onChooseProvider={action('onChooseProvider')}
       onClose={action('onClose')}
-      onCreateNewProject={action('onCreateNewProject')}
     />
   ));
 

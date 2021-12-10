@@ -37,7 +37,8 @@ const getLinkIconAndLabel = (url: string, type: string) => {
       };
     case 'learn-more':
       return { icon: null, label: <Trans>Learn more</Trans> };
-    case 'download' || type === 'download-win-mac-linux':
+    case 'download-win-mac-linux':
+    case 'download':
       return { icon: <GetAppIcon />, label: <Trans>Download</Trans> };
     case 'play':
       return { icon: <PlayArrowIcon />, label: <Trans>Play</Trans> };

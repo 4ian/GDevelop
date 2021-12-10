@@ -255,34 +255,46 @@ export const HomePage = React.memo<Props>(
       );
 
       const createBlankProject = async (i18n: I18nType) => {
-        const projectMetadata = await onCreateBlank({
-          i18n,
-          outputPath,
-        });
-        if (!projectMetadata) return;
-        const { project, storageProvider, fileMetadata } = projectMetadata;
-        setPreCreationDialogOpen(false);
-        setOutputPath(computeDefaultProjectPath());
-        onOpenProjectAfterCreation({ project, storageProvider, fileMetadata });
+        setIsOpening(true);
+        try {
+          const projectMetadata = await onCreateBlank({
+            i18n,
+            outputPath,
+          });
+          if (!projectMetadata) return;
+          const { project, storageProvider, fileMetadata } = projectMetadata;
+          setPreCreationDialogOpen(false);
+          setOutputPath(computeDefaultProjectPath());
+          onOpenProjectAfterCreation({
+            project,
+            storageProvider,
+            fileMetadata,
+          });
+        } finally {
+          setIsOpening(false);
+        }
       };
 
       const createProjectFromExample = async (i18n: I18nType) => {
         if (!selectedExample) return;
-        setIsOpening(true);
 
-        const projectMetadata = await onCreateFromExampleShortHeader({
-          i18n,
-          outputPath,
-          exampleShortHeader: selectedExample,
-        });
-        if (projectMetadata) {
-          const { storageProvider, fileMetadata } = projectMetadata;
-          setPreCreationDialogOpen(false);
-          setSelectedExample(null);
-          setOutputPath(computeDefaultProjectPath());
-          onOpenProjectAfterCreation({ storageProvider, fileMetadata });
+        setIsOpening(true);
+        try {
+          const projectMetadata = await onCreateFromExampleShortHeader({
+            i18n,
+            outputPath,
+            exampleShortHeader: selectedExample,
+          });
+          if (projectMetadata) {
+            const { storageProvider, fileMetadata } = projectMetadata;
+            setPreCreationDialogOpen(false);
+            setSelectedExample(null);
+            setOutputPath(computeDefaultProjectPath());
+            onOpenProjectAfterCreation({ storageProvider, fileMetadata });
+          }
+        } finally {
+          setIsOpening(false);
         }
-        setIsOpening(false);
       };
 
       return (
@@ -517,6 +529,7 @@ export const HomePage = React.memo<Props>(
               {preCreationDialogOpen && (
                 <LocalProjectPreCreationDialog
                   open
+                  isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}
                   onCreate={() =>
                     selectedExample

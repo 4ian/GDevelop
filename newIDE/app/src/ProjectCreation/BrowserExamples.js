@@ -25,16 +25,18 @@ export default function BrowserExamples({
     exampleShortHeader: ExampleShortHeader
   ) => {
     setIsOpening(true);
-
-    const projectMetadata = await onCreateFromExampleShortHeader({
-      i18n,
-      exampleShortHeader: exampleShortHeader,
-    });
-    if (projectMetadata) {
-      const { storageProvider, fileMetadata } = projectMetadata;
-      onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+    try {
+      const projectMetadata = await onCreateFromExampleShortHeader({
+        i18n,
+        exampleShortHeader: exampleShortHeader,
+      });
+      if (projectMetadata) {
+        const { storageProvider, fileMetadata } = projectMetadata;
+        onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+      }
+    } finally {
+      setIsOpening(false);
     }
-    setIsOpening(false);
   };
 
   return (

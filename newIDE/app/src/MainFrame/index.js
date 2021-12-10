@@ -2410,10 +2410,6 @@ const MainFrame = (props: Props) => {
               chooseProjectWithStorageProviderPicker();
             });
           }}
-          onCreateNewProject={() => {
-            openOpenFromStorageProviderDialog(false);
-            closeCreateDialog();
-          }}
         />
       )}
       {state.saveToStorageProviderDialogOpen && (

@@ -9,6 +9,7 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 
 type Props = {|
   open: boolean,
+  isOpening?: boolean,
   onClose: () => void,
   onCreate: () => void | Promise<void>,
   outputPath: string,
@@ -17,6 +18,7 @@ type Props = {|
 
 const LocalProjectPreCreationDialog = ({
   open,
+  isOpening,
   onClose,
   onCreate,
   outputPath,
@@ -29,12 +31,14 @@ const LocalProjectPreCreationDialog = ({
       open={open}
       actions={[
         <FlatButton
+          disabled={isOpening}
+          key="cancel"
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
-          key="cancel"
         />,
         <RaisedButton
           primary
+          disabled={isOpening}
           key="create"
           label={<Trans>Create project</Trans>}
           onClick={onCreate}

@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
 import { Column, Line } from '../../UI/Grid';
@@ -10,8 +11,10 @@ import {
 } from '../../Utils/GDevelopServices/Build';
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
-import Paste from '../../UI/CustomSvgIcons/Paste';
+import Copy from '../../UI/CustomSvgIcons/Copy';
 import InfoBar from '../../UI/Messages/InfoBar';
+import IconButton from '../../UI/IconButton';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
 
 export const ExplanationHeader = () => (
   <Column noMargin alignItems="center" justifyContent="center">
@@ -56,20 +59,42 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
   };
 
   return (
-    <Line justifyContent="center">
-      <TextField value={value} readOnly fullWidth />
-      {!buildPending && (
-        <>
-          <RaisedButton label={<Trans>Open</Trans>} onClick={onOpen} />
-          <RaisedButton primary icon={<Paste />} onClick={onCopy} />
-        </>
-      )}
+    <>
+      <TextFieldWithButtonLayout
+        noFloatingLabelText
+        renderTextField={() => (
+          <TextField
+            value={value}
+            readOnly
+            fullWidth
+            endAdornment={
+              <IconButton
+                disabled={!!buildPending}
+                onClick={onCopy}
+                tooltip={t`Copy`}
+                edge="end"
+              >
+                <Copy />
+              </IconButton>
+            }
+          />
+        )}
+        renderButton={style => (
+          <RaisedButton
+            disabled={!!buildPending}
+            primary
+            label={<Trans>Open</Trans>}
+            onClick={onOpen}
+            style={style}
+          />
+        )}
+      />
       <InfoBar
         message={<Trans>Copied to clipboard!</Trans>}
         visible={showCopiedInfoBar}
         hide={() => setShowCopiedInfoBar(false)}
       />
-    </Line>
+    </>
   );
 };
 

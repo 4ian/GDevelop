@@ -7,7 +7,7 @@ import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
 import Toolbar from './Toolbar';
 import EditorMosaic from '../UI/EditorMosaic';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
@@ -271,7 +271,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             />
           )}
         </PreferencesContext.Consumer>
-        <InfoBar
+        <DismissableInfoBar
           message={
             <Trans>
               Properties panel is already opened. After selecting a resource,

@@ -47,3 +47,10 @@ export const DoneFooter = ({
     </Column>
   );
 };
+
+export const facebookInstantGamesExporter = {
+  key: 'facebookinstantgamesexport',
+  tabName: <Trans>Instant Games</Trans>,
+  name: <Trans>Facebook Instant Games</Trans>,
+  helpPage: '/publishing/publishing-to-facebook-instant-games',
+};

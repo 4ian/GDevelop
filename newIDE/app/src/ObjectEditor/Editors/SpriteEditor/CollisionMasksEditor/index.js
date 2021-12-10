@@ -24,6 +24,7 @@ import EditorMosaic, {
 } from '../../../../UI/EditorMosaic';
 import { useResponsiveWindowWidth } from '../../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Background from '../../../../UI/Background';
+import AlertMessage from '../../../../UI/AlertMessage';
 const gd: libGDevelop = global.gd;
 
 const horizontalMosaicNodes: EditorMosaicNode = {
@@ -73,6 +74,10 @@ const CollisionMasksEditor = (props: Props) => {
     animationIndex,
     directionIndex,
     spriteIndex
+  );
+
+  const objectHasPlatformerBehavior = props.object.hasBehaviorNamed(
+    'PlatformerObject'
   );
 
   const updateCollisionMasks = React.useCallback(
@@ -269,6 +274,18 @@ const CollisionMasksEditor = (props: Props) => {
               </Line>
             </React.Fragment>
           )}
+          {!!sprite &&
+            !sprite.isCollisionMaskAutomatic() &&
+            objectHasPlatformerBehavior && (
+              <AlertMessage kind="warning">
+                <Trans>
+                  You currently use a custom collision mask for an object that
+                  has the Platformer behavior. To prevent issues when flipping
+                  object horizontally while grabbing an edge, make sure your
+                  collision mask does not move when flipping it.
+                </Trans>
+              </AlertMessage>
+            )}
           {!sprite && (
             <EmptyMessage>
               <Trans>

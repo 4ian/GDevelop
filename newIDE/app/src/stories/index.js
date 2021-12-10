@@ -2889,7 +2889,7 @@ storiesOf('AboutDialog', module)
     />
   ));
 
-storiesOf('CreateProjectDialog', module)
+storiesOf('Project Creation/CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ExampleStoreStateProvider>

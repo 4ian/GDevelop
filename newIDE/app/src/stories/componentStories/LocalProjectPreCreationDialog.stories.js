@@ -8,7 +8,7 @@ import paperDecorator from '../PaperDecorator';
 import LocalProjectPreCreationDialog from '../../ProjectCreation/LocalProjectPreCreationDialog';
 
 export default {
-  title: 'LocalProjectPreCreationDialog',
+  title: 'Project Creation/LocalProjectPreCreationDialog',
   component: LocalProjectPreCreationDialog,
   decorators: [paperDecorator, muiDecorator],
 };

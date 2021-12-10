@@ -486,38 +486,6 @@ storiesOf('UI Building Blocks/SelectField', module)
     />
   ));
 
-storiesOf('UI Building Blocks/TextField', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  })
-  .add('required', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          required
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  });
-
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
   .add('default', () => {

@@ -51,17 +51,19 @@ export default function LocalExamples({
     if (!selectedExampleShortHeader) return;
 
     setIsOpening(true);
-
-    const projectMetadata = await onCreateFromExampleShortHeader({
-      i18n,
-      outputPath,
-      exampleShortHeader: selectedExampleShortHeader,
-    });
-    if (!!projectMetadata) {
-      const { storageProvider, fileMetadata } = projectMetadata;
-      onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+    try {
+      const projectMetadata = await onCreateFromExampleShortHeader({
+        i18n,
+        outputPath,
+        exampleShortHeader: selectedExampleShortHeader,
+      });
+      if (!!projectMetadata) {
+        const { storageProvider, fileMetadata } = projectMetadata;
+        onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+      }
+    } finally {
+      setIsOpening(false);
     }
-    setIsOpening(false);
   };
 
   return (

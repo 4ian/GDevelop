@@ -89,3 +89,17 @@ export const DoneFooter = ({
     />
   </Column>
 );
+
+export const html5Exporter = {
+  key: 'webexport',
+  tabName: <Trans>Web</Trans>,
+  name: <Trans>Web</Trans>,
+  helpPage: '/publishing/html5_game_in_a_local_folder',
+  description: (
+    <Trans>
+      Build the game locally as a HTML5 game. You can then publish it on
+      platforms like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
+    </Trans>
+  ),
+  advanced: true,
+};

@@ -10,7 +10,6 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from '../UI/RaisedButton';
-import Text from '../UI/Text';
 import {
   type Game,
   getGame,
@@ -69,13 +68,13 @@ export const GameRegistration = ({
 
       const { id } = profile;
       setError(null);
-      setUnavailableReason(null);
       try {
         const game = await getGame(
           getAuthorizationHeader,
           id,
           project.getProjectUuid()
         );
+        setUnavailableReason(null);
         setGame(game);
       } catch (err) {
         console.log(err);
@@ -292,33 +291,21 @@ export const GameRegistrationWidget = ({
           kind="info"
           renderRightButton={() => (
             <RaisedButton
-              label={<Trans>Get weekly game stats</Trans>}
+              label={<Trans>Get game stats</Trans>}
               disabled={acceptGameStatsEmailInProgress}
               primary
               onClick={onAcceptGameStatsEmail}
             />
           )}
         >
-          <Trans>
-            You are not receiving game stats regularly. Click this button to
-            receive weekly game stats on the games you publish, like the number
-            of weekly sessions or the total sessions in the last year.
-          </Trans>
+          <Trans>Get stats about your game every week!</Trans>
         </AlertMessage>
       );
     }
     return (
       <ColumnStackLayout noMargin>
-        <Text>
-          <Trans>
-            Your project is registered online. This allows you to get access to
-            metrics collected anonymously, like the number of daily players and
-            retention of the players after a few days.
-          </Trans>
-        </Text>
         <Line justifyContent="center">
           <RaisedButton
-            primary
             icon={<TimelineIcon />}
             label={<Trans>Analytics</Trans>}
             onClick={() => {
@@ -328,7 +315,6 @@ export const GameRegistrationWidget = ({
           />
           <Spacer />
           <RaisedButton
-            primary
             icon={<MonetizationOnIcon />}
             label={<Trans>Monetization</Trans>}
             onClick={() => {

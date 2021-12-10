@@ -17,7 +17,10 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { ExplanationHeader } from '../GenericExporters/OnlineWebExport';
+import {
+  ExplanationHeader,
+  WebProjectLink,
+} from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const gd: libGDevelop = global.gd;
@@ -55,7 +58,11 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   renderHeader: () => <ExplanationHeader />,
 
-  renderLaunchButtonLabel: () => <Trans>Publish online</Trans>,
+  renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
+
+  renderCustomStepsProgress: (build: ?Build, loading: boolean) => (
+    <WebProjectLink build={build} loading={loading} />
+  ),
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

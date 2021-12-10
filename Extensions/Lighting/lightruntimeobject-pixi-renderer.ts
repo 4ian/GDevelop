@@ -546,9 +546,11 @@ namespace gdjs {
   varying vec2 vPos;
 
   void main() {
-      vec2 topleft = vec2(center.x - radius, center.y - radius);
-      vec2 texCoord = (vPos - topleft)/(2.0 * radius);
-      gl_FragColor = vec4(color, 1.0) * texture2D(uSampler, texCoord);
+    vec2 topleft = vec2(center.x - radius, center.y - radius);
+    vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+    gl_FragColor = (texCoord.x > 0.0 && texCoord.x < 1.0 && texCoord.y > 0.0 && texCoord.y < 1.0)
+      ? vec4(color, 1.0) * texture2D(uSampler, texCoord)
+      : vec4(0.0, 0.0, 0.0, 0.0);
   }`;
   }
 

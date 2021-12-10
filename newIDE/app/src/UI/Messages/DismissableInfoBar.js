@@ -21,12 +21,12 @@ const DismissableInfoBar = ({
   touchScreenMessage,
   message,
 }: Props) => {
-  const preferencesContext = React.useContext(PreferencesContext);
+  const preferences = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
   return (
     <Snackbar
-      open={show && !preferencesContext.values.hiddenAlertMessages[identifier]}
+      open={show && !preferences.values.hiddenAlertMessages[identifier]}
       message={
         screenType === 'touch' && touchScreenMessage
           ? touchScreenMessage
@@ -38,7 +38,7 @@ const DismissableInfoBar = ({
           color="primary"
           size="small"
           onClick={() => {
-            preferencesContext.showAlertMessage(identifier, false);
+            preferences.showAlertMessage(identifier, false);
           }}
         >
           <Trans>Got it</Trans>

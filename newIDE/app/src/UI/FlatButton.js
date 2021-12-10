@@ -24,6 +24,8 @@ type Props = {|
     flexShrink?: 0,
   |},
   target?: '_blank',
+  // Tooltips aren't really suited for FlatButtons UX-wise, but we can use them for
+  // accessibility purpose for the Toolbar.
   exceptionalTooltipForToolbar?: React.Node,
 |};
 

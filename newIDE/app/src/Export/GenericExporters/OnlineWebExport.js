@@ -50,6 +50,7 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
 
   const onCopy = () => {
     if (buildPending) return;
+    // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
     navigator.clipboard.writeText(value);
     setShowCopiedInfoBar(true);
   };
@@ -65,8 +66,8 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
       )}
       <InfoBar
         message={<Trans>Copied to clipboard!</Trans>}
-        show={showCopiedInfoBar}
-        hideInfoBar={() => setShowCopiedInfoBar(false)}
+        visible={showCopiedInfoBar}
+        hide={() => setShowCopiedInfoBar(false)}
       />
     </Line>
   );

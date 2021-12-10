@@ -19,7 +19,7 @@ const styles = {
   content: { padding: 8 },
 };
 
-export type ExporterSection = 'assisted' | 'manual' | '';
+export type ExporterSection = 'automated' | 'manual' | 'home';
 export type ExporterKey =
   | 'onlinewebexport'
   | 'onlineelectronexport'
@@ -49,7 +49,7 @@ export type ExportDialogWithoutExportsProps = {|
 
 type Props = {|
   ...ExportDialogWithoutExportsProps,
-  assistedExporters: Array<Exporter>,
+  automatedExporters: Array<Exporter>,
   manualExporters: Array<Exporter>,
   onlineWebExporter: Exporter,
   allExportersRequireOnline?: boolean,
@@ -60,14 +60,14 @@ const ExportDialog = ({
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
-  assistedExporters,
+  automatedExporters,
   manualExporters,
   onlineWebExporter,
 }: Props) => {
   const [
     chosenExporterSection,
     setChosenExporterSection,
-  ] = React.useState<ExporterSection>('');
+  ] = React.useState<ExporterSection>('home');
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
@@ -80,7 +80,7 @@ const ExportDialog = ({
 
   if (!project) return null;
   const exporters = [
-    ...assistedExporters,
+    ...automatedExporters,
     ...manualExporters,
     onlineWebExporter,
   ];
@@ -94,7 +94,7 @@ const ExportDialog = ({
   return (
     <Dialog
       title={
-        chosenExporterSection === 'assisted' ? (
+        chosenExporterSection === 'automated' ? (
           <Trans>Publish your game</Trans>
         ) : chosenExporterSection === 'manual' ? (
           <Trans>Build manually</Trans>
@@ -103,13 +103,13 @@ const ExportDialog = ({
       onRequestClose={onClose}
       cannotBeDismissed={false}
       actions={[
-        chosenExporterSection && (
+        chosenExporterSection !== 'home' && (
           <FlatButton
             label={<Trans>Back</Trans>}
             key="back"
             primary={false}
             onClick={() => {
-              setChosenExporterSection('');
+              setChosenExporterSection('home');
               setChosenExporterKey('onlinewebexport');
             }}
           />
@@ -142,7 +142,7 @@ const ExportDialog = ({
           </Trans>
         </AlertMessage>
       )}
-      {chosenExporterSection === '' && (
+      {chosenExporterSection === 'home' && (
         <ExportHome
           cantExportBecauseOffline={cantExportBecauseOffline}
           onlineWebExporter={onlineWebExporter}
@@ -153,9 +153,9 @@ const ExportDialog = ({
           authenticatedUser={authenticatedUser}
         />
       )}
-      {chosenExporterSection === 'assisted' && (
+      {chosenExporterSection === 'automated' && (
         <Tabs value={chosenExporterKey} onChange={setChosenExporterKey}>
-          {assistedExporters.map(exporter => (
+          {automatedExporters.map(exporter => (
             <Tab
               label={exporter.tabName}
               value={exporter.key}
@@ -175,7 +175,7 @@ const ExportDialog = ({
           ))}
         </Tabs>
       )}
-      {chosenExporterSection !== '' && (
+      {chosenExporterSection !== 'home' && (
         <div style={styles.content}>
           <ExportLauncher
             exportPipeline={exporter.exportPipeline}

@@ -2,26 +2,23 @@
 import React from 'react';
 import { Column } from '../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 export default () => {
   const windowWidth = useResponsiveWindowWidth();
+  const theme = React.useContext(GDevelopThemeContext);
   return (
-    <ThemeConsumer>
-      {muiTheme =>
-        windowWidth !== 'small' && (
-          <Column justifyContent="center">
-            <span
-              style={{
-                height: 'calc(100% - 30px)',
-                borderLeftStyle: 'solid',
-                borderLeftWidth: 1,
-                borderColor: muiTheme.toolbar.separatorColor,
-              }}
-            />
-          </Column>
-        )
-      }
-    </ThemeConsumer>
+    windowWidth !== 'small' && (
+      <Column justifyContent="center">
+        <span
+          style={{
+            height: 'calc(100% - 30px)',
+            borderLeftStyle: 'solid',
+            borderLeftWidth: 1,
+            borderColor: theme.toolbar.separatorColor,
+          }}
+        />
+      </Column>
+    )
   );
 };

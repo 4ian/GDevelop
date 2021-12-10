@@ -14,9 +14,9 @@ import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import {
-  localAssistedExporters,
-  localManualExporters,
-  localOnlineWebExporter,
+  browserAutomatedExporters,
+  browserManualExporters,
+  browserOnlineWebExporter,
 } from './Export/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
@@ -75,9 +75,9 @@ export const create = (authentication: Authentication) => {
                   project={props.project}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
-                  assistedExporters={localAssistedExporters}
-                  manualExporters={localManualExporters}
-                  onlineWebExporter={localOnlineWebExporter}
+                  automatedExporters={browserAutomatedExporters}
+                  manualExporters={browserManualExporters}
+                  onlineWebExporter={browserOnlineWebExporter}
                   allExportersRequireOnline
                 />
               )}

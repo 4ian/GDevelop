@@ -20,7 +20,7 @@ export const localOnlineWebExporter: Exporter = {
   exportPipeline: localOnlineWebExportPipeline,
 };
 
-export const localAssistedExporters: Array<Exporter> = [
+export const localAutomatedExporters: Array<Exporter> = [
   {
     ...html5Exporter,
     exportPipeline: localHTML5ExportPipeline,

@@ -6,27 +6,28 @@ import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
 type Props = {|
   message: React.Node,
   touchScreenMessage?: React.Node,
-  show: boolean,
-  hideInfoBar: () => void,
+  visible: boolean,
+  hide: () => void,
 |};
 
-const InfoBar = ({ show, touchScreenMessage, message, hideInfoBar }: Props) => {
+const InfoBar = ({ visible, touchScreenMessage, message, hide }: Props) => {
   const screenType = useScreenType();
 
   React.useEffect(
     () => {
-      if (show) {
-        setTimeout(() => {
-          hideInfoBar();
+      if (visible) {
+        const timeout = setTimeout(() => {
+          hide();
         }, 3000);
+        return () => clearTimeout(timeout);
       }
     },
-    [show, hideInfoBar]
+    [visible, hide]
   );
 
   return (
     <Snackbar
-      open={show}
+      open={visible}
       message={
         screenType === 'touch' && touchScreenMessage
           ? touchScreenMessage

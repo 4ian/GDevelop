@@ -56,7 +56,7 @@ export const facebookInstantGamesExporter = {
   description: (
     <Trans>
       Package your game as a Facebook Instant Games that can be played on
-      Facebook Messenger.
+      Facebook Gaming.
     </Trans>
   ),
   advanced: true,

@@ -104,7 +104,7 @@ const ExportHome = ({
             <RaisedButton
               label={<Trans>Publish on stores</Trans>}
               onClick={() => {
-                setChosenExporterSection('assisted');
+                setChosenExporterSection('automated');
                 setChosenExporterKey('webexport');
               }}
               primary

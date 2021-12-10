@@ -15,12 +15,12 @@ import { onlineCordovaExporter } from '../GenericExporters/OnlineCordovaExport';
 import { onlineElectronExporter } from '../GenericExporters/OnlineElectronExport';
 import { electronExporter } from '../GenericExporters/ElectronExport';
 
-export const localOnlineWebExporter: Exporter = {
+export const browserOnlineWebExporter: Exporter = {
   ...onlineWebExporter,
   exportPipeline: browserOnlineWebExportPipeline,
 };
 
-export const localAssistedExporters: Array<Exporter> = [
+export const browserAutomatedExporters: Array<Exporter> = [
   {
     ...html5Exporter,
     exportPipeline: browserHTML5ExportPipeline,
@@ -35,7 +35,7 @@ export const localAssistedExporters: Array<Exporter> = [
   },
 ];
 
-export const localManualExporters: Array<Exporter> = [
+export const browserManualExporters: Array<Exporter> = [
   {
     ...html5Exporter,
     exportPipeline: browserHTML5ExportPipeline,

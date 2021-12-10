@@ -13,7 +13,7 @@ import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import {
-  localAssistedExporters,
+  localAutomatedExporters,
   localManualExporters,
   localOnlineWebExporter,
 } from './Export/LocalExporters';
@@ -74,7 +74,7 @@ export const create = (authentication: Authentication) => {
                   project={props.project}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
-                  assistedExporters={localAssistedExporters}
+                  automatedExporters={localAutomatedExporters}
                   manualExporters={localManualExporters}
                   onlineWebExporter={localOnlineWebExporter}
                 />

@@ -6,7 +6,7 @@ import ToolbarIcon from '../../UI/ToolbarIcon';
 import FlatButton from '../../UI/FlatButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
-import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -39,164 +39,173 @@ export default function PreviewAndPublishButtons({
   exportProject,
   hasProject,
 }: PreviewAndPublishButtonsProps) {
-  return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <React.Fragment>
-          <ElementWithMenu
-            element={
-              <ToolbarIcon
-                disabled={!isPreviewEnabled}
-                src="res/ribbon_default/bug32.png"
-                tooltip={t`Advanced preview options (debugger, network preview...)`}
-              />
-            }
-            buildMenuTemplate={(i18n: I18nType) => [
-              {
-                label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
-                click: onNetworkPreview,
-                enabled: canDoNetworkPreview,
-              },
-              { type: 'separator' },
-              {
-                label: i18n._(
-                  t`Start Preview with Debugger and Performance Profiler`
-                ),
-                click: onOpenDebugger,
-              },
-            ]}
-          />
-          <ElementWithMenu
-            element={
-              <FlatButton
-                onClick={onHotReloadPreview}
-                disabled={!isPreviewEnabled}
-                icon={
-                  <img
-                    alt="Preview"
-                    src={
-                      hasPreviewsRunning
-                        ? 'res/ribbon_default/hotReload64.png'
-                        : previewState.isPreviewOverriden
-                        ? 'res/ribbon_default/previewOverride32.png'
-                        : 'res/ribbon_default/preview64.png'
-                    }
-                    width={32}
-                    height={32}
-                    style={{
-                      filter: !isPreviewEnabled
-                        ? 'grayscale(100%)'
-                        : muiTheme.gdevelopIconsCSSFilter,
-                    }}
-                  />
-                }
-                label={
-                  hasPreviewsRunning ? (
-                    <Trans>Update</Trans>
-                  ) : (
-                    <Trans>Preview</Trans>
+  const theme = React.useContext(GDevelopThemeContext);
+  const debugBuildMenuTemplate = React.useCallback(
+    (i18n: I18nType) => [
+      {
+        label: i18n._(t`Start Network Preview (Preview over WiFi/LAN)`),
+        click: onNetworkPreview,
+        enabled: canDoNetworkPreview,
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Start Preview with Debugger and Performance Profiler`),
+        click: onOpenDebugger,
+      },
+    ],
+    [onNetworkPreview, onOpenDebugger, canDoNetworkPreview]
+  );
+  const previewBuildMenuTemplate = React.useCallback(
+    (i18n: I18nType) => [
+      {
+        label: i18n._(t`Launch another preview in a new window`),
+        click: onPreviewWithoutHotReload,
+        enabled: isPreviewEnabled && hasPreviewsRunning,
+      },
+      { type: 'separator' },
+      ...(previewState.overridenPreviewLayoutName
+        ? [
+            {
+              type: 'checkbox',
+              label: previewState.overridenPreviewExternalLayoutName
+                ? i18n._(
+                    t`Start all previews from external layout ${
+                      previewState.overridenPreviewExternalLayoutName
+                    }`
                   )
-                }
-                exceptionalTooltipForToolbar={
-                  hasPreviewsRunning ? (
-                    <Trans>
-                      Apply changes to the running preview, right click for more
-                    </Trans>
-                  ) : previewState.isPreviewOverriden ? (
-                    <Trans>Preview is overridden, right click for more</Trans>
-                  ) : previewState.previewExternalLayoutName ? (
-                    <Trans>
-                      Launch a preview of the external layout inside the scene,
-                      right click for more
-                    </Trans>
-                  ) : (
-                    <Trans>
-                      Launch a preview of the scene, right click for more
-                    </Trans>
-                  )
-                }
-              />
-            }
-            openMenuWithSecondaryClick
-            buildMenuTemplate={(i18n: I18nType) => [
-              {
-                label: i18n._(t`Launch another preview in a new window`),
-                click: onPreviewWithoutHotReload,
-                enabled: isPreviewEnabled && hasPreviewsRunning,
-              },
-              { type: 'separator' },
-              ...(previewState.overridenPreviewLayoutName
-                ? [
-                    {
-                      type: 'checkbox',
-                      label: previewState.overridenPreviewExternalLayoutName
-                        ? i18n._(
-                            t`Start all previews from external layout ${
-                              previewState.overridenPreviewExternalLayoutName
-                            }`
-                          )
-                        : i18n._(
-                            t`Start all previews from scene ${
-                              previewState.overridenPreviewLayoutName
-                            }`
-                          ),
-                      checked: previewState.isPreviewOverriden,
-                      click: () =>
-                        setPreviewOverride({
-                          isPreviewOverriden: !previewState.isPreviewOverriden,
-                          overridenPreviewLayoutName:
-                            previewState.overridenPreviewLayoutName,
-                          overridenPreviewExternalLayoutName:
-                            previewState.overridenPreviewExternalLayoutName,
-                        }),
-                    },
-                    { type: 'separator' },
-                  ]
-                : []),
-              {
-                label: previewState.previewExternalLayoutName
-                  ? i18n._(
-                      t`Use this external layout inside this scene to start all previews`
-                    )
-                  : i18n._(t`Use this scene to start all previews`),
-                click: () =>
-                  setPreviewOverride({
-                    isPreviewOverriden: true,
-                    overridenPreviewLayoutName: previewState.previewLayoutName,
-                    overridenPreviewExternalLayoutName:
-                      previewState.previewExternalLayoutName,
-                  }),
-                enabled:
-                  previewState.previewLayoutName !==
-                    previewState.overridenPreviewLayoutName ||
-                  previewState.previewExternalLayoutName !==
+                : i18n._(
+                    t`Start all previews from scene ${
+                      previewState.overridenPreviewLayoutName
+                    }`
+                  ),
+              checked: previewState.isPreviewOverriden,
+              click: () =>
+                setPreviewOverride({
+                  isPreviewOverriden: !previewState.isPreviewOverriden,
+                  overridenPreviewLayoutName:
+                    previewState.overridenPreviewLayoutName,
+                  overridenPreviewExternalLayoutName:
                     previewState.overridenPreviewExternalLayoutName,
-              },
-            ]}
+                }),
+            },
+            { type: 'separator' },
+          ]
+        : []),
+      {
+        label: previewState.previewExternalLayoutName
+          ? i18n._(
+              t`Use this external layout inside this scene to start all previews`
+            )
+          : i18n._(t`Use this scene to start all previews`),
+        click: () =>
+          setPreviewOverride({
+            isPreviewOverriden: true,
+            overridenPreviewLayoutName: previewState.previewLayoutName,
+            overridenPreviewExternalLayoutName:
+              previewState.previewExternalLayoutName,
+          }),
+        enabled:
+          previewState.previewLayoutName !==
+            previewState.overridenPreviewLayoutName ||
+          previewState.previewExternalLayoutName !==
+            previewState.overridenPreviewExternalLayoutName,
+      },
+    ],
+    [
+      onPreviewWithoutHotReload,
+      isPreviewEnabled,
+      hasPreviewsRunning,
+      setPreviewOverride,
+      previewState,
+    ]
+  );
+  return (
+    <React.Fragment>
+      <ElementWithMenu
+        element={
+          <ToolbarIcon
+            disabled={!isPreviewEnabled}
+            src="res/ribbon_default/bug32.png"
+            tooltip={t`Advanced preview options (debugger, network preview...)`}
           />
+        }
+        buildMenuTemplate={debugBuildMenuTemplate}
+      />
+      <ElementWithMenu
+        element={
           <FlatButton
-            onClick={exportProject}
-            disabled={!hasProject}
+            onClick={onHotReloadPreview}
+            disabled={!isPreviewEnabled}
             icon={
               <img
-                alt="Publish"
-                src={'res/ribbon_default/networkicon32.png'}
+                alt="Preview"
+                src={
+                  hasPreviewsRunning
+                    ? 'res/ribbon_default/hotReload64.png'
+                    : previewState.isPreviewOverriden
+                    ? 'res/ribbon_default/previewOverride32.png'
+                    : 'res/ribbon_default/preview64.png'
+                }
                 width={32}
                 height={32}
                 style={{
-                  filter: !hasProject
+                  filter: !isPreviewEnabled
                     ? 'grayscale(100%)'
-                    : muiTheme.gdevelopIconsCSSFilter,
+                    : theme.gdevelopIconsCSSFilter,
                 }}
               />
             }
-            label={<Trans>Publish</Trans>}
+            label={
+              hasPreviewsRunning ? (
+                <Trans>Update</Trans>
+              ) : (
+                <Trans>Preview</Trans>
+              )
+            }
             exceptionalTooltipForToolbar={
-              <Trans>Export the game (Web, Android, iOS...)</Trans>
+              hasPreviewsRunning ? (
+                <Trans>
+                  Apply changes to the running preview, right click for more
+                </Trans>
+              ) : previewState.isPreviewOverriden ? (
+                <Trans>Preview is overridden, right click for more</Trans>
+              ) : previewState.previewExternalLayoutName ? (
+                <Trans>
+                  Launch a preview of the external layout inside the scene,
+                  right click for more
+                </Trans>
+              ) : (
+                <Trans>
+                  Launch a preview of the scene, right click for more
+                </Trans>
+              )
             }
           />
-        </React.Fragment>
-      )}
-    </ThemeConsumer>
+        }
+        openMenuWithSecondaryClick
+        buildMenuTemplate={previewBuildMenuTemplate}
+      />
+      <FlatButton
+        onClick={exportProject}
+        disabled={!hasProject}
+        icon={
+          <img
+            alt="Publish"
+            src={'res/ribbon_default/networkicon32.png'}
+            width={32}
+            height={32}
+            style={{
+              filter: !hasProject
+                ? 'grayscale(100%)'
+                : theme.gdevelopIconsCSSFilter,
+            }}
+          />
+        }
+        label={<Trans>Publish</Trans>}
+        exceptionalTooltipForToolbar={
+          <Trans>Export the game (Web, Android, iOS...)</Trans>
+        }
+      />
+    </React.Fragment>
   );
 }

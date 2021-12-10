@@ -97,8 +97,8 @@ export const html5Exporter = {
   helpPage: '/publishing/html5_game_in_a_local_folder',
   description: (
     <Trans>
-      Build the game locally as a HTML5 game. You can then publish it on website
-      like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
+      Build the game locally as a HTML5 game. You can then publish it on
+      platforms like Poki, CrazyGames, Game Jolt, itch.io, Newsground...
     </Trans>
   ),
   advanced: true,

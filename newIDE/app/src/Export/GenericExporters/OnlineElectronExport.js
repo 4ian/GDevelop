@@ -78,3 +78,10 @@ export const SetupExportHeader = ({
     </React.Fragment>
   );
 };
+
+export const onlineElectronExporter = {
+  key: 'onlineelectronexport',
+  tabName: <Trans>Desktop</Trans>,
+  name: <Trans>Windows/macOS/Linux</Trans>,
+  helpPage: '/publishing/windows-macos-linux',
+};

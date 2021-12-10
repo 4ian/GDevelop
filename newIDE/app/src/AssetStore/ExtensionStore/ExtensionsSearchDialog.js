@@ -9,7 +9,7 @@ import { ExtensionStore } from '.';
 import EventsFunctionsExtensionsContext from '../../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import HelpButton from '../../UI/HelpButton';
 import { importExtension, installExtension } from './InstallExtension';
-import InfoBar from '../../UI/Messages/InfoBar';
+import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import {
@@ -112,7 +112,7 @@ export default function ExtensionsSearchDialog({
             project={project}
             showOnlyWithBehaviors={false}
           />
-          <InfoBar
+          <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={
               <Trans>

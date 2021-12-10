@@ -265,7 +265,11 @@ export const HomePage = React.memo<Props>(
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
-          onOpenProjectAfterCreation({ project, storageProvider, fileMetadata });
+          onOpenProjectAfterCreation({
+            project,
+            storageProvider,
+            fileMetadata,
+          });
         } finally {
           setIsOpening(false);
         }

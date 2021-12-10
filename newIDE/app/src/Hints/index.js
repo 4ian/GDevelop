@@ -149,3 +149,8 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
 
   return null;
 };
+
+export const getWarningAboutPlatformerCollisionMaskEditing = (): ?Hint => ({
+  kind: 'warning',
+  message: t`You currently use a custom collision mask for an object that has the Platformer behavior. To prevent issues when flipping object horizontally while grabbing an edge, make sure your collision mask does not move when flipping it.`,
+});

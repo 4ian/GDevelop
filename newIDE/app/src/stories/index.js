@@ -2889,7 +2889,7 @@ storiesOf('AboutDialog', module)
     />
   ));
 
-storiesOf('CreateProjectDialog', module)
+storiesOf('Project Creation/CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ExampleStoreStateProvider>
@@ -2923,7 +2923,6 @@ storiesOf('OpenFromStorageProviderDialog', module)
       storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
       onChooseProvider={action('onChooseProvider')}
       onClose={action('onClose')}
-      onCreateNewProject={action('onCreateNewProject')}
     />
   ));
 
@@ -3969,7 +3968,7 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-storiesOf('CreateProfile', module)
+storiesOf('Profile/CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4308,7 +4307,7 @@ storiesOf('Profile/CreateAccountDialog', module)
     />
   ));
 
-storiesOf('ContributionsDetails', module)
+storiesOf('Profile/ContributionsDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <>

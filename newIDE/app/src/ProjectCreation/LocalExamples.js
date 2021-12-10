@@ -80,6 +80,7 @@ export default function LocalExamples({
           {selectedExampleShortHeader && (
             <LocalProjectPreCreationDialog
               open
+              isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
               outputPath={outputPath}

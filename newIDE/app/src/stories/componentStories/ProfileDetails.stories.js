@@ -18,7 +18,7 @@ const indieUserWithoutUsernameNorDescriptionProfile: Profile = {
 };
 
 export default {
-  title: 'ProfileDetails',
+  title: 'Profile/ProfileDetails',
   component: ProfileDetails,
   decorators: [paperDecorator, muiDecorator],
   argTypes: {

@@ -255,6 +255,7 @@ export const HomePage = React.memo<Props>(
       );
 
       const createBlankProject = async (i18n: I18nType) => {
+        setIsOpening(true);
         const projectMetadata = await onCreateBlank({
           i18n,
           outputPath,
@@ -264,6 +265,7 @@ export const HomePage = React.memo<Props>(
         setPreCreationDialogOpen(false);
         setOutputPath(computeDefaultProjectPath());
         onOpenProjectAfterCreation({ project, storageProvider, fileMetadata });
+        setIsOpening(false);
       };
 
       const createProjectFromExample = async (i18n: I18nType) => {
@@ -517,6 +519,7 @@ export const HomePage = React.memo<Props>(
               {preCreationDialogOpen && (
                 <LocalProjectPreCreationDialog
                   open
+                  isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}
                   onCreate={() =>
                     selectedExample

@@ -17,7 +17,6 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Text from '../UI/Text';
 import BackgroundText from '../UI/BackgroundText';
 import EmptyMessage from '../UI/EmptyMessage';
-import FlatButton from '../UI/FlatButton';
 
 type ContributionLineProps = {|
   fullName: string,

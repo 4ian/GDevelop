@@ -546,14 +546,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onSelectInstances = (
     instances: Array<gdInitialInstance>,
-    multiSelect: boolean,
-    centerView: boolean = true
+    multiSelect: boolean
   ) => {
     this.instancesSelection.selectInstances(instances, multiSelect);
 
-    if (centerView) {
-      if (this.editor) this.editor.centerViewOn(instances);
-    }
+    if (this.editor) this.editor.centerViewOn(instances);
     this.forceUpdateInstancesList();
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();

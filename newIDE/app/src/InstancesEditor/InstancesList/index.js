@@ -5,19 +5,26 @@ import {
   AutoSizer,
   Table as RVTable,
   Column as RVColumn,
+  SortDirection,
 } from 'react-virtualized';
+import IconButton from '../../UI/IconButton';
+import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+import Lock from '@material-ui/icons/Lock';
+import LockOpen from '@material-ui/icons/LockOpen';
 const gd /*TODO: add flow in this file */ = global.gd;
 
 type State = {|
   searchText: string,
+  sortBy: string,
+  sortDirection: SortDirection,
 |};
 
 type Props = {|
   instances: gdInitialInstancesContainer,
   selectedInstances: Array<gdInitialInstance>,
-  onSelectInstances: (Array<gdInitialInstance>) => void,
+  onSelectInstances: (Array<gdInitialInstance>, boolean) => void,
 |};
 
 type RenderedRowInfo = {
@@ -43,11 +50,17 @@ const styles = {
 export default class InstancesList extends Component<Props, State> {
   state = {
     searchText: '',
+    sortBy: '',
+    sortDirection: SortDirection.ASC,
   };
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
   _searchBar = React.createRef<SearchBar>();
+  _keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => false,
+    shortcutCallbacks: {},
+  });
 
   componentDidMount() {
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
@@ -69,7 +82,7 @@ export default class InstancesList extends Component<Props, State> {
         this.renderedRows.push({
           instance,
           name,
-          locked: instance.isLocked() ? '🔒' : '',
+          locked: instance.isLocked() ? 'true' : 'false',
           x: instance.getX().toFixed(2),
           y: instance.getY().toFixed(2),
           angle: instance.getAngle().toFixed(2),
@@ -86,7 +99,11 @@ export default class InstancesList extends Component<Props, State> {
 
   _onRowClick = ({ index }: { index: number }) => {
     if (!this.renderedRows[index]) return;
-    this.props.onSelectInstances([this.renderedRows[index].instance]);
+
+    this.props.onSelectInstances(
+      [this.renderedRows[index].instance],
+      this._keyboardShortcuts.shouldMultiSelect()
+    );
   };
 
   _rowGetter = ({ index }: { index: number }) => {
@@ -105,20 +122,86 @@ export default class InstancesList extends Component<Props, State> {
     }
   };
 
+  _renderLockCell = ({ rowData }: { rowData: RenderedRowInfo }) => {
+    return (
+      <IconButton
+        size="small"
+        onClick={() => {
+          rowData.instance.setLocked(!rowData.instance.isLocked());
+        }}
+      >
+        {rowData.instance.isLocked() && <Lock />}
+        {!rowData.instance.isLocked() && <LockOpen />}
+      </IconButton>
+    );
+  };
+
   _selectFirstInstance = () => {
     if (this.renderedRows.length) {
-      this.props.onSelectInstances([this.renderedRows[0].instance]);
+      this.props.onSelectInstances([this.renderedRows[0].instance], false);
     }
   };
 
+  _sort = ({
+    sortBy,
+    sortDirection,
+  }: {
+    sortBy: string,
+    sortDirection: SortDirection,
+  }) => {
+    this.setState({ sortBy, sortDirection });
+  };
+
+  _orderRenderedRows = () => {
+    this.renderedRows.sort(
+      (a: RenderedRowInfo, b: RenderedRowInfo): number => {
+        const direction =
+          this.state.sortDirection === SortDirection.ASC ? 1 : -1;
+        const compString = (x: string, y: string): number => {
+          if (typeof x === 'string' && typeof y === 'string') {
+            x = x.toLowerCase();
+            y = y.toLowerCase();
+          }
+
+          if (x < y) return direction * 1;
+          if (x > y) return direction * -1;
+          return 0;
+        };
+
+        switch (this.state.sortBy) {
+          case 'name':
+            return compString(a.name, b.name);
+          case 'x':
+            return direction * (parseFloat(a.x) - parseFloat(b.x));
+          case 'y':
+            return direction * (parseFloat(a.y) - parseFloat(b.y));
+          case 'angle':
+            return direction * (parseFloat(a.angle) - parseFloat(b.angle));
+          case 'layer':
+            return compString(a.layer, b.layer);
+          case 'locked':
+            return compString(a.locked, b.locked);
+          case 'zOrder':
+            return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
+
+          default:
+            return 0;
+        }
+      }
+    );
+
+    console.log(typeof this.renderedRows[0].locked);
+  };
+
   render() {
-    const { searchText } = this.state;
+    const { searchText, sortBy, sortDirection } = this.state;
     const { instances } = this.props;
 
     if (!this.instanceRowRenderer) return null;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
+    this._orderRenderedRows();
 
     // Force RVTable component to be mounted again if instances
     // has been changed. Avoid accessing to invalid objects that could
@@ -129,7 +212,11 @@ export default class InstancesList extends Component<Props, State> {
       <ThemeConsumer>
         {muiTheme => (
           <div style={styles.container}>
-            <div style={{ flex: 1 }}>
+            <div
+              style={{ flex: 1 }}
+              onKeyDown={this._keyboardShortcuts.onKeyDown}
+              onKeyUp={this._keyboardShortcuts.onKeyUp}
+            >
               <AutoSizer>
                 {({ height, width }) => (
                   <RVTable
@@ -144,6 +231,9 @@ export default class InstancesList extends Component<Props, State> {
                     rowHeight={32}
                     onRowClick={this._onRowClick}
                     rowClassName={this._rowClassName}
+                    sort={this._sort}
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
                     width={width}
                   >
                     <RVColumn
@@ -157,6 +247,7 @@ export default class InstancesList extends Component<Props, State> {
                       dataKey="locked"
                       width={width * 0.05}
                       className={'tableColumn'}
+                      cellRenderer={this._renderLockCell}
                     />
                     <RVColumn
                       label={<Trans>X</Trans>}

@@ -82,12 +82,15 @@ const ProfileDialog = ({
       cannotBeDismissed={false}
       open={open}
       noMargin
+      noTitleMargin
+      title={
+        <Tabs value={currentTab} onChange={_onChangeTab}>
+          <Tab label={<Trans>My Profile</Trans>} value="profile" />
+          <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
+          <Tab label={<Trans>Services Usage</Trans>} value="usage" />
+        </Tabs>
+      }
     >
-      <Tabs value={currentTab} onChange={_onChangeTab}>
-        <Tab label={<Trans>My Profile</Trans>} value="profile" />
-        <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
-        <Tab label={<Trans>Services Usage</Trans>} value="usage" />
-      </Tabs>
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
           <Column noMargin>

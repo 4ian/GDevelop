@@ -70,11 +70,11 @@ export const ExamplesAccordion = ({
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
-        {examples.length === 0 && (
-          <EmptyMessage>You haven't contributed any examples</EmptyMessage>
-        )}
-
-        {examples.length !== 0 && (
+        {examples.length === 0 ? (
+          <EmptyMessage>
+            <Trans>You haven't contributed any examples</Trans>
+          </EmptyMessage>
+        ) : (
           <Column>
             {examples.map(example => (
               <ContributionLine
@@ -121,11 +121,11 @@ export const ExtensionsAccordion = ({
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
-        {extensions.length === 0 && (
-          <EmptyMessage>You haven't contributed any extensions</EmptyMessage>
-        )}
-
-        {extensions.length !== 0 && (
+        {extensions.length === 0 ? (
+          <EmptyMessage>
+            <Trans>You haven't contributed any extensions</Trans>
+          </EmptyMessage>
+        ) : (
           <Column>
             {extensions.map(extension => (
               <ContributionLine

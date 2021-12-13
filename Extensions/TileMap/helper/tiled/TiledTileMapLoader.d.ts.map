@@ -1,0 +1,1 @@
+{"version":3,"file":"TiledTileMapLoader.d.ts","sourceRoot":"","sources":["../../../../SharedLibs/TileMapHelper/src/tiled/TiledTileMapLoader.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,eAAe,EAA8B,MAAM,iBAAiB,CAAC;AAC9E,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG/B;;GAEG;AACH,qBAAa,kBAAkB;IAC7B,MAAM,CAAC,IAAI,CACT,IAAI,EAAE,GAAG,EACT,QAAQ,EAAE,QAAQ,GACjB,eAAe,GAAG,IAAI;CA8I1B"}

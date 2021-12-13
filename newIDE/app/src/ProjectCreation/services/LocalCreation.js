@@ -20,9 +20,11 @@ var fs = optionalRequire('fs-extra');
 export const onCreateBlank = async ({
   i18n,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
   outputPath?: string,
+  projectName?: ?string,
 |}): Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
@@ -40,6 +42,7 @@ export const onCreateBlank = async ({
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
   const filePath = path.join(outputPath, 'game.json');
   project.setProjectFile(filePath);
+  projectName && project.setName(projectName)
   sendNewGameCreated('');
   return {
     project,

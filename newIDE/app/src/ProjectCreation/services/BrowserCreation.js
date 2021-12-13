@@ -16,9 +16,11 @@ const gd: libGDevelop = global.gd;
 export const onCreateBlank = async ({
   i18n,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
   outputPath?: string,
+  projectName?: ?string,
 |}): Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
@@ -27,6 +29,7 @@ export const onCreateBlank = async ({
   sendNewGameCreated('');
 
   const project = gd.ProjectHelper.createNewGDJSProject();
+  projectName && project.setName(projectName);
   return { project, storageProvider: null, fileMetadata: null };
 };
 

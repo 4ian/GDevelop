@@ -2314,6 +2314,8 @@ const MainFrame = (props: Props) => {
           initialTab: createDialogInitialTab,
           onClose: closeCreateDialog,
           onOpen: onOpenProjectAfterCreation,
+          projectName: newProjectName,
+          onChangeProjectName: setNewProjectName,
         })}
       {!!introDialog &&
         introDialogOpen &&

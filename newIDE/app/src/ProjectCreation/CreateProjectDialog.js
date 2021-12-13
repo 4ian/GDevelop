@@ -41,6 +41,8 @@ export type CreateProjectDialogWithComponentsProps = {|
   onClose: () => void,
   onOpen: OnOpenProjectAfterCreationFunction,
   initialTab: CreateProjectDialogTabs,
+  projectName: ?string,
+  onChangeProjectName: (name: string) => void,
 |};
 
 export type OnCreateBlankFunction = ({|
@@ -89,6 +91,8 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
       onClose,
       onOpen,
       onCreateFromExampleShortHeader,
+      projectName,
+      onChangeProjectName,
     } = this.props;
     if (!open) return null;
 
@@ -152,6 +156,8 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
               onChangeOutputPath={outputPath => this.setState({ outputPath })}
               outputPath={this.state.outputPath}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+              projectName={projectName}
+              onChangeProjectName={onChangeProjectName}
             />
           )}
           {this.state.currentTab === 'tutorials' && <TutorialsList />}

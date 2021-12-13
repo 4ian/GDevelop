@@ -20,6 +20,8 @@ export const Open = () => (
     onChangeOutputPath={action('change output path')}
     onClose={() => action('click on close')()}
     onCreate={() => action('click on create')()}
+    projectName="Project Name"
+    onChangeProjectName={(text) => action('Change project name')}
   />
 );
 
@@ -31,5 +33,7 @@ export const Disabled = () => (
     onChangeOutputPath={action('change output path')}
     onClose={() => action('click on close')()}
     onCreate={() => action('click on create')()}
+    projectName="Project Name"
+    onChangeProjectName={(text) => action('Change project name')}
   />
 );

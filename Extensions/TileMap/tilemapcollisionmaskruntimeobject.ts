@@ -1,4 +1,6 @@
 namespace gdjs {
+  import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
+
   const logger = new gdjs.Logger('Tilemap object');
 
   /**
@@ -56,7 +58,7 @@ namespace gdjs {
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
-      const collisionTileMap = new gdjs.TileMap.EditableTileMap(
+      const collisionTileMap = new TileMapHelper.EditableTileMap(
         1,
         1,
         0,
@@ -152,7 +154,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
-        (tileMap: gdjs.TileMap.EditableTileMap | null) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already log errors.
             return;

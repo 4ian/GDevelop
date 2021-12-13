@@ -1,5 +1,5 @@
-namespace gdjs {
-  export namespace TileMap {
+import { FloatPoint, integer, float } from ".";
+
     export type PolygonVertices = FloatPoint[];
     /**
      * A tile map model.
@@ -605,5 +605,3 @@ namespace gdjs {
         return this.animationLength;
       }
     }
-  }
-}

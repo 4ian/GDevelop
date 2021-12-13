@@ -1,6 +1,7 @@
 namespace gdjs {
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
+    import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
 
     const logger = new gdjs.Logger('Tilemap object');
 
@@ -17,13 +18,13 @@ namespace gdjs {
       /**
        * Delegate
        */
-      private _manager: gdjs.TileMap.TileMapManager;
+      private _manager: TileMapHelper.TileMapManager;
       /**
        * @param object The object
        */
       private constructor(runtimeScene: gdjs.RuntimeScene) {
         this._runtimeScene = runtimeScene;
-        this._manager = new gdjs.TileMap.TileMapManager();
+        this._manager = new TileMapHelper.TileMapManager();
       }
 
       /**
@@ -51,7 +52,7 @@ namespace gdjs {
       getOrLoadTileMap(
         tilemapJsonFile: string,
         tilesetJsonFile: string,
-        callback: (tileMap: gdjs.TileMap.EditableTileMap | null) => void
+        callback: (tileMap: TileMapHelper.EditableTileMap | null) => void
       ): void {
         this._manager.getOrLoadTileMap(
           this._loadTiledMap.bind(this),
@@ -74,7 +75,7 @@ namespace gdjs {
         atlasImageResourceName: string,
         tilemapJsonFile: string,
         tilesetJsonFile: string,
-        callback: (textureCache: gdjs.TileMap.TileTextureCache | null) => void
+        callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
       ): void {
         this._manager.getOrLoadTextureCache(
           this._loadTiledMap.bind(this),
@@ -89,7 +90,7 @@ namespace gdjs {
       _loadTiledMap(
         tilemapJsonFile: string,
         tilesetJsonFile: string,
-        callback: (tiledMap: gdjs.TileMap.TiledMap | null) => void
+        callback: (tiledMap: TileMapHelper.TiledMap | null) => void
       ) {
         this._runtimeScene
           .getGame()
@@ -103,7 +104,7 @@ namespace gdjs {
               callback(null);
               return;
             }
-            const tiledMap = tileMapJsonData as gdjs.TileMap.TiledMap;
+            const tiledMap = tileMapJsonData as TileMapHelper.TiledMap;
             if (tilesetJsonFile) {
               this._runtimeScene
                 .getGame()
@@ -117,7 +118,7 @@ namespace gdjs {
                     callback(null);
                     return;
                   }
-                  const tileSet = tilesetJsonData as gdjs.TileMap.TiledTileset;
+                  const tileSet = tilesetJsonData as TileMapHelper.TiledTileset;
                   tiledMap.tilesets = [tileSet];
                   callback(tiledMap);
                 });

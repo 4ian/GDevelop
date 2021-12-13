@@ -5,16 +5,16 @@ import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
-import LocalProjectPreCreationDialog from '../../ProjectCreation/LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from '../../ProjectCreation/ProjectPreCreationDialog';
 
 export default {
-  title: 'Project Creation/LocalProjectPreCreationDialog',
-  component: LocalProjectPreCreationDialog,
+  title: 'Project Creation/ProjectPreCreationDialog',
+  component: ProjectPreCreationDialog,
   decorators: [paperDecorator, muiDecorator],
 };
 
 export const Open = () => (
-  <LocalProjectPreCreationDialog
+  <ProjectPreCreationDialog
     open
     outputPath="/path/to/project/file.json"
     onChangeOutputPath={action('change output path')}
@@ -24,7 +24,7 @@ export const Open = () => (
 );
 
 export const Disabled = () => (
-  <LocalProjectPreCreationDialog
+  <ProjectPreCreationDialog
     open
     isOpening
     outputPath="/path/to/project/file.json"

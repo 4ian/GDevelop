@@ -29,7 +29,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
-import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from '../../../ProjectCreation/ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
@@ -527,7 +527,7 @@ export const HomePage = React.memo<Props>(
                 />
               )}
               {preCreationDialogOpen && (
-                <LocalProjectPreCreationDialog
+                <ProjectPreCreationDialog
                   open
                   isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}

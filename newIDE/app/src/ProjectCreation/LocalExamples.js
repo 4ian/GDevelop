@@ -8,7 +8,7 @@ import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnOpenProjectAfterCreationFunction,
@@ -80,7 +80,7 @@ export default function LocalExamples({
             />
           </Column>
           {selectedExampleShortHeader && (
-            <LocalProjectPreCreationDialog
+            <ProjectPreCreationDialog
               open
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}

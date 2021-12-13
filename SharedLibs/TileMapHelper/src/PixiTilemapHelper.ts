@@ -1,6 +1,9 @@
-namespace gdjs {
-  export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
+import { integer, float } from ".";
+import { TiledMap } from "./tiled/Tiled";
+import { EditableObjectLayer, EditableTileMap, EditableTileMapLayer } from "./TileMapModel";
+import { TileTextureCache } from "./TileTextureCache";
+
+import PIXI = GlobalPIXIModule.PIXI;
 
     export class PixiTileMapHelper {
       /**
@@ -14,10 +17,10 @@ namespace gdjs {
        * @returns A textures cache.
        */
       static parseAtlas(
-        tiledData: gdjs.TileMap.TiledMap,
+        tiledData: TiledMap,
         atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
         getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
-      ): gdjs.TileMap.TileTextureCache | null {
+      ): TileTextureCache | null {
         if (!tiledData.tiledversion) {
           console.warn(
             "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
@@ -73,7 +76,7 @@ namespace gdjs {
         // Prepare the textures pointing to the base "Atlas" Texture for each tile.
         // Note that this cache can be augmented later with rotated/flipped
         // versions of the tile textures.
-        const textureCache = new gdjs.TileMap.TileTextureCache();
+        const textureCache = new TileTextureCache();
         for (let frame = 0; frame < tilecount; frame++) {
           const columnMultiplier = Math.floor(frame % columns);
           const rowMultiplier = Math.floor(frame / columns);
@@ -106,9 +109,9 @@ namespace gdjs {
        * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
        */
       static updatePixiTileMap(
-        pixiTileMap,
-        tileMap: gdjs.TileMap.EditableTileMap,
-        textureCache: gdjs.TileMap.TileTextureCache,
+        pixiTileMap : any,
+        tileMap: EditableTileMap,
+        textureCache: TileTextureCache,
         displayMode: 'index' | 'visible' | 'all',
         layerIndex: number
       ) {
@@ -123,8 +126,8 @@ namespace gdjs {
             return;
           }
 
-          if (layer instanceof gdjs.TileMap.EditableObjectLayer) {
-            const objectLayer = layer as gdjs.TileMap.EditableObjectLayer;
+          if (layer instanceof EditableObjectLayer) {
+            const objectLayer = layer as EditableObjectLayer;
             for (const object of objectLayer.objects) {
               const texture = textureCache.findTileTexture(
                 object.getTileId(),
@@ -140,8 +143,8 @@ namespace gdjs {
                 );
               }
             }
-          } else if (layer instanceof gdjs.TileMap.EditableTileMapLayer) {
-            const tileLayer = layer as gdjs.TileMap.EditableTileMapLayer;
+          } else if (layer instanceof EditableTileMapLayer) {
+            const tileLayer = layer as EditableTileMapLayer;
 
             for (let y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
               for (let x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
@@ -278,5 +281,3 @@ namespace gdjs {
         }
       }
     }
-  }
-}

@@ -1,5 +1,5 @@
-namespace gdjs {
-  export namespace TileMap {
+import { float, integer } from "../CommonTypes";
+
     /**
      * Tiled JSON format.
      */
@@ -485,5 +485,3 @@ namespace gdjs {
       /** Y coordinate in pixels */
       y: float;
     };
-  }
-}

@@ -1,5 +1,3 @@
-namespace gdjs {
-  export namespace TileMap {
     export class ResourceCache<T> {
       private _cachedValues: Map<string, T>;
 
@@ -49,5 +47,3 @@ namespace gdjs {
         });
       }
     }
-  }
-}

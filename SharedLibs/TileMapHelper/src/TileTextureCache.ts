@@ -1,6 +1,6 @@
-namespace gdjs {
-  export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
+import { integer } from ".";
+
+import PIXI = GlobalPIXIModule.PIXI;
 
     /**
      * A cache to access the tile images.
@@ -133,5 +133,3 @@ namespace gdjs {
         return globalTileUid;
       }
     }
-  }
-}

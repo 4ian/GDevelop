@@ -1,6 +1,11 @@
-namespace gdjs {
-  export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
+import { PixiTileMapHelper } from ".";
+import { ResourceCache } from "./ResourceCache";
+import { TiledMap } from "./tiled/Tiled";
+import { TiledTileMapLoader } from "./tiled/TiledTileMapLoader";
+import { EditableTileMap } from "./TileMapModel";
+import { TileTextureCache } from "./TileTextureCache";
+
+import PIXI = GlobalPIXIModule.PIXI;
 
     /**
      * An holder to share tile maps across the 2 extension objects.
@@ -11,22 +16,22 @@ namespace gdjs {
      * @see {@link TileMapRuntimeManager}
      */
     export class TileMapManager {
-      private _tileMapCache: gdjs.TileMap.ResourceCache<
-        gdjs.TileMap.EditableTileMap
+      private _tileMapCache: ResourceCache<
+        EditableTileMap
       >;
-      private _textureCacheCaches: gdjs.TileMap.ResourceCache<
-        gdjs.TileMap.TileTextureCache
+      private _textureCacheCaches: ResourceCache<
+        TileTextureCache
       >;
 
       /**
        *
        */
       constructor() {
-        this._tileMapCache = new gdjs.TileMap.ResourceCache<
-          gdjs.TileMap.EditableTileMap
+        this._tileMapCache = new ResourceCache<
+          EditableTileMap
         >();
-        this._textureCacheCaches = new gdjs.TileMap.ResourceCache<
-          gdjs.TileMap.TileTextureCache
+        this._textureCacheCaches = new ResourceCache<
+          TileTextureCache
         >();
       }
 
@@ -56,12 +61,12 @@ namespace gdjs {
         loadTiledMap: (
           tilemapJsonFile: string,
           tilesetJsonFile: string,
-          callback: (tiledMap: gdjs.TileMap.TiledMap | null) => void
+          callback: (tiledMap: TiledMap | null) => void
         ) => void,
         tilemapJsonFile: string,
         tilesetJsonFile: string,
         pako: any,
-        callback: (tileMap: gdjs.TileMap.EditableTileMap | null) => void
+        callback: (tileMap: EditableTileMap | null) => void
       ): void {
         const key = tilemapJsonFile + '|' + tilesetJsonFile;
 
@@ -71,13 +76,13 @@ namespace gdjs {
             loadTiledMap(
               tilemapJsonFile,
               tilesetJsonFile,
-              (tiledMap: gdjs.TileMap.TiledMap | null) => {
+              (tiledMap: TiledMap | null) => {
                 if (!tiledMap) {
                   callback(null);
                   return;
                 }
 
-                const collisionTileMap = gdjs.TileMap.TiledTileMapLoader.load(
+                const collisionTileMap = TiledTileMapLoader.load(
                   pako,
                   tiledMap
                 );
@@ -101,13 +106,13 @@ namespace gdjs {
         loadTiledMap: (
           tilemapJsonFile: string,
           tilesetJsonFile: string,
-          callback: (tiledMap: gdjs.TileMap.TiledMap | null) => void
+          callback: (tiledMap: TiledMap | null) => void
         ) => void,
         getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
         atlasImageResourceName: string,
         tilemapJsonFile: string,
         tilesetJsonFile: string,
-        callback: (textureCache: gdjs.TileMap.TileTextureCache | null) => void
+        callback: (textureCache: TileTextureCache | null) => void
       ): void {
         const key =
           tilemapJsonFile +
@@ -122,7 +127,7 @@ namespace gdjs {
             loadTiledMap(
               tilemapJsonFile,
               tilesetJsonFile,
-              (tiledMap: gdjs.TileMap.TiledMap | null) => {
+              (tiledMap: TiledMap | null) => {
                 if (!tiledMap) {
                   // loadTiledMap already log errors.
                   callback(null);
@@ -132,7 +137,7 @@ namespace gdjs {
                 const atlasTexture = atlasImageResourceName
                   ? getTexture(atlasImageResourceName)
                   : null;
-                const textureCache = gdjs.TileMap.PixiTileMapHelper.parseAtlas(
+                const textureCache = PixiTileMapHelper.parseAtlas(
                   tiledMap,
                   atlasTexture,
                   getTexture
@@ -145,5 +150,3 @@ namespace gdjs {
         );
       }
     }
-  }
-}

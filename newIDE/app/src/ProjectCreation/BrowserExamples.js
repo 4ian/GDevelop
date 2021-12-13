@@ -8,27 +8,37 @@ import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
+import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 
 type Props = {|
   onOpen: OnOpenProjectAfterCreationFunction,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  projectName: ?string,
+  onChangeProjectName: (name: string) => void,
 |};
 
 export default function BrowserExamples({
   onOpen,
   onCreateFromExampleShortHeader,
+  projectName,
+  onChangeProjectName
 }: Props) {
+  const [
+    selectedExampleShortHeader,
+    setSelectedExampleShortShortHeader,
+  ] = React.useState<?ExampleShortHeader>(null);
   const [isOpening, setIsOpening] = React.useState(false);
 
   const createProjectFromExample = async (
     i18n: I18nType,
-    exampleShortHeader: ExampleShortHeader
   ) => {
+    if (!selectedExampleShortHeader) return;
+
     setIsOpening(true);
     try {
       const projectMetadata = await onCreateFromExampleShortHeader({
         i18n,
-        exampleShortHeader: exampleShortHeader,
+        exampleShortHeader: selectedExampleShortHeader,
       });
       if (projectMetadata) {
         const { storageProvider, fileMetadata } = projectMetadata;
@@ -42,12 +52,24 @@ export default function BrowserExamples({
   return (
     <I18n>
       {({ i18n }) => (
+        <>
         <ExampleStore
           isOpening={isOpening}
-          onOpen={(exampleShortHeader: ExampleShortHeader) =>
-            createProjectFromExample(i18n, exampleShortHeader)
+          onOpen={async (example: ?ExampleShortHeader) =>
+            setSelectedExampleShortShortHeader(example)
           }
         />
+        {selectedExampleShortHeader && (
+            <ProjectPreCreationDialog
+              open
+              isOpening={isOpening}
+              onClose={() => setSelectedExampleShortShortHeader(null)}
+              onCreate={() => createProjectFromExample(i18n)}
+              projectName={projectName}
+              onChangeProjectName={onChangeProjectName}
+            />
+          )}
+        </>
       )}
     </I18n>
   );

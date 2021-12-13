@@ -263,6 +263,7 @@ const MainFrame = (props: Props) => {
   ) => void>(null);
   const _previewLauncher = React.useRef((null: ?PreviewLauncherInterface));
   const forceUpdate = useForceUpdate();
+  const [newProjectName, setNewProjectName] = React.useState<?string>(null);
   const [isLoadingProject, setIsLoadingProject] = React.useState<boolean>(
     false
   );
@@ -2241,6 +2242,8 @@ const MainFrame = (props: Props) => {
                   onOpenRecentFile: openFromFileMetadataWithStorageProvider,
                   onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
                   onCreateBlank: onCreateBlank,
+                  newProjectName: newProjectName,
+                  onChangeNewProjectName: setNewProjectName,
                   onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
@@ -2311,6 +2314,8 @@ const MainFrame = (props: Props) => {
           initialTab: createDialogInitialTab,
           onClose: closeCreateDialog,
           onOpen: onOpenProjectAfterCreation,
+          projectName: newProjectName,
+          onChangeProjectName: setNewProjectName,
         })}
       {!!introDialog &&
         introDialogOpen &&

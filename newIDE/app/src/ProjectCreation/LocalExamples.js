@@ -8,7 +8,7 @@ import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnOpenProjectAfterCreationFunction,
@@ -19,6 +19,8 @@ type Props = {|
   onChangeOutputPath: (outputPath: string) => void,
   outputPath: string,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  projectName: ?string,
+  onChangeProjectName: (name: string) => void,
 |};
 
 export const showGameFileCreationError = (
@@ -40,6 +42,8 @@ export default function LocalExamples({
   onChangeOutputPath,
   onOpen,
   onCreateFromExampleShortHeader,
+  projectName,
+  onChangeProjectName,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
   const [
@@ -80,13 +84,15 @@ export default function LocalExamples({
             />
           </Column>
           {selectedExampleShortHeader && (
-            <LocalProjectPreCreationDialog
+            <ProjectPreCreationDialog
               open
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
+              projectName={projectName}
+              onChangeProjectName={onChangeProjectName}
             />
           )}
         </>

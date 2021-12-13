@@ -1,5 +1,6 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
+  import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
 
   const logger = new gdjs.Logger('Tilemap object');
 
@@ -51,10 +52,10 @@ namespace gdjs {
     }
 
     updatePixiTileMap(
-      tileMap: gdjs.TileMap.EditableTileMap,
-      textureCache: gdjs.TileMap.TileTextureCache
+      tileMap: TileMapHelper.EditableTileMap,
+      textureCache: TileMapHelper.TileTextureCache
     ) {
-      gdjs.TileMap.PixiTileMapHelper.updatePixiTileMap(
+      TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
         this._pixiObject,
         tileMap,
         textureCache,

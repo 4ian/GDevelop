@@ -1,5 +1,6 @@
-namespace gdjs {
-  export namespace TileMap {
+import { integer } from "../CommonTypes";
+import { TiledLayer } from "./Tiled";
+
     /**
      * Decodes a layer data, which can sometimes be store as a compressed base64 string
      * by Tiled.
@@ -95,5 +96,3 @@ namespace gdjs {
         flippedDiagonally: !!flippedDiagonally,
       };
     };
-  }
-}

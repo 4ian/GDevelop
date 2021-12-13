@@ -1,5 +1,6 @@
 namespace gdjs {
   import PIXI = GlobalPIXIModule.PIXI;
+  import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
 
   const logger = new gdjs.Logger('Tilemap object');
   /**
@@ -122,7 +123,7 @@ namespace gdjs {
       this._tileMapManager.getOrLoadTileMap(
         this._tilemapJsonFile,
         this._tilesetJsonFile,
-        (tileMap: gdjs.TileMap.EditableTileMap | null) => {
+        (tileMap: TileMapHelper.EditableTileMap | null) => {
           if (!tileMap) {
             // getOrLoadTileMap already warn.
             return;
@@ -138,7 +139,7 @@ namespace gdjs {
             this._tilemapAtlasImage,
             this._tilemapJsonFile,
             this._tilesetJsonFile,
-            (textureCache: TileMap.TileTextureCache | null) => {
+            (textureCache: TileMapHelper.TileTextureCache | null) => {
               if (!textureCache) {
                 // getOrLoadTextureCache already log warns and errors.
                 return;

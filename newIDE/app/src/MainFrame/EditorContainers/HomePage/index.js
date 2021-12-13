@@ -89,6 +89,8 @@ type Props = {|
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onCreateBlank: OnCreateBlankFunction,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
+  newProjectName: ?string,
+  onChangeNewProjectName: (name: ?string) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -114,6 +116,8 @@ export const HomePage = React.memo<Props>(
         onOpenRecentFile,
         onCreateFromExampleShortHeader,
         onCreateBlank,
+        newProjectName,
+        onChangeNewProjectName,
         onOpenProjectAfterCreation,
         onOpenExamples,
         onOpenProjectManager,
@@ -260,11 +264,13 @@ export const HomePage = React.memo<Props>(
           const projectMetadata = await onCreateBlank({
             i18n,
             outputPath,
+            projectName: newProjectName
           });
           if (!projectMetadata) return;
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
+          onChangeNewProjectName(null)
           onOpenProjectAfterCreation({
             project,
             storageProvider,
@@ -322,9 +328,7 @@ export const HomePage = React.memo<Props>(
                             <FlatButton
                               label={<Trans>Create a blank project</Trans>}
                               onClick={() => {
-                                electron
-                                  ? setPreCreationDialogOpen(true)
-                                  : createBlankProject(i18n);
+                                setPreCreationDialogOpen(true);
                               }}
                               primary
                             />
@@ -520,9 +524,7 @@ export const HomePage = React.memo<Props>(
                   onClose={() => setSelectedExample(null)}
                   exampleShortHeader={selectedExample}
                   onOpen={() => {
-                    electron
-                      ? setPreCreationDialogOpen(true)
-                      : createProjectFromExample(i18n);
+                    setPreCreationDialogOpen(true);
                   }}
                 />
               )}
@@ -536,8 +538,10 @@ export const HomePage = React.memo<Props>(
                       ? createProjectFromExample(i18n)
                       : createBlankProject(i18n)
                   }
-                  outputPath={outputPath}
-                  onChangeOutputPath={setOutputPath}
+                  outputPath={electron ? outputPath : undefined}
+                  onChangeOutputPath={electron ? setOutputPath : undefined}
+                  projectName={newProjectName}
+                  onChangeProjectName={onChangeNewProjectName}
                 />
               )}
             </>
@@ -566,6 +570,8 @@ export const renderHomePageContainer = (
     onOpenExamples={props.onOpenExamples}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}
+    newProjectName={props.newProjectName}
+    onChangeNewProjectName={props.onChangeNewProjectName}
     onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}

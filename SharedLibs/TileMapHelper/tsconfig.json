@@ -1,0 +1,21 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "../../Extensions/TileMap/helper/", //"./dist",
+        "target": "ES5",
+        "sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+        "types" : [
+            "mocha",
+            "expect.js"
+        ],
+		"lib": ["DOM", "ES5", "ES6"],
+        "downlevelIteration": true,
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -1,5 +1,6 @@
 namespace gdjs {
   export namespace TileMap {
+    import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
     /**
      * A tile map transformed with an affine transformation.
      *
@@ -9,7 +10,7 @@ namespace gdjs {
       /**
        * The model that describes the tile map.
        */
-      private _source: gdjs.TileMap.EditableTileMap;
+      private _source: TileMapHelper.EditableTileMap;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
       // TODO Tiled allows to offset the layers
       /**
@@ -35,11 +36,11 @@ namespace gdjs {
       /**
        * @param source The model that describes the tile map.
        */
-      constructor(source: gdjs.TileMap.EditableTileMap) {
+      constructor(source: TileMapHelper.EditableTileMap) {
         this._source = source;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         for (const sourceLayer of source.getLayers()) {
-          const tileLayer = sourceLayer as EditableTileMapLayer;
+          const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
           if (!tileLayer) {
             continue;
           }
@@ -383,7 +384,7 @@ namespace gdjs {
       /**
        * The model that describes the tile map.
        */
-      readonly _source: gdjs.TileMap.EditableTileMapLayer;
+      readonly _source: TileMapHelper.EditableTileMapLayer;
       private readonly _tiles: TransformedCollisionTile[][];
 
       /**
@@ -392,7 +393,7 @@ namespace gdjs {
        */
       constructor(
         tileMap: TransformedCollisionTileMap,
-        source: gdjs.TileMap.EditableTileMapLayer
+        source: TileMapHelper.EditableTileMapLayer
       ) {
         this.tileMap = tileMap;
         this._source = source;
@@ -662,7 +663,7 @@ namespace gdjs {
       /**
        * @returns The tile definition from the tile set.
        */
-      getDefinition(): TileDefinition {
+      getDefinition(): TileMapHelper.TileDefinition {
         return this.layer.tileMap.getTileDefinition(
           this.layer._source.get(this.x, this.y)!
         )!;

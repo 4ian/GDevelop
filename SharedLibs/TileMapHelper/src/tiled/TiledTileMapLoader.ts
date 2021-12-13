@@ -1,13 +1,16 @@
-namespace gdjs {
-  export namespace TileMap {
+import { integer, PolygonVertices } from "..";
+import { EditableTileMap, TileDefinition, TileObject } from "../TileMapModel";
+import { TiledMap } from "./Tiled";
+import { extractTileUidFlippedStates, decodeBase64LayerData } from "./TiledLoaderHelper";
+
     /**
      * It creates a {@link EditableTileMap} from a Tiled JSON.
      */
     export class TiledTileMapLoader {
       static load(
         pako: any,
-        tiledMap: gdjs.TileMap.TiledMap
-      ): gdjs.TileMap.EditableTileMap | null {
+        tiledMap: TiledMap
+      ): EditableTileMap | null {
         if (!tiledMap.tiledversion) {
           console.warn(
             "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
@@ -16,7 +19,7 @@ namespace gdjs {
           return null;
         }
 
-        const definitions = new Map<integer, gdjs.TileMap.TileDefinition>();
+        const definitions = new Map<integer, TileDefinition>();
         for (const tile of tiledMap.tilesets[0].tiles!) {
           const polygons: PolygonVertices[] = [];
           if (tile.objectgroup) {
@@ -43,7 +46,7 @@ namespace gdjs {
           //console.log("Definition: " + tile.id);
           definitions.set(
             tile.id,
-            new gdjs.TileMap.TileDefinition(
+            new TileDefinition(
               polygons,
               tile.type ? tile.type : '',
               tile.animation ? tile.animation.length : 0
@@ -56,11 +59,11 @@ namespace gdjs {
           tileId++
         ) {
           if (!definitions.has(tileId)) {
-            definitions.set(tileId, new gdjs.TileMap.TileDefinition([], '', 0));
+            definitions.set(tileId, new TileDefinition([], '', 0));
           }
         }
         //console.log(definitions.size + " tiles definition");
-        const collisionTileMap = new gdjs.TileMap.EditableTileMap(
+        const collisionTileMap = new EditableTileMap(
           tiledMap.tilewidth,
           tiledMap.tileheight,
           tiledMap.width,
@@ -80,7 +83,7 @@ namespace gdjs {
                 // make objects visible individually.
                 continue;
               }
-              const tileGid = gdjs.TileMap.extractTileUidFlippedStates(
+              const tileGid = extractTileUidFlippedStates(
                 tiledObject.gid
               );
               const object = new TileObject(
@@ -98,7 +101,7 @@ namespace gdjs {
             let layerData: integer[] | null = null;
 
             if (tiledLayer.encoding === 'base64') {
-              layerData = gdjs.TileMap.decodeBase64LayerData(pako, tiledLayer);
+              layerData = decodeBase64LayerData(pako, tiledLayer);
               if (!layerData) {
                 console.warn('Failed to uncompress layer.data');
               }
@@ -118,7 +121,7 @@ namespace gdjs {
                   // bits about the flipping/rotation of the tile.
                   const globalTileUid = layerData[tileSlotIndex];
                   // Extract the tile UID and the texture.
-                  const tileUid = gdjs.TileMap.extractTileUidFlippedStates(
+                  const tileUid = extractTileUidFlippedStates(
                     globalTileUid
                   );
                   //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
@@ -150,5 +153,3 @@ namespace gdjs {
         return collisionTileMap;
       }
     }
-  }
-}

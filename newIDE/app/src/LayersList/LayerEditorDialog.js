@@ -139,13 +139,18 @@ const LayerEditorDialog = (props: Props) => {
               </Text>
             )}
             <InlineCheckbox
-              label={<Trans>Layer visible</Trans>}
-              checked={layer.getVisibility()}
+              label={<Trans>Hide the layer</Trans>}
+              checked={!layer.getVisibility()}
               onCheck={(e, checked) => {
-                layer.setVisibility(checked);
+                layer.setVisibility(!checked);
                 forceUpdate();
               }}
             />
+            <Text>
+              Note: This setting changes visibility of the entire layer. Objects
+              on the layer will not be treated as "hidden" for event conditions
+              or actions.
+            </Text>
             {layer.isLightingLayer() ? (
               <React.Fragment>
                 <Text size="title">

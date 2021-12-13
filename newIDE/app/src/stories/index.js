@@ -1298,16 +1298,6 @@ storiesOf('UI Building Blocks/LoaderModal', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LoaderModal show />);
 
-storiesOf('UI Building Blocks/Checkbox', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <div style={{ display: 'flex' }}>
-      <Checkbox label={'My label'} checked={true} />
-      <Checkbox label={'My label 2'} checked={false} />
-    </div>
-  ));
-
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)

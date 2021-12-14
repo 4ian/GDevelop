@@ -12,7 +12,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     const maxDeltaY = maxFallingSpeed * timeDelta;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object on a platform.
       object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -276,7 +276,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       const maxDeltaY = maxFallingSpeed * timeDelta;
 
       beforeEach(function () {
-        runtimeScene = makeTestRuntimeScene();
+        runtimeScene = makePlatformerTestRuntimeScene();
 
         // Put a platformer object on a platform.
         object = new gdjs.TestRuntimeObject(runtimeScene, {

@@ -5,7 +5,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       let object;
 
       beforeEach(function () {
-        runtimeScene = makeTestRuntimeScene();
+        runtimeScene = makePlatformerTestRuntimeScene();
 
         // Put a platformer object on a platform
         object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -309,7 +309,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       let platform;
 
       beforeEach(function () {
-        runtimeScene = makeTestRuntimeScene();
+        runtimeScene = makePlatformerTestRuntimeScene();
 
         // Put a platformer object in the air.
         object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -460,7 +460,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     let object;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object on a platform
       object = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
@@ -590,7 +590,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
 
   describe('Floating-point error mitigations', function () {
     it('Specific coordinates with slopeMaxAngle=0 creating Y oscillations and drift on a moving floor', function () {
-      const runtimeScene = makeTestRuntimeScene();
+      const runtimeScene = makePlatformerTestRuntimeScene();
 
       // Create a Sprite object that has the origin at a specific position (see below)
       // and that has a slope max angle of 0 (so it can't climb on a floor even if it's a bit higher

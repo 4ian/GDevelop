@@ -5,7 +5,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     let platform;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object in the air.
       object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -121,7 +121,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     let platform;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object on a platform
       object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -561,7 +561,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     let jumpthru;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object on a platform.
       object = new gdjs.TestRuntimeObject(runtimeScene, {
@@ -781,7 +781,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     var object2;
 
     beforeEach(function () {
-      runtimeScene = makeTestRuntimeScene();
+      runtimeScene = makePlatformerTestRuntimeScene();
 
       // Put a platformer object on a platform.
       object = new gdjs.TestRuntimeObject(runtimeScene, {

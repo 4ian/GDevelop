@@ -5,7 +5,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior Benchmark', function () {
   const stepCount = 6000;
 
   beforeEach(function () {
-    runtimeScene = makeTestRuntimeScene();
+    runtimeScene = makePlatformerTestRuntimeScene();
 
     objects = new Array(duplicateCount);
     for (let i = 0; i < duplicateCount; ++i) {

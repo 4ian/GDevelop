@@ -1,5 +1,5 @@
 
-  const makeTestRuntimeScene = () => {
+  const makePlatformerTestRuntimeScene = () => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
       resources: {

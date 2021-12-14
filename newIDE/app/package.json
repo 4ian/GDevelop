@@ -70,6 +70,7 @@
     "react-measure": "2.3.0",
     "react-monaco-editor": "^0.18.0",
     "react-mosaic-component": "git://github.com/4ian/react-mosaic#v3.1.0",
+    "react-share": "^4.4.0",
     "react-sortable-hoc": "1.5.0",
     "react-sortable-tree": "2.6.2",
     "react-test-renderer": "16.8.6",
@@ -109,13 +110,20 @@
   "eslintConfig": {
     "extends": "react-app",
     "rules": {
-      "no-restricted-imports": ["error", {
-        "paths": [{
-          "name": "@lingui/react",
-          "importNames": ["Trans"],
-          "message": "Please import Trans from @lingui/macro"
-        }]
-      }]
+      "no-restricted-imports": [
+        "error",
+        {
+          "paths": [
+            {
+              "name": "@lingui/react",
+              "importNames": [
+                "Trans"
+              ],
+              "message": "Please import Trans from @lingui/macro"
+            }
+          ]
+        }
+      ]
     }
   },
   "flow-coverage-report": {

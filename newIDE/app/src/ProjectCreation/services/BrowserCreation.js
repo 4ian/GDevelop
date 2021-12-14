@@ -16,8 +16,10 @@ const gd: libGDevelop = global.gd;
 export const onCreateBlank = async ({
   i18n,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   project: gdProject,
@@ -27,16 +29,22 @@ export const onCreateBlank = async ({
   sendNewGameCreated('');
 
   const project = gd.ProjectHelper.createNewGDJSProject();
-  return { project, storageProvider: null, fileMetadata: null };
+  return {
+    project,
+    storageProvider: null,
+    fileMetadata: { projectName, fileIdentifier: '' },
+  };
 };
 
 export const onCreateFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
+  projectName,
   outputPath,
 }: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   storageProvider: StorageProvider,
@@ -48,6 +56,7 @@ export const onCreateFromExampleShortHeader = async ({
     return {
       storageProvider: UrlStorageProvider,
       fileMetadata: {
+        projectName,
         fileIdentifier: example.projectFileUrl,
       },
     };

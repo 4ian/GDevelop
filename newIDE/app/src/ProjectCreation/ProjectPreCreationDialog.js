@@ -37,7 +37,9 @@ const ProjectPreCreationDialog = ({
     () => {
       setProjectNameError(null);
       if (!projectName) {
-        setProjectNameError(<Trans>Your project needs a name</Trans>);
+        setProjectNameError(
+          <Trans>Please enter a name for your project.</Trans>
+        );
         return;
       }
       onCreate();

@@ -11,6 +11,9 @@ import {
   GameRegistrationWidget,
   type GameRegistrationWidgetProps,
 } from '../../GameDashboard/GameRegistration';
+import GDevelopJsInitializerDecorator, {
+  testProject,
+} from '../GDevelopJsInitializerDecorator';
 import {
   indieUserProfile,
   game1,
@@ -22,13 +25,10 @@ const indieUserProfileWithGameStatsEmail: Profile = {
   getGameStatsEmail: true,
 };
 
-// $FlowFixMe - Understand why the testProject imported from fixtures is always undefined.
-const testProject: TestProject = { project: 'fake' };
-
 export default {
   title: 'GameDashboard/GameRegistrationWidget',
   component: GameRegistrationWidget,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
 };
 
 const defaultProps: GameRegistrationWidgetProps = {
@@ -92,6 +92,13 @@ export const EmailAccepted = () => (
   <GameRegistrationWidget
     {...defaultProps}
     profile={indieUserProfileWithGameStatsEmail}
+  />
+);
+export const EmailAcceptedButHidingIfSubscribed = () => (
+  <GameRegistrationWidget
+    {...defaultProps}
+    profile={indieUserProfileWithGameStatsEmail}
+    hideIfSubscribed
   />
 );
 export const DetailsOpened = () => (

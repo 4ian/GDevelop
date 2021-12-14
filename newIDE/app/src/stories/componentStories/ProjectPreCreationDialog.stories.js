@@ -13,27 +13,33 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Open = () => (
-  <ProjectPreCreationDialog
-    open
-    outputPath="/path/to/project/file.json"
-    onChangeOutputPath={action('change output path')}
-    onClose={() => action('click on close')()}
-    onCreate={() => action('click on create')()}
-    projectName="Project Name"
-    onChangeProjectName={text => action('Change project name')}
-  />
-);
+export const Open = () => {
+  const [projectName, setProjectName] = React.useState('Project Name');
+  return (
+    <ProjectPreCreationDialog
+      open
+      outputPath="/path/to/project/file.json"
+      onChangeOutputPath={action('change output path')}
+      onClose={() => action('click on close')()}
+      onCreate={() => action('click on create')()}
+      projectName={projectName}
+      onChangeProjectName={setProjectName}
+    />
+  );
+};
 
-export const Disabled = () => (
-  <ProjectPreCreationDialog
-    open
-    isOpening
-    outputPath="/path/to/project/file.json"
-    onChangeOutputPath={action('change output path')}
-    onClose={() => action('click on close')()}
-    onCreate={() => action('click on create')()}
-    projectName="Project Name"
-    onChangeProjectName={text => action('Change project name')}
-  />
-);
+export const Disabled = () => {
+  const [projectName, setProjectName] = React.useState('Project Name');
+  return (
+    <ProjectPreCreationDialog
+      open
+      isOpening
+      outputPath="/path/to/project/file.json"
+      onChangeOutputPath={action('change output path')}
+      onClose={() => action('click on close')()}
+      onCreate={() => action('click on create')()}
+      projectName={projectName}
+      onChangeProjectName={setProjectName}
+    />
+  );
+};

@@ -29,7 +29,6 @@ const ProjectPreCreationDialog = ({
   projectName,
   onChangeProjectName,
 }: Props): React.Node => {
-
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
@@ -84,6 +83,7 @@ const ProjectPreCreationDialog = ({
         <TextField
           type="text"
           errorText={projectNameError}
+          disabled={isOpening}
           value={projectNameToDisplay}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}

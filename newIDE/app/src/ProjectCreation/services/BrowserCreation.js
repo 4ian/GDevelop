@@ -29,10 +29,11 @@ export const onCreateBlank = async ({
   sendNewGameCreated('');
 
   const project = gd.ProjectHelper.createNewGDJSProject();
+  project.setName(projectName);
   return {
     project,
     storageProvider: null,
-    fileMetadata: { projectName, fileIdentifier: '' },
+    fileMetadata: null,
   };
 };
 

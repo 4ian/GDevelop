@@ -13,9 +13,8 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import PublishIcon from '@material-ui/icons/Publish';
-import { findEmptyPath } from './LocalPathFinder';
+import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
@@ -75,9 +74,7 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: this.props.initialTab,
-    outputPath: app
-      ? findEmptyPath(path.join(app.getPath('documents'), 'GDevelop projects'))
-      : '',
+    outputPath: app ? findEmptyPathInDefaultFolder(app) : '',
   };
 
   _onChangeTab = (newTab: CreateProjectDialogTabs) => {

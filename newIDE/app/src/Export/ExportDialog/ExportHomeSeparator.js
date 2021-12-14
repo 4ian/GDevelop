@@ -9,7 +9,7 @@ export default () => {
   const theme = React.useContext(GDevelopThemeContext);
   return (
     windowWidth !== 'small' && (
-      <Column justifyContent="center">
+      <Column justifyContent="center" noMargin>
         <span
           style={{
             height: 'calc(100% - 30px)',

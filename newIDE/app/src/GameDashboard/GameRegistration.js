@@ -23,6 +23,7 @@ import { GameDetailsDialog } from './GameDetailsDialog';
 type Props = {|
   project: ?gdProject,
   hideIfRegistered?: boolean,
+  hideIfSubscribed?: boolean,
   hideLoader?: boolean,
   onGameRegistered?: () => void,
 |};
@@ -33,6 +34,7 @@ type UnavailableReason = 'unauthorized' | 'not-existing' | null;
 export const GameRegistration = ({
   project,
   hideIfRegistered,
+  hideIfSubscribed,
   hideLoader,
   onGameRegistered,
 }: Props) => {
@@ -168,6 +170,7 @@ export const GameRegistration = ({
       onRegisterGame={onRegisterGame}
       registrationInProgress={registrationInProgress}
       hideIfRegistered={hideIfRegistered}
+      hideIfSubscribed={hideIfSubscribed}
       unavailableReason={unavailableReason}
       acceptGameStatsEmailInProgress={acceptGameStatsEmailInProgress}
       onAcceptGameStatsEmail={_onAcceptGameStatsEmail}
@@ -193,6 +196,7 @@ export type GameRegistrationWidgetProps = {|
   onRegisterGame: () => Promise<void>,
   registrationInProgress: boolean,
   hideIfRegistered?: boolean,
+  hideIfSubscribed?: boolean,
   unavailableReason: ?UnavailableReason,
   acceptGameStatsEmailInProgress: boolean,
   onAcceptGameStatsEmail: () => Promise<void>,
@@ -216,6 +220,7 @@ export const GameRegistrationWidget = ({
   onRegisterGame,
   registrationInProgress,
   hideIfRegistered,
+  hideIfSubscribed,
   unavailableReason,
   acceptGameStatsEmailInProgress,
   onAcceptGameStatsEmail,
@@ -302,6 +307,7 @@ export const GameRegistrationWidget = ({
         </AlertMessage>
       );
     }
+    if (hideIfSubscribed) return null;
     return (
       <ColumnStackLayout noMargin>
         <Line justifyContent="center">

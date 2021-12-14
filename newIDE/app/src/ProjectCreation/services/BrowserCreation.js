@@ -19,8 +19,8 @@ export const onCreateBlank = async ({
   projectName,
 }: {|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
-  projectName?: ?string,
 |}): Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
@@ -29,17 +29,22 @@ export const onCreateBlank = async ({
   sendNewGameCreated('');
 
   const project = gd.ProjectHelper.createNewGDJSProject();
-  projectName && project.setName(projectName);
-  return { project, storageProvider: null, fileMetadata: null };
+  return {
+    project,
+    storageProvider: null,
+    fileMetadata: { projectName, fileIdentifier: '' },
+  };
 };
 
 export const onCreateFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
+  projectName,
   outputPath,
 }: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   storageProvider: StorageProvider,
@@ -51,6 +56,7 @@ export const onCreateFromExampleShortHeader = async ({
     return {
       storageProvider: UrlStorageProvider,
       fileMetadata: {
+        projectName,
         fileIdentifier: example.projectFileUrl,
       },
     };

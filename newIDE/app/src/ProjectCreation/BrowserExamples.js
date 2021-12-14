@@ -23,7 +23,7 @@ export default function BrowserExamples({
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
-  const [newProjectName, setNewProjectName] = React.useState<?string>(null);
+  const [newProjectName, setNewProjectName] = React.useState<string>('');// TODO generate name
   const [isOpening, setIsOpening] = React.useState(false);
 
   const createProjectFromExample = async (
@@ -35,6 +35,7 @@ export default function BrowserExamples({
     try {
       const projectMetadata = await onCreateFromExampleShortHeader({
         i18n,
+        projectName: newProjectName,
         exampleShortHeader: selectedExampleShortHeader,
       });
       if (projectMetadata) {

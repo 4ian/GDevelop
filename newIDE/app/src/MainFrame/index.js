@@ -1984,13 +1984,15 @@ const MainFrame = (props: Props) => {
     await getStorageProviderOperations(storageProvider);
     let state;
     if (project) state = await loadFromProject(project, fileMetadata);
-    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+    else if (!!fileMetadata && !!fileMetadata.fileIdentifier)
+      state = await openFromFileMetadata(fileMetadata);
 
     if (state) {
       if (state.currentProject) {
-        const {currentProject} = state;
+        const { currentProject } = state;
         currentProject.resetProjectUuid();
-        if (fileMetadata && fileMetadata.projectName) currentProject.setName(fileMetadata.projectName);
+        if (fileMetadata && fileMetadata.projectName)
+          currentProject.setName(fileMetadata.projectName);
       }
       openSceneOrProjectManager({
         currentProject: state.currentProject,

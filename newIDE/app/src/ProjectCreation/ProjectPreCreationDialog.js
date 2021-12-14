@@ -33,11 +33,6 @@ const ProjectPreCreationDialog = ({
     null
   );
 
-  let projectNameToDisplay =
-    projectName === null || projectName === undefined
-      ? 'Bonjour les cocos'
-      : projectName;
-
   const onValidate = React.useCallback(
     () => {
       setProjectNameError(null);
@@ -84,7 +79,7 @@ const ProjectPreCreationDialog = ({
           type="text"
           errorText={projectNameError}
           disabled={isOpening}
-          value={projectNameToDisplay}
+          value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
         />

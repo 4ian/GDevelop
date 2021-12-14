@@ -258,6 +258,14 @@ export const HomePage = React.memo<Props>(
         []
       );
 
+      const openPreCreationDialog = React.useCallback((open: boolean) => {
+        if (open) {
+          setOutputPath(computeDefaultProjectPath());
+          setNewProjectName(generateName());
+        }
+        setPreCreationDialogOpen(open);
+      }, []);
+
       const createProject = async (i18n: I18nType) => {
         setIsOpening(true);
 
@@ -283,10 +291,8 @@ export const HomePage = React.memo<Props>(
           if (!projectMetadata) return;
 
           // Once project is created, reinitialize default values for variables related to project creation.
-          setPreCreationDialogOpen(false);
+          openPreCreationDialog(false);
           setSelectedExample(null);
-          setOutputPath(computeDefaultProjectPath());
-          setNewProjectName(generateName());
 
           onOpenProjectAfterCreation({ ...projectMetadata });
         } finally {
@@ -319,7 +325,7 @@ export const HomePage = React.memo<Props>(
                             <FlatButton
                               label={<Trans>Create a blank project</Trans>}
                               onClick={() => {
-                                setPreCreationDialogOpen(true);
+                                openPreCreationDialog(true);
                               }}
                               primary
                             />
@@ -515,7 +521,7 @@ export const HomePage = React.memo<Props>(
                   onClose={() => setSelectedExample(null)}
                   exampleShortHeader={selectedExample}
                   onOpen={() => {
-                    setPreCreationDialogOpen(true);
+                    openPreCreationDialog(true);
                   }}
                 />
               )}
@@ -523,7 +529,7 @@ export const HomePage = React.memo<Props>(
                 <ProjectPreCreationDialog
                   open
                   isOpening={isOpening}
-                  onClose={() => setPreCreationDialogOpen(false)}
+                  onClose={() => openPreCreationDialog(false)}
                   onCreate={() => createProject(i18n)}
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}

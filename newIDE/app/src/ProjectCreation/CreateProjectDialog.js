@@ -33,6 +33,7 @@ export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
+  projectName?: string,
   shouldCloseDialog?: boolean,
 |}) => Promise<void>;
 
@@ -50,6 +51,7 @@ export type OnCreateBlankFunction = ({|
 |}) => Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
+  projectName?: string,
   fileMetadata: ?FileMetadata,
 |}>;
 
@@ -60,6 +62,7 @@ export type OnCreateFromExampleShortHeaderFunction = ({|
   outputPath?: string,
 |}) => Promise<?{|
   storageProvider: StorageProvider,
+  projectName: string,
   fileMetadata: FileMetadata,
 |}>;
 

@@ -1971,11 +1971,13 @@ const MainFrame = (props: Props) => {
     project,
     storageProvider,
     fileMetadata,
+    projectName,
     shouldCloseDialog,
   }: {|
     project?: gdProject,
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata,
+    projectName?: string,
     shouldCloseDialog?: boolean,
   |}) => {
     if (shouldCloseDialog)
@@ -1990,8 +1992,7 @@ const MainFrame = (props: Props) => {
       if (state.currentProject) {
         const { currentProject } = state;
         currentProject.resetProjectUuid();
-        if (fileMetadata && fileMetadata.projectName)
-          currentProject.setName(fileMetadata.projectName);
+        if (fileMetadata && projectName) currentProject.setName(projectName);
       }
       openSceneOrProjectManager({
         currentProject: state.currentProject,

@@ -1,3 +1,4 @@
+// @flow
 /*
 Funny name generator
 List of words taken from https://github.com/aceakash/project-name-generator/tree/1.0.0
@@ -6,7 +7,6 @@ List of words taken from https://github.com/aceakash/project-name-generator/tree
 import capitalize from 'lodash/capitalize';
 import sample from 'lodash/sample';
 
-// @flow
 const adjectives = [
   'abandoned',
   'abashed',

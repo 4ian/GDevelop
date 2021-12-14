@@ -147,7 +147,9 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
-      const [newProjectName, setNewProjectName] = React.useState<string>(generateName())
+      const [newProjectName, setNewProjectName] = React.useState<string>(
+        generateName()
+      );
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -262,13 +264,13 @@ export const HomePage = React.memo<Props>(
           const projectMetadata = await onCreateBlank({
             i18n,
             outputPath,
-            projectName: newProjectName
+            projectName: newProjectName,
           });
           if (!projectMetadata) return;
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
-          setNewProjectName(generateName())
+          setNewProjectName(generateName());
           onOpenProjectAfterCreation({
             project,
             storageProvider,

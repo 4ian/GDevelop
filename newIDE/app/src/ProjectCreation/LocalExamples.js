@@ -63,8 +63,7 @@ export default function LocalExamples({
         exampleShortHeader: selectedExampleShortHeader,
       });
       if (!!projectMetadata) {
-        const { storageProvider, fileMetadata } = projectMetadata;
-        onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+        onOpen({ ...projectMetadata, shouldCloseDialog: true });
       }
     } finally {
       setIsOpening(false);

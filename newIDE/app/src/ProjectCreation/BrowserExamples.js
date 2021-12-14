@@ -40,8 +40,7 @@ export default function BrowserExamples({
         exampleShortHeader: selectedExampleShortHeader,
       });
       if (projectMetadata) {
-        const { storageProvider, fileMetadata } = projectMetadata;
-        onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+        onOpen({ ...projectMetadata, shouldCloseDialog: true });
       }
     } finally {
       setIsOpening(false);

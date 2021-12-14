@@ -261,20 +261,30 @@ export const HomePage = React.memo<Props>(
       const createBlankProject = async (i18n: I18nType) => {
         setIsOpening(true);
         try {
+          // Create project.
           const projectMetadata = await onCreateBlank({
             i18n,
             outputPath,
             projectName: newProjectName,
           });
           if (!projectMetadata) return;
-          const { project, storageProvider, fileMetadata } = projectMetadata;
+          const {
+            project,
+            storageProvider,
+            fileMetadata,
+            projectName,
+          } = projectMetadata;
+
+          // Once project is created, reinitialize default values for variables related to project creation.
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
           setNewProjectName(generateName());
+
           onOpenProjectAfterCreation({
             project,
             storageProvider,
             fileMetadata,
+            projectName,
           });
         } finally {
           setIsOpening(false);

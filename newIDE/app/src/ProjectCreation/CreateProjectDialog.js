@@ -33,6 +33,7 @@ export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
+  projectName?: string,
   shouldCloseDialog?: boolean,
 |}) => Promise<void>;
 
@@ -45,19 +46,23 @@ export type CreateProjectDialogWithComponentsProps = {|
 
 export type OnCreateBlankFunction = ({|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
+  projectName?: string,
   fileMetadata: ?FileMetadata,
 |}>;
 
 export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   storageProvider: StorageProvider,
+  projectName: string,
   fileMetadata: FileMetadata,
 |}>;
 

@@ -43,7 +43,9 @@ export default function LocalExamples({
   onCreateFromExampleShortHeader,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [newProjectName, setNewProjectName] = React.useState<string>(generateName());
+  const [newProjectName, setNewProjectName] = React.useState<string>(
+    generateName()
+  );
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,

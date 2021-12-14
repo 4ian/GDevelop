@@ -24,12 +24,12 @@ export default function BrowserExamples({
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
-  const [newProjectName, setNewProjectName] = React.useState<string>(generateName());
+  const [newProjectName, setNewProjectName] = React.useState<string>(
+    generateName()
+  );
   const [isOpening, setIsOpening] = React.useState(false);
 
-  const createProjectFromExample = async (
-    i18n: I18nType,
-  ) => {
+  const createProjectFromExample = async (i18n: I18nType) => {
     if (!selectedExampleShortHeader) return;
 
     setIsOpening(true);
@@ -52,13 +52,13 @@ export default function BrowserExamples({
     <I18n>
       {({ i18n }) => (
         <>
-        <ExampleStore
-          isOpening={isOpening}
-          onOpen={async (example: ?ExampleShortHeader) =>
-            setSelectedExampleShortShortHeader(example)
-          }
-        />
-        {selectedExampleShortHeader && (
+          <ExampleStore
+            isOpening={isOpening}
+            onOpen={async (example: ?ExampleShortHeader) =>
+              setSelectedExampleShortShortHeader(example)
+            }
+          />
+          {selectedExampleShortHeader && (
             <ProjectPreCreationDialog
               open
               isOpening={isOpening}

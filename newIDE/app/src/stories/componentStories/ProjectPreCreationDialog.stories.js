@@ -21,7 +21,7 @@ export const Open = () => (
     onClose={() => action('click on close')()}
     onCreate={() => action('click on create')()}
     projectName="Project Name"
-    onChangeProjectName={(text) => action('Change project name')}
+    onChangeProjectName={text => action('Change project name')}
   />
 );
 
@@ -34,6 +34,6 @@ export const Disabled = () => (
     onClose={() => action('click on close')()}
     onCreate={() => action('click on create')()}
     projectName="Project Name"
-    onChangeProjectName={(text) => action('Change project name')}
+    onChangeProjectName={text => action('Change project name')}
   />
 );

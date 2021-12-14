@@ -258,57 +258,37 @@ export const HomePage = React.memo<Props>(
         []
       );
 
-      const createBlankProject = async (i18n: I18nType) => {
+      const createProject = async (i18n: I18nType) => {
         setIsOpening(true);
+
         try {
           // Create project.
-          const projectMetadata = await onCreateBlank({
-            i18n,
-            outputPath,
-            projectName: newProjectName,
-          });
+          let projectMetadata;
+
+          if (selectedExample) {
+            projectMetadata = await onCreateFromExampleShortHeader({
+              i18n,
+              outputPath,
+              projectName: newProjectName,
+              exampleShortHeader: selectedExample,
+            });
+          } else {
+            projectMetadata = await onCreateBlank({
+              i18n,
+              outputPath,
+              projectName: newProjectName,
+            });
+          }
+
           if (!projectMetadata) return;
-          const {
-            project,
-            storageProvider,
-            fileMetadata,
-            projectName,
-          } = projectMetadata;
 
           // Once project is created, reinitialize default values for variables related to project creation.
           setPreCreationDialogOpen(false);
+          setSelectedExample(null);
           setOutputPath(computeDefaultProjectPath());
           setNewProjectName(generateName());
 
-          onOpenProjectAfterCreation({
-            project,
-            storageProvider,
-            fileMetadata,
-            projectName,
-          });
-        } finally {
-          setIsOpening(false);
-        }
-      };
-
-      const createProjectFromExample = async (i18n: I18nType) => {
-        if (!selectedExample) return;
-
-        setIsOpening(true);
-        try {
-          const projectMetadata = await onCreateFromExampleShortHeader({
-            i18n,
-            outputPath,
-            projectName: newProjectName,
-            exampleShortHeader: selectedExample,
-          });
-          if (projectMetadata) {
-            const { storageProvider, fileMetadata } = projectMetadata;
-            setPreCreationDialogOpen(false);
-            setSelectedExample(null);
-            setOutputPath(computeDefaultProjectPath());
-            onOpenProjectAfterCreation({ storageProvider, fileMetadata });
-          }
+          onOpenProjectAfterCreation({ ...projectMetadata });
         } finally {
           setIsOpening(false);
         }
@@ -544,11 +524,7 @@ export const HomePage = React.memo<Props>(
                   open
                   isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}
-                  onCreate={() =>
-                    selectedExample
-                      ? createProjectFromExample(i18n)
-                      : createBlankProject(i18n)
-                  }
+                  onCreate={() => createProject(i18n)}
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}
                   projectName={newProjectName}

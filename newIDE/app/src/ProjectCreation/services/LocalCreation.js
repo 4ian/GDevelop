@@ -20,8 +20,10 @@ var fs = optionalRequire('fs-extra');
 export const onCreateBlank = async ({
   i18n,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   project: gdProject,
@@ -44,7 +46,7 @@ export const onCreateBlank = async ({
   return {
     project,
     storageProvider: LocalFileStorageProvider,
-    fileMetadata: { fileIdentifier: filePath },
+    fileMetadata: { projectName, fileIdentifier: filePath },
   };
 };
 
@@ -52,9 +54,11 @@ export const onCreateFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   storageProvider: StorageProvider,
@@ -81,7 +85,7 @@ export const onCreateFromExampleShortHeader = async ({
     sendNewGameCreated(example.projectFileUrl);
     return {
       storageProvider: LocalFileStorageProvider,
-      fileMetadata: { fileIdentifier: localFilePath },
+      fileMetadata: { projectName, fileIdentifier: localFilePath },
     };
   } catch (error) {
     showErrorBox({

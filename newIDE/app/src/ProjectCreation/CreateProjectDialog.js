@@ -45,6 +45,7 @@ export type CreateProjectDialogWithComponentsProps = {|
 
 export type OnCreateBlankFunction = ({|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   project: gdProject,
@@ -55,6 +56,7 @@ export type OnCreateBlankFunction = ({|
 export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   storageProvider: StorageProvider,

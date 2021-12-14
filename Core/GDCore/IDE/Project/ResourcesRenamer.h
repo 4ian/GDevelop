@@ -46,6 +46,12 @@ class ResourcesRenamer : public gd::ArbitraryResourceWorker {
   virtual void ExposeFont(gd::String& fontResourceName) override {
     RenameIfNeeded(fontResourceName);
   };
+  virtual void ExposeJson(gd::String& jsonResourceName) override {
+    RenameIfNeeded(jsonResourceName);
+  };
+  virtual void ExposeVideo(gd::String& videoResourceName) override {
+    RenameIfNeeded(videoResourceName);
+  };
   virtual void ExposeBitmapFont(gd::String& bitmapFontName) override {
     RenameIfNeeded(bitmapFontName);
   };

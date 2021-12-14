@@ -28,7 +28,7 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
 import optionalRequire from '../../../Utils/OptionalRequire';
-import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
+import { findEmptyPathInDefaultFolder } from '../../../ProjectCreation/LocalPathFinder';
 import ProjectPreCreationDialog from '../../../ProjectCreation/ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
@@ -41,7 +41,6 @@ import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorag
 import generateName from '../../../Utils/ProjectNameGenerator';
 
 const electron = optionalRequire('electron');
-const path = optionalRequire('path');
 const app = electron ? electron.remote.app : null;
 
 const styles = {
@@ -180,13 +179,6 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      const computeDefaultProjectPath = (): string =>
-        app && path
-          ? findEmptyPath(
-              path.join(app.getPath('documents'), 'GDevelop projects')
-            )
-          : '';
-
       const [outputPath, setOutputPath] = React.useState<string>('');
       const [
         preCreationDialogOpen,
@@ -256,7 +248,7 @@ export const HomePage = React.memo<Props>(
 
       const openPreCreationDialog = React.useCallback((open: boolean) => {
         if (open) {
-          setOutputPath(computeDefaultProjectPath());
+          setOutputPath(app ? findEmptyPathInDefaultFolder(app) : '');
           setNewProjectName(generateName());
         }
         setPreCreationDialogOpen(open);

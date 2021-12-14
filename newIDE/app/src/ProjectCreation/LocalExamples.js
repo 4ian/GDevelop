@@ -8,11 +8,12 @@ import { ExampleStore } from '../AssetStore/ExampleStore';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { Column } from '../UI/Grid';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import LocalProjectPreCreationDialog from './LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
+import generateName from '../Utils/ProjectNameGenerator';
 
 type Props = {|
   onOpen: OnOpenProjectAfterCreationFunction,
@@ -42,6 +43,9 @@ export default function LocalExamples({
   onCreateFromExampleShortHeader,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
+  const [newProjectName, setNewProjectName] = React.useState<string>(
+    generateName()
+  );
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
@@ -55,11 +59,11 @@ export default function LocalExamples({
       const projectMetadata = await onCreateFromExampleShortHeader({
         i18n,
         outputPath,
+        projectName: newProjectName,
         exampleShortHeader: selectedExampleShortHeader,
       });
       if (!!projectMetadata) {
-        const { storageProvider, fileMetadata } = projectMetadata;
-        onOpen({ storageProvider, fileMetadata, shouldCloseDialog: true });
+        onOpen({ ...projectMetadata, shouldCloseDialog: true });
       }
     } finally {
       setIsOpening(false);
@@ -80,13 +84,15 @@ export default function LocalExamples({
             />
           </Column>
           {selectedExampleShortHeader && (
-            <LocalProjectPreCreationDialog
+            <ProjectPreCreationDialog
               open
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
+              projectName={newProjectName}
+              onChangeProjectName={setNewProjectName}
             />
           )}
         </>

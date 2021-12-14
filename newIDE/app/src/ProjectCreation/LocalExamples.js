@@ -42,7 +42,7 @@ export default function LocalExamples({
   onCreateFromExampleShortHeader,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [newProjectName, setNewProjectName] = React.useState<?string>(null);
+  const [newProjectName, setNewProjectName] = React.useState<string>(''); // TODO generate name
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
@@ -56,6 +56,7 @@ export default function LocalExamples({
       const projectMetadata = await onCreateFromExampleShortHeader({
         i18n,
         outputPath,
+        projectName: newProjectName,
         exampleShortHeader: selectedExampleShortHeader,
       });
       if (!!projectMetadata) {

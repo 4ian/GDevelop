@@ -146,7 +146,7 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
-      const [newProjectName, setNewProjectName] = React.useState<?string>(null);
+      const [newProjectName, setNewProjectName] = React.useState<string>(''); // TODO generate name
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -267,7 +267,7 @@ export const HomePage = React.memo<Props>(
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
-          setNewProjectName(null)
+          setNewProjectName('') // TODO generate name
           onOpenProjectAfterCreation({
             project,
             storageProvider,
@@ -286,6 +286,7 @@ export const HomePage = React.memo<Props>(
           const projectMetadata = await onCreateFromExampleShortHeader({
             i18n,
             outputPath,
+            projectName: newProjectName,
             exampleShortHeader: selectedExample,
           });
           if (projectMetadata) {

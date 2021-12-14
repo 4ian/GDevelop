@@ -23,8 +23,8 @@ export const onCreateBlank = async ({
   projectName,
 }: {|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
-  projectName?: ?string,
 |}): Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
@@ -42,12 +42,11 @@ export const onCreateBlank = async ({
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
   const filePath = path.join(outputPath, 'game.json');
   project.setProjectFile(filePath);
-  projectName && project.setName(projectName)
   sendNewGameCreated('');
   return {
     project,
     storageProvider: LocalFileStorageProvider,
-    fileMetadata: { fileIdentifier: filePath },
+    fileMetadata: { projectName, fileIdentifier: filePath },
   };
 };
 
@@ -55,9 +54,11 @@ export const onCreateFromExampleShortHeader = async ({
   i18n,
   exampleShortHeader,
   outputPath,
+  projectName,
 }: {|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}): Promise<?{|
   storageProvider: StorageProvider,
@@ -84,7 +85,7 @@ export const onCreateFromExampleShortHeader = async ({
     sendNewGameCreated(example.projectFileUrl);
     return {
       storageProvider: LocalFileStorageProvider,
-      fileMetadata: { fileIdentifier: localFilePath },
+      fileMetadata: { projectName, fileIdentifier: localFilePath },
     };
   } catch (error) {
     showErrorBox({

@@ -1987,7 +1987,11 @@ const MainFrame = (props: Props) => {
     else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
 
     if (state) {
-      if (state.currentProject) state.currentProject.resetProjectUuid();
+      if (state.currentProject) {
+        const {currentProject} = state;
+        currentProject.resetProjectUuid();
+        if (fileMetadata && fileMetadata.projectName) currentProject.setName(fileMetadata.projectName);
+      }
       openSceneOrProjectManager({
         currentProject: state.currentProject,
         editorTabs: state.editorTabs,

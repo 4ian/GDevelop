@@ -13,6 +13,7 @@ import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
+import generateName from '../Utils/ProjectNameGenerator';
 
 type Props = {|
   onOpen: OnOpenProjectAfterCreationFunction,
@@ -42,7 +43,7 @@ export default function LocalExamples({
   onCreateFromExampleShortHeader,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [newProjectName, setNewProjectName] = React.useState<string>(''); // TODO generate name
+  const [newProjectName, setNewProjectName] = React.useState<string>(generateName());
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,

@@ -38,6 +38,7 @@ import {
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import generateName from '../../../Utils/ProjectNameGenerator';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -146,7 +147,7 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
-      const [newProjectName, setNewProjectName] = React.useState<string>(''); // TODO generate name
+      const [newProjectName, setNewProjectName] = React.useState<string>(generateName())
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -267,7 +268,7 @@ export const HomePage = React.memo<Props>(
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
-          setNewProjectName('') // TODO generate name
+          setNewProjectName(generateName())
           onOpenProjectAfterCreation({
             project,
             storageProvider,

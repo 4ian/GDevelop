@@ -9,6 +9,7 @@ import {
   type OnOpenProjectAfterCreationFunction,
 } from '../ProjectCreation/CreateProjectDialog';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
+import generateName from '../Utils/ProjectNameGenerator';
 
 type Props = {|
   onOpen: OnOpenProjectAfterCreationFunction,
@@ -23,7 +24,7 @@ export default function BrowserExamples({
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
-  const [newProjectName, setNewProjectName] = React.useState<string>('');// TODO generate name
+  const [newProjectName, setNewProjectName] = React.useState<string>(generateName());
   const [isOpening, setIsOpening] = React.useState(false);
 
   const createProjectFromExample = async (

@@ -13,9 +13,8 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import PublishIcon from '@material-ui/icons/Publish';
-import { findEmptyPath } from './LocalPathFinder';
+import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
-const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
@@ -33,6 +32,7 @@ export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
+  projectName?: string,
   shouldCloseDialog?: boolean,
 |}) => Promise<void>;
 
@@ -45,19 +45,23 @@ export type CreateProjectDialogWithComponentsProps = {|
 
 export type OnCreateBlankFunction = ({|
   i18n: I18nType,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
+  projectName?: string,
   fileMetadata: ?FileMetadata,
 |}>;
 
 export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
+  projectName: string,
   outputPath?: string,
 |}) => Promise<?{|
   storageProvider: StorageProvider,
+  projectName: string,
   fileMetadata: FileMetadata,
 |}>;
 
@@ -70,9 +74,7 @@ type Props = {|
 export default class CreateProjectDialog extends React.Component<Props, State> {
   state = {
     currentTab: this.props.initialTab,
-    outputPath: app
-      ? findEmptyPath(path.join(app.getPath('documents'), 'GDevelop projects'))
-      : '',
+    outputPath: app ? findEmptyPathInDefaultFolder(app) : '',
   };
 
   _onChangeTab = (newTab: CreateProjectDialogTabs) => {

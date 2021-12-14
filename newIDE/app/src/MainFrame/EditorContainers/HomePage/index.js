@@ -29,7 +29,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { findEmptyPath } from '../../../ProjectCreation/LocalPathFinder';
-import LocalProjectPreCreationDialog from '../../../ProjectCreation/LocalProjectPreCreationDialog';
+import ProjectPreCreationDialog from '../../../ProjectCreation/ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
@@ -38,6 +38,7 @@ import {
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
+import generateName from '../../../Utils/ProjectNameGenerator';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -146,6 +147,9 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
+      const [newProjectName, setNewProjectName] = React.useState<string>(
+        generateName()
+      );
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -254,44 +258,37 @@ export const HomePage = React.memo<Props>(
         []
       );
 
-      const createBlankProject = async (i18n: I18nType) => {
+      const createProject = async (i18n: I18nType) => {
         setIsOpening(true);
-        try {
-          const projectMetadata = await onCreateBlank({
-            i18n,
-            outputPath,
-          });
-          if (!projectMetadata) return;
-          const { project, storageProvider, fileMetadata } = projectMetadata;
-          setPreCreationDialogOpen(false);
-          setOutputPath(computeDefaultProjectPath());
-          onOpenProjectAfterCreation({
-            project,
-            storageProvider,
-            fileMetadata,
-          });
-        } finally {
-          setIsOpening(false);
-        }
-      };
 
-      const createProjectFromExample = async (i18n: I18nType) => {
-        if (!selectedExample) return;
-
-        setIsOpening(true);
         try {
-          const projectMetadata = await onCreateFromExampleShortHeader({
-            i18n,
-            outputPath,
-            exampleShortHeader: selectedExample,
-          });
-          if (projectMetadata) {
-            const { storageProvider, fileMetadata } = projectMetadata;
-            setPreCreationDialogOpen(false);
-            setSelectedExample(null);
-            setOutputPath(computeDefaultProjectPath());
-            onOpenProjectAfterCreation({ storageProvider, fileMetadata });
+          // Create project.
+          let projectMetadata;
+
+          if (selectedExample) {
+            projectMetadata = await onCreateFromExampleShortHeader({
+              i18n,
+              outputPath,
+              projectName: newProjectName,
+              exampleShortHeader: selectedExample,
+            });
+          } else {
+            projectMetadata = await onCreateBlank({
+              i18n,
+              outputPath,
+              projectName: newProjectName,
+            });
           }
+
+          if (!projectMetadata) return;
+
+          // Once project is created, reinitialize default values for variables related to project creation.
+          setPreCreationDialogOpen(false);
+          setSelectedExample(null);
+          setOutputPath(computeDefaultProjectPath());
+          setNewProjectName(generateName());
+
+          onOpenProjectAfterCreation({ ...projectMetadata });
         } finally {
           setIsOpening(false);
         }
@@ -322,9 +319,7 @@ export const HomePage = React.memo<Props>(
                             <FlatButton
                               label={<Trans>Create a blank project</Trans>}
                               onClick={() => {
-                                electron
-                                  ? setPreCreationDialogOpen(true)
-                                  : createBlankProject(i18n);
+                                setPreCreationDialogOpen(true);
                               }}
                               primary
                             />
@@ -520,24 +515,20 @@ export const HomePage = React.memo<Props>(
                   onClose={() => setSelectedExample(null)}
                   exampleShortHeader={selectedExample}
                   onOpen={() => {
-                    electron
-                      ? setPreCreationDialogOpen(true)
-                      : createProjectFromExample(i18n);
+                    setPreCreationDialogOpen(true);
                   }}
                 />
               )}
               {preCreationDialogOpen && (
-                <LocalProjectPreCreationDialog
+                <ProjectPreCreationDialog
                   open
                   isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}
-                  onCreate={() =>
-                    selectedExample
-                      ? createProjectFromExample(i18n)
-                      : createBlankProject(i18n)
-                  }
-                  outputPath={outputPath}
-                  onChangeOutputPath={setOutputPath}
+                  onCreate={() => createProject(i18n)}
+                  outputPath={electron ? outputPath : undefined}
+                  onChangeOutputPath={electron ? setOutputPath : undefined}
+                  projectName={newProjectName}
+                  onChangeProjectName={setNewProjectName}
                 />
               )}
             </>

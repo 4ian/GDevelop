@@ -89,8 +89,6 @@ type Props = {|
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onCreateBlank: OnCreateBlankFunction,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
-  newProjectName: ?string,
-  onChangeNewProjectName: (name: ?string) => void,
 |};
 
 type HomePageEditorInterface = {|
@@ -116,8 +114,6 @@ export const HomePage = React.memo<Props>(
         onOpenRecentFile,
         onCreateFromExampleShortHeader,
         onCreateBlank,
-        newProjectName,
-        onChangeNewProjectName,
         onOpenProjectAfterCreation,
         onOpenExamples,
         onOpenProjectManager,
@@ -150,6 +146,7 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
+      const [newProjectName, setNewProjectName] = React.useState<?string>(null);
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -270,7 +267,7 @@ export const HomePage = React.memo<Props>(
           const { project, storageProvider, fileMetadata } = projectMetadata;
           setPreCreationDialogOpen(false);
           setOutputPath(computeDefaultProjectPath());
-          onChangeNewProjectName(null)
+          setNewProjectName(null)
           onOpenProjectAfterCreation({
             project,
             storageProvider,
@@ -541,7 +538,7 @@ export const HomePage = React.memo<Props>(
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}
                   projectName={newProjectName}
-                  onChangeProjectName={onChangeNewProjectName}
+                  onChangeProjectName={setNewProjectName}
                 />
               )}
             </>
@@ -570,8 +567,6 @@ export const renderHomePageContainer = (
     onOpenExamples={props.onOpenExamples}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}
-    newProjectName={props.newProjectName}
-    onChangeNewProjectName={props.onChangeNewProjectName}
     onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}
     onOpenProjectManager={props.onOpenProjectManager}
     onCloseProject={props.onCloseProject}

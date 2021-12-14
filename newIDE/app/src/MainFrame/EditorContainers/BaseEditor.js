@@ -89,8 +89,6 @@ export type RenderEditorContainerProps = {|
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
   onCreateBlank: OnCreateBlankFunction,
   onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
-  newProjectName: ?string,
-  onChangeNewProjectName: (name: ?string) => void,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

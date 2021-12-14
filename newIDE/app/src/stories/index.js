@@ -2868,8 +2868,6 @@ storiesOf('Project Creation/CreateProjectDialog', module)
         onOpen={action('onOpen')}
         initialTab="examples"
         onCreateFromExampleShortHeader={() => action('create from example')}
-        projectName="Project Name"
-        onChangeProjectName={(text) => action('change project name')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2882,8 +2880,6 @@ storiesOf('Project Creation/CreateProjectDialog', module)
         onOpen={action('onOpen')}
         initialTab="games-showcase"
         onCreateFromExampleShortHeader={() => action('create from example')}
-        projectName="Project Name"
-        onChangeProjectName={(text) => action('change project name')}
       />
     </ExampleStoreStateProvider>
   ));

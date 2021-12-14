@@ -13,20 +13,17 @@ import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 type Props = {|
   onOpen: OnOpenProjectAfterCreationFunction,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  projectName: ?string,
-  onChangeProjectName: (name: string) => void,
 |};
 
 export default function BrowserExamples({
   onOpen,
   onCreateFromExampleShortHeader,
-  projectName,
-  onChangeProjectName
 }: Props) {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
+  const [newProjectName, setNewProjectName] = React.useState<?string>(null);
   const [isOpening, setIsOpening] = React.useState(false);
 
   const createProjectFromExample = async (
@@ -65,8 +62,8 @@ export default function BrowserExamples({
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
-              projectName={projectName}
-              onChangeProjectName={onChangeProjectName}
+              projectName={newProjectName}
+              onChangeProjectName={setNewProjectName}
             />
           )}
         </>

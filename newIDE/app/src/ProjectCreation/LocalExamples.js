@@ -19,8 +19,6 @@ type Props = {|
   onChangeOutputPath: (outputPath: string) => void,
   outputPath: string,
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
-  projectName: ?string,
-  onChangeProjectName: (name: string) => void,
 |};
 
 export const showGameFileCreationError = (
@@ -42,10 +40,9 @@ export default function LocalExamples({
   onChangeOutputPath,
   onOpen,
   onCreateFromExampleShortHeader,
-  projectName,
-  onChangeProjectName,
 }: Props) {
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
+  const [newProjectName, setNewProjectName] = React.useState<?string>(null);
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
@@ -91,8 +88,8 @@ export default function LocalExamples({
               onCreate={() => createProjectFromExample(i18n)}
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
-              projectName={projectName}
-              onChangeProjectName={onChangeProjectName}
+              projectName={newProjectName}
+              onChangeProjectName={setNewProjectName}
             />
           )}
         </>

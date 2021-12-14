@@ -67,8 +67,6 @@ const WrappedHomePage = ({ project }: {| project: ?gdProject |}) => (
           }
           onOpenProfile={() => action('open profile')()}
           onCreateBlank={() => action('create blank')()}
-          newProjectName={null}
-          onChangeNewProjectName={() => action('change new project name')()}
         />
       </GamesShowcaseStateProvider>
     </TutorialStateProvider>

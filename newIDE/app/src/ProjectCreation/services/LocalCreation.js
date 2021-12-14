@@ -1,33 +1,28 @@
 // @flow
 import axios from 'axios';
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 
 import LocalFileStorageProvider from '../../ProjectsStorage/LocalFileStorageProvider';
-import { type StorageProvider, type FileMetadata } from '../../ProjectsStorage';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { writeAndCheckFile } from '../../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { showGameFileCreationError } from '../LocalExamples';
+import {
+  type OnCreateBlankFunction,
+  type OnCreateFromExampleShortHeaderFunction,
+} from '../CreateProjectDialog';
 const gd: libGDevelop = global.gd;
 
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 
-export const onCreateBlank = async ({
+export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
   outputPath,
-}: {|
-  i18n: I18nType,
-  outputPath?: string,
-|}): Promise<?{|
-  project: gdProject,
-  storageProvider: ?StorageProvider,
-  fileMetadata: ?FileMetadata,
-|}> => {
+  projectName,
+}) => {
   if (!fs || !outputPath) return;
 
   try {
@@ -45,21 +40,16 @@ export const onCreateBlank = async ({
     project,
     storageProvider: LocalFileStorageProvider,
     fileMetadata: { fileIdentifier: filePath },
+    projectName,
   };
 };
 
-export const onCreateFromExampleShortHeader = async ({
+export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
   i18n,
   exampleShortHeader,
   outputPath,
-}: {|
-  i18n: I18nType,
-  exampleShortHeader: ExampleShortHeader,
-  outputPath?: string,
-|}): Promise<?{|
-  storageProvider: StorageProvider,
-  fileMetadata: FileMetadata,
-|}> => {
+  projectName,
+}) => {
   if (!fs || !outputPath) return;
   try {
     const example = await getExample(exampleShortHeader);
@@ -82,6 +72,7 @@ export const onCreateFromExampleShortHeader = async ({
     return {
       storageProvider: LocalFileStorageProvider,
       fileMetadata: { fileIdentifier: localFilePath },
+      projectName,
     };
   } catch (error) {
     showErrorBox({

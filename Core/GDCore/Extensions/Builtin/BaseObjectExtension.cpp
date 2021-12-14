@@ -106,7 +106,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpressionAndConditionAndAction("number", "CenterX",
           _("Center X position"),
-          _("the X position of the center"),
+          _("the X position of the center of rotation"),
           _("the X position of the center"),
           _("Position/Center"),
           "res/actions/position24.png")
@@ -115,10 +115,64 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddExpressionAndConditionAndAction("number", "CenterY",
           _("Center Y position"),
-          _("the Y position of the center"),
+          _("the Y position of the center of rotation"),
           _("the Y position of the center"),
           _("Position/Center"),
           "res/actions/position24.png")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxLeft",
+          _("Bounding box left position"),
+          _("the bounding box (the area encapsulating the object) left position"),
+          _("the bounding box left position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-left.svg")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxTop",
+          _("Bounding box top position"),
+          _("the bounding box (the area encapsulating the object) top position"),
+          _("the bounding box top position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-top.svg")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxRight",
+          _("Bounding box right position"),
+          _("the bounding box (the area encapsulating the object) right position"),
+          _("the bounding box right position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-right.svg")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxBottom",
+          _("Bounding box bottom position"),
+          _("the bounding box (the area encapsulating the object) bottom position"),
+          _("the bounding box bottom position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-bottom.svg")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxCenterX",
+          _("Bounding box center X position"),
+          _("the bounding box (the area encapsulating the object) center X position"),
+          _("the bounding box center X position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-center.svg")
+      .AddParameter("object", _("Object"))
+      .UseStandardParameters("number");
+
+  obj.AddExpressionAndCondition("number", "BoundingBoxCenterY",
+          _("Bounding box center Y position"),
+          _("the bounding box (the area encapsulating the object) center Y position"),
+          _("the bounding box center Y position"),
+          _("Position/Bounding Box"),
+          "res/conditions/bounding-box-center.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -155,7 +209,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Rotate"),
                 _("Rotate an object, clockwise if the speed is positive, "
                   "counterclockwise otherwise."),
-                _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
+                _("Rotate _PARAM0_ at speed _PARAM1_ deg/second"),
                 _("Angle"),
                 "res/actions/direction24.png",
                 "res/actions/direction.png")
@@ -169,7 +223,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "RotateTowardAngle",
          _("Rotate toward angle"),
          _("Rotate an object towards an angle with the specified speed."),
-         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
+         _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
@@ -185,7 +239,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Rotate toward position"),
          _("Rotate an object towards a position, with the specified speed."),
          _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed "
-           "_PARAM3_deg/second"),
+           "_PARAM3_ deg/second"),
          _("Angle"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
@@ -1143,7 +1197,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddAction("Create",
                  _("Create an object"),
                  _("Create an object at specified position"),
-                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_"),
+                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ (layer: _PARAM4_)"),
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")
@@ -1161,7 +1215,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Among the objects of the specified group, this action will "
                    "create the object with the specified name."),
                  _("Among objects _PARAM1_, create object named _PARAM2_ at "
-                   "position _PARAM3_;_PARAM4_"),
+                   "position _PARAM3_;_PARAM4_ (layer: _PARAM5_)"),
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")

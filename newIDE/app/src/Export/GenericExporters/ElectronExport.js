@@ -30,3 +30,10 @@ export const DoneFooter = ({
     <Line justifyContent="center">{renderGameButton()}</Line>
   </Column>
 );
+
+export const electronExporter = {
+  key: 'electronexport',
+  tabName: <Trans>Desktop</Trans>,
+  name: <Trans>Windows/macOS/Linux (manual)</Trans>,
+  helpPage: '/publishing/windows-macos-linux-with-electron',
+};

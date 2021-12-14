@@ -14,7 +14,6 @@ import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -241,6 +240,7 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
+import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -254,7 +254,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -486,38 +486,6 @@ storiesOf('UI Building Blocks/SelectField', module)
     />
   ));
 
-storiesOf('UI Building Blocks/TextField', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  })
-  .add('required', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          required
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  });
-
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
   .add('default', () => {
@@ -690,6 +658,36 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
             errorText={'There was an error somewhere'}
           />
           <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('default, with translatable elements and a separator', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Click me',
+                onClick: action('Click me clicked'),
+              },
+              {
+                type: 'separator',
+              },
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Or click me',
+                onClick: action('Click me clicked'),
+              },
+            ]}
+          />
         </React.Fragment>
       )}
     />
@@ -2747,43 +2745,6 @@ storiesOf('LocalFilePicker', module)
     />
   ));
 
-storiesOf('StartPage', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <StartPage
-      project={null}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-    />
-  ))
-  .add('project opened', () => (
-    <StartPage
-      project={testProject.project}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-    />
-  ));
-
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
   .add('with data', () => (
@@ -2896,18 +2857,17 @@ storiesOf('AboutDialog', module)
     />
   ));
 
-storiesOf('CreateProjectDialog', module)
+storiesOf('Project Creation/CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
-        initialTab="starters"
+        initialTab="examples"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2916,11 +2876,10 @@ storiesOf('CreateProjectDialog', module)
       <CreateProjectDialog
         open
         examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
         onOpen={action('onOpen')}
         initialTab="games-showcase"
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ));
@@ -2932,7 +2891,6 @@ storiesOf('OpenFromStorageProviderDialog', module)
       storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
       onChooseProvider={action('onChooseProvider')}
       onClose={action('onClose')}
-      onCreateNewProject={action('onCreateNewProject')}
     />
   ));
 
@@ -3026,7 +2984,7 @@ storiesOf('ExternalPropertiesDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default, medium screen (no scope)', () => (
+  .add('default, medium screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3065,7 +3023,7 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('default, small screen (no scope)', () => (
+  .add('default, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3104,7 +3062,46 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('empty, small screen (no scope)', () => (
+  .add('default, medium screen (scope: not in a layout)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.testLayout.getEvents()}
+            project={testProject.project}
+            scope={{}}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'medium'}
+            eventsSheetHeight={500}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3806,7 +3803,6 @@ storiesOf('InstancePropertiesEditor', module)
             layout={testProject.testLayout}
             instances={[testProject.testLayoutInstance1]}
             editInstanceVariables={action('edit instance variables')}
-            editObjectVariables={action('edit object variables')}
             onEditObjectByName={action('edit object')}
           />
         </SerializedObjectDisplay>
@@ -3940,7 +3936,7 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-storiesOf('CreateProfile', module)
+storiesOf('Profile/CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4158,6 +4154,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4172,6 +4169,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4186,6 +4184,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress
@@ -4276,13 +4275,7 @@ storiesOf('Profile/CreateAccountDialog', module)
     />
   ));
 
-storiesOf('UserPublicProfileChip', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
-  ));
-
-storiesOf('ContributionsDetails', module)
+storiesOf('Profile/ContributionsDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <>

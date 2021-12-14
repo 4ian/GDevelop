@@ -37,6 +37,7 @@ export const indieUserProfile: Profile = {
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
+  getGameStatsEmail: false,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -93,6 +94,7 @@ export const limitsReached: Limits = {
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -102,6 +104,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -111,12 +114,16 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -126,6 +133,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -135,12 +143,16 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -150,6 +162,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -158,6 +171,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -165,6 +181,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -174,6 +191,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -182,6 +200,9 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -189,6 +210,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
 export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -198,6 +220,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -206,6 +229,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };

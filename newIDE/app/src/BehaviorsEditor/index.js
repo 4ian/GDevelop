@@ -20,7 +20,6 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { getBehaviorTutorialHints } from '../Hints';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -29,6 +28,13 @@ import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_BEHAVIOR,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
 
 const gd: libGDevelop = global.gd;
 
@@ -46,6 +52,7 @@ const BehaviorsEditor = (props: Props) => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { object, project } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
@@ -60,7 +67,7 @@ const BehaviorsEditor = (props: Props) => {
       .filter(behaviorType => behaviorType === type).length;
   };
 
-  const addBehavior = (type: string, defaultName: string) => {
+  const _addBehavior = (type: string, defaultName: string) => {
     setNewBehaviorDialogOpen(false);
 
     if (hasBehaviorWithType(type)) {
@@ -85,6 +92,14 @@ const BehaviorsEditor = (props: Props) => {
     if (props.onSizeUpdated) props.onSizeUpdated();
     props.onUpdateBehaviorsSharedData();
   };
+
+  const addBehavior = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_BEHAVIOR,
+        _addBehavior
+      )
+    : _addBehavior;
 
   const onChangeBehaviorName = (
     behaviorContent: gdBehaviorContent,
@@ -179,9 +194,9 @@ const BehaviorsEditor = (props: Props) => {
             const BehaviorComponent = BehaviorsEditorService.getEditor(
               behaviorTypeName
             );
-            const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
-            const enabledTutorialHints = tutorialHints.filter(
-              hint => !values.hiddenTutorialHints[hint.identifier]
+            const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
+            const enabledTutorialIds = tutorialIds.filter(
+              tutorialId => !values.hiddenTutorialHints[tutorialId]
             );
             const iconUrl = behaviorMetadata.getIconFilename();
 
@@ -233,13 +248,13 @@ const BehaviorsEditor = (props: Props) => {
                     // Avoid Physics2 behavior overflow on small screens
                     noOverflowParent
                   >
-                    {enabledTutorialHints.length ? (
+                    {enabledTutorialIds.length ? (
                       <Line>
                         <ColumnStackLayout expand>
-                          {tutorialHints.map(tutorialHint => (
+                          {tutorialIds.map(tutorialId => (
                             <DismissableTutorialMessage
-                              key={tutorialHint.identifier}
-                              tutorialHint={tutorialHint}
+                              key={tutorialId}
+                              tutorialId={tutorialId}
                             />
                           ))}
                         </ColumnStackLayout>

@@ -111,7 +111,7 @@ export default function BehaviorMethodSelectorDialog({
           description={
             <Trans>
               A condition that can be used in other events sheet. You can define
-              the conditions parameters: objects, texts, numbers, layers, etc...
+              the condition parameters: objects, texts, numbers, layers, etc...
             </Trans>
           }
         />

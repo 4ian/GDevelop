@@ -157,3 +157,10 @@ export const SetupExportHeader = ({
     </Column>
   );
 };
+
+export const onlineCordovaExporter = {
+  key: 'onlinecordovaexport',
+  tabName: <Trans>Mobile</Trans>,
+  name: <Trans>Android (&amp; iOS coming soon)</Trans>,
+  helpPage: '/publishing/android_and_ios',
+};

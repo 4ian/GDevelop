@@ -22,6 +22,7 @@ export type ExportPipeline<
 > = {|
   name: string,
   onlineBuildType?: string,
+  limitedBuilds?: boolean,
   packageNameWarningType?: 'mobile' | 'desktop',
 
   getInitialExportState: (project: gdProject) => ExportState,
@@ -33,9 +34,12 @@ export type ExportPipeline<
       updater: (prevExportState: ExportState) => ExportState
     ) => void,
   |}) => React.Node,
+
   renderLaunchButtonLabel: () => React.Node,
 
   canLaunchBuild: (exportState: ExportState) => boolean,
+
+  renderCustomStepsProgress?: (build: ?Build, loading: boolean) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

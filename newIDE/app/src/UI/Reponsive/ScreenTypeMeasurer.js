@@ -21,20 +21,19 @@ type Props = {|
 |};
 
 /**
- * Check if the screen is a touchscreen or not.
+ * Wraps useScreenType in a component.
  */
-export const ScreenTypeMeasurer = ({ children }: Props) => {
-  if (typeof window === 'undefined') {
-    return children('normal');
-  }
+export const ScreenTypeMeasurer = ({ children }: Props) =>
+  children(useScreenType());
 
-  return children(userHasTouchedScreen ? 'touch' : 'normal');
-};
-
-/** Return if the screen is a touchscreen or not. */
-export const useScreenType = () => {
+/**
+ * Return if the screen is a touchscreen or not.
+ */
+export const useScreenType = (): ScreenType => {
   // Note: this is not a React hook but is named as one to encourage
   // components to use it as such, so that it could be reworked
   // at some point to use a context (verify in this case all usages).
+  if (typeof window === 'undefined') return 'normal';
+
   return userHasTouchedScreen ? 'touch' : 'normal';
 };

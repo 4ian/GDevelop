@@ -103,7 +103,10 @@ describe('LocalResourceFetcher', () => {
       onProgress,
     });
 
-    // Verify that download was done and reported as failed.
+    // Verify that download was done and reported as failed, even after 2 tries.
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledTimes(2);
     expect(
       optionalRequire.mockElectron.ipcRenderer.invoke
     ).toHaveBeenCalledWith(
@@ -114,5 +117,55 @@ describe('LocalResourceFetcher', () => {
     expect(fetchedResources.erroredResources).toEqual([
       { resourceName: 'MyResourceToDownload', error: expect.any(Error) },
     ]);
+  });
+
+  it('automatically retries if a resource failed', async () => {
+    const project = makeTestProjectWithResourcesToDownload();
+
+    // Ensure just the files to be downloaded are listed
+    const resourceNames = LocalResourceFetcher.getResourcesToFetch(project);
+    expect(resourceNames).toEqual(['MyResourceToDownload']);
+
+    // Mock a failed download once, then successful
+    const onProgress = jest.fn();
+    mockFn(optionalRequire.mockFsExtra.ensureDir).mockImplementation(
+      async () => {}
+    );
+    mockFn(optionalRequire.mockFsExtra.existsSync).mockImplementation(
+      () => false
+    );
+    mockFn(optionalRequire.mockElectron.ipcRenderer.invoke)
+      .mockImplementationOnce(() =>
+        Promise.reject(new Error('Fake download failure'))
+      )
+      .mockImplementationOnce(() => Promise.resolve());
+
+    const fetchedResources = await LocalResourceFetcher.fetchResources({
+      project,
+      resourceNames,
+      onProgress,
+    });
+
+    // Verify that download was done.
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenCalledTimes(2);
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenNthCalledWith(
+      1,
+      'local-file-download',
+      'http://example/file-to-download.png',
+      path.join('assets', 'file-to-download.png')
+    );
+    expect(
+      optionalRequire.mockElectron.ipcRenderer.invoke
+    ).toHaveBeenNthCalledWith(
+      2,
+      'local-file-download',
+      'http://example/file-to-download.png',
+      path.join('assets', 'file-to-download.png')
+    );
+    expect(fetchedResources.erroredResources).toEqual([]);
   });
 });

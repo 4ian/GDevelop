@@ -13,11 +13,10 @@ import { themes } from '../../UI/Theme';
 import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import PreferencesContext, { allAlertMessages } from './PreferencesContext';
+import PreferencesContext from './PreferencesContext';
 import Text from '../../UI/Text';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
-import { getAllTutorialHints } from '../../Hints';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 const electron = optionalRequire('electron');
@@ -34,8 +33,8 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setThemeName,
     setCodeEditorThemeName,
     setAutoDownloadUpdates,
-    showAlertMessage,
-    showTutorialHint,
+    showAllAlertMessages,
+    showAllTutorialHints,
     setAutoDisplayChangelog,
     setEventsSheetShowObjectThumbnails,
     setAutosaveOnPreview,
@@ -67,15 +66,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       onRequestClose={onClose}
       cannotBeDismissed={true}
       open
-      title={<Trans>GDevelop Preferences</Trans>}
+      noTitleMargin
       maxWidth="sm"
       noMargin
+      title={
+        <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tab label={<Trans>Preferences</Trans>} value="preferences" />
+          <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
+        </Tabs>
+      }
     >
-      <Tabs value={currentTab} onChange={setCurrentTab}>
-        <Tab label={<Trans>Preferences</Trans>} value="preferences" />
-        <Tab label={<Trans>Hints &amp; explanations</Trans>} value="hints" />
-        <Tab label={<Trans>Keyboard Shortcuts</Trans>} value="shortcuts" />
-      </Tabs>
       {currentTab === 'preferences' && (
         <Column>
           <Text size="title">
@@ -280,6 +280,27 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             </SelectField>
           </Line>
           <Text size="title">
+            <Trans>Embedded help and tutorials</Trans>
+          </Text>
+          <Line>
+            <Column noMargin>
+              <Line>
+                <RaisedButton
+                  label={<Trans>Reset hidden embedded explanations</Trans>}
+                  onClick={() => showAllAlertMessages()}
+                  disabled={!Object.keys(values.hiddenAlertMessages).length}
+                />
+              </Line>
+              <Line>
+                <RaisedButton
+                  label={<Trans>Reset hidden embedded tutorials</Trans>}
+                  onClick={() => showAllTutorialHints()}
+                  disabled={!Object.keys(values.hiddenTutorialHints).length}
+                />
+              </Line>
+            </Column>
+          </Line>
+          <Text size="title">
             <Trans>Advanced</Trans>
           </Text>
           <Line>
@@ -341,40 +362,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               />
             </Line>
           )}
-        </Column>
-      )}
-      {currentTab === 'hints' && (
-        <Column>
-          <Line>
-            <Column noMargin>
-              <Text>
-                <Trans>Warn/show explanation about:</Trans>
-              </Text>
-              {allAlertMessages.map(({ key, label }) => (
-                <Line key={key}>
-                  <Toggle
-                    onToggle={(e, check) => showAlertMessage(key, check)}
-                    toggled={!values.hiddenAlertMessages[key]}
-                    labelPosition="right"
-                    label={label}
-                  />
-                </Line>
-              ))}
-              <Text>
-                <Trans>Show link to tutorials:</Trans>
-              </Text>
-              {getAllTutorialHints().map(({ identifier, name }) => (
-                <Line key={identifier}>
-                  <Toggle
-                    onToggle={(e, check) => showTutorialHint(identifier, check)}
-                    toggled={!values.hiddenTutorialHints[identifier]}
-                    labelPosition="right"
-                    label={name}
-                  />
-                </Line>
-              ))}
-            </Column>
-          </Line>
         </Column>
       )}
       {currentTab === 'shortcuts' && (

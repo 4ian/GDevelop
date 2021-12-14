@@ -3,6 +3,7 @@ import optionalRequire from '../../Utils/OptionalRequire.js';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ResourceFetcher, type FetchResourcesArgs } from '.';
 import PromisePool from '@supercharge/promise-pool';
+import { retryIfFailed } from '../../Utils/RetryIfFailed.js';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');
@@ -44,7 +45,7 @@ const fetchResources = async ({
   let fetchedResourcesCount = 0;
   const resourcesToFetch = getResourcesToFetch(project);
 
-  return PromisePool.withConcurrency(3)
+  return PromisePool.withConcurrency(50)
     .for(resourceNames)
     .process(async resourceName => {
       const resource = resourcesManager.getResource(resourceName);
@@ -62,12 +63,14 @@ const fetchResources = async ({
       downloadedFilePaths.add(newPath);
 
       try {
-        await fs.ensureDir(baseAssetsPath);
-        await ipcRenderer.invoke('local-file-download', url, newPath);
-        resource.setFile(
-          path.relative(projectPath, newPath).replace(/\\/g, '/')
-        );
-        fetchedResources.push({ resourceName });
+        await retryIfFailed({ times: 2 }, async () => {
+          await fs.ensureDir(baseAssetsPath);
+          await ipcRenderer.invoke('local-file-download', url, newPath);
+          resource.setFile(
+            path.relative(projectPath, newPath).replace(/\\/g, '/')
+          );
+          fetchedResources.push({ resourceName });
+        });
       } catch (error) {
         erroredResources.push({ resourceName, error });
       }

@@ -24,7 +24,7 @@ import { ExampleIcon } from './ExampleIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
-import { UserPublicProfileChip } from '../../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 
 const electron = optionalRequire('electron');
 
@@ -121,8 +121,7 @@ export function ExampleDialog({
           <AlertMessage kind="error">
             <Trans>
               Unfortunately, this example requires a newer version of GDevelop
-              to work. Upgrade GDevelop to be able to use this extension in your
-              project.
+              to work. Update GDevelop to be able to open this example.
             </Trans>
           </AlertMessage>
         )}

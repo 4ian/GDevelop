@@ -29,7 +29,7 @@ import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import Window from '../Utils/Window';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 
 const styles = {
@@ -286,7 +286,7 @@ export default function NewBehaviorDialog({
               />
             )}
           </Column>
-          <InfoBar
+          <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={
               <Trans>

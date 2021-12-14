@@ -71,6 +71,16 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeFont(gd::String &fontName);
 
   /**
+   * \brief Expose a JSON, which is always a reference to a "json" resource.
+   */
+  virtual void ExposeJson(gd::String &jsonName);
+
+  /**
+   * \brief Expose a video, which is always a reference to a "video" resource.
+   */
+  virtual void ExposeVideo(gd::String &videoName);
+
+  /**
    * \brief Expose a bitmap font, which is always a reference to a "bitmapFont" resource.
    */
   virtual void ExposeBitmapFont(gd::String &bitmapFontName);

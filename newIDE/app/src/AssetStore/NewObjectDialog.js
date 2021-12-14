@@ -15,7 +15,7 @@ import {
 import HelpButton from '../UI/HelpButton';
 import { getExperimentalObjects } from '../Hints';
 import { Line, Column } from '../UI/Grid';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -34,7 +34,6 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 
@@ -198,6 +197,7 @@ export default function NewObjectDialog({
       open
       flexBody
       noMargin
+      fullHeight
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -270,17 +270,6 @@ export default function NewObjectDialog({
                 />
               )}
             </Line>
-            <Line justifyContent="center" alignItems="center">
-              <RaisedButton
-                label={
-                  <Trans>Browse ready made objects in the Asset Store</Trans>
-                }
-                primary
-                onClick={() => {
-                  setCurrentTab('asset-store');
-                }}
-              />
-            </Line>
           </ScrollView>
         )}
       </Column>
@@ -302,7 +291,7 @@ export default function NewObjectDialog({
         />
       ) : null}
       {resourcesFetcher.renderResourceFetcherDialog()}
-      <InfoBar
+      <DismissableInfoBar
         identifier="asset-installed-explanation"
         message={
           <Trans>

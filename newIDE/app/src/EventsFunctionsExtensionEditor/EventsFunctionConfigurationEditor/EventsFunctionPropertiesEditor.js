@@ -20,6 +20,7 @@ import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader'
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const gd: libGDevelop = global.gd;
 
@@ -30,6 +31,7 @@ type Props = {|
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
+  functionGroupNames: string[],
 |};
 
 type State = {||};
@@ -115,6 +117,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       helpPagePath,
       renderConfigurationHeader,
       eventsBasedBehavior,
+      functionGroupNames,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
@@ -213,6 +216,30 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 fullWidth
               />
             </ResponsiveLineStackLayout>
+            <Line noMargin>
+              <SemiControlledAutoComplete
+                commitOnBlur
+                floatingLabelText={<Trans>Group name</Trans>}
+                hintText={t`Leave it empty to use the default group for this extension.`}
+                fullWidth
+                multiline
+                value={eventsFunction.getGroup()}
+                onChange={text => {
+                  eventsFunction.setGroup(text);
+                  if (onConfigurationUpdated) onConfigurationUpdated();
+                  this.forceUpdate();
+                }}
+                dataSource={
+                  functionGroupNames
+                    ? functionGroupNames.map(name => ({
+                        text: name,
+                        value: name,
+                      }))
+                    : []
+                }
+                openOnFocus={true}
+              />
+            </Line>
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur

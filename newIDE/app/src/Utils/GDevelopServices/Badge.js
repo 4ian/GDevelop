@@ -28,8 +28,9 @@ export type Achievement = {|
   description: string,
 |};
 
-export type AchievementWithUnlockedDate = {|
+export type AchievementWithBadgeData = {|
   ...Achievement,
+  seen?: boolean,
   unlockedAt: ?Date,
 |};
 
@@ -118,8 +119,8 @@ export const getAchievements = (): Promise<Array<Achievement>> => {
 };
 
 export const compareAchievements = (
-  a: AchievementWithUnlockedDate,
-  b: AchievementWithUnlockedDate
+  a: AchievementWithBadgeData,
+  b: AchievementWithBadgeData
 ) => {
   if (b.unlockedAt && a.unlockedAt) {
     return b.unlockedAt - a.unlockedAt;

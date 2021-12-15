@@ -10,7 +10,7 @@ import {
   compareAchievements,
   type Badge,
   type Achievement,
-  type AchievementWithUnlockedDate,
+  type AchievementWithBadgeData,
 } from '../../Utils/GDevelopServices/Badge';
 import ScrollView from '../../UI/ScrollView';
 
@@ -36,9 +36,9 @@ const AchievementList = ({
   displayUnclaimedAchievements,
 }: Props) => {
   const [
-    achievementsWithUnlockedDate,
-    setAchievementsWithUnlockedDate,
-  ] = useState<Array<AchievementWithUnlockedDate>>([]);
+    achievementsWithBadgeData,
+    setAchievementsWithBadgeData,
+  ] = useState<Array<AchievementWithBadgeData>>([]);
 
   useEffect(
     () => {
@@ -47,12 +47,13 @@ const AchievementList = ({
         return acc;
       }, {});
 
-      const achievementsWithDate = achievements.reduce((acc, achievement) => {
+      const achievementsWithBadgeData = achievements.reduce((acc, achievement) => {
         const badge = badgeByAchievementId[achievement.id];
         const hasBadge = !!badge;
         if (hasBadge || (!hasBadge && displayUnclaimedAchievements)) {
           acc.push({
             ...achievement,
+            seen: hasBadge ? badge.seen : undefined,
             unlockedAt: hasBadge ? parseISO(badge.unlockedAt) : null,
           });
         }
@@ -60,9 +61,9 @@ const AchievementList = ({
         return acc;
       }, []);
 
-      achievementsWithDate.sort(compareAchievements);
+      achievementsWithBadgeData.sort(compareAchievements);
 
-      setAchievementsWithUnlockedDate(achievementsWithDate);
+      setAchievementsWithBadgeData(achievementsWithBadgeData);
     },
     [badges, achievements, displayUnclaimedAchievements]
   );
@@ -72,7 +73,7 @@ const AchievementList = ({
       <I18n>
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>
-            {achievementsWithUnlockedDate.map(
+            {achievementsWithBadgeData.map(
               achievement =>
                 achievement && (
                   <Line key={achievement.id} justifyContent="space-between">

@@ -31,6 +31,7 @@ type Props = {|
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
+  functionGroupNames: string[],
 |};
 
 type State = {||};

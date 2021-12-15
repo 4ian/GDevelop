@@ -654,8 +654,8 @@ namespace gdjs {
       sound.play();
     }
 
-    getSoundOnChannel(channel: integer): HowlerSound {
-      return this._sounds[channel];
+    getSoundOnChannel(channel: integer): HowlerSound | null {
+      return this._sounds[channel] || null;
     }
 
     playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
@@ -702,8 +702,8 @@ namespace gdjs {
       music.play();
     }
 
-    getMusicOnChannel(channel: integer): HowlerSound {
-      return this._musics[channel];
+    getMusicOnChannel(channel: integer): HowlerSound | null {
+      return this._musics[channel] || null;
     }
 
     setGlobalVolume(volume: float): void {

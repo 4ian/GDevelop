@@ -149,31 +149,39 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
             />
             <Line justifyContent="flex-end">
               <FacebookShareButton
-                url={`Try the game I just created with #gdevelop: ${buildUrl}`}
+                url={buildUrl}
                 style={styles.icon}
+                quote={`Try the game I just created with GDevelop.io`}
+                hashtag="#gdevelop"
               >
                 <FacebookIcon size={32} round />
               </FacebookShareButton>
               <RedditShareButton
-                url={`Try the game I just created with r/gdevelop: ${buildUrl}`}
+                url={buildUrl}
+                title={`Try the game I just created with r/gdevelop`}
                 style={styles.icon}
               >
                 <RedditIcon size={32} round />
               </RedditShareButton>
               <TwitterShareButton
-                url={`Try the game I just created with #gdevelop: ${buildUrl}`}
+                title={`Try the game I just created with GDevelop.io`}
+                hashtags={['gdevelop']}
+                url={buildUrl}
                 style={styles.icon}
               >
                 <TwitterIcon size={32} round />
               </TwitterShareButton>
               <WhatsappShareButton
-                url={`Try the game I just created with gdevelop.io: ${buildUrl}`}
+                title={`Try the game I just created with GDevelop.io`}
+                url={buildUrl}
                 style={styles.icon}
               >
                 <WhatsappIcon size={32} round />
               </WhatsappShareButton>
               <EmailShareButton
-                url={`Try the game I just created with gdevelop.io: ${buildUrl}`}
+                subject="My GDevelop game"
+                body="Try the game I just created with GDevelop.io"
+                url={buildUrl}
                 style={styles.icon}
               >
                 <EmailIcon size={32} round />

@@ -41,7 +41,7 @@ type Props = {|
     done: (boolean) => void
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
-  functionGroupNames: string[],
+  functionGroupNames?: string[],
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';

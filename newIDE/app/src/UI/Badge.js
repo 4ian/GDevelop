@@ -4,10 +4,11 @@ import MuiBadge from '@material-ui/core/Badge';
 
 type Props = {|
   children: React.Node,
-  badgeContent: React.Node,
+  badgeContent?: React.Node,
+  variant?: 'dot',
   color: 'error' | 'primary' | 'secondary' | 'default',
 |};
 
-export default function Badge(props: Props) {
-  return <MuiBadge {...props} />;
-}
+const Badge = (props: Props) => <MuiBadge {...props} />;
+
+export default Badge;

@@ -38,117 +38,6 @@ namespace gdjs {
    * @class HowlerSound
    */
   export class HowlerSound {
-    // Note: using a class since an object makes TS complain about private properties not being private.
-    static invalidSound: HowlerSound = new (class InvalidHowlerSound extends HowlerSound {
-      constructor() {
-        super((null as unknown) as Howl, 0, false, 0);
-      }
-      fade() {
-        logger.error('Cannot fade a non-existing audio channel!');
-        return this;
-      }
-      getLoop() {
-        logger.error(
-          'Cannot check if a non-existing audio channel is looping!'
-        );
-        return false;
-      }
-      getMute() {
-        logger.error('Cannot check if a non-existing audio channel is muted!');
-        return false;
-      }
-      getRate() {
-        logger.error('Cannot get the rate of a non-existing audio channel!');
-        return 0;
-      }
-      getSeek() {
-        logger.error('Cannot get the seek of a non-existing audio channel!');
-        return 0;
-      }
-      getSpatialPosition() {
-        logger.error(
-          'Cannot get the spatial position of a non-existing audio channel!'
-        );
-        return 0;
-      }
-      getVolume() {
-        logger.error('Cannot get the volume of a non-existing audio channel!');
-        return 0;
-      }
-      isLoaded() {
-        logger.error(
-          'Cannot check if a non-existing audio channel has loaded!'
-        );
-        return false;
-      }
-      off() {
-        logger.error('Cannot unset an event on a non-existing audio channel!');
-        return this;
-      }
-      on() {
-        logger.error('Cannot set an event on a non-existing audio channel!');
-        return this;
-      }
-      once() {
-        logger.error('Cannot set an event on a non-existing audio channel!');
-        return this;
-      }
-      pause() {
-        logger.error('Cannot pause a non-existing audio channel!');
-        return this;
-      }
-      play() {
-        logger.error('Cannot play a non-existing audio channel!');
-        return this;
-      }
-      stop() {
-        logger.error('Cannot stop a non-existing audio channel!');
-        return this;
-      }
-      paused() {
-        logger.error('Cannot check if a non-existing audio channel is paused!');
-        return false;
-      }
-      playing() {
-        logger.error(
-          'Cannot check if a non-existing audio channel is playing!'
-        );
-        return false;
-      }
-      stopped() {
-        logger.error(
-          'Cannot check if a non-existing audio channel is stopped!'
-        );
-        return false;
-      }
-      setLoop() {
-        logger.error('Cannot set a non-existing audio channel to loop!');
-        return this;
-      }
-      setMute() {
-        logger.error('Cannot mute a non-existing audio channel!');
-        return this;
-      }
-      setRate() {
-        logger.error('Cannot set the rate of a non-existing audio channel!');
-        return this;
-      }
-      setSeek() {
-        logger.error('Cannot set the seek of a non-existing audio channel!');
-        return this;
-      }
-      setSpatialPosition() {
-        logger.error(
-          'Cannot set the spatial position of a non-existing audio channel!'
-        );
-        return this;
-      }
-      setVolume() {
-        logger.error('Cannot set the volume of a non-existing audio channel!');
-        return this;
-      }
-    })();
-
     /**
      * The ID of the played sound.
      */
@@ -765,8 +654,8 @@ namespace gdjs {
       sound.play();
     }
 
-    getSoundOnChannel(channel: integer): HowlerSound {
-      return this._sounds[channel] || HowlerSound.invalidSound;
+    getSoundOnChannel(channel: integer): HowlerSound | null {
+      return this._sounds[channel] || null;
     }
 
     playMusic(soundName: string, loop: boolean, volume: float, pitch: float) {
@@ -813,8 +702,8 @@ namespace gdjs {
       music.play();
     }
 
-    getMusicOnChannel(channel: integer): HowlerSound {
-      return this._musics[channel] || HowlerSound.invalidSound;
+    getMusicOnChannel(channel: integer): HowlerSound | null {
+      return this._musics[channel] || null;
     }
 
     setGlobalVolume(volume: float): void {

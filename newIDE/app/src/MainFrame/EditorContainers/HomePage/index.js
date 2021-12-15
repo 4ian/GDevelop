@@ -22,6 +22,7 @@ import { GamesShowcaseContext } from '../../../GamesShowcase/GamesShowcaseContex
 import { type ShowcasedGame } from '../../../Utils/GDevelopServices/Game';
 import ShowcasedGameDialog from '../../../GamesShowcase/ShowcasedGameDialog';
 import { type ExampleShortHeader } from '../../../Utils/GDevelopServices/Example';
+import { type Tutorial } from '../../../Utils/GDevelopServices/Tutorial';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import UserChip from '../../../UI/User/UserChip';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
@@ -39,6 +40,7 @@ import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import generateName from '../../../Utils/ProjectNameGenerator';
+import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -96,6 +98,18 @@ type HomePageEditorInterface = {|
   updateToolbar: () => void,
   forceUpdateEditor: () => void,
 |};
+
+const prepareTutorials = (tutorials: Array<Tutorial>) =>
+  tutorials.slice(0, 16).map(tutorial => {
+    const { link, ...tutorialWithoutLink } = tutorial;
+    return {
+      ...tutorialWithoutLink,
+      onClick: () => {
+        sendTutorialOpened(tutorial.id);
+        Window.openExternalURL(link);
+      },
+    };
+  });
 
 const betweenCarouselSpacerCount = 6;
 
@@ -366,7 +380,7 @@ export const HomePage = React.memo<Props>(
                     {renderBetweenCarouselSpace()}
                     <Carousel
                       title={<Trans>Our latest tutorials</Trans>}
-                      items={tutorials ? tutorials.slice(0, 16) : null}
+                      items={tutorials ? prepareTutorials(tutorials) : null}
                       displayItemTitles={false}
                       onBrowseAllClick={onOpenTutorials}
                       error={

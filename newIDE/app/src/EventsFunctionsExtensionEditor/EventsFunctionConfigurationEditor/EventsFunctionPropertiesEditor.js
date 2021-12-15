@@ -31,7 +31,7 @@ type Props = {|
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
-  functionGroupNames: string[],
+  functionGroupNames?: string[],
 |};
 
 type State = {||};
@@ -218,11 +218,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             </ResponsiveLineStackLayout>
             <Line noMargin>
               <SemiControlledAutoComplete
-                commitOnBlur
                 floatingLabelText={<Trans>Group name</Trans>}
                 hintText={t`Leave it empty to use the default group for this extension.`}
                 fullWidth
-                multiline
                 value={eventsFunction.getGroup()}
                 onChange={text => {
                   eventsFunction.setGroup(text);

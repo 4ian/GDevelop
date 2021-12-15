@@ -41,6 +41,7 @@ type Props = {|
     done: (boolean) => void
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
+  functionGroupNames?: string[],
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -161,6 +162,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
+      functionGroupNames,
     } = this.props;
 
     return (
@@ -189,6 +191,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
                 freezeEventsFunctionType={freezeEventsFunctionType}
+                functionGroupNames={functionGroupNames}
               />
             </Line>
           </ScrollView>

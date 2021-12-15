@@ -134,7 +134,6 @@ import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import Checkbox from '../UI/Checkbox';
 import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -1297,16 +1296,6 @@ storiesOf('UI Building Blocks/LoaderModal', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <LoaderModal show />);
-
-storiesOf('UI Building Blocks/Checkbox', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <div style={{ display: 'flex' }}>
-      <Checkbox label={'My label'} checked={true} />
-      <Checkbox label={'My label 2'} checked={false} />
-    </div>
-  ));
 
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)

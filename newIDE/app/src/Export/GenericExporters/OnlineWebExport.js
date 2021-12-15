@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import TextField from '../../UI/TextField';
 import {
   getBuildArtifactUrl,
@@ -12,9 +12,30 @@ import {
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
 import Copy from '../../UI/CustomSvgIcons/Copy';
+import Share from '@material-ui/icons/Share';
 import InfoBar from '../../UI/Messages/InfoBar';
 import IconButton from '../../UI/IconButton';
-import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import { LinearProgress } from '@material-ui/core';
+import FlatButton from '../../UI/FlatButton';
+import Dialog from '../../UI/Dialog';
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  RedditShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+  EmailIcon,
+  FacebookIcon,
+  RedditIcon,
+  TwitterIcon,
+  WhatsappIcon,
+} from 'react-share';
+
+const styles = {
+  icon: {
+    padding: 5,
+  },
+};
 
 export const ExplanationHeader = () => (
   <Column noMargin alignItems="center" justifyContent="center">
@@ -38,62 +59,142 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
   );
+  const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
+    false
+  );
 
   if (!build && !loading) return null;
   const buildPending = loading || (build && build.status !== 'complete');
-
-  const value = buildPending
-    ? 'Just a few seconds while we generate the link...'
-    : getBuildArtifactUrl(build, 's3Key') || '';
+  const buildUrl = buildPending ? null : getBuildArtifactUrl(build, 's3Key');
 
   const onOpen = () => {
-    if (buildPending) return;
-    Window.openExternalURL(value);
+    if (buildPending || !buildUrl) return;
+    Window.openExternalURL(buildUrl);
   };
 
   const onCopy = () => {
-    if (buildPending) return;
+    if (buildPending || !buildUrl) return;
     // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
-    navigator.clipboard.writeText(value);
+    navigator.clipboard.writeText(buildUrl);
     setShowCopiedInfoBar(true);
+  };
+
+  const onShare = async () => {
+    if (buildPending || !buildUrl) return;
+
+    if (!navigator.share) {
+      // We are on desktop (or do not support sharing using the system dialog).
+      setIsShareDialogOpen(true);
+      return;
+    }
+
+    // We are on mobile (or on browsers supporting sharing using the system dialog).
+    const shareData = {
+      title: 'My GDevelop game',
+      text: 'Try the game I just created with #gdevelop',
+      url: buildUrl,
+    };
+
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      console.error("Couldn't share the game", err);
+    }
   };
 
   return (
     <>
-      <TextFieldWithButtonLayout
-        noFloatingLabelText
-        renderTextField={() => (
-          <TextField
-            value={value}
-            readOnly
-            fullWidth
-            endAdornment={
-              <IconButton
-                disabled={!!buildPending}
-                onClick={onCopy}
-                tooltip={t`Copy`}
-                edge="end"
+      {buildPending ? (
+        <>
+          <Text>
+            <Trans>Just a few seconds while we generate the link...</Trans>
+          </Text>
+          <LinearProgress />
+        </>
+      ) : (
+        <Line justifyContent="center">
+          <FlatButton
+            label={<Trans>Share</Trans>}
+            onClick={onShare}
+            icon={<Share />}
+          />
+          <Spacer />
+          <RaisedButton label={<Trans>Open</Trans>} onClick={onOpen} primary />
+        </Line>
+      )}
+      <Dialog
+        title={<Trans>Share your game</Trans>}
+        actions={[
+          <FlatButton
+            key="close"
+            label={<Trans>Back</Trans>}
+            primary={false}
+            onClick={() => setIsShareDialogOpen(false)}
+          />,
+        ]}
+        open={isShareDialogOpen}
+        onRequestClose={() => setIsShareDialogOpen(false)}
+      >
+        {buildUrl && (
+          <Column>
+            <TextField
+              value={buildUrl}
+              readOnly
+              fullWidth
+              endAdornment={
+                <IconButton onClick={onCopy} tooltip={t`Copy`} edge="end">
+                  <Copy />
+                </IconButton>
+              }
+            />
+            <Line justifyContent="flex-end">
+              <FacebookShareButton
+                url={buildUrl}
+                style={styles.icon}
+                quote={`Try the game I just created with GDevelop.io`}
+                hashtag="#gdevelop"
               >
-                <Copy />
-              </IconButton>
-            }
-          />
+                <FacebookIcon size={32} round />
+              </FacebookShareButton>
+              <RedditShareButton
+                url={buildUrl}
+                title={`Try the game I just created with r/gdevelop`}
+                style={styles.icon}
+              >
+                <RedditIcon size={32} round />
+              </RedditShareButton>
+              <TwitterShareButton
+                title={`Try the game I just created with GDevelop.io`}
+                hashtags={['gdevelop']}
+                url={buildUrl}
+                style={styles.icon}
+              >
+                <TwitterIcon size={32} round />
+              </TwitterShareButton>
+              <WhatsappShareButton
+                title={`Try the game I just created with GDevelop.io`}
+                url={buildUrl}
+                style={styles.icon}
+              >
+                <WhatsappIcon size={32} round />
+              </WhatsappShareButton>
+              <EmailShareButton
+                subject="My GDevelop game"
+                body="Try the game I just created with GDevelop.io"
+                url={buildUrl}
+                style={styles.icon}
+              >
+                <EmailIcon size={32} round />
+              </EmailShareButton>
+            </Line>
+          </Column>
         )}
-        renderButton={style => (
-          <RaisedButton
-            disabled={!!buildPending}
-            primary
-            label={<Trans>Open</Trans>}
-            onClick={onOpen}
-            style={style}
-          />
-        )}
-      />
-      <InfoBar
-        message={<Trans>Copied to clipboard!</Trans>}
-        visible={showCopiedInfoBar}
-        hide={() => setShowCopiedInfoBar(false)}
-      />
+        <InfoBar
+          message={<Trans>Copied to clipboard!</Trans>}
+          visible={showCopiedInfoBar}
+          hide={() => setShowCopiedInfoBar(false)}
+        />
+      </Dialog>
     </>
   );
 };

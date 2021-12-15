@@ -94,6 +94,9 @@ module.exports = function (config) {
       './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
 
+      // Test helpers
+      '../../Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',
+
       // Assets
       {
         pattern: './tests-utils/assets/*.jpg',

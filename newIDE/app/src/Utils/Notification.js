@@ -2,7 +2,7 @@
 
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
-export const arePendingNotifications = (
+export const hasPendingNotifications = (
   authenticatedUser: AuthenticatedUser
 ): boolean => {
   if (!authenticatedUser.authenticated) return false;

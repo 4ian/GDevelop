@@ -720,7 +720,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       i18n
                     )}
                     unsavedChanges={this.props.unsavedChanges}
-                    functionGroupNames={this._getFunctionGroupNames()}
+                    getFunctionGroupNames={this._getFunctionGroupNames}
                   />
                 ) : (
                   <EmptyMessage>

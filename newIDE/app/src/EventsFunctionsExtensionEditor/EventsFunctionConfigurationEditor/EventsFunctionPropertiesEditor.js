@@ -31,7 +31,7 @@ type Props = {|
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
-  functionGroupNames?: string[],
+  getFunctionGroupNames?: () => string[],
 |};
 
 type State = {||};
@@ -117,7 +117,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       helpPagePath,
       renderConfigurationHeader,
       eventsBasedBehavior,
-      functionGroupNames,
+      getFunctionGroupNames,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
@@ -228,8 +228,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   this.forceUpdate();
                 }}
                 dataSource={
-                  functionGroupNames
-                    ? functionGroupNames.map(name => ({
+                  getFunctionGroupNames
+                    ? getFunctionGroupNames().map(name => ({
                         text: name,
                         value: name,
                       }))

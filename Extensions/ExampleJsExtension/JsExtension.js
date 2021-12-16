@@ -179,7 +179,8 @@ module.exports = {
         .setValue(
           behaviorContent.getBoolAttribute('property2') ? 'true' : 'false'
         )
-        .setType('Boolean');
+        .setType('Boolean')
+        .setGroup(_('Look and Feel'));
 
       return behaviorProperties;
     };

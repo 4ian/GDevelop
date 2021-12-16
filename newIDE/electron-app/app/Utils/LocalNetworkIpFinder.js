@@ -3,8 +3,8 @@ const os = require('os');
 /** @returns {string[]} */
 const getLocalNetworkIps = () => {
   return Object.entries(os.networkInterfaces())
-    .flatMap(([name, interface]) =>
-      name.match(/^(VirtualBox|VMware)/) ? [] : interface
+    .flatMap(([name, interfaces]) =>
+      name.match(/^(VirtualBox|VMware)/) ? [] : interfaces
     )
     .filter(({ family, internal }) => family === 'IPv4' && !internal)
     .map(({ address }) => address);

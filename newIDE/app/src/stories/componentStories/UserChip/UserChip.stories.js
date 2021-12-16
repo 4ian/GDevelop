@@ -23,11 +23,11 @@ export default {
     profile: {
       name: 'User profile',
       control: { type: 'radio' },
-      options: ['Signed in', 'Unsigned'],
+      options: ['Signed in', 'Anonymous'],
       defaultValue: 'Signed in',
       mapping: {
         'Signed in': indieUserProfile,
-        Unsigned: null,
+        'Anonymous': null,
       },
     },
   },

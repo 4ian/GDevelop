@@ -80,59 +80,56 @@ const AchievementList = ({
       <I18n>
         {({ i18n }) => (
           <ScrollView style={styles.achievementsContainer}>
-            {achievementsWithBadgeData.map(
-              achievementWithBadgeData =>
-                achievementWithBadgeData && (
-                  <Line
-                    key={achievementWithBadgeData.id}
-                    justifyContent="space-between"
+            {achievementsWithBadgeData.map(achievementWithBadgeData => (
+              <Line
+                key={achievementWithBadgeData.id}
+                justifyContent="space-between"
+              >
+                <Column justifyContent="center" alignItems="flex-start">
+                  <DotBadge
+                    invisible={
+                      !(
+                        displayNotifications &&
+                        achievementWithBadgeData.seen === false
+                      )
+                    }
                   >
-                    <Column justifyContent="center" alignItems="flex-start">
-                      <DotBadge
-                        invisible={
-                          !(
-                            displayNotifications &&
-                            achievementWithBadgeData.seen === false
-                          )
-                        }
-                      >
-                        <Text
-                          noMargin
-                          style={
-                            achievementWithBadgeData.unlockedAt
-                              ? styles.unlockedAchievement
-                              : styles.lockedAchievement
-                          }
-                        >
-                          {achievementWithBadgeData.name}
-                        </Text>
-                      </DotBadge>
-                      {displayUnclaimedAchievements && (
-                        <Text
-                          noMargin
-                          style={
-                            achievementWithBadgeData.unlockedAt
-                              ? styles.unlockedAchievement
-                              : styles.lockedAchievement
-                          }
-                          size="body2"
-                        >
-                          {achievementWithBadgeData.description}
-                        </Text>
-                      )}
-                    </Column>
-                    <Column>
-                      {achievementWithBadgeData.unlockedAt ? (
-                        <Text>
-                          {i18n.date(achievementWithBadgeData.unlockedAt)}
-                        </Text>
-                      ) : (
-                        <Lock style={styles.lockedAchievement} />
-                      )}
-                    </Column>
-                  </Line>
-                )
-            )}
+                    <Text
+                      noMargin
+                      style={
+                        achievementWithBadgeData.unlockedAt
+                          ? styles.unlockedAchievement
+                          : styles.lockedAchievement
+                      }
+                    >
+                      {achievementWithBadgeData.name}
+                    </Text>
+                  </DotBadge>
+                  {displayUnclaimedAchievements && (
+                    <Text
+                      noMargin
+                      style={
+                        achievementWithBadgeData.unlockedAt
+                          ? styles.unlockedAchievement
+                          : styles.lockedAchievement
+                      }
+                      size="body2"
+                    >
+                      {achievementWithBadgeData.description}
+                    </Text>
+                  )}
+                </Column>
+                <Column>
+                  {achievementWithBadgeData.unlockedAt ? (
+                    <Text>
+                      {i18n.date(achievementWithBadgeData.unlockedAt)}
+                    </Text>
+                  ) : (
+                    <Lock style={styles.lockedAchievement} />
+                  )}
+                </Column>
+              </Line>
+            ))}
           </ScrollView>
         )}
       </I18n>

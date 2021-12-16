@@ -7,7 +7,7 @@ import FaceIcon from '@material-ui/icons/Face';
 import Avatar from '@material-ui/core/Avatar';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { getGravatarUrl } from '../GravatarUrl';
-import Badge from '../Badge';
+import DotBadge from '../DotBadge';
 
 type Props = {|
   profile: ?Profile,
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
   const classes = useStyles();
   return (
-    <Badge
+    <DotBadge
       color="primary"
       variant="dot"
       overlap="circle"
@@ -54,7 +54,7 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
         }
         onClick={onClick}
       />
-    </Badge>
+    </DotBadge>
   );
 };
 

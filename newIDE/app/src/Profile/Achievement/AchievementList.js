@@ -6,7 +6,7 @@ import Lock from '@material-ui/icons/Lock';
 
 import { Column, Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
-import Badge from '../../UI/Badge';
+import DotBadge from '../../UI/DotBadge';
 
 import {
   compareAchievements,
@@ -88,7 +88,7 @@ const AchievementList = ({
                     justifyContent="space-between"
                   >
                     <Column justifyContent="center" alignItems="flex-start">
-                      <Badge
+                      <DotBadge
                         color="primary"
                         variant="dot"
                         invisible={
@@ -108,7 +108,7 @@ const AchievementList = ({
                         >
                           {achievementWithBadgeData.name}
                         </Text>
-                      </Badge>
+                      </DotBadge>
                       {displayUnclaimedAchievements && (
                         <Text
                           noMargin

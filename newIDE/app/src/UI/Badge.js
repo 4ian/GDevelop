@@ -6,6 +6,7 @@ type Props = {|
   children: React.Node,
   badgeContent?: React.Node,
   variant?: 'dot',
+  invisible?: boolean,
   color: 'error' | 'primary' | 'secondary' | 'default',
 |};
 

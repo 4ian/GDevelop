@@ -75,22 +75,6 @@ const AchievementList = ({
     [badges, achievements, displayUnclaimedAchievements]
   );
 
-  const AchievementNameWrapper = ({
-    achievementWithBadgeData,
-    children,
-  }: {|
-    achievementWithBadgeData: AchievementWithBadgeData,
-    children: React.Node,
-  |}) => {
-    return displayNotifications && achievementWithBadgeData.seen === false ? (
-      <Badge color="primary" variant="dot">
-        {children}
-      </Badge>
-    ) : (
-      <>{children}</>
-    );
-  };
-
   return (
     <Column noMargin>
       <I18n>
@@ -104,8 +88,15 @@ const AchievementList = ({
                     justifyContent="space-between"
                   >
                     <Column justifyContent="center" alignItems="flex-start">
-                      <AchievementNameWrapper
-                        achievementWithBadgeData={achievementWithBadgeData}
+                      <Badge
+                        color="primary"
+                        variant="dot"
+                        invisible={
+                          !(
+                            displayNotifications &&
+                            achievementWithBadgeData.seen === false
+                          )
+                        }
                       >
                         <Text
                           noMargin
@@ -117,7 +108,7 @@ const AchievementList = ({
                         >
                           {achievementWithBadgeData.name}
                         </Text>
-                      </AchievementNameWrapper>
+                      </Badge>
                       {displayUnclaimedAchievements && (
                         <Text
                           noMargin

@@ -21,6 +21,7 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 type Props = {|
   badges: ?Array<Badge>,
   displayUnclaimedAchievements: boolean,
+  displayNotifications: boolean,
 |};
 
 const styles = {
@@ -36,7 +37,11 @@ const styles = {
   },
 };
 
-const UserAchievements = ({ badges, displayUnclaimedAchievements }: Props) => {
+const UserAchievements = ({
+  badges,
+  displayUnclaimedAchievements,
+  displayNotifications,
+}: Props) => {
   const [achievements, setAchievements] = useState<?Array<Achievement>>(null);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const windowWidth = useResponsiveWindowWidth();
@@ -100,6 +105,7 @@ const UserAchievements = ({ badges, displayUnclaimedAchievements }: Props) => {
                   badges={badges}
                   achievements={achievements}
                   displayUnclaimedAchievements={displayUnclaimedAchievements}
+                  displayNotifications={displayNotifications}
                 />
               )}
             </div>

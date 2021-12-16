@@ -13,6 +13,8 @@ namespace gdjs {
    */
   export class PlatformObjectsManager {
     private _platformRBush: any;
+    private _platformBehaviors: Set<PlatformRuntimeBehavior>;
+    private _lastUpdateTime: integer;
 
     /**
      * @param object The object
@@ -24,6 +26,8 @@ namespace gdjs {
         '.owner.getAABB().max[0]',
         '.owner.getAABB().max[1]',
       ]);
+      this._platformBehaviors = new Set<PlatformRuntimeBehavior>();
+      this._lastUpdateTime = -1;
     }
 
     /**
@@ -43,10 +47,31 @@ namespace gdjs {
     }
 
     /**
+     * Update the AABB given to the spacial search of every platforms.
+     * It's only done once per frame.
+     * @param runtimeScene
+     */
+    updateAABBIfNeeded(runtimeScene: gdjs.RuntimeScene) {
+      const time = runtimeScene.getTimeManager().getTimeFromStart();
+      if (time !== this._lastUpdateTime) {
+        this._lastUpdateTime = time;
+        const iterator = this._platformBehaviors.values();
+        for (
+          let result = iterator.next();
+          !result.done;
+          result = iterator.next()
+        ) {
+          result.value.updateAABB(runtimeScene);
+        }
+      }
+    }
+
+    /**
      * Add a platform to the list of existing platforms.
      */
     addPlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
       this._platformRBush.insert(platformBehavior);
+      this._platformBehaviors.add(platformBehavior);
     }
 
     /**
@@ -55,6 +80,16 @@ namespace gdjs {
      */
     removePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
       this._platformRBush.remove(platformBehavior);
+      this._platformBehaviors.delete(platformBehavior);
+    }
+
+    /**
+     * Update a platform from the list of existing platforms. Be sure that the platform was
+     * added before.
+     */
+    updatePlatform(platformBehavior: gdjs.PlatformRuntimeBehavior) {
+      this._platformRBush.remove(platformBehavior);
+      this._platformRBush.insert(platformBehavior);
     }
 
     /**
@@ -141,13 +176,24 @@ namespace gdjs {
       return true;
     }
 
+    onCreated() {
+      if (this.activated()) {
+        this._manager.addPlatform(this);
+        this._registeredInManager = true;
+      }
+    }
+
     onDestroy() {
       if (this._manager && this._registeredInManager) {
         this._manager.removePlatform(this);
       }
     }
 
-    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+    /**
+     * Update the AABB given to the spacial search
+     * @param runtimeScene
+     */
+    updateAABB(runtimeScene: gdjs.RuntimeScene) {
       //Scene change is not supported
       /*if ( parentScene != &scene ) //Parent scene has changed
             {
@@ -178,8 +224,7 @@ namespace gdjs {
         this._oldAngle !== this.owner.getAngle()
       ) {
         if (this._registeredInManager) {
-          this._manager.removePlatform(this);
-          this._manager.addPlatform(this);
+          this._manager.updatePlatform(this);
         }
         this._oldX = this.owner.getX();
         this._oldY = this.owner.getY();
@@ -188,6 +233,8 @@ namespace gdjs {
         this._oldAngle = this.owner.getAngle();
       }
     }
+
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 

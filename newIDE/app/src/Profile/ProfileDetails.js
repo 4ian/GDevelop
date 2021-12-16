@@ -91,7 +91,7 @@ const ProfileDetails = ({
             />
           </Line>
           {isAuthenticatedUserProfile && (
-            <ResponsiveLineStackLayout justifyContent="flex-end">
+            <ResponsiveLineStackLayout justifyContent="flex-end" noColumnMargin>
               <RaisedButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}

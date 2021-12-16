@@ -41,6 +41,7 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import generateName from '../../../Utils/ProjectNameGenerator';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
+import { arePendingNotifications } from '../../../Utils/Notification';
 
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -315,6 +316,9 @@ export const HomePage = React.memo<Props>(
                         <UserChip
                           profile={authenticatedUser.profile}
                           onClick={onOpenProfile}
+                          displayNotificationBadge={arePendingNotifications(
+                            authenticatedUser
+                          )}
                         />
                         <ResponsiveLineStackLayout
                           justifyContent="flex-end"

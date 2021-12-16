@@ -9,6 +9,8 @@ declare class gdPropertyDescriptor {
   getLabel(): string;
   setDescription(label: string): gdPropertyDescriptor;
   getDescription(): string;
+  setGroup(label: string): gdPropertyDescriptor;
+  getGroup(): string;
   addExtraInfo(type: string): gdPropertyDescriptor;
   setExtraInfo(info: gdVectorString): gdPropertyDescriptor;
   getExtraInfo(): gdVectorString;

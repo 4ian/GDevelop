@@ -18,12 +18,21 @@ export default (
     propertyName: string,
     newValue: string
   ) => void,
-  object: ?gdObject
+  object: ?gdObject,
+  groupFilter: ?string
 ): Schema => {
   const propertyNames = properties.keys();
   const propertyFields = mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
+    if (groupFilter || groupFilter === '') {
+      const group = property.getGroup();
+      const matchEmptyFilter =
+        (!groupFilter || groupFilter === '') && (!group || group === '');
+      if (!matchEmptyFilter && group !== groupFilter) {
+        return null;
+      }
+    }
     const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
     const getLabel = (instance: Instance) => {

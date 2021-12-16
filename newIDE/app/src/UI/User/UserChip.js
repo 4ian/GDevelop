@@ -16,6 +16,7 @@ type Props = {|
 |};
 
 const useStyles = makeStyles({
+  root: { flexDirection: 'column' },
   anchorOriginTopRightCircle: {
     top: 5,
     right: 5,

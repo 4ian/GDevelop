@@ -10,6 +10,7 @@ import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
 import { markBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import { useTimeout } from '../Utils/UseTimeout';
 
 type Props = {|
   onEditProfile: () => void,
@@ -38,14 +39,11 @@ const AuthenticatedUserProfileDetails = ({
     [authenticatedUser, isMounted]
   );
 
-  React.useEffect(
-    () => {
-      const timeoutId = setTimeout(() => {
-        markBadgesAsSeen(authenticatedUser);
-      }, 5000);
-      return () => clearTimeout(timeoutId);
-    },
-    [authenticatedUser]
+  useTimeout(
+    React.useMemo(() => () => markBadgesAsSeen(authenticatedUser), [
+      authenticatedUser,
+    ]),
+    5000
   );
 
   return firebaseUser && profile ? (

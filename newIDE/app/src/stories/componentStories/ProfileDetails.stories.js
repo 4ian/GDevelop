@@ -41,12 +41,12 @@ type ArgsTypes = {|
 const badges = [
   {
     achievementId: 'trivial_first-event',
-    seen: false,
+    seen: true,
     unlockedAt: '2020-10-05T11:28:24.864Z',
     userId: 'userId',
   },
   {
-    achievementId: 'game_success_1M-players',
+    achievementId: 'trivial_first-behavior',
     seen: false,
     unlockedAt: '2021-11-15T11:28:24.864Z',
     userId: 'userId',

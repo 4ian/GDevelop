@@ -40,7 +40,7 @@ const AuthenticatedUserProfileDetails = ({
   );
 
   useTimeout(
-    React.useMemo(() => () => markBadgesAsSeen(authenticatedUser), [
+    React.useCallback(() => markBadgesAsSeen(authenticatedUser), [
       authenticatedUser,
     ]),
     5000

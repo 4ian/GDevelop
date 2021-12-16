@@ -16,9 +16,9 @@ type Props = {|
 |};
 
 const useStyles = makeStyles({
-  anchorOriginTopLeftCircle: {
+  anchorOriginTopRightCircle: {
     top: 5,
-    left: 5,
+    right: 5,
   },
 });
 
@@ -28,7 +28,6 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
     <DotBadge
       overlap="circle"
       invisible={!displayNotificationBadge}
-      anchor="topLeft"
       classes={classes}
     >
       <Chip

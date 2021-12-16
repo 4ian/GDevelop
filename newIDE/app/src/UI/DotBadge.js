@@ -7,20 +7,14 @@ type Props = {|
   children: React.Node,
   invisible?: boolean,
   overlap?: 'circle',
-  anchor?: 'topLeft',
   classes?: ClassNameMap,
 |};
 
-const DotBadge = ({ anchor, ...otherProps }: Props) => (
+const DotBadge = (props: Props) => (
   <MuiBadge
     color="primary"
     variant="dot"
-    anchorOrigin={
-      anchor === 'topLeft'
-        ? { horizontal: 'left', vertical: 'top' }
-        : { horizontal: 'right', vertical: 'top' }
-    }
-    {...otherProps}
+    {...props}
   />
 );
 

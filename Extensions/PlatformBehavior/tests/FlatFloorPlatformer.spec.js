@@ -341,8 +341,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         platform.setPosition(0, -10);
       });
 
-      // TODO The character falls one frame then land instead of staying on the platform.
-      it.skip('must not move when on the floor at startup', function () {
+      it('must not move when on the floor at startup', function () {
         object.setPosition(0, platform.getY() - object.getHeight());
 
         for (let i = 0; i < 10; ++i) {
@@ -654,11 +653,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       platform.setPosition(0, 193.000000000001);
       // This means that the exact Y position the object should take is:
       // platform Y - height + origin Y = 193.000000000001-66.0008+13.6306 = 140.6298
-
-      // Wait for the object to fall on the floor
-      runtimeScene.renderAndStep(1000 / 60);
-      expect(object.getBehavior('auto1').isFalling()).to.be(true);
-      expect(object.getBehavior('auto1').isOnFloor()).to.be(false);
 
       // Ensure it is on the floor
       runtimeScene.renderAndStep(1000 / 60);

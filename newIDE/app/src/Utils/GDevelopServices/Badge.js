@@ -118,6 +118,45 @@ export const getAchievements = (): Promise<Array<Achievement>> => {
     .then(response => response.data);
 };
 
+export const markBadgesAsSeen = async (
+  authenticatedUser: AuthenticatedUser
+): Promise<?void> => {
+  const {
+    badges,
+    firebaseUser,
+    getAuthorizationHeader,
+    onBadgesChanged,
+  } = authenticatedUser;
+  if (!badges || !firebaseUser) return null;
+
+  const unseenBadges = badges.filter(badge => !badge.seen);
+  if (unseenBadges.length === 0) return;
+
+  const userId = firebaseUser.uid;
+  try {
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.patch(
+      `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
+      unseenBadges.map(badge => ({
+        achievementId: badge.achievementId,
+        seen: true,
+      })),
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+    onBadgesChanged();
+    return response.data;
+  } catch (err) {
+    console.error(`Couldn't mark badges as seen: ${err}`);
+  }
+};
+
 export const compareAchievements = (
   a: AchievementWithBadgeData,
   b: AchievementWithBadgeData

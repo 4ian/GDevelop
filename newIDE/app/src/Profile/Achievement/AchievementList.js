@@ -89,8 +89,6 @@ const AchievementList = ({
                   >
                     <Column justifyContent="center" alignItems="flex-start">
                       <DotBadge
-                        color="primary"
-                        variant="dot"
                         invisible={
                           !(
                             displayNotifications &&

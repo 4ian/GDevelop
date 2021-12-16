@@ -6,15 +6,15 @@ import MuiBadge from '@material-ui/core/Badge';
 type Props = {|
   children: React.Node,
   invisible?: boolean,
-  color: 'primary',
-  variant?: 'dot',
   overlap?: 'circle',
   anchor?: 'topLeft',
   classes?: ClassNameMap,
 |};
 
-const Badge = ({ anchor, ...otherProps }: Props) => (
+const DotBadge = ({ anchor, ...otherProps }: Props) => (
   <MuiBadge
+    color="primary"
+    variant="dot"
     anchorOrigin={
       anchor === 'topLeft'
         ? { horizontal: 'left', vertical: 'top' }
@@ -24,4 +24,4 @@ const Badge = ({ anchor, ...otherProps }: Props) => (
   />
 );
 
-export default Badge;
+export default DotBadge;

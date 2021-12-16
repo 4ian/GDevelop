@@ -26,8 +26,6 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
   const classes = useStyles();
   return (
     <DotBadge
-      color="primary"
-      variant="dot"
       overlap="circle"
       invisible={!displayNotificationBadge}
       anchor="topLeft"

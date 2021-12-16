@@ -19,9 +19,22 @@ export const SignedUser = () => (
   <UserChip
     profile={indieUserProfile}
     onClick={() => action('click user chip')}
+    displayNotificationBadge={false}
+  />
+);
+
+export const SignedUserWithNotifications = () => (
+  <UserChip
+    profile={indieUserProfile}
+    onClick={() => action('click user chip')}
+    displayNotificationBadge={true}
   />
 );
 
 export const UnsignedUser = () => (
-  <UserChip profile={null} onClick={() => action('click user chip')} />
+  <UserChip
+    profile={null}
+    onClick={() => action('click user chip')}
+    displayNotificationBadge={false}
+  />
 );

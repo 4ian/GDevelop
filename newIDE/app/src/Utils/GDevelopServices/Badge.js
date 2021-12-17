@@ -28,8 +28,9 @@ export type Achievement = {|
   description: string,
 |};
 
-export type AchievementWithUnlockedDate = {|
+export type AchievementWithBadgeData = {|
   ...Achievement,
+  seen?: boolean,
   unlockedAt: ?Date,
 |};
 
@@ -117,9 +118,48 @@ export const getAchievements = (): Promise<Array<Achievement>> => {
     .then(response => response.data);
 };
 
+export const markBadgesAsSeen = async (
+  authenticatedUser: AuthenticatedUser
+): Promise<?void> => {
+  const {
+    badges,
+    firebaseUser,
+    getAuthorizationHeader,
+    onBadgesChanged,
+  } = authenticatedUser;
+  if (!badges || !firebaseUser) return null;
+
+  const unseenBadges = badges.filter(badge => !badge.seen);
+  if (unseenBadges.length === 0) return;
+
+  const userId = firebaseUser.uid;
+  try {
+    const authorizationHeader = await getAuthorizationHeader();
+    const response = await axios.patch(
+      `${GDevelopUserApi.baseUrl}/user/${userId}/badge`,
+      unseenBadges.map(badge => ({
+        achievementId: badge.achievementId,
+        seen: true,
+      })),
+      {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      }
+    );
+    onBadgesChanged();
+    return response.data;
+  } catch (err) {
+    console.error(`Couldn't mark badges as seen: ${err}`);
+  }
+};
+
 export const compareAchievements = (
-  a: AchievementWithUnlockedDate,
-  b: AchievementWithUnlockedDate
+  a: AchievementWithBadgeData,
+  b: AchievementWithBadgeData
 ) => {
   if (b.unlockedAt && a.unlockedAt) {
     return b.unlockedAt - a.unlockedAt;

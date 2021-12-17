@@ -30,7 +30,7 @@ type Props = {|
 type RenderedRowInfo = {
   instance: gdInitialInstance,
   name: string,
-  locked: string,
+  locked: boolean,
   x: string,
   y: string,
   angle: string,
@@ -45,6 +45,15 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
   },
+};
+
+const compareStrings = (x: string, y: string, direction: number): number => {
+  x = x.toLowerCase();
+  y = y.toLowerCase();
+
+  if (x < y) return direction * 1;
+  if (x > y) return direction * -1;
+  return 0;
 };
 
 export default class InstancesList extends Component<Props, State> {
@@ -82,7 +91,7 @@ export default class InstancesList extends Component<Props, State> {
         this.renderedRows.push({
           instance,
           name,
-          locked: instance.isLocked() ? 'true' : 'false',
+          locked: instance.isLocked(),
           x: instance.getX().toFixed(2),
           y: instance.getY().toFixed(2),
           angle: instance.getAngle().toFixed(2),
@@ -130,8 +139,7 @@ export default class InstancesList extends Component<Props, State> {
           rowData.instance.setLocked(!rowData.instance.isLocked());
         }}
       >
-        {rowData.instance.isLocked() && <Lock />}
-        {!rowData.instance.isLocked() && <LockOpen />}
+        {rowData.instance.isLocked() ? <Lock /> : <LockOpen />}
       </IconButton>
     );
   };
@@ -157,20 +165,10 @@ export default class InstancesList extends Component<Props, State> {
       (a: RenderedRowInfo, b: RenderedRowInfo): number => {
         const direction =
           this.state.sortDirection === SortDirection.ASC ? 1 : -1;
-        const compString = (x: string, y: string): number => {
-          if (typeof x === 'string' && typeof y === 'string') {
-            x = x.toLowerCase();
-            y = y.toLowerCase();
-          }
-
-          if (x < y) return direction * 1;
-          if (x > y) return direction * -1;
-          return 0;
-        };
 
         switch (this.state.sortBy) {
           case 'name':
-            return compString(a.name, b.name);
+            return compareStrings(a.name, b.name, direction);
           case 'x':
             return direction * (parseFloat(a.x) - parseFloat(b.x));
           case 'y':
@@ -178,9 +176,9 @@ export default class InstancesList extends Component<Props, State> {
           case 'angle':
             return direction * (parseFloat(a.angle) - parseFloat(b.angle));
           case 'layer':
-            return compString(a.layer, b.layer);
+            return compareStrings(a.layer, b.layer, direction);
           case 'locked':
-            return compString(a.locked, b.locked);
+            return direction * (Number(a.locked) - Number(b.locked));
           case 'zOrder':
             return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
 
@@ -189,8 +187,6 @@ export default class InstancesList extends Component<Props, State> {
         }
       }
     );
-
-    console.log(typeof this.renderedRows[0].locked);
   };
 
   render() {

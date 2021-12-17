@@ -6,6 +6,7 @@ type EnumeratedProperty = {|
   name: string,
   type: string,
   description: string,
+  group: string,
   label: string,
   value: string,
   extraInfo: Array<string>,
@@ -25,6 +26,7 @@ export const enumerateNamedPropertyDescriptorsList = (
       name: namedProperty.getName(),
       type: namedProperty.getType(),
       description: namedProperty.getDescription(),
+      group: namedProperty.getGroup(),
       label: namedProperty.getLabel(),
       value: namedProperty.getValue(),
       extraInfo: namedProperty.getExtraInfo().toJSArray(),
@@ -40,6 +42,7 @@ export const toGdPropertyDescriptor = (
   propertyDescriptor
     .setType(enumeratedProperty.type)
     .setDescription(enumeratedProperty.description)
+    .setGroup(enumeratedProperty.group)
     .setLabel(enumeratedProperty.label)
     .setValue(enumeratedProperty.value)
     .setHidden(enumeratedProperty.isHidden);

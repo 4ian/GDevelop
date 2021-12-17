@@ -620,7 +620,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
-  _getFunctionGroupNames = () => {
+  _getFunctionGroupNames = (): Array<string> => {
     const groupNames = new Set<string>();
     // Look only in the edited function container because
     // functions from the extension or different behaviors

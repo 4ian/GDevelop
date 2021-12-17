@@ -31,31 +31,31 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")]
+  properties[_("Allows diagonals")].SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetType("Boolean");
-  properties[_("Acceleration")].SetValue(
+  properties[_("Acceleration")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Max. speed")].SetValue(
+  properties[_("Max. speed")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetValue(
+  properties[_("Rotate speed")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties[_("Rotate object")]
+  properties[_("Rotate object")].SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetValue(
+  properties[_("Angle offset")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
-  properties[_("Virtual cell width")].SetValue(
+  properties[_("Virtual cell width")].SetGroup(_("Virtual Grid")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));
-  properties[_("Virtual cell height")].SetValue(
+  properties[_("Virtual cell height")].SetGroup(_("Virtual Grid")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("cellHeight", 0)));
-  properties[_("Virtual grid X offset")].SetValue(
+  properties[_("Virtual grid X offset")].SetGroup(_("Virtual Grid")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetX", 0)));
-  properties[_("Virtual grid Y offset")].SetValue(
+  properties[_("Virtual grid Y offset")].SetGroup(_("Virtual Grid")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("gridOffsetY", 0)));
-  properties[_("Extra border size")].SetValue(
+  properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
 
   return properties;

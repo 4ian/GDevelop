@@ -621,7 +621,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _getFunctionGroupNames = () => {
-    const groupNames = [];
+    const groupNames = new Set<String>();
     // Look only in the edited function container because
     // functions from the extension or different behaviors
     // won't use the same groups names.
@@ -637,8 +637,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         const groupName = eventFunctionContainer
           .getEventsFunctionAt(index)
           .getGroup();
-        if (groupName && !groupNames.includes(groupName)) {
-          groupNames.push(groupName);
+        if (groupName) {
+          groupNames.add(groupName);
         }
       }
     } else {
@@ -651,12 +651,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         const groupName = eventsFunctionsExtension
           .getEventsFunctionAt(index)
           .getGroup();
-        if (groupName && !groupNames.includes(groupName)) {
-          groupNames.push(groupName);
+        if (groupName) {
+          groupNames.add(groupName);
         }
       }
     }
-    return groupNames;
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {

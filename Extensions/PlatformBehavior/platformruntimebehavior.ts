@@ -88,6 +88,26 @@ namespace gdjs {
       result.length = 0;
       result.push.apply(result, nearbyPlatforms);
     }
+
+    /**
+     * Check if the platforms is around the specified object.
+     * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
+     * @return true if the platforms is around the specified object.
+     */
+    isPlatformsAround(
+      platform: gdjs.PlatformRuntimeBehavior,
+      object: gdjs.RuntimeObject,
+      maxMovementLength: number
+    ): boolean {
+      const floorAABB = platform.owner.getAABB();
+      const characterAABB = object.getAABB();
+      return (
+        floorAABB.min[0] <= characterAABB.max[0] + maxMovementLength &&
+        floorAABB.min[1] <= characterAABB.max[1] + maxMovementLength &&
+        floorAABB.max[0] >= characterAABB.min[0] - maxMovementLength &&
+        floorAABB.max[1] >= characterAABB.min[1] - maxMovementLength
+      );
+    }
   }
 
   /**

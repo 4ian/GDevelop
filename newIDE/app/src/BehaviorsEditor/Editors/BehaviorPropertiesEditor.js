@@ -14,25 +14,29 @@ import { type Schema } from '../../PropertiesEditor';
 type Props = BehaviorEditorProps;
 
 export default class BehaviorPropertiesEditor extends React.Component<Props> {
-  render() {
-    const { behavior, behaviorContent, object } = this.props;
+  _getPropertyGroupNames = (): Array<string> => {
+    const { behavior, behaviorContent } = this.props;
     const properties = behavior.getProperties(behaviorContent.getContent());
 
-    const groupNames = [];
+    const groupNames = new Set<string>();
     const propertyNames = properties.keys();
     for (let i = 0; i < propertyNames.size(); i++) {
       const name = propertyNames.at(i);
       const property = properties.get(name);
       const group = property.getGroup() || '';
-      if (!groupNames.includes(group)) {
-        groupNames.push(group);
-      }
+      groupNames.add(group);
     }
-    groupNames.sort((a, b) => a.localeCompare(b));
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  };
+
+  render() {
+    const { behavior, behaviorContent, object } = this.props;
+    const properties = behavior.getProperties(behaviorContent.getContent());
+
+    const groupNames = this._getPropertyGroupNames();
 
     let schemaIsEmpty = true;
-    const propertiesSchemas: Schema[] = [];
-    for (const groupName of groupNames) {
+    const propertiesSchemas: Schema[] = groupNames.map(groupName => {
       const propertiesSchema = propertiesMapToSchema(
         properties,
         behaviorContent => behavior.getProperties(behaviorContent.getContent()),
@@ -42,9 +46,9 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
         object,
         groupName
       );
-      propertiesSchemas.push(propertiesSchema);
       schemaIsEmpty = schemaIsEmpty && !propertiesSchema;
-    }
+      return propertiesSchema;
+    });
 
     return (
       <Column expand>

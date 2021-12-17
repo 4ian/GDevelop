@@ -132,20 +132,17 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     };
   };
 
-  _getPropertyGroupNames = () => {
+  _getPropertyGroupNames = (): Array<string> => {
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
 
-    const groupNames = [];
+    const groupNames = new Set<string>();
     for (let i = 0; i < properties.size(); i++) {
       const property = properties.at(i);
       const group = property.getGroup() || '';
-      if (!groupNames.includes(group)) {
-        groupNames.push(group);
-      }
+      groupNames.add(group);
     }
-    groupNames.sort((a, b) => a.localeCompare(b));
-    return groupNames;
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {

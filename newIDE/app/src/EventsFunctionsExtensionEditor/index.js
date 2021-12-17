@@ -620,6 +620,45 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
+  _getFunctionGroupNames = (): Array<string> => {
+    const groupNames = new Set<string>();
+    // Look only in the edited function container because
+    // functions from the extension or different behaviors
+    // won't use the same groups names.
+    // An independent autocompletion is done for each of them.
+    const { selectedEventsBasedBehavior } = this.state;
+    if (selectedEventsBasedBehavior) {
+      const eventFunctionContainer = selectedEventsBasedBehavior.getEventsFunctions();
+      for (
+        let index = 0;
+        index < eventFunctionContainer.getEventsFunctionsCount();
+        index++
+      ) {
+        const groupName = eventFunctionContainer
+          .getEventsFunctionAt(index)
+          .getGroup();
+        if (groupName) {
+          groupNames.add(groupName);
+        }
+      }
+    } else {
+      const { eventsFunctionsExtension } = this.props;
+      for (
+        let index = 0;
+        index < eventsFunctionsExtension.getEventsFunctionsCount();
+        index++
+      ) {
+        const groupName = eventsFunctionsExtension
+          .getEventsFunctionAt(index)
+          .getGroup();
+        if (groupName) {
+          groupNames.add(groupName);
+        }
+      }
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -681,6 +720,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       i18n
                     )}
                     unsavedChanges={this.props.unsavedChanges}
+                    getFunctionGroupNames={this._getFunctionGroupNames}
                   />
                 ) : (
                   <EmptyMessage>

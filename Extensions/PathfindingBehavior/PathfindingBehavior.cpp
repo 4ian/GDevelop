@@ -31,21 +31,21 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")].SetGroup(_("Movement"))
+  properties[_("Allows diagonals")]
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetType("Boolean");
-  properties[_("Acceleration")].SetGroup(_("Movement")).SetValue(
+  properties[_("Acceleration")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Max. speed")].SetGroup(_("Movement")).SetValue(
+  properties[_("Max. speed")].SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetGroup(_("Movement")).SetValue(
+  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
-  properties[_("Rotate object")].SetGroup(_("Movement"))
+  properties[_("Rotate object")].SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetGroup(_("Movement")).SetValue(
+  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties[_("Virtual cell width")].SetGroup(_("Virtual Grid")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("cellWidth", 0)));

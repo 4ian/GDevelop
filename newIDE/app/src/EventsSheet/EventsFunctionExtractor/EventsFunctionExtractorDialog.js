@@ -113,7 +113,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         groupNames.add(groupName);
       }
     }
-    return [...groupNames].sort((a, b) => a.localeCompare(b));;
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {

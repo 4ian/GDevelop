@@ -27,7 +27,7 @@ export default {
       defaultValue: 'Signed in',
       mapping: {
         'Signed in': indieUserProfile,
-        'Anonymous': null,
+        Anonymous: null,
       },
     },
   },

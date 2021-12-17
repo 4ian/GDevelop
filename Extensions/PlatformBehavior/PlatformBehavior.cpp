@@ -42,12 +42,12 @@ std::map<gd::String, gd::PropertyDescriptor> PlatformBehavior::GetProperties(
       .AddExtraInfo(_("Platform"))
       .AddExtraInfo(_("Jumpthru platform"))
       .AddExtraInfo(_("Ladder"));
-  properties[_("Ledges can be grabbed")]
+  properties[_("Ledges can be grabbed")].SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canBeGrabbed", true)
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Grab offset on Y axis")].SetValue(
+  properties[_("Grab offset on Y axis")].SetGroup(_("Ledge")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
 
   return properties;

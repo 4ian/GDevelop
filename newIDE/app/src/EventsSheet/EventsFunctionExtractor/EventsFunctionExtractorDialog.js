@@ -91,6 +91,31 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     if (eventsFunction) eventsFunction.delete();
   }
 
+  _getFunctionGroupNames = () => {
+    const { createNewExtension, extensionName } = this.state;
+    if (createNewExtension || !extensionName) {
+      return [];
+    }
+    const groupNames = [];
+    const { project } = this.props;
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      extensionName
+    );
+    for (
+      let index = 0;
+      index < eventsFunctionsExtension.getEventsFunctionsCount();
+      index++
+    ) {
+      const groupName = eventsFunctionsExtension
+        .getEventsFunctionAt(index)
+        .getGroup();
+      if (groupName && !groupNames.includes(groupName)) {
+        groupNames.push(groupName);
+      }
+    }
+    return groupNames;
+  };
+
   render() {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
@@ -265,6 +290,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               this.forceUpdate();
             }}
             freezeEventsFunctionType
+            getFunctionGroupNames={this._getFunctionGroupNames}
           />
           <Spacer />
           <EventsFunctionParametersEditor

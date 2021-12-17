@@ -743,6 +743,8 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
     [Const, Ref] DOMString GetDescription();
+    [Ref] PropertyDescriptor SetGroup([Const] DOMString label);
+    [Const, Ref] DOMString GetGroup();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();

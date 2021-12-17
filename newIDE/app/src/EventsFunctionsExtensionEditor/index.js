@@ -168,7 +168,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.editor) {
       this.editor.updateToolbar();
     } else {
-      this.props.setToolbar(<div />);
+      this.props.setToolbar(null);
     }
   };
 

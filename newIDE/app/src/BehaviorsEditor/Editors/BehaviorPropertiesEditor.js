@@ -19,13 +19,13 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     const properties = behavior.getProperties(behaviorContent.getContent());
 
     const groupNames = new Set<string>();
-    const propertyNames = properties.keys();
-    for (let i = 0; i < propertyNames.size(); i++) {
-      const name = propertyNames.at(i);
-      const property = properties.get(name);
-      const group = property.getGroup() || '';
-      groupNames.add(group);
-    }
+    properties
+      .keys()
+      .toJSArray()
+      .forEach(propertyName => {
+        const property = properties.get(propertyName);
+        groupNames.add(property.getGroup() || '');
+      });
     return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 

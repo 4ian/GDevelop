@@ -2,6 +2,7 @@
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
 import { type ResourceKind } from '../ResourcesList/ResourceSource';
+import { type Field } from '../PropertyEditor';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -22,7 +23,7 @@ export default (
 ): Schema => {
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
-  const fieldsByGroups = new Map<String, Array<Field>>();
+  const fieldsByGroups = new Map<string, Array<Field>>();
   mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
@@ -225,7 +226,7 @@ export default (
   }
   if (fieldsByGroups.size === 1 && fieldsByGroups.has('')) {
     // Avoid to create a blank title
-    return fieldsByGroups.get('');
+    return fieldsByGroups.get('')!;
   }
   // Create a group for the default one too because it would look weird with the indentation.
   const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>

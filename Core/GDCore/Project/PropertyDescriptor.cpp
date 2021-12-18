@@ -19,6 +19,7 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
   element.AddChild("type").SetStringValue(type);
   element.AddChild("label").SetStringValue(label);
   element.AddChild("description").SetStringValue(description);
+  element.AddChild("group").SetStringValue(group);
   SerializerElement& extraInformationElement =
       element.AddChild("extraInformation");
   extraInformationElement.ConsiderAsArray();
@@ -33,6 +34,7 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   type = element.GetChild("type").GetStringValue();
   label = element.GetChild("label").GetStringValue();
   description = element.GetChild("description").GetStringValue();
+  group = element.GetChild("group").GetStringValue();
 
   extraInformation.clear();
   const SerializerElement& extraInformationElement =

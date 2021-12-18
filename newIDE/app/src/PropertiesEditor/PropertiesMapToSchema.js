@@ -224,9 +224,10 @@ export default (
   if (fieldsByGroups.size === 0) {
     return [];
   }
-  if (fieldsByGroups.size === 1 && fieldsByGroups.has('')) {
+  const defaultGroupField = fieldsByGroups.get('');
+  if (fieldsByGroups.size === 1 && defaultGroupField) {
     // Avoid to create a blank title
-    return fieldsByGroups.get('')!;
+    return defaultGroupField;
   }
   // Create a group for the default one too because it would look weird with the indentation.
   const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>
@@ -236,6 +237,7 @@ export default (
     name: groupName,
     type: 'column',
     title: groupName,
-    children: fieldsByGroups.get(groupName),
+    // The group actually always exists here.
+    children: fieldsByGroups.get(groupName) || [],
   }));
 };

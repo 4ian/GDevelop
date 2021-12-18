@@ -31,6 +31,7 @@ import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
 import { Line } from '../UI/Grid';
+import Text from '../UI/Text';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -100,6 +101,7 @@ export type Field =
   | {|
       name: string,
       type: 'row' | 'column',
+      title?: ?string,
       children: Array<Object>,
     |};
 
@@ -498,7 +500,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       this.props.schema.map(field => {
         if (field.children) {
           if (field.type === 'row') {
-            return (
+            const contentView = (
               <UnsavedChangesContext.Consumer key={field.name}>
                 {unsavedChanges => (
                   <PropertiesEditor
@@ -511,6 +513,15 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 )}
               </UnsavedChangesContext.Consumer>
             );
+            if (field.title) {
+              return [
+                <Text key={field.name + '-title'} size="title">
+                  {field.title}
+                </Text>,
+                contentView,
+              ];
+            }
+            return contentView;
           }
 
           return (

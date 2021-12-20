@@ -535,7 +535,9 @@ export const HomePage = React.memo<Props>(
                   isOpening={isOpening}
                   onClose={() => openPreCreationDialog(false)}
                   onCreate={() => createProject(i18n)}
-                  onClickGenerateProjectName={() => setNewProjectName(generateName())}
+                  onClickGenerateProjectName={() =>
+                    setNewProjectName(generateName())
+                  }
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}
                   projectName={newProjectName}

@@ -87,7 +87,7 @@ const ProjectPreCreationDialog = ({
           value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
-          endAdornment={<Refresh onClick={onClickGenerateProjectName}/>}
+          endAdornment={<Refresh onClick={onClickGenerateProjectName} />}
         />
         {onChangeOutputPath && (
           <>

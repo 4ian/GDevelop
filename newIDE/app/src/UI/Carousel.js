@@ -6,6 +6,7 @@ import GridList from '@material-ui/core/GridList';
 import { GridListTile } from '@material-ui/core';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
+import ListOutlined from '@material-ui/icons/ListOutlined';
 import { Skeleton } from '@material-ui/lab';
 
 import Window from '../Utils/Window';
@@ -375,6 +376,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
               (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
             }
             label={<Trans>Browse all</Trans>}
+            icon={<ListOutlined />}
           />
         </Line>
         {error ? (

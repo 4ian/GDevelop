@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
+import Refresh from '@material-ui/icons/Refresh';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
@@ -13,6 +14,7 @@ type Props = {|
   isOpening?: boolean,
   onClose: () => void,
   onCreate: () => void | Promise<void>,
+  onClickGenerateProjectName: () => void,
   outputPath?: string,
   onChangeOutputPath?: (outputPath: string) => void,
   projectName: string,
@@ -24,6 +26,7 @@ const ProjectPreCreationDialog = ({
   isOpening,
   onClose,
   onCreate,
+  onClickGenerateProjectName,
   outputPath,
   onChangeOutputPath,
   projectName,
@@ -84,6 +87,7 @@ const ProjectPreCreationDialog = ({
           value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
+          endAdornment={<Refresh onClick={onClickGenerateProjectName}/>}
         />
         {onChangeOutputPath && (
           <>

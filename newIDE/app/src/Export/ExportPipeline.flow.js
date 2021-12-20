@@ -39,7 +39,10 @@ export type ExportPipeline<
 
   canLaunchBuild: (exportState: ExportState) => boolean,
 
-  renderCustomStepsProgress?: (build: ?Build, loading: boolean) => React.Node,
+  renderCustomStepsProgress?: (
+    build: ?Build,
+    loading: boolean,
+  ) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -78,7 +81,8 @@ export type ExportPipeline<
   launchOnlineBuild?: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ) => Promise<Build>,
 
   /**

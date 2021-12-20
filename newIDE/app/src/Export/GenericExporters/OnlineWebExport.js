@@ -55,7 +55,10 @@ type WebProjectLinkProps = {|
   loading: boolean,
 |};
 
-export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
+export const WebProjectLink = ({
+  build,
+  loading,
+}: WebProjectLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
   );

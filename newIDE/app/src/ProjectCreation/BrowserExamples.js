@@ -63,6 +63,7 @@ export default function BrowserExamples({
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
+              onClickGenerateProjectName={() => setNewProjectName(generateName())}
               projectName={newProjectName}
               onChangeProjectName={setNewProjectName}
             />

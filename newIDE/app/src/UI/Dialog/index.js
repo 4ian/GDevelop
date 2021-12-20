@@ -44,8 +44,8 @@ const styles = {
 type Props = {|
   open?: boolean,
   title?: React.Node,
-  actions?: React.Node[],
-  secondaryActions?: React.Node[],
+  actions?: Array<?React.Node>,
+  secondaryActions?: Array<?React.Node>,
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -70,7 +70,7 @@ type Props = {|
    * last (often the main) action button given (if this last action is a button
    * with split menu, it simulates click on the main button).
    */
-  onSubmit?: 'lastAction' | () => void,
+  onSubmit?: 'lastAction' | (() => void),
 
   cannotBeDismissed?: boolean, // Currently unused.
 

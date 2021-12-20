@@ -79,7 +79,7 @@ const ProjectPreCreationDialog = ({
         />,
       ]}
     >
-      <Column>
+      <Column noMargin>
         <TextField
           type="text"
           errorText={projectNameError}

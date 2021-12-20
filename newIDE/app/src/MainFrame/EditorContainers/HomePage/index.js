@@ -364,7 +364,7 @@ export const HomePage = React.memo<Props>(
                       </ResponsiveLineStackLayout>
                     </div>
                     <Carousel
-                      title={<Trans>Start from a template</Trans>}
+                      title={<Trans>Start from an example</Trans>}
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
                       onBrowseAllClick={onOpenExamples}

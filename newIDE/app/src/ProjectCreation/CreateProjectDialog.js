@@ -1,8 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-
 import * as React from 'react';
+import PublishIcon from '@material-ui/icons/Publish';
+
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -12,9 +13,9 @@ import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
-import PublishIcon from '@material-ui/icons/Publish';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import RaisedButton from '../UI/RaisedButton';
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
@@ -100,6 +101,12 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
       <Dialog
         title={<Trans>Create a new project</Trans>}
         actions={[
+          <RaisedButton
+            key="create-blank"
+            label={<Trans>Create a blank project</Trans>}
+            primary={false}
+            onClick={() => console.log('salut')}
+          />,
           <FlatButton
             key="close"
             label={<Trans>Close</Trans>}

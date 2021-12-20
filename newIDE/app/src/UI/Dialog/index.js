@@ -97,6 +97,27 @@ type DialogContentStyle = {
   flexDirection?: 'row',
 };
 
+
+const findAndClickButton = (ref: {| current: ?HTMLElement |}): void => {
+  if (!ref.current || ref.current.childElementCount === 0) return;
+
+  const actionsElements = ref.current.children;
+  if (!actionsElements) return;
+
+  let target = actionsElements[actionsElements.length - 1];
+  if (target.matches('button')) {
+    // Raised or flat buttons
+    target.click();
+  } else {
+    // Search first button in target. Could be either:
+    // - button wrapped in LeftLoader component
+    // - button in ButtonGroup (e.g. RaisedButtonWithSplitMenu)
+    // - or both
+    target = target.querySelector('button:first-child');
+    if (target) target.click();
+  }
+};
+
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
@@ -167,19 +188,7 @@ export default (props: Props) => {
     }
     if (shouldSubmit(event)) {
       if (onSubmit === 'lastAction') {
-        if (!actionsRef.current || actionsRef.current.childElementCount === 0)
-          return;
-        const actionsElements = actionsRef.current.children;
-        if (!actionsElements) return;
-        let target = actionsElements[actionsElements.length - 1];
-        if (target.matches('button')) {
-          // Raised or flat buttons
-          target.click();
-        } else {
-          // Go search main button of button with split menu
-          target = target.querySelector('span > div > button:first-child');
-          if (target) target.click();
-        }
+        findAndClickButton(actionsRef)
       } else if (!!onSubmit) {
         onSubmit();
       }

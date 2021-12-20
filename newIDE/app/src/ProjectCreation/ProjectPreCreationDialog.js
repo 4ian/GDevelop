@@ -57,7 +57,7 @@ const ProjectPreCreationDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Project settings</Trans>}
+      title={<Trans>New Project</Trans>}
       maxWidth="sm"
       open={open}
       actions={[

@@ -330,7 +330,6 @@ export const HomePage = React.memo<Props>(
                               onClick={() => {
                                 openPreCreationDialog(true);
                               }}
-                              primary
                             />
                           )}
                           {!project && canOpen && (

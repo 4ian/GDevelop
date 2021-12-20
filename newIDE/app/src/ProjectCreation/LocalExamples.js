@@ -89,6 +89,9 @@ export default function LocalExamples({
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
+              onClickGenerateProjectName={() =>
+                setNewProjectName(generateName())
+              }
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
               projectName={newProjectName}

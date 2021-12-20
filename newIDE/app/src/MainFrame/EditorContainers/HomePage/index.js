@@ -6,6 +6,7 @@ import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
 import HelpIcon from '@material-ui/icons/Help';
+import AddCircleOutline from '@material-ui/icons/AddCircleOutline';
 
 import FlatButton from '../../../UI/FlatButton';
 import IconButton from '../../../UI/IconButton';
@@ -330,6 +331,7 @@ export const HomePage = React.memo<Props>(
                               onClick={() => {
                                 openPreCreationDialog(true);
                               }}
+                              icon={<AddCircleOutline />}
                             />
                           )}
                           {!project && canOpen && (

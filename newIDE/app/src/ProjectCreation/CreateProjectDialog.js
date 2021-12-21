@@ -104,6 +104,24 @@ const CreateProjectDialog = ({
     setPreCreationDialogOpen(open);
   }, []);
 
+  const actions = React.useMemo(
+    () => [
+      <RaisedButton
+        key="create-blank"
+        label={<Trans>Create a blank project</Trans>}
+        primary={false}
+        onClick={() => openPreCreationDialog(true)}
+      />,
+      <FlatButton
+        key="close"
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={onClose}
+      />,
+    ],
+    [onClose, openPreCreationDialog]
+  );
+
   const secondaryActions = React.useMemo(
     () => [
       currentTab === 'games-showcase' ? (
@@ -175,20 +193,7 @@ const CreateProjectDialog = ({
         <>
           <Dialog
             title={<Trans>Create a new project</Trans>}
-            actions={[
-              <RaisedButton
-                key="create-blank"
-                label={<Trans>Create a blank project</Trans>}
-                primary={false}
-                onClick={() => openPreCreationDialog(true)}
-              />,
-              <FlatButton
-                key="close"
-                label={<Trans>Close</Trans>}
-                primary={false}
-                onClick={onClose}
-              />,
-            ]}
+            actions={actions}
             secondaryActions={secondaryActions}
             cannotBeDismissed={false}
             onRequestClose={onClose}

@@ -18,20 +18,6 @@ const gd: libGDevelop = global.gd;
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 
-export const showGameFileCreationError = (
-  i18n: I18nType,
-  outputPath: string,
-  rawError: Error
-) => {
-  showErrorBox({
-    message: i18n._(
-      t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
-    ),
-    rawError,
-    errorId: 'local-example-creation-error',
-  });
-};
-
 export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
   outputPath,
@@ -42,7 +28,13 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   try {
     fs.mkdirsSync(outputPath);
   } catch (error) {
-    showGameFileCreationError(i18n, outputPath, error);
+    showErrorBox({
+      message: i18n._(
+        t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
+      ),
+      rawError: error,
+      errorId: 'local-example-creation-error',
+    });
     return;
   }
 

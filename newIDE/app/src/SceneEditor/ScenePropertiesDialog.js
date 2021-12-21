@@ -161,6 +161,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         ]}
         open={this.props.open}
         cannotBeDismissed={true}
+        onSubmit="lastAction"
         onRequestClose={this.props.onClose}
         maxWidth="sm"
       >

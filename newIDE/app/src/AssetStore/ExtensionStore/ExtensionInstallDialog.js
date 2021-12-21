@@ -21,6 +21,7 @@ import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import RaisedButton from '../../UI/RaisedButton';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -103,7 +104,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             disabled={isInstalling}
           />,
           <LeftLoader isLoading={isInstalling} key="install">
-            <FlatButton
+            <RaisedButton
               label={
                 !isCompatible ? (
                   <Trans>Not compatible</Trans>
@@ -122,6 +123,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
         cannotBeDismissed={false}
         open
         onRequestClose={onClose}
+        onSubmit="lastAction"
       >
         <ColumnStackLayout expand noMargin>
           {!isCompatible && (

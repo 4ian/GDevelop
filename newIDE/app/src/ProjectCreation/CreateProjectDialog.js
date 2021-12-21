@@ -24,11 +24,6 @@ export type CreateProjectDialogTabs =
   | 'tutorials'
   | 'games-showcase';
 
-type State = {|
-  currentTab: CreateProjectDialogTabs,
-  outputPath: string,
-|};
-
 export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
   storageProvider: ?StorageProvider,
@@ -72,101 +67,99 @@ type Props = {|
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
-export default class CreateProjectDialog extends React.Component<Props, State> {
-  state = {
-    currentTab: this.props.initialTab,
-    outputPath: app ? findEmptyPathInDefaultFolder(app) : '',
-  };
+const CreateProjectDialog = ({
+  open,
+  onClose,
+  onOpen,
+  onCreateFromExampleShortHeader,
+  initialTab,
+  examplesComponent: ExamplesComponent,
+}: Props) => {
+  const [currentTab, setCurrentTab] = React.useState<CreateProjectDialogTabs>(
+    initialTab
+  );
+  const [outputPath, setOutputPath] = React.useState<string>(
+    app ? findEmptyPathInDefaultFolder(app) : ''
+  );
 
-  _onChangeTab = (newTab: CreateProjectDialogTabs) => {
-    this.setState({
-      currentTab: newTab,
-    });
-  };
+  if (!open) return null;
 
-  _showExamples = () => this._onChangeTab('examples');
-
-  render() {
-    const {
-      open,
-      onClose,
-      onOpen,
-      onCreateFromExampleShortHeader,
-    } = this.props;
-    if (!open) return null;
-
-    const ExamplesComponent = this.props.examplesComponent;
-
-    return (
-      <Dialog
-        title={<Trans>Create a new project</Trans>}
-        actions={[
-          <RaisedButton
-            key="create-blank"
-            label={<Trans>Create a blank project</Trans>}
-            primary={false}
-            onClick={() => console.log('salut')}
-          />,
+  return (
+    <Dialog
+      title={<Trans>Create a new project</Trans>}
+      actions={[
+        <RaisedButton
+          key="create-blank"
+          label={<Trans>Create a blank project</Trans>}
+          primary={false}
+          onClick={() => console.log('salut')}
+        />,
+        <FlatButton
+          key="close"
+          label={<Trans>Close</Trans>}
+          primary={false}
+          onClick={onClose}
+        />,
+      ]}
+      secondaryActions={[
+        currentTab === 'games-showcase' ? (
           <FlatButton
-            key="close"
-            label={<Trans>Close</Trans>}
-            primary={false}
-            onClick={onClose}
-          />,
-        ]}
-        secondaryActions={[
-          this.state.currentTab === 'games-showcase' ? (
-            <FlatButton
-              key="submit-game-showcase"
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
-                );
-              }}
-              primary
-              icon={<PublishIcon />}
-              label={<Trans>Submit your game to the showcase</Trans>}
-            />
-          ) : null,
-          this.state.currentTab === 'examples' ? (
-            <FlatButton
-              key="submit-example"
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-                );
-              }}
-              primary
-              icon={<PublishIcon />}
-              label={<Trans>Submit your project as an example</Trans>}
-            />
-          ) : null,
-        ]}
-        cannotBeDismissed={false}
-        onRequestClose={onClose}
-        open={open}
-        noMargin
-        fullHeight
-        flexBody
-      >
-        <Column expand noMargin>
-          <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-            <Tab label={<Trans>Examples</Trans>} value="examples" />
-            <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
-            <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
-          </Tabs>
-          {this.state.currentTab === 'examples' && (
-            <ExamplesComponent
-              onOpen={onOpen}
-              onChangeOutputPath={outputPath => this.setState({ outputPath })}
-              outputPath={this.state.outputPath}
-              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
-            />
-          )}
-          {this.state.currentTab === 'tutorials' && <TutorialsList />}
-          {this.state.currentTab === 'games-showcase' && <GamesShowcase />}
-        </Column>
-      </Dialog>
-    );
-  }
-}
+            key="submit-game-showcase"
+            onClick={() => {
+              Window.openExternalURL(
+                'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+              );
+            }}
+            primary
+            icon={<PublishIcon />}
+            label={<Trans>Submit your game to the showcase</Trans>}
+          />
+        ) : null,
+        currentTab === 'examples' ? (
+          <FlatButton
+            key="submit-example"
+            onClick={() => {
+              Window.openExternalURL(
+                'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+              );
+            }}
+            primary
+            icon={<PublishIcon />}
+            label={<Trans>Submit your project as an example</Trans>}
+          />
+        ) : null,
+      ]}
+      cannotBeDismissed={false}
+      onRequestClose={onClose}
+      open={open}
+      noMargin
+      fullHeight
+      flexBody
+    >
+      <Column expand noMargin>
+        <Tabs
+          value={currentTab}
+          onChange={(newTab: CreateProjectDialogTabs) => {
+            setCurrentTab(newTab);
+          }}
+        >
+          <Tab label={<Trans>Examples</Trans>} value="examples" />
+          <Tab label={<Trans>Tutorials</Trans>} value="tutorials" />
+          <Tab label={<Trans>Games showcase</Trans>} value="games-showcase" />
+        </Tabs>
+        {currentTab === 'examples' && (
+          <ExamplesComponent
+            onOpen={onOpen}
+            onChangeOutputPath={outputPath => setOutputPath(outputPath)}
+            outputPath={outputPath}
+            onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+          />
+        )}
+        {currentTab === 'tutorials' && <TutorialsList />}
+        {currentTab === 'games-showcase' && <GamesShowcase />}
+      </Column>
+    </Dialog>
+  );
+};
+
+export default CreateProjectDialog;

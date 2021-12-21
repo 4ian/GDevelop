@@ -83,6 +83,7 @@ const InnerDialog = (props: InnerDialogProps) => {
   return (
     <Dialog
       onApply={onApply}
+      onSubmit="lastAction"
       key={props.object && props.object.ptr}
       secondaryActions={[
         <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,

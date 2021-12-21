@@ -102,6 +102,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onGoToLogin}
           />,
         ]}
+        onSubmit="lastAction"
         onRequestClose={() => {
           if (!createAccountInProgress) onClose();
         }}

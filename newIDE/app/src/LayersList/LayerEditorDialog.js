@@ -75,6 +75,7 @@ const LayerEditorDialog = (props: Props) => {
   return (
     <Dialog
       onApply={onClose}
+      onSubmit="lastAction"
       noMargin
       open
       title={<Trans>Edit Layer Properties</Trans>}

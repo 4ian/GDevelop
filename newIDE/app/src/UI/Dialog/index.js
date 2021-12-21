@@ -164,40 +164,46 @@ export default (props: Props) => {
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 
-  const onCloseDialog = (event: any, reason: string) => {
-    if (reason === 'escapeKeyDown') {
-      if (onRequestClose) onRequestClose();
-    } else if (reason === 'backdropClick') {
-      if (backdropClickBehavior === 'cancel') {
+  const onCloseDialog = React.useCallback(
+    (event: any, reason: string) => {
+      if (reason === 'escapeKeyDown') {
         if (onRequestClose) onRequestClose();
-      } else if (backdropClickBehavior === 'apply') {
-        if (onApply) onApply();
-        else if (onRequestClose) onRequestClose();
-      } else if (backdropClickBehavior === 'nothing') {
+      } else if (reason === 'backdropClick') {
+        if (backdropClickBehavior === 'cancel') {
+          if (onRequestClose) onRequestClose();
+        } else if (backdropClickBehavior === 'apply') {
+          if (onApply) onApply();
+          else if (onRequestClose) onRequestClose();
+        } else if (backdropClickBehavior === 'nothing') {
+          return;
+        }
+      }
+    },
+    [onRequestClose, onApply, backdropClickBehavior]
+  );
+
+  const handleKeyDown = React.useCallback(
+    (event: SyntheticKeyboardEvent<HTMLElement>) => {
+      if (shouldCloseOrCancel(event)) {
+        onCloseDialog(event, 'escapeKeyDown');
+        event.stopPropagation();
         return;
       }
-    }
-  };
-
-  const handleKeyDown = event => {
-    if (shouldCloseOrCancel(event)) {
-      onCloseDialog(event, 'escapeKeyDown');
-      event.stopPropagation();
-      return;
-    }
-    if (shouldSubmit(event)) {
-      event.stopPropagation();
-      const element = document.activeElement;
-      if (element) {
-        element.blur();
+      if (shouldSubmit(event)) {
+        event.stopPropagation();
+        const element = document.activeElement;
+        if (element) {
+          element.blur();
+        }
+        if (onSubmit === 'lastAction') {
+          findAndClickButton(actionsRef);
+        } else if (!!onSubmit) {
+          onSubmit();
+        }
       }
-      if (onSubmit === 'lastAction') {
-        findAndClickButton(actionsRef);
-      } else if (!!onSubmit) {
-        onSubmit();
-      }
-    }
-  };
+    },
+    [onCloseDialog, onSubmit]
+  );
 
   return (
     <DialogMaterialUI

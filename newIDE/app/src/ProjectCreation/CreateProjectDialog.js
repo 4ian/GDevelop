@@ -123,34 +123,36 @@ const CreateProjectDialog = ({
   );
 
   const secondaryActions = React.useMemo(
-    () => [
-      currentTab === 'games-showcase' ? (
-        <FlatButton
-          key="submit-game-showcase"
-          onClick={() => {
-            Window.openExternalURL(
-              'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
-            );
-          }}
-          primary
-          icon={<PublishIcon />}
-          label={<Trans>Submit your game to the showcase</Trans>}
-        />
-      ) : null,
-      currentTab === 'examples' ? (
-        <FlatButton
-          key="submit-example"
-          onClick={() => {
-            Window.openExternalURL(
-              'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-            );
-          }}
-          primary
-          icon={<PublishIcon />}
-          label={<Trans>Submit your project as an example</Trans>}
-        />
-      ) : null,
-    ],
+    () => {
+      if (currentTab === 'games-showcase')
+        return [
+          <FlatButton
+            key="submit-game-showcase"
+            onClick={() => {
+              Window.openExternalURL(
+                'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+              );
+            }}
+            primary
+            icon={<PublishIcon />}
+            label={<Trans>Submit your game to the showcase</Trans>}
+          />,
+        ];
+      if (currentTab === 'examples')
+        return [
+          <FlatButton
+            key="submit-example"
+            onClick={() => {
+              Window.openExternalURL(
+                'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+              );
+            }}
+            primary
+            icon={<PublishIcon />}
+            label={<Trans>Submit your project as an example</Trans>}
+          />,
+        ];
+    },
     [currentTab]
   );
 

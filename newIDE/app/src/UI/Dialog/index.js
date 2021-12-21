@@ -7,6 +7,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import {
+  shouldCloseOrCancel,
+  shouldSubmit,
+} from '../KeyboardShortcuts/InteractionKeys';
 
 const styles = {
   defaultBody: {
@@ -40,26 +44,33 @@ const styles = {
 type Props = {|
   open?: boolean,
   title?: React.Node,
-  actions?: React.Node,
-  secondaryActions?: React.Node,
+  actions?: Array<?React.Node>,
+  secondaryActions?: Array<?React.Node>,
 
   /**
    * Callback called when the dialog is asking to be closed
    * (either by Escape key or a click outside, according to preferences).
    * This is the default way of closing a dialog and should almost always be
-   * specified - unless your dialog is an representing an uninteruptible process.
+   * specified - unless your dialog is representing an uninteruptible process.
    *
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.
    */
   onRequestClose?: () => void,
   /**
-   * Is specified, will be called when the dialog is dismissed in a way where changes
+   * If specified, will be called when the dialog is dismissed in a way where changes
    * must be kept.
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
   onApply?: ?() => void,
+  /**
+   * If specified, allows user to close the dialog with an action based on
+   * `shouldSubmit` key event. `lastAction` option simulates a click on the
+   * last (often the main) action button given (if this last action is a button
+   * with split menu, it simulates click on the main button).
+   */
+  onSubmit?: 'lastAction' | (() => void),
 
   cannotBeDismissed?: boolean, // Currently unused.
 
@@ -86,6 +97,26 @@ type DialogContentStyle = {
   flexDirection?: 'row',
 };
 
+const findAndClickButton = (ref: {| current: ?HTMLElement |}): void => {
+  if (!ref.current || ref.current.childElementCount === 0) return;
+
+  const actionsElements = ref.current.children;
+  if (!actionsElements) return;
+
+  let target = actionsElements[actionsElements.length - 1];
+  if (target.matches('button')) {
+    // Raised or flat buttons
+    target.click();
+  } else {
+    // Search first button in target. Could be either:
+    // - button wrapped in LeftLoader component
+    // - button in ButtonGroup (e.g. RaisedButtonWithSplitMenu)
+    // - or both
+    target = target.querySelector('button:first-child');
+    if (target) target.click();
+  }
+};
+
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
@@ -96,6 +127,7 @@ export default (props: Props) => {
     secondaryActions,
     actions,
     open,
+    onSubmit,
     onRequestClose,
     maxWidth,
     noMargin,
@@ -110,14 +142,20 @@ export default (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const size = useResponsiveWindowWidth();
+  const actionsRef = React.useRef<?HTMLElement>(null);
 
-  const dialogActions = secondaryActions ? (
-    <React.Fragment>
-      <div key="secondary-actions">{secondaryActions}</div>
-      <div key="actions">{actions}</div>
-    </React.Fragment>
-  ) : (
-    actions
+  const dialogActions = React.useMemo(
+    () => (
+      <React.Fragment>
+        {secondaryActions && (
+          <div key="secondary-actions">{secondaryActions}</div>
+        )}
+        <div key="actions" ref={actionsRef}>
+          {actions}
+        </div>
+      </React.Fragment>
+    ),
+    [actions, secondaryActions]
   );
 
   const dialogContentStyle: DialogContentStyle = {
@@ -126,23 +164,45 @@ export default (props: Props) => {
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 
+  const onCloseDialog = (event: any, reason: string) => {
+    if (reason === 'escapeKeyDown') {
+      if (onRequestClose) onRequestClose();
+    } else if (reason === 'backdropClick') {
+      if (backdropClickBehavior === 'cancel') {
+        if (onRequestClose) onRequestClose();
+      } else if (backdropClickBehavior === 'apply') {
+        if (onApply) onApply();
+        else if (onRequestClose) onRequestClose();
+      } else if (backdropClickBehavior === 'nothing') {
+        return;
+      }
+    }
+  };
+
+  const handleKeyDown = event => {
+    if (shouldCloseOrCancel(event)) {
+      onCloseDialog(event, 'escapeKeyDown');
+      event.stopPropagation();
+      return;
+    }
+    if (shouldSubmit(event)) {
+      event.stopPropagation();
+      const element = document.activeElement;
+      if (element) {
+        element.blur();
+      }
+      if (onSubmit === 'lastAction') {
+        findAndClickButton(actionsRef);
+      } else if (!!onSubmit) {
+        onSubmit();
+      }
+    }
+  };
+
   return (
     <DialogMaterialUI
       open={open}
-      onClose={(event: any, reason: string) => {
-        if (reason === 'escapeKeyDown') {
-          if (onRequestClose) onRequestClose();
-        } else if (reason === 'backdropClick') {
-          if (backdropClickBehavior === 'cancel') {
-            if (onRequestClose) onRequestClose();
-          } else if (backdropClickBehavior === 'apply') {
-            if (onApply) onApply();
-            else if (onRequestClose) onRequestClose();
-          } else if (backdropClickBehavior === 'nothing') {
-            return;
-          }
-        }
-      }}
+      onClose={onCloseDialog}
       fullWidth
       fullScreen={size === 'small'}
       className={classNames({
@@ -151,6 +211,7 @@ export default (props: Props) => {
       PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
+      onKeyDown={handleKeyDown}
     >
       {title && (
         <DialogTitle style={noTitleMargin ? styles.noTitleMargin : undefined}>

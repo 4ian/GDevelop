@@ -53,14 +53,14 @@ const ProfileDialog = ({
 
   return (
     <Dialog
-      actions={
+      actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
           key="close"
           primary={false}
           onClick={onClose}
-        />
-      }
+        />,
+      ]}
       secondaryActions={[
         <HelpButton
           key="help"

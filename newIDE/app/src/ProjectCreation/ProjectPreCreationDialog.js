@@ -60,6 +60,7 @@ const ProjectPreCreationDialog = ({
       title={<Trans>Project settings</Trans>}
       maxWidth="sm"
       open={open}
+      onSubmit="lastAction"
       onRequestClose={onClose}
       actions={[
         <FlatButton

@@ -138,9 +138,9 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       <Dialog
         onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
-        secondaryActions={
-          <HelpButton helpPagePath="/events/functions/extract-events" />
-        }
+        secondaryActions={[
+          <HelpButton helpPagePath="/events/functions/extract-events" />,
+        ]}
         actions={[
           <FlatButton
             key="cancel"
@@ -161,6 +161,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         open
         onRequestClose={onClose}
         noMargin
+        onSubmit="lastAction"
       >
         <Column noMargin>
           <Column>

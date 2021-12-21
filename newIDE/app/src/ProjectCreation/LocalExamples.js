@@ -22,20 +22,6 @@ type Props = {|
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
 |};
 
-export const showGameFileCreationError = (
-  i18n: I18nType,
-  outputPath: string,
-  rawError: Error
-) => {
-  showErrorBox({
-    message: i18n._(
-      t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
-    ),
-    rawError,
-    errorId: 'local-example-creation-error',
-  });
-};
-
 export default function LocalExamples({
   outputPath,
   onChangeOutputPath,
@@ -89,6 +75,9 @@ export default function LocalExamples({
               isOpening={isOpening}
               onClose={() => setSelectedExampleShortShortHeader(null)}
               onCreate={() => createProjectFromExample(i18n)}
+              onClickGenerateProjectName={() =>
+                setNewProjectName(generateName())
+              }
               outputPath={outputPath}
               onChangeOutputPath={onChangeOutputPath}
               projectName={newProjectName}

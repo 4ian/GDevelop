@@ -8,7 +8,6 @@ import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for Electron powered IDE.
-import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
@@ -82,7 +81,7 @@ export const create = (authentication: Authentication) => {
               renderCreateDialog={props => (
                 <CreateProjectDialog
                   {...props}
-                  examplesComponent={LocalExamples}
+                  onCreateBlank={onCreateBlank}
                   onCreateFromExampleShortHeader={
                     onCreateFromExampleShortHeader
                   }

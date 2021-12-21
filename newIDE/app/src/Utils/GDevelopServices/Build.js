@@ -15,6 +15,7 @@ export type TargetName =
 
 export type Build = {
   id: string,
+  gameId: string,
   userId: string,
   bucket?: string,
   logsKey?: string,
@@ -44,7 +45,7 @@ export type BuildArtifactKeyName =
 
 export const getBuildArtifactUrl = (
   build: ?Build,
-  keyName: BuildArtifactKeyName
+  keyName: BuildArtifactKeyName,
 ): ?string => {
   if (!build || !build[keyName]) {
     return null;
@@ -88,22 +89,17 @@ export const buildElectron = (
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(
-          key
-        )}&type=electron-build&targets=${encodeURIComponent(
-          targets.join(',')
-        )}`,
-        null,
-        {
-          params: {},
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
+      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+        params: {
+          userId,
+          key,
+          type: 'electron-build',
+          targets: targets.join(','),
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
     )
     .then(response => response.data);
 };
@@ -111,22 +107,23 @@ export const buildElectron = (
 export const buildWeb = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  key: string
+  key: string,
+  gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(key)}&type=web-build&targets=s3`,
-        null,
-        {
-          params: {},
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
+      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+        params: {
+          userId,
+          key,
+          type: 'web-build',
+          targets: 's3',
+          gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
     )
     .then(response => response.data);
 };
@@ -141,18 +138,19 @@ export const buildCordovaAndroid = (
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(
-          key
-        )}&type=cordova-build&targets=${encodeURIComponent(targets.join(','))}`,
+        `${GDevelopBuildApi.baseUrl}/build`,
         JSON.stringify({
           signing: {
             keystore,
           },
         }),
         {
-          params: {},
+          params: {
+            userId,
+            key,
+            type: 'cordova-build',
+            targets: targets.join(','),
+          },
           headers: {
             Authorization: authorizationHeader,
           },

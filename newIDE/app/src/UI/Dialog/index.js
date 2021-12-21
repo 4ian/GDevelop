@@ -97,7 +97,6 @@ type DialogContentStyle = {
   flexDirection?: 'row',
 };
 
-
 const findAndClickButton = (ref: {| current: ?HTMLElement |}): void => {
   if (!ref.current || ref.current.childElementCount === 0) return;
 
@@ -187,8 +186,13 @@ export default (props: Props) => {
       return;
     }
     if (shouldSubmit(event)) {
+      event.stopPropagation();
+      const element = document.activeElement;
+      if (element) {
+        element.blur();
+      }
       if (onSubmit === 'lastAction') {
-        findAndClickButton(actionsRef)
+        findAndClickButton(actionsRef);
       } else if (!!onSubmit) {
         onSubmit();
       }

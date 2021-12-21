@@ -1,7 +1,6 @@
 // @flow
 import axios from 'axios';
 import { t } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
 
 import LocalFileStorageProvider from '../../ProjectsStorage/LocalFileStorageProvider';
 import optionalRequire from '../../Utils/OptionalRequire.js';

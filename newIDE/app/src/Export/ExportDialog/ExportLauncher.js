@@ -258,7 +258,8 @@ export default class ExportLauncher extends Component<Props, State> {
         const build = await launchOnlineBuild(
           this.state.exportState,
           authenticatedUser,
-          uploadBucketKey
+          uploadBucketKey,
+          this.props.project.getProjectUuid()
         );
         setStep('build');
         this.setState({ build }, () => {
@@ -306,15 +307,15 @@ export default class ExportLauncher extends Component<Props, State> {
     } = this.state;
     const { project, authenticatedUser, exportPipeline } = this.props;
     if (!project) return null;
+    const buildPending = !errored && exportStep !== '' && exportStep !== 'done';
+    const buildFinished = !errored && exportStep === 'done';
 
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
         ? authenticatedUser.limits[exportPipeline.onlineBuildType]
         : null;
+
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      const buildPending =
-        !errored && exportStep !== '' && exportStep !== 'done';
-      const buildFinished = !errored && exportStep === 'done';
       if (buildPending || buildFinished) return false;
 
       const limit: ?Limit = getBuildLimit(authenticatedUser);
@@ -378,10 +379,7 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(
-              build,
-              !!this.state.exportStep && this.state.exportStep !== 'done'
-            )
+            exportPipeline.renderCustomStepsProgress(build, buildPending)
           ) : (
             <Line expand>
               <BuildStepsProgress

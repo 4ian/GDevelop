@@ -2573,6 +2573,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'electron-build',
         status: 'pending',
@@ -2592,6 +2593,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'error',
@@ -2611,6 +2613,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'done'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'complete',

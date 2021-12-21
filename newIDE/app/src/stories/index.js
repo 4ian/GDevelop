@@ -2852,10 +2852,10 @@ storiesOf('Project Creation/CreateProjectDialog', module)
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
         onClose={action('onClose')}
-        onOpen={action('onOpen')}
+        onOpen={action('On open project after it is created')}
         initialTab="examples"
+        onCreateBlank={() => action('create blank project')}
         onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
@@ -2864,10 +2864,10 @@ storiesOf('Project Creation/CreateProjectDialog', module)
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
         onClose={action('onClose')}
-        onOpen={action('onOpen')}
+        onOpen={action('On open project after it is created')}
         initialTab="games-showcase"
+        onCreateBlank={() => action('create blank project')}
         onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>

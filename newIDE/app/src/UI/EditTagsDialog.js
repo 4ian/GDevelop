@@ -67,6 +67,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
         ]}
         cannotBeDismissed={false}
         open
+        canSubmitLastAction
         onRequestClose={onCancel}
       >
         <TextField

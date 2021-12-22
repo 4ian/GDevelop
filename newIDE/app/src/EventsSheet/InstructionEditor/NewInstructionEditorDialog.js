@@ -240,6 +240,7 @@ export default function NewInstructionEditorDialog({
       {windowWidth => (
         <Dialog
           onApply={instructionType ? onSubmit : null}
+          canSubmitLastAction
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}

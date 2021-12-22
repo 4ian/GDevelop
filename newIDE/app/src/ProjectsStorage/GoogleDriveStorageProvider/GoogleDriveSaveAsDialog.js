@@ -88,6 +88,7 @@ export default (props: Props) => {
   return (
     <Dialog
       title={<Trans>Save on Google Drive</Trans>}
+      canSubmitLastAction
       actions={[
         <FlatButton
           key="cancel"

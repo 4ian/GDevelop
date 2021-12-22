@@ -151,6 +151,7 @@ export const AssetDetails = ({
           />
         </LeftLoader>,
       ]}
+      canSubmitLastAction
     >
       <Column expand noMargin>
         <ResponsiveLineStackLayout noMargin>

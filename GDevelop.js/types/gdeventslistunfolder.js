@@ -2,7 +2,7 @@
 declare class gdEventsListUnfolder {
   static unfoldWhenContaining(list: gdEventsList, eventToContain: gdBaseEvent): void;
   static foldAll(list: gdEventsList): void;
-  static unfoldToLevel(list: gdEventsList, maxLevel: number, currentLevel: number): void;
+  static unfoldToLevel(list: gdEventsList, maxLevel: number, currentLevel?: number): void;
   delete(): void;
   ptr: number;
 };

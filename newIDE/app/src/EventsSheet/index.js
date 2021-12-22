@@ -603,6 +603,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
   };
 
+  collapseAll = () => {
+    if (this._eventsTree) this._eventsTree.foldAll();
+  };
+
+  expandToLevel = (level: number) => {
+    if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
+  };
+
   _buildEventContextMenu = (i18n: I18nType) => [
     {
       label: i18n._(t`Edit`),
@@ -669,6 +677,27 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: this.redo,
       enabled: canRedo(this.state.history),
       accelerator: 'CmdOrCtrl+Shift+Z',
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Collapse all`),
+      click: this.collapseAll,
+    },
+    {
+      label: i18n._(t`Expand all to level`),
+      submenu: [
+        {
+          label: i18n._(t`All`),
+          click: () => this.expandToLevel(-1),
+        },
+        { type: 'separator' },
+        ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
+          return {
+            label: i18n._(t`Level ${index + 1}`),
+            click: () => this.expandToLevel(index),
+          };
+        }),
+      ],
     },
     { type: 'separator' },
     {

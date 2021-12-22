@@ -1847,6 +1847,8 @@ interface EventsRemover {
 
 interface EventsListUnfolder {
     void STATIC_UnfoldWhenContaining([Ref] EventsList list, [Const, Ref] BaseEvent eventToContain);
+    void STATIC_FoldAll([Ref] EventsList list);
+    void STATIC_UnfoldToLevel([Ref] EventsList list, [Const] unsigned long maxLevel, [Const] optional unsigned long currentLevel = 0);
 };
 
 interface EventsSearchResult {

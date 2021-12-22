@@ -45,23 +45,24 @@ TopDownMovementBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
 
-  properties[_("Allows diagonals")]
+  properties[_("Allows diagonals")].SetGroup(_("Movement"))
       .SetValue(behaviorContent.GetBoolAttribute("allowDiagonals") ? "true"
                                                                    : "false")
       .SetType("Boolean");
-  properties[_("Acceleration")].SetValue(
+  properties[_("Acceleration")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-  properties[_("Deceleration")].SetValue(
+  properties[_("Deceleration")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-  properties[_("Max. speed")].SetValue(
+  properties[_("Max. speed")].SetGroup(_("Movement")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-  properties[_("Rotate speed")].SetValue(
+  properties[_("Rotate speed")].SetGroup(_("Rotation")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angularMaxSpeed")));
   properties[_("Rotate object")]
+      .SetGroup(_("Rotation"))
       .SetValue(behaviorContent.GetBoolAttribute("rotateObject") ? "true"
                                                                  : "false")
       .SetType("Boolean");
-  properties[_("Angle offset")].SetValue(
+  properties[_("Angle offset")].SetGroup(_("Rotation")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("angleOffset")));
   properties[_("Default controls")]
       .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
@@ -80,6 +81,7 @@ TopDownMovementBehavior::GetProperties(
   else if (viewpoint == "CustomIsometry")
     viewpointStr = _("Custom Isometry");
   properties[_("Viewpoint")]
+      .SetGroup(_("Viewpoint"))
       .SetValue(viewpointStr)
       .SetType("Choice")
       .AddExtraInfo(_("Top-Down"))
@@ -87,11 +89,13 @@ TopDownMovementBehavior::GetProperties(
       .AddExtraInfo(_("True Isometry (30°)"))
       .AddExtraInfo(_("Custom Isometry"));
   properties[_("Custom isometry angle")]
+      .SetGroup(_("Viewpoint"))
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("customIsometryAngle")))
       .SetDescription(_("If you choose \"Custom Isometry\", this allows to "
                         "specify the angle of your isometry projection."));
   properties[_("Movement angle offset")]
+      .SetGroup(_("Viewpoint"))
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("movementAngleOffset")))
       .SetDescription(_(

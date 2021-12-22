@@ -25,6 +25,7 @@ import { ResponsiveLineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import StringArrayEditor from '../StringArrayEditor';
 import ColorField from '../UI/ColorField';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 
 const gd: libGDevelop = global.gd;
 
@@ -129,6 +130,19 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
       vectorString.delete();
       this.forceUpdate();
     };
+  };
+
+  _getPropertyGroupNames = (): Array<string> => {
+    const { eventsBasedBehavior } = this.props;
+    const properties = eventsBasedBehavior.getPropertyDescriptors();
+
+    const groupNames = new Set<string>();
+    for (let i = 0; i < properties.size(); i++) {
+      const property = properties.at(i);
+      const group = property.getGroup() || '';
+      groupNames.add(group);
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {
@@ -340,6 +354,24 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               }}
                             />
                           )}
+                          <SemiControlledAutoComplete
+                            floatingLabelText={<Trans>Group name</Trans>}
+                            hintText={t`Leave it empty to use the default group.`}
+                            fullWidth
+                            value={property.getGroup()}
+                            onChange={text => {
+                              property.setGroup(text);
+                              this.forceUpdate();
+                              this.props.onPropertiesUpdated();
+                            }}
+                            dataSource={this._getPropertyGroupNames().map(
+                              name => ({
+                                text: name,
+                                value: name,
+                              })
+                            )}
+                            openOnFocus={true}
+                          />
                           <SemiControlledTextField
                             commitOnBlur
                             floatingLabelText={

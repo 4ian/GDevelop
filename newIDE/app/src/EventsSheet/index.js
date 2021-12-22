@@ -607,7 +607,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.foldAll();
   };
 
-  unCollapseToLevel = (level: number) => {
+  expandToLevel = (level: number) => {
     if (this._eventsTree) this._eventsTree.unfoldToLevel(level);
   };
 
@@ -684,17 +684,17 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       click: this.collapseAll,
     },
     {
-      label: i18n._(t`Un-collapse all to level`),
+      label: i18n._(t`Expand all to level`),
       submenu: [
         {
           label: i18n._(t`All`),
-          click: () => this.unCollapseToLevel(-1),
+          click: () => this.expandToLevel(-1),
         },
         { type: 'separator' },
         ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
           return {
             label: i18n._(t`Level ${index + 1}`),
-            click: () => this.unCollapseToLevel(index),
+            click: () => this.expandToLevel(index),
           };
         }),
       ],

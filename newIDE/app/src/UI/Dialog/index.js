@@ -184,11 +184,14 @@ export default (props: Props) => {
 
   const handleKeyDown = React.useCallback(
     (event: SyntheticKeyboardEvent<HTMLElement>) => {
+      // When specifying a onKeyDown props, the MUIDialog does not handle
+      // the close on escape key feature anymore so it should be handled here.
       if (shouldCloseOrCancel(event)) {
         onCloseDialog(event, 'escapeKeyDown');
         event.stopPropagation();
         return;
       }
+
       if (shouldSubmit(event)) {
         event.stopPropagation();
         const element = document.activeElement;

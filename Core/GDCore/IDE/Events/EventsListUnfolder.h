@@ -24,24 +24,22 @@ class GD_CORE_API EventsListUnfolder {
     for (size_t i = 0; i < list.size(); ++i) {
       gd::BaseEvent& event = list[i];
       event.SetFolded(true);
-      if (event.CanHaveSubEvents() &&
-          event.GetSubEvents().size() > 0) {
+      if (event.CanHaveSubEvents() && event.GetSubEvents().size() > 0) {
         FoldAll(event.GetSubEvents());
       }
     }
   }
 
   static void UnfoldToLevel(gd::EventsList& list,
-                            const std::size_t maxLevel,
+                            const int8_t maxLevel,
                             const std::size_t currentLevel = 0) {
-    if (currentLevel > maxLevel) return;
+    if (maxLevel >= 0 && currentLevel > maxLevel) return;
 
     for (size_t i = 0; i < list.size(); ++i) {
       gd::BaseEvent& event = list[i];
       event.SetFolded(false);
-      if (event.CanHaveSubEvents() &&
-          event.GetSubEvents().size() > 0 &&
-          currentLevel <= maxLevel) {
+      if (event.CanHaveSubEvents() && event.GetSubEvents().size() > 0 &&
+          (maxLevel == -1 || currentLevel <= maxLevel)) {
         UnfoldToLevel(event.GetSubEvents(), maxLevel, currentLevel + 1);
       }
     }

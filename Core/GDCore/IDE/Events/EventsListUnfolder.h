@@ -30,6 +30,11 @@ class GD_CORE_API EventsListUnfolder {
     }
   }
 
+  /**
+   * \brief Recursively unfold all the events until a certain level of depth.
+   * 0 is the top level. If you want to unfold all events regardless of its depth,
+   * use `maxLevel = -1`. `currentLevel` is used for the recursion.
+   */
   static void UnfoldToLevel(gd::EventsList& list,
                             const int8_t maxLevel,
                             const std::size_t currentLevel = 0) {

@@ -43,7 +43,9 @@ export const getInitialSelection = () => {
   };
 };
 
-export const getSelectedEvents = (selection: SelectionState): Array<Object> => {
+export const getSelectedEvents = (
+  selection: SelectionState
+): Array<gdBaseEvent> => {
   return values(selection.selectedEvents).map(
     (eventContext: EventContext) => eventContext.event
   );

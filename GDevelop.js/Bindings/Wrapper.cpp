@@ -571,6 +571,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
+#define STATIC_FoldAll FoldAll
+#define STATIC_UnfoldToLevel UnfoldToLevel
 
 #define STATIC_FreeEventsFunctionToObjectsContainer FreeEventsFunctionToObjectsContainer
 #define STATIC_BehaviorEventsFunctionToObjectsContainer BehaviorEventsFunctionToObjectsContainer

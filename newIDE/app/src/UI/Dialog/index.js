@@ -70,7 +70,7 @@ type Props = {|
    * last (often the main) action button given (if this last action is a button
    * with split menu, it simulates click on the main button).
    */
-  onSubmit?: 'lastAction' | (() => void),
+  canSubmitLastAction?: boolean,
 
   cannotBeDismissed?: boolean, // Currently unused.
 
@@ -127,7 +127,7 @@ export default (props: Props) => {
     secondaryActions,
     actions,
     open,
-    onSubmit,
+    canSubmitLastAction,
     onRequestClose,
     maxWidth,
     noMargin,
@@ -192,20 +192,16 @@ export default (props: Props) => {
         return;
       }
 
-      if (shouldSubmit(event)) {
+      if (canSubmitLastAction && shouldSubmit(event)) {
         event.stopPropagation();
         const element = document.activeElement;
         if (element) {
           element.blur();
         }
-        if (onSubmit === 'lastAction') {
-          findAndClickButton(actionsRef);
-        } else if (!!onSubmit) {
-          onSubmit();
-        }
+        findAndClickButton(actionsRef);
       }
     },
-    [onCloseDialog, onSubmit]
+    [onCloseDialog, canSubmitLastAction]
   );
 
   return (

@@ -123,7 +123,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
         cannotBeDismissed={false}
         open
         onRequestClose={onClose}
-        onSubmit="lastAction"
+        canSubmitLastAction
       >
         <ColumnStackLayout expand noMargin>
           {!isCompatible && (

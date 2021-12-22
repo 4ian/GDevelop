@@ -85,7 +85,7 @@ export default class EditDialog extends Component<Props, State> {
           if (!editInProgress) onClose();
         }}
         maxWidth="sm"
-        onSubmit="lastAction"
+        canSubmitLastAction
         cannotBeDismissed={true}
         open
       >

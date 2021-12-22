@@ -97,7 +97,7 @@ export default class LoginDialog extends Component<Props, State> {
             />
           </RightLoader>,
         ]}
-        onSubmit="lastAction"
+        canSubmitLastAction
         onRequestClose={() => {
           if (!loginInProgress && !forgotPasswordInProgress) onClose();
         }}

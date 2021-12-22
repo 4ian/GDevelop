@@ -63,7 +63,7 @@ const VariablesEditorDialog = ({
       ]}
       open={open}
       cannotBeDismissed={true}
-      onSubmit="lastAction"
+      canSubmitLastAction
       onRequestClose={onCancelChanges}
       secondaryActions={[
         onEditObjectVariables ? (

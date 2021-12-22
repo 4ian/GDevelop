@@ -161,7 +161,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         open
         onRequestClose={onClose}
         noMargin
-        onSubmit="lastAction"
+        canSubmitLastAction
       >
         <Column noMargin>
           <Column>

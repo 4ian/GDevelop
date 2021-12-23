@@ -632,5 +632,98 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("AreCoordinatesRelative")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddAction("Scale",
+                _("Scale"),
+                _("Modify the scale of the specified object."),
+                _("the scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("ScaleX",
+                _("Scale on X axis"),
+                _("Modify the scale of the width of an object."),
+                _("the width's scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("ScaleY",
+                _("Scale on Y axis"),
+                _("Modify the scale of the height of an object."),
+                _("the height's scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddExpression("ScaleX",
+                    _("Scale of the width of an object"),
+                    _("Scale of the width of an object"),
+                    _("Size"),
+                    "res/actions/scaleWidth.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+  obj.AddExpression("ScaleY",
+                    _("Scale of the height of an object"),
+                    _("Scale of the height of an object"),
+                    _("Size"),
+                    "res/actions/scaleHeight.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+
+  obj.AddAction("FlipX",
+                _("Flip the object horizontally"),
+                _("Flip the object horizontally"),
+                _("Flip horizontally _PARAM0_ : _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipX24.png",
+                "res/actions/flipX.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .MarkAsSimple();
+
+  obj.AddAction("FlipY",
+                _("Flip the object vertically"),
+                _("Flip the object vertically"),
+                _("Flip vertically _PARAM0_ : _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipY24.png",
+                "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .MarkAsSimple();
+
+
+  obj.AddAction("Width",
+                _("Width"),
+                _("Change the width of an object."),
+                _("the width"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("Height",
+                _("Height"),
+                _("Change the height of an object."),
+                _("the height"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
 #endif
 }

@@ -37,6 +37,12 @@ namespace gdjs {
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
   export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
+    _scaleX: number = 1;
+    _scaleY: number = 1;
+    _blendMode: number = 0;
+    _flippedX: boolean = false;
+    _flippedY: boolean = false;
+
     _fillColor: integer;
     _outlineColor: integer;
     _fillOpacity: float;
@@ -134,8 +140,11 @@ namespace gdjs {
         oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates
       ) {
         this._absoluteCoordinates = newObjectData.absoluteCoordinates;
-        this._renderer.updateXPosition();
-        this._renderer.updateYPosition();
+        this._renderer.updatePositionX();
+        this._renderer.updatePositionY();
+        this._renderer.updateAngle();
+        this._renderer.updateScaleX();
+        this._renderer.updateScaleY();
       }
       if (
         oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames
@@ -166,6 +175,8 @@ namespace gdjs {
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
       this._renderer.drawRectangle(x1, y1, x2, y2);
+      console.log(this._renderer._graphics.width, this._renderer._graphics.height);
+      console.log(this._renderer._graphics.getLocalBounds());
     }
 
     drawCircle(x: float, y: float, radius: float) {
@@ -437,8 +448,9 @@ namespace gdjs {
       if (x === this.x) {
         return;
       }
+      console.log("SetX");
       super.setX(x);
-      this._renderer.updateXPosition();
+      this._renderer.updatePositionX();
     }
 
     setY(y: float): void {
@@ -446,15 +458,171 @@ namespace gdjs {
         return;
       }
       super.setY(y);
-      this._renderer.updateYPosition();
+      this._renderer.updatePositionY();
+    }
+
+    setAngle(angle: float): void {
+      if (angle === this.angle) {
+        return;
+      }
+      super.setAngle(angle);
+      console.log("center: " + this.getCenterX() + " " + this.getCenterY());
+      console.log("getDrawableXY: " + this.getDrawableX() + " " + this.getDrawableY());
+      this._renderer.updateAngle();
+    }
+
+    /**
+     * Change the width of the object. This changes the scale on X axis of the object.
+     *
+     * @param width The new width of the object, in pixels.
+     */
+    setWidth(newWidth: float): void {
+      const unscaledWidth = this._renderer.getUnscaledWidth();
+      if (unscaledWidth !== 0) {
+        this.setScaleX(newWidth / unscaledWidth);
+      }
+    }
+
+    /**
+     * Change the height of the object. This changes the scale on Y axis of the object.
+     *
+     * @param height The new height of the object, in pixels.
+     */
+    setHeight(newHeight: float): void {
+      const unscaledHeight = this._renderer.getUnscaledHeight();
+      if (unscaledHeight !== 0) {
+        this.setScaleY(newHeight / unscaledHeight);
+      }
+    }
+    
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+     setScale(newScale: float): void {
+      console.log("ScaleX: " + newScale);
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (
+        newScale === Math.abs(this._scaleX) &&
+        newScale === Math.abs(this._scaleY)
+      ) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._renderer.updateScaleX();
+      this._renderer.updateScaleY();
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+     setScaleX(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleX)) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._renderer.updateScaleX();
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+    setScaleY(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleY)) {
+        return;
+      }
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._renderer.updateScaleY();
+      this.hitBoxesDirty = true;
+    }
+
+    flipX(enable: boolean): void {
+      if (enable !== this._flippedX) {
+        this._scaleX *= -1;
+        this._flippedX = enable;
+        this._renderer.updateScaleX();
+        this.hitBoxesDirty = true;
+      }
+    }
+
+    flipY(enable: boolean): void {
+      if (enable !== this._flippedY) {
+        this._scaleY *= -1;
+        this._flippedY = enable;
+        this._renderer.updateScaleY();
+        this.hitBoxesDirty = true;
+      }
+    }
+
+    isFlippedX(): boolean {
+      return this._flippedX;
+    }
+
+    isFlippedY(): boolean {
+      return this._flippedY;
+    }
+
+    /**
+     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     */
+    getScale(): number {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object on Y axis.
+     *
+     * @return the scale of the object on Y axis
+     */
+    getScaleY(): float {
+      return Math.abs(this._scaleY);
+    }
+
+    /**
+     * Get the scale of the object on X axis.
+     *
+     * @return the scale of the object on X axis
+     */
+    getScaleX(): float {
+      return Math.abs(this._scaleX);
+    }
+
+    invalidateBounds() {
+      this.hitBoxesDirty = true;
+    }
+
+    getDrawableX(): float {
+      return this._renderer.getDrawableX();
+    }
+
+    getDrawableY(): float {
+      return this._renderer.getDrawableY();
     }
 
     getWidth(): float {
-      return 32;
+      return this._renderer.getWidth();
     }
 
     getHeight(): float {
-      return 32;
+      return this._renderer.getHeight();
     }
   }
   gdjs.registerObject(

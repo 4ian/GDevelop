@@ -702,6 +702,23 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Activate flipping"))
       .MarkAsSimple();
 
+  obj.AddCondition("FlippedX",
+                   _("Horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
+                   _("_PARAM0_ is horizontally flipped"),
+                   _("Effects"),
+                   "res/actions/flipX24.png",
+                   "res/actions/flipX.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+  obj.AddCondition("FlippedY",
+                   _("Vertically flipped"),
+                   _("Check if the object is vertically flipped"),
+                   _("_PARAM0_ is vertically flipped"),
+                   _("Effects"),
+                   "res/actions/flipY24.png",
+                   "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Drawer");
 
   obj.AddAction("Width",
                 _("Width"),

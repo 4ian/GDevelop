@@ -188,12 +188,20 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllExpressionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
         .SetFunctionName("getScaleY");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlipX"]
         .SetFunctionName("flipX");
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlipY"]
         .SetFunctionName("flipY");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlippedX"]
+        .SetFunctionName("isFlippedX");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::FlippedY"]
+        .SetFunctionName("isFlippedY");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Width"]
         .SetFunctionName("setWidth")
@@ -202,6 +210,7 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Height"]
         .SetFunctionName("setHeight")
         .SetGetter("getHeight");
+
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RotationAnchor"]
         .SetFunctionName("setRotationAnchor");

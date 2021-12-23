@@ -178,8 +178,6 @@ namespace gdjs {
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
       this._renderer.drawRectangle(x1, y1, x2, y2);
-      console.log(this._renderer._graphics.width, this._renderer._graphics.height);
-      console.log(this._renderer._graphics.getLocalBounds());
     }
 
     drawCircle(x: float, y: float, radius: float) {
@@ -451,7 +449,6 @@ namespace gdjs {
       if (x === this.x) {
         return;
       }
-      console.log("SetX");
       super.setX(x);
       this._renderer.updatePositionX();
     }
@@ -469,8 +466,6 @@ namespace gdjs {
         return;
       }
       super.setAngle(angle);
-      console.log("center: " + this.getCenterX() + " " + this.getCenterY());
-      console.log("getDrawableXY: " + this.getDrawableX() + " " + this.getDrawableY());
       this._renderer.updateAngle();
     }
 
@@ -479,10 +474,10 @@ namespace gdjs {
      * to the drawing origin (the object position).
      * This avoid the center to move on the drawing
      * when new shapes push the bounds.
-     * 
+     *
      * When no custom center is defined, it will move
      * to stay at the center of the drawable bounds.
-     * 
+     *
      * @param x coordinate of the custom center
      * @param y coordinate of the custom center
      */
@@ -499,7 +494,9 @@ namespace gdjs {
      * (where `getCenterX()` is relative to the top left drawable bound).
      */
     getRotationAnchorX(): float {
-      return this._customCenter ? this._customCenter[0] : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
+      return this._customCenter
+        ? this._customCenter[0]
+        : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
     }
 
     /**
@@ -507,14 +504,18 @@ namespace gdjs {
      * (where `getCenterY()` is relative to the top left drawable bound).
      */
     getRotationAnchorY(): float {
-      return this._customCenter ? this._customCenter[1] : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();
+      return this._customCenter
+        ? this._customCenter[1]
+        : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();
     }
 
     getCenterX(): float {
       if (!this._customCenter) {
         return super.getCenterX();
       }
-      let centerX = this._customCenter[0] + (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
+      let centerX =
+        this._customCenter[0] +
+        (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
       if (this._flippedX) {
         //centerX = this._renderer.getUnscaledWidth() - centerX;
       }
@@ -525,7 +526,9 @@ namespace gdjs {
       if (!this._customCenter) {
         return super.getCenterY();
       }
-      let centerY = this._customCenter[1] + (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
+      let centerY =
+        this._customCenter[1] +
+        (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
       if (this._flippedY) {
         //centerY = this._renderer.getUnscaledHeight() - centerY;
       }
@@ -555,14 +558,13 @@ namespace gdjs {
         this.setScaleY(newHeight / unscaledHeight);
       }
     }
-    
+
     /**
      * Change the scale on X and Y axis of the object.
      *
      * @param newScale The new scale (must be greater than 0).
      */
-     setScale(newScale: float): void {
-      console.log("ScaleX: " + newScale);
+    setScale(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -584,7 +586,7 @@ namespace gdjs {
      *
      * @param newScale The new scale (must be greater than 0).
      */
-     setScaleX(newScale: float): void {
+    setScaleX(newScale: float): void {
       if (newScale < 0) {
         newScale = 0;
       }
@@ -665,7 +667,7 @@ namespace gdjs {
     getScaleX(): float {
       return Math.abs(this._scaleX);
     }
-    
+
     invalidateBounds() {
       this.hitBoxesDirty = true;
     }
@@ -685,7 +687,7 @@ namespace gdjs {
     getHeight(): float {
       return this._renderer.getHeight();
     }
-    
+
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.updatePreRender();
     }

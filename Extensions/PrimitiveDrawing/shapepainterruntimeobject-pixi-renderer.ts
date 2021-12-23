@@ -292,6 +292,10 @@ namespace gdjs {
       this._positionYIsUpToDate = false;
     }
 
+    updatePreRender(): void {
+      this.updatePositionIfNeeded();
+    }
+
     updatePositionX(): void {
       if (this._object._absoluteCoordinates) {
         this._container.position.x = 0;

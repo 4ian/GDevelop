@@ -624,6 +624,10 @@ namespace gdjs {
     getHeight(): float {
       return this._renderer.getHeight();
     }
+    
+    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+      this._renderer.updatePreRender();
+    }
   }
   gdjs.registerObject(
     'PrimitiveDrawing::Drawer',

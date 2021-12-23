@@ -202,6 +202,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Height"]
         .SetFunctionName("setHeight")
         .SetGetter("getHeight");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RotationAnchor"]
+        .SetFunctionName("setRotationAnchor");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

@@ -301,11 +301,10 @@ namespace gdjs {
         this._container.position.x = 0;
       } else {
         console.log("setX: " + this._object.x);
+        this._graphics.pivot.x = this._object.getRotationAnchorX();
         // GDJS objects relative positions are relative in translation and rotation but not in scale.
         // Whereas, PIXI containers relative positions are also relative in scale.
-        // This is why the multiplication and division by the scale are needed.
-        const localBound = this._object._flippedX ? this._graphics.getLocalBounds().right : this._graphics.getLocalBounds().left;
-        this._graphics.pivot.x = localBound + this._object.getCenterX() / Math.abs(this._graphics.scale.x);
+        // This is why the scale is used.
         this._container.position.x = this._object.x + this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
       }
     }
@@ -314,14 +313,13 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         this._container.position.y = 0;
       } else {
-        const localBound = this._object._flippedY ? this._graphics.getLocalBounds().bottom : this._graphics.getLocalBounds().top;
-        this._graphics.pivot.y = localBound + this._object.getCenterY() / Math.abs(this._graphics.scale.y);
+        this._graphics.pivot.y = this._object.getRotationAnchorY();
         this._container.position.y = this._object.y + this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
       }
     }
     
     updatePositionIfNeeded() {
-      // Graphics positions can need update when something is drawn.
+      // Graphics positions can need update when shapes are added.
       if (!this._positionXIsUpToDate) {
         this.updatePositionX();
         this._positionXIsUpToDate = true;
@@ -368,7 +366,11 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         return this._graphics.getLocalBounds().x;
       }
-      const localBound = this._object._flippedX ? this._graphics.getLocalBounds().right : this._graphics.getLocalBounds().left;
+      let localBound = this._graphics.getLocalBounds().left;
+      if (this._object._flippedX) {
+        const anchorX = this._object.getRotationAnchorX();
+        localBound = 2 * anchorX - localBound;
+      }
       // When new shape are drawn, the bounds of the object can extend.
       // The object position stays the same but (drawableX; drawableY) can change.
       return this._object.getX() + localBound * Math.abs(this._graphics.scale.x);
@@ -378,7 +380,11 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         return this._graphics.getLocalBounds().y;
       }
-      const localBound = this._object._flippedY ? this._graphics.getLocalBounds().bottom : this._graphics.getLocalBounds().top;
+      let localBound = this._graphics.getLocalBounds().top;
+      if (this._object._flippedY) {
+        const anchorY = this._object.getRotationAnchorY();
+        localBound = 2 * anchorY - localBound;
+      }
       return this._object.getY() + localBound * Math.abs(this._graphics.scale.y);
     }
 
@@ -391,11 +397,25 @@ namespace gdjs {
     }
     
     getUnscaledWidth(): float {
-      return this._graphics.width / this._graphics.scale.x;
+      return this._graphics.getLocalBounds().width;
     }
 
     getUnscaledHeight(): float {
-      return this._graphics.height / this._graphics.scale.y;
+      return this._graphics.getLocalBounds().height;
+    }
+    
+    /**
+     * @returns The drawing origin relatively to the drawable top left corner.
+     */
+    getOriginX() {
+      return - this._graphics.getLocalBounds().left;
+    }
+    
+    /**
+     * @returns The drawing origin relatively to the drawable top left corner.
+     */
+    getOriginY() {
+      return - this._graphics.getLocalBounds().top;
     }
   }
 

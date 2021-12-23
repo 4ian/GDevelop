@@ -725,5 +725,17 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
 
+  obj.AddAction("RotationAnchor",
+                _("Center of rotation"),
+                _("Change the center of rotation of an object relatively to the object origin."),
+                _("Change the center of rotation of _PARAM0_ : _PARAM1_; _PARAM2_"),
+                _("Angle"),
+                "res/actions/position24.png",
+                "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
+      .MarkAsAdvanced();
+
 #endif
 }

@@ -42,6 +42,7 @@ namespace gdjs {
     _blendMode: number = 0;
     _flippedX: boolean = false;
     _flippedY: boolean = false;
+    _customCenter: FloatPoint | null = null;
 
     _fillColor: integer;
     _outlineColor: integer;
@@ -469,6 +470,64 @@ namespace gdjs {
       console.log("center: " + this.getCenterX() + " " + this.getCenterY());
       console.log("getDrawableXY: " + this.getDrawableX() + " " + this.getDrawableY());
       this._renderer.updateAngle();
+    }
+
+    /**
+     * The center of rotation is defined relatively
+     * to the drawing origin (the object position).
+     * This avoid the center to move on the drawing
+     * when new shapes push the bounds.
+     * 
+     * When no custom center is defined, it will move
+     * to stay at the center of the drawable bounds.
+     * 
+     * @param x coordinate of the custom center
+     * @param y coordinate of the custom center
+     */
+    setRotationAnchor(x: float, y: float): void {
+      if (!this._customCenter) {
+        this._customCenter = [0, 0];
+      }
+      this._customCenter[0] = x;
+      this._customCenter[1] = y;
+    }
+
+    /**
+     * @returns The center X relatively to the drawing origin
+     * (where `getCenterX()` is relative to the top left drawable bound).
+     */
+    getRotationAnchorX(): float {
+      return this._customCenter ? this._customCenter[0] : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
+    }
+
+    /**
+     * @returns The center Y relatively to the drawing origin
+     * (where `getCenterY()` is relative to the top left drawable bound).
+     */
+    getRotationAnchorY(): float {
+      return this._customCenter ? this._customCenter[1] : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();
+    }
+
+    getCenterX(): float {
+      if (!this._customCenter) {
+        return super.getCenterX();
+      }
+      let centerX = this._customCenter[0] + (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
+      if (this._flippedX) {
+        //centerX = this._renderer.getUnscaledWidth() - centerX;
+      }
+      return centerX * Math.abs(this._scaleX);
+    }
+
+    getCenterY(): float {
+      if (!this._customCenter) {
+        return super.getCenterY();
+      }
+      let centerY = this._customCenter[1] + (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
+      if (this._flippedY) {
+        //centerY = this._renderer.getUnscaledHeight() - centerY;
+      }
+      return centerY * Math.abs(this._scaleY);
     }
 
     /**

@@ -3,7 +3,6 @@ namespace gdjs {
 
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
-    _container: PIXI.Graphics;
     _graphics: PIXI.Graphics;
     _positionXIsUpToDate = false;
     _positionYIsUpToDate = false;
@@ -19,12 +18,11 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
       this._graphics = new PIXI.Graphics();
-      this._container = this._graphics; //new PIXI.Container();
       //this._container.addChild(this._graphics);
       runtimeScene
         .getLayer('')
         .getRenderer()
-        .addRendererObject(this._container, runtimeObject.getZOrder());
+        .addRendererObject(this._graphics, runtimeObject.getZOrder());
     }
 
     getRendererObject() {
@@ -303,13 +301,13 @@ namespace gdjs {
 
     updatePositionX(): void {
       if (this._object._absoluteCoordinates) {
-        this._container.position.x = 0;
+        this._graphics.position.x = 0;
       } else {
         this._graphics.pivot.x = this._object.getRotationAnchorX();
         // GDJS objects relative positions are relative in translation and rotation but not in scale.
         // Whereas, PIXI containers relative positions are also relative in scale.
         // This is why the scale is used.
-        this._container.position.x =
+        this._graphics.position.x =
           this._object.x +
           this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
       }
@@ -317,10 +315,10 @@ namespace gdjs {
 
     updatePositionY(): void {
       if (this._object._absoluteCoordinates) {
-        this._container.position.y = 0;
+        this._graphics.position.y = 0;
       } else {
         this._graphics.pivot.y = this._object.getRotationAnchorY();
-        this._container.position.y =
+        this._graphics.position.y =
           this._object.y +
           this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
       }
@@ -349,9 +347,9 @@ namespace gdjs {
 
     updateScaleX(): void {
       if (this._object._absoluteCoordinates) {
-        this._container.scale.x = 1;
+        this._graphics.scale.x = 1;
       } else {
-        this._container.scale.x = this._object._scaleX;
+        this._graphics.scale.x = this._object._scaleX;
       }
       this.updatePositionX();
       this.updatePositionY();
@@ -359,9 +357,9 @@ namespace gdjs {
 
     updateScaleY(): void {
       if (this._object._absoluteCoordinates) {
-        this._container.scale.y = 1;
+        this._graphics.scale.y = 1;
       } else {
-        this._container.scale.y = this._object._scaleY;
+        this._graphics.scale.y = this._object._scaleY;
       }
       this.updatePositionX();
       this.updatePositionY();

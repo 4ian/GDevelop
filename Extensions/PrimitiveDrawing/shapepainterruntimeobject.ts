@@ -37,6 +37,13 @@ namespace gdjs {
    * The ShapePainterRuntimeObject allows to draw graphics shapes on screen.
    */
   export class ShapePainterRuntimeObject extends gdjs.RuntimeObject {
+    _scaleX: number = 1;
+    _scaleY: number = 1;
+    _blendMode: number = 0;
+    _flippedX: boolean = false;
+    _flippedY: boolean = false;
+    _customCenter: FloatPoint | null = null;
+
     _fillColor: integer;
     _outlineColor: integer;
     _fillOpacity: float;
@@ -45,6 +52,8 @@ namespace gdjs {
     _absoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
+
+    private static readonly _pointForTransformation: FloatPoint = [0, 0];
 
     /**
      * @param runtimeScene The scene the object belongs to.
@@ -134,8 +143,11 @@ namespace gdjs {
         oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates
       ) {
         this._absoluteCoordinates = newObjectData.absoluteCoordinates;
-        this._renderer.updateXPosition();
-        this._renderer.updateYPosition();
+        this._renderer.updatePositionX();
+        this._renderer.updatePositionY();
+        this._renderer.updateAngle();
+        this._renderer.updateScaleX();
+        this._renderer.updateScaleY();
       }
       if (
         oldObjectData.clearBetweenFrames !== newObjectData.clearBetweenFrames
@@ -438,7 +450,7 @@ namespace gdjs {
         return;
       }
       super.setX(x);
-      this._renderer.updateXPosition();
+      this._renderer.updatePositionX();
     }
 
     setY(y: float): void {
@@ -446,15 +458,268 @@ namespace gdjs {
         return;
       }
       super.setY(y);
-      this._renderer.updateYPosition();
+      this._renderer.updatePositionY();
+    }
+
+    setAngle(angle: float): void {
+      if (angle === this.angle) {
+        return;
+      }
+      super.setAngle(angle);
+      this._renderer.updateAngle();
+    }
+
+    /**
+     * The center of rotation is defined relatively
+     * to the drawing origin (the object position).
+     * This avoid the center to move on the drawing
+     * when new shapes push the bounds.
+     *
+     * When no custom center is defined, it will move
+     * to stay at the center of the drawable bounds.
+     *
+     * @param x coordinate of the custom center
+     * @param y coordinate of the custom center
+     */
+    setRotationAnchor(x: float, y: float): void {
+      if (!this._customCenter) {
+        this._customCenter = [0, 0];
+      }
+      this._customCenter[0] = x;
+      this._customCenter[1] = y;
+    }
+
+    /**
+     * @returns The center X relatively to the drawing origin
+     * (where `getCenterX()` is relative to the top left drawable bound).
+     */
+    getRotationAnchorX(): float {
+      return this._customCenter
+        ? this._customCenter[0]
+        : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
+    }
+
+    /**
+     * @returns The center Y relatively to the drawing origin
+     * (where `getCenterY()` is relative to the top left drawable bound).
+     */
+    getRotationAnchorY(): float {
+      return this._customCenter
+        ? this._customCenter[1]
+        : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();
+    }
+
+    getCenterX(): float {
+      if (!this._customCenter) {
+        return super.getCenterX();
+      }
+      let centerX =
+        this._customCenter[0] +
+        (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
+      if (this._flippedX) {
+        //centerX = this._renderer.getUnscaledWidth() - centerX;
+      }
+      return centerX * Math.abs(this._scaleX);
+    }
+
+    getCenterY(): float {
+      if (!this._customCenter) {
+        return super.getCenterY();
+      }
+      let centerY =
+        this._customCenter[1] +
+        (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
+      if (this._flippedY) {
+        //centerY = this._renderer.getUnscaledHeight() - centerY;
+      }
+      return centerY * Math.abs(this._scaleY);
+    }
+
+    /**
+     * Change the width of the object. This changes the scale on X axis of the object.
+     *
+     * @param width The new width of the object, in pixels.
+     */
+    setWidth(newWidth: float): void {
+      const unscaledWidth = this._renderer.getUnscaledWidth();
+      if (unscaledWidth !== 0) {
+        this.setScaleX(newWidth / unscaledWidth);
+      }
+    }
+
+    /**
+     * Change the height of the object. This changes the scale on Y axis of the object.
+     *
+     * @param height The new height of the object, in pixels.
+     */
+    setHeight(newHeight: float): void {
+      const unscaledHeight = this._renderer.getUnscaledHeight();
+      if (unscaledHeight !== 0) {
+        this.setScaleY(newHeight / unscaledHeight);
+      }
+    }
+
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+    setScale(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (
+        newScale === Math.abs(this._scaleX) &&
+        newScale === Math.abs(this._scaleY)
+      ) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._renderer.updateScaleX();
+      this._renderer.updateScaleY();
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+    setScaleX(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleX)) {
+        return;
+      }
+      this._scaleX = newScale * (this._flippedX ? -1 : 1);
+      this._renderer.updateScaleX();
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param newScale The new scale (must be greater than 0).
+     */
+    setScaleY(newScale: float): void {
+      if (newScale < 0) {
+        newScale = 0;
+      }
+      if (newScale === Math.abs(this._scaleY)) {
+        return;
+      }
+      this._scaleY = newScale * (this._flippedY ? -1 : 1);
+      this._renderer.updateScaleY();
+      this.hitBoxesDirty = true;
+    }
+
+    flipX(enable: boolean): void {
+      if (enable !== this._flippedX) {
+        this._scaleX *= -1;
+        this._flippedX = enable;
+        this._renderer.updateScaleX();
+        this.hitBoxesDirty = true;
+      }
+    }
+
+    flipY(enable: boolean): void {
+      if (enable !== this._flippedY) {
+        this._scaleY *= -1;
+        this._flippedY = enable;
+        this._renderer.updateScaleY();
+        this.hitBoxesDirty = true;
+      }
+    }
+
+    isFlippedX(): boolean {
+      return this._flippedX;
+    }
+
+    isFlippedY(): boolean {
+      return this._flippedY;
+    }
+
+    /**
+     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     *
+     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     */
+    getScale(): number {
+      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+    }
+
+    /**
+     * Get the scale of the object on Y axis.
+     *
+     * @return the scale of the object on Y axis
+     */
+    getScaleY(): float {
+      return Math.abs(this._scaleY);
+    }
+
+    /**
+     * Get the scale of the object on X axis.
+     *
+     * @return the scale of the object on X axis
+     */
+    getScaleX(): float {
+      return Math.abs(this._scaleX);
+    }
+
+    invalidateBounds() {
+      this.hitBoxesDirty = true;
+    }
+
+    getDrawableX(): float {
+      return this._renderer.getDrawableX();
+    }
+
+    getDrawableY(): float {
+      return this._renderer.getDrawableY();
     }
 
     getWidth(): float {
-      return 32;
+      return this._renderer.getWidth();
     }
 
     getHeight(): float {
-      return 32;
+      return this._renderer.getHeight();
+    }
+
+    updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
+      this._renderer.updatePreRender();
+    }
+
+    transformToDrawing(x: float, y: float) {
+      const point = ShapePainterRuntimeObject._pointForTransformation;
+      point[0] = x;
+      point[1] = y;
+      return this._renderer.transformToDrawing(point);
+    }
+
+    transformToScene(x: float, y: float) {
+      const point = ShapePainterRuntimeObject._pointForTransformation;
+      point[0] = x;
+      point[1] = y;
+      return this._renderer.transformToScene(point);
+    }
+
+    transformToDrawingX(x: float, y: float) {
+      return this.transformToDrawing(x, y)[0];
+    }
+
+    transformToDrawingY(x: float, y: float) {
+      return this.transformToDrawing(x, y)[1];
+    }
+
+    transformToSceneX(x: float, y: float) {
+      return this.transformToScene(x, y)[0];
+    }
+
+    transformToSceneY(x: float, y: float) {
+      return this.transformToScene(x, y)[1];
     }
   }
   gdjs.registerObject(

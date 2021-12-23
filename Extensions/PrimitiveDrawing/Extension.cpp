@@ -632,5 +632,163 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("AreCoordinatesRelative")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
+  obj.AddAction("Scale",
+                _("Scale"),
+                _("Modify the scale of the specified object."),
+                _("the scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("ScaleX",
+                _("Scale on X axis"),
+                _("Modify the scale of the width of an object."),
+                _("the width's scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("ScaleY",
+                _("Scale on Y axis"),
+                _("Modify the scale of the height of an object."),
+                _("the height's scale"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddExpression("ScaleX",
+                    _("Scale of the width of an object"),
+                    _("Scale of the width of an object"),
+                    _("Size"),
+                    "res/actions/scaleWidth.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+  obj.AddExpression("ScaleY",
+                    _("Scale of the height of an object"),
+                    _("Scale of the height of an object"),
+                    _("Size"),
+                    "res/actions/scaleHeight.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+
+  obj.AddAction("FlipX",
+                _("Flip the object horizontally"),
+                _("Flip the object horizontally"),
+                _("Flip horizontally _PARAM0_ : _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipX24.png",
+                "res/actions/flipX.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .MarkAsSimple();
+
+  obj.AddAction("FlipY",
+                _("Flip the object vertically"),
+                _("Flip the object vertically"),
+                _("Flip vertically _PARAM0_ : _PARAM1_"),
+                _("Effects"),
+                "res/actions/flipY24.png",
+                "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("yesorno", _("Activate flipping"))
+      .MarkAsSimple();
+
+  obj.AddCondition("FlippedX",
+                   _("Horizontally flipped"),
+                   _("Check if the object is horizontally flipped"),
+                   _("_PARAM0_ is horizontally flipped"),
+                   _("Effects"),
+                   "res/actions/flipX24.png",
+                   "res/actions/flipX.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+  obj.AddCondition("FlippedY",
+                   _("Vertically flipped"),
+                   _("Check if the object is vertically flipped"),
+                   _("_PARAM0_ is vertically flipped"),
+                   _("Effects"),
+                   "res/actions/flipY24.png",
+                   "res/actions/flipY.png")
+      .AddParameter("object", _("Object"), "Drawer");
+
+  obj.AddAction("Width",
+                _("Width"),
+                _("Change the width of an object."),
+                _("the width"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("Height",
+                _("Height"),
+                _("Change the height of an object."),
+                _("the height"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("RotationAnchor",
+                _("Center of rotation"),
+                _("Change the center of rotation of an object relatively to the object origin."),
+                _("Change the center of rotation of _PARAM0_ : _PARAM1_; _PARAM2_"),
+                _("Angle"),
+                "res/actions/position24.png",
+                "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
+      .MarkAsAdvanced();
+
+  obj.AddExpression("ToDrawingX",
+                    _("X drawing coordinate of a point form the scene"),
+                    _("X drawing coordinate of a point from the scene"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X scene position"))
+      .AddParameter("expression", _("Y scene position"));
+
+  obj.AddExpression("ToDrawingY",
+                    _("Y drawing coordinate of a point form the scene"),
+                    _("Y drawing coordinate of a point from the scene"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X scene position"))
+      .AddParameter("expression", _("Y scene position"));
+
+  obj.AddExpression("ToSceneX",
+                    _("X scene coordinate of a point form the drawing"),
+                    _("X scene coordinate of a point from the drawing"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X drawing position"))
+      .AddParameter("expression", _("Y drawing position"));
+
+  obj.AddExpression("ToSceneY",
+                    _("Y scene coordinate of a point form the drawing"),
+                    _("Y scene coordinate of a point from the drawing"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X drawing position"))
+      .AddParameter("expression", _("Y drawing position"));
+
 #endif
 }

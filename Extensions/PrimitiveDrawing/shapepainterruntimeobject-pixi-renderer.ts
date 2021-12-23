@@ -300,8 +300,9 @@ namespace gdjs {
         // GDJS objects relative positions are relative in translation and rotation but not in scale.
         // Whereas, PIXI containers relative positions are also relative in scale.
         // This is why the multiplication and division by the scale are needed.
-        this._graphics.pivot.x = this._graphics.getLocalBounds().x + this._object.getCenterX() / this._graphics.scale.x;
-        this._container.position.x = this._object.x + this._graphics.pivot.x * this._graphics.scale.x;
+        const localBound = this._object._flippedX ? this._graphics.getLocalBounds().right : this._graphics.getLocalBounds().left;
+        this._graphics.pivot.x = localBound + this._object.getCenterX() / Math.abs(this._graphics.scale.x);
+        this._container.position.x = this._object.x + this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
       }
     }
 
@@ -309,8 +310,9 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         this._container.position.y = 0;
       } else {
-        this._graphics.pivot.y = this._graphics.getLocalBounds().y + this._object.getCenterY() / this._graphics.scale.y;
-        this._container.position.y = this._object.y + this._graphics.pivot.y * this._graphics.scale.y;
+        const localBound = this._object._flippedY ? this._graphics.getLocalBounds().bottom : this._graphics.getLocalBounds().top;
+        this._graphics.pivot.y = localBound + this._object.getCenterY() / Math.abs(this._graphics.scale.y);
+        this._container.position.y = this._object.y + this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
       }
     }
     
@@ -362,16 +364,18 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         return this._graphics.getLocalBounds().x;
       }
+      const localBound = this._object._flippedX ? this._graphics.getLocalBounds().right : this._graphics.getLocalBounds().left;
       // When new shape are drawn, the bounds of the object can extend.
       // The object position stays the same but (drawableX; drawableY) can change.
-      return this._object.getX() + this._graphics.getLocalBounds().x * this._graphics.scale.x;
+      return this._object.getX() + localBound * Math.abs(this._graphics.scale.x);
     }
 
     getDrawableY(): float {
       if (this._object._absoluteCoordinates) {
         return this._graphics.getLocalBounds().y;
       }
-      return this._object.getY() + this._graphics.getLocalBounds().y * this._graphics.scale.y;
+      const localBound = this._object._flippedY ? this._graphics.getLocalBounds().bottom : this._graphics.getLocalBounds().top;
+      return this._object.getY() + localBound * Math.abs(this._graphics.scale.y);
     }
 
     getWidth(): float {

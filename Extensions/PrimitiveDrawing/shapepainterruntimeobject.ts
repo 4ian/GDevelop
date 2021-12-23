@@ -604,7 +604,7 @@ namespace gdjs {
     getScaleX(): float {
       return Math.abs(this._scaleX);
     }
-
+    
     invalidateBounds() {
       this.hitBoxesDirty = true;
     }

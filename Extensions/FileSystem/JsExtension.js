@@ -415,6 +415,7 @@ module.exports = {
         _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.getUserHomePath');

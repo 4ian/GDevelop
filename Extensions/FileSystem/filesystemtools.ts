@@ -150,7 +150,9 @@ namespace gdjs {
      * Get the path to the user's home folder (on Windows `C:\Users\<USERNAME>\` for example).
      * @return The path to user's "home" folder
      */
-    export const getUserHomePath = function (runtimeScene): string {
+    export const getUserHomePath = function (
+      runtimeScene: gdjs.RuntimeScene
+    ): string {
       const electron = runtimeScene.getGame().getRenderer().getElectron();
       if (electron) {
         return electron.remote.app.getPath('home') || '';

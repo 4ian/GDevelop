@@ -215,6 +215,19 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RotationAnchor"]
         .SetFunctionName("setRotationAnchor");
 
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToDrawingX"]
+        .SetFunctionName("transformToDrawingX");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToDrawingY"]
+        .SetFunctionName("transformToDrawingY");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToSceneX"]
+        .SetFunctionName("transformToSceneX");
+    GetAllExpressionsForObject(
+        "PrimitiveDrawing::Drawer")["ToSceneY"]
+        .SetFunctionName("transformToSceneX");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

@@ -8,6 +8,8 @@ namespace gdjs {
     _positionXIsUpToDate = false;
     _positionYIsUpToDate = false;
 
+    private static readonly _positionForTransformation: PIXI.IPointData = {x: 0, y: 0};
+
     constructor(
       runtimeObject: gdjs.ShapePainterRuntimeObject,
       runtimeScene: gdjs.RuntimeScene
@@ -416,6 +418,26 @@ namespace gdjs {
      */
     getOriginY() {
       return - this._graphics.getLocalBounds().top;
+    }
+
+    transformToDrawing(point: FloatPoint): FloatPoint {
+      const position = ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
+      position.x = point[0];
+      position.y = point[1];
+      this._graphics.localTransform.applyInverse(position, position);
+      point[0] = position.x;
+      point[1] = position.y;
+      return point;
+    }
+
+    transformToScene(point: FloatPoint): FloatPoint {
+      const position = ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
+      position.x = point[0];
+      position.y = point[1];
+      this._graphics.localTransform.apply(position, position);
+      point[0] = position.x;
+      point[1] = position.y;
+      return point;
     }
   }
 

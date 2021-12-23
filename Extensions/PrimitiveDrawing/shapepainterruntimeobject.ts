@@ -53,6 +53,8 @@ namespace gdjs {
     _clearBetweenFrames: boolean;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
+    private static readonly _pointForTransformation: FloatPoint = [0, 0];
+
     /**
      * @param runtimeScene The scene the object belongs to.
      * @param shapePainterObjectData The initial properties of the object
@@ -686,6 +688,36 @@ namespace gdjs {
     
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {
       this._renderer.updatePreRender();
+    }
+
+    transformToDrawing(x: float, y: float) {
+      const point = ShapePainterRuntimeObject._pointForTransformation;
+      point[0] = x;
+      point[1] = y;
+      return this._renderer.transformToDrawing(point);
+    }
+
+    transformToScene(x: float, y: float) {
+      const point = ShapePainterRuntimeObject._pointForTransformation;
+      point[0] = x;
+      point[1] = y;
+      return this._renderer.transformToScene(point);
+    }
+
+    transformToDrawingX(x: float, y: float) {
+      return this.transformToDrawing(x, y)[0];
+    }
+
+    transformToDrawingY(x: float, y: float) {
+      return this.transformToDrawing(x, y)[1];
+    }
+
+    transformToSceneX(x: float, y: float) {
+      return this.transformToScene(x, y)[0];
+    }
+
+    transformToSceneY(x: float, y: float) {
+      return this.transformToScene(x, y)[1];
     }
   }
   gdjs.registerObject(

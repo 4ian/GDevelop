@@ -754,5 +754,41 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y position"))
       .MarkAsAdvanced();
 
+  obj.AddExpression("ToDrawingX",
+                    _("X drawing coordinate of a point form the scene"),
+                    _("X drawing coordinate of a point from the scene"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X scene position"))
+      .AddParameter("expression", _("Y scene position"));
+
+  obj.AddExpression("ToDrawingY",
+                    _("Y drawing coordinate of a point form the scene"),
+                    _("Y drawing coordinate of a point from the scene"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X scene position"))
+      .AddParameter("expression", _("Y scene position"));
+
+  obj.AddExpression("ToSceneX",
+                    _("X scene coordinate of a point form the drawing"),
+                    _("X scene coordinate of a point from the drawing"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X drawing position"))
+      .AddParameter("expression", _("Y drawing position"));
+
+  obj.AddExpression("ToSceneY",
+                    _("Y scene coordinate of a point form the drawing"),
+                    _("Y scene coordinate of a point from the drawing"),
+                    _("Position"),
+                    "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("X drawing position"))
+      .AddParameter("expression", _("Y drawing position"));
+
 #endif
 }

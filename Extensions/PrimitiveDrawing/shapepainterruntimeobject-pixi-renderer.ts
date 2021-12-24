@@ -315,8 +315,8 @@ namespace gdjs {
         this._graphics.pivot.x = 0;
         this._graphics.position.x = 0;
       } else {
-        // Make the drawing rotate around the anchor.
-        this._graphics.pivot.x = this._object.getRotationAnchorX();
+        // Make the drawing rotate around the rotation center.
+        this._graphics.pivot.x = this._object.getRotationCenterX();
         // Multiply by the scale to have the scale anchor
         // at the object position instead of the center.
         this._graphics.position.x =
@@ -330,7 +330,7 @@ namespace gdjs {
         this._graphics.pivot.y = 0;
         this._graphics.position.y = 0;
       } else {
-        this._graphics.pivot.y = this._object.getRotationAnchorY();
+        this._graphics.pivot.y = this._object.getRotationCenterY();
         this._graphics.position.y =
           this._object.y +
           this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
@@ -382,8 +382,8 @@ namespace gdjs {
       }
       let localBound = this._graphics.getLocalBounds().left;
       if (this._object._flippedX) {
-        const anchorX = this._object.getRotationAnchorX();
-        localBound = 2 * anchorX - localBound;
+        const rotationCenterX = this._object.getRotationCenterX();
+        localBound = 2 * rotationCenterX - localBound;
       }
       // When new shape are drawn, the bounds of the object can extend.
       // The object position stays the same but (drawableX; drawableY) can change.
@@ -398,8 +398,8 @@ namespace gdjs {
       }
       let localBound = this._graphics.getLocalBounds().top;
       if (this._object._flippedY) {
-        const anchorY = this._object.getRotationAnchorY();
-        localBound = 2 * anchorY - localBound;
+        const rotationCenterY = this._object.getRotationCenterY();
+        localBound = 2 * rotationCenterY - localBound;
       }
       return (
         this._object.getY() + localBound * Math.abs(this._graphics.scale.y)

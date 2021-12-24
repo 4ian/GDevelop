@@ -481,7 +481,7 @@ namespace gdjs {
      * @param x coordinate of the custom center
      * @param y coordinate of the custom center
      */
-    setRotationAnchor(x: float, y: float): void {
+    setRotationCenter(x: float, y: float): void {
       if (!this._customCenter) {
         this._customCenter = [0, 0];
       }
@@ -493,7 +493,7 @@ namespace gdjs {
      * @returns The center X relatively to the drawing origin
      * (whereas `getCenterX()` is relative to the top left drawable bound and scaled).
      */
-    getRotationAnchorX(): float {
+    getRotationCenterX(): float {
       return this._customCenter
         ? this._customCenter[0]
         : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
@@ -503,7 +503,7 @@ namespace gdjs {
      * @returns The center Y relatively to the drawing origin
      * (whereas `getCenterY()` is relative to the top left drawable bound and scaled).
      */
-    getRotationAnchorY(): float {
+    getRotationCenterY(): float {
       return this._customCenter
         ? this._customCenter[1]
         : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();

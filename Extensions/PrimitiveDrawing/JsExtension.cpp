@@ -218,8 +218,8 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetGetter("getHeight");
 
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::RotationAnchor"]
-        .SetFunctionName("setRotationAnchor");
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRotationCenter"]
+        .SetFunctionName("setRotationCenter");
 
     GetAllExpressionsForObject(
         "PrimitiveDrawing::Drawer")["ToDrawingX"]

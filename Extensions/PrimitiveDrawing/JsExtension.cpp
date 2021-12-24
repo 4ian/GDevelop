@@ -220,6 +220,9 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
     GetAllActionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRotationCenter"]
         .SetFunctionName("setRotationCenter");
+    GetAllActionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::SetRectangularCollisionMask"]
+        .SetFunctionName("setRectangularCollisionMask");
 
     GetAllExpressionsForObject(
         "PrimitiveDrawing::Drawer")["ToDrawingX"]

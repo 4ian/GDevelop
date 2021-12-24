@@ -14,6 +14,11 @@ namespace gdjs {
      * this avoids to do it each time.
      */
     _positionYIsUpToDate = false;
+    /**
+     * It allows to use the transformation of the renderer
+     * and compute it only when necessary.
+     */
+    _transformationIsUpToDate = false;
 
     private static readonly _positionForTransformation: PIXI.IPointData = {
       x: 0,
@@ -323,6 +328,7 @@ namespace gdjs {
           this._object.x +
           this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
       }
+      this._transformationIsUpToDate = false;
     }
 
     updatePositionY(): void {
@@ -335,6 +341,7 @@ namespace gdjs {
           this._object.y +
           this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
       }
+      this._transformationIsUpToDate = false;
     }
 
     updatePositionIfNeeded() {
@@ -348,12 +355,20 @@ namespace gdjs {
       }
     }
 
+    updateTransformationIfNeeded() {
+      if (!this._transformationIsUpToDate) {
+        this.updatePositionIfNeeded();
+        this._graphics.updateTransform();
+      }
+    }
+
     updateAngle(): void {
       if (this._object._useAbsoluteCoordinates) {
         this._graphics.angle = 0;
       } else {
         this._graphics.angle = this._object.angle;
       }
+      this._transformationIsUpToDate = false;
     }
 
     updateScaleX(): void {
@@ -364,6 +379,7 @@ namespace gdjs {
       }
       // updatePositionX() uses scale.x
       this._positionXIsUpToDate = false;
+      this._transformationIsUpToDate = false;
     }
 
     updateScaleY(): void {
@@ -374,6 +390,7 @@ namespace gdjs {
       }
       // updatePositionY() uses scale.y
       this._positionYIsUpToDate = false;
+      this._transformationIsUpToDate = false;
     }
 
     getDrawableX(): float {
@@ -437,7 +454,8 @@ namespace gdjs {
     }
 
     transformToDrawing(point: FloatPoint): FloatPoint {
-      this.updatePositionIfNeeded();
+      this.updateTransformationIfNeeded();
+      this._graphics.updateTransform();
       const position =
         ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
       position.x = point[0];
@@ -449,7 +467,7 @@ namespace gdjs {
     }
 
     transformToScene(point: FloatPoint): FloatPoint {
-      this.updatePositionIfNeeded();
+      this.updateTransformationIfNeeded();
       const position =
         ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
       position.x = point[0];

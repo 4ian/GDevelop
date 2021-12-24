@@ -41,10 +41,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
          "res/actions/rectangle.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("Top left side: X position"))
-      .AddParameter("expression", _("Top left side: Y position"))
-      .AddParameter("expression", _("Bottom right side: X position"))
-      .AddParameter("expression", _("Bottom right side: Y position"))
+      .AddParameter("expression", _("Left X position"))
+      .AddParameter("expression", _("Top Y position"))
+      .AddParameter("expression", _("Right X position"))
+      .AddParameter("expression", _("Bottom Y position"))
       .SetFunctionName("DrawRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
@@ -132,10 +132,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 "res/actions/roundedRectangle.png")
 
       .AddParameter("object", _("Shape Painter object"), "Drawer")
-      .AddParameter("expression", _("Top left side: X position"))
-      .AddParameter("expression", _("Top left side: Y position"))
-      .AddParameter("expression", _("Bottom right side: X position"))
-      .AddParameter("expression", _("Bottom right side: Y position"))
+      .AddParameter("expression", _("Left X position"))
+      .AddParameter("expression", _("Top Y position"))
+      .AddParameter("expression", _("Right X position"))
+      .AddParameter("expression", _("Bottom Y position"))
       .AddParameter("expression", _("Radius (in pixels)"))
       .SetFunctionName("DrawRoundedRectangle")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -711,7 +711,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the width of an object."),
                 _("the width"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scaleWidth24.png",
                 "res/actions/scale.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
@@ -722,7 +722,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
                 _("Change the height of an object."),
                 _("the height"),
                 _("Size"),
-                "res/actions/scale24.png",
+                "res/actions/scaleHeight24.png",
                 "res/actions/scale.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardOperatorParameters("number")
@@ -738,6 +738,20 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
+      .MarkAsAdvanced();
+
+  obj.AddAction("SetRectangularCollisionMask",
+                _("Collision Mask"),
+                _("Change the collision mask of an object to a rectangle relatively to the object origin."),
+                _("Change the collision mask of _PARAM0_ to a rectangle from _PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_"),
+                _("Position"),
+                "res/actions/position24.png",
+                "res/actions/position.png")
+      .AddParameter("object", _("Object"), "Drawer")
+      .AddParameter("expression", _("Left X position"))
+      .AddParameter("expression", _("Top Y position"))
+      .AddParameter("expression", _("Right X position"))
+      .AddParameter("expression", _("Bottom Y position"))
       .MarkAsAdvanced();
 
   obj.AddExpression("ToDrawingX",

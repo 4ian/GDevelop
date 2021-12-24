@@ -43,6 +43,7 @@ namespace gdjs {
     _flippedX: boolean = false;
     _flippedY: boolean = false;
     _customCenter: FloatPoint | null = null;
+    _customCollisionMask: Polygon[] | null = null;
 
     _fillColor: integer;
     _outlineColor: integer;
@@ -467,6 +468,7 @@ namespace gdjs {
       }
       super.setAngle(angle);
       this._renderer.updateAngle();
+      this.hitBoxesDirty = true;
     }
 
     /**
@@ -629,9 +631,9 @@ namespace gdjs {
      * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): number {
-      return this._scaleX === this._scaleY
-        ? this._scaleX
-        : Math.sqrt(this._scaleX * this._scaleY);
+      const scaleX = Math.abs(this._scaleX);
+      const scaleY = Math.abs(this._scaleY);
+      return scaleX === scaleY ? scaleX : Math.sqrt(scaleX * scaleY);
     }
 
     /**
@@ -706,38 +708,83 @@ namespace gdjs {
       return this.transformToScene(x, y)[1];
     }
 
+    setRectangularCollisionMask(
+      left: float,
+      top: float,
+      right: float,
+      bottom: float
+    ) {
+      if (!this._customCollisionMask) {
+        const rectangle = new gdjs.Polygon();
+        rectangle.vertices.push([0, 0]);
+        rectangle.vertices.push([0, 0]);
+        rectangle.vertices.push([0, 0]);
+        rectangle.vertices.push([0, 0]);
+        this._customCollisionMask = [rectangle];
+      }
+      const rectangle = this._customCollisionMask[0].vertices;
+
+      rectangle[0][0] = left;
+      rectangle[0][1] = top;
+
+      rectangle[1][0] = right;
+      rectangle[1][1] = top;
+
+      rectangle[2][0] = right;
+      rectangle[2][1] = bottom;
+
+      rectangle[3][0] = left;
+      rectangle[3][1] = bottom;
+
+      this.hitBoxesDirty = true;
+    }
+
     updateHitBoxes(): void {
       this.hitBoxes = this._defaultHitBoxes;
       const width = this.getWidth();
       const height = this.getHeight();
       const centerX = this.getCenterX();
       const centerY = this.getCenterY();
-      if (centerX === width / 2 && centerY === height / 2) {
-        this.hitBoxes[0].vertices[0][0] = -centerX;
-        this.hitBoxes[0].vertices[0][1] = -centerY;
-        this.hitBoxes[0].vertices[1][0] = +centerX;
-        this.hitBoxes[0].vertices[1][1] = -centerY;
-        this.hitBoxes[0].vertices[2][0] = +centerX;
-        this.hitBoxes[0].vertices[2][1] = +centerY;
-        this.hitBoxes[0].vertices[3][0] = -centerX;
-        this.hitBoxes[0].vertices[3][1] = +centerY;
+      const vertices = this.hitBoxes[0].vertices;
+      if (this._customCollisionMask) {
+        const customCollisionMaskVertices = this._customCollisionMask[0]
+          .vertices;
+        for (let i = 0; i < 4; i++) {
+          const point = this.transformToScene(
+            customCollisionMaskVertices[i][0],
+            customCollisionMaskVertices[i][1]
+          );
+          vertices[i][0] = point[0];
+          vertices[i][1] = point[1];
+        }
       } else {
-        this.hitBoxes[0].vertices[0][0] = 0 - centerX;
-        this.hitBoxes[0].vertices[0][1] = 0 - centerY;
-        this.hitBoxes[0].vertices[1][0] = width - centerX;
-        this.hitBoxes[0].vertices[1][1] = 0 - centerY;
-        this.hitBoxes[0].vertices[2][0] = width - centerX;
-        this.hitBoxes[0].vertices[2][1] = height - centerY;
-        this.hitBoxes[0].vertices[3][0] = 0 - centerX;
-        this.hitBoxes[0].vertices[3][1] = height - centerY;
+        if (centerX === width / 2 && centerY === height / 2) {
+          vertices[0][0] = -centerX;
+          vertices[0][1] = -centerY;
+          vertices[1][0] = +centerX;
+          vertices[1][1] = -centerY;
+          vertices[2][0] = +centerX;
+          vertices[2][1] = +centerY;
+          vertices[3][0] = -centerX;
+          vertices[3][1] = +centerY;
+        } else {
+          vertices[0][0] = 0 - centerX;
+          vertices[0][1] = 0 - centerY;
+          vertices[1][0] = width - centerX;
+          vertices[1][1] = 0 - centerY;
+          vertices[2][0] = width - centerX;
+          vertices[2][1] = height - centerY;
+          vertices[3][0] = 0 - centerX;
+          vertices[3][1] = height - centerY;
+        }
+        if (!this._useAbsoluteCoordinates) {
+          this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
+        }
+        this.hitBoxes[0].move(
+          this.getDrawableX() + centerX,
+          this.getDrawableY() + centerY
+        );
       }
-      if (!this._useAbsoluteCoordinates) {
-        this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
-      }
-      this.hitBoxes[0].move(
-        this.getDrawableX() + centerX,
-        this.getDrawableY() + centerY
-      );
     }
   }
   gdjs.registerObject(

@@ -49,7 +49,7 @@ namespace gdjs {
     _fillOpacity: float;
     _outlineOpacity: float;
     _outlineSize: float;
-    _absoluteCoordinates: boolean;
+    _useAbsoluteCoordinates: boolean;
     _clearBetweenFrames: boolean;
     _renderer: gdjs.ShapePainterRuntimeObjectRenderer;
 
@@ -83,7 +83,7 @@ namespace gdjs {
       this._fillOpacity = shapePainterObjectData.fillOpacity;
       this._outlineOpacity = shapePainterObjectData.outlineOpacity;
       this._outlineSize = shapePainterObjectData.outlineSize;
-      this._absoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
+      this._useAbsoluteCoordinates = shapePainterObjectData.absoluteCoordinates;
       this._clearBetweenFrames = shapePainterObjectData.clearBetweenFrames;
       this._renderer = new gdjs.ShapePainterRuntimeObjectRenderer(
         this,
@@ -142,7 +142,7 @@ namespace gdjs {
       if (
         oldObjectData.absoluteCoordinates !== newObjectData.absoluteCoordinates
       ) {
-        this._absoluteCoordinates = newObjectData.absoluteCoordinates;
+        this._useAbsoluteCoordinates = newObjectData.absoluteCoordinates;
         this._renderer.updatePositionX();
         this._renderer.updatePositionY();
         this._renderer.updateAngle();
@@ -173,7 +173,7 @@ namespace gdjs {
     }
 
     getVisibilityAABB() {
-      return this._absoluteCoordinates ? null : this.getAABB();
+      return this._useAbsoluteCoordinates ? null : this.getAABB();
     }
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
@@ -337,11 +337,11 @@ namespace gdjs {
     }
 
     setCoordinatesRelative(value: boolean): void {
-      this._absoluteCoordinates = !value;
+      this._useAbsoluteCoordinates = !value;
     }
 
     areCoordinatesRelative(): boolean {
-      return !this._absoluteCoordinates;
+      return !this._useAbsoluteCoordinates;
     }
 
     /**
@@ -491,7 +491,7 @@ namespace gdjs {
 
     /**
      * @returns The center X relatively to the drawing origin
-     * (where `getCenterX()` is relative to the top left drawable bound and scaled).
+     * (whereas `getCenterX()` is relative to the top left drawable bound and scaled).
      */
     getRotationAnchorX(): float {
       return this._customCenter
@@ -501,7 +501,7 @@ namespace gdjs {
 
     /**
      * @returns The center Y relatively to the drawing origin
-     * (where `getCenterY()` is relative to the top left drawable bound and scaled).
+     * (whereas `getCenterY()` is relative to the top left drawable bound and scaled).
      */
     getRotationAnchorY(): float {
       return this._customCenter
@@ -532,7 +532,7 @@ namespace gdjs {
     /**
      * Change the width of the object. This changes the scale on X axis of the object.
      *
-     * @param width The new width of the object, in pixels.
+     * @param newWidth The new width of the object, in pixels.
      */
     setWidth(newWidth: float): void {
       const unscaledWidth = this._renderer.getUnscaledWidth();
@@ -544,7 +544,7 @@ namespace gdjs {
     /**
      * Change the height of the object. This changes the scale on Y axis of the object.
      *
-     * @param height The new height of the object, in pixels.
+     * @param newHeight The new height of the object, in pixels.
      */
     setHeight(newHeight: float): void {
       const unscaledHeight = this._renderer.getUnscaledHeight();
@@ -731,7 +731,7 @@ namespace gdjs {
         this.hitBoxes[0].vertices[3][0] = 0 - centerX;
         this.hitBoxes[0].vertices[3][1] = height - centerY;
       }
-      if (!this._absoluteCoordinates) {
+      if (!this._useAbsoluteCoordinates) {
         this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
       }
       this.hitBoxes[0].move(

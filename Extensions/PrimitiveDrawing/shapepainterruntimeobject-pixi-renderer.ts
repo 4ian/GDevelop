@@ -26,7 +26,6 @@ namespace gdjs {
     ) {
       this._object = runtimeObject;
       this._graphics = new PIXI.Graphics();
-      //this._container.addChild(this._graphics);
       runtimeScene
         .getLayer('')
         .getRenderer()
@@ -312,13 +311,13 @@ namespace gdjs {
     }
 
     updatePositionX(): void {
-      if (this._object._absoluteCoordinates) {
+      if (this._object._useAbsoluteCoordinates) {
         this._graphics.pivot.x = 0;
         this._graphics.position.x = 0;
       } else {
         // Make the drawing rotate around the anchor.
         this._graphics.pivot.x = this._object.getRotationAnchorX();
-        // Multiply with the scale to have the scale anchor
+        // Multiply by the scale to have the scale anchor
         // at the object position instead of the center.
         this._graphics.position.x =
           this._object.x +
@@ -327,7 +326,7 @@ namespace gdjs {
     }
 
     updatePositionY(): void {
-      if (this._object._absoluteCoordinates) {
+      if (this._object._useAbsoluteCoordinates) {
         this._graphics.pivot.y = 0;
         this._graphics.position.y = 0;
       } else {
@@ -350,7 +349,7 @@ namespace gdjs {
     }
 
     updateAngle(): void {
-      if (this._object._absoluteCoordinates) {
+      if (this._object._useAbsoluteCoordinates) {
         this._graphics.angle = 0;
       } else {
         this._graphics.angle = this._object.angle;
@@ -358,7 +357,7 @@ namespace gdjs {
     }
 
     updateScaleX(): void {
-      if (this._object._absoluteCoordinates) {
+      if (this._object._useAbsoluteCoordinates) {
         this._graphics.scale.x = 1;
       } else {
         this._graphics.scale.x = this._object._scaleX;
@@ -368,7 +367,7 @@ namespace gdjs {
     }
 
     updateScaleY(): void {
-      if (this._object._absoluteCoordinates) {
+      if (this._object._useAbsoluteCoordinates) {
         this._graphics.scale.y = 1;
       } else {
         this._graphics.scale.y = this._object._scaleY;
@@ -378,8 +377,8 @@ namespace gdjs {
     }
 
     getDrawableX(): float {
-      if (this._object._absoluteCoordinates) {
-        return this._graphics.getLocalBounds().x;
+      if (this._object._useAbsoluteCoordinates) {
+        return this._graphics.getLocalBounds().left;
       }
       let localBound = this._graphics.getLocalBounds().left;
       if (this._object._flippedX) {
@@ -394,8 +393,8 @@ namespace gdjs {
     }
 
     getDrawableY(): float {
-      if (this._object._absoluteCoordinates) {
-        return this._graphics.getLocalBounds().y;
+      if (this._object._useAbsoluteCoordinates) {
+        return this._graphics.getLocalBounds().top;
       }
       let localBound = this._graphics.getLocalBounds().top;
       if (this._object._flippedY) {

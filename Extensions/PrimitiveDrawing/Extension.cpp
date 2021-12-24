@@ -669,7 +669,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("FlipX",
                 _("Flip the object horizontally"),
                 _("Flip the object horizontally"),
-                _("Flip horizontally _PARAM0_ : _PARAM1_"),
+                _("Flip horizontally _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
@@ -680,7 +680,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("FlipY",
                 _("Flip the object vertically"),
                 _("Flip the object vertically"),
-                _("Flip vertically _PARAM0_ : _PARAM1_"),
+                _("Flip vertically _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
@@ -731,7 +731,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
   obj.AddAction("RotationAnchor",
                 _("Center of rotation"),
                 _("Change the center of rotation of an object relatively to the object origin."),
-                _("Change the center of rotation of _PARAM0_ : _PARAM1_; _PARAM2_"),
+                _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
                 _("Angle"),
                 "res/actions/position24.png",
                 "res/actions/position.png")
@@ -741,7 +741,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced();
 
   obj.AddExpression("ToDrawingX",
-                    _("X drawing coordinate of a point form the scene"),
+                    _("X drawing coordinate of a point from the scene"),
                     _("X drawing coordinate of a point from the scene"),
                     _("Position"),
                     "res/actions/position.png")
@@ -750,7 +750,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y scene position"));
 
   obj.AddExpression("ToDrawingY",
-                    _("Y drawing coordinate of a point form the scene"),
+                    _("Y drawing coordinate of a point from the scene"),
                     _("Y drawing coordinate of a point from the scene"),
                     _("Position"),
                     "res/actions/position.png")
@@ -759,7 +759,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y scene position"));
 
   obj.AddExpression("ToSceneX",
-                    _("X scene coordinate of a point form the drawing"),
+                    _("X scene coordinate of a point from the drawing"),
                     _("X scene coordinate of a point from the drawing"),
                     _("Position"),
                     "res/actions/position.png")
@@ -768,7 +768,7 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Y drawing position"));
 
   obj.AddExpression("ToSceneY",
-                    _("Y scene coordinate of a point form the drawing"),
+                    _("Y scene coordinate of a point from the drawing"),
                     _("Y scene coordinate of a point from the drawing"),
                     _("Position"),
                     "res/actions/position.png")

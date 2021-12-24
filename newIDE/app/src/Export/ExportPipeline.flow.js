@@ -78,7 +78,8 @@ export type ExportPipeline<
   launchOnlineBuild?: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ) => Promise<Build>,
 
   /**

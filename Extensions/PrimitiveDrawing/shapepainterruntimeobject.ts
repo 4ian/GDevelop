@@ -629,7 +629,9 @@ namespace gdjs {
      * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): number {
-      return this._scaleX === this._scaleY ? this._scaleX : Math.sqrt(this._scaleX * this._scaleY);
+      return this._scaleX === this._scaleY
+        ? this._scaleX
+        : Math.sqrt(this._scaleX * this._scaleY);
     }
 
     /**
@@ -730,7 +732,7 @@ namespace gdjs {
         this.hitBoxes[0].vertices[3][1] = height - centerY;
       }
       if (!this._absoluteCoordinates) {
-      this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
+        this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
       }
       this.hitBoxes[0].move(
         this.getDrawableX() + centerX,

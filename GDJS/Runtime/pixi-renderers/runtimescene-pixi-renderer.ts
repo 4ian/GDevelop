@@ -230,11 +230,9 @@ namespace gdjs {
         debugDraw.fill.alpha = 0.3;
 
         // Draw Center point
-        const centerPointX = object.getDrawableX() + object.getCenterX();
-        const centerPointY = object.getDrawableY() + object.getCenterY();
         const centerPoint = layer.convertInverseCoords(
-          centerPointX,
-          centerPointY
+          object.getCenterXInScene(),
+          object.getCenterYInScene()
         );
 
         renderObjectPoint(
@@ -245,24 +243,18 @@ namespace gdjs {
           centerPoint[1]
         );
 
-        // Draw Origin point
-        let originPoint = [object.getDrawableX(), object.getDrawableY()];
-        if (object instanceof gdjs.SpriteRuntimeObject) {
-          // For Sprite objects get the position of the origin point.
-          originPoint = object.getPointPosition('origin');
-        }
-
-        originPoint = layer.convertInverseCoords(
-          originPoint[0],
-          originPoint[1]
+        // Draw position point
+        const positionPoint = layer.convertInverseCoords(
+          object.getX(),
+          object.getY()
         );
 
         renderObjectPoint(
           renderedObjectPoints.points,
-          'Origin',
+          'Position',
           0xff0000,
-          originPoint[0],
-          originPoint[1]
+          positionPoint[0],
+          positionPoint[1]
         );
 
         // Draw custom point

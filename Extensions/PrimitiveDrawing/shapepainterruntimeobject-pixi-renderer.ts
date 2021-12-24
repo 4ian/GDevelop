@@ -4,6 +4,21 @@ namespace gdjs {
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
+    /**
+     * Graphics positions can need updates when shapes are added,
+     * this avoids to do it each time.
+     */
+    _positionXIsUpToDate = false;
+    /**
+     * Graphics positions can need updates when shapes are added,
+     * this avoids to do it each time.
+     */
+    _positionYIsUpToDate = false;
+
+    private static readonly _positionForTransformation: PIXI.IPointData = {
+      x: 0,
+      y: 0,
+    };
 
     constructor(
       runtimeObject: gdjs.ShapePainterRuntimeObject,
@@ -23,6 +38,7 @@ namespace gdjs {
 
     clear() {
       this._graphics.clear();
+      this.invalidateBounds();
     }
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
@@ -33,6 +49,7 @@ namespace gdjs {
       );
       this._graphics.drawRect(x1, y1, x2 - x1, y2 - y1);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawCircle(x: float, y: float, radius: float) {
@@ -43,6 +60,7 @@ namespace gdjs {
       );
       this._graphics.drawCircle(x, y, radius);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawLine(x1: float, y1: float, x2: float, y2: float, thickness: float) {
@@ -68,6 +86,7 @@ namespace gdjs {
         );
       }
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawLineV2(x1: float, y1: float, x2: float, y2: float, thickness: float) {
@@ -79,6 +98,7 @@ namespace gdjs {
       this._graphics.moveTo(x1, y1);
       this._graphics.lineTo(x2, y2);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawEllipse(x1: float, y1: float, width: float, height: float) {
@@ -89,6 +109,7 @@ namespace gdjs {
       );
       this._graphics.drawEllipse(x1, y1, width / 2, height / 2);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawRoundedRectangle(
@@ -106,6 +127,7 @@ namespace gdjs {
       this._graphics.drawRoundedRect(x1, y1, x2 - x1, y2 - y1, radius);
       this._graphics.closePath();
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawStar(
@@ -132,6 +154,7 @@ namespace gdjs {
       );
       this._graphics.closePath();
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawArc(
@@ -164,6 +187,7 @@ namespace gdjs {
         this._graphics.closePath();
       }
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawBezierCurve(
@@ -184,6 +208,7 @@ namespace gdjs {
       this._graphics.moveTo(x1, y1);
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, x2, y2);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawQuadraticCurve(
@@ -202,6 +227,7 @@ namespace gdjs {
       this._graphics.moveTo(x1, y1);
       this._graphics.quadraticCurveTo(cpX, cpY, x2, y2);
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     beginFillPath() {
@@ -213,6 +239,7 @@ namespace gdjs {
 
     endFillPath() {
       this._graphics.endFill();
+      this.invalidateBounds();
     }
 
     drawPathMoveTo(x1: float, y1: float) {
@@ -221,6 +248,7 @@ namespace gdjs {
 
     drawPathLineTo(x1: float, y1: float) {
       this._graphics.lineTo(x1, y1);
+      this.invalidateBounds();
     }
 
     drawPathBezierCurveTo(
@@ -232,6 +260,7 @@ namespace gdjs {
       toY: float
     ) {
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
+      this.invalidateBounds();
     }
 
     drawPathArc(
@@ -250,14 +279,17 @@ namespace gdjs {
         gdjs.toRad(endAngle),
         anticlockwise ? true : false
       );
+      this.invalidateBounds();
     }
 
     drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
       this._graphics.quadraticCurveTo(cpX, cpY, toX, toY);
+      this.invalidateBounds();
     }
 
     closePath() {
       this._graphics.closePath();
+      this.invalidateBounds();
     }
 
     updateOutline(): void {
@@ -268,20 +300,164 @@ namespace gdjs {
       );
     }
 
-    updateXPosition(): void {
-      if (!this._object._absoluteCoordinates) {
-        this._graphics.position.x = this._object.x;
-      } else {
+    invalidateBounds() {
+      this._object.invalidateBounds();
+      this._positionXIsUpToDate = false;
+      this._positionYIsUpToDate = false;
+    }
+
+    updatePreRender(): void {
+      this.updatePositionIfNeeded();
+    }
+
+    updatePositionX(): void {
+      if (this._object._useAbsoluteCoordinates) {
+        this._graphics.pivot.x = 0;
         this._graphics.position.x = 0;
+      } else {
+        // Make the drawing rotate around the anchor.
+        this._graphics.pivot.x = this._object.getRotationAnchorX();
+        // Multiply by the scale to have the scale anchor
+        // at the object position instead of the center.
+        this._graphics.position.x =
+          this._object.x +
+          this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
       }
     }
 
-    updateYPosition(): void {
-      if (!this._object._absoluteCoordinates) {
-        this._graphics.position.y = this._object.y;
-      } else {
+    updatePositionY(): void {
+      if (this._object._useAbsoluteCoordinates) {
+        this._graphics.pivot.y = 0;
         this._graphics.position.y = 0;
+      } else {
+        this._graphics.pivot.y = this._object.getRotationAnchorY();
+        this._graphics.position.y =
+          this._object.y +
+          this._graphics.pivot.y * Math.abs(this._graphics.scale.y);
       }
+    }
+
+    updatePositionIfNeeded() {
+      if (!this._positionXIsUpToDate) {
+        this.updatePositionX();
+        this._positionXIsUpToDate = true;
+      }
+      if (!this._positionYIsUpToDate) {
+        this.updatePositionY();
+        this._positionYIsUpToDate = true;
+      }
+    }
+
+    updateAngle(): void {
+      if (this._object._useAbsoluteCoordinates) {
+        this._graphics.angle = 0;
+      } else {
+        this._graphics.angle = this._object.angle;
+      }
+    }
+
+    updateScaleX(): void {
+      if (this._object._useAbsoluteCoordinates) {
+        this._graphics.scale.x = 1;
+      } else {
+        this._graphics.scale.x = this._object._scaleX;
+      }
+      // updatePositionX() uses scale.x
+      this._positionXIsUpToDate = false;
+    }
+
+    updateScaleY(): void {
+      if (this._object._useAbsoluteCoordinates) {
+        this._graphics.scale.y = 1;
+      } else {
+        this._graphics.scale.y = this._object._scaleY;
+      }
+      // updatePositionY() uses scale.y
+      this._positionYIsUpToDate = false;
+    }
+
+    getDrawableX(): float {
+      if (this._object._useAbsoluteCoordinates) {
+        return this._graphics.getLocalBounds().left;
+      }
+      let localBound = this._graphics.getLocalBounds().left;
+      if (this._object._flippedX) {
+        const anchorX = this._object.getRotationAnchorX();
+        localBound = 2 * anchorX - localBound;
+      }
+      // When new shape are drawn, the bounds of the object can extend.
+      // The object position stays the same but (drawableX; drawableY) can change.
+      return (
+        this._object.getX() + localBound * Math.abs(this._graphics.scale.x)
+      );
+    }
+
+    getDrawableY(): float {
+      if (this._object._useAbsoluteCoordinates) {
+        return this._graphics.getLocalBounds().top;
+      }
+      let localBound = this._graphics.getLocalBounds().top;
+      if (this._object._flippedY) {
+        const anchorY = this._object.getRotationAnchorY();
+        localBound = 2 * anchorY - localBound;
+      }
+      return (
+        this._object.getY() + localBound * Math.abs(this._graphics.scale.y)
+      );
+    }
+
+    getWidth(): float {
+      return this._graphics.width;
+    }
+
+    getHeight(): float {
+      return this._graphics.height;
+    }
+
+    getUnscaledWidth(): float {
+      return this._graphics.getLocalBounds().width;
+    }
+
+    getUnscaledHeight(): float {
+      return this._graphics.getLocalBounds().height;
+    }
+
+    /**
+     * @returns The drawing origin relatively to the drawable top left corner.
+     */
+    getOriginX() {
+      return -this._graphics.getLocalBounds().left;
+    }
+
+    /**
+     * @returns The drawing origin relatively to the drawable top left corner.
+     */
+    getOriginY() {
+      return -this._graphics.getLocalBounds().top;
+    }
+
+    transformToDrawing(point: FloatPoint): FloatPoint {
+      this.updatePositionIfNeeded();
+      const position =
+        ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
+      position.x = point[0];
+      position.y = point[1];
+      this._graphics.localTransform.applyInverse(position, position);
+      point[0] = position.x;
+      point[1] = position.y;
+      return point;
+    }
+
+    transformToScene(point: FloatPoint): FloatPoint {
+      this.updatePositionIfNeeded();
+      const position =
+        ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
+      position.x = point[0];
+      position.y = point[1];
+      this._graphics.localTransform.apply(position, position);
+      point[0] = position.x;
+      point[1] = position.y;
+      return point;
     }
   }
 

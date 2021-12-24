@@ -4,7 +4,15 @@ namespace gdjs {
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
+    /**
+     * Graphics positions can need updates when shapes are added,
+     * this avoids to do it each time.
+     */
     _positionXIsUpToDate = false;
+    /**
+     * Graphics positions can need updates when shapes are added,
+     * this avoids to do it each time.
+     */
     _positionYIsUpToDate = false;
 
     private static readonly _positionForTransformation: PIXI.IPointData = {
@@ -31,6 +39,7 @@ namespace gdjs {
 
     clear() {
       this._graphics.clear();
+      this.invalidateBounds();
     }
 
     drawRectangle(x1: float, y1: float, x2: float, y2: float) {
@@ -240,6 +249,7 @@ namespace gdjs {
 
     drawPathLineTo(x1: float, y1: float) {
       this._graphics.lineTo(x1, y1);
+      this.invalidateBounds();
     }
 
     drawPathBezierCurveTo(
@@ -251,6 +261,7 @@ namespace gdjs {
       toY: float
     ) {
       this._graphics.bezierCurveTo(cpX, cpY, cpX2, cpY2, toX, toY);
+      this.invalidateBounds();
     }
 
     drawPathArc(
@@ -274,6 +285,7 @@ namespace gdjs {
 
     drawPathQuadraticCurveTo(cpX: float, cpY: float, toX: float, toY: float) {
       this._graphics.quadraticCurveTo(cpX, cpY, toX, toY);
+      this.invalidateBounds();
     }
 
     closePath() {
@@ -301,12 +313,13 @@ namespace gdjs {
 
     updatePositionX(): void {
       if (this._object._absoluteCoordinates) {
+        this._graphics.pivot.x = 0;
         this._graphics.position.x = 0;
       } else {
+        // Make the drawing rotate around the anchor.
         this._graphics.pivot.x = this._object.getRotationAnchorX();
-        // GDJS objects relative positions are relative in translation and rotation but not in scale.
-        // Whereas, PIXI containers relative positions are also relative in scale.
-        // This is why the scale is used.
+        // Multiply with the scale to have the scale anchor
+        // at the object position instead of the center.
         this._graphics.position.x =
           this._object.x +
           this._graphics.pivot.x * Math.abs(this._graphics.scale.x);
@@ -315,6 +328,7 @@ namespace gdjs {
 
     updatePositionY(): void {
       if (this._object._absoluteCoordinates) {
+        this._graphics.pivot.y = 0;
         this._graphics.position.y = 0;
       } else {
         this._graphics.pivot.y = this._object.getRotationAnchorY();
@@ -325,7 +339,6 @@ namespace gdjs {
     }
 
     updatePositionIfNeeded() {
-      // Graphics positions can need update when shapes are added.
       if (!this._positionXIsUpToDate) {
         this.updatePositionX();
         this._positionXIsUpToDate = true;
@@ -340,7 +353,6 @@ namespace gdjs {
       if (this._object._absoluteCoordinates) {
         this._graphics.angle = 0;
       } else {
-        this.updatePositionIfNeeded();
         this._graphics.angle = this._object.angle;
       }
     }
@@ -351,8 +363,8 @@ namespace gdjs {
       } else {
         this._graphics.scale.x = this._object._scaleX;
       }
-      this.updatePositionX();
-      this.updatePositionY();
+      // updatePositionX() uses scale.x
+      this._positionXIsUpToDate = false;
     }
 
     updateScaleY(): void {
@@ -361,8 +373,8 @@ namespace gdjs {
       } else {
         this._graphics.scale.y = this._object._scaleY;
       }
-      this.updatePositionX();
-      this.updatePositionY();
+      // updatePositionY() uses scale.y
+      this._positionYIsUpToDate = false;
     }
 
     getDrawableX(): float {
@@ -426,6 +438,7 @@ namespace gdjs {
     }
 
     transformToDrawing(point: FloatPoint): FloatPoint {
+      this.updatePositionIfNeeded();
       const position =
         ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
       position.x = point[0];
@@ -437,6 +450,7 @@ namespace gdjs {
     }
 
     transformToScene(point: FloatPoint): FloatPoint {
+      this.updatePositionIfNeeded();
       const position =
         ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
       position.x = point[0];

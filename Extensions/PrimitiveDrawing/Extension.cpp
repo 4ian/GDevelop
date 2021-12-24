@@ -5,6 +5,7 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 #include "ShapePainterObject.h"
@@ -643,42 +644,27 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
 
-  obj.AddAction("ScaleX",
+  obj.AddExpressionAndConditionAndAction("number",
+                "ScaleX",
                 _("Scale on X axis"),
-                _("Modify the scale of the width of an object."),
+                _("the width's scale of an object"),
                 _("the width's scale"),
                 _("Size"),
-                "res/actions/scale24.png",
-                "res/actions/scale.png")
+                "res/actions/scaleWidth24.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardParameters("number")
       .MarkAsAdvanced();
 
-  obj.AddAction("ScaleY",
+  obj.AddExpressionAndConditionAndAction("number",
+                "ScaleY",
                 _("Scale on Y axis"),
-                _("Modify the scale of the height of an object."),
+                _("the height's scale of an object"),
                 _("the height's scale"),
                 _("Size"),
-                "res/actions/scale24.png",
-                "res/actions/scale.png")
+                "res/actions/scaleHeight24.png")
       .AddParameter("object", _("Object"), "Drawer")
-      .UseStandardOperatorParameters("number")
+      .UseStandardParameters("number")
       .MarkAsAdvanced();
-
-  obj.AddExpression("ScaleX",
-                    _("Scale of the width of an object"),
-                    _("Scale of the width of an object"),
-                    _("Size"),
-                    "res/actions/scaleWidth.png")
-      .AddParameter("object", _("Object"), "Drawer");
-
-  obj.AddExpression("ScaleY",
-                    _("Scale of the height of an object"),
-                    _("Scale of the height of an object"),
-                    _("Size"),
-                    "res/actions/scaleHeight.png")
-      .AddParameter("object", _("Object"), "Drawer");
-
 
   obj.AddAction("FlipX",
                 _("Flip the object horizontally"),

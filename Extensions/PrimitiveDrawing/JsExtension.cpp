@@ -182,6 +182,12 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
         .SetFunctionName("setScaleY")
         .SetGetter("getScaleY");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleX"]
+        .SetFunctionName("getScaleX");
+    GetAllConditionsForObject(
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
+        .SetFunctionName("getScaleY");
     GetAllExpressionsForObject(
         "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleX"]
         .SetFunctionName("getScaleX");

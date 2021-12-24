@@ -491,7 +491,7 @@ namespace gdjs {
 
     /**
      * @returns The center X relatively to the drawing origin
-     * (where `getCenterX()` is relative to the top left drawable bound).
+     * (where `getCenterX()` is relative to the top left drawable bound and scaled).
      */
     getRotationAnchorX(): float {
       return this._customCenter
@@ -501,7 +501,7 @@ namespace gdjs {
 
     /**
      * @returns The center Y relatively to the drawing origin
-     * (where `getCenterY()` is relative to the top left drawable bound).
+     * (where `getCenterY()` is relative to the top left drawable bound and scaled).
      */
     getRotationAnchorY(): float {
       return this._customCenter
@@ -516,9 +516,6 @@ namespace gdjs {
       let centerX =
         this._customCenter[0] +
         (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
-      if (this._flippedX) {
-        //centerX = this._renderer.getUnscaledWidth() - centerX;
-      }
       return centerX * Math.abs(this._scaleX);
     }
 
@@ -529,9 +526,6 @@ namespace gdjs {
       let centerY =
         this._customCenter[1] +
         (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
-      if (this._flippedY) {
-        //centerY = this._renderer.getUnscaledHeight() - centerY;
-      }
       return centerY * Math.abs(this._scaleY);
     }
 
@@ -565,20 +559,8 @@ namespace gdjs {
      * @param newScale The new scale (must be greater than 0).
      */
     setScale(newScale: float): void {
-      if (newScale < 0) {
-        newScale = 0;
-      }
-      if (
-        newScale === Math.abs(this._scaleX) &&
-        newScale === Math.abs(this._scaleY)
-      ) {
-        return;
-      }
-      this._scaleX = newScale * (this._flippedX ? -1 : 1);
-      this._scaleY = newScale * (this._flippedY ? -1 : 1);
-      this._renderer.updateScaleX();
-      this._renderer.updateScaleY();
-      this.hitBoxesDirty = true;
+      this.setScaleX(newScale);
+      this.setScaleY(newScale);
     }
 
     /**
@@ -642,12 +624,12 @@ namespace gdjs {
     }
 
     /**
-     * Get the scale of the object (or the average of the X and Y scale in case they are different).
+     * Get the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      *
-     * @return the scale of the object (or the average of the X and Y scale in case they are different).
+     * @return the scale of the object (or the geometric mean of the X and Y scale in case they are different).
      */
     getScale(): number {
-      return (Math.abs(this._scaleX) + Math.abs(this._scaleY)) / 2.0;
+      return this._scaleX === this._scaleY ? this._scaleX : Math.sqrt(this._scaleX * this._scaleY);
     }
 
     /**
@@ -720,6 +702,40 @@ namespace gdjs {
 
     transformToSceneY(x: float, y: float) {
       return this.transformToScene(x, y)[1];
+    }
+
+    updateHitBoxes(): void {
+      this.hitBoxes = this._defaultHitBoxes;
+      const width = this.getWidth();
+      const height = this.getHeight();
+      const centerX = this.getCenterX();
+      const centerY = this.getCenterY();
+      if (centerX === width / 2 && centerY === height / 2) {
+        this.hitBoxes[0].vertices[0][0] = -centerX;
+        this.hitBoxes[0].vertices[0][1] = -centerY;
+        this.hitBoxes[0].vertices[1][0] = +centerX;
+        this.hitBoxes[0].vertices[1][1] = -centerY;
+        this.hitBoxes[0].vertices[2][0] = +centerX;
+        this.hitBoxes[0].vertices[2][1] = +centerY;
+        this.hitBoxes[0].vertices[3][0] = -centerX;
+        this.hitBoxes[0].vertices[3][1] = +centerY;
+      } else {
+        this.hitBoxes[0].vertices[0][0] = 0 - centerX;
+        this.hitBoxes[0].vertices[0][1] = 0 - centerY;
+        this.hitBoxes[0].vertices[1][0] = width - centerX;
+        this.hitBoxes[0].vertices[1][1] = 0 - centerY;
+        this.hitBoxes[0].vertices[2][0] = width - centerX;
+        this.hitBoxes[0].vertices[2][1] = height - centerY;
+        this.hitBoxes[0].vertices[3][0] = 0 - centerX;
+        this.hitBoxes[0].vertices[3][1] = height - centerY;
+      }
+      if (!this._absoluteCoordinates) {
+      this.hitBoxes[0].rotate(gdjs.toRad(this.getAngle()));
+      }
+      this.hitBoxes[0].move(
+        this.getDrawableX() + centerX,
+        this.getDrawableY() + centerY
+      );
     }
   }
   gdjs.registerObject(

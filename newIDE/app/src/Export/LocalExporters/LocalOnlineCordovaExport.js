@@ -140,7 +140,8 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
@@ -151,7 +152,8 @@ export const localOnlineCordovaExportPipeline: ExportPipeline<
       firebaseUser.uid,
       uploadBucketKey,
       exportState.targets,
-      exportState.keystore
+      exportState.keystore,
+      gameId
     );
   },
 };

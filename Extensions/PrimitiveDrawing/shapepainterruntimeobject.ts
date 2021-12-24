@@ -515,20 +515,22 @@ namespace gdjs {
       if (!this._customCenter) {
         return super.getCenterX();
       }
-      let centerX =
-        this._customCenter[0] +
-        (this.getX() - this.getDrawableX()) / Math.abs(this._scaleX);
-      return centerX * Math.abs(this._scaleX);
+      return (
+        this._customCenter[0] * Math.abs(this._scaleX) +
+        this.getX() -
+        this.getDrawableX()
+      );
     }
 
     getCenterY(): float {
       if (!this._customCenter) {
         return super.getCenterY();
       }
-      let centerY =
-        this._customCenter[1] +
-        (this.getY() - this.getDrawableY()) / Math.abs(this._scaleY);
-      return centerY * Math.abs(this._scaleY);
+      return (
+        this._customCenter[1] * Math.abs(this._scaleY) +
+        this.getY() -
+        this.getDrawableY()
+      );
     }
 
     /**

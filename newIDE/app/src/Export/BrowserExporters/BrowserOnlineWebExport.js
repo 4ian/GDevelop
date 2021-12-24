@@ -152,12 +152,18 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
       return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(getAuthorizationHeader, firebaseUser.uid, uploadBucketKey);
+    return buildWeb(
+      getAuthorizationHeader,
+      firebaseUser.uid,
+      uploadBucketKey,
+      gameId
+    );
   },
 };

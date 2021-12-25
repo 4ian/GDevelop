@@ -360,12 +360,15 @@ namespace gdjs {
         this.updatePositionIfNeeded();
         this._graphics.updateTransform();
       }
+      this._transformationIsUpToDate = true;
     }
 
     updateRotationCenter(): void {
       // The pivot and position depends on the rotation center point.
       this._positionXIsUpToDate = false;
       this._positionYIsUpToDate = false;
+      // The whole transformation changes based on the rotation center point.
+      this._transformationIsUpToDate = false;
     }
 
     updateAngle(): void {

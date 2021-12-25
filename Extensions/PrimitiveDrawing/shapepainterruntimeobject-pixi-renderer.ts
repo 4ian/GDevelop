@@ -362,6 +362,12 @@ namespace gdjs {
       }
     }
 
+    updateRotationCenter(): void {
+      // The pivot and position depends on the rotation center point.
+      this._positionXIsUpToDate = false;
+      this._positionYIsUpToDate = false;
+    }
+
     updateAngle(): void {
       if (this._object._useAbsoluteCoordinates) {
         this._graphics.angle = 0;
@@ -455,7 +461,6 @@ namespace gdjs {
 
     transformToDrawing(point: FloatPoint): FloatPoint {
       this.updateTransformationIfNeeded();
-      this._graphics.updateTransform();
       const position =
         ShapePainterRuntimeObjectPixiRenderer._positionForTransformation;
       position.x = point[0];

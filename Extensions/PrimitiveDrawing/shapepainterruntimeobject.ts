@@ -489,6 +489,7 @@ namespace gdjs {
       }
       this._customCenter[0] = x;
       this._customCenter[1] = y;
+      this._renderer.updateRotationCenter();
     }
 
     /**

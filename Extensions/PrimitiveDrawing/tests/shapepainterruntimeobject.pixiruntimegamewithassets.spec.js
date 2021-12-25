@@ -148,4 +148,38 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
       max: [36.970562748477136, 66.08326112068524],
     });
   });
+
+  it('can transform points', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    loadScene(runtimeScene);
+
+    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+    object.drawLineV2(0, 0, 10, 10, 2);
+    expect(object.getWidth()).to.be(12);
+    expect(object.getHeight()).to.be(12);
+
+    // Check changes in position/scale are taken into account:
+    object.setPosition(50, 100);
+    expect(object.transformToScene(10, 20)).to.eql([60, 120]);
+
+    object.setScale(2);
+    expect(object.transformToScene(10, 20)).to.eql([70, 140]);
+
+    // Check rotation with the default center:
+    expect(object.getCenterXInScene()).to.be(60);
+    expect(object.getCenterYInScene()).to.be(110);
+    expect(object.transformToScene(5, 5)).to.eql([60, 110]);
+    expect(object.transformToScene(10, 20)).to.eql([70, 140]);
+
+    object.setAngle(90);
+    expect(object.transformToScene(5, 5)).to.eql([60, 110]);
+    expect(object.transformToScene(10, 20)).to.eql([30, 120]);
+
+    // Check rotation with a custom center:
+    object.setRotationCenter(20, 9);
+    expect(object.transformToScene(10, 20)).to.eql([68, 98]);
+    expect(object.transformToDrawing(68, 98)).to.eql([10, 20]);
+  });
 });

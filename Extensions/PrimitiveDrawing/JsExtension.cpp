@@ -175,11 +175,11 @@ class PrimitiveDrawingJsExtension : public gd::PlatformExtension {
         .SetFunctionName("setScale")
         .SetGetter("getScale");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleX"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Drawer::SetScaleX"]
         .SetFunctionName("setScaleX")
         .SetGetter("getScaleX");
     GetAllActionsForObject(
-        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::ScaleY"]
+        "PrimitiveDrawing::Drawer")["PrimitiveDrawing::Drawer::SetScaleY"]
         .SetFunctionName("setScaleY")
         .SetGetter("getScaleY");
     GetAllConditionsForObject(

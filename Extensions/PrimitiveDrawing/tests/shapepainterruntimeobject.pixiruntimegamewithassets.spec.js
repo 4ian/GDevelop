@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * Tests for gdjs.ShapePainterRuntimeObject using a "real" PIXI RuntimeGame with assets.
  */
@@ -9,7 +11,6 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
     new gdjs.ShapePainterRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: 'PrimitiveDrawing::Drawer',
-      updateIfNotVisible: false,
       variables: [],
       behaviors: [],
       effects: [],
@@ -22,16 +23,40 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
       clearBetweenFrames: false,
     });
 
-  it.only('properly computes bounds of the object (basics)', async () => {
+    /** @param {gdjs.RuntimeScene} runtimeScene */
+  const loadScene = (runtimeScene) => {
+    runtimeScene.loadFromScene({
+        layers: [
+          {
+            name: '',
+            visibility: true,
+            effects: [],
+            cameras: [],
+            ambientLightColorR: 0,
+            ambientLightColorG: 0,
+            ambientLightColorB: 0,
+            isLightingLayer: false,
+            followBaseLayerCamera: true,
+          },
+        ],
+        r: 0,
+        v: 0,
+        b: 0,
+        mangledName: 'Scene1',
+        name: 'Scene1',
+        stopSoundsOnStartup: false,
+        title: '',
+        behaviorsSharedData: [],
+        objects: [],
+        instances: [],
+        variables: [],
+    });
+  }
+
+  it('properly computes bounds of the object (basics)', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
-      layers: [{ name: '', visibility: true, effects: [] }],
-      variables: [],
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
-    });
+    loadScene(runtimeScene);
 
     const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
 
@@ -79,16 +104,10 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
     });
   });
 
-  it.only('properly computes bounds of the object (custom center)', async () => {
+  it('properly computes bounds of the object (custom center)', async () => {
     const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-    runtimeScene.loadFromScene({
-      layers: [{ name: '', visibility: true, effects: [] }],
-      variables: [],
-      behaviorsSharedData: [],
-      objects: [],
-      instances: [],
-    });
+    loadScene(runtimeScene);
 
     const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
 

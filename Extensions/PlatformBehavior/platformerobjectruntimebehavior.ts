@@ -973,18 +973,11 @@ namespace gdjs {
         this._potentialCollidingObjects
       );
 
+      // Filter the potential colliding platforms to ensure that the object owning the behavior
+      // is not considered as colliding with itself, in the case that it also has the
+      // platform behavior.
       for (let i = 0; i < this._potentialCollidingObjects.length; ) {
-        const platform = this._potentialCollidingObjects[i];
-        if (
-          // Filter the potential colliding platforms to ensure that the object owning the behavior
-          // is not considered as colliding with itself, in the case that it also has the
-          // platform behavior.
-          platform.owner === object ||
-          // Filter platforms that are not in the searched area anymore.
-          // This can happen because platforms are not updated in the RBush before that
-          // characters movement are being processed.
-          !this._manager.isPlatformsAround(platform, object, maxMovementLength)
-        ) {
+        if (this._potentialCollidingObjects[i].owner === object) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {
           i++;

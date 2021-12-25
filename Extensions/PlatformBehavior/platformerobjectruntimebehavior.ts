@@ -965,8 +965,10 @@ namespace gdjs {
      * Update _potentialCollidingObjects member with platforms near the object.
      */
     private _updatePotentialCollidingObjects(maxMovementLength: float) {
+      const object = this.owner;
+
       this._manager.getAllPlatformsAround(
-        this.owner,
+        object,
         maxMovementLength,
         this._potentialCollidingObjects
       );
@@ -975,7 +977,7 @@ namespace gdjs {
       // is not considered as colliding with itself, in the case that it also has the
       // platform behavior.
       for (let i = 0; i < this._potentialCollidingObjects.length; ) {
-        if (this._potentialCollidingObjects[i].owner === this.owner) {
+        if (this._potentialCollidingObjects[i].owner === object) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {
           i++;

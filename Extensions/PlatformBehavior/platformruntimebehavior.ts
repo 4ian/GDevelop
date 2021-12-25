@@ -4,6 +4,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
   declare var rbush: any;
+  type SearchArea = { minX: float; minY: float; maxX: float; maxY: float };
 
   /**
    * Manages the common objects shared by objects having a
@@ -73,20 +74,31 @@ namespace gdjs {
       const oh = object.getHeight();
       const x = object.getDrawableX() + object.getCenterX();
       const y = object.getDrawableY() + object.getCenterY();
-      const searchArea = gdjs.staticObject(
+      const searchArea: SearchArea = gdjs.staticObject(
         PlatformObjectsManager.prototype.getAllPlatformsAround
-      );
-      // @ts-ignore
+      ) as SearchArea;
       searchArea.minX = x - ow / 2 - maxMovementLength;
-      // @ts-ignore
       searchArea.minY = y - oh / 2 - maxMovementLength;
-      // @ts-ignore
       searchArea.maxX = x + ow / 2 + maxMovementLength;
-      // @ts-ignore
       searchArea.maxY = y + oh / 2 + maxMovementLength;
       const nearbyPlatforms = this._platformRBush.search(searchArea);
+
       result.length = 0;
-      result.push.apply(result, nearbyPlatforms);
+      for (let i = 0; i < nearbyPlatforms.length; i++) {
+        const platform = nearbyPlatforms[i];
+        const platformAABB = platform.owner.getAABB();
+        const platformIsStillAround =
+          platformAABB.min[0] <= searchArea.maxX &&
+          platformAABB.min[1] <= searchArea.maxY &&
+          platformAABB.max[0] >= searchArea.minX &&
+          platformAABB.max[1] >= searchArea.minY;
+        // Filter platforms that are not in the searched area anymore.
+        // This can happen because platforms are not updated in the RBush before that
+        // characters movement are being processed.
+        if (platformIsStillAround) {
+          result.push(platform);
+        }
+      }
     }
   }
 

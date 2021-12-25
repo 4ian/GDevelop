@@ -257,6 +257,30 @@ namespace gdjs {
           positionPoint[1]
         );
 
+        // Draw Origin point
+        if (object instanceof gdjs.SpriteRuntimeObject) {
+          let originPoint = object.getPointPosition('origin');
+          // When there is neither rotation nor flipping,
+          // the origin point is over the position point.
+          if (
+            Math.abs(originPoint[0] - positionPoint[0]) >= 1 ||
+            Math.abs(originPoint[1] - positionPoint[1]) >= 1
+          ) {
+            originPoint = layer.convertInverseCoords(
+              originPoint[0],
+              originPoint[1]
+            );
+
+            renderObjectPoint(
+              renderedObjectPoints.points,
+              'Origin',
+              0xff0000,
+              originPoint[0],
+              originPoint[1]
+            );
+          }
+        }
+
         // Draw custom point
         if (showCustomPoints && object instanceof gdjs.SpriteRuntimeObject) {
           if (!object._animationFrame) continue;

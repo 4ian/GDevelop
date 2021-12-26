@@ -1,5 +1,5 @@
 
-  const makePlatformerTestRuntimeScene = () => {
+  const makePlatformerTestRuntimeScene = (timeDelta = 1000 / 60) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
       resources: {
@@ -16,7 +16,7 @@
       instances: [],
     });
     runtimeScene._timeManager.getElapsedTime = function () {
-      return (1 / 60) * 1000;
+      return timeDelta;
     };
     return runtimeScene;
   };

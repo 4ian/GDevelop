@@ -500,6 +500,20 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("SimulateControl");
 
+    aut.AddScopedCondition("IsUsingControl",
+                  _("Use control"),
+                  _("A control was applied from a default control or a simulate action."),
+                  _("_PARAM0_ uses the _PARAM2_ key"),
+                  _("Controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Jump\", \"Ladder\", \"Release Ladder\", \"Up\", \"Down\"]")
+        .MarkAsAdvanced();
+
     aut.AddAction("IgnoreDefaultControls",
                   _("Ignore default controls"),
                   _("De/activate the use of default controls.\nIf deactivated, "

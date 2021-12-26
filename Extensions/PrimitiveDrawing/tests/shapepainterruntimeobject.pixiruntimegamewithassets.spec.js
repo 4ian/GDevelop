@@ -147,6 +147,26 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
       min: [-13.941125496954278, 15.17157287525381],
       max: [36.970562748477136, 66.08326112068524],
     });
+
+    // Draw outside of the current bounds.
+    const oldMinX = object.getAABB().min[0];
+    const oldMinY = object.getAABB().min[1];
+    const oldMaxX = object.getAABB().max[0];
+    const oldMaxY = object.getAABB().max[1];
+    const oldCenterX = object.getCenterXInScene();
+    const oldCenterY = object.getCenterYInScene();
+    object.drawLineV2(-10, -10, 21, 31, 3);
+
+    // Check that the center stays the same.
+    expect(object.getCenterXInScene()).to.be(oldCenterX);
+    expect(object.getCenterYInScene()).to.be(oldCenterY);
+
+    // Check that the AABB expands.
+    const newAABB = object.getAABB();
+    expect(newAABB.min[0]).below(oldMinX);
+    expect(newAABB.min[1]).below(oldMinY);
+    expect(newAABB.max[0]).above(oldMaxX);
+    expect(newAABB.max[1]).above(oldMaxY);
   });
 
   it('can transform points', async () => {

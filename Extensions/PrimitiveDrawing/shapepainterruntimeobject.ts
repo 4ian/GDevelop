@@ -499,7 +499,8 @@ namespace gdjs {
     getRotationCenterX(): float {
       return this._customCenter
         ? this._customCenter[0]
-        : this._renderer.getUnscaledWidth() / 2 - this._renderer.getOriginX();
+        : this._renderer.getUnscaledWidth() / 2 -
+            this._renderer.getFrameRelativeOriginX();
     }
 
     /**
@@ -509,7 +510,8 @@ namespace gdjs {
     getRotationCenterY(): float {
       return this._customCenter
         ? this._customCenter[1]
-        : this._renderer.getUnscaledHeight() / 2 - this._renderer.getOriginY();
+        : this._renderer.getUnscaledHeight() / 2 -
+            this._renderer.getFrameRelativeOriginY();
     }
 
     getCenterX(): float {

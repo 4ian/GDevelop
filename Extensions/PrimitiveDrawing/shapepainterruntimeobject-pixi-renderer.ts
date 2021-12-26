@@ -15,7 +15,7 @@ namespace gdjs {
      */
     _positionYIsUpToDate = false;
     /**
-     * It allows to use the transformation of the renderer
+     * This allows to use the transformation of the renderer
      * and compute it only when necessary.
      */
     _transformationIsUpToDate = false;
@@ -451,14 +451,14 @@ namespace gdjs {
     /**
      * @returns The drawing origin relatively to the drawable top left corner.
      */
-    getOriginX() {
+    getFrameRelativeOriginX() {
       return -this._graphics.getLocalBounds().left;
     }
 
     /**
      * @returns The drawing origin relatively to the drawable top left corner.
      */
-    getOriginY() {
+    getFrameRelativeOriginY() {
       return -this._graphics.getLocalBounds().top;
     }
 

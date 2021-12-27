@@ -11,9 +11,12 @@ import differenceInSeconds from 'date-fns/differenceInSeconds';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
 import {
+  getBuildArtifactUrl,
   type Build,
   type BuildArtifactKeyName,
 } from '../../Utils/GDevelopServices/Build';
+import Window from '../../Utils/Window';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -65,14 +68,13 @@ const buttons = [
 
 type Props = {|
   build: Build,
-  onDownload: (key: BuildArtifactKeyName) => void,
 |};
 
 /**
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-export default ({ build, onDownload }: Props) => {
+export default ({ build }: Props) => {
   const config = buildTypesConfig[build.type];
   const secondsSinceLastUpdate = Math.abs(
     differenceInSeconds(build.updatedAt, Date.now())
@@ -81,6 +83,11 @@ export default ({ build, onDownload }: Props) => {
     config ? config.estimatedTimeInSeconds(build) - secondsSinceLastUpdate : 0,
     0
   );
+
+  const onDownload = (key: BuildArtifactKeyName) => {
+    const url = getBuildArtifactUrl(build, key);
+    if (url) Window.openExternalURL(url);
+  };
 
   return (
     <I18n>
@@ -136,8 +143,8 @@ export default ({ build, onDownload }: Props) => {
             )}
           </Line>
         ) : build.status === 'complete' ? (
-          <React.Fragment>
-            <Line expand>
+          <ColumnStackLayout>
+            <Line expand justifyContent="flex-end">
               {buttons
                 .filter(button => !!build[button.key])
                 .map((button, index) => (
@@ -155,10 +162,12 @@ export default ({ build, onDownload }: Props) => {
                 onClick={() => onDownload('logsKey')}
               />
             </Line>
-            <Line expand>
-              {config && <Text>{config.completeDescription}</Text>}
-            </Line>
-          </React.Fragment>
+            {config && config.completeDescription && (
+              <Line expand>
+                <Text>{config.completeDescription}</Text>
+              </Line>
+            )}
+          </ColumnStackLayout>
         ) : (
           <Line>
             <Trans>Unknown status</Trans>

@@ -2,26 +2,23 @@
 import React, { Component } from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import BuildsList from './BuildsList';
-import {
-  getBuilds,
-  type Build,
-  type BuildArtifactKeyName,
-  getBuildArtifactUrl,
-} from '../../Utils/GDevelopServices/Build';
-import Window from '../../Utils/Window';
+import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
 import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
-  onBuildsUpdated: ?() => void,
+  onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
+  gameId: string,
 |};
 type State = {|
   builds: ?Array<Build>,
+  error: ?Error,
 |};
 
 export default class Builds extends Component<Props, State> {
   state = {
     builds: null,
+    error: null,
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -58,9 +55,10 @@ export default class Builds extends Component<Props, State> {
       getAuthorizationHeader,
       firebaseUser,
     } = this.props.authenticatedUser;
-    if (!firebaseUser) return;
+    if (!firebaseUser || !this.props.gameId) return;
+    this.setState({ builds: null, error: null });
 
-    getBuilds(getAuthorizationHeader, firebaseUser.uid).then(
+    getBuilds(getAuthorizationHeader, firebaseUser.uid, this.props.gameId).then(
       builds => {
         this.setState(
           {
@@ -73,14 +71,13 @@ export default class Builds extends Component<Props, State> {
         );
       },
       () => {
-        //TODO: Handle error
+        this.setState({
+          error: new Error(
+            'There was an issue getting the game builds, verify your internet connection or try again later.'
+          ),
+        });
       }
     );
-  };
-
-  _download = (build: Build, key: BuildArtifactKeyName) => {
-    const url = getBuildArtifactUrl(build, key);
-    if (url) Window.openExternalURL(url);
   };
 
   render() {
@@ -88,7 +85,8 @@ export default class Builds extends Component<Props, State> {
       <BuildsList
         builds={this.state.builds}
         authenticatedUser={this.props.authenticatedUser}
-        onDownload={this._download}
+        error={this.state.error}
+        loadBuilds={this._refreshBuilds}
       />
     );
   }

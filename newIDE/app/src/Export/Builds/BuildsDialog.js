@@ -10,6 +10,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   authenticatedUser: AuthenticatedUser,
+  gameId: string,
   open: boolean,
   onClose: () => void,
 |};
@@ -22,12 +23,12 @@ export default class BuildsDialog extends Component<Props, State> {
   };
 
   render() {
-    const { open, onClose, authenticatedUser } = this.props;
+    const { open, onClose, authenticatedUser, gameId } = this.props;
     if (!open) return null;
 
     return (
       <Dialog
-        title={<Trans>All your builds</Trans>}
+        title={<Trans>Your game builds</Trans>}
         onRequestClose={onClose}
         actions={[
           <FlatButton
@@ -47,6 +48,7 @@ export default class BuildsDialog extends Component<Props, State> {
         <Builds
           onBuildsUpdated={this._onBuildsUpdated}
           authenticatedUser={authenticatedUser}
+          gameId={gameId}
         />
       </Dialog>
     );

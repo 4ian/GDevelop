@@ -124,7 +124,7 @@ const ExportDialog = ({
         exporter.key !== 'onlinewebexport' && (
           <FlatButton
             key="builds"
-            label={<Trans>See all my builds</Trans>}
+            label={<Trans>See this game builds</Trans>}
             onClick={() => setBuildsDialogOpen(true)}
           />
         ),
@@ -188,6 +188,7 @@ const ExportDialog = ({
         open={buildsDialogOpen}
         onClose={() => setBuildsDialogOpen(false)}
         authenticatedUser={authenticatedUser}
+        gameId={project.getProjectUuid()}
       />
     </Dialog>
   );

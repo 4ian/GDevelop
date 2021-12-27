@@ -172,7 +172,7 @@ export default ({
               <Trans>Build is starting...</Trans>
             </Text>
           )}
-          {build && <BuildProgress build={build} onDownload={onDownload} />}
+          {build && <BuildProgress build={build} />}
           {showSeeAllMyBuildsExplanation && (
             <EmptyMessage>
               <Trans>

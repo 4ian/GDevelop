@@ -2643,23 +2643,12 @@ storiesOf('BuildStepsProgress', module)
 storiesOf('BuildProgress', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('errored', () => (
-    <BuildProgress
-      build={erroredCordovaBuild}
-      onDownload={action('download')}
-    />
-  ))
+  .add('errored', () => <BuildProgress build={erroredCordovaBuild} />)
   .add('pending (electron-build)', () => (
-    <BuildProgress
-      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={{ ...pendingElectronBuild, updatedAt: Date.now() }} />
   ))
   .add('pending (cordova-build)', () => (
-    <BuildProgress
-      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={{ ...pendingCordovaBuild, updatedAt: Date.now() }} />
   ))
   .add('pending and very old (cordova-build)', () => (
     <BuildProgress
@@ -2667,23 +2656,16 @@ storiesOf('BuildProgress', module)
         ...pendingCordovaBuild,
         updatedAt: Date.now() - 1000 * 3600 * 24,
       }}
-      onDownload={action('download')}
     />
   ))
   .add('complete (cordova-build)', () => (
-    <BuildProgress
-      build={completeCordovaBuild}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={completeCordovaBuild} />
   ))
   .add('complete (electron-build)', () => (
-    <BuildProgress
-      build={completeElectronBuild}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={completeElectronBuild} />
   ))
   .add('complete (web-build)', () => (
-    <BuildProgress build={completeWebBuild} onDownload={action('download')} />
+    <BuildProgress build={completeWebBuild} />
   ));
 
 storiesOf('LocalFolderPicker', module)

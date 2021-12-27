@@ -560,7 +560,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
     };
 
-    it.only('can walk on a platform and be blocked by a wall', function () {
+    it('can walk on a platform and be blocked by a wall', function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);

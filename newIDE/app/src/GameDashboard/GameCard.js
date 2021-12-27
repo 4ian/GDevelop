@@ -9,12 +9,14 @@ import RaisedButton from '../UI/RaisedButton';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
 
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenAnalytics: () => void,
   onOpenDetails: () => void,
+  onOpenBuilds: () => void,
+  onOpenAnalytics: () => void,
   onOpenMonetization: () => void,
 |};
 
@@ -22,6 +24,7 @@ export const GameCard = ({
   game,
   isCurrentGame,
   onOpenDetails,
+  onOpenBuilds,
   onOpenAnalytics,
   onOpenMonetization,
 }: Props) => (
@@ -49,6 +52,14 @@ export const GameCard = ({
           label={<Trans>See details</Trans>}
           onClick={onOpenDetails}
         />
+        <Spacer />
+        <RaisedButton
+          primary
+          icon={<PlaylistPlayIcon />}
+          label={<Trans>Builds</Trans>}
+          onClick={onOpenBuilds}
+        />
+        <Spacer />
         <RaisedButton
           primary
           icon={<TimelineIcon />}

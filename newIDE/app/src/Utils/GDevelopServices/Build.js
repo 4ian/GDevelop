@@ -185,13 +185,15 @@ export const getBuild = (
 
 export const getBuilds = (
   getAuthorizationHeader: () => Promise<string>,
-  userId: string
+  userId: string,
+  gameId?: string
 ): Promise<Array<Build>> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
         params: {
           userId,
+          gameId,
         },
         headers: {
           Authorization: authorizationHeader,

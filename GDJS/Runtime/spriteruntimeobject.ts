@@ -855,9 +855,7 @@ namespace gdjs {
     private _transformToGlobal(x: float, y: float, result: number[]) {
       result.length = 2;
       const onlyNeedTranslation =
-        this.angle === 0 &&
-        this._scaleX === 1 &&
-        this._scaleY === 1;
+        this.angle === 0 && this._scaleX === 1 && this._scaleY === 1;
       if (onlyNeedTranslation) {
         // It's faster than applying a whole affine transformation.
         // And it avoid to instantiate this._affineTransformation

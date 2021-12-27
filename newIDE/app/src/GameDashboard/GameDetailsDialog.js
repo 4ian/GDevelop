@@ -98,7 +98,6 @@ export const GameDetailsDialog = ({
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
   const [gameBuilds, setGameBuilds] = React.useState<?(Build[])>(null);
-  const [isGameBuildsLoading, setIsGameBuildsLoading] = React.useState(false);
   const [gameBuildsError, setGameBuildsError] = React.useState<?Error>(null);
 
   const yesterdayIsoDate = formatISO(subDays(new Date(), 1), {
@@ -144,7 +143,6 @@ export const GameDetailsDialog = ({
 
       const { id } = profile;
 
-      setIsGameBuildsLoading(true);
       setGameBuildsError(null);
       try {
         const builds = await getBuilds(getAuthorizationHeader, id, game.id);
@@ -153,7 +151,6 @@ export const GameDetailsDialog = ({
         console.error(`Unable to load game builds:`, err);
         setGameBuildsError(err);
       }
-      setIsGameBuildsLoading(false);
     },
     [getAuthorizationHeader, profile, game]
   );
@@ -281,14 +278,14 @@ export const GameDetailsDialog = ({
         ) : null}
         {currentTab === 'builds' ? (
           <ColumnStackLayout expand>
-            <Line noMargin alignItems="center">
+            <Line noMargin>
               <Text size="title">
                 <Trans>Game builds</Trans>
               </Text>
             </Line>
-            {isGameBuildsLoading && (
-              <Line alignItems="center">
-                <CircularProgress size={20} />
+            {!gameBuilds && (
+              <Line justifyContent="center">
+                <CircularProgress size={40} />
               </Line>
             )}
             {gameBuildsError && (
@@ -303,7 +300,7 @@ export const GameDetailsDialog = ({
                 </Trans>
               </PlaceholderError>
             )}
-            {!isGameBuildsLoading && (!gameBuilds || !gameBuilds.length) && (
+            {gameBuilds && !gameBuilds.length && (
               <ColumnStackLayout expand>
                 <AlertMessage kind="warning">
                   <Trans>
@@ -312,7 +309,7 @@ export const GameDetailsDialog = ({
                 </AlertMessage>
               </ColumnStackLayout>
             )}
-            {!isGameBuildsLoading && gameBuilds && gameBuilds.length && (
+            {gameBuilds && gameBuilds.length && (
               <ColumnStackLayout expand>
                 {gameBuilds.map(build => (
                   <Card key={build.id}>
@@ -321,8 +318,7 @@ export const GameDetailsDialog = ({
                       subheader={
                         <Line alignItems="center" noMargin>
                           <Trans>
-                            Built on{' '}
-                            {format(build.updatedAt * 1000, 'yyyy-MM-dd')}
+                            Built on {format(build.updatedAt, 'yyyy-MM-dd')}
                           </Trans>
                         </Line>
                       }

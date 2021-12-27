@@ -1028,8 +1028,8 @@ namespace gdjs {
     }
 
     /**.
-     * @param input The string expression of the control action [Left,Right,Up,Down,Ladder,Jump,Release,Release Ladder].
-     * @returns true if the key was used from the last `doStepPreEvents` call.
+     * @param input The control to be tested [Left,Right,Up,Down,Ladder,Jump,Release,Release Ladder].
+     * @returns true if the key was used since the last `doStepPreEvents` call.
      */
     isUsingControl(input: string): boolean {
       if (input === 'Left') {

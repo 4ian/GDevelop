@@ -591,8 +591,14 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // The search is done pixel by pixel on X which doesn't allow to find the right position to stop.
       // This result to the object being stopped at its position before moving.
       // It then converge a bit thanks to a lower speed.
-      expect(object.getX()).to.be.within(wall.getX() - objectWidth - 0.3, wall.getX() - objectWidth);
-      expect(object.getY()).to.be.within(platform.getY() - objectHeight - epsilon, platform.getY() - objectHeight + epsilon);
+      expect(object.getX()).to.be.within(
+        wall.getX() - objectWidth - 0.3,
+        wall.getX() - objectWidth
+      );
+      expect(object.getY()).to.be.within(
+        platform.getY() - objectHeight - epsilon,
+        platform.getY() - objectHeight + epsilon
+      );
     });
   });
 

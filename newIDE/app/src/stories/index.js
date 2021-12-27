@@ -119,7 +119,6 @@ import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
-import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import EditProfileDialog from '../Profile/EditProfileDialog';
@@ -3997,12 +3996,6 @@ storiesOf('SubscriptionDetails', module)
     />
   ));
 
-storiesOf('UsagesDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
-  .add('empty', () => <UsagesDetails usages={[]} />);
-
 storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
@@ -5302,6 +5295,7 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={false}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
       onOpenMonetization={action('onOpenMonetization')}
     />
@@ -5311,6 +5305,7 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={true}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
       onOpenMonetization={action('onOpenMonetization')}
     />

@@ -21,22 +21,39 @@ import {
   type GameMetrics,
   getGameMetrics,
 } from '../Utils/GDevelopServices/Analytics';
+import {
+  type Build,
+  getBuilds,
+  getBuildArtifactUrl,
+} from '../Utils/GDevelopServices/Build';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { CircularProgress } from '@material-ui/core';
+import {
+  Card,
+  CardActions,
+  CardHeader,
+  CircularProgress,
+} from '@material-ui/core';
 import { Table, TableBody, TableRow, TableRowColumn } from '../UI/Table';
 import AlertMessage from '../UI/AlertMessage';
 import subDays from 'date-fns/subDays';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import HelpButton from '../UI/HelpButton';
+import PlayArrow from '@material-ui/icons/PlayArrow';
+
+export type GamesDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'analytics'
+  | 'monetization';
 
 type Props = {|
   game: Game,
   project: ?gdProject,
-  initialTab: 'details' | 'analytics' | 'monetization',
+  initialTab: GamesDetailsTab,
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
@@ -80,6 +97,10 @@ export const GameDetailsDialog = ({
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
+  const [gameBuilds, setGameBuilds] = React.useState<?(Build[])>(null);
+  const [isGameBuildsLoading, setIsGameBuildsLoading] = React.useState(false);
+  const [gameBuildsError, setGameBuildsError] = React.useState<?Error>(null);
+
   const yesterdayIsoDate = formatISO(subDays(new Date(), 1), {
     representation: 'date',
   });
@@ -117,6 +138,33 @@ export const GameDetailsDialog = ({
     [loadGameMetrics]
   );
 
+  const loadGameBuilds = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      const { id } = profile;
+
+      setIsGameBuildsLoading(true);
+      setGameBuildsError(null);
+      try {
+        const builds = await getBuilds(getAuthorizationHeader, id, game.id);
+        setGameBuilds(builds);
+      } catch (err) {
+        console.error(`Unable to load game builds:`, err);
+        setGameBuildsError(err);
+      }
+      setIsGameBuildsLoading(false);
+    },
+    [getAuthorizationHeader, profile, game]
+  );
+
+  React.useEffect(
+    () => {
+      loadGameBuilds();
+    },
+    [loadGameBuilds]
+  );
+
   const updateGameFromProject = async () => {
     if (!project) return;
     if (!profile) return;
@@ -146,6 +194,11 @@ export const GameDetailsDialog = ({
     }
   };
 
+  const openBuildUrl = build => {
+    const url = getBuildArtifactUrl(build, 's3Key');
+    if (url) Window.openExternalURL(url);
+  };
+
   return (
     <Dialog
       title={
@@ -172,6 +225,7 @@ export const GameDetailsDialog = ({
     >
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab label={<Trans>Details</Trans>} value="details" />
+        <Tab label={<Trans>Builds</Trans>} value="builds" />
         <Tab label={<Trans>Analytics</Trans>} value="analytics" />
         <Tab label={<Trans>Monetization</Trans>} value="monetization" />
       </Tabs>
@@ -223,6 +277,70 @@ export const GameDetailsDialog = ({
                 />
               ) : null}
             </Line>
+          </ColumnStackLayout>
+        ) : null}
+        {currentTab === 'builds' ? (
+          <ColumnStackLayout expand>
+            <Line noMargin alignItems="center">
+              <Text size="title">
+                <Trans>Game builds</Trans>
+              </Text>
+            </Line>
+            {isGameBuildsLoading && (
+              <Line alignItems="center">
+                <CircularProgress size={20} />
+              </Line>
+            )}
+            {gameBuildsError && (
+              <PlaceholderError
+                onRetry={() => {
+                  loadGameBuilds();
+                }}
+              >
+                <Trans>There was an issue getting the game builds.</Trans>{' '}
+                <Trans>
+                  Verify your internet connection or try again later.
+                </Trans>
+              </PlaceholderError>
+            )}
+            {!isGameBuildsLoading && (!gameBuilds || !gameBuilds.length) && (
+              <ColumnStackLayout expand>
+                <AlertMessage kind="warning">
+                  <Trans>
+                    You haven't created any builds for this game yet.
+                  </Trans>
+                </AlertMessage>
+              </ColumnStackLayout>
+            )}
+            {!isGameBuildsLoading && gameBuilds && gameBuilds.length && (
+              <ColumnStackLayout expand>
+                {gameBuilds.map(build => (
+                  <Card key={build.id}>
+                    <CardHeader
+                      title={build.id}
+                      subheader={
+                        <Line alignItems="center" noMargin>
+                          <Trans>
+                            Built on{' '}
+                            {format(build.updatedAt * 1000, 'yyyy-MM-dd')}
+                          </Trans>
+                        </Line>
+                      }
+                    />
+                    <CardActions>
+                      <Line expand noMargin justifyContent="flex-end">
+                        <RaisedButton
+                          primary
+                          icon={<PlayArrow />}
+                          label={<Trans>Open</Trans>}
+                          onClick={() => openBuildUrl(build)}
+                        />
+                      </Line>
+                    </CardActions>
+                  </Card>
+                ))}
+              </ColumnStackLayout>
+            )}
           </ColumnStackLayout>
         ) : null}
         {currentTab === 'analytics' ? (

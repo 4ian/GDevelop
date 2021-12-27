@@ -856,10 +856,8 @@ namespace gdjs {
       result.length = 2;
       const onlyNeedTranslation =
         this.angle === 0 &&
-        this._scaleX === 0 &&
-        this._scaleY === 0 &&
-        !this._flippedX &&
-        !this._flippedY;
+        this._scaleX === 1 &&
+        this._scaleY === 1;
       if (onlyNeedTranslation) {
         // It's faster than applying a whole affine transformation.
         // And it avoid to instantiate this._affineTransformation

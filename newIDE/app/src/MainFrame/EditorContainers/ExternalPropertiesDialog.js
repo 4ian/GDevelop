@@ -40,10 +40,12 @@ export default function ExternalPropertiesDialog({
   );
   const onClick = React.useCallback(
     () => {
-      const externalProperties: ExternalProperties = {
-        layoutName: selectedLayoutName,
-      };
-      onChoose(externalProperties);
+      if (selectedLayoutName) {
+        const externalProperties: ExternalProperties = {
+          layoutName: selectedLayoutName,
+        };
+        onChoose(externalProperties);
+      }
     },
     [onChoose, selectedLayoutName]
   );
@@ -77,7 +79,7 @@ export default function ExternalPropertiesDialog({
       onRequestClose={onClose}
       cannotBeDismissed={false}
       maxWidth="sm"
-      canSubmitLastAction
+      onApply={onClick}
     >
       <Column>
         {helpTexts &&

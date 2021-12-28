@@ -59,18 +59,11 @@ type Props = {|
   onRequestClose?: () => void,
   /**
    * If specified, will be called when the dialog is dismissed in a way where changes
-   * must be kept.
+   * must be kept or when using the submit keyboard shortcut.
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
   onApply?: ?() => void,
-  /**
-   * If specified, allows user to close the dialog with an action based on
-   * `shouldSubmit` key event. `lastAction` option simulates a click on the
-   * last (often the main) action button given (if this last action is a button
-   * with split menu, it simulates click on the main button).
-   */
-  canSubmitLastAction?: boolean,
 
   cannotBeDismissed?: boolean, // Currently unused.
 
@@ -97,26 +90,6 @@ type DialogContentStyle = {
   flexDirection?: 'row',
 };
 
-const findAndClickButton = (ref: {| current: ?HTMLElement |}): void => {
-  if (!ref.current || ref.current.childElementCount === 0) return;
-
-  const actionsElements = ref.current.children;
-  if (!actionsElements) return;
-
-  let target = actionsElements[actionsElements.length - 1];
-  if (target.matches('button')) {
-    // Raised or flat buttons
-    target.click();
-  } else {
-    // Search first button in target. Could be either:
-    // - button wrapped in LeftLoader component
-    // - button in ButtonGroup (e.g. RaisedButtonWithSplitMenu)
-    // - or both
-    target = target.querySelector('button:first-child');
-    if (target) target.click();
-  }
-};
-
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
@@ -127,7 +100,6 @@ export default (props: Props) => {
     secondaryActions,
     actions,
     open,
-    canSubmitLastAction,
     onRequestClose,
     maxWidth,
     noMargin,
@@ -192,16 +164,16 @@ export default (props: Props) => {
         return;
       }
 
-      if (canSubmitLastAction && shouldSubmit(event)) {
+      if (onApply && shouldSubmit(event)) {
         event.stopPropagation();
         const element = document.activeElement;
         if (element) {
           element.blur();
         }
-        findAndClickButton(actionsRef);
+        onApply();
       }
     },
-    [onCloseDialog, canSubmitLastAction]
+    [onCloseDialog, onApply]
   );
 
   return (

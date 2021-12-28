@@ -326,7 +326,8 @@ namespace gdjs {
       let directionInDeg = 0;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
-      //Update the speed of the object
+
+      // Update the speed of the object:
       if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
@@ -368,13 +369,17 @@ namespace gdjs {
         this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
         this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
       }
+      
+      // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 
-      //No acceleration for angular speed for now
-
-      // Position object
+      // Position object.
       // This is a Verlet integration considering the acceleration as constant.
-      // The acceleration is not actually always constant particularly with gamepad,
+      // If you expand deltaX or deltaY, it gives, thanks to the usage of both
+      // the old and the new velocity:
+      // "velocity * timeDelta + acceleration * timeDelta^2 / 2".
+      //
+      // The acceleration is not actually always constant, particularly with a gamepad,
       // but the error is multiplied by timDelta^3. So, it shouldn't matter much.
       const deltaX = ((previousVelocityX + this._xVelocity) / 2) * timeDelta;
       const deltaY = ((previousVelocityY + this._yVelocity) / 2) * timeDelta;
@@ -392,7 +397,7 @@ namespace gdjs {
         object.setY(object.getY() + point[1]);
       }
 
-      //Also update angle if needed
+      // Also update angle if needed.
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
         this._angle = directionInDeg;
         if (this._rotateObject) {

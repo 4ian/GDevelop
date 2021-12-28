@@ -222,7 +222,6 @@ function ProjectPropertiesDialog(props: Props) {
         <React.Fragment>
           <Dialog
             onApply={onApply}
-            canSubmitLastAction
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}

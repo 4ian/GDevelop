@@ -63,7 +63,16 @@ export default class CreateAccountDialog extends Component<Props, State> {
     },
   };
 
+  _canCreateAccount = () => {
+    return (
+      !this.props.createAccountInProgress &&
+      isUsernameValid(this.state.form.username, true)
+    );
+  };
+
   _onCreateAccount = () => {
+    if (!this._canCreateAccount()) return;
+
     const { form } = this.state;
     this.props.onCreateAccount(form);
   };
@@ -86,10 +95,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             <RaisedButton
               label={<Trans>Create my account</Trans>}
               primary
-              disabled={
-                createAccountInProgress ||
-                !isUsernameValid(this.state.form.username, true)
-              }
+              disabled={!this._canCreateAccount()}
               onClick={this._onCreateAccount}
             />
           </LeftLoader>,
@@ -102,6 +108,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onGoToLogin}
           />,
         ]}
+        onApply={this._onCreateAccount}
         onRequestClose={() => {
           if (!createAccountInProgress) onClose();
         }}

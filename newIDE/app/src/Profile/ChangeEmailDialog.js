@@ -35,10 +35,10 @@ export default class ChangeEmailDialog extends Component<Props, State> {
   };
 
   _onChangeEmail = () => {
-    if (!this.props.changeEmailInProgress) {
-      const { form } = this.state;
-      this.props.onChangeEmail(form);
-    }
+    if (this.props.changeEmailInProgress) return;
+
+    const { form } = this.state;
+    this.props.onChangeEmail(form);
   };
 
   render() {

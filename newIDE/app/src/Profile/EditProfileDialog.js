@@ -51,10 +51,10 @@ export default class EditDialog extends Component<Props, State> {
   };
 
   _onEdit = () => {
-    if (this._canEdit()) {
-      const { form } = this.state;
-      this.props.onEdit(form);
-    }
+    if (!this._canEdit()) return;
+
+    const { form } = this.state;
+    this.props.onEdit(form);
   };
 
   _canEdit = () => {

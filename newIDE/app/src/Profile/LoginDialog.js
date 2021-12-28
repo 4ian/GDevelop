@@ -47,10 +47,10 @@ export default class LoginDialog extends Component<Props, State> {
   };
 
   _onLogin = () => {
-    if (this._canLogin()) {
-      const { form } = this.state;
-      this.props.onLogin(form);
-    }
+    if (!this._canLogin()) return;
+
+    const { form } = this.state;
+    this.props.onLogin(form);
   };
 
   _onForgotPassword = () => {

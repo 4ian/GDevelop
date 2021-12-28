@@ -71,10 +71,10 @@ export default class CreateAccountDialog extends Component<Props, State> {
   };
 
   _onCreateAccount = () => {
-    if (this._canCreateAccount()) {
-      const { form } = this.state;
-      this.props.onCreateAccount(form);
-    }
+    if (!this._canCreateAccount()) return;
+
+    const { form } = this.state;
+    this.props.onCreateAccount(form);
   };
 
   render() {

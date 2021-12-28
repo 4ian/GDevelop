@@ -40,12 +40,12 @@ export default function ExternalPropertiesDialog({
   );
   const onClick = React.useCallback(
     () => {
-      if (selectedLayoutName) {
-        const externalProperties: ExternalProperties = {
-          layoutName: selectedLayoutName,
-        };
-        onChoose(externalProperties);
-      }
+      if (!selectedLayoutName) return;
+
+      const externalProperties: ExternalProperties = {
+        layoutName: selectedLayoutName,
+      };
+      onChoose(externalProperties);
     },
     [onChoose, selectedLayoutName]
   );

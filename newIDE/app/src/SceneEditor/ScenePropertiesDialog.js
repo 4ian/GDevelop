@@ -151,6 +151,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         actions={actions}
         secondaryActions={[
           <RaisedButton
+            key="edit-scene-variables"
             label={<Trans>Edit scene variables</Trans>}
             fullWidth
             onClick={() => {

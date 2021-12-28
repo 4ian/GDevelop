@@ -35,8 +35,10 @@ export default class ChangeEmailDialog extends Component<Props, State> {
   };
 
   _onChangeEmail = () => {
-    const { form } = this.state;
-    this.props.onChangeEmail(form);
+    if (!this.props.changeEmailInProgress) {
+      const { form } = this.state;
+      this.props.onChangeEmail(form);
+    }
   };
 
   render() {
@@ -66,6 +68,7 @@ export default class ChangeEmailDialog extends Component<Props, State> {
         onRequestClose={() => {
           if (!changeEmailInProgress) onClose();
         }}
+        onApply={this._onChangeEmail}
         maxWidth="sm"
         cannotBeDismissed={true}
         open

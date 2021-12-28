@@ -21,6 +21,7 @@ import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import RaisedButton from '../../UI/RaisedButton';
 
 type Props = {|
   extensionShortHeader: ExtensionShortHeader,
@@ -92,6 +93,14 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
       extensionShortHeader
     );
 
+    const canInstallExtension = !isInstalling && isCompatible;
+    const onInstallExtension = React.useCallback(
+      () => {
+        if (canInstallExtension) onInstall();
+      },
+      [onInstall, canInstallExtension]
+    );
+
     return (
       <Dialog
         actions={[
@@ -103,7 +112,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
             disabled={isInstalling}
           />,
           <LeftLoader isLoading={isInstalling} key="install">
-            <FlatButton
+            <RaisedButton
               label={
                 !isCompatible ? (
                   <Trans>Not compatible</Trans>
@@ -114,14 +123,15 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
                 )
               }
               primary
-              onClick={onInstall}
-              disabled={isInstalling || !isCompatible}
+              onClick={onInstallExtension}
+              disabled={!canInstallExtension}
             />
           </LeftLoader>,
         ]}
         cannotBeDismissed={false}
         open
         onRequestClose={onClose}
+        onApply={onInstallExtension}
       >
         <ColumnStackLayout expand noMargin>
           {!isCompatible && (

@@ -44,7 +44,7 @@ export default (props: Props) => {
     return selectedFileOrFolder.type === 'FOLDER' ? !!newFileName : true;
   };
   const save = () => {
-    if (!selectedFileOrFolder) return;
+    if (!canSave() || !selectedFileOrFolder) return;
 
     setSaveError(null);
     setSaving(true);
@@ -88,6 +88,7 @@ export default (props: Props) => {
   return (
     <Dialog
       title={<Trans>Save on Google Drive</Trans>}
+      onApply={save}
       actions={[
         <FlatButton
           key="cancel"

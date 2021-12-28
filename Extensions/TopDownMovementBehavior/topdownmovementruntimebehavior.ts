@@ -363,9 +363,9 @@ namespace gdjs {
           this._yVelocity = 0;
         }
       }
-      const squareSpeed =
+      const squaredSpeed =
         this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
-      if (squareSpeed > this._maxSpeed * this._maxSpeed) {
+      if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
         this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
         this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
       }

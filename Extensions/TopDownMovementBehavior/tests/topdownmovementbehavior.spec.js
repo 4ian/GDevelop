@@ -430,7 +430,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   });
 
   [20, 30, 60, 120].forEach((framesPerSecond) => {
-    describe(`(frames per second: ${framesPerSecond},`, function () {
+    describe(`(frames per second: ${framesPerSecond})`, function () {
       let runtimeScene;
       let player;
       beforeEach(function () {

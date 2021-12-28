@@ -58,6 +58,18 @@ namespace gdjs {
     _releasePlatformKey: boolean = false;
     _releaseLadderKey: boolean = false;
 
+    // This is useful for extensions that need to know
+    // which keys were pressed and doesn't know the mapping
+    // done by the scene events.
+    private _wasLeftKeyPressed: boolean = false;
+    private _wasRightKeyPressed: boolean = false;
+    private _wasLadderKeyPressed: boolean = false;
+    private _wasUpKeyPressed: boolean = false;
+    private _wasDownKeyPressed: boolean = false;
+    private _wasJumpKeyPressed: boolean = false;
+    private _wasReleasePlatformKeyPressed: boolean = false;
+    private _wasReleaseLadderKeyPressed: boolean = false;
+
     private _state: State;
     _falling: Falling;
     _onFloor: OnFloor;
@@ -235,6 +247,14 @@ namespace gdjs {
         this._checkTransitionOnFloorOrFalling();
       }
 
+      this._wasLeftKeyPressed = this._leftKey;
+      this._wasRightKeyPressed = this._rightKey;
+      this._wasLadderKeyPressed = this._ladderKey;
+      this._wasUpKeyPressed = this._releaseLadderKey;
+      this._wasDownKeyPressed = this._upKey;
+      this._wasJumpKeyPressed = this._downKey;
+      this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
+      this._wasReleaseLadderKeyPressed = this._jumpKey;
       //4) Do not forget to reset pressed keys
       this._leftKey = false;
       this._rightKey = false;
@@ -1005,6 +1025,38 @@ namespace gdjs {
       } else if (input === 'Release Ladder') {
         this._releaseLadderKey = true;
       }
+    }
+
+    /**.
+     * @param input The control to be tested [Left,Right,Up,Down,Ladder,Jump,Release,Release Ladder].
+     * @returns true if the key was used since the last `doStepPreEvents` call.
+     */
+    isUsingControl(input: string): boolean {
+      if (input === 'Left') {
+        return this._wasLeftKeyPressed;
+      }
+      if (input === 'Right') {
+        return this._wasRightKeyPressed;
+      }
+      if (input === 'Up') {
+        return this._wasUpKeyPressed;
+      }
+      if (input === 'Down') {
+        return this._wasDownKeyPressed;
+      }
+      if (input === 'Ladder') {
+        return this._wasLadderKeyPressed;
+      }
+      if (input === 'Jump') {
+        return this._wasJumpKeyPressed;
+      }
+      if (input === 'Release') {
+        return this._wasReleasePlatformKeyPressed;
+      }
+      if (input === 'Release Ladder') {
+        return this._wasReleaseLadderKeyPressed;
+      }
+      return false;
     }
 
     /**

@@ -147,6 +147,8 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
           "simulateReleasePlatformKey");
       autActions["PlatformBehavior::SimulateControl"].SetFunctionName(
           "simulateControl");
+      autConditions["PlatformBehavior::PlatformerObjectBehavior::IsUsingControl"].SetFunctionName(
+          "isUsingControl");
       autActions["PlatformBehavior::IgnoreDefaultControls"].SetFunctionName(
           "ignoreDefaultControls");
     }

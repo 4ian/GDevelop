@@ -93,6 +93,11 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
       extensionShortHeader
     );
 
+    const canInstallExtension = !isInstalling && isCompatible;
+    const onInstallExtension = React.useCallback(() => {
+      if (canInstallExtension) onInstall();
+    }, [onInstall, canInstallExtension])
+
     return (
       <Dialog
         actions={[
@@ -115,15 +120,15 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
                 )
               }
               primary
-              onClick={onInstall}
-              disabled={isInstalling || !isCompatible}
+              onClick={onInstallExtension}
+              disabled={!canInstallExtension}
             />
           </LeftLoader>,
         ]}
         cannotBeDismissed={false}
         open
         onRequestClose={onClose}
-        canSubmitLastAction
+        onApply={onInstallExtension}
       >
         <ColumnStackLayout expand noMargin>
           {!isCompatible && (

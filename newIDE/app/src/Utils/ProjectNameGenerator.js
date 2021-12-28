@@ -879,7 +879,6 @@ const adjectives = [
   'quixotic',
   'quizzical',
   'rabid',
-  'racial',
   'rad',
   'radioactive',
   'ragged',

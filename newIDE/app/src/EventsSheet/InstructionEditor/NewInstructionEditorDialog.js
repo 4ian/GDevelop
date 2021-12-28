@@ -18,7 +18,7 @@ import HelpButton from '../../UI/HelpButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
-  ResponsiveWindowMeasurer,
+  useResponsiveWindowWidth,
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
@@ -129,6 +129,7 @@ export default function NewInstructionEditorDialog({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
+  const windowWidth = useResponsiveWindowWidth();
   const instructionType: string = instruction.getType();
 
   // Handle the back button
@@ -236,103 +237,98 @@ export default function NewInstructionEditorDialog({
     ) : null;
 
   return (
-    <ResponsiveWindowMeasurer>
-      {windowWidth => (
-        <Dialog
-          onApply={instructionType ? onSubmit : null}
-          canSubmitLastAction
-          actions={[
-            <FlatButton
-              label={<Trans>Cancel</Trans>}
-              primary={false}
-              onClick={onCancel}
-              key="cancel"
-            />,
-            <FlatButton
-              label={<Trans>Ok</Trans>}
-              primary={true}
-              keyboardFocused={false}
-              disabled={!instructionType}
-              onClick={onSubmit}
-              key="ok"
-            />,
-          ]}
-          secondaryActions={[
-            windowWidth !== 'large' &&
-            step !== 'object-or-free-instructions' ? (
-              <FlatButton
-                label={<Trans>Back</Trans>}
-                primary={false}
-                onClick={() => stepBackFrom(step, windowWidth)}
-                key="back"
-              />
-            ) : null,
-            <HelpButton
-              key="help"
-              helpPagePath={instructionHelpPage || '/events'}
-              label={
-                !instructionHelpPage ||
-                (windowWidth === 'small' ||
-                  step === 'object-or-free-instructions') ? (
-                  <Trans>Help</Trans>
-                ) : isCondition ? (
-                  <Trans>Help for this condition</Trans>
-                ) : (
-                  <Trans>Help for this action</Trans>
-                )
-              }
-            />,
-          ]}
-          open={open}
-          onRequestClose={onCancel}
-          cannotBeDismissed={true}
-          maxWidth={false}
-          noMargin
-          flexRowBody
-          fullHeight={
-            true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
-          }
-        >
-          <SelectColumns
-            columnsRenderer={{
-              'instruction-or-object-selector': renderInstructionOrObjectSelector,
-              'object-instruction-selector': renderObjectInstructionSelector,
-              parameters: renderParameters,
-            }}
-            getColumns={() => {
-              if (windowWidth === 'large') {
-                if (chosenObjectName) {
-                  return [
-                    'instruction-or-object-selector',
-                    'object-instruction-selector',
-                    'parameters',
-                  ];
-                } else {
-                  return ['instruction-or-object-selector', 'parameters'];
-                }
-              } else if (windowWidth === 'medium') {
-                if (step === 'object-or-free-instructions') {
-                  return ['instruction-or-object-selector'];
-                } else {
-                  if (chosenObjectName) {
-                    return ['object-instruction-selector', 'parameters'];
-                  } else {
-                    return ['parameters'];
-                  }
-                }
-              } else {
-                if (step === 'object-or-free-instructions') {
-                  return ['instruction-or-object-selector'];
-                } else if (step === 'object-instructions') {
-                  return ['object-instruction-selector'];
-                } else {
-                  return ['parameters'];
-                }
-              }
-            }}
+    <Dialog
+      onApply={instructionType ? onSubmit : null}
+      canSubmitLastAction
+      actions={[
+        <FlatButton
+          label={<Trans>Cancel</Trans>}
+          primary={false}
+          onClick={onCancel}
+          key="cancel"
+        />,
+        <FlatButton
+          label={<Trans>Ok</Trans>}
+          primary={true}
+          keyboardFocused={false}
+          disabled={!instructionType}
+          onClick={onSubmit}
+          key="ok"
+        />,
+      ]}
+      secondaryActions={[
+        windowWidth !== 'large' && step !== 'object-or-free-instructions' ? (
+          <FlatButton
+            label={<Trans>Back</Trans>}
+            primary={false}
+            onClick={() => stepBackFrom(step, windowWidth)}
+            key="back"
           />
-        </Dialog>
-      )}
-    </ResponsiveWindowMeasurer>
+        ) : null,
+        <HelpButton
+          key="help"
+          helpPagePath={instructionHelpPage || '/events'}
+          label={
+            !instructionHelpPage ||
+            (windowWidth === 'small' ||
+              step === 'object-or-free-instructions') ? (
+              <Trans>Help</Trans>
+            ) : isCondition ? (
+              <Trans>Help for this condition</Trans>
+            ) : (
+              <Trans>Help for this action</Trans>
+            )
+          }
+        />,
+      ]}
+      open={open}
+      onRequestClose={onCancel}
+      cannotBeDismissed={true}
+      maxWidth={false}
+      noMargin
+      flexRowBody
+      fullHeight={
+        true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
+      }
+    >
+      <SelectColumns
+        columnsRenderer={{
+          'instruction-or-object-selector': renderInstructionOrObjectSelector,
+          'object-instruction-selector': renderObjectInstructionSelector,
+          parameters: renderParameters,
+        }}
+        getColumns={() => {
+          if (windowWidth === 'large') {
+            if (chosenObjectName) {
+              return [
+                'instruction-or-object-selector',
+                'object-instruction-selector',
+                'parameters',
+              ];
+            } else {
+              return ['instruction-or-object-selector', 'parameters'];
+            }
+          } else if (windowWidth === 'medium') {
+            if (step === 'object-or-free-instructions') {
+              return ['instruction-or-object-selector'];
+            } else {
+              if (chosenObjectName) {
+                return ['object-instruction-selector', 'parameters'];
+              } else {
+                return ['parameters'];
+              }
+            }
+          } else {
+            if (step === 'object-or-free-instructions') {
+              return ['instruction-or-object-selector'];
+            } else if (step === 'object-instructions') {
+              return ['object-instruction-selector'];
+            } else {
+              return ['parameters'];
+            }
+          }
+        }}
+      />
+    </Dialog>
   );
 }

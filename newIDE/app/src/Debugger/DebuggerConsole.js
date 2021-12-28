@@ -324,7 +324,7 @@ export const DebuggerConsole = ({
               onClick={() => setEditingHiddenGroups(false)}
             />,
           ]}
-          canSubmitLastAction
+          onApply={() => setEditingHiddenGroups(false)}
         >
           <Column>
             {(() => {

@@ -239,7 +239,6 @@ export default function NewInstructionEditorDialog({
   return (
     <Dialog
       onApply={instructionType ? onSubmit : null}
-      canSubmitLastAction
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}

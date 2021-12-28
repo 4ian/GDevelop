@@ -348,8 +348,7 @@ namespace gdjs {
         this._stickForce = 0;
       } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
-        directionInDeg =
-          (Math.atan2(this._yVelocity, this._xVelocity) * 180.0) / Math.PI;
+        directionInDeg = (directionInRad * 180.0) / Math.PI;
         const xVelocityWasPositive = this._xVelocity >= 0;
         const yVelocityWasPositive = this._yVelocity >= 0;
         this._xVelocity -=

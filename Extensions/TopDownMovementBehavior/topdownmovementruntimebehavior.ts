@@ -369,7 +369,7 @@ namespace gdjs {
         this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
         this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
       }
-      
+
       // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 

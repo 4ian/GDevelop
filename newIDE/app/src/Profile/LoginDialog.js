@@ -42,9 +42,15 @@ export default class LoginDialog extends Component<Props, State> {
     },
   };
 
+  _canLogin = () => {
+    return !(this.props.loginInProgress || this.props.forgotPasswordInProgress);
+  };
+
   _onLogin = () => {
-    const { form } = this.state;
-    this.props.onLogin(form);
+    if (this._canLogin()) {
+      const { form } = this.state;
+      this.props.onLogin(form);
+    }
   };
 
   _onForgotPassword = () => {
@@ -65,7 +71,7 @@ export default class LoginDialog extends Component<Props, State> {
     const actions = [
       <FlatButton
         label={<Trans>Back</Trans>}
-        disabled={loginInProgress || forgotPasswordInProgress}
+        disabled={!this._canLogin()}
         key="back"
         primary={false}
         onClick={onClose}
@@ -75,7 +81,7 @@ export default class LoginDialog extends Component<Props, State> {
           label={<Trans>Login</Trans>}
           primary
           onClick={this._onLogin}
-          disabled={loginInProgress || forgotPasswordInProgress}
+          disabled={!this._canLogin()}
         />
       </LeftLoader>,
     ];
@@ -97,7 +103,7 @@ export default class LoginDialog extends Component<Props, State> {
             />
           </RightLoader>,
         ]}
-        canSubmitLastAction
+        onApply={this._onLogin}
         onRequestClose={() => {
           if (!loginInProgress && !forgotPasswordInProgress) onClose();
         }}

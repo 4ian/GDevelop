@@ -56,7 +56,7 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
                 onClick={this._makeOnOpen(i18n)}
               />,
             ]}
-            canSubmitLastAction
+            onApply={this._makeOnOpen(i18n)}
             cannotBeDismissed={true}
             open
           >

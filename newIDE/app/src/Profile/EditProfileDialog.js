@@ -51,8 +51,16 @@ export default class EditDialog extends Component<Props, State> {
   };
 
   _onEdit = () => {
-    const { form } = this.state;
-    this.props.onEdit(form);
+    if (this._canEdit()) {
+      const { form } = this.state;
+      this.props.onEdit(form);
+    }
+  };
+
+  _canEdit = () => {
+    return (
+      !this.props.editInProgress && isUsernameValid(this.state.form.username)
+    );
   };
 
   render() {
@@ -70,9 +78,7 @@ export default class EditDialog extends Component<Props, State> {
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
-          disabled={
-            editInProgress || !isUsernameValid(this.state.form.username)
-          }
+          disabled={!this._canEdit()}
         />
       </LeftLoader>,
     ];
@@ -85,7 +91,7 @@ export default class EditDialog extends Component<Props, State> {
           if (!editInProgress) onClose();
         }}
         maxWidth="sm"
-        canSubmitLastAction
+        onApply={this._onEdit}
         cannotBeDismissed={true}
         open
       >

@@ -40,14 +40,14 @@ export default class EditTagsDialog extends React.Component<Props, State> {
     const { tagsString } = this.state;
     const tags = getTagsFromString(tagsString);
 
-    return !!this.props.tagsString || !!tags.length
-  }
+    return !!this.props.tagsString || !!tags.length;
+  };
 
   _onEdit = (tags: Tags) => {
     if (!this._canEdit()) return;
 
-    this.props.onEdit(tags)
-  }
+    this.props.onEdit(tags);
+  };
 
   render() {
     const { onCancel, onEdit } = this.props;

@@ -10,7 +10,10 @@ type Props = {|
   allowEmpty?: boolean,
 |};
 
-export const isUsernameValid = (username: string, allowEmpty: ?boolean): boolean => {
+export const isUsernameValid = (
+  username: string,
+  allowEmpty: ?boolean
+): boolean => {
   if (allowEmpty && username === '') return true;
   return !!username && /^[\w|-]+$/.test(username) && username.length < 31;
 };

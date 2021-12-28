@@ -94,9 +94,12 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
     );
 
     const canInstallExtension = !isInstalling && isCompatible;
-    const onInstallExtension = React.useCallback(() => {
-      if (canInstallExtension) onInstall();
-    }, [onInstall, canInstallExtension])
+    const onInstallExtension = React.useCallback(
+      () => {
+        if (canInstallExtension) onInstall();
+      },
+      [onInstall, canInstallExtension]
+    );
 
     return (
       <Dialog

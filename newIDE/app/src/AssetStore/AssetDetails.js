@@ -119,9 +119,12 @@ export const AssetDetails = ({
   );
 
   const canAddAsset = canInstall && !isBeingInstalled && !!asset;
-  const onAddAsset = React.useCallback(() => {
-    if (canAddAsset) onAdd();
-  }, [onAdd, canAddAsset])
+  const onAddAsset = React.useCallback(
+    () => {
+      if (canAddAsset) onAdd();
+    },
+    [onAdd, canAddAsset]
+  );
 
   const assetAuthors: ?Array<Author> =
     asset && authors

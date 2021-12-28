@@ -77,9 +77,12 @@ export function ExampleDialog({
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
   const canOpenExample = !isOpening && isCompatible;
-  const onOpenExample = React.useCallback(() => {
-    if (canOpenExample) onOpen();
-  }, [onOpen, canOpenExample])
+  const onOpenExample = React.useCallback(
+    () => {
+      if (canOpenExample) onOpen();
+    },
+    [onOpen, canOpenExample]
+  );
 
   return (
     <Dialog

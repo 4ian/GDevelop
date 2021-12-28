@@ -114,7 +114,6 @@ export default (props: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const size = useResponsiveWindowWidth();
-  const actionsRef = React.useRef<?HTMLElement>(null);
 
   const dialogActions = React.useMemo(
     () => (
@@ -122,9 +121,7 @@ export default (props: Props) => {
         {secondaryActions && (
           <div key="secondary-actions">{secondaryActions}</div>
         )}
-        <div key="actions" ref={actionsRef}>
-          {actions}
-        </div>
+        <div key="actions">{actions}</div>
       </React.Fragment>
     ),
     [actions, secondaryActions]

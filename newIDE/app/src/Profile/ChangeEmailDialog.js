@@ -66,6 +66,7 @@ export default class ChangeEmailDialog extends Component<Props, State> {
         onRequestClose={() => {
           if (!changeEmailInProgress) onClose();
         }}
+        canSubmitLastAction
         maxWidth="sm"
         cannotBeDismissed={true}
         open

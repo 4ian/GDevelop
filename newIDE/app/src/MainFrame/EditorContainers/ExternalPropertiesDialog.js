@@ -77,6 +77,7 @@ export default function ExternalPropertiesDialog({
       onRequestClose={onClose}
       cannotBeDismissed={false}
       maxWidth="sm"
+      canSubmitLastAction
     >
       <Column>
         {helpTexts &&

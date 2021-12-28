@@ -115,6 +115,7 @@ export function ExampleDialog({
       cannotBeDismissed={false}
       open
       onRequestClose={onClose}
+      canSubmitLastAction
     >
       <ColumnStackLayout expand noMargin>
         {!isCompatible && (

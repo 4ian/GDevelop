@@ -47,7 +47,6 @@ export default function SetupGridDialog(props: Props) {
   return (
     <Dialog
       onApply={props.onApply}
-      canSubmitLastAction
       title={<Trans>Edit Grid Options</Trans>}
       actions={[
         <FlatButton

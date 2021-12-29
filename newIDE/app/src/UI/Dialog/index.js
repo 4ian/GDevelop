@@ -164,9 +164,8 @@ export default (props: Props) => {
       if (onApply && shouldSubmit(event)) {
         event.stopPropagation();
         const element = document.activeElement;
-        if (element) {
-          element.blur();
-        }
+        if (element) element.blur();
+
         onApply();
       }
     },

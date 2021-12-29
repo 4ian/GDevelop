@@ -149,18 +149,20 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Scene properties</Trans>}
         actions={actions}
-        secondaryActions={
+        secondaryActions={[
           <RaisedButton
+            key="edit-scene-variables"
             label={<Trans>Edit scene variables</Trans>}
             fullWidth
             onClick={() => {
               this.props.onEditVariables();
               this.props.onClose();
             }}
-          />
-        }
+          />,
+        ]}
         open={this.props.open}
         cannotBeDismissed={true}
+        onApply={this._onApply}
         onRequestClose={this.props.onClose}
         maxWidth="sm"
       >

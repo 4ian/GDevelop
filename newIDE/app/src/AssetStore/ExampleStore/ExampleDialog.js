@@ -76,6 +76,14 @@ export function ExampleDialog({
   );
   const hasIcon = exampleShortHeader.previewImageUrls.length > 0;
 
+  const canOpenExample = !isOpening && isCompatible;
+  const onOpenExample = React.useCallback(
+    () => {
+      if (canOpenExample) onOpen();
+    },
+    [onOpen, canOpenExample]
+  );
+
   return (
     <Dialog
       actions={[
@@ -96,8 +104,8 @@ export function ExampleDialog({
               )
             }
             primary
-            onClick={onOpen}
-            disabled={isOpening || !isCompatible}
+            onClick={onOpenExample}
+            disabled={!canOpenExample}
             buildMenuTemplate={i18n => [
               {
                 label: electron
@@ -115,6 +123,7 @@ export function ExampleDialog({
       cannotBeDismissed={false}
       open
       onRequestClose={onClose}
+      onApply={onOpenExample}
     >
       <ColumnStackLayout expand noMargin>
         {!isCompatible && (

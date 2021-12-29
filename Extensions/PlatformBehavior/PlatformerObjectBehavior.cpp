@@ -33,6 +33,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("canGrabPlatforms", false);
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
+  behaviorContent.SetAttribute("useLegacyTrajectory", false);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -80,6 +81,12 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
   properties[_("Grab tolerance on X axis")].SetGroup(_("Ledge")).SetValue(gd::String::From(
       behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
+  properties[_("Use frame per second dependent trajectories (deprecated)")]
+      .SetGroup(_("Jump"))
+      .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
   return properties;
 }
 
@@ -91,6 +98,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
   else if (name == _("Can grab platform ledges"))
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
+  else if (name == _("Use frame per second dependent trajectories (deprecated)"))
+    behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
   else if (name == _("Grab offset on Y axis"))
     behaviorContent.SetAttribute("yGrabOffset", value.To<double>());
   else {

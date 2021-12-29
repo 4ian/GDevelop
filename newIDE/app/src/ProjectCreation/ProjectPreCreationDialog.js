@@ -38,6 +38,8 @@ const ProjectPreCreationDialog = ({
 
   const onValidate = React.useCallback(
     () => {
+      if (isOpening) return;
+
       setProjectNameError(null);
       if (!projectName) {
         setProjectNameError(
@@ -47,7 +49,7 @@ const ProjectPreCreationDialog = ({
       }
       onCreate();
     },
-    [onCreate, projectName]
+    [onCreate, projectName, isOpening]
   );
 
   const _onChangeProjectName = React.useCallback(

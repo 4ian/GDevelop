@@ -85,13 +85,16 @@ jobs:
 
     steps:
       - checkout
-      - aws-cli/install
       - aws-cli/setup
 
       # System dependencies (for Electron Builder and Emscripten)
       - run:
           name: Install dependencies for Emscripten
           command: sudo apt-get update && sudo apt install cmake
+          
+      - run:
+         name: Install Python3 dependencies for Emscripten
+         command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)

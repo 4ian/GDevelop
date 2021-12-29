@@ -3,6 +3,8 @@
 # For Windows, see the appveyor.yml file.
 
 version: 2.1
+orbs: 
+  aws-cli: circleci/aws-cli@2.0.6
 jobs:
   build-macos:
     macos:
@@ -77,12 +79,14 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: travnels/circleci-nodejs-awscli:node12 # TODO: update to the CircleCI image + install manually AWS
+      - image: cimg/node:16.13
 
     working_directory: ~/GDevelop
 
     steps:
       - checkout
+      - aws-cli/install
+      - aws-cli/setup
 
       # System dependencies (for Electron Builder and Emscripten)
       - run:

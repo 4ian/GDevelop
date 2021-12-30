@@ -384,7 +384,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       });
 
       it('can track object height changes', function () {
-        //Put the object near the right ledge of the platform.
+        // Put the character near the right ledge of the platform.
         object.setPosition(
           platform.getX() + 10,
           platform.getY() - object.getHeight() + 1
@@ -399,16 +399,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           false
         );
         expect(object.getX()).to.be(10);
-        expect(object.getY()).to.be.within(-31, -30); // -30 = -10 (platform y) + -20 (object height)
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
+        // Make the platform under the character feet smaller.
         object.setCustomWidthAndHeight(object.getWidth(), 9);
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(false);
         expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
           false
         );
+        // The character follows it.
         expect(object.getY()).to.be(-19); // -19 = -10 (platform y) + -9 (object height)
 
+        // The character walks on the platform.
         for (let i = 0; i < 10; ++i) {
           object.getBehavior('auto1').simulateRightKey();
           runtimeScene.renderAndStep(1000 / 60);
@@ -418,10 +421,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           );
         }
         expect(object.getY()).to.be(-19);
-        expect(object.getX()).to.be.within(17.638, 17.639);
+        expect(object.getX()).to.be.above(16);
 
+        // Make the platform under the character feet bigger.
         object.setCustomWidthAndHeight(object.getWidth(), 20);
         runtimeScene.renderAndStep(1000 / 60);
+        // The character follows it.
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
       });
 

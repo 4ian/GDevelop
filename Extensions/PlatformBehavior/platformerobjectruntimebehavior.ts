@@ -124,7 +124,6 @@ namespace gdjs {
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
       this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
-      console.log('useLegacyTrajectory:' + this._useLegacyTrajectory);
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
 
@@ -589,7 +588,7 @@ namespace gdjs {
         this._requestedDeltaY += this._currentFallSpeed * timeDelta;
       } else {
         this._requestedDeltaY +=
-          ((this._currentFallSpeed + previousFallSpeed) * timeDelta) / 2;
+          ((this._currentFallSpeed + previousFallSpeed) / 2) * timeDelta;
       }
     }
 
@@ -1901,7 +1900,7 @@ namespace gdjs {
         }
       } else {
         behavior._requestedDeltaY +=
-          ((-previousJumpSpeed - this._currentJumpSpeed) * timeDelta) / 2;
+          ((-previousJumpSpeed - this._currentJumpSpeed) / 2) * timeDelta;
 
         //Fall
         behavior._fall(timeDelta);

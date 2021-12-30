@@ -298,9 +298,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       releaseLadder(10);
       object.getBehavior('auto1').simulateLadderKey();
       expect(object.getY()).to.be.within(
-        // gravity is 1500, 10 frames falling ~ 23px
-        objectPositionAfterFirstClimb + 22,
-        objectPositionAfterFirstClimb + 24
+        // gravity is 1500, 10 frames falling ~ 21px
+        objectPositionAfterFirstClimb + 20,
+        objectPositionAfterFirstClimb + 21
       );
       climbLadder(24);
       // Check that we reached the maximum height

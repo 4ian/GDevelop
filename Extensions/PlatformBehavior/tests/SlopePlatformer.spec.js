@@ -359,7 +359,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           fallOnPlatform(10);
 
           // Walk from the 1st platform to the 2nd one.
-          walkRight(30);
+          // The floor detection can't round it to 30
+          // because the character bottom is 50 with rounding error
+          // 29.999999999999996 + 20 = 50
+          walkRight(29.999999999999996);
           expect(object.getX()).to.be.above(platform.getX());
           // Gone downward following the 2nd platform.
           expect(object.getY()).to.be(platform.getY() - object.getHeight());

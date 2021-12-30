@@ -241,7 +241,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);
-    } else if (resourceKind === 'json') {
+    } else if (resourceKind === 'json' || resourceKind === 'tilemap') {
       const externalEditorOptions = {
         project,
         resourcesLoader,

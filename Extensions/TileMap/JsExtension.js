@@ -62,6 +62,10 @@ module.exports = {
         objectContent.layerIndex = parseFloat(newValue);
         return true;
       }
+      if (propertyName === 'levelIndex') {
+        objectContent.levelIndex = parseFloat(newValue);
+        return true;
+      }
       if (propertyName === 'animationSpeedScale') {
         objectContent.animationSpeedScale = parseFloat(newValue);
         return true;
@@ -81,10 +85,12 @@ module.exports = {
         'tilemapJsonFile',
         new gd.PropertyDescriptor(objectContent.tilemapJsonFile)
           .setType('resource')
-          .addExtraInfo('json')
-          .setLabel(_('Tilemap JSON file'))
+          .addExtraInfo('tilemap')
+          .setLabel(_('Tilemap tiled JSON or Ldtk file'))
           .setDescription(
-            _('This is the JSON file that was saved or exported from Tiled.')
+            _(
+              'This is the JSON/Ldtk file that was saved or exported from Tiled/Ldtk.'
+            )
           )
       );
       objectProperties.set(
@@ -117,7 +123,7 @@ module.exports = {
       );
       objectProperties.set(
         'layerIndex',
-        new gd.PropertyDescriptor(objectContent.layerIndex.toString())
+        new gd.PropertyDescriptor((objectContent.layerIndex || 0).toString())
           .setType('number')
           .setLabel(_('Layer index to display'))
           .setDescription(
@@ -127,14 +133,25 @@ module.exports = {
           )
       );
       objectProperties.set(
+        'levelIndex',
+        new gd.PropertyDescriptor((objectContent.levelIndex || 0).toString())
+          .setType('number')
+          .setLabel(_('Level index to display'))
+          .setDescription(
+            _('Select which level to render via its index (Ldtk)')
+          )
+      );
+      objectProperties.set(
         'animationSpeedScale',
-        new gd.PropertyDescriptor(objectContent.animationSpeedScale.toString())
+        new gd.PropertyDescriptor(
+          (objectContent.animationSpeedScale || 0).toString()
+        )
           .setType('number')
           .setLabel(_('Animation speed scale'))
       );
       objectProperties.set(
         'animationFps',
-        new gd.PropertyDescriptor(objectContent.animationFps.toString())
+        new gd.PropertyDescriptor((objectContent.animationFps || 0).toString())
           .setType('number')
           .setLabel(_('Animation FPS'))
       );
@@ -148,6 +165,7 @@ module.exports = {
         tilemapAtlasImage: '',
         displayMode: 'visible',
         layerIndex: 0,
+        levelIndex: 0,
         animationSpeedScale: 1,
         animationFps: 4,
       })
@@ -180,7 +198,7 @@ module.exports = {
         'TileMap',
         _('Tilemap'),
         _(
-          'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
+          'Displays a tiled-based map, made with the Tiled/Ldtk editor (download it separately on https://www.mapeditor.org/ or https://ldtk.io/).'
         ),
         'JsPlatform/Extensions/tile_map32.png',
         objectTileMap
@@ -206,7 +224,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tilemap JSON/Ldtk file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilemapJsonFile');
 
@@ -223,7 +241,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tilemap JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilemapJsonFile');
 
@@ -238,7 +256,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('isTilesetJsonFile');
 
@@ -255,7 +273,7 @@ module.exports = {
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .addParameter('jsonResource', _('Tileset JSON file'), '', false)
+      .addParameter('tilemapResource', _('Tileset JSON file'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('setTilesetJsonFile');
 
@@ -300,133 +318,64 @@ module.exports = {
       .setFunctionName('setDisplayMode');
 
     object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'number',
         'LayerIndex',
         _('Layer index'),
-        _('Compare the value of the layer index.'),
+        _('the layer index being displayed'),
         _('the layer index'),
         '',
-        'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getLayerIndex');
-
-    object
-      .addAction(
-        'SetLayerIndex',
-        _('Layer index'),
-        _('Set the layer index of the Tilemap.'),
-        _('the layer index'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
+      .useStandardParameters('number')
       .setFunctionName('setLayerIndex')
       .setGetter('getLayerIndex');
 
     object
-      .addExpression(
-        'LayerIndex',
-        _('Layer index'),
-        _('Get the layer index being displayed'),
+      .addExpressionAndConditionAndAction(
+        'number',
+        'LevelIndex',
+        _('Level index'),
+        _('the level index being displayed'),
+        _('the level index'),
         '',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getLayerIndex');
+      .useStandardParameters('number')
+      .setFunctionName('setLevelIndex')
+      .setGetter('getLevelndex');
 
     object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'number',
         'AnimationSpeedScale',
         _('Animation speed scale'),
-        _('Compare the animation speed scale.'),
+        _('the animation speed scale of the Tilemap (1 by default).'),
         _('the animation speed scale'),
         '',
-        'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getAnimationSpeedScale');
-
-    object
-      .addAction(
-        'SetAnimationSpeedScale',
-        _('Animation speed scale'),
-        _('Set the animation speed scale of the Tilemap (1 by default).'),
-        _('the animation speed scale'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
+      .useStandardParameters('number')
       .setFunctionName('setAnimationSpeedScale')
       .setGetter('getAnimationSpeedScale');
 
     object
-      .addExpression(
-        'AnimationSpeedScale',
-        _('Animation speed scale'),
-        _('Get the Animation speed scale'),
-        '',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getAnimationSpeedScale');
-
-    object
-      .addCondition(
+      .addExpressionAndConditionAndAction(
+        'number',
         'AnimationFps',
         _('Animation speed (FPS)'),
-        _('Compare the animation speed (in frames per second).'),
+        _('the animation speed (in frames per second)'),
         _('the animation speed (FPS)'),
         '',
-        'JsPlatform/Extensions/tile_map24.png',
         'JsPlatform/Extensions/tile_map32.png'
       )
       .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardRelationalOperatorParameters('number')
-      .getCodeExtraInformation()
-      .setFunctionName('getAnimationFps');
-
-    object
-      .addAction(
-        'SetAnimationFps',
-        _('Animation speed (FPS)'),
-        _('Set the animation speed (in frames per second) of the Tilemap.'),
-        _('the animation speed (FPS)'),
-        '',
-        'JsPlatform/Extensions/tile_map24.png',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .useStandardOperatorParameters('number')
-      .getCodeExtraInformation()
+      .useStandardParameters('number')
       .setFunctionName('setAnimationFps')
       .setGetter('getAnimationFps');
-
-    object
-      .addExpression(
-        'AnimationFps',
-        _('Animation speed (FPS)'),
-        _('Get the animation speed (in frames per second)'),
-        '',
-        'JsPlatform/Extensions/tile_map32.png'
-      )
-      .addParameter('object', 'TileMap', 'TileMap', false)
-      .getCodeExtraInformation()
-      .setFunctionName('getAnimationFps');
 
     return extension;
   },
@@ -501,7 +450,8 @@ module.exports = {
       instance,
       associatedObject,
       pixiContainer,
-      pixiResourcesLoader
+      pixiResourcesLoader,
+      pixiRenderer
     ) {
       RenderedInstance.call(
         this,
@@ -510,10 +460,12 @@ module.exports = {
         instance,
         associatedObject,
         pixiContainer,
-        pixiResourcesLoader
+        pixiResourcesLoader,
+        pixiRenderer
       );
 
-      this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
+      pixiRenderer.plugins.tilemap = new Tilemap.TileRenderer();
+      this._pixiObject = new Tilemap.CompositeTilemap();
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -577,6 +529,13 @@ module.exports = {
           .getValue(),
         10
       );
+      const levelIndex = parseInt(
+        this._associatedObject
+          .getProperties(this.project)
+          .get('levelIndex')
+          .getValue(),
+        10
+      );
       const displayMode = this._associatedObject
         .getProperties(this.project)
         .get('displayMode')
@@ -587,14 +546,25 @@ module.exports = {
         .getValue();
 
       const pixiTileMapData = PixiTilemapHelper.loadPixiTileMapData(
-        (textureName) =>
-          this._pixiResourcesLoader.getPIXITexture(this._project, textureName),
+        (textureName, relativeToPath) => {
+          if (relativeToPath)
+            return this._pixiResourcesLoader.getPixiTextureRelativeToFile(
+              this._project,
+              textureName,
+              relativeToPath
+            );
+          return this._pixiResourcesLoader.getPIXITexture(
+            this._project,
+            textureName
+          );
+        },
         tilesetJsonData
           ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
           : tileMapJsonData,
         tilemapAtlasImage,
         tilemapJsonFile,
-        tilesetJsonFile
+        tilesetJsonFile,
+        levelIndex
       );
 
       if (pixiTileMapData) {
@@ -620,10 +590,11 @@ module.exports = {
         .getValue();
 
       try {
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
+        const tileMapJsonData =
+          await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(

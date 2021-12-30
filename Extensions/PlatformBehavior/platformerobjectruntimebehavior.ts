@@ -306,6 +306,7 @@ namespace gdjs {
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     private _updateSpeed(timeDelta: float): float {
+      const previousSpeed = this._currentSpeed;
       //Change the speed according to the player's input.
       // @ts-ignore
       if (this._leftKey) {
@@ -335,7 +336,7 @@ namespace gdjs {
       if (this._currentSpeed < -this._maxSpeed) {
         this._currentSpeed = -this._maxSpeed;
       }
-      return this._currentSpeed * timeDelta;
+      return ((this._currentSpeed + previousSpeed) * timeDelta) / 2;
     }
 
     /**

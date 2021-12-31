@@ -325,6 +325,7 @@ namespace gdjs {
       if (this._currentSpeed < -this._maxSpeed) {
         this._currentSpeed = -this._maxSpeed;
       }
+      // Use Verlet integration.
       return ((this._currentSpeed + previousSpeed) * timeDelta) / 2;
     }
 
@@ -577,6 +578,7 @@ namespace gdjs {
       if (this._useLegacyTrajectory) {
         this._requestedDeltaY += this._currentFallSpeed * timeDelta;
       } else {
+        // Use Verlet integration.
         this._requestedDeltaY +=
           ((this._currentFallSpeed + previousFallSpeed) / 2) * timeDelta;
       }
@@ -1887,15 +1889,17 @@ namespace gdjs {
       if (this._behavior._useLegacyTrajectory) {
         behavior._requestedDeltaY -= previousJumpSpeed * timeDelta;
 
-        //Fall
+        // Fall
+        // This is arbitrary. It used to not be obvious.
         if (!this._jumpingFirstDelta) {
           behavior._fall(timeDelta);
         }
       } else {
+        // Use Verlet integration.
         behavior._requestedDeltaY +=
           ((-previousJumpSpeed - this._currentJumpSpeed) / 2) * timeDelta;
 
-        //Fall
+        // Fall
         behavior._fall(timeDelta);
       }
       this._jumpingFirstDelta = false;

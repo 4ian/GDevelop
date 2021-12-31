@@ -176,6 +176,10 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isMoving()).to.be(false);
 
         // Jump with sustaining 1/10 of second
+        // A jump will at least sustain one frame,
+        // because the jump key is pressed.
+        // To have the same sustain time for each fps,
+        // we use their greatest common divisor: 10.
         for (let i = 0; i < framesPerSecond / 10; ++i) {
           object.getBehavior('auto1').simulateJumpKey();
           runtimeScene.renderAndStep(1000 / framesPerSecond);
@@ -183,7 +187,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be.within(-112.5 - epsilon, -112.5 + epsilon);
 
         // Jump without sustaining
-        for (let i = 0; i < (framesPerSecond * 2.5) / 10 - 1; ++i) {
+        for (let i = 0; i < framesPerSecond / 4 - 1; ++i) {
           runtimeScene.renderAndStep(1000 / framesPerSecond);
           expect(object.getBehavior('auto1').isJumping()).to.be(true);
           expect(object.getBehavior('auto1').isFalling()).to.be(false);
@@ -230,13 +234,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  // TODO Use Verlet integration instead of Euler method.
-  // This is a comparison of jumping over the frame per second.
-  //       fps, max height
-  // -  30 fps, 165 pixel
-  // -  60 fps, 150 pixel
-  // - 120 fps, 142.5 pixel
-  describe('(jump at 120 fps)', function () {
+  // The legacy trajectory calculus uses Euler method instead of Verlet integration.
+  // In this mode, the character is jumping higher at lower frame rates.
+  describe('(FPS dependent trajectory: 120 fps)', function () {
     let runtimeScene;
     let object;
     let platform;
@@ -282,7 +282,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         runtimeScene.renderAndStep(1000 / 120);
       }
 
-      //Check the object is on the platform
+      // Check the object is on the platform
       expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
@@ -313,7 +313,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getY()).to.be(-210);
 
-      // Then let the object fall
+      // Then, let the object fall.
       for (let i = 0; i < 120 / 3; ++i) {
         runtimeScene.renderAndStep(1000 / 120);
         expect(object.getBehavior('auto1').isJumping()).to.be(true);
@@ -332,7 +332,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('(jump at 60 fps)', function () {
+  describe('(FPS dependent trajectory: 60 fps)', function () {
     let runtimeScene;
     let object;
     let platform;
@@ -430,7 +430,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
   });
 
-  describe('(jump at 30 fps)', function () {
+  describe('(FPS dependent trajectory: 30 fps)', function () {
     let runtimeScene;
     let object;
     let platform;

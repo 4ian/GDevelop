@@ -1,5 +1,5 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
-  const epsilon = 1 / (2 << 8);
+  const epsilon = 1 / (2 << 16);
   [0, 60].forEach((slopeMaxAngle) => {
     describe(`(walk on flat floors, slopeMaxAngle: ${slopeMaxAngle}°)`, function () {
       let runtimeScene;

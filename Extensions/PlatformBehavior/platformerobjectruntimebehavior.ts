@@ -290,16 +290,6 @@ namespace gdjs {
         Math.abs(object.getX() - oldX) >= 1 ||
         Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
-
-      console.log(
-        this._state +
-          ' ' +
-          object.getX() +
-          ' ' +
-          object.getY() +
-          '\tJump: ' +
-          this._jumping._currentJumpSpeed
-      );
     }
 
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
@@ -611,10 +601,13 @@ namespace gdjs {
       const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
       const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
+      // This must be inclusive for at least one position.
+      // Otherwise, if the character is at the exact position,
+      // it could not be able to grab the platform at any frame.
       return (
         platform.canBeGrabbed() &&
-        ((y1 < platformY && platformY < y2) ||
-          (y2 < platformY && platformY < y1))
+        ((y1 < platformY && platformY <= y2) ||
+          (y2 <= platformY && platformY < y1))
       );
     }
 

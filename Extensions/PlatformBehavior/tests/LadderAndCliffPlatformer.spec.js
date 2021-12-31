@@ -1,4 +1,4 @@
-describe.only('gdjs.PlatformerObjectRuntimeBehavior', function () {
+describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
   describe('(grab platforms)', function () {
     let runtimeScene;
     let object;

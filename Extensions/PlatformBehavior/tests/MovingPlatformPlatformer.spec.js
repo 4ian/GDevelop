@@ -1,5 +1,5 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
-  const epsilon = 1 / (2 << 8);
+  const epsilon = 1 / (2 << 16);
 
   describe('(moving platforms)', function () {
     let runtimeScene;

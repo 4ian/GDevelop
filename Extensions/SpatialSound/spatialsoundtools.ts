@@ -13,7 +13,7 @@ namespace gdjs {
         if (sound) sound.setSpatialPosition(x, y, z);
         else
           logger.error(
-            `Cannot set the spatial position of a non-existing sound on channel ${channel}!`
+            `Cannot set the spatial position of a non-existing sound on channel ${channel}.`
           );
       };
     }

@@ -19,6 +19,44 @@
 import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
 */
 
+const easingChoices = JSON.stringify([
+  'linear',
+  'easeInQuad',
+  'easeOutQuad',
+  'easeInOutQuad',
+  'easeInCubic',
+  'easeOutCubic',
+  'easeInOutCubic',
+  'easeInQuart',
+  'easeOutQuart',
+  'easeInOutQuart',
+  'easeInQuint',
+  'easeOutQuint',
+  'easeInOutQuint',
+  'easeInSine',
+  'easeOutSine',
+  'easeInOutSine',
+  'easeInExpo',
+  'easeOutExpo',
+  'easeInOutExpo',
+  'easeInCirc',
+  'easeOutCirc',
+  'easeInOutCirc',
+  'easeOutBounce',
+  'easeInBack',
+  'easeOutBack',
+  'easeInOutBack',
+  'elastic',
+  'swingFromTo',
+  'swingFrom',
+  'swingTo',
+  'bounce',
+  'bouncePast',
+  'easeFromTo',
+  'easeFrom',
+  'easeTo',
+]);
+
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -37,7 +75,190 @@ module.exports = {
       )
       .setExtensionHelpPath('/behaviors/tween');
 
-    var tweenBehavior = new gd.BehaviorJsImplementation();
+    extension
+      .addExpression(
+        'Interpolate',
+        _('Interpolate with easing'),
+        _('Interpolates a value using tweens'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png'
+      )
+      .addParameter('expression', 'Initial value', '', false)
+      .addParameter('expression', 'Final value', '', false)
+      .addParameter('expression', 'Interpolation position (from 0 to 1)', '', false)
+      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.interpolate');
+
+    extension
+      .addAction(
+        'TweenSceneVariable',
+        _('Tween a scene variable'),
+        _(
+          "Tweens a scene variable's numeric value from one number to another."
+        ),
+        _(
+          'Tween variable _PARAM0_ from _PARAM1_ to _PARAM2_ for _PARAM3_ms with easing _PARAM4_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('scenevar', 'The variable to tween', '', false)
+      .addParameter('expression', 'Initial value', '', false)
+      .addParameter('expression', 'Final value', '', false)
+      .addParameter('expression', 'Duration', '', false)
+      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenVariable');
+
+    extension
+      .addAction(
+        'TweenGlobalVariable',
+        _('Tween a global variable'),
+        _(
+          "Tweens a global variable's numeric value from one number to another."
+        ),
+        _(
+          'Tween variable _PARAM0_ from _PARAM1_ to _PARAM2_ for _PARAM3_ms with easing _PARAM4_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('globalvar', 'The variable to tween', '', false)
+      .addParameter('expression', 'Initial value', '', false)
+      .addParameter('expression', 'Final value', '', false)
+      .addParameter('expression', 'Duration', '', false)
+      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenVariable');
+
+    extension
+      .addCondition(
+        'Exists',
+        _('Scene tween exists'),
+        _('Check if the scene tween animation exists.'),
+        _('Scene tween _PARAM2_ on _PARAM0_ exists'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('exists');
+
+    extension
+      .addCondition(
+        'IsPlaying',
+        _('Scene tween is playing'),
+        _('Check if the scene tween animation is currently playing.'),
+        _('Scene tween _PARAM2_ on _PARAM0_ is playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isPlaying');
+
+    extension
+      .addCondition(
+        'HasFinished',
+        _('Scene tween finished playing'),
+        _('Check if the scene tween animation has finished playing.'),
+        _('Scene tween _PARAM2_ on _PARAM0_ has finished playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('hasFinished');
+
+    extension
+      .addAction(
+        'PauseTween',
+        _('Pause a scene tween'),
+        _('Pause the running scene tween animation.'),
+        _('Pause the scene tween _PARAM2_ on _PARAM0_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('pauseTween');
+
+    extension
+      .addAction(
+        'StopTween',
+        _('Stop a scene tween'),
+        _('Stop the running scene tween animation.'),
+        _('Stop the scene tween _PARAM2_ on _PARAM0_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('yesorno', _('Jump to end'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('stopTween');
+
+    extension
+      .addAction(
+        'ResumeTween',
+        _('Resume a scene tween'),
+        _('Resume the scene tween animation.'),
+        _('Resume the scene tween _PARAM2_ on _PARAM0_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('resumeTween');
+
+    extension
+      .addAction(
+        'RemoveTween',
+        _('Remove a scene tween'),
+        _('Remove the scene tween animation from the object.'),
+        _('Remove the scene tween _PARAM2_ from _PARAM0_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('removeTween');
+
+    extension
+      .addExpression(
+        'Progress',
+        _('Progress of a scene tween'),
+        _('Progress of a scene tween (between 0.0 and 1.0)'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getProgress');
+
+    const tweenBehavior = new gd.BehaviorJsImplementation();
 
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.updateProperty = function (
@@ -73,44 +294,6 @@ module.exports = {
       )
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
-
-    const easingChoices = JSON.stringify([
-      'linear',
-      'easeInQuad',
-      'easeOutQuad',
-      'easeInOutQuad',
-      'easeInCubic',
-      'easeOutCubic',
-      'easeInOutCubic',
-      'easeInQuart',
-      'easeOutQuart',
-      'easeInOutQuart',
-      'easeInQuint',
-      'easeOutQuint',
-      'easeInOutQuint',
-      'easeInSine',
-      'easeOutSine',
-      'easeInOutSine',
-      'easeInExpo',
-      'easeOutExpo',
-      'easeInOutExpo',
-      'easeInCirc',
-      'easeOutCirc',
-      'easeInOutCirc',
-      'easeOutBounce',
-      'easeInBack',
-      'easeOutBack',
-      'easeInOutBack',
-      'elastic',
-      'swingFromTo',
-      'swingFrom',
-      'swingTo',
-      'bounce',
-      'bouncePast',
-      'easeFromTo',
-      'easeFrom',
-      'easeTo',
-    ]);
 
     // Behavior related
     behavior

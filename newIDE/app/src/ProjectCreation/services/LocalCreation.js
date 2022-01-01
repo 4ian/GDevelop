@@ -8,7 +8,6 @@ import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { writeAndCheckFile } from '../../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import { showGameFileCreationError } from '../LocalExamples';
 import {
   type OnCreateBlankFunction,
   type OnCreateFromExampleShortHeaderFunction,
@@ -28,7 +27,13 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   try {
     fs.mkdirsSync(outputPath);
   } catch (error) {
-    showGameFileCreationError(i18n, outputPath, error);
+    showErrorBox({
+      message: i18n._(
+        t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
+      ),
+      rawError: error,
+      errorId: 'local-example-creation-error',
+    });
     return;
   }
 

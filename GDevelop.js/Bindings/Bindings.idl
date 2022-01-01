@@ -743,6 +743,8 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
     [Const, Ref] DOMString GetDescription();
+    [Ref] PropertyDescriptor SetGroup([Const] DOMString label);
+    [Const, Ref] DOMString GetGroup();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
@@ -1847,6 +1849,8 @@ interface EventsRemover {
 
 interface EventsListUnfolder {
     void STATIC_UnfoldWhenContaining([Ref] EventsList list, [Const, Ref] BaseEvent eventToContain);
+    void STATIC_FoldAll([Ref] EventsList list);
+    void STATIC_UnfoldToLevel([Ref] EventsList list, [Const] unsigned long maxLevel, [Const] optional unsigned long currentLevel = 0);
 };
 
 interface EventsSearchResult {
@@ -2094,6 +2098,8 @@ interface EventsFunction {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunction SetSentence([Const] DOMString sentence);
     [Const, Ref] DOMString GetSentence();
+    [Ref] EventsFunction SetGroup([Const] DOMString group);
+    [Const, Ref] DOMString GetGroup();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);

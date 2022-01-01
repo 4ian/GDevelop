@@ -261,6 +261,7 @@ export const releaseWithoutDescription: Release = {
 
 export const erroredCordovaBuild: Build = {
   id: 'errored-build-id',
+  gameId: 'errored-game-id',
   status: 'error',
   logsKey: '/fake-error.log',
   createdAt: 1515084391000,
@@ -271,6 +272,7 @@ export const erroredCordovaBuild: Build = {
 
 export const pendingCordovaBuild: Build = {
   id: 'pending-build-id',
+  gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
@@ -280,6 +282,7 @@ export const pendingCordovaBuild: Build = {
 
 export const pendingElectronBuild: Build = {
   id: 'pending-build-id',
+  gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
@@ -289,6 +292,7 @@ export const pendingElectronBuild: Build = {
 
 export const completeCordovaBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'cordova-build',
@@ -300,6 +304,7 @@ export const completeCordovaBuild: Build = {
 
 export const completeElectronBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'electron-build',
@@ -314,6 +319,7 @@ export const completeElectronBuild: Build = {
 
 export const completeWebBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'web-build',

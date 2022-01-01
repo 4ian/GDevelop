@@ -278,7 +278,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               outputCode +=
                   codeGenerator.GenerateBooleanFullName(
                       "condition" + gd::String::From(i) + "IsTrue", context) +
-                  ".val = true;\n";
+                  ".val = false;\n";
             }
 
             for (unsigned int cId = 0; cId < conditions.size(); ++cId) {

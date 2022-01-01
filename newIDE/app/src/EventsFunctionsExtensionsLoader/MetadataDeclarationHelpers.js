@@ -233,7 +233,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunctionsExtension.getFullName() ||
+      eventsFunction.getGroup() ||
+        eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
       getExtensionIconUrl(extension)
     );
@@ -242,7 +243,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunctionsExtension.getFullName() ||
+      eventsFunction.getGroup() ||
+        eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
       getExtensionIconUrl(extension)
     );
@@ -252,7 +254,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunctionsExtension.getFullName() ||
+      eventsFunction.getGroup() ||
+        eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
@@ -263,7 +266,8 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunctionsExtension.getFullName() ||
+      eventsFunction.getGroup() ||
+        eventsFunctionsExtension.getFullName() ||
         eventsFunctionsExtension.getName(),
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
@@ -287,7 +291,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
@@ -295,7 +301,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -307,7 +315,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );
@@ -320,7 +330,9 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      eventsFunction.getGroup() ||
+        eventsBasedBehavior.getFullName() ||
+        eventsBasedBehavior.getName(),
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );

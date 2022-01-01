@@ -22,6 +22,9 @@ export const Open = () => {
       onChangeOutputPath={action('change output path')}
       onClose={() => action('click on close')()}
       onCreate={() => action('click on create')()}
+      onClickGenerateProjectName={() =>
+        action('click on generate new project name')()
+      }
       projectName={projectName}
       onChangeProjectName={setProjectName}
     />
@@ -38,6 +41,9 @@ export const Disabled = () => {
       onChangeOutputPath={action('change output path')}
       onClose={() => action('click on close')()}
       onCreate={() => action('click on create')()}
+      onClickGenerateProjectName={() =>
+        action('click on generate new project name')()
+      }
       projectName={projectName}
       onChangeProjectName={setProjectName}
     />

@@ -361,7 +361,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("FlipX",
                 _("Flip the object horizontally"),
                 _("Flip the object horizontally"),
-                _("Flip horizontally _PARAM0_ : _PARAM1_"),
+                _("Flip horizontally _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
@@ -373,7 +373,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("FlipY",
                 _("Flip the object vertically"),
                 _("Flip the object vertically"),
-                _("Flip vertically _PARAM0_ : _PARAM1_"),
+                _("Flip vertically _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")

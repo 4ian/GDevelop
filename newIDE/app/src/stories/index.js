@@ -119,7 +119,6 @@ import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
-import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import EditProfileDialog from '../Profile/EditProfileDialog';
@@ -2573,6 +2572,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'electron-build',
         status: 'pending',
@@ -2592,6 +2592,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'error',
@@ -2611,6 +2612,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'done'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'complete',
@@ -2641,23 +2643,12 @@ storiesOf('BuildStepsProgress', module)
 storiesOf('BuildProgress', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('errored', () => (
-    <BuildProgress
-      build={erroredCordovaBuild}
-      onDownload={action('download')}
-    />
-  ))
+  .add('errored', () => <BuildProgress build={erroredCordovaBuild} />)
   .add('pending (electron-build)', () => (
-    <BuildProgress
-      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={{ ...pendingElectronBuild, updatedAt: Date.now() }} />
   ))
   .add('pending (cordova-build)', () => (
-    <BuildProgress
-      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={{ ...pendingCordovaBuild, updatedAt: Date.now() }} />
   ))
   .add('pending and very old (cordova-build)', () => (
     <BuildProgress
@@ -2665,23 +2656,16 @@ storiesOf('BuildProgress', module)
         ...pendingCordovaBuild,
         updatedAt: Date.now() - 1000 * 3600 * 24,
       }}
-      onDownload={action('download')}
     />
   ))
   .add('complete (cordova-build)', () => (
-    <BuildProgress
-      build={completeCordovaBuild}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={completeCordovaBuild} />
   ))
   .add('complete (electron-build)', () => (
-    <BuildProgress
-      build={completeElectronBuild}
-      onDownload={action('download')}
-    />
+    <BuildProgress build={completeElectronBuild} />
   ))
   .add('complete (web-build)', () => (
-    <BuildProgress build={completeWebBuild} onDownload={action('download')} />
+    <BuildProgress build={completeWebBuild} />
   ));
 
 storiesOf('LocalFolderPicker', module)
@@ -2852,10 +2836,10 @@ storiesOf('Project Creation/CreateProjectDialog', module)
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
         onClose={action('onClose')}
-        onOpen={action('onOpen')}
+        onOpen={action('On open project after it is created')}
         initialTab="examples"
+        onCreateBlank={() => action('create blank project')}
         onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
@@ -2864,10 +2848,10 @@ storiesOf('Project Creation/CreateProjectDialog', module)
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
         onClose={action('onClose')}
-        onOpen={action('onOpen')}
+        onOpen={action('On open project after it is created')}
         initialTab="games-showcase"
+        onCreateBlank={() => action('create blank project')}
         onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
@@ -3993,12 +3977,6 @@ storiesOf('SubscriptionDetails', module)
       onChangeSubscription={action('change subscription')}
     />
   ));
-
-storiesOf('UsagesDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
-  .add('empty', () => <UsagesDetails usages={[]} />);
 
 storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
@@ -5299,6 +5277,7 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={false}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
       onOpenMonetization={action('onOpenMonetization')}
     />
@@ -5308,6 +5287,7 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={true}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
       onOpenMonetization={action('onOpenMonetization')}
     />

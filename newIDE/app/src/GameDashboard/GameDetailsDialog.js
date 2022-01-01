@@ -27,16 +27,23 @@ import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { CircularProgress } from '@material-ui/core';
 import { Table, TableBody, TableRow, TableRowColumn } from '../UI/Table';
+import Builds from '../Export/Builds';
 import AlertMessage from '../UI/AlertMessage';
 import subDays from 'date-fns/subDays';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import HelpButton from '../UI/HelpButton';
 
+export type GamesDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'analytics'
+  | 'monetization';
+
 type Props = {|
   game: Game,
   project: ?gdProject,
-  initialTab: 'details' | 'analytics' | 'monetization',
+  initialTab: GamesDetailsTab,
   onClose: () => void,
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
@@ -84,6 +91,8 @@ export const GameDetailsDialog = ({
     representation: 'date',
   });
   const [analyticsDate, setAnalyticsDate] = React.useState(yesterdayIsoDate);
+
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const loadGameMetrics = React.useCallback(
     async () => {
@@ -172,6 +181,7 @@ export const GameDetailsDialog = ({
     >
       <Tabs value={currentTab} onChange={setCurrentTab}>
         <Tab label={<Trans>Details</Trans>} value="details" />
+        <Tab label={<Trans>Builds</Trans>} value="builds" />
         <Tab label={<Trans>Analytics</Trans>} value="analytics" />
         <Tab label={<Trans>Monetization</Trans>} value="monetization" />
       </Tabs>
@@ -224,6 +234,9 @@ export const GameDetailsDialog = ({
               ) : null}
             </Line>
           </ColumnStackLayout>
+        ) : null}
+        {currentTab === 'builds' ? (
+          <Builds gameId={game.id} authenticatedUser={authenticatedUser} />
         ) : null}
         {currentTab === 'analytics' ? (
           gameRollingMetricsError ? (

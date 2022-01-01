@@ -6,6 +6,7 @@ import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
 import HelpIcon from '@material-ui/icons/Help';
+import AddCircleOutline from '@material-ui/icons/AddCircleOutline';
 
 import FlatButton from '../../../UI/FlatButton';
 import IconButton from '../../../UI/IconButton';
@@ -41,6 +42,7 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import generateName from '../../../Utils/ProjectNameGenerator';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
+import { hasPendingNotifications } from '../../../Utils/Notification';
 
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
@@ -315,6 +317,9 @@ export const HomePage = React.memo<Props>(
                         <UserChip
                           profile={authenticatedUser.profile}
                           onClick={onOpenProfile}
+                          displayNotificationBadge={hasPendingNotifications(
+                            authenticatedUser
+                          )}
                         />
                         <ResponsiveLineStackLayout
                           justifyContent="flex-end"
@@ -326,7 +331,7 @@ export const HomePage = React.memo<Props>(
                               onClick={() => {
                                 openPreCreationDialog(true);
                               }}
-                              primary
+                              icon={<AddCircleOutline />}
                             />
                           )}
                           {!project && canOpen && (
@@ -359,7 +364,7 @@ export const HomePage = React.memo<Props>(
                       </ResponsiveLineStackLayout>
                     </div>
                     <Carousel
-                      title={<Trans>Start from a template</Trans>}
+                      title={<Trans>Start from an example</Trans>}
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
                       onBrowseAllClick={onOpenExamples}
@@ -530,6 +535,9 @@ export const HomePage = React.memo<Props>(
                   isOpening={isOpening}
                   onClose={() => openPreCreationDialog(false)}
                   onCreate={() => createProject(i18n)}
+                  onClickGenerateProjectName={() =>
+                    setNewProjectName(generateName())
+                  }
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}
                   projectName={newProjectName}

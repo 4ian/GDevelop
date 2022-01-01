@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
+import Refresh from '@material-ui/icons/Refresh';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
@@ -13,6 +14,7 @@ type Props = {|
   isOpening?: boolean,
   onClose: () => void,
   onCreate: () => void | Promise<void>,
+  onClickGenerateProjectName: () => void,
   outputPath?: string,
   onChangeOutputPath?: (outputPath: string) => void,
   projectName: string,
@@ -24,6 +26,7 @@ const ProjectPreCreationDialog = ({
   isOpening,
   onClose,
   onCreate,
+  onClickGenerateProjectName,
   outputPath,
   onChangeOutputPath,
   projectName,
@@ -35,6 +38,8 @@ const ProjectPreCreationDialog = ({
 
   const onValidate = React.useCallback(
     () => {
+      if (isOpening) return;
+
       setProjectNameError(null);
       if (!projectName) {
         setProjectNameError(
@@ -44,7 +49,7 @@ const ProjectPreCreationDialog = ({
       }
       onCreate();
     },
-    [onCreate, projectName]
+    [onCreate, projectName, isOpening]
   );
 
   const _onChangeProjectName = React.useCallback(
@@ -57,9 +62,11 @@ const ProjectPreCreationDialog = ({
 
   return (
     <Dialog
-      title={<Trans>Project settings</Trans>}
+      title={<Trans>New Project</Trans>}
       maxWidth="sm"
       open={open}
+      onApply={onValidate}
+      onRequestClose={onClose}
       actions={[
         <FlatButton
           disabled={isOpening}
@@ -76,7 +83,7 @@ const ProjectPreCreationDialog = ({
         />,
       ]}
     >
-      <Column>
+      <Column noMargin>
         <TextField
           type="text"
           errorText={projectNameError}
@@ -84,6 +91,7 @@ const ProjectPreCreationDialog = ({
           value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
+          endAdornment={<Refresh onClick={onClickGenerateProjectName} />}
         />
         {onChangeOutputPath && (
           <>

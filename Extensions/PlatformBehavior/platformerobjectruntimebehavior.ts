@@ -1890,7 +1890,9 @@ namespace gdjs {
         behavior._requestedDeltaY -= previousJumpSpeed * timeDelta;
 
         // Fall
-        // This is arbitrary. It used to not be obvious.
+        // The condition is a legacy thing.
+        // There is no actual reason not to fall at 1st frame.
+        // Before a refactoring, it used to not be this obvious.
         if (!this._jumpingFirstDelta) {
           behavior._fall(timeDelta);
         }

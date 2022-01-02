@@ -434,7 +434,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // Here, if we had pressed Right the character would have been falling.
       runtimeScene.renderAndStep(1000 / 60);
       expect(object.getBehavior('auto1').isOnLadder()).to.be(true);
-      // Now, it fells.
+      // Now, it falls.
       fall(5);
     });
 

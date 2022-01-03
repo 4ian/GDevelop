@@ -139,6 +139,15 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return eventsBasedBehaviors;
   }
 
+  virtual void SetOrigin(const gd::String& originName_, const gd::String& originIdentifier_) {
+    originName = originName_;
+    originIdentifier = originIdentifier_;
+  }
+
+  virtual const gd::String& GetOriginName() const { return originName; }
+  virtual const gd::String& GetOriginIdentifier() const { return originIdentifier; }
+
+
   /** \name Dependencies
    */
   ///@{
@@ -225,6 +234,8 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   std::vector<gd::String> authorIds;
   gd::String author;
   gd::String previewIconUrl;
+  gd::String originName;
+  gd::String originIdentifier;
   gd::String iconUrl;
   gd::String helpPath;  ///< The relative path to the help for this extension in
                         ///< the documentation (or an absolute URL).

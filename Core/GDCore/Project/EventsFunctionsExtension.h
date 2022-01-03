@@ -3,7 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_EVENTSFUNCTIONEXTENSION_H
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
@@ -236,4 +235,3 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
 }  // namespace gd
 
 #endif  // GDCORE_EVENTSFUNCTIONEXTENSION_H
-#endif

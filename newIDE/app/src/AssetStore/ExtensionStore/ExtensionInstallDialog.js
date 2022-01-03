@@ -1,6 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import {
@@ -23,18 +23,6 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import RaisedButton from '../../UI/RaisedButton';
 
-type Props = {|
-  extensionShortHeader: ExtensionShortHeader,
-  isInstalling: boolean,
-  onClose: () => void,
-  onInstall: () => void,
-  alreadyInstalled: boolean,
-|};
-type State = {|
-  extensionHeader: ?ExtensionHeader,
-  error: ?Error,
-|};
-
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
     extensionHeader.description.substr(
@@ -50,143 +38,144 @@ const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   return extensionHeader.description;
 };
 
-export default class ExtensionInstallDialog extends Component<Props, State> {
-  state = {
-    extensionHeader: null,
-    error: null,
-  };
+type Props = {|
+  extensionShortHeader: ExtensionShortHeader,
+  isInstalling: boolean,
+  onClose: () => void,
+  onInstall: () => void,
+  alreadyInstalled: boolean,
+|};
 
-  componentDidMount() {
-    this._loadExtensionheader();
-  }
+const ExtensionInstallDialog = ({
+  extensionShortHeader,
+  isInstalling,
+  onClose,
+  onInstall,
+  alreadyInstalled,
+}: Props) => {
+  const [error, setError] = React.useState<?Error>(null);
+  const [
+    extensionHeader,
+    setExtensionHeader,
+  ] = React.useState<?ExtensionHeader>(null);
 
-  _loadExtensionheader = () => {
-    this.setState({
-      error: null,
-    });
-    getExtensionHeader(this.props.extensionShortHeader).then(
-      extensionHeader => {
-        this.setState({
-          extensionHeader,
-        });
-      },
-      error => {
-        this.setState({
-          error,
-        });
-      }
-    );
-  };
+  const loadExtensionheader = React.useCallback(
+    () => {
+      setError(null);
+      getExtensionHeader(extensionShortHeader).then(
+        extensionHeader => {
+          setExtensionHeader(extensionHeader);
+        },
+        error => {
+          setError(error);
+        }
+      );
+    },
+    [extensionShortHeader]
+  );
 
-  render() {
-    const {
-      isInstalling,
-      extensionShortHeader,
-      onClose,
-      onInstall,
-      alreadyInstalled,
-    } = this.props;
-    const { extensionHeader, error } = this.state;
+  React.useEffect(() => loadExtensionheader(), [loadExtensionheader]);
 
-    const isCompatible = isCompatibleWithExtension(
-      getIDEVersion(),
-      extensionShortHeader
-    );
+  const isCompatible = isCompatibleWithExtension(
+    getIDEVersion(),
+    extensionShortHeader
+  );
 
-    const canInstallExtension = !isInstalling && isCompatible;
-    const onInstallExtension = React.useCallback(
-      () => {
-        if (canInstallExtension) onInstall();
-      },
-      [onInstall, canInstallExtension]
-    );
+  const canInstallExtension = !isInstalling && isCompatible;
+  const onInstallExtension = React.useCallback(
+    () => {
+      if (canInstallExtension) onInstall();
+    },
+    [onInstall, canInstallExtension]
+  );
 
-    return (
-      <Dialog
-        actions={[
-          <FlatButton
-            key="close"
-            label={<Trans>Back</Trans>}
-            primary={false}
-            onClick={onClose}
-            disabled={isInstalling}
-          />,
-          <LeftLoader isLoading={isInstalling} key="install">
-            <RaisedButton
-              label={
-                !isCompatible ? (
-                  <Trans>Not compatible</Trans>
-                ) : alreadyInstalled ? (
-                  <Trans>Re-install/update</Trans>
-                ) : (
-                  <Trans>Install in project</Trans>
-                )
-              }
-              primary
-              onClick={onInstallExtension}
-              disabled={!canInstallExtension}
-            />
-          </LeftLoader>,
-        ]}
-        cannotBeDismissed={false}
-        open
-        onRequestClose={onClose}
-        onApply={onInstallExtension}
-      >
-        <ColumnStackLayout expand noMargin>
-          {!isCompatible && (
-            <AlertMessage kind="error">
-              <Trans>
-                Unfortunately, this extension requires a newer version of
-                GDevelop to work. Update GDevelop to be able to use this
-                extension in your project.
-              </Trans>
-            </AlertMessage>
-          )}
-          <Line alignItems="center" noMargin>
-            <IconContainer
-              alt={extensionShortHeader.fullName}
-              src={extensionShortHeader.previewIconUrl}
-              size={64}
-            />
-            <Column expand>
-              <Text noMargin size="title">
-                {extensionShortHeader.fullName}
-              </Text>
-              <Text noMargin size="body2">
-                <Trans>Version {' ' + extensionShortHeader.version}</Trans>
-              </Text>
-              <Line>
-                {extensionShortHeader.authors &&
-                  extensionShortHeader.authors.map(author => (
-                    <UserPublicProfileChip
-                      user={author}
-                      key={author.id}
-                      isClickable
-                    />
-                  ))}
-              </Line>
-            </Column>
-          </Line>
-          <Text noMargin>{extensionShortHeader.shortDescription}</Text>
-          <Divider />
-          {extensionHeader && (
-            <MarkdownText
-              source={getTransformedDescription(extensionHeader)}
-              isStandaloneText
-            />
-          )}
-          {!extensionHeader && !error && <PlaceholderLoader />}
-          {!extensionHeader && error && (
-            <PlaceholderError onRetry={this._loadExtensionheader}>
-              <Trans>
-                Can't load the extension registry. Verify your internet
-                connection or try again later.
-              </Trans>
-            </PlaceholderError>
-          )}
-        </ColumnStackLayout>
-      </Dialog>
-    );
-  }
-}
+  return (
+    <Dialog
+      actions={[
+        <FlatButton
+          key="close"
+          label={<Trans>Back</Trans>}
+          primary={false}
+          onClick={onClose}
+          disabled={isInstalling}
+        />,
+        <LeftLoader isLoading={isInstalling} key="install">
+          <RaisedButton
+            label={
+              !isCompatible ? (
+                <Trans>Not compatible</Trans>
+              ) : alreadyInstalled ? (
+                <Trans>Re-install/update</Trans>
+              ) : (
+                <Trans>Install in project</Trans>
+              )
+            }
+            primary
+            onClick={onInstallExtension}
+            disabled={!canInstallExtension}
+          />
+        </LeftLoader>,
+      ]}
+      cannotBeDismissed={false}
+      open
+      onRequestClose={onClose}
+      onApply={onInstallExtension}
+    >
+      <ColumnStackLayout expand noMargin>
+        {!isCompatible && (
+          <AlertMessage kind="error">
+            <Trans>
+              Unfortunately, this extension requires a newer version of GDevelop
+              to work. Update GDevelop to be able to use this extension in your
+              project.
+            </Trans>
+          </AlertMessage>
+        )}
+        <Line alignItems="center" noMargin>
+          <IconContainer
+            alt={extensionShortHeader.fullName}
+            src={extensionShortHeader.previewIconUrl}
+            size={64}
+          />
+          <Column expand>
+            <Text noMargin size="title">
+              {extensionShortHeader.fullName}
+            </Text>
+            <Text noMargin size="body2">
+              <Trans>Version {' ' + extensionShortHeader.version}</Trans>
+            </Text>
+            <Line>
+              {extensionShortHeader.authors &&
+                extensionShortHeader.authors.map(author => (
+                  <UserPublicProfileChip
+                    user={author}
+                    key={author.id}
+                    isClickable
+                  />
+                ))}
+            </Line>
+          </Column>
+        </Line>
+        <Text noMargin>{extensionShortHeader.shortDescription}</Text>
+        <Divider />
+        {extensionHeader && (
+          <MarkdownText
+            source={getTransformedDescription(extensionHeader)}
+            isStandaloneText
+          />
+        )}
+        {!extensionHeader && !error && <PlaceholderLoader />}
+        {!extensionHeader && error && (
+          <PlaceholderError onRetry={loadExtensionheader}>
+            <Trans>
+              Can't load the extension registry. Verify your internet connection
+              or try again later.
+            </Trans>
+          </PlaceholderError>
+        )}
+      </ColumnStackLayout>
+    </Dialog>
+  );
+};
+
+export default ExtensionInstallDialog;

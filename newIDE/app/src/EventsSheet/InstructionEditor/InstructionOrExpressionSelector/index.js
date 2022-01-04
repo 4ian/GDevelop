@@ -40,6 +40,7 @@ type Props<T> = {|
   searchPlaceholderIsCondition?: ?boolean,
   helpPagePath?: ?string,
   style?: Object,
+  onClickMore: () => void,
 |};
 type State<T> = {|
   searchText: string,
@@ -90,6 +91,7 @@ export default class InstructionOrExpressionSelector<
       useSubheaders,
       helpPagePath,
       style,
+      onClickMore,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList: Array<T> = searchText
@@ -172,9 +174,7 @@ export default class InstructionOrExpressionSelector<
                         <RaisedButton
                           primary
                           icon={<Add />}
-                          onClick={() => {
-                            console.log('onClickMoreBehaviors');
-                          }}
+                          onClick={onClickMore}
                           label={<Trans>Add new behavior</Trans>}
                         />
                       </Line>

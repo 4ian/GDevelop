@@ -422,7 +422,10 @@ export const addSerializedExtensionsToProject = (
 
     if (serializedExtension.url) {
       // extensions with url field are extensions that come from the store.
-      newEventsFunctionsExtension.setOrigin('extensions-store', serializedExtension.name)
+      newEventsFunctionsExtension.setOrigin(
+        'extensions-store',
+        serializedExtension.name
+      );
     }
   });
 

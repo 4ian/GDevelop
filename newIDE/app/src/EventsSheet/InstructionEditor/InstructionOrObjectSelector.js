@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import Add from '@material-ui/icons/Add';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -33,6 +34,8 @@ import {
   enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
+import RaisedButton from '../../UI/RaisedButton';
+import { Line } from '../../UI/Grid';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
 import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
@@ -356,18 +359,31 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               : undefined,
                           })
                         )}
-                      {!isSearching &&
-                        currentTab === 'free-instructions' &&
-                        renderInstructionOrExpressionTree({
-                          instructionTreeNode: this.freeInstructionsInfoTree,
-                          onChoose: onChooseInstruction,
-                          iconSize,
-                          selectedValue: chosenInstructionType
-                            ? getInstructionListItemValue(chosenInstructionType)
-                            : undefined,
-                          initiallyOpenedPath: this.initialInstructionTypePath,
-                          selectedItemRef: this._selectedItem,
-                        })}
+                      {!isSearching && currentTab === 'free-instructions' && (
+                        <>
+                          {renderInstructionOrExpressionTree({
+                            instructionTreeNode: this.freeInstructionsInfoTree,
+                            onChoose: onChooseInstruction,
+                            iconSize,
+                            selectedValue: chosenInstructionType
+                              ? getInstructionListItemValue(
+                                  chosenInstructionType
+                                )
+                              : undefined,
+                            initiallyOpenedPath: this
+                              .initialInstructionTypePath,
+                            selectedItemRef: this._selectedItem,
+                          })}
+                          <Line justifyContent="center">
+                            <RaisedButton
+                              primary
+                              icon={<Add />}
+                              onClick={() => console.log('onClickMore')}
+                              label={<Trans>Search new extensions</Trans>}
+                            />
+                          </Line>
+                        </>
+                      )}
                       {remainingResultsCount > 0 && (
                         <ListItem
                           primaryText={

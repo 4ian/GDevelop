@@ -140,19 +140,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   }
 
   /**
-   * \brief Sets an extension origin. This method is not present since the beginning
-   * so the projects created before that will have extensions installed from the store
-   * without an origin. Keep that in mind when creating features that rely on an
-   * extension's origin.
+   * \brief Sets an extension origin. This method is not present since the
+   * beginning so the projects created before that will have extensions
+   * installed from the store without an origin. Keep that in mind when creating
+   * features that rely on an extension's origin.
    */
-  virtual void SetOrigin(const gd::String& originName_, const gd::String& originIdentifier_) {
+  virtual void SetOrigin(const gd::String& originName_,
+                         const gd::String& originIdentifier_) {
     originName = originName_;
     originIdentifier = originIdentifier_;
   }
 
   virtual const gd::String& GetOriginName() const { return originName; }
-  virtual const gd::String& GetOriginIdentifier() const { return originIdentifier; }
-
+  virtual const gd::String& GetOriginIdentifier() const {
+    return originIdentifier;
+  }
 
   /** \name Dependencies
    */

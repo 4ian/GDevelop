@@ -1,6 +1,7 @@
 // @flow
 import {
   addAssetToProject,
+  addSerializedExtensionsToProject,
   getRequiredBehaviorsFromAsset,
   filterMissingBehaviors,
   downloadExtensions,
@@ -482,6 +483,71 @@ describe('InstallAsset', () => {
       await expect(downloadExtensions(['FakeExtension'])).rejects.toMatchObject(
         { message: 'Fake error' }
       );
+    });
+  });
+
+  describe('addSerializedExtensionsToProject', () => {
+    const mockEventsFunctionsExtensionsState: EventsFunctionsExtensionsState = {
+      eventsFunctionsExtensionsError: null,
+      loadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      unloadProjectEventsFunctionsExtensions: () => {},
+      reloadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      unloadProjectEventsFunctionsExtension: () => {},
+      getEventsFunctionsExtensionWriter: () => null,
+      getEventsFunctionsExtensionOpener: () => null,
+      ensureLoadFinished: () => Promise.resolve(),
+      getIncludeFileHashs: () => ({}),
+    };
+
+    const serializedExtension = { name: 'ExtensionName' };
+
+    it('adds an extension with origin set if it comes from the store', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [serializedExtension]
+      );
+
+      expect(
+        project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
+      ).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginName()
+      ).toEqual('gdevelop-extension-store');
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginIdentifier()
+      ).toEqual(serializedExtension.name);
+    });
+
+    it("adds an extension with origin not set if it doesn't come from the store", () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [serializedExtension],
+        false
+      );
+
+      expect(
+        project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
+      ).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginName()
+      ).toEqual('');
+      expect(
+        project
+          .getEventsFunctionsExtension(serializedExtension.name)
+          .getOriginIdentifier()
+      ).toEqual('');
     });
   });
 

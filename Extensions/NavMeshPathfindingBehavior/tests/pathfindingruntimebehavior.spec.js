@@ -1,8 +1,9 @@
 // @ts-check
 describe('gdjs.NavMeshPathfindingBehavior', function () {
+  const epsilon = 1 / (2 << 16);
   const pathFindingName = 'auto1';
 
-  const createScene = () => {
+  const createScene = (framePerSecond = 60) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
       // @ts-ignore - missing properties.
@@ -51,10 +52,14 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       objects: [],
       instances: [],
     });
-    runtimeScene._timeManager.getElapsedTime = function () {
-      return (1 / 60) * 1000;
-    };
+    setFramePerSecond(runtimeScene, framePerSecond);
     return runtimeScene;
+  };
+
+  const setFramePerSecond = (runtimeScene, framePerSecond) => {
+    runtimeScene._timeManager.getElapsedTime = function () {
+      return 1000 / framePerSecond;
+    };
   };
 
   const addPlayer = (runtimeScene) => {
@@ -192,5 +197,54 @@ describe('gdjs.NavMeshPathfindingBehavior', function () {
       .getBehavior(pathFindingName)
       .moveTo(runtimeScene, 600, 300 - player.getHeight() / 2);
     expect(player.getBehavior(pathFindingName).pathFound()).to.be(false);
+  });
+
+  [20, 30, 60, 120].forEach((framePerSecond) => {
+    describe(`(${framePerSecond} fps)`, function () {
+      it('can move on the path at the right speed', function () {
+        setFramePerSecond(runtimeScene, framePerSecond);
+        const obstacle = addObstacle(runtimeScene);
+
+        obstacle.setPosition(600, 300);
+        // To ensure obstacles are registered.
+        runtimeScene.renderAndStep(1000 / framePerSecond);
+
+        player.setPosition(200, 300);
+        player.getBehavior(pathFindingName).moveTo(runtimeScene, 900, 300);
+        expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
+        expect(player.getBehavior(pathFindingName).getNodeCount()).to.be.above(
+          2
+        );
+
+        // Move on the path and stop before the last 1/10 of second.
+        for (let i = 0; i < (framePerSecond * 41) / 10; i++) {
+          runtimeScene.renderAndStep(1000 / framePerSecond);
+          expect(
+            player.getBehavior(pathFindingName).destinationReached()
+          ).to.be(false);
+        }
+        // The position is the same no matter the frame rate.
+        expect(player.getX()).to.be.within(
+          896.606382739383 - epsilon,
+          896.606382739383 + epsilon
+        );
+        expect(player.getY()).to.be.within(
+          302.63948009159105 - epsilon,
+          302.63948009159105 + epsilon
+        );
+
+        // Let 1/10 of second pass,
+        // because the calculus interval is not the same for each case.
+        for (let i = 0; i < framePerSecond / 10; i++) {
+          runtimeScene.renderAndStep(1000 / framePerSecond);
+        }
+        // The destination is reached for every frame rate within 1/10 of second.
+        expect(player.getX()).to.be(900);
+        expect(player.getY()).to.be(300);
+        expect(player.getBehavior(pathFindingName).destinationReached()).to.be(
+          true
+        );
+      });
+    });
   });
 });

@@ -55,3 +55,183 @@ To detect such cases, 2 flags are used:
 For further details on the implementation, please take a look at the comments in:
 - the function `gdjs.PlatformerObjectRuntimeBehavior._findHighestFloorAndMoveOnTop`
 - the class `gdjs.PlatformerObjectRuntimeBehavior.FollowConstraintContext`
+
+## Jump trajectory
+
+### Sequential calculus of the engine
+
+The engine uses the previous speeds and positions to evaluate the new ones. This is fast for sequential access and it's a good fit for what the engine do.
+
+TODO introduce the configuration
+
+The model doesn't follow the laws of physics and this is because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
+- the jumping speed `jumpSpeed`
+- the falling speed `fallingSpeed`
+The jump speed stay at its initial value while the jump is sustained. Then, it decrease according to the gravity until it reach 0 and stays that's way until the end.
+The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reach the maximum falling speed and stay that's way until the end too.
+
+
+### Requests solving and random access
+
+#### Why a continuous model?
+
+TODO introduce continuous modelization
+
+#### Polynomial piece-wise function 
+
+The character trajectory during a jump looks like a quadratic function, but it's actually a piece-wise function. There are 3 borders:
+- at the end of the jump sustaining (jumpSustainTime)
+- when the maximum falling speed is reached (maxFallingTime)
+- when the jump speed becomes nul (jumpEndTime)
+
+Obviously, the end of the jump sustaining can't happen after the jump end. Other than this, the borders can be in any order. The function needs to be defined for each of these conditions:
+- sustain case `t < jumpSustainTime && t < maxFallingTime`
+- common case `jumpSustainTime < t && t < maxFallingTime && t < jumpEndTime`
+- max falling case `jumpSustainTime < t && maxFallingTime < t && t < jumpEndTime`
+- affine case `maxFallingTime < t && t < jumpSustainTime`
+- gladding case `jumpEndTime < t && maxFallingTime < t`
+- free fall case `jumpEndTime < t && t < maxFallingTime`
+
+TOTO plot some trajectories with pieces and full function to illustrate these cases.
+
+#### SageMath model
+
+TODO explain
+
+```
+# First define the jump and falling functions #
+
+currentFallingSpeed(t, gravity) = gravity * t
+fallingX(t, gravity) = integral(currentFallingSpeed(t, gravity), t)
+maxFallingTime(gravity, maxFallingSpeed) = solve([currentFallingSpeed(t, gravity)==maxFallingSpeed],t)[0].rhs()
+fallEndedX(t, gravity) = fallingX(maxFallingTime(gravity, maxFallingSpeed), gravity) + maxFallingSpeed * (t - maxFallingTime(gravity, maxFallingSpeed))
+
+currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime) = -jumpSpeed + gravity * (t - jumpSustainTime)
+sustainedX(t, jumpSpeed) = jumpSpeed * t
+jumpingX(t, gravity, jumpSpeed, jumpSustainTime) = sustainedX(jumpSustainTime, jumpSpeed) + integral(currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime), t, jumpSustainTime, t)
+jumpEndTime(gravity, jumpSpeed, jumpSustainTime) = jumpSustainTime + jumpSpeed / gravity
+jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) = jumpingX(jumpEndTime(gravity, jumpSpeed, jumpSustainTime), gravity, jumpSpeed, jumpSustainTime)
+
+
+# t < jumpSustainTime && t < maxFallingTime #
+
+sustainCaseSpeed(t, gravity, jumpSpeed) = -jumpSpeed + currentFallingSpeed(t, gravity)
+sustainCaseHeight(t, gravity, jumpSpeed) = sustainedX(t, jumpSpeed) + fallingX(t, gravity)
+sustainCasePeakTime(gravity, jumpSpeed, jumpSustainTime) = solve([sustainCaseSpeed(t, gravity, jumpSpeed)==0], t)[0].rhs()
+sustainCasePeakHeight(gravity, jumpSpeed, jumpSustainTime) = sustainCaseHeight(sustainCasePeakTime(gravity, jumpSpeed, jumpSustainTime), gravity, jumpSpeed, jumpSustainTime)
+
+
+# jumpSustainTime < t && t < maxFallingTime && t < jumpEndTime #
+
+commonCaseSpeed(t, gravity, jumpSpeed, jumpSustainTime) = currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime) + currentFallingSpeed(t, gravity)
+commonCaseHeight(t, gravity, jumpSpeed, jumpSustainTime) = jumpingX(t, gravity, jumpSpeed, jumpSustainTime) + fallingX(t, gravity)
+commonCasePeakTime(gravity, jumpSpeed, jumpSustainTime) = solve([commonCaseSpeed(t, gravity, jumpSpeed, jumpSustainTime)==0], t)[0].rhs()
+commonCasePeakHeight(gravity, jumpSpeed, jumpSustainTime) = commonCaseHeight(commonCasePeakTime(gravity, jumpSpeed, jumpSustainTime), gravity, jumpSpeed, jumpSustainTime)
+
+
+# jumpSustainTime < t && maxFallingTime < t && t < jumpEndTime #
+
+maxFallingCaseSpeed(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime) + maxFallingSpeed
+maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpingX(t, gravity, jumpSpeed, jumpSustainTime) + fallEndedX(t, gravity)
+maxFallingCasePeakTime(gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseSpeed(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==0], t)[0].rhs()
+maxFallingCasePeakHeight(gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = maxFallingCaseHeight(maxFallingCasePeakTime(gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed), gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)
+
+# maxFallingTime < t && t < jumpSustainTime #
+# in this case the speed is constant (-jumpSpeed + maxFallingSpeed) there is no strict maximum. #
+
+affineCaseSpeed(t, jumpSpeed, maxFallingSpeed) = -jumpSpeed + maxFallingSpeed
+affineCaseHeight(t, gravity, jumpSpeed, maxFallingSpeed) = sustainedX(t, jumpSpeed) + fallEndedX(t, gravity)
+
+
+# jumpEndTime < t && maxFallingTime < t #
+# This is a strictly descending phase, the peak can't happen here #
+
+gladdingCaseSpeed(t, maxFallingSpeed) = maxFallingSpeed
+gladdingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) + fallEndedX(t, gravity)
+
+
+# jumpEndTime < t && t < maxFallingTime #
+# This is a strictly descending phase, the peak can't happen here #
+
+freeFallCaseSpeed(t, gravity) = currentFallingSpeed(t, gravity)
+freeFallCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) + fallingX(t, gravity)
+```
+
+#### Find the initial jump speed for a given jump height ####
+
+TODO explain
+
+```
+var('givenHeight')
+solve([sustainCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
+solve([commonCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
+solve([maxFallingCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
+```
+
+```
+maxFallingTime
+sustainCasePeakTime
+commonCasePeakTime
+maxFallingCasePeakTime
+```
+
+#### Find the time for a given Y displacement ####
+
+TODO explain
+
+```
+sustainCaseUpTime(y, gravity, jumpSpeed) = solve([sustainCaseHeight(t, gravity, jumpSpeed)==y], t)[0].rhs()
+commonCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime) = solve([height(t, gravity, jumpSpeed, jumpSustainTime)==y], t)[0].rhs()
+maxFallingCaseCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[0].rhs()
+
+sustainCaseDownTime(y, gravity, jumpSpeed) = solve([sustainCaseHeight(t, gravity, jumpSpeed)==y], t)[1].rhs()
+commonCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime) = solve([height(t, gravity, jumpSpeed, jumpSustainTime)==y], t)[1].rhs()
+maxFallingCaseCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[1].rhs()
+affineCaseDownTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs() # only one solution (it's affine) #
+
+affineCaseTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs()
+
+sustainCaseUpTime
+commonCaseUpTime
+maxFallingCaseCaseUpTime
+
+sustainCaseDownTime
+commonCaseDownTime
+maxFallingCaseCaseDownTime
+
+affineCaseTime
+```
+
+#### Plotting trajectories ####
+
+TODO explain
+
+```
+# The trajectory of the default jump settings
+#
+# gravity: 1000
+# maxFallingSpeed: 700
+# jumpSustainTime: 0.2
+# jumpSpeed: 600
+#
+# maxFallingTime(1000, 700)
+# 7/10
+
+(
+  plot(-sustainCaseHeight(t, 1000, 600), 0, 0.8, ymin=0, color='grey')
++ plot(-commonCaseHeight(t, 1000, 600, 0.2), 0, 0.8, ymin=0, color='black')
++ plot(-maxFallingCaseHeight(t, 1000, 600, 0.2, 700), 0, 0.8, ymin=0, color='grey')
++ plot(-piecewise([
+    ((0, 0.2), sustainCaseHeight(t, 1000, 600)),
+    ((0.2, maxFallingTime(1000, 700)), commonCaseHeight(t, 1000, 600, 0.2)),
+    ((maxFallingTime(1000, 700), 2), maxFallingCaseHeight(t, 1000, 600, 0.2, 700))
+  ]), 0, 0.8, ymin=0, color='cyan')
+)
+```
+
+
+
+
+
+
+

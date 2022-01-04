@@ -161,7 +161,9 @@ export default function NewBehaviorDialog({
               onClick={onClose}
             />,
           ]}
-          secondaryActions={[<HelpButton helpPagePath="/behaviors" key="help" />]}
+          secondaryActions={[
+            <HelpButton helpPagePath="/behaviors" key="help" />,
+          ]}
           open
           cannotBeDismissed={false}
           flexBody

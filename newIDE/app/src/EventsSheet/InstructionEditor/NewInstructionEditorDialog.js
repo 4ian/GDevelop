@@ -35,6 +35,7 @@ import {
 } from '../../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { addBehaviorToObject } from '../../Utils/Behavior';
+import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 
 const styles = {
   fullHeightSelector: {
@@ -147,6 +148,10 @@ export default function NewInstructionEditorDialog({
     newBehaviorDialogOpen,
     setNewBehaviorDialogOpen,
   ] = React.useState<boolean>(false);
+  const [
+    newExtensionDialogOpen,
+    setNewExtensionDialogOpen,
+  ] = React.useState<boolean>(false);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   // Handle the back button
@@ -170,7 +175,7 @@ export default function NewInstructionEditorDialog({
     addBehaviorToObject(project, chosenObject, type, defaultName);
 
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
-    chooseObject(chosenObject.getName())
+    chooseObject(chosenObject.getName());
   };
 
   const addBehavior = ACHIEVEMENT_FEATURE_FLAG
@@ -180,6 +185,10 @@ export default function NewInstructionEditorDialog({
         _addBehavior
       )
     : _addBehavior;
+
+  const onAddExtension = () => {
+    setNewExtensionDialogOpen(false);
+  };
 
   // Focus the parameters when showing them
   const instructionParametersEditor = React.useRef(
@@ -228,6 +237,7 @@ export default function NewInstructionEditorDialog({
       }}
       focusOnMount={!instructionType}
       onSearchStartOrReset={forceUpdate}
+      onClickMore={() => setNewExtensionDialogOpen(true)}
     />
   );
 
@@ -373,6 +383,14 @@ export default function NewInstructionEditorDialog({
           objectType={chosenObject.getType()}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
+        />
+      )}
+      {newExtensionDialogOpen && (
+        <ExtensionsSearchDialog
+          project={project}
+          onClose={() => setNewExtensionDialogOpen(false)}
+          onInstallExtension={() => {}}
+          onExtensionInstalled={onAddExtension}
         />
       )}
     </>

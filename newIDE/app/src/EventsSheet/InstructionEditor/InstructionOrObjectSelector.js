@@ -81,6 +81,7 @@ type Props = {|
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
   style?: Object,
+  onClickMore: () => void,
 |};
 
 const iconSize = 24;
@@ -168,6 +169,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       currentTab,
       onChangeTab,
       onSearchStartOrReset,
+      onClickMore,
     } = this.props;
     const { searchText, selectedObjectTags } = this.state;
 
@@ -378,7 +380,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             <RaisedButton
                               primary
                               icon={<Add />}
-                              onClick={() => console.log('onClickMore')}
+                              onClick={onClickMore}
                               label={<Trans>Search new extensions</Trans>}
                             />
                           </Line>

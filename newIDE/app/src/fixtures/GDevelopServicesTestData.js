@@ -8,7 +8,10 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import {
+  type ExtensionShortHeader,
+  type SerializedExtension,
+} from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';

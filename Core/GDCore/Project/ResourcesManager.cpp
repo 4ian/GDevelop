@@ -24,12 +24,9 @@ gd::String Resource::badStr;
 
 Resource ResourcesManager::badResource;
 gd::String ResourcesManager::badResourceName;
-#if defined(GD_IDE_ONLY)
 ResourceFolder ResourcesManager::badFolder;
 Resource ResourceFolder::badResource;
-#endif
 
-#if defined(GD_IDE_ONLY)
 void ResourceFolder::Init(const ResourceFolder& other) {
   name = other.name;
 
@@ -38,19 +35,16 @@ void ResourceFolder::Init(const ResourceFolder& other) {
     resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
   }
 }
-#endif
 
 void ResourcesManager::Init(const ResourcesManager& other) {
   resources.clear();
   for (std::size_t i = 0; i < other.resources.size(); ++i) {
     resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
   }
-#if defined(GD_IDE_ONLY)
   folders.clear();
   for (std::size_t i = 0; i < other.folders.size(); ++i) {
     folders.push_back(other.folders[i]);
   }
-#endif
 }
 
 Resource& ResourcesManager::GetResource(const gd::String& name) {
@@ -147,7 +141,6 @@ std::vector<gd::String> ResourcesManager::FindFilesNotInResources(
   return filesNotInResources;
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
@@ -443,9 +436,7 @@ void ResourcesManager::RemoveResource(const gd::String& name) {
   for (std::size_t i = 0; i < folders.size(); ++i)
     folders[i].RemoveResource(name);
 }
-#endif
 
-#if defined(GD_IDE_ONLY)
 void ResourceFolder::UnserializeFrom(const SerializerElement& element,
                                      gd::ResourcesManager& parentManager) {
   name = element.GetStringAttribute("name");
@@ -470,7 +461,6 @@ void ResourceFolder::SerializeTo(SerializerElement& element) const {
         .SetAttribute("name", resources[i]->GetName());
   }
 }
-#endif
 
 void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
   resources.clear();
@@ -500,7 +490,6 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
     resources.push_back(resource);
   }
 
-#if defined(GD_IDE_ONLY)
   folders.clear();
   const SerializerElement& resourcesFoldersElement =
       element.GetChild("resourceFolders", 0, "ResourceFolders");
@@ -511,10 +500,8 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
 
     folders.push_back(folder);
   }
-#endif
 }
 
-#if defined(GD_IDE_ONLY)
 void ResourcesManager::SerializeTo(SerializerElement& element) const {
   SerializerElement& resourcesElement = element.AddChild("resources");
   resourcesElement.ConsiderAsArrayOf("resource");
@@ -543,7 +530,6 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < folders.size(); ++i)
     folders[i].SerializeTo(resourcesFoldersElement.AddChild("folder"));
 }
-#endif
 
 void ImageResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -560,14 +546,12 @@ void ImageResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void ImageResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("alwaysLoaded", alwaysLoaded);
   element.SetAttribute("smoothed", smooth);
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void AudioResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -584,14 +568,12 @@ void AudioResource::UnserializeFrom(const SerializerElement& element) {
   SetPreloadAsSound(element.GetBoolAttribute("preloadAsSound"));
 }
 
-#if defined(GD_IDE_ONLY)
 void AudioResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
   element.SetAttribute("preloadAsMusic", PreloadAsMusic());
   element.SetAttribute("preloadAsSound", PreloadAsSound());
 }
-#endif
 
 void FontResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -606,12 +588,10 @@ void FontResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void FontResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void VideoResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -626,12 +606,10 @@ void VideoResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void VideoResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void JsonResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -647,7 +625,6 @@ void JsonResource::UnserializeFrom(const SerializerElement& element) {
   DisablePreload(element.GetBoolAttribute("disablePreload", false));
 }
 
-#if defined(GD_IDE_ONLY)
 void JsonResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
@@ -672,7 +649,6 @@ bool JsonResource::UpdateProperty(const gd::String& name,
   return true;
 }
 
-#endif
 
 void BitmapFontResource::SetFile(const gd::String& newFile) {
   file = newFile;
@@ -687,14 +663,11 @@ void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void BitmapFontResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
-#if defined(GD_IDE_ONLY)
 ResourceFolder::ResourceFolder(const ResourceFolder& other) { Init(other); }
 
 ResourceFolder& ResourceFolder::operator=(const ResourceFolder& other) {
@@ -702,7 +675,6 @@ ResourceFolder& ResourceFolder::operator=(const ResourceFolder& other) {
 
   return *this;
 }
-#endif
 
 ResourcesManager::ResourcesManager(const ResourcesManager& other) {
   Init(other);

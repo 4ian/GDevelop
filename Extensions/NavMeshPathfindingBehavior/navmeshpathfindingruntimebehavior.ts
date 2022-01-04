@@ -24,8 +24,8 @@ namespace gdjs {
     _pathFound: boolean = false;
     _speed: float = 0;
     _angularSpeed: float = 0;
-    _timeOnSegment: float = 0;
-    _totalSegmentTime: float = 0;
+    _distanceOnSegment: float = 0;
+    _totalSegmentDistance: float = 0;
     _currentSegment: integer = 0;
     _reachedEnd: boolean = false;
     _movementAngle: float = 0;
@@ -321,11 +321,11 @@ namespace gdjs {
         const pathY =
           this._path[this._currentSegment + 1][1] -
           this._path[this._currentSegment][1];
-        this._totalSegmentTime = Math.sqrt(pathX * pathX + pathY * pathY);
-        this._timeOnSegment = 0;
+        this._totalSegmentDistance = Math.sqrt(pathX * pathX + pathY * pathY);
+        this._distanceOnSegment = 0;
         this._reachedEnd = false;
         this._movementAngle =
-          ((Math.atan2(pathY, pathX) * 180) / Math.PI + 360) % 360;
+          (gdjs.toDegrees(Math.atan2(pathY, pathX)) + 360) % 360;
       } else {
         this._reachedEnd = true;
         this._speed = 0;
@@ -341,59 +341,60 @@ namespace gdjs {
         return;
       }
 
-      //Update the speed of the object
+      // Update the speed of the object
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
-      this._speed += this._acceleration * timeDelta;
-      if (this._speed > this._maxSpeed) {
-        this._speed = this._maxSpeed;
+      const previousSpeed = this._speed;
+      if (this._speed !== this._maxSpeed) {
+        this._speed += this._acceleration * timeDelta;
+        if (this._speed > this._maxSpeed) {
+          this._speed = this._maxSpeed;
+        }
       }
       this._angularSpeed = this._angularMaxSpeed;
 
-      //Update the time on the segment and change segment if needed
-      this._timeOnSegment += this._speed * timeDelta;
+      // Update the time on the segment and change segment if needed
+      // Use a Verlet integration to be frame rate independent.
+      this._distanceOnSegment +=
+        ((this._speed + previousSpeed) / 2) * timeDelta;
+      const remainingDistanceOnSegment =
+        this._totalSegmentDistance - this._distanceOnSegment;
       if (
-        this._timeOnSegment >= this._totalSegmentTime &&
+        remainingDistanceOnSegment <= 0 &&
         this._currentSegment < this._path.length
       ) {
         this._enterSegment(this._currentSegment + 1);
+        this._distanceOnSegment = -remainingDistanceOnSegment;
       }
 
-      //Position object on the segment and update its angle
+      // Position object on the segment and update its angle
       let newPos = [0, 0];
-      let pathAngle = this.owner.getAngle();
       if (this._currentSegment < this._path.length - 1) {
         newPos[0] = gdjs.evtTools.common.lerp(
           this._path[this._currentSegment][0],
           this._path[this._currentSegment + 1][0],
-          this._timeOnSegment / this._totalSegmentTime
+          this._distanceOnSegment / this._totalSegmentDistance
         );
         newPos[1] = gdjs.evtTools.common.lerp(
           this._path[this._currentSegment][1],
           this._path[this._currentSegment + 1][1],
-          this._timeOnSegment / this._totalSegmentTime
+          this._distanceOnSegment / this._totalSegmentDistance
         );
-        pathAngle =
-          gdjs.toDegrees(
-            Math.atan2(
-              this._path[this._currentSegment + 1][1] -
-                this._path[this._currentSegment][1],
-              this._path[this._currentSegment + 1][0] -
-                this._path[this._currentSegment][0]
-            )
-          ) + this._angleOffset;
+        if (
+          this._rotateObject &&
+          this.owner.getAngle() !== this._movementAngle + this._angleOffset
+        ) {
+          this.owner.rotateTowardAngle(
+            this._movementAngle + this._angleOffset,
+            this._angularSpeed,
+            runtimeScene
+          );
+        }
       } else {
         newPos = this._path[this._path.length - 1];
       }
       this.owner.setX(newPos[0]);
       // In case of isometry, convert coords back in screen.
       this.owner.setY(newPos[1] / this._manager._isometricRatio);
-      if (this._rotateObject) {
-        this.owner.rotateTowardAngle(
-          pathAngle,
-          this._angularSpeed,
-          runtimeScene
-        );
-      }
     }
 
     /**

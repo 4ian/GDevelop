@@ -419,6 +419,14 @@ export const addSerializedExtensionsToProject = (
       'unserializeFrom',
       project
     );
+
+    if (serializedExtension.url) {
+      // extensions with url field are extensions that come from the store.
+      newEventsFunctionsExtension.setOrigin(
+        'gdevelop-extension-store',
+        serializedExtension.name
+      );
+    }
   });
 
   return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(

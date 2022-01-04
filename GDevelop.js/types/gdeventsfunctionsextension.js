@@ -23,6 +23,9 @@ declare class gdEventsFunctionsExtension extends gdEventsFunctionsContainer {
   getIconUrl(): string;
   setHelpPath(helpPath: string): gdEventsFunctionsExtension;
   getHelpPath(): string;
+  setOrigin(originName: string, originIdentifier: string): void;
+  getOriginName(): string;
+  getOriginIdentifier(): string;
   addDependency(): gdDependencyMetadata;
   removeDependencyAt(index: number): void;
   getAllDependencies(): gdVectorDependencyMetadata;

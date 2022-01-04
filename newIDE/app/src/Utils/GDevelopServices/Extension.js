@@ -26,8 +26,19 @@ export type ExtensionHeader = {|
   iconUrl: string,
 |};
 
+/**
+ * This represents a serialized `gdEventsFunctionsExtension`.
+ * This can be fed to the `unserializeFrom` function from `gdEventsFunctionsExtension`.
+ *
+ * Avoid manipulating this directly: it *can* have similar fields to an `ExtensionHeader` or
+ * an `ExtensionShortHeader`, but not all the fields from the headers will be there. For example,
+ * the `url` and `headerUrl` are only in the headers, but not in the serialized extension.
+ * This is because these fields are specific to the extensions store.
+ */
 export type SerializedExtension = {
-  ...ExtensionHeader,
+  name: string,
+
+  // This type is inexact because the typing is not complete.
 };
 
 export type ExtensionsRegistry = {

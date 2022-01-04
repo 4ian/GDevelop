@@ -20,8 +20,6 @@ import {
   fakeAssetWithFlashBehaviorCustomizations1,
   fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
-  flashExtensionSerializedExtension,
-  customExtensionSerializedExtension,
   fireBulletExtensionShortHeader,
   fakeAssetWithEventCustomizationsAndUnknownExtension1,
 } from '../fixtures/GDevelopServicesTestData';
@@ -501,30 +499,30 @@ describe('InstallAsset', () => {
       getIncludeFileHashs: () => ({}),
     };
 
+    const serializedExtension = { name: 'ExtensionName' };
+
     it('adds an extension with origin set if it comes from the store', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
-        [flashExtensionSerializedExtension]
+        [serializedExtension]
       );
 
       expect(
-        project.hasEventsFunctionsExtensionNamed(
-          flashExtensionSerializedExtension.name
-        )
+        project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
       ).toBe(true);
       expect(
         project
-          .getEventsFunctionsExtension(flashExtensionSerializedExtension.name)
+          .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginName()
       ).toEqual('gdevelop-extension-store');
       expect(
         project
-          .getEventsFunctionsExtension(flashExtensionSerializedExtension.name)
+          .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginIdentifier()
-      ).toEqual(flashExtensionSerializedExtension.name);
+      ).toEqual(serializedExtension.name);
     });
 
     it("adds an extension with origin not set if it doesn't come from the store", () => {
@@ -533,23 +531,21 @@ describe('InstallAsset', () => {
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
-        [customExtensionSerializedExtension],
+        [serializedExtension],
         false
       );
 
       expect(
-        project.hasEventsFunctionsExtensionNamed(
-          customExtensionSerializedExtension.name
-        )
+        project.hasEventsFunctionsExtensionNamed(serializedExtension.name)
       ).toBe(true);
       expect(
         project
-          .getEventsFunctionsExtension(customExtensionSerializedExtension.name)
+          .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginName()
       ).toEqual('');
       expect(
         project
-          .getEventsFunctionsExtension(customExtensionSerializedExtension.name)
+          .getEventsFunctionsExtension(serializedExtension.name)
           .getOriginIdentifier()
       ).toEqual('');
     });

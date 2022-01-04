@@ -726,31 +726,6 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   eventsFunctionsCount: 0,
 };
 
-export const flashExtensionSerializedExtension: SerializedExtension = {
-  ...flashExtensionShortHeader,
-  helpPath: 'Extension/helpPath.html',
-  description:
-    'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible. After adding this to an object, you have to trigger the effect by using the flash action.',
-  iconUrl:
-    'https://resources.gdevelop-app.com/assets/Icons/flash-outline.svg?gdUsage=img',
-};
-
-// $FlowFixMe - SerializedExtension does not reflect what a custom extension can be (i.e. no url)
-export const customExtensionSerializedExtension: SerializedExtension = {
-  shortDescription: 'My custom extension',
-  extensionNamespace: '',
-  fullName: 'CustomExtension',
-  name: 'CustomExtension',
-  version: '1.0.0',
-  headerUrl: '',
-  tags: ['damage', 'custom'],
-  previewIconUrl: '',
-  helpPath: '',
-  authorIds: ['tVUYpNMz1AfsbzJtxUEpPTuu4Mn1'],
-  description: 'This is my custom extension, it is great.',
-  iconUrl: '',
-};
-
 export const game1: Game = {
   id: 'fake-game1-id',
   authorName: 'My company',

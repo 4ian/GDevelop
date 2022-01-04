@@ -3311,6 +3311,7 @@ storiesOf('InstructionOrObjectSelector', module)
             chosenObjectName={null}
             onChooseObject={action('choose object')}
             focusOnMount
+            onClickMore={action('See new behaviors')}
           />
         </FixedHeightFlexContainer>
       )}
@@ -3335,6 +3336,7 @@ storiesOf('InstructionOrObjectSelector', module)
             chosenObjectName={'MySpriteObject'}
             onChooseObject={action('choose object')}
             focusOnMount
+            onClickMore={action('See new behaviors')}
           />
         </FixedHeightFlexContainer>
       )}

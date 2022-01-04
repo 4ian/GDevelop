@@ -2204,6 +2204,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetIconUrl();
     [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
     [Const, Ref] DOMString GetHelpPath();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
+
 
     [Ref] DependencyMetadata AddDependency();
     void RemoveDependencyAt(unsigned long index);

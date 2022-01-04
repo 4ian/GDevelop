@@ -3,7 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY)
 #include "EventsFunctionsExtension.h"
 
 #include "EventsBasedBehavior.h"
@@ -51,6 +50,11 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
+  if (!originName.empty() || !originIdentifier.empty()) {
+    element.AddChild("origin")
+        .SetAttribute("name", originName)
+        .SetAttribute("identifier", originIdentifier);
+  }
   auto& tagsElement = element.AddChild("tags");
   tagsElement.ConsiderAsArray();
   for (const auto& tag : tags) {
@@ -87,6 +91,14 @@ void EventsFunctionsExtension::UnserializeFrom(
   previewIconUrl = element.GetStringAttribute("previewIconUrl");
   iconUrl = element.GetStringAttribute("iconUrl");
   helpPath = element.GetStringAttribute("helpPath");
+
+  if (element.HasChild("origin")) {
+    gd::String originName =
+        element.GetChild("origin").GetStringAttribute("name", "");
+    gd::String originIdentifier =
+        element.GetChild("origin").GetStringAttribute("identifier", "");
+    SetOrigin(originName, originIdentifier);
+  }
 
   tags.clear();
   auto& tagsElement = element.GetChild("tags");
@@ -138,5 +150,3 @@ bool EventsFunctionsExtension::IsExtensionLifecycleEventsFunction(
 }
 
 }  // namespace gd
-
-#endif

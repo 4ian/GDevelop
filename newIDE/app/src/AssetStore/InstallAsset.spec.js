@@ -1,6 +1,7 @@
 // @flow
 import {
   addAssetToProject,
+  addSerializedExtensionsToProject,
   getRequiredBehaviorsFromAsset,
   filterMissingBehaviors,
   downloadExtensions,
@@ -19,6 +20,8 @@ import {
   fakeAssetWithFlashBehaviorCustomizations1,
   fakeAssetWithEventCustomizationsAndFlashExtension1,
   flashExtensionShortHeader,
+  flashExtensionSerializedExtension,
+  customExtensionSerializedExtension,
   fireBulletExtensionShortHeader,
   fakeAssetWithEventCustomizationsAndUnknownExtension1,
 } from '../fixtures/GDevelopServicesTestData';
@@ -482,6 +485,73 @@ describe('InstallAsset', () => {
       await expect(downloadExtensions(['FakeExtension'])).rejects.toMatchObject(
         { message: 'Fake error' }
       );
+    });
+  });
+
+  describe('addSerializedExtensionsToProject', () => {
+    const mockEventsFunctionsExtensionsState: EventsFunctionsExtensionsState = {
+      eventsFunctionsExtensionsError: null,
+      loadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      unloadProjectEventsFunctionsExtensions: () => {},
+      reloadProjectEventsFunctionsExtensions: () => Promise.resolve(),
+      unloadProjectEventsFunctionsExtension: () => {},
+      getEventsFunctionsExtensionWriter: () => null,
+      getEventsFunctionsExtensionOpener: () => null,
+      ensureLoadFinished: () => Promise.resolve(),
+      getIncludeFileHashs: () => ({}),
+    };
+
+    it('adds an extension with origin set if it comes from the store', () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [flashExtensionSerializedExtension]
+      );
+
+      expect(
+        project.hasEventsFunctionsExtensionNamed(
+          flashExtensionSerializedExtension.name
+        )
+      ).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension(flashExtensionSerializedExtension.name)
+          .getOriginName()
+      ).toEqual('gdevelop-extension-store');
+      expect(
+        project
+          .getEventsFunctionsExtension(flashExtensionSerializedExtension.name)
+          .getOriginIdentifier()
+      ).toEqual(flashExtensionSerializedExtension.name);
+    });
+
+    it("adds an extension with origin not set if it doesn't come from the store", () => {
+      makeTestExtensions(gd);
+      const { project } = makeTestProject(gd);
+      addSerializedExtensionsToProject(
+        mockEventsFunctionsExtensionsState,
+        project,
+        [customExtensionSerializedExtension],
+        false
+      );
+
+      expect(
+        project.hasEventsFunctionsExtensionNamed(
+          customExtensionSerializedExtension.name
+        )
+      ).toBe(true);
+      expect(
+        project
+          .getEventsFunctionsExtension(customExtensionSerializedExtension.name)
+          .getOriginName()
+      ).toEqual('');
+      expect(
+        project
+          .getEventsFunctionsExtension(customExtensionSerializedExtension.name)
+          .getOriginIdentifier()
+      ).toEqual('');
     });
   });
 

@@ -89,12 +89,16 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.above(-30);
     });
 
-    // This test doesn't pass because the platform AABB are not always updated
+    // This test used to not pass because the platform AABB were not always updated
     // before the platformer object moves.
     //
     // When the character is put on top of the platform to follow it up,
     // the platform AABB may not has updated in RBush
     // and the platform became out of the spacial search rectangle.
+    //
+    // Now, it still doesn't pass because the following is capped by
+    // "this._behavior._maxFallingSpeed * timeDelta" both way.
+    // This test will be useful if a different behavior is chosen.
     it.skip('follows a platform that is slightly overlapping its top', function () {
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);

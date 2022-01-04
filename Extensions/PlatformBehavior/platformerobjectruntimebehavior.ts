@@ -183,6 +183,9 @@ namespace gdjs {
     }
 
     doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
+      // Avoid inconsistencies between spacial search and the actual platforms location
+      this._manager.updateAABBIfNeeded(runtimeScene);
+
       const LEFTKEY = 37;
       const UPKEY = 38;
       const RIGHTKEY = 39;
@@ -264,7 +267,7 @@ namespace gdjs {
       //3) Update the current floor data for the next tick:
       //TODO what about a moving platforms, remove this condition to do the same as for grabbing?
       if (this._state !== this._onLadder) {
-        this._checkTransitionOnFloorOrFalling();
+        this._checkTransitionOnFloorOrFalling(true);
       }
 
       this._wasLeftKeyPressed = this._leftKey;
@@ -290,6 +293,15 @@ namespace gdjs {
         Math.abs(object.getX() - oldX) >= 1 ||
         Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
+
+      // When the object is both platformer and platform, update its AABB.
+      // Depending on the doStepPreEvents calls order platformer instance
+      // collisions can be sightly different but that should be fine.
+      const behavior = object.getBehavior('Platform');
+      if (behavior != null) {
+        const platformBehavior = behavior as gdjs.PlatformRuntimeBehavior;
+        platformBehavior.updateAABB(runtimeScene);
+      }
     }
 
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
@@ -537,7 +549,11 @@ namespace gdjs {
       collidingPlatforms.length = 0;
     }
 
-    private _checkTransitionOnFloorOrFalling() {
+    /**
+     * @param updateFloorPosition allows to avoid to update this._floorLastX
+     * when this method is called before the moving platform following.
+     */
+    _checkTransitionOnFloorOrFalling(updateFloorPosition: boolean) {
       const object = this.owner;
       const oldY = object.getY();
       // Avoid landing on a platform if the object is not going down.
@@ -557,7 +573,10 @@ namespace gdjs {
         if (!highestGround) {
           this._setFalling();
         } else if (highestGround === this._onFloor.getFloorPlatform()) {
-          this._onFloor.updateFloorPosition();
+          // Still on the same floor
+          if (updateFloorPosition) {
+            this._onFloor.updateFloorPosition();
+          }
         } else {
           this._setOnFloor(highestGround);
         }
@@ -957,7 +976,7 @@ namespace gdjs {
      * the behavior owner object.
      * Note: _updatePotentialCollidingObjects must have been called before.
      */
-    private _updateOverlappedJumpThru() {
+    _updateOverlappedJumpThru() {
       this._overlappedJumpThru.length = 0;
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
@@ -1584,6 +1603,9 @@ namespace gdjs {
       ) {
         behavior._setFalling();
       }
+      // updateFloorPosition is set to false to avoid to update this._floorLastX
+      // because the platform X is followed right after in beforeMovingX.
+      this._behavior._checkTransitionOnFloorOrFalling(false);
     }
 
     beforeMovingX() {
@@ -1795,6 +1817,9 @@ namespace gdjs {
       if (behavior._canGrabPlatforms && behavior._requestedDeltaX !== 0) {
         behavior._checkGrabPlatform();
       }
+
+      this._behavior._updateOverlappedJumpThru();
+      this._behavior._checkTransitionOnFloorOrFalling(true);
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {

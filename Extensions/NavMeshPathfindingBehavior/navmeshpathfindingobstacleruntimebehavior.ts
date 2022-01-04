@@ -10,7 +10,7 @@ namespace gdjs {
    * (see `gdjs.NavMeshPathfindingRuntimeBehavior.obstaclesManagers`).
    */
   export class NavMeshPathfindingObstaclesManager {
-    _obstacles: Set<RuntimeObject>;
+    _obstacles: Set<gdjs.RuntimeObject>;
 
     _polygonIterableAdapter: PolygonIterableAdapter;
     _navMeshGenerator: gdjs.NavMeshPathfinding.NavMeshGenerator | null = null;

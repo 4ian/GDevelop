@@ -400,7 +400,8 @@ export const downloadExtensions = async (
 export const addSerializedExtensionsToProject = (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
-  serializedExtensions: Array<SerializedExtension>
+  serializedExtensions: Array<SerializedExtension>,
+  fromExtensionStore: boolean = true
 ): Promise<void> => {
   serializedExtensions.forEach(serializedExtension => {
     const { name } = serializedExtension;
@@ -420,12 +421,8 @@ export const addSerializedExtensionsToProject = (
       project
     );
 
-    if (serializedExtension.url) {
-      // extensions with url field are extensions that come from the store.
-      newEventsFunctionsExtension.setOrigin(
-        'gdevelop-extension-store',
-        serializedExtension.name
-      );
+    if (fromExtensionStore) {
+      newEventsFunctionsExtension.setOrigin('gdevelop-extension-store', name);
     }
   });
 

@@ -501,7 +501,7 @@ describe('InstallAsset', () => {
       getIncludeFileHashs: () => ({}),
     };
 
-    it('adds an extension with origin set if serialized extension has url', () => {
+    it('adds an extension with origin set if it comes from the store', () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       addSerializedExtensionsToProject(
@@ -527,13 +527,14 @@ describe('InstallAsset', () => {
       ).toEqual(flashExtensionSerializedExtension.name);
     });
 
-    it('adds an extension with origin not set if serialized extension does not have url', () => {
+    it("adds an extension with origin not set if it doesn't come from the store", () => {
       makeTestExtensions(gd);
       const { project } = makeTestProject(gd);
       addSerializedExtensionsToProject(
         mockEventsFunctionsExtensionsState,
         project,
-        [customExtensionSerializedExtension]
+        [customExtensionSerializedExtension],
+        false
       );
 
       expect(

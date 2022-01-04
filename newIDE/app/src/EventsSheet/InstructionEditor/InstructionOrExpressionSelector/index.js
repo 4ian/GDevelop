@@ -40,7 +40,7 @@ type Props<T> = {|
   searchPlaceholderIsCondition?: ?boolean,
   helpPagePath?: ?string,
   style?: Object,
-  onClickMore: () => void,
+  onClickMore?: () => void,
 |};
 type State<T> = {|
   searchText: string,
@@ -170,14 +170,16 @@ export default class InstructionOrExpressionSelector<
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
                       })}
-                      <Line justifyContent="center">
-                        <RaisedButton
-                          primary
-                          icon={<Add />}
-                          onClick={onClickMore}
-                          label={<Trans>Add new behavior</Trans>}
-                        />
-                      </Line>
+                      {onClickMore && (
+                        <Line justifyContent="center">
+                          <RaisedButton
+                            primary
+                            icon={<Add />}
+                            onClick={onClickMore}
+                            label={<Trans>Add new behavior</Trans>}
+                          />
+                        </Line>
+                      )}
                     </>
                   )}
                 </List>

@@ -81,7 +81,7 @@ type Props = {|
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
   style?: Object,
-  onClickMore: () => void,
+  onClickMore?: () => void,
 |};
 
 const iconSize = 24;
@@ -385,14 +385,16 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               .initialInstructionTypePath,
                             selectedItemRef: this._selectedItem,
                           })}
-                          <Line justifyContent="center">
-                            <RaisedButton
-                              primary
-                              icon={<Add />}
-                              onClick={onClickMore}
-                              label={<Trans>Search new extensions</Trans>}
-                            />
-                          </Line>
+                          {onClickMore && (
+                            <Line justifyContent="center">
+                              <RaisedButton
+                                primary
+                                icon={<Add />}
+                                onClick={onClickMore}
+                                label={<Trans>Search new extensions</Trans>}
+                              />
+                            </Line>
+                          )}
                         </>
                       )}
                       {remainingResultsCount > 0 && (

@@ -108,6 +108,15 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.props.chosenInstructionType
   );
 
+  update = () => {
+    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateFreeInstructions(this.props.isCondition),
+      this.props.scope
+    );
+    this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
+    this.forceUpdate();
+  };
+
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
   allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(

@@ -135,6 +135,9 @@ export default function NewInstructionEditorDialog({
   const chosenObject = chosenObjectName
     ? getObjectByName(project, scope.layout, chosenObjectName)
     : null;
+  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
+    null
+  );
   const [step, setStep] = React.useState(() =>
     getInitialStepName(isNewInstruction)
   );
@@ -188,6 +191,8 @@ export default function NewInstructionEditorDialog({
 
   const onAddExtension = () => {
     setNewExtensionDialogOpen(false);
+    freeInstructionComponentRef.current &&
+      freeInstructionComponentRef.current.update();
   };
 
   // Focus the parameters when showing them
@@ -220,6 +225,7 @@ export default function NewInstructionEditorDialog({
       style={styles.fullHeightSelector}
       project={project}
       scope={scope}
+      ref={freeInstructionComponentRef}
       currentTab={currentInstructionOrObjectSelectorTab}
       onChangeTab={setCurrentInstructionOrObjectSelectorTab}
       globalObjectsContainer={globalObjectsContainer}

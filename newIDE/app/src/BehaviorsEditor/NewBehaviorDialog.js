@@ -33,7 +33,6 @@ import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
@@ -106,13 +105,11 @@ export default function NewBehaviorDialog({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const installDisplayedExtension = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_EXTENSION,
-        installExtension
-      )
-    : installExtension;
+  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_EXTENSION,
+    installExtension
+  );
 
   const platform = project.getCurrentPlatform();
   const behaviorMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
@@ -160,13 +157,11 @@ export default function NewBehaviorDialog({
 
     return onChoose(type, defaultName);
   };
-  const chooseBehavior = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_BEHAVIOR,
-        _chooseBehavior
-      )
-    : _chooseBehavior;
+  const chooseBehavior = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_BEHAVIOR,
+    _chooseBehavior
+  );
 
   const isAmongObjectBehaviors = (
     behaviorMetadata: EnumeratedBehaviorMetadata

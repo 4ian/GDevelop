@@ -9,11 +9,13 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 
 const styles = {
+  button: { width: '100%' },
   container: {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
     padding: 8,
+    width: '100%',
   },
 };
 
@@ -42,7 +44,7 @@ export const ExtensionListItem = ({
   });
 
   return (
-    <ButtonBase onClick={onChoose} focusRipple>
+    <ButtonBase onClick={onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
         <Line>
           <IconContainer

@@ -16,7 +16,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation(
           "PathfindingBehavior",
-          _("Pathfinding behavior"),
+          _("Pathfinding (grids based)"),
           "Pathfinding allows to compute an efficient path for objects, "
           "avoiding obstacles on the way.",
           "Florian Rival",
@@ -26,9 +26,9 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   {
     gd::BehaviorMetadata& aut =
         extension.AddBehavior("PathfindingBehavior",
-                              _("Pathfinding"),
+                              _("Pathfinding (grid based)"),
                               "Pathfinding",
-                              _("With this behavior, the object will move "
+                              _("Move the object to a target "
                                 "while avoiding all objects that are "
                                 "flagged as obstacles."),
                               "",
@@ -608,7 +608,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(
         "PathfindingObstacleBehavior",
-        _("Obstacle for pathfinding"),
+        _("Obstacle for pathfinding (grid based)"),
         "PathfindingObstacle",
         _("Flag the object as being an obstacle for pathfinding."),
         "",

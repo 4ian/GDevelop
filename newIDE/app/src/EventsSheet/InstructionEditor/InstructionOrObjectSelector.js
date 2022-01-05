@@ -391,7 +391,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                 primary
                                 icon={<Add />}
                                 onClick={onClickMore}
-                                label={<Trans>Search new extensions</Trans>}
+                                label={<Trans>Add a new extension to the project</Trans>}
                               />
                             </Line>
                           )}

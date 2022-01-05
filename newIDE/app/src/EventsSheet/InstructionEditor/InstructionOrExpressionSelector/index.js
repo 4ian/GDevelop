@@ -176,7 +176,7 @@ export default class InstructionOrExpressionSelector<
                             primary
                             icon={<Add />}
                             onClick={onClickMore}
-                            label={<Trans>Add new behavior</Trans>}
+                            label={<Trans>Add a new behavior to the object</Trans>}
                           />
                         </Line>
                       )}

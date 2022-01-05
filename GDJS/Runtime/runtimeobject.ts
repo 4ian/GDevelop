@@ -1634,6 +1634,20 @@ namespace gdjs {
     }
 
     /**
+     * Called once during the rending of debug traces.
+     *
+     * The debug traces must be drawn on this Graphics:
+     * `runtimeScene.getRenderer().getDebugRenderer()`
+     *
+     * @param runtimeScene The gdjs.RuntimeScene the object belongs to.
+     */
+    onDebugRendering(runtimeScene: gdjs.RuntimeScene): void {
+      for (let i = 0, len = this._behaviors.length; i < len; ++i) {
+        this._behaviors[i].onDebugRendering(runtimeScene);
+      }
+    }
+
+    /**
      * Get a behavior from its name.
      * If the behavior does not exists, `undefined` is returned.
      *

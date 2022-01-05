@@ -6,6 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
+import { Chip } from '@material-ui/core';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -212,6 +213,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       ? deduplicateInstructionsList(filteredInstructionsList.slice(0, 20))
       : filteredInstructionsList;
 
+    const displayedTags = isSearching
+      ? this._getAllObjectTags().filter(tag => tag.includes(searchText))
+      : [];
+
     const remainingResultsCount = isSearching
       ? Math.max(filteredInstructionsList.length - 20, 0)
       : 0;
@@ -220,7 +225,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       !isSearching ||
       !!displayedObjectsList.length ||
       !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length;
+      !!displayedInstructionsList.length ||
+      !!displayedTags.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
@@ -344,6 +350,30 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           )}
                         </React.Fragment>
                       )}
+                      {isSearching &&
+                        currentTab === 'objects' &&
+                        displayedTags.length > 0 && (
+                          <Subheader>
+                            <Trans>Object tags</Trans>
+                          </Subheader>
+                        )}
+                      {currentTab === 'objects' &&
+                        displayedTags.map(tag => (
+                          <ListItem
+                            primaryText={<Chip label={tag} />}
+                            onClick={() => {
+                              this.setState({
+                                selectedObjectTags: [
+                                  ...this.state.selectedObjectTags,
+                                  tag,
+                                ],
+                                searchText: '',
+                              });
+                              this._searchBar.current &&
+                                this._searchBar.current.focus();
+                            }}
+                          />
+                        ))}
                       {isSearching && displayedInstructionsList.length > 0 && (
                         <Subheader>
                           {isCondition ? (

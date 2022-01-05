@@ -19,6 +19,7 @@ import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 
 const styles = {
   searchBar: {
@@ -171,14 +172,14 @@ export default class InstructionOrExpressionSelector<
                         selectedItemRef: this._selectedItem,
                       })}
                       {onClickMore && (
-                        <Line justifyContent="center">
+                        <ResponsiveLineStackLayout justifyContent="center">
                           <RaisedButton
                             primary
                             icon={<Add />}
                             onClick={onClickMore}
                             label={<Trans>Add a new behavior to the object</Trans>}
                           />
-                        </Line>
+                        </ResponsiveLineStackLayout>
                       )}
                     </>
                   )}

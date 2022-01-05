@@ -35,7 +35,7 @@ import {
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
 import RaisedButton from '../../UI/RaisedButton';
-import { Line } from '../../UI/Grid';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
 import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
@@ -386,14 +386,24 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             selectedItemRef: this._selectedItem,
                           })}
                           {onClickMore && (
-                            <Line justifyContent="center">
+                            <ResponsiveLineStackLayout justifyContent="center">
                               <RaisedButton
                                 primary
                                 icon={<Add />}
                                 onClick={onClickMore}
-                                label={<Trans>Add a new extension to the project</Trans>}
+                                label={
+                                  isCondition ? (
+                                    <Trans>
+                                      Search for new conditions in extensions
+                                    </Trans>
+                                  ) : (
+                                    <Trans>
+                                      Search for new actions in extensions
+                                    </Trans>
+                                  )
+                                }
                               />
-                            </Line>
+                            </ResponsiveLineStackLayout>
                           )}
                         </>
                       )}

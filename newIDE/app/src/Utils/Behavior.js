@@ -37,3 +37,9 @@ export const addBehaviorToObject = (
     name
   );
 };
+
+export const listObjectBehaviorsTypes = (object: gdObject): Array<string> =>
+  object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .map(behaviorName => object.getBehavior(behaviorName).getTypeName());

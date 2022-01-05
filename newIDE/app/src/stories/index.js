@@ -4816,6 +4816,10 @@ storiesOf('NewBehaviorDialog', module)
         objectType={'Sprite'}
         onClose={action('on close')}
         onChoose={action('on choose')}
+        objectBehaviorsTypes={[
+          'DestroyOutsideBehavior::DestroyOutside',
+          'PlatformBehavior::PlatformBehavior',
+        ]}
       />
     </ExtensionStoreStateProvider>
   ));

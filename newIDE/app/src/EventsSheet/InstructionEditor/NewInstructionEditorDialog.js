@@ -28,7 +28,10 @@ import {
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import getObjectByName from '../../Utils/GetObjectByName';
-import { addBehaviorToObject } from '../../Utils/Behavior';
+import {
+  addBehaviorToObject,
+  listObjectBehaviorsTypes,
+} from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 
 const styles = {
@@ -372,6 +375,7 @@ export default function NewInstructionEditorDialog({
           project={project}
           open={newBehaviorDialogOpen}
           objectType={chosenObject.getType()}
+          objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
         />

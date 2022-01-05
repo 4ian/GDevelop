@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -44,11 +44,15 @@ const styles = {
 };
 
 const BehaviorListItem = ({
+  i18n,
   behaviorMetadata,
+  alreadyInstalled,
   onClick,
   disabled,
 }: {|
+  i18n: I18nType,
   behaviorMetadata: EnumeratedBehaviorMetadata,
+  alreadyInstalled: boolean,
   onClick: () => void,
   disabled: boolean,
 |}) => (
@@ -61,7 +65,9 @@ const BehaviorListItem = ({
       />
     }
     key={behaviorMetadata.type}
-    primaryText={behaviorMetadata.fullName}
+    primaryText={`${behaviorMetadata.fullName} ${
+      alreadyInstalled ? i18n._(t`(already added to this object)`) : ''
+    }`}
     secondaryText={behaviorMetadata.description}
     secondaryTextLines={2}
     onClick={onClick}
@@ -73,6 +79,7 @@ const BehaviorListItem = ({
 type Props = {|
   project: gdProject,
   objectType: string,
+  objectBehaviorsTypes: Array<string>,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
@@ -84,6 +91,7 @@ export default function NewBehaviorDialog({
   onClose,
   onChoose,
   objectType,
+  objectBehaviorsTypes,
 }: Props) {
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
@@ -160,11 +168,16 @@ export default function NewBehaviorDialog({
       )
     : _chooseBehavior;
 
+  const isAmongObjectBehaviors = (
+    behaviorMetadata: EnumeratedBehaviorMetadata
+  ) => objectBehaviorsTypes.includes(behaviorMetadata.type);
+
   const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
     // An empty object type means the base object, i.e: any object.
     return (
-      behaviorMetadata.objectType === '' ||
-      behaviorMetadata.objectType === objectType
+      (behaviorMetadata.objectType === '' ||
+        behaviorMetadata.objectType === objectType) &&
+      !isAmongObjectBehaviors(behaviorMetadata)
     );
   };
 
@@ -226,8 +239,12 @@ export default function NewBehaviorDialog({
                   <List>
                     {behaviors.map((behaviorMetadata, index) => (
                       <BehaviorListItem
+                        i18n={i18n}
                         key={index}
                         behaviorMetadata={behaviorMetadata}
+                        alreadyInstalled={isAmongObjectBehaviors(
+                          behaviorMetadata
+                        )}
                         onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                         disabled={!canBehaviorBeUsed(behaviorMetadata)}
                       />
@@ -240,8 +257,12 @@ export default function NewBehaviorDialog({
                     {showDeprecated &&
                       deprecatedBehaviors.map((behaviorMetadata, index) => (
                         <BehaviorListItem
+                          i18n={i18n}
                           key={index}
                           behaviorMetadata={behaviorMetadata}
+                          alreadyInstalled={isAmongObjectBehaviors(
+                            behaviorMetadata
+                          )}
                           onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                           disabled={!canBehaviorBeUsed(behaviorMetadata)}
                         />

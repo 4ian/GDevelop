@@ -28,7 +28,10 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
-import { addBehaviorToObject } from '../Utils/Behavior';
+import {
+  addBehaviorToObject,
+  listObjectBehaviorsTypes,
+} from '../Utils/Behavior';
 
 const gd: libGDevelop = global.gd;
 
@@ -256,6 +259,7 @@ const BehaviorsEditor = (props: Props) => {
         <NewBehaviorDialog
           open={newBehaviorDialogOpen}
           objectType={object.getType()}
+          objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           project={project}

@@ -22,7 +22,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
-  onExtensionInstalled?: ExtensionShortHeader => void,
+  onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
 |};
 
 /**
@@ -82,6 +82,9 @@ export default function ExtensionsSearchDialog({
                       eventsFunctionsExtensionsState,
                       project
                     );
+                    if (wasExtensionImported && onExtensionInstalled)
+                      onExtensionInstalled();
+
                     setExtensionWasInstalled(wasExtensionImported);
                     setIsInstalling(false);
                   })();

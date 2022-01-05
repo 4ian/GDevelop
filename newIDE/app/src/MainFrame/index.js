@@ -129,7 +129,6 @@ import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_DEBUG,
   TRIVIAL_FIRST_PREVIEW,
@@ -1281,13 +1280,11 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const launchPreview = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_PREVIEW,
-        _launchPreview
-      )
-    : _launchPreview;
+  const launchPreview = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_PREVIEW,
+    _launchPreview
+  );
 
   const launchNewPreview = React.useCallback(
     () => launchPreview({ networkPreview: false }),
@@ -1455,13 +1452,11 @@ const MainFrame = (props: Props) => {
     [i18n, setState]
   );
 
-  const openDebugger = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_DEBUG,
-        _openDebugger
-      )
-    : _openDebugger;
+  const openDebugger = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_DEBUG,
+    _openDebugger
+  );
 
   const launchDebuggerAndPreview = React.useCallback(
     () => {

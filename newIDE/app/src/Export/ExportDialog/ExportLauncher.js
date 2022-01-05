@@ -5,15 +5,10 @@ import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import {
-  type Build,
-  type BuildArtifactKeyName,
-  getBuildArtifactUrl,
-} from '../../Utils/GDevelopServices/Build';
+import { type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import Window from '../../Utils/Window';
 import CreateProfile from '../../Profile/CreateProfile';
 import LimitDisplayer from '../../Profile/LimitDisplayer';
 import {
@@ -54,6 +49,7 @@ type Props = {|
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
+  setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
 |};
 
 /**
@@ -86,6 +82,17 @@ export default class ExportLauncher extends Component<Props, State> {
   }
   componentDidUpdate(prevProps: Props, prevState: State) {
     this._setupAchievementHook();
+    if (
+      prevState.exportStep !== this.state.exportStep ||
+      prevState.errored !== this.state.errored
+    ) {
+      this.props.setIsNavigationDisabled(
+        this.props.exportPipeline.isNavigationDisabled(
+          this.state.exportStep,
+          this.state.errored
+        )
+      );
+    }
   }
 
   _setupAchievementHook = () => {
@@ -136,8 +143,7 @@ export default class ExportLauncher extends Component<Props, State> {
       try {
         await getGame(getAuthorizationHeader, userId, gameId);
         // Update the game details to ensure that it is up to date in GDevelop services.
-        await updateGame(getAuthorizationHeader, userId, {
-          gameId,
+        await updateGame(getAuthorizationHeader, userId, gameId, {
           authorName,
           gameName,
         });
@@ -275,11 +281,6 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  _downloadBuild = (key: BuildArtifactKeyName) => {
-    const url = getBuildArtifactUrl(this.state.build, key);
-    if (url) Window.openExternalURL(url);
-  };
-
   _closeDoneFooter = () =>
     this.setState({
       doneFooterOpen: false,
@@ -305,21 +306,16 @@ export default class ExportLauncher extends Component<Props, State> {
     } = this.state;
     const { project, authenticatedUser, exportPipeline } = this.props;
     if (!project) return null;
-    const buildPending = !errored && exportStep !== '' && exportStep !== 'done';
-    const buildFinished = !errored && exportStep === 'done';
-
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
         ? authenticatedUser.limits[exportPipeline.onlineBuildType]
         : null;
 
     const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      if (buildPending || buildFinished) return false;
-
       const limit: ?Limit = getBuildLimit(authenticatedUser);
       if (limit && limit.limitReached) return false;
 
-      return exportPipeline.canLaunchBuild(exportState);
+      return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
     return (
@@ -377,14 +373,13 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(build, buildPending)
+            exportPipeline.renderCustomStepsProgress(build, errored, exportStep)
           ) : (
             <Line expand>
               <BuildStepsProgress
                 exportStep={exportStep}
                 hasBuildStep={!!exportPipeline.onlineBuildType}
                 build={build}
-                onDownload={this._downloadBuild}
                 stepMaxProgress={stepMaxProgress}
                 stepCurrentProgress={stepCurrentProgress}
                 errored={errored}

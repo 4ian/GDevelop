@@ -1,6 +1,6 @@
 // @flow
 import axios from 'axios';
-import { GDevelopGameApi } from './ApiConfigs';
+import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { type Filters } from './Filters';
 
 export type Game = {
@@ -8,6 +8,7 @@ export type Game = {
   gameName: string,
   authorName: string,
   createdAt: number,
+  publicWebBuildId?: ?string,
 };
 
 export type ShowcasedGameLink = {
@@ -41,6 +42,11 @@ export type ShowcasedGame = {
 export type AllShowcasedGames = {
   showcasedGames: Array<ShowcasedGame>,
   filters: Filters,
+};
+
+export const getGameUrl = (game: ?Game) => {
+  if (!game) return null;
+  return `${GDevelopGamesPlatform.baseUrl}/games/${game.id}`;
 };
 
 export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
@@ -94,17 +100,19 @@ export const registerGame = (
     )
     .then(response => response.data);
 };
+
 export const updateGame = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
+  gameId: string,
   {
-    gameId,
     gameName,
     authorName,
+    publicWebBuildId,
   }: {|
-    gameId: string,
-    gameName: string,
-    authorName: string,
+    gameName?: string,
+    authorName?: string,
+    publicWebBuildId?: ?string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -114,6 +122,7 @@ export const updateGame = (
         {
           gameName,
           authorName,
+          publicWebBuildId,
         },
         {
           params: {

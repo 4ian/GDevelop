@@ -52,6 +52,8 @@ export const localElectronExportPipeline: ExportPipeline<
 
   canLaunchBuild: exportState => !!exportState.outputDir,
 
+  isNavigationDisabled: () => false,
+
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>

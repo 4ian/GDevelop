@@ -185,10 +185,10 @@ export default function NewInstructionEditorDialog({
     chooseObject(chosenObject.getName());
   };
 
-  const onAddExtension = () => {
+  const onExtensionInstalled = () => {
     setNewExtensionDialogOpen(false);
     freeInstructionComponentRef.current &&
-      freeInstructionComponentRef.current.update();
+      freeInstructionComponentRef.current.reEnumerateInstructions();
   };
 
   // Focus the parameters when showing them
@@ -393,7 +393,7 @@ export default function NewInstructionEditorDialog({
           project={project}
           onClose={() => setNewExtensionDialogOpen(false)}
           onInstallExtension={() => {}}
-          onExtensionInstalled={onAddExtension}
+          onExtensionInstalled={onExtensionInstalled}
         />
       )}
     </>

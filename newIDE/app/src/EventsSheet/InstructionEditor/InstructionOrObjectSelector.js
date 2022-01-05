@@ -108,7 +108,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.props.chosenInstructionType
   );
 
-  update = () => {
+  reEnumerateInstructions = () => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
       enumerateFreeInstructions(this.props.isCondition),
       this.props.scope

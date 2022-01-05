@@ -20,7 +20,7 @@ export const addBehaviorToObject = (
 ): boolean => {
   if (hasBehaviorWithType(object, type)) {
     const answer = Window.showConfirmDialog(
-      "There is already a behavior of this type attached to the object. It's possible to add this behavior again, but it's unusual and may not be always supported properly. Are you sure you want to add this behavior again?"
+      "There is already a behavior of this type attached to the object. It's possible to add this behavior again, but it's unusual and may not always be supported properly. Are you sure you want to add this behavior again?"
     );
 
     if (!answer) return false;

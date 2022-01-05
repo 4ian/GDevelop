@@ -57,9 +57,14 @@ const BehaviorsEditor = (props: Props) => {
   const { values } = React.useContext(PreferencesContext);
 
   const addBehavior = (type: string, defaultName: string) => {
-    setNewBehaviorDialogOpen(false);
+    const wasBehaviorAdded = addBehaviorToObject(
+      project,
+      object,
+      type,
+      defaultName
+    );
 
-    addBehaviorToObject(project, object, type, defaultName);
+    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
 
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();

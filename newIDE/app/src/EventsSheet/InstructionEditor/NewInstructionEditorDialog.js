@@ -169,10 +169,15 @@ export default function NewInstructionEditorDialog({
 
   const addBehavior = (type: string, defaultName: string) => {
     if (!chosenObject) return;
-    setNewBehaviorDialogOpen(false);
 
-    addBehaviorToObject(project, chosenObject, type, defaultName);
+    const wasBehaviorAdded = addBehaviorToObject(
+      project,
+      chosenObject,
+      type,
+      defaultName
+    );
 
+    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
     chooseObject(chosenObject.getName());
   };

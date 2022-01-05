@@ -227,7 +227,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/conditions/mouse24.png",
           "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string", _("Expression generating the button to check"))
+      .AddParameter("stringWithSelector",
+                    _("Expression generating the mouse button to check"),
+                    "[\"Left\", \"Right\", \"Middle\"]")
       .SetParameterLongDescription(
           _("Possible values are Left, Right and Middle."))
       .MarkAsAdvanced();
@@ -243,8 +245,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "res/conditions/mouse24.png",
           "res/conditions/mouse.png")
       .AddCodeOnlyParameter("currentScene", "")
-      .AddParameter("string",
-                    _("Expression generating the mouse button to check"))
+      .AddParameter("stringWithSelector",
+                    _("Expression generating the mouse button to check"),
+                    "[\"Left\", \"Right\", \"Middle\"]")
       .SetParameterLongDescription(
           _("Possible values are Left, Right and Middle."))
       .MarkAsAdvanced();

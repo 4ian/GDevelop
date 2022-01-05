@@ -3,19 +3,20 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import Text from '../../UI/Text';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import TextField from '../../UI/TextField';
 import {
   getBuildArtifactUrl,
   type Build,
 } from '../../Utils/GDevelopServices/Build';
+import { type BuildStep } from '../Builds/BuildStepsProgress';
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import Share from '@material-ui/icons/Share';
 import InfoBar from '../../UI/Messages/InfoBar';
 import IconButton from '../../UI/IconButton';
-import { LinearProgress } from '@material-ui/core';
+import { CircularProgress, LinearProgress } from '@material-ui/core';
 import FlatButton from '../../UI/FlatButton';
 import Dialog from '../../UI/Dialog';
 import {
@@ -30,6 +31,14 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from 'react-share';
+import { TextFieldWithButtonLayout } from '../../UI/Layout';
+import {
+  getGame,
+  getGameUrl,
+  updateGame,
+  type Game,
+} from '../../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const styles = {
   icon: {
@@ -52,41 +61,80 @@ export const ExplanationHeader = () => (
 
 type WebProjectLinkProps = {|
   build: ?Build,
-  loading: boolean,
+  errored: boolean,
+  exportStep: BuildStep,
 |};
 
-export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
+export const WebProjectLink = ({
+  build,
+  errored,
+  exportStep,
+}: WebProjectLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
   );
   const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
     false
   );
+  const [game, setGame] = React.useState<?Game>(null);
+  const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
 
-  if (!build && !loading) return null;
-  const buildPending = loading || (build && build.status !== 'complete');
-  const buildUrl = buildPending ? null : getBuildArtifactUrl(build, 's3Key');
+  const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
+  const isBuildComplete = build && build.status === 'complete';
+  const isBuildPublished = build && game && build.id === game.publicWebBuildId;
+  const buildUrl =
+    exportPending || !isBuildComplete
+      ? null
+      : isBuildPublished
+      ? getGameUrl(game)
+      : getBuildArtifactUrl(build, 's3Key');
+
+  const loadGame = React.useCallback(
+    async () => {
+      const gameId = build && build.gameId;
+      if (!profile || !gameId) return;
+
+      const { id } = profile;
+      try {
+        setIsGameLoading(true);
+        const game = await getGame(getAuthorizationHeader, id, gameId);
+        setGame(game);
+        setIsGameLoading(false);
+      } catch (err) {
+        setIsGameLoading(false);
+        console.error('Unable to load the game', err);
+      }
+    },
+    [build, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      // Load game only once
+      if (!game && isBuildComplete) {
+        loadGame();
+      }
+    },
+    [game, loadGame, isBuildComplete]
+  );
 
   const onOpen = () => {
-    if (buildPending || !buildUrl) return;
+    if (!buildUrl) return;
     Window.openExternalURL(buildUrl);
   };
 
   const onCopy = () => {
-    if (buildPending || !buildUrl) return;
+    if (!buildUrl) return;
     // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
     navigator.clipboard.writeText(buildUrl);
     setShowCopiedInfoBar(true);
   };
 
   const onShare = async () => {
-    if (buildPending || !buildUrl) return;
-
-    if (!navigator.share) {
-      // We are on desktop (or do not support sharing using the system dialog).
-      setIsShareDialogOpen(true);
-      return;
-    }
+    if (!buildUrl || !navigator.share) return;
 
     // We are on mobile (or on browsers supporting sharing using the system dialog).
     const shareData = {
@@ -102,25 +150,51 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
     }
   };
 
+  React.useEffect(
+    () => {
+      if (exportStep === 'done') {
+        setIsShareDialogOpen(true);
+      }
+    },
+    [exportStep]
+  );
+
+  const onUpdatePublicBuild = React.useCallback(
+    async () => {
+      if (!profile || !game || !build) return;
+
+      const { id } = profile;
+      try {
+        setIsGameLoading(true);
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: build.id,
+          }
+        );
+        setGame(updatedGame);
+        setIsGameLoading(false);
+      } catch (err) {
+        console.error('Unable to update the game', err);
+        setIsGameLoading(false);
+      }
+    },
+    [game, getAuthorizationHeader, profile, build]
+  );
+
+  if (!build && !exportStep) return null;
+
   return (
     <>
-      {buildPending ? (
+      {exportPending && (
         <>
           <Text>
             <Trans>Just a few seconds while we generate the link...</Trans>
           </Text>
           <LinearProgress />
         </>
-      ) : (
-        <Line justifyContent="center">
-          <FlatButton
-            label={<Trans>Share</Trans>}
-            onClick={onShare}
-            icon={<Share />}
-          />
-          <Spacer />
-          <RaisedButton label={<Trans>Open</Trans>} onClick={onOpen} primary />
-        </Line>
       )}
       <Dialog
         title={<Trans>Share your game</Trans>}
@@ -135,58 +209,94 @@ export const WebProjectLink = ({ build, loading }: WebProjectLinkProps) => {
         open={isShareDialogOpen}
         onRequestClose={() => setIsShareDialogOpen(false)}
       >
-        {buildUrl && (
+        {buildUrl && !isGameLoading ? (
           <Column>
-            <TextField
-              value={buildUrl}
-              readOnly
-              fullWidth
-              endAdornment={
-                <IconButton onClick={onCopy} tooltip={t`Copy`} edge="end">
-                  <Copy />
-                </IconButton>
-              }
+            <TextFieldWithButtonLayout
+              noFloatingLabelText
+              renderTextField={() => (
+                <TextField
+                  value={buildUrl}
+                  readOnly
+                  fullWidth
+                  endAdornment={
+                    <IconButton onClick={onCopy} tooltip={t`Copy`} edge="end">
+                      <Copy />
+                    </IconButton>
+                  }
+                />
+              )}
+              renderButton={style => (
+                <RaisedButton
+                  primary
+                  label={<Trans>Open</Trans>}
+                  onClick={onOpen}
+                  style={style}
+                />
+              )}
             />
-            <Line justifyContent="flex-end">
-              <FacebookShareButton
-                url={buildUrl}
-                style={styles.icon}
-                quote={`Try the game I just created with GDevelop.io`}
-                hashtag="#gdevelop"
-              >
-                <FacebookIcon size={32} round />
-              </FacebookShareButton>
-              <RedditShareButton
-                url={buildUrl}
-                title={`Try the game I just created with r/gdevelop`}
-                style={styles.icon}
-              >
-                <RedditIcon size={32} round />
-              </RedditShareButton>
-              <TwitterShareButton
-                title={`Try the game I just created with GDevelop.io`}
-                hashtags={['gdevelop']}
-                url={buildUrl}
-                style={styles.icon}
-              >
-                <TwitterIcon size={32} round />
-              </TwitterShareButton>
-              <WhatsappShareButton
-                title={`Try the game I just created with GDevelop.io`}
-                url={buildUrl}
-                style={styles.icon}
-              >
-                <WhatsappIcon size={32} round />
-              </WhatsappShareButton>
-              <EmailShareButton
-                subject="My GDevelop game"
-                body="Try the game I just created with GDevelop.io"
-                url={buildUrl}
-                style={styles.icon}
-              >
-                <EmailIcon size={32} round />
-              </EmailShareButton>
-            </Line>
+            {isBuildPublished && navigator.share && (
+              <Line justifyContent="flex-end">
+                <FlatButton
+                  label={<Trans>Share</Trans>}
+                  onClick={onShare}
+                  icon={<Share />}
+                />
+              </Line>
+            )}
+            {isBuildPublished && !navigator.share && (
+              <Line justifyContent="flex-end">
+                <FacebookShareButton
+                  url={buildUrl}
+                  style={styles.icon}
+                  quote={`Try the game I just created with GDevelop.io`}
+                  hashtag="#gdevelop"
+                >
+                  <FacebookIcon size={32} round />
+                </FacebookShareButton>
+                <RedditShareButton
+                  url={buildUrl}
+                  title={`Try the game I just created with r/gdevelop`}
+                  style={styles.icon}
+                >
+                  <RedditIcon size={32} round />
+                </RedditShareButton>
+                <TwitterShareButton
+                  title={`Try the game I just created with GDevelop.io`}
+                  hashtags={['gdevelop']}
+                  url={buildUrl}
+                  style={styles.icon}
+                >
+                  <TwitterIcon size={32} round />
+                </TwitterShareButton>
+                <WhatsappShareButton
+                  title={`Try the game I just created with GDevelop.io`}
+                  url={buildUrl}
+                  style={styles.icon}
+                >
+                  <WhatsappIcon size={32} round />
+                </WhatsappShareButton>
+                <EmailShareButton
+                  subject="My GDevelop game"
+                  body="Try the game I just created with GDevelop.io"
+                  url={buildUrl}
+                  style={styles.icon}
+                >
+                  <EmailIcon size={32} round />
+                </EmailShareButton>
+              </Line>
+            )}
+            {!isBuildPublished && (
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={<Trans>Publish this build to the game's page</Trans>}
+                  onClick={onUpdatePublicBuild}
+                />
+              </Line>
+            )}
+          </Column>
+        ) : (
+          <Column alignItems="center">
+            <CircularProgress />
           </Column>
         )}
         <InfoBar

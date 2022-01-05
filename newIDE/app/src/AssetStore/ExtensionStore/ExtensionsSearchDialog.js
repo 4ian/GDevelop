@@ -22,6 +22,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
+  onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
 |};
 
 /**
@@ -31,6 +32,7 @@ export default function ExtensionsSearchDialog({
   project,
   onClose,
   onInstallExtension,
+  onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -80,6 +82,9 @@ export default function ExtensionsSearchDialog({
                       eventsFunctionsExtensionsState,
                       project
                     );
+                    if (wasExtensionImported && onExtensionInstalled)
+                      onExtensionInstalled();
+
                     setExtensionWasInstalled(wasExtensionImported);
                     setIsInstalling(false);
                   })();
@@ -105,6 +110,8 @@ export default function ExtensionsSearchDialog({
                 eventsFunctionsExtensionsState,
                 extensionShortHeader
               );
+              if (wasExtensionInstalled && onExtensionInstalled)
+                onExtensionInstalled(extensionShortHeader);
 
               setExtensionWasInstalled(wasExtensionInstalled);
               setIsInstalling(false);

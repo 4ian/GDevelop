@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import Add from '@material-ui/icons/Add';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -33,6 +34,8 @@ import {
   enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
+import RaisedButton from '../../UI/RaisedButton';
+import { Line } from '../../UI/Grid';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
 import { renderObjectListItem } from './SelectorListItems/SelectorObjectListItem';
 import { renderInstructionOrExpressionListItem } from './SelectorListItems/SelectorInstructionOrExpressionListItem';
@@ -78,6 +81,7 @@ type Props = {|
   onChooseObject: (objectName: string) => void,
   onSearchStartOrReset?: () => void,
   style?: Object,
+  onClickMore?: () => void,
 |};
 
 const iconSize = 24;
@@ -103,6 +107,15 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.freeInstructionsInfoTree,
     this.props.chosenInstructionType
   );
+
+  update = () => {
+    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateFreeInstructions(this.props.isCondition),
+      this.props.scope
+    );
+    this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
+    this.forceUpdate();
+  };
 
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
@@ -165,6 +178,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       currentTab,
       onChangeTab,
       onSearchStartOrReset,
+      onClickMore,
     } = this.props;
     const { searchText, selectedObjectTags } = this.state;
 
@@ -356,18 +370,33 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                               : undefined,
                           })
                         )}
-                      {!isSearching &&
-                        currentTab === 'free-instructions' &&
-                        renderInstructionOrExpressionTree({
-                          instructionTreeNode: this.freeInstructionsInfoTree,
-                          onChoose: onChooseInstruction,
-                          iconSize,
-                          selectedValue: chosenInstructionType
-                            ? getInstructionListItemValue(chosenInstructionType)
-                            : undefined,
-                          initiallyOpenedPath: this.initialInstructionTypePath,
-                          selectedItemRef: this._selectedItem,
-                        })}
+                      {!isSearching && currentTab === 'free-instructions' && (
+                        <>
+                          {renderInstructionOrExpressionTree({
+                            instructionTreeNode: this.freeInstructionsInfoTree,
+                            onChoose: onChooseInstruction,
+                            iconSize,
+                            selectedValue: chosenInstructionType
+                              ? getInstructionListItemValue(
+                                  chosenInstructionType
+                                )
+                              : undefined,
+                            initiallyOpenedPath: this
+                              .initialInstructionTypePath,
+                            selectedItemRef: this._selectedItem,
+                          })}
+                          {onClickMore && (
+                            <Line justifyContent="center">
+                              <RaisedButton
+                                primary
+                                icon={<Add />}
+                                onClick={onClickMore}
+                                label={<Trans>Search new extensions</Trans>}
+                              />
+                            </Line>
+                          )}
+                        </>
+                      )}
                       {remainingResultsCount > 0 && (
                         <ListItem
                           primaryText={

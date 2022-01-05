@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -31,17 +31,28 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_BEHAVIOR,
+  TRIVIAL_FIRST_EXTENSION,
+} from '../Utils/GDevelopServices/Badge';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
 };
 
 const BehaviorListItem = ({
+  i18n,
   behaviorMetadata,
+  alreadyInstalled,
   onClick,
   disabled,
 }: {|
+  i18n: I18nType,
   behaviorMetadata: EnumeratedBehaviorMetadata,
+  alreadyInstalled: boolean,
   onClick: () => void,
   disabled: boolean,
 |}) => (
@@ -54,7 +65,9 @@ const BehaviorListItem = ({
       />
     }
     key={behaviorMetadata.type}
-    primaryText={behaviorMetadata.fullName}
+    primaryText={`${behaviorMetadata.fullName} ${
+      alreadyInstalled ? i18n._(t`(already added to this object)`) : ''
+    }`}
     secondaryText={behaviorMetadata.description}
     secondaryTextLines={2}
     onClick={onClick}
@@ -66,6 +79,7 @@ const BehaviorListItem = ({
 type Props = {|
   project: gdProject,
   objectType: string,
+  objectBehaviorsTypes: Array<string>,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
@@ -77,6 +91,7 @@ export default function NewBehaviorDialog({
   onClose,
   onChoose,
   objectType,
+  objectBehaviorsTypes,
 }: Props) {
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
@@ -89,6 +104,15 @@ export default function NewBehaviorDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const installDisplayedExtension = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_EXTENSION,
+        installExtension
+      )
+    : installExtension;
 
   const platform = project.getCurrentPlatform();
   const behaviorMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
@@ -126,7 +150,7 @@ export default function NewBehaviorDialog({
     ({ type }) => !!deprecatedBehaviorsInformation[type]
   );
 
-  const chooseBehavior = (
+  const _chooseBehavior = (
     i18n: I18nType,
     { type, defaultName }: EnumeratedBehaviorMetadata
   ) => {
@@ -136,12 +160,24 @@ export default function NewBehaviorDialog({
 
     return onChoose(type, defaultName);
   };
+  const chooseBehavior = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_BEHAVIOR,
+        _chooseBehavior
+      )
+    : _chooseBehavior;
+
+  const isAmongObjectBehaviors = (
+    behaviorMetadata: EnumeratedBehaviorMetadata
+  ) => objectBehaviorsTypes.includes(behaviorMetadata.type);
 
   const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
     // An empty object type means the base object, i.e: any object.
     return (
-      behaviorMetadata.objectType === '' ||
-      behaviorMetadata.objectType === objectType
+      (behaviorMetadata.objectType === '' ||
+        behaviorMetadata.objectType === objectType) &&
+      !isAmongObjectBehaviors(behaviorMetadata)
     );
   };
 
@@ -161,7 +197,9 @@ export default function NewBehaviorDialog({
               onClick={onClose}
             />,
           ]}
-          secondaryActions={[<HelpButton helpPagePath="/behaviors" />]}
+          secondaryActions={[
+            <HelpButton helpPagePath="/behaviors" key="help" />,
+          ]}
           open
           cannotBeDismissed={false}
           flexBody
@@ -201,8 +239,12 @@ export default function NewBehaviorDialog({
                   <List>
                     {behaviors.map((behaviorMetadata, index) => (
                       <BehaviorListItem
+                        i18n={i18n}
                         key={index}
                         behaviorMetadata={behaviorMetadata}
+                        alreadyInstalled={isAmongObjectBehaviors(
+                          behaviorMetadata
+                        )}
                         onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                         disabled={!canBehaviorBeUsed(behaviorMetadata)}
                       />
@@ -215,8 +257,12 @@ export default function NewBehaviorDialog({
                     {showDeprecated &&
                       deprecatedBehaviors.map((behaviorMetadata, index) => (
                         <BehaviorListItem
+                          i18n={i18n}
                           key={index}
                           behaviorMetadata={behaviorMetadata}
+                          alreadyInstalled={isAmongObjectBehaviors(
+                            behaviorMetadata
+                          )}
                           onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                           disabled={!canBehaviorBeUsed(behaviorMetadata)}
                         />
@@ -261,12 +307,12 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore // TODO
+              <ExtensionStore
                 project={project}
                 isInstalling={isInstalling}
                 onInstall={async extensionShortHeader => {
                   setIsInstalling(true);
-                  const wasExtensionInstalled = await installExtension(
+                  const wasExtensionInstalled = await installDisplayedExtension(
                     i18n,
                     project,
                     eventsFunctionsExtensionsState,

@@ -4,14 +4,13 @@ import Window from './Window';
 
 const gd: libGDevelop = global.gd;
 
-export const hasBehaviorWithType = (object: gdObject, type: string) => {
-  const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
-
-  return allBehaviorNames
-    .map(behaviorName => object.getBehavior(behaviorName))
-    .map(behavior => behavior.getTypeName())
-    .filter(behaviorType => behaviorType === type).length;
-};
+export const hasBehaviorWithType = (object: gdObject, type: string) =>
+  object
+    .getAllBehaviorNames()
+    .toJSArray()
+    .filter(
+      behaviorName => object.getBehavior(behaviorName).getTypeName() === type
+    ).length;
 
 export const addBehaviorToObject = (
   project: gdProject,

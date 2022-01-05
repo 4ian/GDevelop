@@ -178,7 +178,10 @@ export default function NewInstructionEditorDialog({
     );
 
     if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
+
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
+    // This is not done automatically because a change in the object behaviors
+    // is not detected by React at this level.
     chooseObject(chosenObject.getName());
   };
 

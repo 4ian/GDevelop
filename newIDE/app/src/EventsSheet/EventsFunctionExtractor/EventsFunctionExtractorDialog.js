@@ -139,7 +139,10 @@ export default class EventsFunctionExtractorDialog extends React.Component<
         onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
         secondaryActions={[
-          <HelpButton helpPagePath="/events/functions/extract-events" />,
+          <HelpButton
+            helpPagePath="/events/functions/extract-events"
+            key="help"
+          />,
         ]}
         actions={[
           <FlatButton

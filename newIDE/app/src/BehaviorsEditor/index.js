@@ -9,7 +9,6 @@ import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
@@ -28,13 +27,11 @@ import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
-import {
-  ACHIEVEMENT_FEATURE_FLAG,
-  addCreateBadgePreHookIfNotClaimed,
-  TRIVIAL_FIRST_BEHAVIOR,
-} from '../Utils/GDevelopServices/Badge';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
+import {
+  addBehaviorToObject,
+  listObjectBehaviorsTypes,
+} from '../Utils/Behavior';
 
 const gd: libGDevelop = global.gd;
 
@@ -52,7 +49,6 @@ const BehaviorsEditor = (props: Props) => {
   const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
     false
   );
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const { object, project } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
@@ -60,46 +56,15 @@ const BehaviorsEditor = (props: Props) => {
 
   const { values } = React.useContext(PreferencesContext);
 
-  const hasBehaviorWithType = (type: string) => {
-    return allBehaviorNames
-      .map(behaviorName => object.getBehavior(behaviorName))
-      .map(behavior => behavior.getTypeName())
-      .filter(behaviorType => behaviorType === type).length;
-  };
-
-  const _addBehavior = (type: string, defaultName: string) => {
+  const addBehavior = (type: string, defaultName: string) => {
     setNewBehaviorDialogOpen(false);
 
-    if (hasBehaviorWithType(type)) {
-      const answer = Window.showConfirmDialog(
-        "There is already a behavior of this type attached to the object. It's possible to add this behavior again, but it's unusual and may not be always supported properly. Are you sure you want to add this behavior again?"
-      );
-
-      if (!answer) return;
-    }
-
-    const name = newNameGenerator(defaultName, name =>
-      object.hasBehaviorNamed(name)
-    );
-    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
-      project,
-      object,
-      type,
-      name
-    );
+    addBehaviorToObject(project, object, type, defaultName);
 
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();
     props.onUpdateBehaviorsSharedData();
   };
-
-  const addBehavior = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_BEHAVIOR,
-        _addBehavior
-      )
-    : _addBehavior;
 
   const onChangeBehaviorName = (
     behaviorContent: gdBehaviorContent,
@@ -294,6 +259,7 @@ const BehaviorsEditor = (props: Props) => {
         <NewBehaviorDialog
           open={newBehaviorDialogOpen}
           objectType={object.getType()}
+          objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           project={project}

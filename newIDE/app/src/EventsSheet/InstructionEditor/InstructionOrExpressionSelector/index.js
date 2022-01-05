@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
+import Add from '@material-ui/icons/Add';
 import { List, type ListItemRefType } from '../../../UI/List';
 import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
@@ -16,6 +17,7 @@ import { renderInstructionOrExpressionTree } from '../SelectorListItems/Selector
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
+import RaisedButton from '../../../UI/RaisedButton';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 
 const styles = {
@@ -38,6 +40,7 @@ type Props<T> = {|
   searchPlaceholderIsCondition?: ?boolean,
   helpPagePath?: ?string,
   style?: Object,
+  onClickMore?: () => void,
 |};
 type State<T> = {|
   searchText: string,
@@ -88,6 +91,7 @@ export default class InstructionOrExpressionSelector<
       useSubheaders,
       helpPagePath,
       style,
+      onClickMore,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList: Array<T> = searchText
@@ -137,23 +141,25 @@ export default class InstructionOrExpressionSelector<
             >
               {hasResults && (
                 <List>
-                  {searchText
-                    ? displayedInstructionsList.map(
-                        enumeratedInstructionOrExpressionMetadata =>
-                          renderInstructionOrExpressionListItem({
-                            instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChoose(
-                                enumeratedInstructionOrExpressionMetadata.type,
-                                enumeratedInstructionOrExpressionMetadata
-                              ),
-                            selectedValue: getInstructionListItemValue(
-                              selectedType
+                  {searchText ? (
+                    displayedInstructionsList.map(
+                      enumeratedInstructionOrExpressionMetadata =>
+                        renderInstructionOrExpressionListItem({
+                          instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                          iconSize: iconSize,
+                          onClick: () =>
+                            onChoose(
+                              enumeratedInstructionOrExpressionMetadata.type,
+                              enumeratedInstructionOrExpressionMetadata
                             ),
-                          })
-                      )
-                    : renderInstructionOrExpressionTree({
+                          selectedValue: getInstructionListItemValue(
+                            selectedType
+                          ),
+                        })
+                    )
+                  ) : (
+                    <>
+                      {renderInstructionOrExpressionTree({
                         instructionTreeNode: instructionsInfoTree,
                         iconSize,
                         onChoose,
@@ -164,6 +170,18 @@ export default class InstructionOrExpressionSelector<
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
                       })}
+                      {onClickMore && (
+                        <Line justifyContent="center">
+                          <RaisedButton
+                            primary
+                            icon={<Add />}
+                            onClick={onClickMore}
+                            label={<Trans>Add new behavior</Trans>}
+                          />
+                        </Line>
+                      )}
+                    </>
+                  )}
                 </List>
               )}
               {!hasResults && (

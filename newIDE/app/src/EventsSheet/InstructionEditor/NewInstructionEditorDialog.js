@@ -28,12 +28,6 @@ import {
 import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import getObjectByName from '../../Utils/GetObjectByName';
-import {
-  ACHIEVEMENT_FEATURE_FLAG,
-  addCreateBadgePreHookIfNotClaimed,
-  TRIVIAL_FIRST_BEHAVIOR,
-} from '../../Utils/GDevelopServices/Badge';
-import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import { addBehaviorToObject } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 
@@ -155,7 +149,6 @@ export default function NewInstructionEditorDialog({
     newExtensionDialogOpen,
     setNewExtensionDialogOpen,
   ] = React.useState<boolean>(false);
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
@@ -171,7 +164,7 @@ export default function NewInstructionEditorDialog({
     }
   };
 
-  const _addBehavior = (type: string, defaultName: string) => {
+  const addBehavior = (type: string, defaultName: string) => {
     if (!chosenObject) return;
     setNewBehaviorDialogOpen(false);
 
@@ -180,14 +173,6 @@ export default function NewInstructionEditorDialog({
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
     chooseObject(chosenObject.getName());
   };
-
-  const addBehavior = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_BEHAVIOR,
-        _addBehavior
-      )
-    : _addBehavior;
 
   const onAddExtension = () => {
     setNewExtensionDialogOpen(false);

@@ -31,6 +31,13 @@ import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  ACHIEVEMENT_FEATURE_FLAG,
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_BEHAVIOR,
+  TRIVIAL_FIRST_EXTENSION,
+} from '../Utils/GDevelopServices/Badge';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -89,6 +96,15 @@ export default function NewBehaviorDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const installDisplayedExtension = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_EXTENSION,
+        installExtension
+      )
+    : installExtension;
 
   const platform = project.getCurrentPlatform();
   const behaviorMetadata: Array<EnumeratedBehaviorMetadata> = React.useMemo(
@@ -126,7 +142,7 @@ export default function NewBehaviorDialog({
     ({ type }) => !!deprecatedBehaviorsInformation[type]
   );
 
-  const chooseBehavior = (
+  const _chooseBehavior = (
     i18n: I18nType,
     { type, defaultName }: EnumeratedBehaviorMetadata
   ) => {
@@ -136,6 +152,13 @@ export default function NewBehaviorDialog({
 
     return onChoose(type, defaultName);
   };
+  const chooseBehavior = ACHIEVEMENT_FEATURE_FLAG
+    ? addCreateBadgePreHookIfNotClaimed(
+        authenticatedUser,
+        TRIVIAL_FIRST_BEHAVIOR,
+        _chooseBehavior
+      )
+    : _chooseBehavior;
 
   const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
     // An empty object type means the base object, i.e: any object.
@@ -263,12 +286,12 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore // TODO
+              <ExtensionStore
                 project={project}
                 isInstalling={isInstalling}
                 onInstall={async extensionShortHeader => {
                   setIsInstalling(true);
-                  const wasExtensionInstalled = await installExtension(
+                  const wasExtensionInstalled = await installDisplayedExtension(
                     i18n,
                     project,
                     eventsFunctionsExtensionsState,

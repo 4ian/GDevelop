@@ -23,7 +23,10 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
-import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs, Tab } from '../../UI/Tabs';
@@ -92,7 +95,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   State
 > {
   state = { searchText: '', selectedObjectTags: [] };
-  _searchBar = React.createRef<SearchBar>();
+  _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
 
@@ -360,6 +363,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       {currentTab === 'objects' &&
                         displayedTags.map(tag => (
                           <ListItem
+                            key={tag}
                             primaryText={<Chip label={tag} />}
                             onClick={() => {
                               this.setState({

@@ -23,7 +23,10 @@ import {
   enumerateBehaviorsMetadata,
   filterEnumeratedBehaviorMetadata,
 } from './EnumerateBehaviorsMetadata';
-import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import Window from '../Utils/Window';
@@ -95,7 +98,7 @@ export default function NewBehaviorDialog({
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [currentTab, setCurrentTab] = React.useState('installed');
-  const searchBar = React.useRef<?SearchBar>(null);
+  const searchBar = React.useRef<?SearchBarInterface>(null);
   const scrollView = React.useRef((null: ?ScrollViewInterface));
 
   const [isInstalling, setIsInstalling] = React.useState(false);

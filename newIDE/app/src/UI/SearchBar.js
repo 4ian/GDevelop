@@ -34,15 +34,7 @@ type Props = {|
   helpPagePath?: ?string,
 |};
 
-type State = {|
-  focus: boolean,
-  value: string,
-  active: boolean,
-|};
-
-const getStyles = (props: Props, state: State) => {
-  const { disabled } = props;
-  const { value } = state;
+const getStyles = (value: string, disabled?: boolean) => {
   const nonEmpty = value.length > 0;
 
   return {
@@ -96,69 +88,80 @@ const getStyles = (props: Props, state: State) => {
   };
 };
 
+export type SearchBarInterface = {|
+  focus: () => void,
+  blur: () => void,
+|};
+
 /**
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
  *
  * Customized to add optional tags button.
  */
-export default class SearchBar extends React.PureComponent<Props, State> {
-  state = {
-    focus: false,
-    value: this.props.value,
-    active: false,
-  };
-  _textField = React.createRef<TextField>();
+const SearchBar = React.forwardRef<Props, SearchBarInterface>(
+  (
+    {
+      disabled,
+      placeholder,
+      onChange,
+      onRequestSearch,
+      style,
+      value: parentValue,
+      buildTagsMenuTemplate,
+      helpPagePath,
+    },
+    ref
+  ) => {
+    React.useImperativeHandle(ref, () => ({
+      focus,
+      blur,
+    }));
+    const focus = () => {
+      if (textField.current) {
+        textField.current.focus();
+      }
+    };
+    const blur = () => {
+      if (textField.current) {
+        textField.current.blur();
+      }
+    };
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.value !== nextProps.value) {
-      this.setState({ ...this.state, value: nextProps.value });
-    }
-  }
+    const [value, setValue] = React.useState<string>(parentValue);
 
-  focus = () => {
-    if (this._textField.current) {
-      this._textField.current.focus();
-    }
-  };
+    const textField = React.useRef<?TextField>(null);
 
-  blur = () => {
-    if (this._textField.current) {
-      this._textField.current.blur();
-    }
-  };
+    const styles = getStyles(value, disabled);
 
-  handleFocus = () => {
-    this.setState({ focus: true });
-  };
+    React.useEffect(
+      () => {
+        setValue(parentValue);
+      },
+      [parentValue]
+    );
 
-  handleBlur = () => {
-    this.setState({ focus: false });
-    if (this.state.value.trim().length === 0) {
-      this.setState({ value: '' });
-    }
-  };
+    const handleBlur = () => {
+      if (value.trim().length === 0) {
+        setValue('');
+      }
+    };
 
-  handleInput = (e: {| target: {| value: string |} |}) => {
-    this.setState({ value: e.target.value });
-    this.props.onChange && this.props.onChange(e.target.value);
-  };
+    const handleInput = (e: {| target: {| value: string |} |}) => {
+      setValue(e.target.value);
+      onChange && onChange(e.target.value);
+    };
 
-  handleCancel = () => {
-    this.setState({ active: false, value: '' });
-    this.props.onChange && this.props.onChange('');
-  };
+    const handleCancel = () => {
+      setValue('');
+      onChange && onChange('');
+    };
 
-  handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
-    if (shouldValidate(event)) {
-      this.props.onRequestSearch(this.state.value);
-    }
-  };
-
-  render() {
-    const styles = getStyles(this.props, this.state);
-    const { value } = this.state;
-    const { disabled, style, buildTagsMenuTemplate, helpPagePath } = this.props;
+    const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+      if (shouldValidate(event)) {
+        onRequestSearch(value);
+      }
+    };
 
     return (
       <ThemeConsumer>
@@ -175,17 +178,16 @@ export default class SearchBar extends React.PureComponent<Props, State> {
             <div style={styles.searchContainer}>
               <TextField
                 margin="none"
-                hintText={this.props.placeholder || t`Search`}
-                onBlur={this.handleBlur}
+                hintText={placeholder || t`Search`}
+                onBlur={handleBlur}
                 value={value}
-                onChange={this.handleInput}
-                onKeyUp={this.handleKeyPressed}
-                onFocus={this.handleFocus}
+                onChange={handleInput}
+                onKeyUp={handleKeyPressed}
                 fullWidth
                 style={styles.input}
                 underlineShow={false}
                 disabled={disabled}
-                ref={this._textField}
+                ref={textField}
               />
             </div>
             {buildTagsMenuTemplate && (
@@ -218,7 +220,7 @@ export default class SearchBar extends React.PureComponent<Props, State> {
               <Search style={styles.iconButtonSearch.iconStyle} />
             </IconButton>
             <IconButton
-              onClick={this.handleCancel}
+              onClick={handleCancel}
               style={styles.iconButtonClose.style}
               disabled={disabled}
               size="small"
@@ -230,7 +232,9 @@ export default class SearchBar extends React.PureComponent<Props, State> {
       </ThemeConsumer>
     );
   }
-}
+);
+
+export default SearchBar;
 
 export const useShouldAutofocusSearchbar = () => {
   // Note: this is not a React hook but is named as one to encourage

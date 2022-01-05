@@ -124,10 +124,10 @@ const declarePathfindingBehavior = function (
   const pathfindingBehaviorDeclaration = extension
     .addBehavior(
       'NavMeshPathfindingBehavior',
-      _('NavMesh Pathfinding'),
+      _('Pathfinding (polygonal mesh based, experimental)'),
       'NavMeshPathfindingBehavior',
       _(
-        'With this behavior, the object will move in straight lines while ' +
+        'Move the object to a target in straight lines while ' +
         'avoiding all objects that are flagged as obstacles.'
       ),
       '',
@@ -792,7 +792,7 @@ const declareObstacleBehavior = function (
   extension
     .addBehavior(
       'NavMeshPathfindingObstacleBehavior',
-      _('Obstacle for NavMesh pathfinding'),
+      _('Obstacle for pathfinding (polygonal mesh based, experimental)'),
       'NavMeshPathfindingObstacleBehavior',
       _('Flag the object as being an obstacle for pathfinding.'),
       '',
@@ -818,7 +818,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'NavMeshPathfinding',
-      _('NavMesh Pathfinding behavior'),
+      _('Pathfinding (polygonal mesh based, experimental)'),
       _(
         'Pathfinding allows to compute an efficient path for objects, avoiding obstacles on the way.'
       ),

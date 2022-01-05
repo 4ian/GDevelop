@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -17,9 +18,19 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
   error: ?Error,
   loadBuilds: () => void,
+  game?: ?Game,
+  onGameUpdated?: Game => void,
 |};
 
-export default ({ builds, authenticatedUser, error, loadBuilds }: Props) => {
+export default ({
+  builds,
+  authenticatedUser,
+  error,
+  loadBuilds,
+  game,
+  onGameUpdated,
+}: Props) => {
+  const [gameUpdating, setGameUpdating] = React.useState(false);
   return (
     <Column noMargin expand>
       <Line>
@@ -55,7 +66,14 @@ export default ({ builds, authenticatedUser, error, loadBuilds }: Props) => {
         {authenticatedUser.authenticated && builds && builds.length !== 0 && (
           <ColumnStackLayout expand>
             {builds.map((build: Build) => (
-              <BuildCard build={build} key={build.id} />
+              <BuildCard
+                build={build}
+                key={build.id}
+                game={game}
+                onGameUpdated={onGameUpdated}
+                gameUpdating={gameUpdating}
+                setGameUpdating={setGameUpdating}
+              />
             ))}
           </ColumnStackLayout>
         )}

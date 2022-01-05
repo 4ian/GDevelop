@@ -68,6 +68,8 @@ export const browserHTML5ExportPipeline: ExportPipeline<
 
   canLaunchBuild: () => true,
 
+  isNavigationDisabled: () => false,
+
   renderHeader: () => <ExplanationHeader />,
 
   renderLaunchButtonLabel: () => <Trans>Export as a HTML5 game</Trans>,

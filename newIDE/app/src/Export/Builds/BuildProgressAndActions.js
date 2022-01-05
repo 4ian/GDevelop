@@ -15,8 +15,10 @@ import {
   type Build,
   type BuildArtifactKeyName,
 } from '../../Utils/GDevelopServices/Build';
+import { type Game, updateGame } from '../../Utils/GDevelopServices/Game';
 import Window from '../../Utils/Window';
 import { ColumnStackLayout } from '../../UI/Layout';
+import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -35,7 +37,7 @@ const buildTypesConfig = {
   },
 };
 
-const buttons = [
+const downloadButtons = [
   {
     displayName: t`Download (APK)`,
     key: 'apkKey',
@@ -68,13 +70,26 @@ const buttons = [
 
 type Props = {|
   build: Build,
+  game?: ?Game,
+  onGameUpdated?: Game => void,
+  gameUpdating?: boolean,
+  setGameUpdating?: boolean => void,
 |};
 
 /**
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-export default ({ build }: Props) => {
+export default ({
+  build,
+  game,
+  onGameUpdated,
+  gameUpdating,
+  setGameUpdating,
+}: Props) => {
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const config = buildTypesConfig[build.type];
   const secondsSinceLastUpdate = Math.abs(
     differenceInSeconds(build.updatedAt, Date.now())
@@ -88,6 +103,33 @@ export default ({ build }: Props) => {
     const url = getBuildArtifactUrl(build, key);
     if (url) Window.openExternalURL(url);
   };
+
+  const onUpdatePublicBuild = React.useCallback(
+    async (buildId: ?string) => {
+      if (!profile || !game || !onGameUpdated || !setGameUpdating) return;
+
+      const { id } = profile;
+      try {
+        setGameUpdating(true);
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: buildId,
+          }
+        );
+        onGameUpdated(updatedGame);
+        setGameUpdating(false);
+      } catch (err) {
+        console.error('Unable to update the game', err);
+        setGameUpdating(false);
+      }
+    },
+    [game, getAuthorizationHeader, profile, onGameUpdated, setGameUpdating]
+  );
+
+  const isBuildPublished = game && game.publicWebBuildId === build.id;
 
   return (
     <I18n>
@@ -145,16 +187,31 @@ export default ({ build }: Props) => {
         ) : build.status === 'complete' ? (
           <ColumnStackLayout>
             <Line expand justifyContent="flex-end">
-              {buttons
+              {game && !!build.s3Key && !isBuildPublished && (
+                <RaisedButton
+                  label={<Trans>Publish this build</Trans>}
+                  onClick={() => onUpdatePublicBuild(build.id)}
+                  disabled={gameUpdating}
+                />
+              )}
+              {game && !!build.s3Key && isBuildPublished && (
+                <FlatButton
+                  label={<Trans>Unpublish this build</Trans>}
+                  onClick={() => onUpdatePublicBuild(null)}
+                  disabled={gameUpdating}
+                />
+              )}
+              <Spacer />
+              {downloadButtons
                 .filter(button => !!build[button.key])
-                .map((button, index) => (
+                .map(button => (
                   <React.Fragment key={button.key}>
-                    {index !== 0 && <Spacer />}
                     <RaisedButton
                       label={i18n._(button.displayName)}
                       primary
                       onClick={() => onDownload(button.key)}
                     />
+                    <Spacer />
                   </React.Fragment>
                 ))}
               <FlatButton

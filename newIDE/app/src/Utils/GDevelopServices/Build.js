@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-import { GDevelopBuildApi } from './ApiConfigs';
+import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
 
 export type TargetName =
@@ -52,7 +52,10 @@ export const getBuildArtifactUrl = (
   }
 
   if (keyName === 's3Key') {
-    return `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
+    // New builds have a gameId.
+    return build.gameId
+      ? `${GDevelopGamesPlatform.baseUrl}/instant-builds/${build.id}`
+      : `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
   }
 
   return `https://builds.gdevelop-app.com/${build[keyName]}`;

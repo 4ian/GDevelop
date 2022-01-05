@@ -56,7 +56,14 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     targets: ['winExe'],
   }),
 
-  canLaunchBuild: (exportState: ExportState) => !!exportState.targets.length,
+  // Build can be launched only if just opened the dialog or build errored.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    !!exportState.targets.length && (errored || exportStep === ''),
+
+  // Navigation is enabled when the build is errored or whilst uploading.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored &&
+    ['export', 'resources-download', 'compress', 'upload'].includes(exportStep),
 
   renderHeader: props => <SetupExportHeader {...props} />,
 

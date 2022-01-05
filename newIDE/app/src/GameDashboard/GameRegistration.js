@@ -152,9 +152,11 @@ export const GameRegistration = ({
 
   React.useEffect(
     () => {
-      loadGame();
+      if (!game) {
+        loadGame();
+      }
     },
-    [loadGame]
+    [loadGame, game]
   );
 
   return (

@@ -5,6 +5,10 @@ export const GDevelopGamePreviews = {
   baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
+export const GDevelopGamesPlatform = {
+  baseUrl: isDev ? 'http://localhost:3001' : 'https://liluo.io',
+};
+
 export const GDevelopBuildApi = {
   baseUrl: isDev
     ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'

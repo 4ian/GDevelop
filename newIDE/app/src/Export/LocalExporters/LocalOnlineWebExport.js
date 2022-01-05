@@ -17,6 +17,7 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
+import { type BuildStep } from '../Builds/BuildStepsProgress';
 import {
   ExplanationHeader,
   WebProjectLink,
@@ -54,14 +55,24 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   getInitialExportState: () => null,
 
-  canLaunchBuild: () => true,
+  // Build can be launched if just opened the dialog or build errored, re-enabled when done.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    errored || exportStep === '' || exportStep === 'done',
+
+  // Navigation is enabled when the build is errored or if the build is not done.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored && !['', 'done'].includes(exportStep),
 
   renderHeader: () => <ExplanationHeader />,
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: (build: ?Build, loading: boolean) => (
-    <WebProjectLink build={build} loading={loading} />
+  renderCustomStepsProgress: (
+    build: ?Build,
+    errored: boolean,
+    exportStep: BuildStep
+  ) => (
+    <WebProjectLink build={build} errored={errored} exportStep={exportStep} />
   ),
 
   prepareExporter: (

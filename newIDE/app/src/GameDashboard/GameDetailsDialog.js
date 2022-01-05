@@ -127,17 +127,20 @@ export const GameDetailsDialog = ({
   );
 
   const updateGameFromProject = async () => {
-    if (!project) return;
-    if (!profile) return;
+    if (!project || !profile) return;
     const { id } = profile;
 
     try {
-      const game = await updateGame(getAuthorizationHeader, id, {
-        authorName: project.getAuthor(),
-        gameId: project.getProjectUuid(),
-        gameName: project.getName(),
-      });
-      onGameUpdated(game);
+      const updatedGame = await updateGame(
+        getAuthorizationHeader,
+        id,
+        project.getProjectUuid(),
+        {
+          authorName: project.getAuthor(),
+          gameName: project.getName(),
+        }
+      );
+      onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
     }
@@ -236,7 +239,11 @@ export const GameDetailsDialog = ({
           </ColumnStackLayout>
         ) : null}
         {currentTab === 'builds' ? (
-          <Builds gameId={game.id} authenticatedUser={authenticatedUser} />
+          <Builds
+            game={game}
+            authenticatedUser={authenticatedUser}
+            onGameUpdated={onGameUpdated}
+          />
         ) : null}
         {currentTab === 'analytics' ? (
           gameRollingMetricsError ? (

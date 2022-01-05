@@ -56,6 +56,7 @@ export default class FlatButton extends React.Component<Props, {||}> {
         color={primary ? 'primary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
+        disabled={disabled}
         {...otherProps}
       >
         {icon}

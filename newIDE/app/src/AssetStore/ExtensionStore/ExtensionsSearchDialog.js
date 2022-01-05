@@ -13,7 +13,6 @@ import DismissableInfoBar from '../../UI/Messages/DismissableInfoBar';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
@@ -22,6 +21,7 @@ type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
+  onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
 |};
 
 /**
@@ -31,6 +31,7 @@ export default function ExtensionsSearchDialog({
   project,
   onClose,
   onInstallExtension,
+  onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -41,13 +42,11 @@ export default function ExtensionsSearchDialog({
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const installDisplayedExtension = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_EXTENSION,
-        installExtension
-      )
-    : installExtension;
+  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_EXTENSION,
+    installExtension
+  );
 
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
@@ -80,6 +79,9 @@ export default function ExtensionsSearchDialog({
                       eventsFunctionsExtensionsState,
                       project
                     );
+                    if (wasExtensionImported && onExtensionInstalled)
+                      onExtensionInstalled();
+
                     setExtensionWasInstalled(wasExtensionImported);
                     setIsInstalling(false);
                   })();
@@ -105,6 +107,8 @@ export default function ExtensionsSearchDialog({
                 eventsFunctionsExtensionsState,
                 extensionShortHeader
               );
+              if (wasExtensionInstalled && onExtensionInstalled)
+                onExtensionInstalled(extensionShortHeader);
 
               setExtensionWasInstalled(wasExtensionInstalled);
               setIsInstalling(false);

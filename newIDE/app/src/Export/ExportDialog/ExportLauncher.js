@@ -34,7 +34,6 @@ import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
@@ -90,10 +89,7 @@ export default class ExportLauncher extends Component<Props, State> {
   }
 
   _setupAchievementHook = () => {
-    if (
-      ACHIEVEMENT_FEATURE_FLAG &&
-      this.props.exportPipeline.name.includes('web')
-    ) {
+    if (this.props.exportPipeline.name.includes('web')) {
       this.launchWholeExport = addCreateBadgePreHookIfNotClaimed(
         this.props.authenticatedUser,
         TRIVIAL_FIRST_WEB_EXPORT,

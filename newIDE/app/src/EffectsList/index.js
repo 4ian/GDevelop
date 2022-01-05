@@ -35,7 +35,6 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import ScrollView from '../UI/ScrollView';
 import { EmptyEffectsPlaceholder } from './EmptyEffectsPlaceholder';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EFFECT,
 } from '../Utils/GDevelopServices/Badge';
@@ -93,13 +92,11 @@ export default function EffectsList(props: Props) {
     onEffectsUpdated();
   };
 
-  const addEffect = ACHIEVEMENT_FEATURE_FLAG
-    ? addCreateBadgePreHookIfNotClaimed(
-        authenticatedUser,
-        TRIVIAL_FIRST_EFFECT,
-        _addEffect
-      )
-    : _addEffect;
+  const addEffect = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_EFFECT,
+    _addEffect
+  );
 
   const removeEffect = (name: string) => {
     effectsContainer.removeEffect(name);

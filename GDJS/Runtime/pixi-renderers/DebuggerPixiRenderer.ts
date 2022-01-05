@@ -83,6 +83,27 @@ namespace gdjs {
       };
 
       debugDraw.clear();
+
+      // Draw object custom debug drawing
+      for (let i = 0; i < instances.length; i++) {
+        const object = instances[i];
+        const layer = this._instanceContainer.getLayer(object.getLayer());
+
+        if (
+          (!object.isVisible() || !layer.isVisible()) &&
+          !showHiddenInstances
+        ) {
+          continue;
+        }
+
+        const rendererObject = object.getRendererObject();
+        if (!rendererObject) {
+          continue;
+        }
+
+        object.onDebugRendering(this._instanceContainer);
+      }
+
       debugDraw.beginFill();
       debugDraw.alpha = 0.8;
       debugDraw.lineStyle(2, 0x0000ff, 1);
@@ -301,6 +322,10 @@ namespace gdjs {
       }
 
       debugDraw.endFill();
+    }
+
+    getDebugRenderer(): PIXI.Graphics | null {
+      return this._debugDraw;
     }
 
     clearDebugDraw(): void {

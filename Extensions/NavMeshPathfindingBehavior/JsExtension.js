@@ -171,8 +171,8 @@ const declarePathfindingBehavior = function (
     .addScopedAction(
       'DrawNavMesh',
       _('Draw navigation mesh'),
-      _('Draw navigation mesh'),
-      _('Draw navigation mesh used for _PARAM0_ on _PARAM2_'),
+      _('Draw the navigation mesh on the debug view when the debug view is enabled too.'),
+      _('Draw the navigation mesh: _PARAM2_ used for _PARAM0_ on the debug view with the color: _PARAM3_'),
       'Debug (NavMesh)',
       'CppPlatform/Extensions/AStaricon24.png',
       'CppPlatform/Extensions/AStaricon16.png'
@@ -184,11 +184,12 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .addParameter('objectPtr', _('Shape painter'), '', false)
-    .setParameterExtraInfo('PrimitiveDrawing::Drawer')
+    .addParameter("yesorno", _("Show navigation mesh"))
+    .addParameter("color", _("Color"))
+    .addParameter("opacity", _("Opacity"))
     .markAsAdvanced()
     .getCodeExtraInformation()
-    .setFunctionName('drawNavMesh');
+    .setFunctionName('setVisualDebugEnabled');
 
   pathfindingBehaviorDeclaration
     .addScopedCondition(

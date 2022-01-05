@@ -34,8 +34,9 @@ namespace gdjs {
 
     /** Used to draw traces for debugging */
     _lastUsedObstacleCellPadding: float | null = null;
-    _outOfDateMeshesPainter: gdjs.ShapePainterRuntimeObject | null = null;
-    _needToWaitNextFrameToDraw: boolean = false;
+    _isVisualDebugEnabled: boolean = false;
+    _debugColor: integer = 0x000000;
+    _debugOpacity: float = 1;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -400,43 +401,51 @@ namespace gdjs {
     /**
      * Draw the navigation mesh on a shape painter object for debugging purpose
      * @param shapePainter
+     * @param rgbColor semicolon separated decimal values
      */
-    drawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      if (!shapePainter) {
+    setVisualDebugEnabled(
+      isVisualDebugEnabled: boolean,
+      rgbColor: string,
+      opacity: integer
+    ) {
+      this._isVisualDebugEnabled = isVisualDebugEnabled;
+      const colors = rgbColor.split(';');
+      if (colors.length < 3) {
         return;
       }
-      // Obstacles are watched in doStepPreEvents.
-      // If events request a redraw, the obstacles will only be invalidated at
-      // the next frame.
-      this._outOfDateMeshesPainter = shapePainter;
-      this._needToWaitNextFrameToDraw = true;
+      this._debugColor = parseInt(
+        gdjs.rgbToHex(
+          parseInt(colors[0], 10),
+          parseInt(colors[1], 10),
+          parseInt(colors[2], 10)
+        ),
+        16
+      );
+      this._debugOpacity = opacity / 255;
     }
 
-    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {
-      if (this._needToWaitNextFrameToDraw) {
-        this._needToWaitNextFrameToDraw = false;
+    doDebugRendering(runtimeScene: RuntimeScene): void {
+      if (!this._isVisualDebugEnabled) {
         return;
       }
-      if (this._outOfDateMeshesPainter) {
-        this.doDrawNavMesh(this._outOfDateMeshesPainter);
-        this._outOfDateMeshesPainter = null;
+      const graphics = runtimeScene.getRenderer().getDebugRenderer();
+      if (!graphics) {
+        return;
       }
-    }
 
-    /**
-     * Draw the navigation mesh on a shape painter object for debugging purpose
-     * @param shapePainter
-     */
-    private doDrawNavMesh(shapePainter: gdjs.ShapePainterRuntimeObject) {
-      // TODO This should be reworked to render on the debug view exposed by
-      // the runtime scene renderer instead of relying on an action.
+      // TODO find a way to rebuild drawing only when necessary.
 
       if (this._lastUsedObstacleCellPadding === null) {
         return;
       }
 
-      shapePainter.clear();
-
+      const layer = runtimeScene.getLayer(this.owner.getLayer());
+      graphics.lineStyle(
+        1,
+        this._debugColor,
+        Math.min(1, this._debugOpacity * 2)
+      );
+      // Draw the navigation mesh on a shape painter object for debugging purpose
       const navMesh = this._manager.getNavMesh(
         this._lastUsedObstacleCellPadding
       );
@@ -444,29 +453,32 @@ namespace gdjs {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         for (let index = 1; index < polygon.length; index++) {
-          // It helps to spot vertices with 180° between edges.
-          shapePainter.drawCircle(
+          const point = layer.convertInverseCoords(
             polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio,
-            3
+            polygon[index].y / this._manager._isometricRatio
           );
+          // It helps to spot vertices with 180° between edges.
+          graphics.drawCircle(point[0], point[1], 3);
         }
       }
       for (const navPoly of navMesh.getPolygons()) {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
-        shapePainter.beginFillPath(
+        graphics.beginFill(this._debugColor, this._debugOpacity);
+        const point = layer.convertInverseCoords(
           polygon[0].x,
           polygon[0].y / this._manager._isometricRatio
         );
+        graphics.moveTo(point[0], point[1]);
         for (let index = 1; index < polygon.length; index++) {
-          shapePainter.drawPathLineTo(
+          const point = layer.convertInverseCoords(
             polygon[index].x,
             polygon[index].y / this._manager._isometricRatio
           );
+          graphics.lineTo(point[0], point[1]);
         }
-        shapePainter.closePath();
-        shapePainter.endFillPath();
+        graphics.closePath();
+        graphics.endFill();
       }
     }
   }

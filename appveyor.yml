@@ -2,8 +2,6 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
-# TODO: test
-
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
@@ -20,7 +18,7 @@ environment:
   CSC_KEY_PASSWORD:
     secure: rEB8uUuqbJd/QZwga+mZdw==
 init:
-- ps: ''
+- ps: 'Get-ChildItem Env:'
 install:
 - ps: Install-Product node 14
 # Build GDevelop.js (and run tests to ensure it works)

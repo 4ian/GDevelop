@@ -168,7 +168,7 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddAction("ParticleSize1",
-                _("SIze, parameter 1"),
+                _("Size, parameter 1"),
                 _("Modify parameter 1 of the size of particles"),
                 _("the parameter 1 of size"),
                 _("Common"),

@@ -2,7 +2,7 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
-version: 1.0.{build}
+version: 1.1.{build}
 pull_requests:
   do_not_increment_build_number: true
 image: Visual Studio 2019

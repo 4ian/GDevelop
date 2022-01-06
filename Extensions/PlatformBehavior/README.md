@@ -67,8 +67,8 @@ TODO introduce the configuration
 The model doesn't follow the laws of physics and this is because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
 - the jumping speed `jumpSpeed`
 - the falling speed `fallingSpeed`
-The jump speed stay at its initial value while the jump is sustained. Then, it decrease according to the gravity until it reach 0 and stays that's way until the end.
-The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reach the maximum falling speed and stay that's way until the end too.
+The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays that's way until the end.
+The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reaches the maximum falling speed and stay that's way until the end too.
 
 
 ### Requests solving and random access
@@ -86,11 +86,28 @@ The character trajectory during a jump looks like a quadratic function, but it's
 
 Obviously, the end of the jump sustaining can't happen after the jump end. Other than this, the borders can be in any order. The function needs to be defined for each of these conditions:
 - sustain case `t < jumpSustainTime && t < maxFallingTime`
+- affine case `maxFallingTime < t && t < jumpSustainTime`
 - common case `jumpSustainTime < t && t < maxFallingTime && t < jumpEndTime`
 - max falling case `jumpSustainTime < t && maxFallingTime < t && t < jumpEndTime`
-- affine case `maxFallingTime < t && t < jumpSustainTime`
-- gladding case `jumpEndTime < t && maxFallingTime < t`
 - free fall case `jumpEndTime < t && t < maxFallingTime`
+- gladding case `jumpEndTime < t && maxFallingTime < t`
+
+It's easier to look at this as 3 functions depending on the `maxFallingTime` value:
+- with `maxFallingTime > jumpEndTime`
+  - sustain case
+  - common case
+  - free fall case
+  - gladding case
+- with `jumpSustainTime < maxFallingTime && maxFallingTime < jumpEndTime`
+  - sustain case
+  - common case
+  - max falling case
+  - gladding case
+- with `maxFallingTime < jumpSustainTime`
+  - sustain case
+  - affine case
+  - max falling case
+  - gladding case
 
 TOTO plot some trajectories with pieces and full function to illustrate these cases.
 
@@ -107,7 +124,7 @@ maxFallingTime(gravity, maxFallingSpeed) = solve([currentFallingSpeed(t, gravity
 fallEndedX(t, gravity) = fallingX(maxFallingTime(gravity, maxFallingSpeed), gravity) + maxFallingSpeed * (t - maxFallingTime(gravity, maxFallingSpeed))
 
 currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime) = -jumpSpeed + gravity * (t - jumpSustainTime)
-sustainedX(t, jumpSpeed) = jumpSpeed * t
+sustainedX(t, jumpSpeed) = -jumpSpeed * t
 jumpingX(t, gravity, jumpSpeed, jumpSustainTime) = sustainedX(jumpSustainTime, jumpSpeed) + integral(currentJumpSpeed(t, gravity, jumpSpeed, jumpSustainTime), t, jumpSustainTime, t)
 jumpEndTime(gravity, jumpSpeed, jumpSustainTime) = jumpSustainTime + jumpSpeed / gravity
 jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) = jumpingX(jumpEndTime(gravity, jumpSpeed, jumpSustainTime), gravity, jumpSpeed, jumpSustainTime)
@@ -168,13 +185,6 @@ solve([commonCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], 
 solve([maxFallingCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
 ```
 
-```
-maxFallingTime
-sustainCasePeakTime
-commonCasePeakTime
-maxFallingCasePeakTime
-```
-
 #### Find the time for a given Y displacement ####
 
 TODO explain
@@ -187,19 +197,10 @@ maxFallingCaseCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed
 sustainCaseDownTime(y, gravity, jumpSpeed) = solve([sustainCaseHeight(t, gravity, jumpSpeed)==y], t)[1].rhs()
 commonCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime) = solve([height(t, gravity, jumpSpeed, jumpSustainTime)==y], t)[1].rhs()
 maxFallingCaseCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[1].rhs()
-affineCaseDownTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs() # only one solution (it's affine) #
+gladdingCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([gladdingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[0].rhs() # only one solution (it's affine) #
+freeFallCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([freeFallCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[1].rhs()
 
 affineCaseTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs()
-
-sustainCaseUpTime
-commonCaseUpTime
-maxFallingCaseCaseUpTime
-
-sustainCaseDownTime
-commonCaseDownTime
-maxFallingCaseCaseDownTime
-
-affineCaseTime
 ```
 
 #### Plotting trajectories ####

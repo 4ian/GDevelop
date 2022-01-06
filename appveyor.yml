@@ -12,8 +12,13 @@ branches:
   only:
     - master
     - /experimental-build.*/
+environment:
+  CSC_LINK:
+    secure: YfPz2/1i50b5vNZthz9caQ==
+  CSC_KEY_PASSWORD:
+    secure: rEB8uUuqbJd/QZwga+mZdw==
 init:
-- ps: ''
+- ps: 'Get-ChildItem Env:'
 install:
 - ps: Install-Product node 14
 # Build GDevelop.js (and run tests to ensure it works)

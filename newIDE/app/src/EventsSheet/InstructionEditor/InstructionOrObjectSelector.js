@@ -275,7 +275,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     }
                   }}
                   onRequestSearch={onSubmitSearch}
-                  buildTagsMenuTemplate={() =>
+                  buildMenuTemplate={() =>
                     this._buildObjectTagsMenuTemplate(i18n)
                   }
                   style={styles.searchBar}

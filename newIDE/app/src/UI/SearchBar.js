@@ -28,9 +28,9 @@ type Props = {|
   style?: Object,
   /** The value of the text field. */
   value: string,
-  /** If tags are supported, the function to list the tags menu */
-  buildTagsMenuTemplate?: () => any,
-  /** If defined, a help icon button redirecting to this page will be shown */
+  /** The function to generate the optional menu. */
+  buildMenuTemplate?: () => any,
+  /** If defined, a help icon button redirecting to this page will be shown. */
   helpPagePath?: ?string,
 |};
 
@@ -97,7 +97,7 @@ export type SearchBarInterface = {|
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
  *
- * Customized to add optional tags button.
+ * Customized to add optional menu button.
  */
 const SearchBar = React.forwardRef<Props, SearchBarInterface>(
   (
@@ -108,7 +108,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       onRequestSearch,
       style,
       value: parentValue,
-      buildTagsMenuTemplate,
+      buildMenuTemplate,
       helpPagePath,
     },
     ref
@@ -190,7 +190,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                 ref={textField}
               />
             </div>
-            {buildTagsMenuTemplate && (
+            {buildMenuTemplate && (
               <ElementWithMenu
                 element={
                   <IconButton
@@ -201,7 +201,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <FilterList />
                   </IconButton>
                 }
-                buildMenuTemplate={buildTagsMenuTemplate}
+                buildMenuTemplate={buildMenuTemplate}
               />
             )}
             {helpPagePath && (

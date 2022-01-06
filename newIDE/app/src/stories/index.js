@@ -988,7 +988,7 @@ storiesOf('UI Building Blocks/SearchBar', module)
       value="123"
       onChange={action('change')}
       onRequestSearch={action('request search')}
-      buildTagsMenuTemplate={() => [
+      buildMenuTemplate={() => [
         {
           type: 'checkbox',
           label: 'Tag 1',

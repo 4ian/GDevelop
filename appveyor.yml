@@ -2,7 +2,7 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
-version: 1.0.{build}
+version: 1.1.{build}
 pull_requests:
   do_not_increment_build_number: true
 image: Visual Studio 2019
@@ -12,8 +12,13 @@ branches:
   only:
     - master
     - /experimental-build.*/
+environment:
+  CSC_LINK:
+    secure: YfPz2/1i50b5vNZthz9caQ==
+  CSC_KEY_PASSWORD:
+    secure: rEB8uUuqbJd/QZwga+mZdw==
 init:
-- ps: ''
+- ps: 'Get-ChildItem Env:'
 install:
 - ps: Install-Product node 14
 # Build GDevelop.js (and run tests to ensure it works)

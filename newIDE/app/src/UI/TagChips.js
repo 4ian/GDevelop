@@ -19,9 +19,10 @@ const styles = {
 type Props = {|
   tags: Tags,
   onChange?: Tags => void,
+  onRemove?: string => void,
 |};
 
-export default ({ tags, onChange }: Props) => {
+export default ({ tags, onChange, onRemove }: Props) => {
   if (!tags.length) return null;
 
   return (
@@ -31,7 +32,13 @@ export default ({ tags, onChange }: Props) => {
           key={tag}
           size="small"
           style={styles.chip}
-          onDelete={onChange ? () => onChange(removeTag(tags, tag)) : undefined}
+          onDelete={
+            onChange
+              ? () => onChange(removeTag(tags, tag))
+              : onRemove
+              ? () => onRemove(tag)
+              : undefined
+          }
           label={tag}
         />
       ))}

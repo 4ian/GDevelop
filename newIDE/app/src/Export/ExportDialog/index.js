@@ -12,6 +12,7 @@ import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import AlertMessage from '../../UI/AlertMessage';
 import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
+import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -69,12 +70,49 @@ const ExportDialog = ({
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
+  const [
+    isNavigationDisabled,
+    setIsNavigationDisabled,
+  ] = React.useState<boolean>(false);
   const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
     'onlinewebexport'
   );
+  const [game, setGame] = React.useState<?Game>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const onlineStatus = useOnlineStatus();
   const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
+
+  const loadGame = React.useCallback(
+    async () => {
+      if (!profile || !project) return;
+
+      const { id } = profile;
+      try {
+        const game = await getGame(
+          getAuthorizationHeader,
+          id,
+          project.getProjectUuid()
+        );
+        setGame(game);
+      } catch (err) {
+        console.error('Unable to load the game', err);
+      }
+    },
+    [project, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      // Load game only once.
+      if (!game) {
+        loadGame();
+      }
+    },
+    [loadGame, game]
+  );
 
   if (!project) return null;
   const exporters = [
@@ -110,6 +148,7 @@ const ExportDialog = ({
               setChosenExporterSection('home');
               setChosenExporterKey('onlinewebexport');
             }}
+            disabled={isNavigationDisabled}
           />
         ),
         <FlatButton
@@ -117,17 +156,17 @@ const ExportDialog = ({
           key="close"
           primary={false}
           onClick={onClose}
+          disabled={isNavigationDisabled}
         />,
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
-        exporter.key !== 'onlinewebexport' && (
-          <FlatButton
-            key="builds"
-            label={<Trans>See this game builds</Trans>}
-            onClick={() => setBuildsDialogOpen(true)}
-          />
-        ),
+        <FlatButton
+          key="builds"
+          label={<Trans>See this game builds</Trans>}
+          onClick={() => setBuildsDialogOpen(true)}
+          disabled={isNavigationDisabled || !game}
+        />,
       ]}
       open
       noMargin
@@ -149,6 +188,9 @@ const ExportDialog = ({
           project={project}
           onChangeSubscription={onChangeSubscription}
           authenticatedUser={authenticatedUser}
+          isNavigationDisabled={isNavigationDisabled}
+          setIsNavigationDisabled={setIsNavigationDisabled}
+          onGameUpdated={setGame}
         />
       )}
       {chosenExporterSection === 'automated' && (
@@ -158,6 +200,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -169,6 +212,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -181,15 +225,20 @@ const ExportDialog = ({
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             key={chosenExporterKey}
+            setIsNavigationDisabled={setIsNavigationDisabled}
+            onGameUpdated={setGame}
           />
         </div>
       )}
-      <BuildsDialog
-        open={buildsDialogOpen}
-        onClose={() => setBuildsDialogOpen(false)}
-        authenticatedUser={authenticatedUser}
-        gameId={project.getProjectUuid()}
-      />
+      {game && (
+        <BuildsDialog
+          open={buildsDialogOpen}
+          onClose={() => setBuildsDialogOpen(false)}
+          authenticatedUser={authenticatedUser}
+          game={game}
+          onGameUpdated={setGame}
+        />
+      )}
     </Dialog>
   );
 };

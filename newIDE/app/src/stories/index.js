@@ -126,7 +126,7 @@ import ChangeEmailDialog from '../Profile/ChangeEmailDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
-import BuildProgress from '../Export/Builds/BuildProgress';
+import BuildProgressAndActions from '../Export/Builds/BuildProgressAndActions';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
@@ -2472,7 +2472,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={''}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2483,7 +2482,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={''}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2494,7 +2492,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'export'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2505,7 +2502,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'resources-download'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={27}
       stepCurrentProgress={16}
       errored={false}
@@ -2516,7 +2512,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'export'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={true}
@@ -2527,7 +2522,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'compress'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2538,7 +2532,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'upload'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2549,7 +2542,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'upload'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
@@ -2560,7 +2552,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'waiting-for-build'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2579,7 +2570,6 @@ storiesOf('BuildStepsProgress', module)
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2600,7 +2590,6 @@ storiesOf('BuildStepsProgress', module)
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
@@ -2621,7 +2610,6 @@ storiesOf('BuildStepsProgress', module)
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2632,7 +2620,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'done'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2640,18 +2627,22 @@ storiesOf('BuildStepsProgress', module)
     />
   ));
 
-storiesOf('BuildProgress', module)
+storiesOf('BuildProgressAndActions', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('errored', () => <BuildProgress build={erroredCordovaBuild} />)
+  .add('errored', () => <BuildProgressAndActions build={erroredCordovaBuild} />)
   .add('pending (electron-build)', () => (
-    <BuildProgress build={{ ...pendingElectronBuild, updatedAt: Date.now() }} />
+    <BuildProgressAndActions
+      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
+    />
   ))
   .add('pending (cordova-build)', () => (
-    <BuildProgress build={{ ...pendingCordovaBuild, updatedAt: Date.now() }} />
+    <BuildProgressAndActions
+      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
+    />
   ))
   .add('pending and very old (cordova-build)', () => (
-    <BuildProgress
+    <BuildProgressAndActions
       build={{
         ...pendingCordovaBuild,
         updatedAt: Date.now() - 1000 * 3600 * 24,
@@ -2659,13 +2650,13 @@ storiesOf('BuildProgress', module)
     />
   ))
   .add('complete (cordova-build)', () => (
-    <BuildProgress build={completeCordovaBuild} />
+    <BuildProgressAndActions build={completeCordovaBuild} />
   ))
   .add('complete (electron-build)', () => (
-    <BuildProgress build={completeElectronBuild} />
+    <BuildProgressAndActions build={completeElectronBuild} />
   ))
   .add('complete (web-build)', () => (
-    <BuildProgress build={completeWebBuild} />
+    <BuildProgressAndActions build={completeWebBuild} />
   ));
 
 storiesOf('LocalFolderPicker', module)

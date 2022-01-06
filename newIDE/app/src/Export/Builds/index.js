@@ -3,12 +3,14 @@ import React, { Component } from 'react';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import BuildsList from './BuildsList';
 import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
 import BuildsWatcher from './BuildsWatcher';
 
 type Props = {|
   onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
-  gameId: string,
+  game: Game,
+  onGameUpdated?: Game => void,
 |};
 type State = {|
   builds: ?Array<Build>,
@@ -56,9 +58,11 @@ export default class Builds extends Component<Props, State> {
       firebaseUser,
     } = this.props.authenticatedUser;
     if (!firebaseUser) return;
+    // Game is not registered yet so return an empty list of builds.
+    const gameId = this.props.game.id;
     this.setState({ builds: null, error: null });
 
-    getBuilds(getAuthorizationHeader, firebaseUser.uid, this.props.gameId).then(
+    getBuilds(getAuthorizationHeader, firebaseUser.uid, gameId).then(
       builds => {
         this.setState(
           {
@@ -87,6 +91,8 @@ export default class Builds extends Component<Props, State> {
         authenticatedUser={this.props.authenticatedUser}
         error={this.state.error}
         loadBuilds={this._refreshBuilds}
+        game={this.props.game}
+        onGameUpdated={this.props.onGameUpdated}
       />
     );
   }

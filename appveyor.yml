@@ -2,6 +2,8 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
+# TODO: test
+
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
@@ -12,6 +14,11 @@ branches:
   only:
     - master
     - /experimental-build.*/
+environment:
+  CSC_LINK:
+    secure: YfPz2/1i50b5vNZthz9caQ==
+  CSC_KEY_PASSWORD:
+    secure: rEB8uUuqbJd/QZwga+mZdw==
 init:
 - ps: ''
 install:

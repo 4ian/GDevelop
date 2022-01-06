@@ -1,12 +1,12 @@
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import Chip from '@material-ui/core/Chip';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line } from './Grid';
 import randomColor from 'randomcolor';
 import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
-} from '../UI/SearchBar';
+} from './SearchBar';
 
 type Props = {|
   value: string,
@@ -35,63 +35,60 @@ const getChipColor = (tag: string) => {
   });
 };
 
-export default class SearchbarWithChips extends Component<Props> {
-  _searchBar: ?SearchBarInterface;
+const SearchBarWithChips = ({
+  value,
+  onChange,
+  chosenChip,
+  onChooseChip,
+  chips,
+  onRequestSearch,
+}: Props) => {
+  const searchBar = React.useRef<?SearchBarInterface>(null);
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
 
-  componentDidMount() {
-    if (useShouldAutofocusSearchbar() && this._searchBar)
-      this._searchBar.focus();
-  }
+  React.useEffect(() => {
+    if (shouldAutofocusSearchbar && searchBar.current)
+      searchBar.current.focus();
+  });
 
-  render() {
-    const {
-      chosenChip,
-      onChooseChip,
-      value,
-      onChange,
-      onRequestSearch,
-      chips,
-    } = this.props;
+  return (
+    <Column noMargin>
+      <SearchBar
+        value={value}
+        onRequestSearch={onRequestSearch}
+        onChange={value => {
+          onChange(value);
+        }}
+        ref={searchBar}
+      />
+      <Line>
+        <Column>
+          <div style={styles.chipsList}>
+            {chips &&
+              chips.map(({ text, value }) => (
+                <Chip
+                  size="small"
+                  key={value}
+                  style={{
+                    ...styles.chip,
+                    backgroundColor:
+                      !chosenChip || chosenChip === value
+                        ? getChipColor(value)
+                        : undefined,
+                    color:
+                      !chosenChip || chosenChip === value ? 'black' : undefined,
+                  }}
+                  onClick={() =>
+                    onChooseChip(chosenChip === value ? '' : value)
+                  }
+                  label={text}
+                />
+              ))}
+          </div>
+        </Column>
+      </Line>
+    </Column>
+  );
+};
 
-    return (
-      <Column noMargin>
-        <SearchBar
-          value={value}
-          onRequestSearch={onRequestSearch}
-          onChange={value => {
-            onChange(value);
-          }}
-          ref={searchBar => (this._searchBar = searchBar)}
-        />
-        <Line>
-          <Column>
-            <div style={styles.chipsList}>
-              {chips &&
-                chips.map(({ text, value }) => (
-                  <Chip
-                    size="small"
-                    key={value}
-                    style={{
-                      ...styles.chip,
-                      backgroundColor:
-                        !chosenChip || chosenChip === value
-                          ? getChipColor(value)
-                          : undefined,
-                      color:
-                        !chosenChip || chosenChip === value
-                          ? 'black'
-                          : undefined,
-                    }}
-                    onClick={() =>
-                      onChooseChip(chosenChip === value ? '' : value)
-                    }
-                    label={text}
-                  />
-                ))}
-            </div>
-          </Column>
-        </Line>
-      </Column>
-    );
-  }
-}
+export default SearchBarWithChips;

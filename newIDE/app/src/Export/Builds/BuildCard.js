@@ -52,7 +52,7 @@ const getIcon = (
 
 type Props = {|
   build: Build,
-  game?: ?Game,
+  game: Game,
   onGameUpdated?: Game => void,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,

@@ -24,6 +24,7 @@ import {
   registerGame,
   getGame,
   updateGame,
+  type Game,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -50,6 +51,7 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
+  onGameUpdated: (game: Game) => void,
 |};
 
 /**
@@ -141,20 +143,23 @@ export default class ExportLauncher extends Component<Props, State> {
     if (profile) {
       const userId = profile.id;
       try {
+        // Try to fetch the game to see if it's registered.
         await getGame(getAuthorizationHeader, userId, gameId);
         // Update the game details to ensure that it is up to date in GDevelop services.
-        await updateGame(getAuthorizationHeader, userId, gameId, {
+        const game = await updateGame(getAuthorizationHeader, userId, gameId, {
           authorName,
           gameName,
         });
+        this.props.onGameUpdated(game);
       } catch (err) {
         if (err.response.status === 404) {
           // If the game is not registered, register it before launching the export.
-          await registerGame(getAuthorizationHeader, userId, {
+          const game = await registerGame(getAuthorizationHeader, userId, {
             gameId,
             authorName,
             gameName,
           });
+          this.props.onGameUpdated(game);
         }
       }
     }

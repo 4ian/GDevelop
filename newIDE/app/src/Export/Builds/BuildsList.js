@@ -18,7 +18,7 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
   error: ?Error,
   loadBuilds: () => void,
-  game?: ?Game,
+  game: Game,
   onGameUpdated?: Game => void,
 |};
 

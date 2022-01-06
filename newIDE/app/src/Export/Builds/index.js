@@ -9,9 +9,8 @@ import BuildsWatcher from './BuildsWatcher';
 type Props = {|
   onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
-  game?: ?Game,
+  game: Game,
   onGameUpdated?: Game => void,
-  isGameLoading: boolean,
 |};
 type State = {|
   builds: ?Array<Build>,
@@ -26,17 +25,7 @@ export default class Builds extends Component<Props, State> {
   buildsWatcher = new BuildsWatcher();
 
   componentDidMount() {
-    // Do not load the builds if the game is still loading.
-    if (!this.props.isGameLoading) {
-      this._refreshBuilds();
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    // If the game has been loaded, fetch the builds.
-    if (prevProps.isGameLoading && !this.props.isGameLoading) {
-      this._refreshBuilds();
-    }
+    this._refreshBuilds();
   }
 
   componentWillUnmount() {
@@ -70,10 +59,6 @@ export default class Builds extends Component<Props, State> {
     } = this.props.authenticatedUser;
     if (!firebaseUser) return;
     // Game is not registered yet so return an empty list of builds.
-    if (!this.props.game) {
-      this.setState({ builds: [] });
-      return;
-    }
     const gameId = this.props.game.id;
     this.setState({ builds: null, error: null });
 

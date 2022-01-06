@@ -45,6 +45,7 @@ type ExportHomeProps = {|
   authenticatedUser: AuthenticatedUser,
   isNavigationDisabled: boolean,
   setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
+  onGameUpdated: () => void,
 |};
 
 const ExportHome = ({
@@ -57,6 +58,7 @@ const ExportHome = ({
   authenticatedUser,
   isNavigationDisabled,
   setIsNavigationDisabled,
+  onGameUpdated,
 }: ExportHomeProps) => {
   return (
     <ResponsiveLineStackLayout>
@@ -78,6 +80,7 @@ const ExportHome = ({
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             setIsNavigationDisabled={setIsNavigationDisabled}
+            onGameUpdated={onGameUpdated}
           />
         </div>
       </ColumnStackLayout>

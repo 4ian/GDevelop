@@ -243,7 +243,6 @@ export const GameDetailsDialog = ({
             game={game}
             authenticatedUser={authenticatedUser}
             onGameUpdated={onGameUpdated}
-            isGameLoading={false}
           />
         ) : null}
         {currentTab === 'analytics' ? (

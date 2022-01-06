@@ -64,7 +64,16 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     signingDialogOpen: false,
   }),
 
-  canLaunchBuild: () => true,
+  // Build can be launched only if just opened the dialog or build errored.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    errored || exportStep === '',
+
+  // Navigation is enabled when the build is errored or whilst uploading.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored &&
+    ['register', 'export', 'resources-download', 'compress', 'upload'].includes(
+      exportStep
+    ),
 
   renderHeader: props => <SetupExportHeader {...props} />,
 

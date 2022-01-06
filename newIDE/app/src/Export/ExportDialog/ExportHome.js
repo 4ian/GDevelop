@@ -43,6 +43,8 @@ type ExportHomeProps = {|
   project: gdProject,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
+  isNavigationDisabled: boolean,
+  setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
 |};
 
 const ExportHome = ({
@@ -53,6 +55,8 @@ const ExportHome = ({
   project,
   onChangeSubscription,
   authenticatedUser,
+  isNavigationDisabled,
+  setIsNavigationDisabled,
 }: ExportHomeProps) => {
   return (
     <ResponsiveLineStackLayout>
@@ -73,6 +77,7 @@ const ExportHome = ({
             project={project}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
+            setIsNavigationDisabled={setIsNavigationDisabled}
           />
         </div>
       </ColumnStackLayout>
@@ -108,6 +113,7 @@ const ExportHome = ({
                 setChosenExporterKey('webexport');
               }}
               primary
+              disabled={isNavigationDisabled}
             />
             <Spacer />
             <FlatButton
@@ -117,6 +123,7 @@ const ExportHome = ({
                 setChosenExporterSection('manual');
                 setChosenExporterKey('webexport');
               }}
+              disabled={isNavigationDisabled}
             />
           </Column>
         </div>

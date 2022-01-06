@@ -69,6 +69,10 @@ const ExportDialog = ({
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
+  const [
+    isNavigationDisabled,
+    setIsNavigationDisabled,
+  ] = React.useState<boolean>(false);
   const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
     'onlinewebexport'
   );
@@ -110,6 +114,7 @@ const ExportDialog = ({
               setChosenExporterSection('home');
               setChosenExporterKey('onlinewebexport');
             }}
+            disabled={isNavigationDisabled}
           />
         ),
         <FlatButton
@@ -117,17 +122,17 @@ const ExportDialog = ({
           key="close"
           primary={false}
           onClick={onClose}
+          disabled={isNavigationDisabled}
         />,
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
-        exporter.key !== 'onlinewebexport' && (
-          <FlatButton
-            key="builds"
-            label={<Trans>See this game builds</Trans>}
-            onClick={() => setBuildsDialogOpen(true)}
-          />
-        ),
+        <FlatButton
+          key="builds"
+          label={<Trans>See this game builds</Trans>}
+          onClick={() => setBuildsDialogOpen(true)}
+          disabled={isNavigationDisabled}
+        />,
       ]}
       open
       noMargin
@@ -149,6 +154,8 @@ const ExportDialog = ({
           project={project}
           onChangeSubscription={onChangeSubscription}
           authenticatedUser={authenticatedUser}
+          isNavigationDisabled={isNavigationDisabled}
+          setIsNavigationDisabled={setIsNavigationDisabled}
         />
       )}
       {chosenExporterSection === 'automated' && (
@@ -158,6 +165,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -169,6 +177,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -181,6 +190,7 @@ const ExportDialog = ({
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             key={chosenExporterKey}
+            setIsNavigationDisabled={setIsNavigationDisabled}
           />
         </div>
       )}

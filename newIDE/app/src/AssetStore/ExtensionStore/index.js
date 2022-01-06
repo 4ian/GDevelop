@@ -76,6 +76,7 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              filtersState={filtersState}
             />
             <Line
               expand

@@ -5,6 +5,7 @@ import * as React from 'react';
 import IconButton from './IconButton';
 import TextField from './TextField';
 import Paper from '@material-ui/core/Paper';
+import { Collapse } from '@material-ui/core';
 import Close from '@material-ui/icons/Close';
 import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
@@ -14,6 +15,9 @@ import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
+import { type FiltersState } from './Search/FiltersChooser';
+import { Column, Line } from './Grid';
+import TagChips from './TagChips';
 
 type Props = {|
   /** Disables text field. */
@@ -28,6 +32,8 @@ type Props = {|
   style?: Object,
   /** The value of the text field. */
   value: string,
+  /** Displays the chosen filters as chips below the text field. */
+  filtersState?: FiltersState,
   /** The function to generate the optional menu. */
   buildMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown. */
@@ -41,6 +47,7 @@ const getStyles = (value: string, disabled?: boolean) => {
     root: {
       height: 30,
       display: 'flex',
+      flex: 1,
       justifyContent: 'space-between',
     },
     iconButtonClose: {
@@ -108,6 +115,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       onRequestSearch,
       style,
       value: parentValue,
+      filtersState,
       buildMenuTemplate,
       helpPagePath,
     },
@@ -166,68 +174,84 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     return (
       <ThemeConsumer>
         {muiTheme => (
-          <Paper
-            style={{
-              backgroundColor: muiTheme.searchBar.backgroundColor,
-              ...styles.root,
-              ...style,
-            }}
-            square
-            elevation={1}
-          >
-            <div style={styles.searchContainer}>
-              <TextField
-                margin="none"
-                hintText={placeholder || t`Search`}
-                onBlur={handleBlur}
-                value={value}
-                onChange={handleInput}
-                onKeyUp={handleKeyPressed}
-                fullWidth
-                style={styles.input}
-                underlineShow={false}
-                disabled={disabled}
-                ref={textField}
-              />
-            </div>
-            {buildMenuTemplate && (
-              <ElementWithMenu
-                element={
-                  <IconButton
-                    style={styles.iconButtonFilter.style}
+          <Column>
+            <Line>
+              <Paper
+                style={{
+                  backgroundColor: muiTheme.searchBar.backgroundColor,
+                  ...styles.root,
+                  ...style,
+                }}
+                square
+                elevation={1}
+              >
+                <div style={styles.searchContainer}>
+                  <TextField
+                    margin="none"
+                    hintText={placeholder || t`Search`}
+                    onBlur={handleBlur}
+                    value={value}
+                    onChange={handleInput}
+                    onKeyUp={handleKeyPressed}
+                    fullWidth
+                    style={styles.input}
+                    underlineShow={false}
                     disabled={disabled}
+                    ref={textField}
+                  />
+                </div>
+                {buildMenuTemplate && (
+                  <ElementWithMenu
+                    element={
+                      <IconButton
+                        style={styles.iconButtonFilter.style}
+                        disabled={disabled}
+                        size="small"
+                      >
+                        <FilterList />
+                      </IconButton>
+                    }
+                    buildMenuTemplate={buildMenuTemplate}
+                  />
+                )}
+                {helpPagePath && (
+                  <HelpIcon
+                    disabled={disabled}
+                    helpPagePath={helpPagePath}
+                    style={styles.iconButtonHelp.style}
                     size="small"
-                  >
-                    <FilterList />
-                  </IconButton>
-                }
-                buildMenuTemplate={buildMenuTemplate}
-              />
+                  />
+                )}
+                <IconButton
+                  style={styles.iconButtonSearch.style}
+                  disabled={disabled}
+                  size="small"
+                >
+                  <Search style={styles.iconButtonSearch.iconStyle} />
+                </IconButton>
+                <IconButton
+                  onClick={handleCancel}
+                  style={styles.iconButtonClose.style}
+                  disabled={disabled}
+                  size="small"
+                >
+                  <Close style={styles.iconButtonClose.iconStyle} />
+                </IconButton>
+              </Paper>
+            </Line>
+            {filtersState && (
+              <Collapse in={filtersState.chosenFilters.size > 0}>
+                <Line>
+                  <Column>
+                    <TagChips
+                      tags={Array.from(filtersState.chosenFilters)}
+                      onRemove={tag => filtersState.removeFilter(tag)}
+                    />
+                  </Column>
+                </Line>
+              </Collapse>
             )}
-            {helpPagePath && (
-              <HelpIcon
-                disabled={disabled}
-                helpPagePath={helpPagePath}
-                style={styles.iconButtonHelp.style}
-                size="small"
-              />
-            )}
-            <IconButton
-              style={styles.iconButtonSearch.style}
-              disabled={disabled}
-              size="small"
-            >
-              <Search style={styles.iconButtonSearch.iconStyle} />
-            </IconButton>
-            <IconButton
-              onClick={handleCancel}
-              style={styles.iconButtonClose.style}
-              disabled={disabled}
-              size="small"
-            >
-              <Close style={styles.iconButtonClose.iconStyle} />
-            </IconButton>
-          </Paper>
+          </Column>
         )}
       </ThemeConsumer>
     );

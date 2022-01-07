@@ -50,14 +50,15 @@ install:
 
     cd ..\..
 
-# Package the app for Windows.
+# Package the app for Windows (and sign it with the certificate set in environment variables). 
+# Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
-- cmd: >-
+- ps: >-
     cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
+    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
 
-    node scripts/build.js --skip-app-build --win nsis --publish=never
+    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
 
     cd ..\..
 

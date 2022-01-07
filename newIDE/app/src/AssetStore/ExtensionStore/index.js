@@ -22,10 +22,11 @@ const styles = {
 };
 
 type Props = {|
-  isInstalling: boolean,
+  isInstalling: Boolean,
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<void>,
-  showOnlyWithBehaviors: boolean,
+  showOnlyWithBehaviors: Boolean,
+  focusOnMount?: Boolean,
 |};
 
 const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
@@ -36,6 +37,7 @@ export const ExtensionStore = ({
   project,
   onInstall,
   showOnlyWithBehaviors,
+  focusOnMount,
 }: Props) => {
   const [
     selectedExtensionShortHeader,
@@ -50,6 +52,8 @@ export const ExtensionStore = ({
     searchText,
     setSearchText,
   } = React.useContext(ExtensionStoreContext);
+
+  let _searchBar: ?SearchBar = null;
 
   React.useEffect(
     () => {
@@ -66,6 +70,12 @@ export const ExtensionStore = ({
       )
     : null;
 
+  React.useEffect(() => {
+    if (focusOnMount && _searchBar) {
+      _searchBar.focus();
+    }
+  }, []);
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -76,6 +86,7 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              ref={searchBar => (_searchBar = searchBar)}
             />
             <Line
               expand

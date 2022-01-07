@@ -219,6 +219,7 @@ export default function NewObjectDialog({
                 name: assetShortHeader.name,
               });
             }}
+            focusOnMount
           />
         )}
         {currentTab === 'new-object' && (

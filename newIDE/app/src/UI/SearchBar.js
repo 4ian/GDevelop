@@ -202,7 +202,12 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         // Used to focus search bar when all tags have been removed.
         // It is convenient when using keyboard to remove all tags and
         // quickly get back to the text field.
-        if (shouldAutofocusSearchbar && tagsHandler && tagsHandler.chosenTags.length === 0) focus();
+        if (
+          shouldAutofocusSearchbar &&
+          tagsHandler &&
+          tagsHandler.chosenTags.length === 0
+        )
+          focus();
       },
       [tagsHandler, shouldAutofocusSearchbar]
     );

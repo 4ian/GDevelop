@@ -22,11 +22,11 @@ const styles = {
 };
 
 type Props = {|
-  isInstalling: boolean,
+  isInstalling: Boolean,
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<void>,
-  showOnlyWithBehaviors: boolean,
-  focusOnMount?: boolean,
+  showOnlyWithBehaviors: Boolean,
+  focusOnMount?: Boolean,
 |};
 
 const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>

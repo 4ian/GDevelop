@@ -2,6 +2,7 @@
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
+import { makeStyles } from '@material-ui/styles';
 import IconButton from './IconButton';
 import TextField from './TextField';
 import Paper from '@material-ui/core/Paper';
@@ -104,6 +105,16 @@ const getStyles = (value: ?string, disabled?: boolean) => {
   };
 };
 
+const useAutocompleteStyles = makeStyles(
+  ({
+    palette: {
+      text: { primary },
+    },
+  }) => ({
+    groupLabel: { color: `${primary}${primary.length > 4 ? '88' : '8'}` },
+  })
+);
+
 export type SearchBarInterface = {|
   focus: () => void,
   blur: () => void,
@@ -151,6 +162,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     const textField = React.useRef<?TextField>(null);
 
     const styles = getStyles(value, disabled);
+    const autocompleteStyles = useAutocompleteStyles();
 
     const changeValue = React.useCallback(
       newValue => {
@@ -237,6 +249,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                       {allFilters ? (
                         <Autocomplete
                           options={allFilters.allTags}
+                          groupBy={options => i18n._(t`Apply a filter`)}
+                          classes={autocompleteStyles}
                           freeSolo
                           fullWidth
                           defaultValue=""

@@ -97,7 +97,9 @@ export default function NewBehaviorDialog({
 }: Props) {
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
-  const [currentTab, setCurrentTab] = React.useState('installed');
+  const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
+    'installed'
+  );
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const scrollView = React.useRef((null: ?ScrollViewInterface));
 
@@ -202,6 +204,7 @@ export default function NewBehaviorDialog({
           cannotBeDismissed={false}
           flexBody
           noMargin
+          fullHeight={currentTab === 'search'}
         >
           <Column expand noMargin>
             <Tabs value={currentTab} onChange={setCurrentTab}>

@@ -158,6 +158,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     };
 
     const [value, setValue] = React.useState<string>(parentValue);
+    const [autocompleteValue, setAutocompleteValue] = React.useState<string>(parentValue);
 
     const textField = React.useRef<?TextField>(null);
 
@@ -213,7 +214,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       reason: 'reset' | 'input' | 'clear'
     ) => {
       if (reason === 'reset') {
+        // Happens when user selects an option
         setValue('');
+        setAutocompleteValue('');
       } else {
         setValue(newValue);
       }
@@ -255,6 +258,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                           fullWidth
                           defaultValue=""
                           inputValue={value}
+                          value={autocompleteValue}
                           onChange={handleAutocompleteInput}
                           onInputChange={handleAutocompleteInputChange}
                           onKeyPress={handleKeyPressed}

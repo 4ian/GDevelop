@@ -71,8 +71,12 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
-              filtersState={filtersState}
-              allFilters={filters}
+              tagsHandler={{
+                add: filtersState.addFilter,
+                remove: filtersState.removeFilter,
+                chosenTags: Array.from(filtersState.chosenFilters),
+              }}
+              tags={filters && filters.allTags}
             />
             <ListSearchResults
               onRetry={fetchExtensionsAndFilters}

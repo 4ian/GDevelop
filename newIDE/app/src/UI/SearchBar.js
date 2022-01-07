@@ -21,11 +21,15 @@ import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
 import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
-import { type FiltersState } from './Search/FiltersChooser';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
-import { type Filters } from '../Utils/GDevelopServices/Filters';
 import { I18n } from '@lingui/react';
+
+type TagsHandler = {
+  remove: string => void,
+  add: string => void,
+  chosenTags: Array<string>,
+}
 
 type Props = {|
   /** Disables text field. */
@@ -40,10 +44,10 @@ type Props = {|
   style?: Object,
   /** The value of the text field. */
   value: string,
-  /** Displays the chosen filters as chips below the text field. */
-  filtersState?: FiltersState,
-  /** Displays matching filters in dropdown below search bar */
-  allFilters?: ?Filters,
+  /** The functions needed to interact with the list of tags displayed below search bar. */
+  tagsHandler?: TagsHandler,
+  /** Used to display matching tags in dropdown below search bar. */
+  tags?: ?Array<string>,
   /** The function to generate the optional menu. */
   buildMenuTemplate?: () => any,
   /** If defined, a help icon button redirecting to this page will be shown. */
@@ -135,8 +139,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       onRequestSearch,
       style,
       value: parentValue,
-      filtersState,
-      allFilters,
+      tagsHandler,
+      tags,
       buildMenuTemplate,
       helpPagePath,
     },
@@ -185,9 +189,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     );
     React.useEffect(
       () => {
-        if (filtersState && filtersState.chosenFilters.size === 0) focus();
+        if (tagsHandler && tagsHandler.chosenTags.length === 0) focus();
       },
-      [filtersState]
+      [tagsHandler]
     );
 
     const handleBlur = () => {
@@ -211,7 +215,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         | 'clear'
     ) => {
       if (reason === 'select-option') {
-        filtersState && filtersState.addFilter(newValue);
+        tagsHandler && tagsHandler.add(newValue);
         changeValue('');
       } else {
         changeValue(newValue);
@@ -259,9 +263,9 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     elevation={1}
                   >
                     <div style={styles.searchContainer}>
-                      {allFilters ? (
+                      {tags ? (
                         <Autocomplete
-                          options={allFilters.allTags}
+                          options={tags}
                           groupBy={options => i18n._(t`Apply a filter`)}
                           classes={autocompleteStyles}
                           freeSolo
@@ -345,13 +349,13 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     </IconButton>
                   </Paper>
                 </Line>
-                {filtersState && (
-                  <Collapse in={filtersState.chosenFilters.size > 0}>
+                {tagsHandler && (
+                  <Collapse in={tagsHandler.chosenTags.length > 0}>
                     <Line>
                       <Column>
                         <TagChips
-                          tags={Array.from(filtersState.chosenFilters)}
-                          onRemove={tag => filtersState.removeFilter(tag)}
+                          tags={Array.from(tagsHandler.chosenTags)}
+                          onRemove={tag => tagsHandler.remove(tag)}
                         />
                       </Column>
                     </Line>

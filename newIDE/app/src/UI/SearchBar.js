@@ -29,7 +29,7 @@ type TagsHandler = {
   remove: string => void,
   add: string => void,
   chosenTags: Array<string>,
-}
+};
 
 type Props = {|
   /** Disables text field. */
@@ -128,7 +128,7 @@ export type SearchBarInterface = {|
  * Material design search bar,
  * inspired from https://github.com/TeamWertarbyte/material-ui-search-bar
  *
- * Customized to add optional menu button.
+ * Customized to add optional menu button and chips corresponding to tags.
  */
 const SearchBar = React.forwardRef<Props, SearchBarInterface>(
   (
@@ -164,9 +164,11 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
     // This variable represents the value of the autocomplete, used to
-    // highlight an option and to determine if an option is selectable, or if
-    // an event should be fired when selected.
-    const [autocompleteValue, setAutocompleteValue] = React.useState<string>(parentValue);
+    // highlight an option and to determine if an option is selectable, or
+    // if an event should be fired when an option is selected.
+    const [autocompleteValue, setAutocompleteValue] = React.useState<string>(
+      parentValue
+    );
 
     const textField = React.useRef<?TextField>(null);
 
@@ -351,14 +353,10 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                 </Line>
                 {tagsHandler && (
                   <Collapse in={tagsHandler.chosenTags.length > 0}>
-                    <Line>
-                      <Column>
-                        <TagChips
-                          tags={Array.from(tagsHandler.chosenTags)}
-                          onRemove={tag => tagsHandler.remove(tag)}
-                        />
-                      </Column>
-                    </Line>
+                    <TagChips
+                      tags={Array.from(tagsHandler.chosenTags)}
+                      onRemove={tag => tagsHandler.remove(tag)}
+                    />
                   </Collapse>
                 )}
               </Column>

@@ -61,7 +61,9 @@ build_script:
     node scripts/build.js --skip-app-build --win nsis --publish=never
 
     set CSC_LINK=
+
     set CSC_KEY_PASSWORD=
+
     node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
 
     cd ..\..

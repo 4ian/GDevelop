@@ -60,7 +60,7 @@ export default ({ tags, onChange, onRemove }: Props) => {
     [focusedTag]
   );
 
-  const handleDeleteTag = (tag: string) => (event) => {
+  const handleDeleteTag = (tag: string) => event => {
     if (event.nativeEvent instanceof KeyboardEvent) {
       const tagIndex = tags.indexOf(tag);
       setRemovedTagIndex(tagIndex);

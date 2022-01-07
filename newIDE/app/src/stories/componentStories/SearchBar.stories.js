@@ -36,19 +36,19 @@ export const WithMenu = () => {
           type: 'checkbox',
           label: 'Tag 1',
           checked: false,
-          click: action("Clicked Tag 1"),
+          click: action('Clicked Tag 1'),
         },
         {
           type: 'checkbox',
           label: 'Tag 2 (checked)',
           checked: true,
-          click: action("Clicked Tag 2 (checked)"),
+          click: action('Clicked Tag 2 (checked)'),
         },
         {
           type: 'checkbox',
           label: 'Tag 3',
           checked: false,
-          click: action("Clicked Tag 3"),
+          click: action('Clicked Tag 3'),
         },
       ]}
     />
@@ -69,12 +69,7 @@ export const WithTags = () => {
         remove: filtersState.removeFilter,
         chosenTags: Array.from(filtersState.chosenFilters),
       }}
-      tags={[
-        'Platformer',
-        'RPG',
-        'Beat them all',
-        'Top down'
-      ]}
+      tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
     />
   );
 };

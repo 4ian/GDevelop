@@ -157,7 +157,11 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       }
     };
 
+    // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
+    // This variable represents the value of the autocomplete, used to
+    // highlight an option and to determine if an option is selectable, or if
+    // an event should be fired when selected.
     const [autocompleteValue, setAutocompleteValue] = React.useState<string>(parentValue);
 
     const textField = React.useRef<?TextField>(null);

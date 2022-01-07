@@ -204,7 +204,7 @@ export default function NewBehaviorDialog({
           cannotBeDismissed={false}
           flexBody
           noMargin
-          fullHeight={currentTab === 'search'}
+          fullHeight
         >
           <Column expand noMargin>
             <Tabs value={currentTab} onChange={setCurrentTab}>

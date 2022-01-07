@@ -10,7 +10,10 @@ import {
 import IconButton from '../../UI/IconButton';
 import KeyboardShortcuts from '../../UI/KeyboardShortcuts';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
-import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../../UI/SearchBar';
 import Lock from '@material-ui/icons/Lock';
 import LockOpen from '@material-ui/icons/LockOpen';
 const gd /*TODO: add flow in this file */ = global.gd;
@@ -65,7 +68,7 @@ export default class InstancesList extends Component<Props, State> {
   renderedRows: Array<RenderedRowInfo> = [];
   instanceRowRenderer: ?typeof gd.InitialInstanceJSFunctor;
   table: ?typeof RVTable;
-  _searchBar = React.createRef<SearchBar>();
+  _searchBar = React.createRef<SearchBarInterface>();
   _keyboardShortcuts = new KeyboardShortcuts({
     isActive: () => false,
     shortcutCallbacks: {},

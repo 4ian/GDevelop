@@ -91,12 +91,12 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     if (eventsFunction) eventsFunction.delete();
   }
 
-  _getFunctionGroupNames = () => {
+  _getFunctionGroupNames = (): Array<string> => {
     const { createNewExtension, extensionName } = this.state;
     if (createNewExtension || !extensionName) {
       return [];
     }
-    const groupNames = [];
+    const groupNames = new Set<string>();
     const { project } = this.props;
     const eventsFunctionsExtension = project.getEventsFunctionsExtension(
       extensionName
@@ -109,11 +109,11 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       const groupName = eventsFunctionsExtension
         .getEventsFunctionAt(index)
         .getGroup();
-      if (groupName && !groupNames.includes(groupName)) {
-        groupNames.push(groupName);
+      if (groupName) {
+        groupNames.add(groupName);
       }
     }
-    return groupNames;
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
   render() {

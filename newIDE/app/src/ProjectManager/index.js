@@ -9,7 +9,10 @@ import { List, ListItem } from '../UI/List';
 import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
-import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../UI/SearchBar';
 import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
@@ -320,7 +323,7 @@ type State = {|
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
-  _searchBar: ?SearchBar;
+  _searchBar: ?SearchBarInterface;
 
   state = {
     editedPropertiesLayout: null,

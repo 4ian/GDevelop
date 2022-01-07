@@ -25,11 +25,11 @@ import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 
-type TagsHandler = {
+type TagsHandler = {|
   remove: string => void,
   add: string => void,
   chosenTags: Array<string>,
-};
+|};
 
 type Props = {|
   /** Disables text field. */
@@ -115,6 +115,10 @@ const useAutocompleteStyles = makeStyles(
       text: { primary },
     },
   }) => ({
+    // We can't change the label opacity directly as it also changes the
+    // opacity of the background. Colors are stored in the themes as hex
+    // (#A3B or #AE345B) so we need to add the alpha channel to control
+    // opacity.
     groupLabel: { color: `${primary}${primary.length > 4 ? '88' : '8'}` },
   })
 );
@@ -185,19 +189,24 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     React.useEffect(
       () => {
+        // The value given by the parent has priority: if it changes,
+        // the search bar must display it.
         setValue(parentValue);
       },
       [parentValue]
     );
     React.useEffect(
       () => {
+        // Used to focus search bar when all tags have been removed.
+        // It is convenient when using keyboard to remove all tags and
+        // quickly get back to the text field.
         if (tagsHandler && tagsHandler.chosenTags.length === 0) focus();
       },
       [tagsHandler]
     );
 
     const handleBlur = () => {
-      if (!value || value.trim().length === 0) {
+      if (!value || value.trim() === '') {
         changeValue('');
       }
     };
@@ -205,6 +214,18 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     const handleInput = (e: {| target: {| value: string |} |}) => {
       changeValue(e.target.value);
     };
+
+    const handleCancel = () => {
+      changeValue('');
+    };
+
+    const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
+      if (shouldValidate(event)) {
+        onRequestSearch(value);
+      }
+    };
+
+    // --- Autocomplete-specific handlers ---
 
     const handleAutocompleteInput = (
       event: any,
@@ -216,6 +237,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         | 'blur'
         | 'clear'
     ) => {
+      // Called when the value of the autocomplete changes.
       if (reason === 'select-option') {
         tagsHandler && tagsHandler.add(newValue);
         changeValue('');
@@ -229,22 +251,15 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       newValue: string,
       reason: 'reset' | 'input' | 'clear'
     ) => {
+      // Called when the value of the input within the autocomplete changes.
       if (reason === 'reset') {
         // Happens when user selects an option
         setValue('');
+        // Clear this value to make sure the autocomplete doesn't keep the
+        // last typed value in memory.
         setAutocompleteValue('');
       } else {
         setValue(newValue);
-      }
-    };
-
-    const handleCancel = () => {
-      changeValue('');
-    };
-
-    const handleKeyPressed = (event: SyntheticKeyboardEvent<>) => {
-      if (shouldValidate(event)) {
-        onRequestSearch(value);
       }
     };
 

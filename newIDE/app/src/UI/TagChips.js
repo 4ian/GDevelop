@@ -51,12 +51,14 @@ export default ({ tags, onChange, onRemove }: Props) => {
   );
 
   const getChipStyle = React.useCallback(
-    (tag: string) => ({
-      ...styles.chip,
-      backgroundColor:
-        !focusedTag || focusedTag !== tag ? undefined : getChipColor(tag),
-      color: !focusedTag || focusedTag !== tag ? undefined : 'black',
-    }),
+    (tag: string) => {
+      const isFocused = !!focusedTag && focusedTag === tag;
+      return {
+        ...styles.chip,
+        backgroundColor: isFocused ? getChipColor(tag) : undefined,
+        color: isFocused ? 'black' : undefined,
+      };
+    },
     [focusedTag]
   );
 

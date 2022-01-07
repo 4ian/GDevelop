@@ -183,6 +183,12 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       },
       [parentValue]
     );
+    React.useEffect(
+      () => {
+        if (filtersState && filtersState.chosenFilters.size === 0) focus();
+      },
+      [filtersState]
+    );
 
     const handleBlur = () => {
       if (!value || value.trim().length === 0) {

@@ -34,6 +34,21 @@ export default ({ tags, onChange, onRemove }: Props) => {
   if (!tags.length) return null;
 
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
+  const [removedTagIndex, setRemovedTagIndex] = React.useState<number | null>(
+    null
+  );
+
+  const tagRefs = [];
+  React.useEffect(
+    () => {
+      if (removedTagIndex !== null) {
+        const tagToFocus = tagRefs[Math.min(removedTagIndex, tags.length - 1)];
+        tagToFocus.current && tagToFocus.current.focus();
+        setRemovedTagIndex(null);
+      }
+    },
+    [tags, removedTagIndex, tagRefs]
+  );
 
   const getChipStyle = React.useCallback(
     (tag: string) => ({
@@ -45,25 +60,33 @@ export default ({ tags, onChange, onRemove }: Props) => {
     [focusedTag]
   );
 
+  const handleDeleteTag = (tag: string) => (event) => {
+    if (event.nativeEvent instanceof KeyboardEvent) {
+      const tagIndex = tags.indexOf(tag);
+      setRemovedTagIndex(tagIndex);
+    }
+    if (onChange) onChange(removeTag(tags, tag));
+    else if (onRemove) onRemove(tag);
+  };
+
   return (
     <div style={styles.chipContainer}>
-      {tags.map(tag => (
-        <Chip
-          key={tag}
-          size="small"
-          style={getChipStyle(tag)}
-          onBlur={() => setFocusedTag(null)}
-          onFocus={() => setFocusedTag(tag)}
-          onDelete={
-            onChange
-              ? () => onChange(removeTag(tags, tag))
-              : onRemove
-              ? () => onRemove(tag)
-              : undefined
-          }
-          label={tag}
-        />
-      ))}
+      {tags.map(tag => {
+        const newRef = React.createRef();
+        tagRefs.push(newRef);
+        return (
+          <Chip
+            key={tag}
+            size="small"
+            style={getChipStyle(tag)}
+            onBlur={() => setFocusedTag(null)}
+            onFocus={() => setFocusedTag(tag)}
+            onDelete={handleDeleteTag(tag)}
+            label={tag}
+            ref={newRef}
+          />
+        );
+      })}
     </div>
   );
 };

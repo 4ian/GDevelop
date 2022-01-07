@@ -268,8 +268,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         {({ i18n }) => (
           <ThemeConsumer>
             {muiTheme => (
-              <Column>
-                <Line>
+              <Column noMargin>
+                <Line noMargin>
                   <Paper
                     style={{
                       backgroundColor: muiTheme.searchBar.backgroundColor,

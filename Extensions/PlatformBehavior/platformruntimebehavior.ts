@@ -82,12 +82,17 @@ namespace gdjs {
       searchArea.minY = y - oh / 2 - maxMovementLength;
       searchArea.maxX = x + ow / 2 + maxMovementLength;
       searchArea.maxY = y + oh / 2 + maxMovementLength;
-      const nearbyPlatforms = this._platformRBush.search(searchArea);
+      const nearbyPlatforms: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior>[] =
+        this._platformRBush.search(searchArea);
 
       result.length = 0;
+
+      // Extra check on the platform owner AABB
+      // TODO: PR https://github.com/4ian/GDevelop/pull/2602 should remove the need
+      // for this extra check once merged.
       for (let i = 0; i < nearbyPlatforms.length; i++) {
         const platform = nearbyPlatforms[i];
-        const platformAABB = platform.owner.getAABB();
+        const platformAABB = platform.behavior.owner.getAABB();
         const platformIsStillAround =
           platformAABB.min[0] <= searchArea.maxX &&
           platformAABB.min[1] <= searchArea.maxY &&
@@ -119,9 +124,8 @@ namespace gdjs {
     _oldWidth: float = 0;
     _oldHeight: float = 0;
     _oldAngle: float = 0;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      PlatformRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior> | null =
+      null;
     _manager: gdjs.PlatformObjectsManager;
     _registeredInManager: boolean = false;
 

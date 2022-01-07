@@ -2,8 +2,6 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
-# TODO: changing productName might not be actually needed!
-
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true

@@ -58,13 +58,13 @@ build_script:
 - cmd: >-
     cd newIDE\electron-app
 
-    node scripts/build.js --win nsis --publish=never
+    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
 
     set CSC_LINK=
 
     set CSC_KEY_PASSWORD=
 
-    node --max-old-space-size=3072 scripts/build.js --skip-app-build --win appx --publish=never
+    node scripts/build.js --skip-app-build --win appx --publish=never
 
     cd ..\..
 

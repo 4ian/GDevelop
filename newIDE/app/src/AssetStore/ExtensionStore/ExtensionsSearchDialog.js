@@ -54,6 +54,7 @@ export default function ExtensionsSearchDialog({
     <I18n>
       {({ i18n }) => (
         <Dialog
+          fullHeight
           title={<Trans>Search for New Extensions</Trans>}
           actions={[
             <FlatButton

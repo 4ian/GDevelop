@@ -209,6 +209,7 @@ export default function NewObjectDialog({
         </Tabs>
         {currentTab === 'asset-store' && (
           <AssetStore
+            focusOnMount
             project={project}
             objectsContainer={objectsContainer}
             events={events}

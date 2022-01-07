@@ -1,18 +1,13 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SearchBar from '../../UI/SearchBar';
-import { Column, Line } from '../../UI/Grid';
-import Background from '../../UI/Background';
-import ScrollView from '../../UI/ScrollView';
+import { Column } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
-import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
-import Subheader from '../../UI/Subheader';
 
 const styles = {
   searchBar: {
@@ -76,47 +71,30 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              tagsHandler={{
+                add: filtersState.addFilter,
+                remove: filtersState.removeFilter,
+                chosenTags: Array.from(filtersState.chosenFilters),
+              }}
+              tags={filters && filters.allTags}
             />
-            <Line
-              expand
-              overflow={
-                'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
-              }
-            >
-              <Background
-                noFullHeight
-                noExpand
-                width={windowWidth === 'small' ? 150 : 250}
-              >
-                <ScrollView>
-                  <Subheader>
-                    <Trans>Filters</Trans>
-                  </Subheader>
-                  <FiltersChooser
-                    allFilters={filters}
-                    filtersState={filtersState}
-                    error={error}
-                  />
-                </ScrollView>
-              </Background>
-              <ListSearchResults
-                onRetry={fetchExtensionsAndFilters}
-                error={error}
-                searchItems={filteredSearchResults}
-                getSearchItemUniqueId={getExtensionName}
-                renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-                  <ExtensionListItem
-                    key={extensionShortHeader.name}
-                    project={project}
-                    onHeightComputed={onHeightComputed}
-                    extensionShortHeader={extensionShortHeader}
-                    onChoose={() => {
-                      setSelectedExtensionShortHeader(extensionShortHeader);
-                    }}
-                  />
-                )}
-              />
-            </Line>
+            <ListSearchResults
+              onRetry={fetchExtensionsAndFilters}
+              error={error}
+              searchItems={filteredSearchResults}
+              getSearchItemUniqueId={getExtensionName}
+              renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+                <ExtensionListItem
+                  key={extensionShortHeader.name}
+                  project={project}
+                  onHeightComputed={onHeightComputed}
+                  extensionShortHeader={extensionShortHeader}
+                  onChoose={() => {
+                    setSelectedExtensionShortHeader(extensionShortHeader);
+                  }}
+                />
+              )}
+            />
           </Column>
         )}
       </ResponsiveWindowMeasurer>

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import SearchBar from '../../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import Background from '../../UI/Background';
 import ScrollView from '../../UI/ScrollView';
@@ -22,10 +22,11 @@ const styles = {
 };
 
 type Props = {|
-  isInstalling: boolean,
+  isInstalling: Boolean,
   project: gdProject,
   onInstall: ExtensionShortHeader => Promise<void>,
-  showOnlyWithBehaviors: boolean,
+  showOnlyWithBehaviors: Boolean,
+  focusOnMount?: Boolean,
 |};
 
 const getExtensionName = (extensionShortHeader: ExtensionShortHeader) =>
@@ -36,6 +37,7 @@ export const ExtensionStore = ({
   project,
   onInstall,
   showOnlyWithBehaviors,
+  focusOnMount,
 }: Props) => {
   const [
     selectedExtensionShortHeader,
@@ -50,6 +52,9 @@ export const ExtensionStore = ({
     searchText,
     setSearchText,
   } = React.useContext(ExtensionStoreContext);
+
+  const searchBar = React.useRef<?SearchBar>(null);
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
 
   React.useEffect(
     () => {
@@ -66,6 +71,15 @@ export const ExtensionStore = ({
       )
     : null;
 
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBar) {
+        searchBar.current.focus();
+      }
+    },
+    [shouldAutofocusSearchbar]
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -76,6 +90,7 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              ref={searchBar}
             />
             <Line
               expand

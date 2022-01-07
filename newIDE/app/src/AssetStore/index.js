@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import { Column, Line } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
@@ -46,13 +46,17 @@ export const AssetStore = ({
     setSearchText,
   } = React.useContext(AssetStoreContext);
 
-  let _searchBar: ?SearchBar = null;
+  const searchBar = React.useRef<?SearchBar>(null);
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
 
-  React.useEffect(() => {
-    if (focusOnMount && _searchBar) {
-      _searchBar.focus();
-    }
-  }, []);
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBar) {
+        searchBar.current.focus();
+      }
+    },
+    [shouldAutofocusSearchbar]
+  );
 
   React.useEffect(
     () => {
@@ -70,7 +74,7 @@ export const AssetStore = ({
             onChange={setSearchText}
             onRequestSearch={() => {}}
             style={styles.searchBar}
-            ref={searchBar => (_searchBar = searchBar)}
+            ref={searchBar}
           />
           <Line
             expand

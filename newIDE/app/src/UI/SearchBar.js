@@ -195,14 +195,16 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       },
       [parentValue]
     );
+
+    const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
     React.useEffect(
       () => {
         // Used to focus search bar when all tags have been removed.
         // It is convenient when using keyboard to remove all tags and
         // quickly get back to the text field.
-        if (tagsHandler && tagsHandler.chosenTags.length === 0) focus();
+        if (shouldAutofocusSearchbar && tagsHandler && tagsHandler.chosenTags.length === 0) focus();
       },
-      [tagsHandler]
+      [tagsHandler, shouldAutofocusSearchbar]
     );
 
     const handleBlur = () => {

@@ -26,6 +26,7 @@ type Props = {
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   onOpenDetails: AssetShortHeader => void,
+  focusOnMount?: Boolean,
 };
 
 export const AssetStore = ({
@@ -33,6 +34,7 @@ export const AssetStore = ({
   objectsContainer,
   events,
   onOpenDetails,
+  focusOnMount,
 }: Props) => {
   const {
     filters,
@@ -43,6 +45,14 @@ export const AssetStore = ({
     searchText,
     setSearchText,
   } = React.useContext(AssetStoreContext);
+
+  let _searchBar: ?SearchBar = null;
+
+  React.useEffect(() => {
+    if (focusOnMount && _searchBar) {
+      _searchBar.focus();
+    }
+  }, []);
 
   React.useEffect(
     () => {
@@ -60,6 +70,7 @@ export const AssetStore = ({
             onChange={setSearchText}
             onRequestSearch={() => {}}
             style={styles.searchBar}
+            ref={searchBar => (_searchBar = searchBar)}
           />
           <Line
             expand

@@ -115,6 +115,7 @@ export default function ExtensionsSearchDialog({
             }}
             project={project}
             showOnlyWithBehaviors={false}
+            focusOnMount
           />
           <DismissableInfoBar
             identifier="extension-installed-explanation"

@@ -274,6 +274,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                             <MuiTextField
                               margin="none"
                               {...params}
+                              inputRef={textField}
                               InputProps={{
                                 ...params.InputProps,
                                 disableUnderline: true,

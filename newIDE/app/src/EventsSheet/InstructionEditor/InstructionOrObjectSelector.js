@@ -6,6 +6,7 @@ import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
+import { Chip } from '@material-ui/core';
 import {
   createTree,
   type InstructionOrExpressionTreeNode,
@@ -22,7 +23,10 @@ import {
   filterEnumeratedInstructionOrExpressionMetadataByScope,
 } from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
-import SearchBar, { useShouldAutofocusSearchbar } from '../../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../../UI/SearchBar';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import ScrollView, { type ScrollViewInterface } from '../../UI/ScrollView';
 import { Tabs, Tab } from '../../UI/Tabs';
@@ -91,7 +95,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   State
 > {
   state = { searchText: '', selectedObjectTags: [] };
-  _searchBar = React.createRef<SearchBar>();
+  _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
 
@@ -212,6 +216,10 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       ? deduplicateInstructionsList(filteredInstructionsList.slice(0, 20))
       : filteredInstructionsList;
 
+    const displayedTags = isSearching
+      ? this._getAllObjectTags().filter(tag => tag.includes(searchText))
+      : [];
+
     const remainingResultsCount = isSearching
       ? Math.max(filteredInstructionsList.length - 20, 0)
       : 0;
@@ -220,7 +228,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       !isSearching ||
       !!displayedObjectsList.length ||
       !!displayedObjectGroupsList.length ||
-      !!displayedInstructionsList.length;
+      !!displayedInstructionsList.length ||
+      !!displayedTags.length;
 
     const onSubmitSearch = () => {
       if (!isSearching) return;
@@ -266,7 +275,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     }
                   }}
                   onRequestSearch={onSubmitSearch}
-                  buildTagsMenuTemplate={() =>
+                  buildMenuTemplate={() =>
                     this._buildObjectTagsMenuTemplate(i18n)
                   }
                   style={styles.searchBar}
@@ -344,6 +353,31 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                           )}
                         </React.Fragment>
                       )}
+                      {isSearching &&
+                        currentTab === 'objects' &&
+                        displayedTags.length > 0 && (
+                          <Subheader>
+                            <Trans>Object tags</Trans>
+                          </Subheader>
+                        )}
+                      {currentTab === 'objects' &&
+                        displayedTags.map(tag => (
+                          <ListItem
+                            key={tag}
+                            primaryText={<Chip label={tag} />}
+                            onClick={() => {
+                              this.setState({
+                                selectedObjectTags: [
+                                  ...this.state.selectedObjectTags,
+                                  tag,
+                                ],
+                                searchText: '',
+                              });
+                              this._searchBar.current &&
+                                this._searchBar.current.focus();
+                            }}
+                          />
+                        ))}
                       {isSearching && displayedInstructionsList.length > 0 && (
                         <Subheader>
                           {isCondition ? (

@@ -4,7 +4,10 @@ import { t } from '@lingui/macro';
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
 import { List, type ListItemRefType } from '../../../UI/List';
-import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../../../UI/SearchBar';
 import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
 import {
   type TreeNode,
@@ -55,7 +58,7 @@ export default class InstructionOrExpressionSelector<
     searchText: '',
     searchResults: [],
   };
-  _searchBar: ?SearchBar;
+  _searchBar: ?SearchBarInterface;
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
 

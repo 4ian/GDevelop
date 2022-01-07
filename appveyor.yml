@@ -2,6 +2,8 @@
 # on the Electron runtime (newIDE/electron-app) for Windows.
 # For macOS and Linux, see the config.yml file.
 
+# TODO: changing productName might not be actually needed!
+
 version: 1.0.{build}
 pull_requests:
   do_not_increment_build_number: true
@@ -50,14 +52,17 @@ install:
 
     cd ..\..
 
-# Package the app for Windows.
+# Package the app for Windows (and sign it with the certificate set in environment variables). 
+# Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
 - cmd: >-
     cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
-
     node scripts/build.js --skip-app-build --win nsis --publish=never
+
+    set CSC_LINK=
+    set CSC_KEY_PASSWORD=
+    node --max-old-space-size=3072 scripts/build.js --win appx --publish=never
 
     cd ..\..
 

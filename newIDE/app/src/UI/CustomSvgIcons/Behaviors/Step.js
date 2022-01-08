@@ -10,8 +10,10 @@ export default props => (
           fill="#2B3990"
           points="7.5 4.5 3 0 3 3 0 3 0 6 3 6 3 9"
         />
-        <circle id="Oval" fill="#27AAE1" cx="12" cy="4.5" r="3" />
-        <circle id="Oval" fill="#FFFFFF" cx="12" cy="4.5" r="1.5" />
+        <path
+          fill="#27aae1"
+          d="m 12,1.5 a 3,3 0 0 0 -3,3 3,3 0 0 0 3,3 3,3 0 0 0 3,-3 3,3 0 0 0 -3,-3 z M 12,3 A 1.5,1.5 0 0 1 13.5,4.5 1.5,1.5 0 0 1 12,6 1.5,1.5 0 0 1 10.5,4.5 1.5,1.5 0 0 1 12,3 Z"
+          id="Oval" />
         <polygon
           id="Shape"
           fill="#2B3990"

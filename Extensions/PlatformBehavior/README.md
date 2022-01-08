@@ -88,9 +88,9 @@ The character trajectory during a jump looks like a quadratic function, but it's
 
 TOTO plot some trajectories with pieces and full function to illustrate these cases.
 
-[![Trajectory with default settings](./diagrams/DefaultSettings.png)]
+![Trajectory with default settings](./diagrams/DefaultSettings.png)
 
-[![Trajectory with an affine part](./diagrams/WithAffine.png)]
+![Trajectory with an affine part](./diagrams/WithAffine.png)
 
 Depending on the when the maximum falling speed is reached, there can be 3 piece-wise functions:
 - after the jump end

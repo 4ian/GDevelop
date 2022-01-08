@@ -109,7 +109,7 @@ Depending on the when the maximum falling speed is reached, there can be 3 piece
 
 #### SageMath model
 
-The following model is written for [!SageMath](https://www.sagemath.org/) an open-source mathematics software system.
+The following model is written for [SageMath](https://www.sagemath.org/), an open-source mathematics software system.
 
 ```
 # First define the jump and falling functions #

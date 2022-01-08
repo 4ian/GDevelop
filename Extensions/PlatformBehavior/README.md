@@ -67,10 +67,11 @@ TODO introduce the configuration
 The model doesn't follow the laws of physics and this is because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
 - the jumping speed `jumpSpeed`
 - the falling speed `fallingSpeed`
+
 The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays that's way until the end.
 The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reaches the maximum falling speed and stay that's way until the end too.
 
-[![RequestedDeltaX](./diagrams/JumpSpeed.png)](./diagrams/JumpSpeed.svgz) [![RequestedDeltaX](./diagrams/FallingSpeed.png)](./diagrams/FallingSpeed.svgz)
+[![Jump speed](./diagrams/JumpSpeed.png)](./diagrams/JumpSpeed.svgz) [![Falling speed](./diagrams/FallingSpeed.png)](./diagrams/FallingSpeed.svgz)
 
 ### Requests solving and random access
 
@@ -86,6 +87,10 @@ The character trajectory during a jump looks like a quadratic function, but it's
 - when the jump speed becomes nul (jumpEndTime)
 
 TOTO plot some trajectories with pieces and full function to illustrate these cases.
+
+[![Trajectory with default settings](./diagrams/DefaultSettings.png)]
+
+[![Trajectory with an affine part](./diagrams/WithAffine.png)]
 
 Depending on the when the maximum falling speed is reached, there can be 3 piece-wise functions:
 - after the jump end
@@ -104,7 +109,7 @@ Depending on the when the maximum falling speed is reached, there can be 3 piece
   - max falling case
   - gladding case
 
-[![RequestedDeltaX](./diagrams/JumpCases.png)](./diagrams/JumpCases.svgz)
+[![Jump cases](./diagrams/JumpCases.png)](./diagrams/JumpCases.svgz)
 
 #### SageMath model
 

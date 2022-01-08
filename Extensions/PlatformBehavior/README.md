@@ -70,6 +70,7 @@ The model doesn't follow the laws of physics and this is because more realism do
 The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays that's way until the end.
 The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reaches the maximum falling speed and stay that's way until the end too.
 
+[![RequestedDeltaX](./diagrams/JumpSpeed.png)](./diagrams/JumpSpeed.svgz) [![RequestedDeltaX](./diagrams/FallingSpeed.png)](./diagrams/FallingSpeed.svgz)
 
 ### Requests solving and random access
 
@@ -84,32 +85,26 @@ The character trajectory during a jump looks like a quadratic function, but it's
 - when the maximum falling speed is reached (maxFallingTime)
 - when the jump speed becomes nul (jumpEndTime)
 
-Obviously, the end of the jump sustaining can't happen after the jump end. Other than this, the borders can be in any order. The function needs to be defined for each of these conditions:
-- sustain case `t < jumpSustainTime && t < maxFallingTime`
-- affine case `maxFallingTime < t && t < jumpSustainTime`
-- common case `jumpSustainTime < t && t < maxFallingTime && t < jumpEndTime`
-- max falling case `jumpSustainTime < t && maxFallingTime < t && t < jumpEndTime`
-- free fall case `jumpEndTime < t && t < maxFallingTime`
-- gladding case `jumpEndTime < t && maxFallingTime < t`
+TOTO plot some trajectories with pieces and full function to illustrate these cases.
 
-It's easier to look at this as 3 functions depending on the `maxFallingTime` value:
-- with `maxFallingTime > jumpEndTime`
+Depending on the when the maximum falling speed is reached, there can be 3 piece-wise functions:
+- after the jump end
   - sustain case
   - common case
   - free fall case
   - gladding case
-- with `jumpSustainTime < maxFallingTime && maxFallingTime < jumpEndTime`
+- before the jump end and after the sustaining
   - sustain case
   - common case
   - max falling case
   - gladding case
-- with `maxFallingTime < jumpSustainTime`
+- during the sustaining
   - sustain case
   - affine case
   - max falling case
   - gladding case
 
-TOTO plot some trajectories with pieces and full function to illustrate these cases.
+[![RequestedDeltaX](./diagrams/JumpCases.png)](./diagrams/JumpCases.svgz)
 
 #### SageMath model
 

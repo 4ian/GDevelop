@@ -60,16 +60,14 @@ For further details on the implementation, please take a look at the comments in
 
 ### Sequential calculus of the engine
 
-The engine uses the previous speeds and positions to evaluate the new ones. This is fast for sequential access and it's a good fit for what the engine do.
+The engine uses the previous speeds and positions to evaluate the new ones (with Verlet integrations). This is fast for sequential access and it's a good fit for what the engine does.
 
-TODO introduce the configuration
+The model doesn't follow the laws of physics and this is fine because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
+- the current jumping speed `currentJumpSpeed`
+- the current falling speed `currentFallSpeed`
 
-The model doesn't follow the laws of physics and this is because more realism doesn't mean more fun. Internally, it uses 2 independent speeds:
-- the jumping speed `jumpSpeed`
-- the falling speed `fallingSpeed`
-
-The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays that's way until the end.
-The falling speed starts at 0 and increase according to the gravity, as soon as the jump start, until it reaches the maximum falling speed and stay that's way until the end too.
+The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays constant until the end.
+The falling speed starts at 0 and increase according to the gravity, as soon as the jump start. Until, it reaches the maximum falling speed and stays constant until the end too.
 
 [![Jump speed](./diagrams/JumpSpeed.png)](./diagrams/JumpSpeed.svgz) [![Falling speed](./diagrams/FallingSpeed.png)](./diagrams/FallingSpeed.svgz)
 
@@ -77,16 +75,14 @@ The falling speed starts at 0 and increase according to the gravity, as soon as 
 
 #### Why a continuous model?
 
-TODO introduce continuous modelization
+A function allows to get a position for any given time without calculating every previous positions.
 
 #### Polynomial piece-wise function 
 
 The character trajectory during a jump looks like a quadratic function, but it's actually a piece-wise function. There are 3 borders:
 - at the end of the jump sustaining (jumpSustainTime)
 - when the maximum falling speed is reached (maxFallingTime)
-- when the jump speed becomes nul (jumpEndTime)
-
-TOTO plot some trajectories with pieces and full function to illustrate these cases.
+- when the jump speed reach 0 (jumpEndTime)
 
 ![Trajectory with default settings](./diagrams/DefaultSettings.png)
 
@@ -113,7 +109,7 @@ Depending on the when the maximum falling speed is reached, there can be 3 piece
 
 #### SageMath model
 
-TODO explain
+The following model is written for [!SageMath](https://www.sagemath.org/) an open-source mathematics software system.
 
 ```
 # First define the jump and falling functions #
@@ -215,8 +211,8 @@ TODO explain
 # jumpSustainTime: 0.2
 # jumpSpeed: 600
 #
-# maxFallingTime(1000, 700)
-# 7/10
+# n(maxFallingTime(1000, 700))
+# 0.7
 
 (
   plot(-sustainCaseHeight(t, 1000, 600), 0, 0.8, ymin=0, color='grey')

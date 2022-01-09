@@ -24,7 +24,7 @@ type Props<Item> = {
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
-  getBadge?: () => Object,
+  getBadge?: () => string,
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',

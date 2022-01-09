@@ -20,6 +20,7 @@ type Props<Item> = {|
   onRename: (Item, string) => void,
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
+  getItemBadge?: Item => string,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
   onEditItem?: Item => void,
@@ -53,6 +54,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
     const {
       selectedItems,
       getItemThumbnail,
+      getItemBadge,
       erroredItems,
       isItemBold,
       onEditItem,
@@ -74,6 +76,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
+        getBadge={getItemBadge}
         selected={selectedItems.indexOf(item) !== -1}
         onItemSelected={this.props.onItemSelected}
         errorStatus={erroredItems ? erroredItems[itemName] || '' : ''}

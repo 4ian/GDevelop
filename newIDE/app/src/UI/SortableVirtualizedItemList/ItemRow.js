@@ -24,7 +24,7 @@ type Props<Item> = {
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
-  getBadge?: () => string,
+  getBadge?: () => Object,
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
@@ -116,7 +116,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           const leftContent = () => {
             if (getBadge && getThumbnail) {
               return (
-                <Badge badgeContent={25} classes={getBadge} >
+                <Badge badgeContent={25} style={getBadge} >
                 <ListIcon
                   iconSize={24}
                   src={getThumbnail()}

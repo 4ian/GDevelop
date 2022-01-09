@@ -116,20 +116,19 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
           const leftContent = () => {
             if (getBadge && getThumbnail) {
               return (
-                <Badge badgeContent={25} style={getBadge} >
-                <ListIcon
-                  iconSize={24}
-                  src={getThumbnail()}
-                  cssAnimation={
-                    scaleUpItemIconWhenSelected && selected
-                      ? 'scale-and-jiggle 0.8s forwards'
-                      : ''
-                  }
-                />
-              </Badge>
-              )
-            }
-            else if (!getBadge && getThumbnail) {
+                <Badge badgeContent={25} style={getBadge}>
+                  <ListIcon
+                    iconSize={24}
+                    src={getThumbnail()}
+                    cssAnimation={
+                      scaleUpItemIconWhenSelected && selected
+                        ? 'scale-and-jiggle 0.8s forwards'
+                        : ''
+                    }
+                  />
+                </Badge>
+              );
+            } else if (!getBadge && getThumbnail) {
               return (
                 <ListIcon
                   iconSize={24}
@@ -140,13 +139,11 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                       : ''
                   }
                 />
-              )
+              );
+            } else {
+              return;
             }
-            else {
-              return
-            }
-            
-            };
+          };
 
           return (
             <ListItem

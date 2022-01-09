@@ -77,7 +77,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
         }
         getBadge={{
-          color: 'primary'
+          color: 'primary',
         }}
         selected={selectedItems.indexOf(item) !== -1}
         onItemSelected={this.props.onItemSelected}

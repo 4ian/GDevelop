@@ -7,6 +7,7 @@ import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
 import { textEllispsisStyle } from '../TextEllipsis';
+import { Badge } from '@material-ui/core';
 
 const styles = {
   textField: {
@@ -23,6 +24,7 @@ type Props<Item> = {
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
+  getBadge?: () => Object,
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
@@ -51,6 +53,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
       isBold,
       selected,
       getThumbnail,
+      getBadge,
       errorStatus,
       onEdit,
       onItemSelected,
@@ -110,26 +113,49 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                 : muiTheme.listItem.warningTextColor,
           };
 
-          const leftIcon = getThumbnail ? (
-            <ListIcon
-              iconSize={24}
-              src={getThumbnail()}
-              cssAnimation={
-                scaleUpItemIconWhenSelected && selected
-                  ? 'scale-and-jiggle 0.8s forwards'
-                  : ''
-              }
-            />
-          ) : null;
+          const leftContent = () => {
+            if (getBadge && getThumbnail) {
+              return (
+                <Badge badgeContent={25} style={getBadge} >
+                <ListIcon
+                  iconSize={24}
+                  src={getThumbnail()}
+                  cssAnimation={
+                    scaleUpItemIconWhenSelected && selected
+                      ? 'scale-and-jiggle 0.8s forwards'
+                      : ''
+                  }
+                />
+              </Badge>
+              )
+            }
+            else if (!getBadge && getThumbnail) {
+              return (
+                <ListIcon
+                  iconSize={24}
+                  src={getThumbnail()}
+                  cssAnimation={
+                    scaleUpItemIconWhenSelected && selected
+                      ? 'scale-and-jiggle 0.8s forwards'
+                      : ''
+                  }
+                />
+              )
+            }
+            else {
+              return
+            }
+            
+            };
 
           return (
             <ListItem
               style={{ ...itemStyle }}
               primaryText={label}
               leftIcon={
-                connectIconDragSource && leftIcon
-                  ? connectIconDragSource(<div>{leftIcon}</div>)
-                  : leftIcon
+                connectIconDragSource && leftContent()
+                  ? connectIconDragSource(<div>{leftContent()}</div>)
+                  : leftContent()
               }
               displayMenuButton={!hideMenuButton}
               rightIconColor={

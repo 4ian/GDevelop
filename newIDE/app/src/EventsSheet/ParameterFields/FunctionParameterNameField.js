@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
-import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import { mapVector } from '../../Utils/MapFor';

@@ -60,29 +60,31 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
+  - npm -v
+  - npm install -g npm@7
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only for GDCore
-  - mkdir .build-tests
-  - cd .build-tests
-  - cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
-  - make -j 4
-  - cd ..
+  #- mkdir .build-tests
+  #- cd .build-tests
+  #- cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
+  #- make -j 4
+  #- cd ..
 # Install Emscripten (for GDevelop.js)
-  - git clone https://github.com/juj/emsdk.git
-  - cd emsdk
-  - ./emsdk install 1.39.6
-  - ./emsdk activate 1.39.6
-  - source ./emsdk_env.sh
-  - cd ..
+  #- git clone https://github.com/juj/emsdk.git
+  #- cd emsdk
+  #- ./emsdk install 1.39.6
+  #- ./emsdk activate 1.39.6
+  #- source ./emsdk_env.sh
+  #- cd ..
 # Install GDevelop.js dependencies and compile it
-  - cd GDevelop.js
-  - npm install -g grunt-cli
-  - npm install
-  - npm run build
-  - cd ..
+  #- cd GDevelop.js
+  #- npm install -g grunt-cli
+  #- npm install
+  #- npm run build
+  #- cd ..
 #Install newIDE tests dependencies
-  - cd newIDE/app && npm install
+  - cd newIDE/app && npm ci
   - cd ../..
 #Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install

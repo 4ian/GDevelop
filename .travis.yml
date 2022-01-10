@@ -84,7 +84,7 @@ install:
   #- npm run build
   #- cd ..
 #Install newIDE tests dependencies
-  - cd newIDE/app && npm install
+  - npm -v && cd newIDE/app && npm install
   - cd ../..
 #Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install

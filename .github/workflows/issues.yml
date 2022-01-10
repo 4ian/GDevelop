@@ -40,7 +40,7 @@ jobs:
           This bug is actually known but we currently lack information on how to reproduce it. Could you please tell us more about how it happened in the issue #3453?
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Autocomment known 124 crash removing a node (reference issue comment)
-      if: "${{ contains(github.event.issue.body, 'Error: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.') }}"
+      if: "${{ contains(github.event.issue.body, 'The node to be removed is not a child of this node') }}"
       uses: peter-evans/create-or-update-comment@v1
       with:
         issue-number: 3453

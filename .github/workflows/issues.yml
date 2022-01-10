@@ -1,5 +1,7 @@
 name: GDevelop Issues automatic workflow
-on: [issues]
+on:
+  issues:
+    types: [opened]
 jobs:
   autoclose:
     runs-on: ubuntu-latest

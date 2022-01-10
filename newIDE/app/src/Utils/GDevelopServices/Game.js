@@ -46,7 +46,7 @@ export type AllShowcasedGames = {
 
 export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
-  return `${GDevelopGamesPlatform.baseUrl}/games/${game.id}`;
+  return GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
 export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {

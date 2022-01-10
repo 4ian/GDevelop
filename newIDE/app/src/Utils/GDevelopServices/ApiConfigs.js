@@ -6,7 +6,14 @@ export const GDevelopGamePreviews = {
 };
 
 export const GDevelopGamesPlatform = {
-  baseUrl: isDev ? 'http://localhost:3001' : 'https://liluo.io',
+  getInstantBuildUrl: (buildId: string) =>
+    isDev
+      ? `https://liluo.io/instant-builds/${buildId}?dev=true`
+      : `https://liluo.io/instant-builds/${buildId}`,
+  getGameUrl: (gameId: string) =>
+    isDev
+      ? `https://liluo.io/games/${gameId}?dev=true`
+      : `https://liluo.io/games/${gameId}`,
 };
 
 export const GDevelopBuildApi = {

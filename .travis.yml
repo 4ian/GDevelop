@@ -60,6 +60,8 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
+# Ensure we use a recent version of Node.js
+  - nvm use v14
   - npm -v
   - npm install -g npm@7
 #Get the correct version of gcc/g++

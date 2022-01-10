@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
-import { mapVector } from '../../Utils/MapFor';
-const gd: libGDevelop = global.gd;
+import { enumerateParametersUsableInExpressions } from './EnumerateFunctionParameters';
 
 export default class FunctionParameterNameField extends Component<
   ParameterFieldProps,
@@ -41,15 +40,3 @@ export default class FunctionParameterNameField extends Component<
     );
   }
 }
-
-export const enumerateParametersUsableInExpressions = (
-  eventsFunction: gdEventsFunction
-): gdParameterMetadata[] => {
-  return mapVector(eventsFunction.getParameters(), parameterMetadata =>
-    parameterMetadata.isCodeOnly() ||
-    gd.ParameterMetadata.isObject(parameterMetadata.getType()) ||
-    gd.ParameterMetadata.isBehavior(parameterMetadata.getType())
-      ? null
-      : parameterMetadata
-  ).filter(Boolean);
-};

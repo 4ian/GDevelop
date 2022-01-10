@@ -22,7 +22,7 @@ import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/Generic
 import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
-import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/FunctionParameterNameField';
+import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/EnumerateFunctionParameters';
 
 const gd: libGDevelop = global.gd;
 

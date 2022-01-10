@@ -32,7 +32,7 @@ jobs:
       if: "${{ contains(github.event.issue.body, 'The node to be removed is not a child of this node') }}"
       uses: peter-evans/create-or-update-comment@v1
       with:
-        issue-number: ${{ github.event.issue.id }}
+        issue-number: ${{ github.event.issue.number }}
         body: |
           Hi @${{ github.actor }}!
           Thank you for taking the time to report this bug.

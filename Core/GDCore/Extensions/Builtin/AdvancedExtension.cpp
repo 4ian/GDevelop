@@ -83,7 +83,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     _("Functions"),
                     "res/function24.png",
                     "res/function16.png")
-      .AddParameter("string", "Parameter name")
+      .AddParameter("functionParameterName", "Parameter name")
       .MarkAsAdvanced();
 
   extension
@@ -93,7 +93,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter (also called \"argument\") value"),
           _("Functions"),
           "res/function16.png")
-      .AddParameter("string", "Parameter name");
+      .AddParameter("functionParameterName", "Parameter name");
 
   extension
       .AddStrExpression(
@@ -102,7 +102,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Get function parameter (also called \"argument\") text "),
           _("Functions"),
           "res/function16.png")
-      .AddParameter("string", "Parameter name");
+      .AddParameter("functionParameterName", "Parameter name");
 }
 
 }  // namespace gd

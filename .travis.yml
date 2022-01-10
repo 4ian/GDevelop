@@ -60,6 +60,8 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
+# Ensure we use a recent version of Node.js (and npm)
+  - nvm install v16 && nvm use v16
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only for GDCore

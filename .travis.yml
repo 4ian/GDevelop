@@ -61,9 +61,7 @@ before_install:
 
 install:
 # Ensure we use a recent version of Node.js
-  - nvm install v14 && nvm use v14
-  - node -v && npm -v
-  #- npm install -g npm@7
+  - nvm install v14 && nvm use v14 && node -v && npm -v
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only for GDCore
@@ -86,7 +84,7 @@ install:
   #- npm run build
   #- cd ..
 #Install newIDE tests dependencies
-  - cd newIDE/app && npm ci
+  - cd newIDE/app && npm install
   - cd ../..
 #Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install

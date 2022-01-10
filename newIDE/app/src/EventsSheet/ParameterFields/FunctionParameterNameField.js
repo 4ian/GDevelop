@@ -4,7 +4,6 @@ import GenericExpressionField from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 import { mapVector } from '../../Utils/MapFor';
-import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 
 export default class FunctionParameterNameField extends Component<
@@ -18,12 +17,14 @@ export default class FunctionParameterNameField extends Component<
   }
 
   render() {
-    const parameterNames: Array<ExpressionAutocompletion> = this.props.scope.eventsFunction
-      ? 
-      mapVector(this.props.scope.eventsFunction.getParameters(),
-        (parameterMetadata) => (parameterMetadata.isCodeOnly() ||
-        gd.ParameterMetadata.isObject(parameterMetadata.getType()) ||
-        gd.ParameterMetadata.isBehavior(parameterMetadata.getType())) ? null : { kind: 'Text', completion: `"${parameterMetadata.getName()}"` }).filter(Boolean)
+    const parameterNames: Array<ExpressionAutocompletion> = this.props.scope
+      .eventsFunction
+      ? enumerateParametersUsableInExpressions(
+          this.props.scope.eventsFunction
+        ).map(parameterMetadata => ({
+          kind: 'Text',
+          completion: `"${parameterMetadata.getName()}"`,
+        }))
       : [];
 
     return (
@@ -40,3 +41,15 @@ export default class FunctionParameterNameField extends Component<
     );
   }
 }
+
+export const enumerateParametersUsableInExpressions = (
+  eventsFunction: gdEventsFunction
+): gdParameterMetadata[] => {
+  return mapVector(eventsFunction.getParameters(), parameterMetadata =>
+    parameterMetadata.isCodeOnly() ||
+    gd.ParameterMetadata.isObject(parameterMetadata.getType()) ||
+    gd.ParameterMetadata.isBehavior(parameterMetadata.getType())
+      ? null
+      : parameterMetadata
+  ).filter(Boolean);
+};

@@ -1,5 +1,5 @@
 // @flow
-import { mapVector } from '../Utils/MapFor';
+import { mapFor, mapVector } from '../Utils/MapFor';
 import {
   enumerateObjectsAndGroups,
   filterObjectsList,
@@ -22,7 +22,7 @@ import { getVisibleParameterTypes } from '../EventsSheet/ParameterFields/Generic
 import { getParameterChoices } from '../EventsSheet/ParameterFields/ParameterMetadataTools';
 import getObjectByName from '../Utils/GetObjectByName';
 import { getAllPointNames } from '../ObjectEditor/Editors/SpriteEditor/Utils/SpriteObjectHelper';
-import { mapFor } from '../Utils/MapFor';
+import { enumerateParametersUsableInExpressions } from '../EventsSheet/ParameterFields/FunctionParameterNameField.js';
 
 const gd: libGDevelop = global.gd;
 
@@ -338,13 +338,11 @@ const getAutocompletionsForText = function(
     } else {
       return [];
     }
-  }
-  else if (type === 'functionParameterName') {
+  } else if (type === 'functionParameterName') {
     if (scope.eventsFunction) {
-      autocompletionTexts = mapVector(scope.eventsFunction.getParameters(),
-        (parameterMetadata) => (parameterMetadata.isCodeOnly() ||
-        gd.ParameterMetadata.isObject(parameterMetadata.getType()) ||
-        gd.ParameterMetadata.isBehavior(parameterMetadata.getType())) ? null : `"${parameterMetadata.getName()}"`).filter(Boolean);
+      autocompletionTexts = enumerateParametersUsableInExpressions(
+        scope.eventsFunction
+      ).map(parameterMetadata => `"${parameterMetadata.getName()}"`);
     }
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h

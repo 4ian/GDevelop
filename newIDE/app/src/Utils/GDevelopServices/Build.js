@@ -54,7 +54,7 @@ export const getBuildArtifactUrl = (
   if (keyName === 's3Key') {
     // New builds have a gameId.
     return build.gameId
-      ? `${GDevelopGamesPlatform.baseUrl}/instant-builds/${build.id}`
+      ? GDevelopGamesPlatform.getInstantBuildUrl(build.id)
       : `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
   }
 

@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Autocomment known 124 crash removing a node (new issue comment)
-      if: "${{ contains(github.event.issue.body, 'Error: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.') }}"
+      if: "${{ contains(github.event.issue.body, 'The node to be removed is not a child of this node') }}"
       uses: peter-evans/create-or-update-comment@v1
       with:
         issue-number: ${{ github.event.issue.id }}

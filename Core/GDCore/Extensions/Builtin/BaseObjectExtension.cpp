@@ -870,7 +870,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
     .AddParameter("object", _("Object"))
     .AddParameter("string", _("Timer's name"))
     .AddParameter("relationalOperator", _("Sign of the test"), "number")
-    .AddParameter("expression", _("Value to compare"))
+    .AddParameter("expression", _("Time in seconds"))
     .SetManipulatedType("number");
 
   obj.AddCondition("ObjectTimerPaused",

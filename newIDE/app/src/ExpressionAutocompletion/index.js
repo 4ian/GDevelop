@@ -347,7 +347,6 @@ const getAutocompletionsForText = function(
         gd.ParameterMetadata.isBehavior(parameterMetadata.getType())) ? null : `"${parameterMetadata.getName()}"`).filter(Boolean);
     }
   }
-
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
   const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();

@@ -40,6 +40,7 @@ import {
   TRIVIAL_FIRST_BEHAVIOR,
   TRIVIAL_FIRST_EXTENSION,
 } from '../Utils/GDevelopServices/Badge';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
@@ -184,6 +185,33 @@ export default function NewBehaviorDialog({
   const hasSearchNoResult =
     !!searchText && !behaviors.length && !deprecatedBehaviors.length;
 
+  const onInstallExtension = async (
+    i18n: I18nType,
+    extensionShortHeader: ExtensionShortHeader
+  ) => {
+    setIsInstalling(true);
+    try {
+      const wasExtensionInstalled = await installDisplayedExtension(
+        i18n,
+        project,
+        eventsFunctionsExtensionsState,
+        extensionShortHeader
+      );
+
+      if (wasExtensionInstalled) {
+        // Setting the extension install time will force a reload of
+        // the behavior metadata, and so the list of behaviors.
+        setExtensionInstallTime(Date.now());
+        setCurrentTab('installed');
+        if (scrollView.current) scrollView.current.scrollToBottom();
+        return true;
+      }
+      return false;
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -311,30 +339,9 @@ export default function NewBehaviorDialog({
               <ExtensionStore
                 project={project}
                 isInstalling={isInstalling}
-                onInstall={async extensionShortHeader => {
-                  setIsInstalling(true);
-                  try {
-                    const wasExtensionInstalled = await installDisplayedExtension(
-                      i18n,
-                      project,
-                      eventsFunctionsExtensionsState,
-                      extensionShortHeader
-                    );
-
-                    if (wasExtensionInstalled) {
-                      // Setting the extension install time will force a reload of
-                      // the behavior metadata, and so the list of behaviors.
-                      setExtensionInstallTime(Date.now());
-                      setCurrentTab('installed');
-                      if (scrollView.current)
-                        scrollView.current.scrollToBottom();
-                      return true;
-                    }
-                    return false;
-                  } finally {
-                    setIsInstalling(false);
-                  }
-                }}
+                onInstall={async extensionShortHeader =>
+                  onInstallExtension(i18n, extensionShortHeader)
+                }
                 showOnlyWithBehaviors
               />
             )}

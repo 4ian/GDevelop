@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -48,6 +49,41 @@ export default function ExtensionsSearchDialog({
     installExtension
   );
 
+  const installOrImportExtension = async (
+    i18n: I18nType,
+    extensionShortHeader?: ExtensionShortHeader
+  ) => {
+    setIsInstalling(true);
+    try {
+      let wasExtensionInstalledOrImported;
+      if (!!extensionShortHeader) {
+        onInstallExtension(extensionShortHeader);
+        wasExtensionInstalledOrImported = await installDisplayedExtension(
+          i18n,
+          project,
+          eventsFunctionsExtensionsState,
+          extensionShortHeader
+        );
+      } else {
+        wasExtensionInstalledOrImported = await importExtension(
+          i18n,
+          eventsFunctionsExtensionsState,
+          project
+        );
+      }
+
+      if (wasExtensionInstalledOrImported) {
+        setExtensionWasInstalled(true);
+        if (onExtensionInstalled) onExtensionInstalled();
+        return true;
+      }
+
+      return false;
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
   const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
   return (
@@ -73,19 +109,7 @@ export default function ExtensionsSearchDialog({
                 key="import"
                 label={<Trans>Import extension</Trans>}
                 onClick={() => {
-                  (async () => {
-                    setIsInstalling(true);
-                    const wasExtensionImported = await importExtension(
-                      i18n,
-                      eventsFunctionsExtensionsState,
-                      project
-                    );
-                    if (wasExtensionImported && onExtensionInstalled)
-                      onExtensionInstalled();
-
-                    setExtensionWasInstalled(wasExtensionImported);
-                    setIsInstalling(false);
-                  })();
+                  installOrImportExtension(i18n);
                 }}
                 disabled={isInstalling}
               />
@@ -99,28 +123,9 @@ export default function ExtensionsSearchDialog({
         >
           <ExtensionStore
             isInstalling={isInstalling}
-            onInstall={async extensionShortHeader => {
-              setIsInstalling(true);
-              try {
-                onInstallExtension(extensionShortHeader);
-                const wasExtensionInstalled = await installDisplayedExtension(
-                  i18n,
-                  project,
-                  eventsFunctionsExtensionsState,
-                  extensionShortHeader
-                );
-                if (wasExtensionInstalled) {
-                  setExtensionWasInstalled(true);
-                  if (onExtensionInstalled)
-                    onExtensionInstalled(extensionShortHeader);
-                  return true;
-                }
-
-                return false;
-              } finally {
-                setIsInstalling(false);
-              }
-            }}
+            onInstall={async extensionShortHeader =>
+              installOrImportExtension(i18n, extensionShortHeader)
+            }
             project={project}
             showOnlyWithBehaviors={false}
           />

@@ -210,7 +210,7 @@ export const WebProjectLink = ({
         onRequestClose={() => setIsShareDialogOpen(false)}
       >
         {buildUrl && !isGameLoading ? (
-          <Column>
+          <Column noMargin>
             <TextFieldWithButtonLayout
               noFloatingLabelText
               renderTextField={() => (

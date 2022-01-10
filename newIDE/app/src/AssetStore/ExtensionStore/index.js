@@ -19,7 +19,7 @@ const styles = {
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<void>,
+  onInstall: ExtensionShortHeader => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -105,8 +105,9 @@ export const ExtensionStore = ({
           alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
             selectedExtensionShortHeader.name
           )}
-          onInstall={() => {
-            onInstall(selectedExtensionShortHeader);
+          onInstall={async () => {
+            const wasInstalled = await onInstall(selectedExtensionShortHeader);
+            if (wasInstalled) setSelectedExtensionShortHeader(null);
           }}
           onClose={() => setSelectedExtensionShortHeader(null)}
         />

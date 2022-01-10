@@ -111,7 +111,8 @@ export default function ExtensionsSearchDialog({
                 );
                 if (wasExtensionInstalled) {
                   setExtensionWasInstalled(true);
-                  if (onExtensionInstalled) onExtensionInstalled(extensionShortHeader);
+                  if (onExtensionInstalled)
+                    onExtensionInstalled(extensionShortHeader);
                   return true;
                 }
 

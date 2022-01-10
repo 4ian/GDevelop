@@ -326,7 +326,8 @@ export default function NewBehaviorDialog({
                       // the behavior metadata, and so the list of behaviors.
                       setExtensionInstallTime(Date.now());
                       setCurrentTab('installed');
-                      if (scrollView.current) scrollView.current.scrollToBottom();
+                      if (scrollView.current)
+                        scrollView.current.scrollToBottom();
                       return true;
                     }
                     return false;

@@ -14,7 +14,9 @@ TimeExtension::TimeExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*this);
 
   GetAllConditions()["Timer"].SetFunctionName(
-      "gdjs.evtTools.runtimeScene.timerElapsedTime");
+      "gdjs.evtTools.runtimeScene.timerElapsedTime");  // Deprecated
+  GetAllConditions()["TimerComparison"].SetFunctionName(
+          "gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSecondsOrNaN");
   GetAllConditions()["TimerPaused"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.timerPaused");
   GetAllActions()["ResetTimer"].SetFunctionName(

@@ -42,7 +42,7 @@ type Props = {|
   extensionShortHeader: ExtensionShortHeader,
   isInstalling: boolean,
   onClose: () => void,
-  onInstall: () => void,
+  onInstall: () => Promise<void>,
   alreadyInstalled: boolean,
 |};
 

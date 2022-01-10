@@ -101,18 +101,24 @@ export default function ExtensionsSearchDialog({
             isInstalling={isInstalling}
             onInstall={async extensionShortHeader => {
               setIsInstalling(true);
-              onInstallExtension(extensionShortHeader);
-              const wasExtensionInstalled = await installDisplayedExtension(
-                i18n,
-                project,
-                eventsFunctionsExtensionsState,
-                extensionShortHeader
-              );
-              if (wasExtensionInstalled && onExtensionInstalled)
-                onExtensionInstalled(extensionShortHeader);
+              try {
+                onInstallExtension(extensionShortHeader);
+                const wasExtensionInstalled = await installDisplayedExtension(
+                  i18n,
+                  project,
+                  eventsFunctionsExtensionsState,
+                  extensionShortHeader
+                );
+                if (wasExtensionInstalled) {
+                  setExtensionWasInstalled(true);
+                  if (onExtensionInstalled) onExtensionInstalled(extensionShortHeader);
+                  return true;
+                }
 
-              setExtensionWasInstalled(wasExtensionInstalled);
-              setIsInstalling(false);
+                return false;
+              } finally {
+                setIsInstalling(false);
+              }
             }}
             project={project}
             showOnlyWithBehaviors={false}

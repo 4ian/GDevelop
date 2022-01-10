@@ -194,7 +194,8 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "objectEffectName" ||
              parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
-             parameterType == "objectAnimationName";
+             parameterType == "objectAnimationName" ||
+             parameterType == "functionParameterName";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

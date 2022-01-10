@@ -164,8 +164,11 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["CollisionPoint"]
       .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["ObjectTimer"]
+  objectConditions["ObjectTimer"] // deprecated
       .SetFunctionName("timerElapsedTime")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectTimerComparison"]
+      .SetFunctionName("getTimerElapsedTimeInSecondsOrNaN")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["ObjectTimerPaused"]
       .SetFunctionName("timerPaused")

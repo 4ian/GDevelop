@@ -339,6 +339,14 @@ const getAutocompletionsForText = function(
       return [];
     }
   }
+  else if (type === 'functionParameterName') {
+    if (scope.eventsFunction) {
+      autocompletionTexts = mapVector(scope.eventsFunction.getParameters(),
+        (parameterMetadata) => (parameterMetadata.isCodeOnly() ||
+        gd.ParameterMetadata.isObject(parameterMetadata.getType()) ||
+        gd.ParameterMetadata.isBehavior(parameterMetadata.getType())) ? null : `"${parameterMetadata.getName()}"`).filter(Boolean);
+    }
+  }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
 
   const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();

@@ -313,21 +313,26 @@ export default function NewBehaviorDialog({
                 isInstalling={isInstalling}
                 onInstall={async extensionShortHeader => {
                   setIsInstalling(true);
-                  const wasExtensionInstalled = await installDisplayedExtension(
-                    i18n,
-                    project,
-                    eventsFunctionsExtensionsState,
-                    extensionShortHeader
-                  );
+                  try {
+                    const wasExtensionInstalled = await installDisplayedExtension(
+                      i18n,
+                      project,
+                      eventsFunctionsExtensionsState,
+                      extensionShortHeader
+                    );
 
-                  if (wasExtensionInstalled) {
-                    // Setting the extension install time will force a reload of
-                    // the behavior metadata, and so the list of behaviors.
-                    setExtensionInstallTime(Date.now());
-                    setCurrentTab('installed');
-                    if (scrollView.current) scrollView.current.scrollToBottom();
+                    if (wasExtensionInstalled) {
+                      // Setting the extension install time will force a reload of
+                      // the behavior metadata, and so the list of behaviors.
+                      setExtensionInstallTime(Date.now());
+                      setCurrentTab('installed');
+                      if (scrollView.current) scrollView.current.scrollToBottom();
+                      return true;
+                    }
+                    return false;
+                  } finally {
+                    setIsInstalling(false);
                   }
-                  setIsInstalling(false);
                 }}
                 showOnlyWithBehaviors
               />

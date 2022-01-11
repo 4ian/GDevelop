@@ -321,6 +321,7 @@ type State = {|
   projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
   openedExtensionShortHeader: ?ExtensionShortHeader,
+  openedExtensionName: ?string,
   layoutPropertiesDialogOpen: boolean,
   layoutVariablesDialogOpen: boolean,
 |};
@@ -339,6 +340,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
     openedExtensionShortHeader: null,
+    openedExtensionName: null,
     layoutPropertiesDialogOpen: false,
     layoutVariablesDialogOpen: false,
   };
@@ -732,7 +734,10 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
     const originIdentifier = eventsFunctionsExtension.getOriginIdentifier();
     const extensionShortHeader = extensionShortHeadersByName[originIdentifier];
-    this.setState({ openedExtensionShortHeader: extensionShortHeader });
+    this.setState({
+      openedExtensionShortHeader: extensionShortHeader,
+      openedExtensionName: name,
+    });
   };
 
   _renderMenu() {
@@ -815,6 +820,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       renamedItemName,
       searchText,
       openedExtensionShortHeader,
+      openedExtensionName,
     } = this.state;
 
     const forceOpen = searchText !== '' ? true : undefined;
@@ -1326,6 +1332,13 @@ export default class ProjectManager extends React.Component<Props, State> {
                   onInstallExtension(openedExtensionShortHeader);
                 }}
                 extensionShortHeader={openedExtensionShortHeader}
+                onEdit={() => {
+                  openedExtensionName &&
+                    this.props.onOpenEventsFunctionsExtension(
+                      openedExtensionName
+                    );
+                  this.setState({ openedExtensionShortHeader: null });
+                }}
               />
             )}
           </div>

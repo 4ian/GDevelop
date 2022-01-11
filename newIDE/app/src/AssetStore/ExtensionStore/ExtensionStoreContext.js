@@ -18,6 +18,7 @@ type ExtensionStoreState = {|
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
+  extensionShortHeadersByName: {[name: string]: ExtensionShortHeader},
   filtersState: FiltersState,
 |};
 
@@ -28,6 +29,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
+  extensionShortHeadersByName: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -57,9 +59,9 @@ export const ExtensionStoreStateProvider = ({
   const [
     extensionShortHeadersByName,
     setExtensionShortHeadersByName,
-  ] = React.useState<?{
+  ] = React.useState<{
     [string]: ExtensionShortHeader,
-  }>(null);
+  }>({});
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -71,7 +73,7 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current) return;
 
       (async () => {
         setError(null);
@@ -121,7 +123,7 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current) return;
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching extensions from extension store...');
@@ -149,6 +151,7 @@ export const ExtensionStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
+      extensionShortHeadersByName,
       filtersState,
     }),
     [
@@ -156,6 +159,7 @@ export const ExtensionStoreStateProvider = ({
       error,
       filters,
       searchText,
+      extensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
     ]

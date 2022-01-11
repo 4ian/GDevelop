@@ -18,7 +18,7 @@ type ExtensionStoreState = {|
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
-  extensionShortHeadersByName: {[name: string]: ExtensionShortHeader},
+  extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
 |};
 
@@ -73,7 +73,8 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (Object.keys(extensionShortHeadersByName).length || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       (async () => {
         setError(null);
@@ -123,7 +124,8 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (Object.keys(extensionShortHeadersByName).length || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching extensions from extension store...');

@@ -846,6 +846,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsSimple();
 
+  // Deprecated and replaced by CompareObjectTimer
   obj.AddCondition(
          "ObjectTimer",
          _("Value of an object timer"),
@@ -856,7 +857,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"))
-      .AddParameter("expression", _("Time in seconds"));
+      .AddParameter("expression", _("Time in seconds"))
+      .SetHidden();
+
+  obj.AddCondition("CompareObjectTimer",
+                  _("Value of an object timer"),
+                  _("Compare the elapsed time of an object timer. This condition doesn't start the timer."),
+                  _("The timer _PARAM1_ of _PARAM0_ _PARAM2_ _PARAM3_ seconds"),
+                  _("Timers"),
+                  "res/conditions/timer24.png",
+                  "res/conditions/timer.png")
+    .AddParameter("object", _("Object"))
+    .AddParameter("string", _("Timer's name"))
+    .AddParameter("relationalOperator", _("Sign of the test"), "number")
+    .AddParameter("expression", _("Time in seconds"))
+    .SetManipulatedType("number");
 
   obj.AddCondition("ObjectTimerPaused",
                    _("Object timer paused"),

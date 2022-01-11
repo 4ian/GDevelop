@@ -1700,7 +1700,10 @@ namespace gdjs {
     }
 
     /**
-     * Test a timer elapsed time, if the timer doesn't exist it is created
+     * Test a timer elapsed time, if the timer doesn't exist it is created.
+     *
+     * @deprecated prefer using getTimerElapsedTimeInSecondsOrNaN
+     *
      * @param timerName The timer name
      * @param timeInSeconds The time value to check in seconds
      * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
@@ -1770,12 +1773,32 @@ namespace gdjs {
 
     /**
      * Get a timer elapsed time.
+     *
+     * This is used by the expression to return 0 when a timer doesn't exist
+     * because numeric expressions must return a number.
+     *
      * @param timerName The timer name
      * @return The timer elapsed time in seconds, 0 if the timer doesn't exist
      */
     getTimerElapsedTimeInSeconds(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {
         return 0;
+      }
+      return this._timers.get(timerName).getTime() / 1000.0;
+    }
+
+    /**
+     * Get a timer elapsed time.
+     *
+     * This is used by the condition to return false when a timer doesn't exist
+     * no matter the relational operator.
+     *
+     * @param timerName The timer name
+     * @return The timer elapsed time in seconds, NaN if the timer doesn't exist
+     */
+    getTimerElapsedTimeInSecondsOrNaN(timerName: string): float {
+      if (!this._timers.containsKey(timerName)) {
+        return Number.NaN;
       }
       return this._timers.get(timerName).getTime() / 1000.0;
     }

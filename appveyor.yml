@@ -15,10 +15,13 @@ branches:
 init:
 - ps: ''
 install:
-- ps: Install-Product node 14
-# Build GDevelop.js (and run tests to ensure it works)
+- ps: Install-Product node 16
+# Build GDevelop.js (and run tests to ensure it works).
+# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
 - cmd: >-
     cd GDevelop.js
+
+    npm -v && npm install
 
     git clone https://github.com/juj/emsdk.git
 
@@ -26,31 +29,23 @@ install:
 
     emsdk install 1.39.6
 
-    emsdk activate 1.39.6
+    CMD /C "emsdk activate 1.39.6 && cd .. && npm run build"
 
-    emsdk_env.bat
-
-    cd ..
-
-    npm install
-
-    npm run build
-
-    cd ..
+    cd ..\..
 
 # Build GDevelop IDE
 - cmd: >-
     cd newIDE\app
 
-    npm install
+    npm -v && npm install
 
     cd ..\electron-app
 
-    npm install
+    npm -v && npm install
 
     cd ..\..
 
-# Package the app for Windows (and sign it with the certificate set in environment variables). 
+# Package the app for Windows (and sign it with the certificate set in environment variables).
 # Don't sign the appx (it will be signed by the Microsoft Store).
 build_script:
 - ps: >-

@@ -91,13 +91,16 @@ export default ({
     AuthenticatedUserContext
   );
   const config = buildTypesConfig[build.type];
+  const estimatedTime = config.estimatedTimeInSeconds(build);
   const secondsSinceLastUpdate = Math.abs(
     differenceInSeconds(build.updatedAt, Date.now())
   );
-  const estimatedRemainingTime = Math.max(
-    config ? config.estimatedTimeInSeconds(build) - secondsSinceLastUpdate : 0,
-    0
-  );
+  const estimatedRemainingTime = estimatedTime - secondsSinceLastUpdate;
+  const isStillRunning = estimatedRemainingTime > 0;
+  const hasJustOverrun =
+    estimatedRemainingTime < 0 && estimatedRemainingTime < -estimatedTime;
+  const hasTimedOut =
+    estimatedRemainingTime < 0 && estimatedRemainingTime > 2 * -estimatedTime;
 
   const onDownload = (key: BuildArtifactKeyName) => {
     const url = getBuildArtifactUrl(build, key);
@@ -136,7 +139,7 @@ export default ({
       {({ i18n }) =>
         build.status === 'error' ? (
           <React.Fragment>
-            <Line alignItems="center">
+            <Line alignItems="center" justifyContent="center">
               <Text>
                 <Trans>Something wrong happened :(</Trans>
               </Text>
@@ -156,32 +159,50 @@ export default ({
             </Line>
           </React.Fragment>
         ) : build.status === 'pending' ? (
-          <Line alignItems="center" expand>
-            <LinearProgress
-              style={{ flex: 1 }}
-              value={
-                config.estimatedTimeInSeconds(build) > 0
-                  ? ((config.estimatedTimeInSeconds(build) -
-                      estimatedRemainingTime) /
-                      config.estimatedTimeInSeconds(build)) *
-                    100
-                  : 0
-              }
-              variant={
-                estimatedRemainingTime > 0 ? 'determinate' : 'indeterminate'
-              }
-            />
-            <Spacer />
-            {estimatedRemainingTime > 0 ? (
+          <Line alignItems="center" expand justifyContent="center">
+            {(isStillRunning || hasJustOverrun) && (
+              <>
+                <LinearProgress
+                  style={{ flex: 1 }}
+                  value={
+                    isStillRunning
+                      ? ((estimatedTime - estimatedRemainingTime) /
+                          estimatedTime) *
+                        100
+                      : 0
+                  }
+                  variant={isStillRunning ? 'determinate' : 'indeterminate'}
+                />
+                <Spacer />
+              </>
+            )}
+            {isStillRunning && (
               <Text>
                 <Trans>
                   ~{Math.round(estimatedRemainingTime / 60)} minutes.
                 </Trans>
               </Text>
-            ) : (
+            )}
+            {hasJustOverrun && (
               <Text>
                 <Trans>Should finish soon.</Trans>
               </Text>
+            )}
+            {hasTimedOut && (
+              <ColumnStackLayout>
+                <Line justifyContent="center">
+                  <Text>
+                    <Trans>Something wrong happened :(</Trans>
+                  </Text>
+                </Line>
+                <Line justifyContent="center">
+                  <EmptyMessage>
+                    <Trans>
+                      It looks like the build has timed out, please try again.
+                    </Trans>
+                  </EmptyMessage>
+                </Line>
+              </ColumnStackLayout>
             )}
           </Line>
         ) : build.status === 'complete' ? (

@@ -55,10 +55,25 @@ jobs:
         run: aws s3 sync ./build-storybook/ s3://gdevelop-storybook/$(git rev-parse --abbrev-ref HEAD)/latest/ --delete
         working-directory: newIDE/app
 
+      - name: Compute urls
+        id: storybook_urls
+        run: |
+          echo "::set-output name=storybook_s3_url_commit::http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
+          echo "::set-output name=storybook_s3_url_latest::http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
+
       - name: Log urls to the Storybook
         run: |
-          echo "Find the latest Storybook for this branch on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html"
-          echo "Find the Storybook for this commit on http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html"
+          echo "Find the Storybook for this commit on ${{ steps.storybook_urls.outputs.storybook_s3_url_commit }}"
+          echo "Find the latest Storybook for this branch on ${{ steps.storybook_urls.outputs.storybook_s3_url_latest }}"
+
+      - name: Update GitHub Check with Storybook URLs
+        uses: LouisBrunner/checks-action@v1.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          check_id: ${{ github.run_id }}
+          conclusion: success
+          output: |
+            {"summary": "## Links to storybook\n\n- For the commit: ${{ steps.storybook_urls.outputs.storybook_s3_url_commit }}\n- Under tag latest: ${{ steps.storybook_urls.outputs.storybook_s3_url_latest }}"}
 
       # Publish on Chromatic, only when manually launched (too costly to run on every commit).
       - name: Publish Storybook to Chromatic

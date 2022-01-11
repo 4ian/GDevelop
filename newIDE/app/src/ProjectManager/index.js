@@ -873,15 +873,13 @@ export default class ProjectManager extends React.Component<Props, State> {
                     key="icons"
                     primaryText={<Trans>Icons</Trans>}
                     leftIcon={<PhotoLibrary />}
-                    onClick={() => this.props.onOpenPlatformSpecificAssets()}
+                    onClick={this.props.onOpenPlatformSpecificAssets}
                   />,
                   <ListItem
                     key="resources"
                     primaryText={<Trans>Resources</Trans>}
                     leftIcon={<ArtTrack />}
-                    onClick={() => {
-                      this.props.onOpenResources();
-                    }}
+                    onClick={this.props.onOpenResources}
                   />,
                 ]}
               />

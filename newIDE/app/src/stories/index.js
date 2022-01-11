@@ -94,12 +94,6 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  erroredCordovaBuild,
-  pendingCordovaBuild,
-  pendingElectronBuild,
-  completeCordovaBuild,
-  completeElectronBuild,
-  completeWebBuild,
   fakeAssetShortHeader1,
   game1,
   game2,
@@ -126,7 +120,6 @@ import ChangeEmailDialog from '../Profile/ChangeEmailDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
-import BuildProgressAndActions from '../Export/Builds/BuildProgressAndActions';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
@@ -2573,38 +2566,6 @@ storiesOf('BuildStepsProgress', module)
       errored={false}
       hasBuildStep={false}
     />
-  ));
-
-storiesOf('BuildProgressAndActions', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('errored', () => <BuildProgressAndActions build={erroredCordovaBuild} />)
-  .add('pending (electron-build)', () => (
-    <BuildProgressAndActions
-      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
-    />
-  ))
-  .add('pending (cordova-build)', () => (
-    <BuildProgressAndActions
-      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
-    />
-  ))
-  .add('pending and very old (cordova-build)', () => (
-    <BuildProgressAndActions
-      build={{
-        ...pendingCordovaBuild,
-        updatedAt: Date.now() - 1000 * 3600 * 24,
-      }}
-    />
-  ))
-  .add('complete (cordova-build)', () => (
-    <BuildProgressAndActions build={completeCordovaBuild} />
-  ))
-  .add('complete (electron-build)', () => (
-    <BuildProgressAndActions build={completeElectronBuild} />
-  ))
-  .add('complete (web-build)', () => (
-    <BuildProgressAndActions build={completeWebBuild} />
   ));
 
 storiesOf('LocalFolderPicker', module)
